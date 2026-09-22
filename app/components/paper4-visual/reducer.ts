@@ -17,7 +17,7 @@ export function runtimeReducer(state: RuntimeState, action: RuntimeAction): Runt
     case "PREVIOUS":
       return { ...state, eventIndex: Math.max(0, state.eventIndex - 1), eventId: action.eventId, playing: false, predictionStatus: "idle", predictionAnswer: "" };
     case "NEXT":
-      return { ...state, eventIndex: state.eventIndex + 1, eventId: action.eventId, playing: false, predictionStatus: "idle", predictionAnswer: "" };
+      return { ...state, eventIndex: state.eventIndex + 1, eventId: action.eventId, playing: action.keepPlaying ?? false, predictionStatus: "idle", predictionAnswer: "" };
     case "PLAY":
       return state.playing ? state : { ...state, playing: true };
     case "PAUSE":

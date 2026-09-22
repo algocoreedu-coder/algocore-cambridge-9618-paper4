@@ -10,15 +10,24 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function validateTraceChunk(value: unknown, metadata: PatternMetadata, artifact: PythonArtifactDto): TraceChunk {
+export function validateTraceChunk(value: unknown, metadata: PatternMetadata, preloadArtifact?: PythonArtifactDto): TraceChunk {
   assert(isRecord(value), "Trace payload is not an object.");
   assert(value.schema_version === "paper4-v2-trace-chunk-v1", "Unsupported trace schema.");
   assert(value.pattern_id === metadata.pattern_id, "Trace pattern does not match requested metadata.");
   assert(isRecord(value.owner), "Trace owner is missing.");
+  assert(isRecord(value.python_artifact), "Trace Python artifact is missing.");
+  const artifact = value.python_artifact as unknown as PythonArtifactDto;
+  assert(typeof artifact.python_artifact_id === "string" && Array.isArray(artifact.lines), "Trace Python artifact is malformed.");
   assert(value.owner.lesson_id === metadata.owner_lesson_id, "Trace lesson owner mismatch.");
+  assert(value.owner.python_artifact_id === metadata.python_artifact_id, "Trace metadata artifact mismatch.");
   assert(value.owner.python_artifact_id === artifact.python_artifact_id, "Trace Python artifact mismatch.");
   assert(value.owner.artifact_version === artifact.version, "Trace artifact version mismatch.");
   assert(value.owner.code_sha256 === artifact.code_sha256, "Trace source hash mismatch.");
+  if (preloadArtifact) {
+    assert(preloadArtifact.python_artifact_id === artifact.python_artifact_id, "Preloaded Python artifact ID mismatch.");
+    assert(preloadArtifact.version === artifact.version, "Preloaded Python artifact version mismatch.");
+    assert(preloadArtifact.code_sha256 === artifact.code_sha256, "Preloaded Python source hash mismatch.");
+  }
   assert(Array.isArray(value.scenarios) && value.scenarios.length === metadata.scenario_count, "Trace scenario count mismatch.");
   assert(Array.isArray(value.events) && value.events.length === metadata.event_count, "Trace event count mismatch.");
 
@@ -56,16 +65,16 @@ export function validateTraceChunk(value: unknown, metadata: PatternMetadata, ar
 
 export async function loadTraceChunk(
   metadata: PatternMetadata,
-  artifact: PythonArtifactDto,
+  preloadArtifact?: PythonArtifactDto,
   fetcher: typeof fetch = fetch,
 ): Promise<TraceChunk> {
-  const cacheKey = `${metadata.trace_url}|${artifact.code_sha256}`;
+  const cacheKey = metadata.trace_url;
   const cached = traceCache.get(cacheKey);
   if (cached) return cached;
   const request = fetcher(metadata.trace_url, { headers: { Accept: "application/json" }, cache: "force-cache" })
     .then(async (response) => {
       if (!response.ok) throw new Error(`Trace request failed (${response.status}).`);
-      return validateTraceChunk(await response.json(), metadata, artifact);
+      return validateTraceChunk(await response.json(), metadata, preloadArtifact);
     })
     .catch((error: unknown) => {
       traceCache.delete(cacheKey);

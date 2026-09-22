@@ -61,7 +61,7 @@ function DataBlock({ value }: { readonly value: JsonValue | undefined }) {
 type V2Props = Extract<Paper4VisualRuntimeProps, { patterns: readonly PatternMetadata[] }>;
 
 function V2Runtime(props: V2Props) {
-  const { patterns, pythonArtifact, initialPatternId, locale, initialLocale = "vi", autoplayDelayMs = 1800, headingLevel = 2, className } = props;
+  const { patterns, pythonArtifact: preloadArtifact, initialPatternId, locale, initialLocale = "vi", autoplayDelayMs = 1800, headingLevel = 2, className } = props;
   const requestedLocale = locale ?? initialLocale;
   const firstPattern = patterns.find((item) => item.pattern_id === initialPatternId) ?? patterns[0];
   const [state, dispatch] = useReducer(runtimeReducer, createInitialRuntimeState(firstPattern?.pattern_id ?? "", requestedLocale));
@@ -81,7 +81,7 @@ function V2Runtime(props: V2Props) {
     let current = true;
     if (!pattern) return;
     setLoadState({ status: "loading" });
-    loadTraceChunk(pattern, pythonArtifact).then((chunk) => {
+    loadTraceChunk(pattern, preloadArtifact).then((chunk) => {
       if (!current) return;
       const scenario = defaultScenario(chunk);
       const firstEventId = scenario.event_ids[0] ?? "";
@@ -92,7 +92,7 @@ function V2Runtime(props: V2Props) {
       if (current) setLoadState({ status: "error", message: reason instanceof Error ? reason.message : String(reason) });
     });
     return () => { current = false; };
-  }, [loadRevision, pattern, pythonArtifact]);
+  }, [loadRevision, pattern, preloadArtifact]);
 
   const scenarioEvents = useMemo(() => {
     if (!loadState.chunk || !state.scenarioId) return [];
@@ -105,7 +105,7 @@ function V2Runtime(props: V2Props) {
 
   useEffect(() => {
     if (!state.playing || !nextEvent) return;
-    const timer = window.setTimeout(() => dispatch({ type: "NEXT", eventId: nextEvent.event_id }), Math.max(500, autoplayDelayMs));
+    const timer = window.setTimeout(() => dispatch({ type: "NEXT", eventId: nextEvent.event_id, keepPlaying: true }), Math.max(500, autoplayDelayMs));
     return () => window.clearTimeout(timer);
   }, [autoplayDelayMs, nextEvent, state.playing]);
 
@@ -121,6 +121,8 @@ function V2Runtime(props: V2Props) {
   if (loadState.status === "error" || !loadState.chunk || !event) {
     return <section className={`${styles.empty} ${className ?? ""}`} role="alert"><p>{t.loadError}</p><p className={styles.errorDetail}>{loadState.message}</p><button type="button" onClick={() => setLoadRevision((value) => value + 1)}>{t.retry}</button></section>;
   }
+
+  const pythonArtifact = loadState.chunk.python_artifact;
 
   const eventName = event.accessibility.accessible_label[state.locale];
   const progress = ((eventIndex + 1) / scenarioEvents.length) * 100;
@@ -177,7 +179,7 @@ function V2Runtime(props: V2Props) {
 }
 
 export function Paper4VisualRuntime(props: Paper4VisualRuntimeProps) {
-  if ("patterns" in props && props.patterns && props.pythonArtifact) return <V2Runtime {...props as V2Props} />;
+  if ("patterns" in props && props.patterns) return <V2Runtime {...props as V2Props} />;
   const locale = props.locale ?? props.initialLocale ?? "vi";
   return <section className={`${styles.empty} ${props.className ?? ""}`} data-runtime-version="legacy-adapter" role="status" lang={locale}>{copy[locale].migration}</section>;
 }

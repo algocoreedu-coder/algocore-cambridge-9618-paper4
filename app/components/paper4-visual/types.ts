@@ -84,6 +84,7 @@ export type TraceChunk = Readonly<{
     artifact_version: string;
     code_sha256: string;
   }>;
+  python_artifact: PythonArtifactDto;
   scenarios: readonly TraceScenario[];
   events: readonly TraceEvent[];
 }>;
@@ -120,7 +121,7 @@ export type RuntimeAction =
   | { readonly type: "SELECT_PATTERN"; readonly patternId: string }
   | { readonly type: "TRACE_READY"; readonly patternId: string; readonly scenarioId: string; readonly firstEventId: string }
   | { readonly type: "PREVIOUS"; readonly eventId: string }
-  | { readonly type: "NEXT"; readonly eventId: string }
+  | { readonly type: "NEXT"; readonly eventId: string; readonly keepPlaying?: boolean }
   | { readonly type: "PLAY" }
   | { readonly type: "PAUSE" }
   | { readonly type: "RESET"; readonly firstEventId: string }
@@ -133,6 +134,6 @@ type RuntimeCommonProps = Readonly<{
   autoplayDelayMs?: number; headingLevel?: 2 | 3; className?: string;
 }>;
 export type Paper4VisualRuntimeProps = RuntimeCommonProps & (
-  | Readonly<{ patterns: readonly PatternMetadata[]; pythonArtifact: PythonArtifactDto; registry?: never }>
+  | Readonly<{ patterns: readonly PatternMetadata[]; pythonArtifact?: PythonArtifactDto; registry?: never }>
   | Readonly<{ registry: RuntimeRegistry; patterns?: never; pythonArtifact?: never }>
 );
