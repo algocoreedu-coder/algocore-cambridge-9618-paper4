@@ -1,0 +1,1987 @@
+{
+  "schema_version": "paper4-v2-lesson-dto-v1",
+  "identity": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.binary-search",
+    "package_id": "ac-9618-p4-2026-python.package.search-sort",
+    "slug": "binary-search",
+    "version": "pilot-v1",
+    "label": "binary-search",
+    "title": {
+      "vi": "Tìm nhị phân trong mảng đã sắp",
+      "en": "Binary search in a sorted array"
+    },
+    "scope": {
+      "role": "core",
+      "exam_year": 2026,
+      "programming_language": "Python",
+      "objective_mapping_status": "LEAD_MAPPED"
+    }
+  },
+  "authority": {
+    "official_pattern_ids": [
+      "BINARY_SEARCH"
+    ],
+    "approved_association_pattern_ids": [],
+    "association_scope": "official_pattern_owner",
+    "cambridge_marking_chain_ids": [
+      "paper4-2026.marking-chain.binary-search"
+    ]
+  },
+  "sections": [
+    {
+      "section_id": "paper4.section.recognition",
+      "kind": "recognition",
+      "order": 1,
+      "data_keys": [
+        "identity",
+        "authority"
+      ]
+    },
+    {
+      "section_id": "paper4.section.exam-cues",
+      "kind": "exam-cues",
+      "order": 2,
+      "data_keys": [
+        "theory.knowledge_units[].exam_signals"
+      ]
+    },
+    {
+      "section_id": "paper4.section.knowledge",
+      "kind": "knowledge",
+      "order": 3,
+      "data_keys": [
+        "theory.knowledge_units"
+      ]
+    },
+    {
+      "section_id": "paper4.section.method",
+      "kind": "method",
+      "order": 4,
+      "data_keys": [
+        "theory.knowledge_units[].python_connection",
+        "theory.knowledge_units[].invariant_or_rule"
+      ]
+    },
+    {
+      "section_id": "paper4.section.worked-example",
+      "kind": "worked-example",
+      "order": 5,
+      "data_keys": [
+        "theory.knowledge_units[].micro_example"
+      ]
+    },
+    {
+      "section_id": "paper4.section.action-view",
+      "kind": "action-view",
+      "order": 6,
+      "data_keys": [
+        "python",
+        "tests",
+        "visual"
+      ]
+    },
+    {
+      "section_id": "paper4.section.marking-pitfalls",
+      "kind": "marking-pitfalls",
+      "order": 7,
+      "data_keys": [
+        "marking",
+        "errors"
+      ]
+    },
+    {
+      "section_id": "paper4.section.practice",
+      "kind": "practice",
+      "order": 8,
+      "data_keys": [
+        "practice"
+      ]
+    },
+    {
+      "section_id": "paper4.section.retrieval",
+      "kind": "retrieval",
+      "order": 9,
+      "data_keys": [
+        "retrieval"
+      ]
+    },
+    {
+      "section_id": "paper4.section.next-and-sources",
+      "kind": "next-and-sources",
+      "order": 10,
+      "data_keys": [
+        "navigation",
+        "sources"
+      ]
+    }
+  ],
+  "theory": {
+    "knowledge_units": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.midpoint-update",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-19.1-02",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 37,
+              "printed_page": "37",
+              "heading": "Algorithms",
+              "bullet_locator": "Search note 2",
+              "anchor_text": "Write an algorithm to implement a binary search"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-19-BINARY",
+            "chapter": 19,
+            "printed_pages": [
+              454,
+              455,
+              456,
+              457
+            ],
+            "pdf_pages": [
+              470,
+              471,
+              472,
+              473
+            ],
+            "relationship": "direct_algorithm"
+          }
+        ],
+        "title": {
+          "en": "Midpoint, interval reduction and failure",
+          "vi": "Phần tử giữa, thu hẹp khoảng và thất bại"
+        },
+        "explanation": {
+          "vi": "Middle dùng chia nguyên để chọn một index trong khoảng. Sau khi so sánh, phải loại luôn middle bằng `middle-1` hoặc `middle+1`; nếu không, khoảng có thể không nhỏ đi và vòng lặp không kết thúc.",
+          "en": "Middle uses integer division to choose an index in the interval. After comparison, exclude middle with `middle-1` or `middle+1`; otherwise the interval may fail to shrink and the loop may not terminate."
+        },
+        "python_connection": {
+          "vi": "L016 tính middle; L024–L029 xử lý bằng/nhỏ hơn/lớn hơn. L030–L031 định nghĩa thất bại khi `low > high` bằng sentinel `-1`.",
+          "en": "L016 computes middle; L024-L029 handle equal/less/greater cases. L030-L031 define failure when `low > high` by returning sentinel `-1`."
+        },
+        "representation": {
+          "vi": "Ở mỗi bước ghi `(low, high, middle, values[middle])`; gạch bỏ middle cùng nửa không thể chứa target.",
+          "en": "At each step record `(low, high, middle, values[middle])`; cross out middle and the half that cannot contain the target."
+        },
+        "invariant_or_rule": {
+          "vi": "Middle luôn nằm trong khoảng hiện tại; mỗi lần chưa tìm thấy làm kích thước khoảng giảm; trả index khi bằng và sentinel chỉ khi khoảng rỗng.",
+          "en": "Middle is always inside the current interval; every unsuccessful comparison shrinks the interval; return the index on equality and the sentinel only after the interval is empty."
+        },
+        "misconceptions": [
+          {
+            "vi": "Đặt `high = middle` hoặc `low = middle`, giữ lại phần tử vừa loại.",
+            "en": "Setting `high = middle` or `low = middle`, retaining the item just eliminated."
+          },
+          {
+            "vi": "Dùng `/` tạo float làm index.",
+            "en": "Using `/`, producing a float index."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Cần hoàn thiện công thức middle hoặc cập nhật bounds.",
+            "en": "The midpoint formula or bound updates must be completed."
+          },
+          {
+            "vi": "Cần xử lý trường hợp không tìm thấy rõ ràng.",
+            "en": "The not-found case must be handled explicitly."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "low=0, high=1, target lớn hơn phần tử tại middle=0.",
+            "en": "low=0, high=1, and target is greater than the item at middle=0."
+          },
+          "walkthrough": {
+            "vi": "Đặt low=1; khoảng giảm còn một phần tử. Nếu đặt low=0, vòng lặp có thể lặp lại cùng trạng thái.",
+            "en": "Set low=1; the interval shrinks to one item. If low remains 0, the same state may repeat."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1"
+          ],
+          "active_line_ids": [
+            "binary-search.v1.L016",
+            "binary-search.v1.L024",
+            "binary-search.v1.L027",
+            "binary-search.v1.L029",
+            "binary-search.v1.L031"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Điều gì chứng minh vòng lặp tiến tới kết thúc?",
+            "en": "What proves that the loop progresses toward termination?"
+          },
+          "answer": {
+            "vi": "Mỗi nhánh chưa tìm thấy loại middle nên độ dài `[low, high]` giảm.",
+            "en": "Every not-found branch excludes middle, so the length of `[low, high]` decreases."
+          },
+          "rationale": {
+            "vi": "Một biến đo giảm nghiêm ngặt là bằng chứng termination.",
+            "en": "A strictly decreasing measure establishes termination."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.preconditions-interval",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-19.1-03",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 37,
+              "printed_page": "37",
+              "heading": "Algorithms",
+              "bullet_locator": "Search note 3",
+              "anchor_text": "The conditions necessary for the use of a binary search"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-19-BINARY",
+            "chapter": 19,
+            "printed_pages": [
+              454,
+              455,
+              456,
+              457
+            ],
+            "pdf_pages": [
+              470,
+              471,
+              472,
+              473
+            ],
+            "relationship": "direct_algorithm"
+          }
+        ],
+        "title": {
+          "en": "Preconditions and the search interval",
+          "vi": "Tiền điều kiện và khoảng tìm kiếm"
+        },
+        "explanation": {
+          "vi": "Tìm kiếm nhị phân chỉ loại bỏ nửa khoảng an toàn khi dữ liệu đã sắp theo cùng comparator dùng để so sánh target. Khoảng tìm kiếm đóng `[low, high]` chứa mọi vị trí còn có thể là đáp án.",
+          "en": "Binary search can safely discard half an interval only when data is sorted under the same comparator used against the target. The closed search interval `[low, high]` contains every position that can still be the answer."
+        },
+        "python_connection": {
+          "vi": "L005–L009 kiểm tra thứ tự tăng; L037–L039 từ chối input không sắp. L013–L015 khởi tạo khoảng đóng từ 0 đến `len(values)-1` và chỉ lặp khi khoảng chưa rỗng.",
+          "en": "L005-L009 check ascending order; L037-L039 reject unsorted input. L013-L015 initialise the closed interval from 0 to `len(values)-1` and continue only while it is non-empty."
+        },
+        "representation": {
+          "vi": "Tô ba vùng: đã loại bên trái, khoảng ứng viên `[low, high]`, đã loại bên phải. Mỗi bước phải giữ target, nếu có, trong vùng ứng viên.",
+          "en": "Shade three regions: discarded left, candidate interval `[low, high]`, and discarded right. Each step must keep the target, if present, in the candidate region."
+        },
+        "invariant_or_rule": {
+          "vi": "Tiền điều kiện là ascending order nhất quán; bất biến là nếu target tồn tại thì index của nó nằm trong `[low, high]`.",
+          "en": "The precondition is a consistent ascending order; the invariant is that if the target exists, its index lies in `[low, high]`."
+        },
+        "misconceptions": [
+          {
+            "vi": "Chạy tìm nhị phân trên list chưa sắp.",
+            "en": "Running binary search on an unsorted list."
+          },
+          {
+            "vi": "Trộn khoảng đóng `[low, high]` với điều kiện của khoảng nửa mở.",
+            "en": "Mixing a closed `[low, high]` interval with half-open interval conditions."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề nói dữ liệu đã sắp hoặc yêu cầu nêu điều kiện áp dụng.",
+            "en": "The task states that data is sorted or asks for the conditions of use."
+          },
+          {
+            "vi": "Cần duy trì lower/upper bound trong quá trình tìm.",
+            "en": "Lower and upper bounds must be maintained during the search."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "Tìm 7 trong `[1,4,7,9]`: ban đầu low=0, high=3.",
+            "en": "Find 7 in `[1,4,7,9]`: initially low=0 and high=3."
+          },
+          "walkthrough": {
+            "vi": "Middle=1 có giá trị 4; loại index 0..1 và đặt low=2, target vẫn trong khoảng 2..3.",
+            "en": "Middle=1 has value 4; discard indices 0..1 and set low=2, keeping the target within 2..3."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1"
+          ],
+          "active_line_ids": [
+            "binary-search.v1.L005",
+            "binary-search.v1.L013",
+            "binary-search.v1.L014",
+            "binary-search.v1.L037"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Tại sao kiểm tra thứ tự phải dùng cùng quan hệ so sánh với target?",
+            "en": "Why must the order check use the same comparison relation as the target search?"
+          },
+          "answer": {
+            "vi": "Nếu comparator khác, việc loại một nửa không còn đảm bảo giữ target.",
+            "en": "With a different comparator, discarding one half no longer guarantees retaining the target."
+          },
+          "rationale": {
+            "vi": "Bất biến phụ thuộc trực tiếp vào thứ tự dữ liệu.",
+            "en": "The invariant depends directly on the data order."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.recursive-variant",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-19.1-02",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 37,
+              "printed_page": "37",
+              "heading": "Algorithms",
+              "bullet_locator": "Search note 2",
+              "anchor_text": "Write an algorithm to implement a binary search"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-19-BINARY",
+            "chapter": 19,
+            "printed_pages": [
+              454,
+              455,
+              456,
+              457
+            ],
+            "pdf_pages": [
+              470,
+              471,
+              472,
+              473
+            ],
+            "relationship": "component_foundation"
+          },
+          {
+            "section_id": "BOOK-19-RECURSION",
+            "chapter": 19,
+            "printed_pages": [
+              490,
+              491,
+              492,
+              493
+            ],
+            "pdf_pages": [
+              506,
+              507,
+              508,
+              509
+            ],
+            "relationship": "component_foundation"
+          }
+        ],
+        "title": {
+          "en": "Recursive binary search variant",
+          "vi": "Biến thể tìm nhị phân đệ quy"
+        },
+        "explanation": {
+          "vi": "Biến thể đệ quy mang `low` và `high` trong từng lời gọi. Base case là khoảng rỗng; recursive case tính middle rồi gọi lại đúng nửa còn khả năng chứa target, đồng thời trả kết quả của lời gọi con lên trên.",
+          "en": "The recursive variant carries `low` and `high` in each call. Its base case is an empty interval; the recursive case computes middle, calls the only half that can contain the target, and propagates the child result upward."
+        },
+        "python_connection": {
+          "vi": "Artifact binary-search thực thi biến thể đệ quy ở L048–L061: L050–L052 xử lý khoảng rỗng, L053 tính middle, L059/L061 trả kết quả từ lời gọi trên khoảng nhỏ hơn. L064–L067 chạy cả hai phiên bản và phát hiện nếu index không khớp.",
+          "en": "The binary-search artifact executes the recursive variant at L048-L061: L050-L052 handle an empty interval, L053 computes middle, and L059/L061 return the result of a call on a smaller interval. L064-L067 run both versions and detect an index mismatch."
+        },
+        "representation": {
+          "vi": "Dùng stack frame chứa `(low, high, middle)` cho mỗi lời gọi; mũi tên đi xuống biểu diễn lời gọi con và mũi tên lên biểu diễn index/sentinel trả về.",
+          "en": "Use a stack frame containing `(low, high, middle)` for each call; downward arrows show child calls and upward arrows show the returned index/sentinel."
+        },
+        "invariant_or_rule": {
+          "vi": "Base case `low > high` trả not-found; mỗi lời gọi con nhận khoảng nhỏ hơn; mọi nhánh recursive phải `return` kết quả gọi con.",
+          "en": "Base case `low > high` returns not-found; each child call receives a smaller interval; every recursive branch must return the child result."
+        },
+        "misconceptions": [
+          {
+            "vi": "Gọi đệ quy nhưng quên `return`, làm mất index tìm được.",
+            "en": "Calling recursively without `return`, losing the found index."
+          },
+          {
+            "vi": "Giữ nguyên bounds trong lời gọi con nên không tiến tới base case.",
+            "en": "Passing unchanged bounds to the child, so the base case is never approached."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề yêu cầu viết hoặc đổi tìm kiếm nhị phân sang dạng đệ quy.",
+            "en": "The task asks for a recursive binary search or a conversion to recursion."
+          },
+          {
+            "vi": "Signature có low/high hoặc yêu cầu mô tả base case.",
+            "en": "The signature carries low/high or the task asks for a base case."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "Khoảng 0..3, middle=1, target lớn hơn giá trị giữa.",
+            "en": "Interval 0..3, middle=1, target greater than the middle value."
+          },
+          "walkthrough": {
+            "vi": "Gọi và trả `search(values, target, 2, 3)`; frame cha chờ kết quả rồi truyền nguyên kết quả lên.",
+            "en": "Call and return `search(values, target, 2, 3)`; the parent waits and propagates the result unchanged."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1"
+          ],
+          "active_line_ids": [
+            "binary-search.v1.L048",
+            "binary-search.v1.L050",
+            "binary-search.v1.L052",
+            "binary-search.v1.L053",
+            "binary-search.v1.L059",
+            "binary-search.v1.L061",
+            "binary-search.v1.L064",
+            "binary-search.v1.L065",
+            "binary-search.v1.L066"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Tại sao L059 và L061 đều phải `return` lời gọi đệ quy?",
+            "en": "Why must both L059 and L061 return their recursive calls?"
+          },
+          "answer": {
+            "vi": "Để index hoặc sentinel từ frame sâu nhất đi qua mọi frame về caller ban đầu.",
+            "en": "So the index or sentinel from the deepest frame passes through every frame to the original caller."
+          },
+          "rationale": {
+            "vi": "Call tạo công việc; return truyền kết quả và L066 kiểm tra nó với bản lặp.",
+            "en": "A call creates work; return carries its result, which L066 checks against the iterative result."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      }
+    ]
+  },
+  "python": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.binary-search",
+    "pattern_ids": [
+      "BINARY_SEARCH"
+    ],
+    "version": "pilot-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "binary-search.v1.L001",
+        "order": 1,
+        "text": "import json"
+      },
+      {
+        "line_id": "binary-search.v1.L002",
+        "order": 2,
+        "text": "import sys"
+      },
+      {
+        "line_id": "binary-search.v1.L003",
+        "order": 3,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L004",
+        "order": 4,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L005",
+        "order": 5,
+        "text": "def is_ascending(values):"
+      },
+      {
+        "line_id": "binary-search.v1.L006",
+        "order": 6,
+        "text": "    for index in range(1, len(values)):"
+      },
+      {
+        "line_id": "binary-search.v1.L007",
+        "order": 7,
+        "text": "        if values[index - 1] > values[index]:"
+      },
+      {
+        "line_id": "binary-search.v1.L008",
+        "order": 8,
+        "text": "            return False"
+      },
+      {
+        "line_id": "binary-search.v1.L009",
+        "order": 9,
+        "text": "    return True"
+      },
+      {
+        "line_id": "binary-search.v1.L010",
+        "order": 10,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L011",
+        "order": 11,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L012",
+        "order": 12,
+        "text": "def binary_search(values, target, trace):"
+      },
+      {
+        "line_id": "binary-search.v1.L013",
+        "order": 13,
+        "text": "    low = 0"
+      },
+      {
+        "line_id": "binary-search.v1.L014",
+        "order": 14,
+        "text": "    high = len(values) - 1"
+      },
+      {
+        "line_id": "binary-search.v1.L015",
+        "order": 15,
+        "text": "    while low <= high:"
+      },
+      {
+        "line_id": "binary-search.v1.L016",
+        "order": 16,
+        "text": "        middle = (low + high) // 2"
+      },
+      {
+        "line_id": "binary-search.v1.L017",
+        "order": 17,
+        "text": "        trace.append({"
+      },
+      {
+        "line_id": "binary-search.v1.L018",
+        "order": 18,
+        "text": "            \"event\": \"inspect_middle\","
+      },
+      {
+        "line_id": "binary-search.v1.L019",
+        "order": 19,
+        "text": "            \"low\": low,"
+      },
+      {
+        "line_id": "binary-search.v1.L020",
+        "order": 20,
+        "text": "            \"high\": high,"
+      },
+      {
+        "line_id": "binary-search.v1.L021",
+        "order": 21,
+        "text": "            \"middle\": middle,"
+      },
+      {
+        "line_id": "binary-search.v1.L022",
+        "order": 22,
+        "text": "            \"value\": values[middle],"
+      },
+      {
+        "line_id": "binary-search.v1.L023",
+        "order": 23,
+        "text": "        })"
+      },
+      {
+        "line_id": "binary-search.v1.L024",
+        "order": 24,
+        "text": "        if values[middle] == target:"
+      },
+      {
+        "line_id": "binary-search.v1.L025",
+        "order": 25,
+        "text": "            return middle"
+      },
+      {
+        "line_id": "binary-search.v1.L026",
+        "order": 26,
+        "text": "        if target < values[middle]:"
+      },
+      {
+        "line_id": "binary-search.v1.L027",
+        "order": 27,
+        "text": "            high = middle - 1"
+      },
+      {
+        "line_id": "binary-search.v1.L028",
+        "order": 28,
+        "text": "        else:"
+      },
+      {
+        "line_id": "binary-search.v1.L029",
+        "order": 29,
+        "text": "            low = middle + 1"
+      },
+      {
+        "line_id": "binary-search.v1.L030",
+        "order": 30,
+        "text": "    trace.append({\"event\": \"search_exhausted\", \"low\": low, \"high\": high})"
+      },
+      {
+        "line_id": "binary-search.v1.L031",
+        "order": 31,
+        "text": "    return -1"
+      },
+      {
+        "line_id": "binary-search.v1.L032",
+        "order": 32,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L033",
+        "order": 33,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L048",
+        "order": 34,
+        "text": "def recursive_binary_search(values, target, low, high, trace):"
+      },
+      {
+        "line_id": "binary-search.v1.L049",
+        "order": 35,
+        "text": "    trace.append({\"event\": \"recursive_call\", \"low\": low, \"high\": high})"
+      },
+      {
+        "line_id": "binary-search.v1.L050",
+        "order": 36,
+        "text": "    if low > high:"
+      },
+      {
+        "line_id": "binary-search.v1.L051",
+        "order": 37,
+        "text": "        trace.append({\"event\": \"recursive_base_not_found\", \"low\": low, \"high\": high})"
+      },
+      {
+        "line_id": "binary-search.v1.L052",
+        "order": 38,
+        "text": "        return -1"
+      },
+      {
+        "line_id": "binary-search.v1.L053",
+        "order": 39,
+        "text": "    middle = (low + high) // 2"
+      },
+      {
+        "line_id": "binary-search.v1.L054",
+        "order": 40,
+        "text": "    trace.append({\"event\": \"recursive_inspect\", \"middle\": middle, \"value\": values[middle]})"
+      },
+      {
+        "line_id": "binary-search.v1.L055",
+        "order": 41,
+        "text": "    if values[middle] == target:"
+      },
+      {
+        "line_id": "binary-search.v1.L056",
+        "order": 42,
+        "text": "        return middle"
+      },
+      {
+        "line_id": "binary-search.v1.L057",
+        "order": 43,
+        "text": "    if target < values[middle]:"
+      },
+      {
+        "line_id": "binary-search.v1.L058",
+        "order": 44,
+        "text": "        trace.append({\"event\": \"recursive_progress_left\", \"next_low\": low, \"next_high\": middle - 1})"
+      },
+      {
+        "line_id": "binary-search.v1.L059",
+        "order": 45,
+        "text": "        return recursive_binary_search(values, target, low, middle - 1, trace)"
+      },
+      {
+        "line_id": "binary-search.v1.L060",
+        "order": 46,
+        "text": "    trace.append({\"event\": \"recursive_progress_right\", \"next_low\": middle + 1, \"next_high\": high})"
+      },
+      {
+        "line_id": "binary-search.v1.L061",
+        "order": 47,
+        "text": "    return recursive_binary_search(values, target, middle + 1, high, trace)"
+      },
+      {
+        "line_id": "binary-search.v1.L062",
+        "order": 48,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L063",
+        "order": 49,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L034",
+        "order": 50,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "binary-search.v1.L035",
+        "order": 51,
+        "text": "    values = fixture[\"values\"]"
+      },
+      {
+        "line_id": "binary-search.v1.L036",
+        "order": 52,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "binary-search.v1.L037",
+        "order": 53,
+        "text": "    if not is_ascending(values):"
+      },
+      {
+        "line_id": "binary-search.v1.L038",
+        "order": 54,
+        "text": "        trace.append({\"event\": \"reject_unsorted_input\"})"
+      },
+      {
+        "line_id": "binary-search.v1.L039",
+        "order": 55,
+        "text": "        return {\"status\": \"UNSORTED\", \"index\": -1, \"trace\": trace}"
+      },
+      {
+        "line_id": "binary-search.v1.L064",
+        "order": 56,
+        "text": "    iterative_index = binary_search(values, fixture[\"target\"], trace)"
+      },
+      {
+        "line_id": "binary-search.v1.L065",
+        "order": 57,
+        "text": "    recursive_index = recursive_binary_search(values, fixture[\"target\"], 0, len(values) - 1, trace)"
+      },
+      {
+        "line_id": "binary-search.v1.L066",
+        "order": 58,
+        "text": "    if iterative_index != recursive_index:"
+      },
+      {
+        "line_id": "binary-search.v1.L067",
+        "order": 59,
+        "text": "        return {\"status\": \"MISMATCH\", \"index\": iterative_index, \"recursive_index\": recursive_index, \"trace\": trace}"
+      },
+      {
+        "line_id": "binary-search.v1.L068",
+        "order": 60,
+        "text": "    return {"
+      },
+      {
+        "line_id": "binary-search.v1.L069",
+        "order": 61,
+        "text": "        \"status\": \"FOUND\" if iterative_index != -1 else \"NOT_FOUND\","
+      },
+      {
+        "line_id": "binary-search.v1.L070",
+        "order": 62,
+        "text": "        \"index\": iterative_index,"
+      },
+      {
+        "line_id": "binary-search.v1.L071",
+        "order": 63,
+        "text": "        \"recursive_index\": recursive_index,"
+      },
+      {
+        "line_id": "binary-search.v1.L072",
+        "order": 64,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "binary-search.v1.L073",
+        "order": 65,
+        "text": "    }"
+      },
+      {
+        "line_id": "binary-search.v1.L042",
+        "order": 66,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L043",
+        "order": 67,
+        "text": ""
+      },
+      {
+        "line_id": "binary-search.v1.L044",
+        "order": 68,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "binary-search.v1.L045",
+        "order": 69,
+        "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
+      },
+      {
+        "line_id": "binary-search.v1.L046",
+        "order": 70,
+        "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
+      },
+      {
+        "line_id": "binary-search.v1.L047",
+        "order": 71,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "b4576f5bfd015f234669ba147ac78b04e1e09147d65f21cf41ea2427f098cada",
+    "caption": {
+      "vi": "Tìm kiếm nhị phân với bất biến đoạn tìm kiếm và kiểm tra tiền điều kiện sắp xếp.",
+      "en": "Binary search with an interval invariant and a sorted-input precondition."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r2.a3.binary-search.pilot-v1.author-run",
+      "independent_rerun_ref": "p4r2.a3.binary-search.pilot-v1.independent-rerun",
+      "execution_log_sha256": "f53e3c60f90bd0f5718714a34580fa4c92edab62a8a287ec853a57b2761c3b95"
+    }
+  },
+  "tests": {
+    "fixtures": [
+      {
+        "fixture_id": "binary-search.normal",
+        "case_kind": "normal",
+        "input": {
+          "target": 31,
+          "values": [
+            4,
+            9,
+            17,
+            23,
+            31,
+            42,
+            58
+          ]
+        }
+      },
+      {
+        "fixture_id": "binary-search.boundary",
+        "case_kind": "boundary",
+        "input": {
+          "target": 7,
+          "values": []
+        }
+      },
+      {
+        "fixture_id": "binary-search.failure",
+        "case_kind": "failure",
+        "input": {
+          "target": 9,
+          "values": [
+            4,
+            17,
+            9,
+            23
+          ]
+        }
+      }
+    ],
+    "expected_outputs": [
+      {
+        "expected_output_id": "binary-search.normal.expected-output",
+        "fixture_ref": "binary-search.normal",
+        "value": {
+          "index": 4,
+          "recursive_index": 4,
+          "status": "FOUND",
+          "trace": [
+            {
+              "event": "inspect_middle",
+              "high": 6,
+              "low": 0,
+              "middle": 3,
+              "value": 23
+            },
+            {
+              "event": "inspect_middle",
+              "high": 6,
+              "low": 4,
+              "middle": 5,
+              "value": 42
+            },
+            {
+              "event": "inspect_middle",
+              "high": 4,
+              "low": 4,
+              "middle": 4,
+              "value": 31
+            },
+            {
+              "event": "recursive_call",
+              "high": 6,
+              "low": 0
+            },
+            {
+              "event": "recursive_inspect",
+              "middle": 3,
+              "value": 23
+            },
+            {
+              "event": "recursive_progress_right",
+              "next_high": 6,
+              "next_low": 4
+            },
+            {
+              "event": "recursive_call",
+              "high": 6,
+              "low": 4
+            },
+            {
+              "event": "recursive_inspect",
+              "middle": 5,
+              "value": 42
+            },
+            {
+              "event": "recursive_progress_left",
+              "next_high": 4,
+              "next_low": 4
+            },
+            {
+              "event": "recursive_call",
+              "high": 4,
+              "low": 4
+            },
+            {
+              "event": "recursive_inspect",
+              "middle": 4,
+              "value": 31
+            }
+          ]
+        }
+      },
+      {
+        "expected_output_id": "binary-search.boundary.expected-output",
+        "fixture_ref": "binary-search.boundary",
+        "value": {
+          "index": -1,
+          "recursive_index": -1,
+          "status": "NOT_FOUND",
+          "trace": [
+            {
+              "event": "search_exhausted",
+              "high": -1,
+              "low": 0
+            },
+            {
+              "event": "recursive_call",
+              "high": -1,
+              "low": 0
+            },
+            {
+              "event": "recursive_base_not_found",
+              "high": -1,
+              "low": 0
+            }
+          ]
+        }
+      },
+      {
+        "expected_output_id": "binary-search.failure.expected-output",
+        "fixture_ref": "binary-search.failure",
+        "value": {
+          "index": -1,
+          "status": "UNSORTED",
+          "trace": [
+            {
+              "event": "reject_unsorted_input"
+            }
+          ]
+        }
+      }
+    ],
+    "normal_boundary_failure_coverage": {
+      "normal": true,
+      "boundary": true,
+      "failure": true
+    },
+    "author_run_ref": "p4r2.a3.binary-search.pilot-v1.author-run",
+    "independent_rerun_ref": "p4r2.a3.binary-search.pilot-v1.independent-rerun",
+    "execution_log_sha256": "f53e3c60f90bd0f5718714a34580fa4c92edab62a8a287ec853a57b2761c3b95"
+  },
+  "visual": {
+    "owned_patterns": [
+      {
+        "pattern_id": "BINARY_SEARCH",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.binary-search",
+        "owner_lesson_slug": "binary-search",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
+        "trace_url": "/paper4-v2/traces/binary-search.json",
+        "scenario_count": 3,
+        "event_count": 15
+      }
+    ],
+    "approved_static_or_representational_support": []
+  },
+  "marking": {
+    "chains": [
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.binary-search",
+        "pattern_id": "BINARY_SEARCH",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-03",
+        "method_step_refs": [
+          "B2-BINARY_SEARCH-S01",
+          "B2-BINARY_SEARCH-S02",
+          "B2-BINARY_SEARCH-S03",
+          "B2-BINARY_SEARCH-S04",
+          "B2-BINARY_SEARCH-S05",
+          "B2-BINARY_SEARCH-S06"
+        ],
+        "error_ref": "B2-ERR-BINARY_SEARCH-01",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B2-ERR-BINARY_SEARCH-01, B2-ERR-BINARY_SEARCH-02, B2-ERR-BINARY_SEARCH-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B2-ERR-BINARY_SEARCH-01, B2-ERR-BINARY_SEARCH-02, B2-ERR-BINARY_SEARCH-03."
+        },
+        "marking_atoms": [
+          {
+            "atom_id": "mp-9618-s22-42-2-c-i-completed-statements",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Complete the 6 source-supplied statements accurately. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=group_max; group=grp-9618-s22-42-2-c-i-completed-statements; group_max=6; source_issues=S22-42-2CI-GUARD,S22-42-2CI-MID. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Complete the 6 source-supplied statements accurately. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=group_max; group=grp-9618-s22-42-2-c-i-completed-statements; group_max=6; source_issues=S22-42-2CI-GUARD,S22-42-2CI-MID. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s22_ms_42",
+              "pdf_page": 22,
+              "heading": "9618_s22_42 9618_s22_42_2(c)(i)",
+              "bullet_locator": "mp-9618-s22-42-2-c-i-completed-statements",
+              "anchor_text": "QP 9618_s22_qp_42 pdf 6 requirement req-9618-s22-42-2(c)(i)-01; MS 9618_s22_ms_42 pdf 22,23"
+            }
+          },
+          {
+            "atom_id": "mp-9618-s22-42-2-c-i-01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Credit for function declaration taking appropriate parameters and recursive calls. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=discrete; source_issues=S22-42-2CI-GUARD,S22-42-2CI-MID. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Credit for function declaration taking appropriate parameters and recursive calls. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=discrete; source_issues=S22-42-2CI-GUARD,S22-42-2CI-MID. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s22_ms_42",
+              "pdf_page": 22,
+              "heading": "9618_s22_42 9618_s22_42_2(c)(i)",
+              "bullet_locator": "mp-9618-s22-42-2-c-i-01",
+              "anchor_text": "QP 9618_s22_qp_42 pdf 6 requirement req-9618-s22-42-2(c)(i)-01; MS 9618_s22_ms_42 pdf 22,23"
+            }
+          },
+          {
+            "atom_id": "mp-9618-s22-42-2-c-i-02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Credit for remainder of the function is accurate including appropriate DIV operator. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=discrete; source_issues=S22-42-2CI-GUARD,S22-42-2CI-MID. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Credit for remainder of the function is accurate including appropriate DIV operator. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=discrete; source_issues=S22-42-2CI-GUARD,S22-42-2CI-MID. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s22_ms_42",
+              "pdf_page": 22,
+              "heading": "9618_s22_42 9618_s22_42_2(c)(i)",
+              "bullet_locator": "mp-9618-s22-42-2-c-i-02",
+              "anchor_text": "QP 9618_s22_qp_42 pdf 6 requirement req-9618-s22-42-2(c)(i)-01; MS 9618_s22_ms_42 pdf 22,23"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-41-1-E-I-01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Function header BinarySearch taking DataToFind as a parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Function header BinarySearch taking DataToFind as a parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_41",
+              "pdf_page": 10,
+              "heading": "9618_s24_41 9618_s24_41_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-41-1-E-I-01",
+              "anchor_text": "QP 9618_s24_qp_41 pdf 4 requirement req-9618-s24-41-1(e)(i)-01; MS 9618_s24_ms_41 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-41-1-E-I-02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Calculating the mid value (First + Last) \\ 2 or equivalent inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Calculating the mid value (First + Last) \\ 2 or equivalent inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_41",
+              "pdf_page": 10,
+              "heading": "9618_s24_41 9618_s24_41_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-41-1-E-I-02",
+              "anchor_text": "QP 9618_s24_qp_41 pdf 4 requirement req-9618-s24-41-1(e)(i)-01; MS 9618_s24_ms_41 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-41-1-E-I-03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Checking if the data at mid is the parameter and returning mid inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Checking if the data at mid is the parameter and returning mid inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_41",
+              "pdf_page": 10,
+              "heading": "9618_s24_41 9618_s24_41_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-41-1-E-I-03",
+              "anchor_text": "QP 9618_s24_qp_41 pdf 4 requirement req-9618-s24-41-1(e)(i)-01; MS 9618_s24_ms_41 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-41-1-E-I-04",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "If DataToFind < mid, updating Last/Upper with mid – 1 inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "If DataToFind < mid, updating Last/Upper with mid – 1 inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_41",
+              "pdf_page": 10,
+              "heading": "9618_s24_41 9618_s24_41_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-41-1-E-I-04",
+              "anchor_text": "QP 9618_s24_qp_41 pdf 4 requirement req-9618-s24-41-1(e)(i)-01; MS 9618_s24_ms_41 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-41-1-E-I-05",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "If DataToFind > mid, updating First/Lower with mid + 1 inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "If DataToFind > mid, updating First/Lower with mid + 1 inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_41",
+              "pdf_page": 10,
+              "heading": "9618_s24_41 9618_s24_41_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-41-1-E-I-05",
+              "anchor_text": "QP 9618_s24_qp_41 pdf 4 requirement req-9618-s24-41-1(e)(i)-01; MS 9618_s24_ms_41 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-41-1-E-I-06",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Returning -1 when not found and a suitable loop with end criteria [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Returning -1 when not found and a suitable loop with end criteria [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-41-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_41",
+              "pdf_page": 10,
+              "heading": "9618_s24_41 9618_s24_41_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-41-1-E-I-06",
+              "anchor_text": "QP 9618_s24_qp_41 pdf 4 requirement req-9618-s24-41-1(e)(i)-01; MS 9618_s24_ms_41 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-42-3-D-I-01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Recursive function BinarySearch taking the 4 indicated parameters [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Recursive function BinarySearch taking the 4 indicated parameters [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_42",
+              "pdf_page": 47,
+              "heading": "9618_s24_42 9618_s24_42_3(d)(i)",
+              "bullet_locator": "MP-9618-S24-42-3-D-I-01",
+              "anchor_text": "QP 9618_s24_qp_42 pdf 13 requirement req-9618-s24-42-3(d)(i)-01; MS 9618_s24_ms_42 pdf 47,48"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-42-3-D-I-02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Suitable base case (e.g. First > Last) … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Suitable base case (e.g. First > Last) … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_42",
+              "pdf_page": 47,
+              "heading": "9618_s24_42 9618_s24_42_3(d)(i)",
+              "bullet_locator": "MP-9618-S24-42-3-D-I-02",
+              "anchor_text": "QP 9618_s24_qp_42 pdf 13 requirement req-9618-s24-42-3(d)(i)-01; MS 9618_s24_ms_42 pdf 47,48"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-42-3-D-I-03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… returning –1 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… returning –1 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_42",
+              "pdf_page": 47,
+              "heading": "9618_s24_42 9618_s24_42_3(d)(i)",
+              "bullet_locator": "MP-9618-S24-42-3-D-I-03",
+              "anchor_text": "QP 9618_s24_qp_42 pdf 13 requirement req-9618-s24-42-3(d)(i)-01; MS 9618_s24_ms_42 pdf 47,48"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-42-3-D-I-04",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Calculating middle element [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Calculating middle element [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_42",
+              "pdf_page": 47,
+              "heading": "9618_s24_42 9618_s24_42_3(d)(i)",
+              "bullet_locator": "MP-9618-S24-42-3-D-I-04",
+              "anchor_text": "QP 9618_s24_qp_42 pdf 13 requirement req-9618-s24-42-3(d)(i)-01; MS 9618_s24_ms_42 pdf 47,48"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-42-3-D-I-05",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Comparing ToFind with middle and returning Middle if found [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Comparing ToFind with middle and returning Middle if found [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_42",
+              "pdf_page": 47,
+              "heading": "9618_s24_42 9618_s24_42_3(d)(i)",
+              "bullet_locator": "MP-9618-S24-42-3-D-I-05",
+              "anchor_text": "QP 9618_s24_qp_42 pdf 13 requirement req-9618-s24-42-3(d)(i)-01; MS 9618_s24_ms_42 pdf 47,48"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-42-3-D-I-06",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "If ToFind less than middle, recursive call with Last as Middle – [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "If ToFind less than middle, recursive call with Last as Middle – [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_42",
+              "pdf_page": 47,
+              "heading": "9618_s24_42 9618_s24_42_3(d)(i)",
+              "bullet_locator": "MP-9618-S24-42-3-D-I-06",
+              "anchor_text": "QP 9618_s24_qp_42 pdf 13 requirement req-9618-s24-42-3(d)(i)-01; MS 9618_s24_ms_42 pdf 47,48"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-42-3-D-I-07",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "If ToFind more than middle, recursive call with First as Middle + [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "If ToFind more than middle, recursive call with First as Middle + [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-S24-42-3-D-I; group_max=6. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_42",
+              "pdf_page": 47,
+              "heading": "9618_s24_42 9618_s24_42_3(d)(i)",
+              "bullet_locator": "MP-9618-S24-42-3-D-I-07",
+              "anchor_text": "QP 9618_s24_qp_42 pdf 13 requirement req-9618-s24-42-3(d)(i)-01; MS 9618_s24_ms_42 pdf 47,48"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-43-1-E-I-01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Function header BinarySearch taking DataToFind as a parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Function header BinarySearch taking DataToFind as a parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_43",
+              "pdf_page": 10,
+              "heading": "9618_s24_43 9618_s24_43_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-43-1-E-I-01",
+              "anchor_text": "QP 9618_s24_qp_43 pdf 4 requirement req-9618-s24-43-1(e)(i)-01; MS 9618_s24_ms_43 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-43-1-E-I-02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Calculating the mid value (First + Last) \\ 2 or equivalent inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Calculating the mid value (First + Last) \\ 2 or equivalent inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_43",
+              "pdf_page": 10,
+              "heading": "9618_s24_43 9618_s24_43_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-43-1-E-I-02",
+              "anchor_text": "QP 9618_s24_qp_43 pdf 4 requirement req-9618-s24-43-1(e)(i)-01; MS 9618_s24_ms_43 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-43-1-E-I-03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Checking if the data at mid is the parameter and returning mid inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Checking if the data at mid is the parameter and returning mid inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_43",
+              "pdf_page": 10,
+              "heading": "9618_s24_43 9618_s24_43_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-43-1-E-I-03",
+              "anchor_text": "QP 9618_s24_qp_43 pdf 4 requirement req-9618-s24-43-1(e)(i)-01; MS 9618_s24_ms_43 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-43-1-E-I-04",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "If DataToFind < mid, updating Last/Upper with mid – 1 inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "If DataToFind < mid, updating Last/Upper with mid – 1 inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_43",
+              "pdf_page": 10,
+              "heading": "9618_s24_43 9618_s24_43_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-43-1-E-I-04",
+              "anchor_text": "QP 9618_s24_qp_43 pdf 4 requirement req-9618-s24-43-1(e)(i)-01; MS 9618_s24_ms_43 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-43-1-E-I-05",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "If DataToFind > mid, updating First/Lower with mid + 1 inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "If DataToFind > mid, updating First/Lower with mid + 1 inside loop [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_43",
+              "pdf_page": 10,
+              "heading": "9618_s24_43 9618_s24_43_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-43-1-E-I-05",
+              "anchor_text": "QP 9618_s24_qp_43 pdf 4 requirement req-9618-s24-43-1(e)(i)-01; MS 9618_s24_ms_43 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "MP-9618-S24-43-1-E-I-06",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Returning -1 when not found and a suitable loop with end criteria [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Returning -1 when not found and a suitable loop with end criteria [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=accept_equivalent; group=MPG-9618-S24-43-1-E-I; alternatives=\"Source row contains alternative/accept-equivalent wording; preserve the complete row context.\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s24_ms_43",
+              "pdf_page": 10,
+              "heading": "9618_s24_43 9618_s24_43_1(e)(i)",
+              "bullet_locator": "MP-9618-S24-43-1-E-I-06",
+              "anchor_text": "QP 9618_s24_qp_43 pdf 4 requirement req-9618-s24-43-1(e)(i)-01; MS 9618_s24_ms_43 pdf 10,11"
+            }
+          },
+          {
+            "atom_id": "9618_s25_43_2-e-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Search() header (and close) taking array and integer as parameters [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Search() header (and close) taking array and integer as parameters [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 26,
+              "heading": "9618_s25_43 9618_s25_43_2(e)",
+              "bullet_locator": "9618_s25_43_2(e).mp.01",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 5 requirement req-9618-s25-43-2(e)-01; MS 9618_s25_ms_43 pdf 26,27,28"
+            }
+          },
+          {
+            "atom_id": "9618_s25_43_2-e-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Looping/recursive calls until no elements left/Low<=High and returning –1 if not found [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Looping/recursive calls until no elements left/Low<=High and returning –1 if not found [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 26,
+              "heading": "9618_s25_43 9618_s25_43_2(e)",
+              "bullet_locator": "9618_s25_43_2(e).mp.02",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 5 requirement req-9618-s25-43-2(e)-01; MS 9618_s25_ms_43 pdf 26,27,28"
+            }
+          },
+          {
+            "atom_id": "9618_s25_43_2-e-.mp.03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… calculating middle index and accessing this value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_2(e).mp.02\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… calculating middle index and accessing this value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_2(e).mp.02\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 26,
+              "heading": "9618_s25_43 9618_s25_43_2(e)",
+              "bullet_locator": "9618_s25_43_2(e).mp.03",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 5 requirement req-9618-s25-43-2(e)-01; MS 9618_s25_ms_43 pdf 26,27,28"
+            }
+          },
+          {
+            "atom_id": "9618_s25_43_2-e-.mp.04",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… comparison of array at middle value to integer parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_2(e).mp.03\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… comparison of array at middle value to integer parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_2(e).mp.03\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 26,
+              "heading": "9618_s25_43 9618_s25_43_2(e)",
+              "bullet_locator": "9618_s25_43_2(e).mp.04",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 5 requirement req-9618-s25-43-2(e)-01; MS 9618_s25_ms_43 pdf 26,27,28"
+            }
+          },
+          {
+            "atom_id": "9618_s25_43_2-e-.mp.05",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… if they are equal return mid [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_2(e).mp.04\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… if they are equal return mid [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_2(e).mp.04\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 26,
+              "heading": "9618_s25_43 9618_s25_43_2(e)",
+              "bullet_locator": "9618_s25_43_2(e).mp.05",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 5 requirement req-9618-s25-43-2(e)-01; MS 9618_s25_ms_43 pdf 26,27,28"
+            }
+          },
+          {
+            "atom_id": "9618_s25_43_2-e-.mp.06",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… if array[mid] < parameter update low to middle + 1, if array[mid] > parameter update high to middle – 1 // recursive call with updated low and updated high [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_2(e).mp.05\"; alternatives=[\"Accept an equivalent route only where the official wording permits it; Lead must preserve the QP contract.\"]. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… if array[mid] < parameter update low to middle + 1, if array[mid] > parameter update high to middle – 1 // recursive call with updated low and updated high [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_2(e).mp.05\"; alternatives=[\"Accept an equivalent route only where the official wording permits it; Lead must preserve the QP contract.\"]. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 26,
+              "heading": "9618_s25_43 9618_s25_43_2(e)",
+              "bullet_locator": "9618_s25_43_2(e).mp.06",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 5 requirement req-9618-s25-43-2(e)-01; MS 9618_s25_ms_43 pdf 26,27,28"
+            }
+          },
+          {
+            "atom_id": "9618_w25_42_2-e-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Function header (and end) taking four parameters and recursive function written [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Function header (and end) taking four parameters and recursive function written [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_42",
+              "pdf_page": 23,
+              "heading": "9618_w25_42 9618_w25_42_2(e)",
+              "bullet_locator": "9618_w25_42_2(e).mp.01",
+              "anchor_text": "QP 9618_w25_qp_42 pdf 7 requirement req-9618-w25-42-2(e)-01; MS 9618_w25_ms_42 pdf 23,24"
+            }
+          },
+          {
+            "atom_id": "9618_w25_42_2-e-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Calculating middle value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Calculating middle value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_42",
+              "pdf_page": 23,
+              "heading": "9618_w25_42 9618_w25_42_2(e)",
+              "bullet_locator": "9618_w25_42_2(e).mp.02",
+              "anchor_text": "QP 9618_w25_qp_42 pdf 7 requirement req-9618-w25-42-2(e)-01; MS 9618_w25_ms_42 pdf 23,24"
+            }
+          },
+          {
+            "atom_id": "9618_w25_42_2-e-.mp.03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Comparing middle value to data parameter and returning index if equal [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Comparing middle value to data parameter and returning index if equal [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_42",
+              "pdf_page": 23,
+              "heading": "9618_w25_42 9618_w25_42_2(e)",
+              "bullet_locator": "9618_w25_42_2(e).mp.03",
+              "anchor_text": "QP 9618_w25_qp_42 pdf 7 requirement req-9618-w25-42-2(e)-01; MS 9618_w25_ms_42 pdf 23,24"
+            }
+          },
+          {
+            "atom_id": "9618_w25_42_2-e-.mp.04",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "If middle is greater than, recursive call with middle –1 for upper [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "If middle is greater than, recursive call with middle –1 for upper [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_42",
+              "pdf_page": 23,
+              "heading": "9618_w25_42 9618_w25_42_2(e)",
+              "bullet_locator": "9618_w25_42_2(e).mp.04",
+              "anchor_text": "QP 9618_w25_qp_42 pdf 7 requirement req-9618-w25-42-2(e)-01; MS 9618_w25_ms_42 pdf 23,24"
+            }
+          },
+          {
+            "atom_id": "9618_w25_42_2-e-.mp.05",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "If middle is less than, recursive call with middle + 1 for lower [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "If middle is less than, recursive call with middle + 1 for lower [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_42",
+              "pdf_page": 23,
+              "heading": "9618_w25_42 9618_w25_42_2(e)",
+              "bullet_locator": "9618_w25_42_2(e).mp.05",
+              "anchor_text": "QP 9618_w25_qp_42 pdf 7 requirement req-9618-w25-42-2(e)-01; MS 9618_w25_ms_42 pdf 23,24"
+            }
+          },
+          {
+            "atom_id": "9618_w25_42_2-e-.mp.06",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Checking if not found and returning –1 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Checking if not found and returning –1 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_42",
+              "pdf_page": 23,
+              "heading": "9618_w25_42 9618_w25_42_2(e)",
+              "bullet_locator": "9618_w25_42_2(e).mp.06",
+              "anchor_text": "QP 9618_w25_qp_42 pdf 7 requirement req-9618-w25-42-2(e)-01; MS 9618_w25_ms_42 pdf 23,24"
+            }
+          }
+        ],
+        "limited_evidence": true,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 3 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 3 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      }
+    ]
+  },
+  "errors": {
+    "error_refs": [
+      "B2-ERR-BINARY_SEARCH-01"
+    ],
+    "misconceptions": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.midpoint-update",
+        "vi": "Đặt `high = middle` hoặc `low = middle`, giữ lại phần tử vừa loại.",
+        "en": "Setting `high = middle` or `low = middle`, retaining the item just eliminated."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.midpoint-update",
+        "vi": "Dùng `/` tạo float làm index.",
+        "en": "Using `/`, producing a float index."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.preconditions-interval",
+        "vi": "Chạy tìm nhị phân trên list chưa sắp.",
+        "en": "Running binary search on an unsorted list."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.preconditions-interval",
+        "vi": "Trộn khoảng đóng `[low, high]` với điều kiện của khoảng nửa mở.",
+        "en": "Mixing a closed `[low, high]` interval with half-open interval conditions."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.recursive-variant",
+        "vi": "Gọi đệ quy nhưng quên `return`, làm mất index tìm được.",
+        "en": "Calling recursively without `return`, losing the found index."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.recursive-variant",
+        "vi": "Giữ nguyên bounds trong lời gọi con nên không tiến tới base case.",
+        "en": "Passing unchanged bounds to the child, so the base case is never approached."
+      }
+    ],
+    "checks": [
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.binary-search",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B2-ERR-BINARY_SEARCH-01, B2-ERR-BINARY_SEARCH-02, B2-ERR-BINARY_SEARCH-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B2-ERR-BINARY_SEARCH-01, B2-ERR-BINARY_SEARCH-02, B2-ERR-BINARY_SEARCH-03."
+        }
+      }
+    ]
+  },
+  "practice": {
+    "items": [
+      {
+        "assessment_item_id": "binary-search.f1",
+        "pattern_ids": [
+          "BINARY_SEARCH"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-03"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.binary-search.assessment.progression",
+        "level": "faded",
+        "prompt": {
+          "vi": "Hoàn thiện guard và cập nhật biên để fixture boundary kết thúc an toàn với danh sách rỗng và fixture failure bị từ chối vì chưa sắp xếp. Nộp Python đã sửa, hai trace ngắn và giải thích vì sao dùng `middle - 1` hoặc `middle + 1`.",
+          "en": "Complete the guard and bound updates so the boundary fixture terminates safely on an empty list and the failure fixture is rejected as unsorted. Submit the repaired Python, two short traces, and explain why the update uses `middle - 1` or `middle + 1`."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
+          "binary-search.boundary",
+          "binary-search.boundary.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Bản sửa Python chạy được, output fixture thực tế, trace trước/sau và ghi chú sửa lỗi.",
+          "en": "Runnable Python repair, actual fixture output, before/after trace, and error-repair note."
+        },
+        "hint": {
+          "vi": "Viết invariant cho đoạn đóng `[low, high]` trước khi cập nhật biên.",
+          "en": "State the invariant for the closed interval `[low, high]` before updating a bound."
+        },
+        "feedback": {
+          "vi": "Nếu không kết thúc hoặc sai index, đối chiếu precondition sorted, điều kiện `low <= high`, phép tính midpoint và bước loại bỏ midpoint.",
+          "en": "If the search does not terminate or returns the wrong index, check the sorted precondition, `low <= high`, midpoint calculation, and the step that excludes the midpoint."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "binary-search.faded.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho BINARY_SEARCH và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for BINARY_SEARCH with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "binary-search.faded.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.binary-search.pilot-v1, binary-search.boundary, binary-search.boundary.expected-output."
+            },
+            {
+              "criterion_id": "binary-search.faded.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      },
+      {
+        "assessment_item_id": "binary-search.g1",
+        "pattern_ids": [
+          "BINARY_SEARCH"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-03"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.binary-search.assessment.progression",
+        "level": "guided",
+        "prompt": {
+          "vi": "Với fixture normal, trace từng vòng lặp bằng `low`, `high`, `middle` và giá trị giữa cho đến khi tìm thấy 31. Sau mỗi phép so sánh, nêu nửa khoảng bị loại và kiểm tra khoảng còn lại vẫn chứa mọi vị trí khả dĩ.",
+          "en": "For the normal fixture, trace every iteration using `low`, `high`, `middle`, and the middle value until 31 is found. After each comparison, name the discarded half and check that the remaining interval still contains every possible position."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
+          "binary-search.normal",
+          "binary-search.normal.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Trace song ngữ có chú thích, dự đoán, chuyển trạng thái thực tế và một kiểm tra bất biến.",
+          "en": "Bilingual annotated trace with predictions, actual state transitions, and one invariant check."
+        },
+        "hint": {
+          "vi": "Viết invariant cho đoạn đóng `[low, high]` trước khi cập nhật biên.",
+          "en": "State the invariant for the closed interval `[low, high]` before updating a bound."
+        },
+        "feedback": {
+          "vi": "Nếu không kết thúc hoặc sai index, đối chiếu precondition sorted, điều kiện `low <= high`, phép tính midpoint và bước loại bỏ midpoint.",
+          "en": "If the search does not terminate or returns the wrong index, check the sorted precondition, `low <= high`, midpoint calculation, and the step that excludes the midpoint."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "binary-search.guided.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho BINARY_SEARCH và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for BINARY_SEARCH with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "binary-search.guided.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.binary-search.pilot-v1, binary-search.normal, binary-search.normal.expected-output."
+            },
+            {
+              "criterion_id": "binary-search.guided.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      },
+      {
+        "assessment_item_id": "binary-search.i1",
+        "pattern_ids": [
+          "BINARY_SEARCH"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-03"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.binary-search.assessment.progression",
+        "level": "independent",
+        "prompt": {
+          "vi": "Cài đặt tìm kiếm nhị phân theo hợp đồng danh sách tăng dần, bao gồm biến thể lặp và biến thể đệ quy có cùng kết quả. Chạy ba fixture, nộp output thực tế, trace khoảng tìm kiếm và assertions về found/not-found/unsorted.",
+          "en": "Implement binary search for an ascending-list contract, including iterative and recursive variants that return the same result. Run all three fixtures and submit actual outputs, interval traces, and assertions for found/not-found/unsorted cases."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
+          "binary-search.normal",
+          "binary-search.normal.expected-output",
+          "binary-search.boundary",
+          "binary-search.boundary.expected-output",
+          "binary-search.failure",
+          "binary-search.failure.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Lời giải Python chạy được, output normal-boundary-failure, assertions và bản tự kiểm.",
+          "en": "Runnable Python solution, normal-boundary-failure outputs, assertions, and self-audit."
+        },
+        "hint": {
+          "vi": "Viết invariant cho đoạn đóng `[low, high]` trước khi cập nhật biên.",
+          "en": "State the invariant for the closed interval `[low, high]` before updating a bound."
+        },
+        "feedback": {
+          "vi": "Nếu không kết thúc hoặc sai index, đối chiếu precondition sorted, điều kiện `low <= high`, phép tính midpoint và bước loại bỏ midpoint.",
+          "en": "If the search does not terminate or returns the wrong index, check the sorted precondition, `low <= high`, midpoint calculation, and the step that excludes the midpoint."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "binary-search.independent.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho BINARY_SEARCH và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for BINARY_SEARCH with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "binary-search.independent.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.binary-search.pilot-v1, binary-search.normal, binary-search.normal.expected-output, binary-search.boundary, binary-search.boundary.expected-output, binary-search.failure, binary-search.failure.expected-output."
+            },
+            {
+              "criterion_id": "binary-search.independent.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            },
+            {
+              "criterion_id": "binary-search.independent.rubric.transfer",
+              "description": {
+                "vi": "Lời giải chạy đủ normal, boundary và failure mà không dùng đáp án được mở sẵn.",
+                "en": "The solution runs normal, boundary, and failure cases without a pre-revealed answer."
+              },
+              "evidence_required": "Three actual outputs and assertions covering acceptance, boundary behaviour, and rejection."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 4/4 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 4/4 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      }
+    ]
+  },
+  "retrieval": {
+    "release_refs": [],
+    "items": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.midpoint-update",
+        "prompt": {
+          "vi": "Điều gì chứng minh vòng lặp tiến tới kết thúc?",
+          "en": "What proves that the loop progresses toward termination?"
+        },
+        "answer": {
+          "vi": "Mỗi nhánh chưa tìm thấy loại middle nên độ dài `[low, high]` giảm.",
+          "en": "Every not-found branch excludes middle, so the length of `[low, high]` decreases."
+        },
+        "rationale": {
+          "vi": "Một biến đo giảm nghiêm ngặt là bằng chứng termination.",
+          "en": "A strictly decreasing measure establishes termination."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check"
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.preconditions-interval",
+        "prompt": {
+          "vi": "Tại sao kiểm tra thứ tự phải dùng cùng quan hệ so sánh với target?",
+          "en": "Why must the order check use the same comparison relation as the target search?"
+        },
+        "answer": {
+          "vi": "Nếu comparator khác, việc loại một nửa không còn đảm bảo giữ target.",
+          "en": "With a different comparator, discarding one half no longer guarantees retaining the target."
+        },
+        "rationale": {
+          "vi": "Bất biến phụ thuộc trực tiếp vào thứ tự dữ liệu.",
+          "en": "The invariant depends directly on the data order."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check"
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.recursive-variant",
+        "prompt": {
+          "vi": "Tại sao L059 và L061 đều phải `return` lời gọi đệ quy?",
+          "en": "Why must both L059 and L061 return their recursive calls?"
+        },
+        "answer": {
+          "vi": "Để index hoặc sentinel từ frame sâu nhất đi qua mọi frame về caller ban đầu.",
+          "en": "So the index or sentinel from the deepest frame passes through every frame to the original caller."
+        },
+        "rationale": {
+          "vi": "Call tạo công việc; return truyền kết quả và L066 kiểm tra nó với bản lặp.",
+          "en": "A call creates work; return carries its result, which L066 checks against the iterative result."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check"
+      }
+    ]
+  },
+  "navigation": {
+    "previous_slug": "sorting",
+    "next_slug": "stack"
+  },
+  "sources": [
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 470,
+        "printed_page": 454,
+        "heading": "19.1.1 Binary search",
+        "anchor_text": "BOOK-19-BINARY"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 506,
+        "printed_page": 490,
+        "heading": "19.2.1 Understanding recursion",
+        "anchor_text": "BOOK-19-RECURSION"
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 37,
+        "printed_page": "37",
+        "heading": "Algorithms",
+        "bullet_locator": "Search note 3",
+        "anchor_text": "The conditions necessary for the use of a binary search"
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 37,
+        "printed_page": "37",
+        "heading": "Algorithms",
+        "bullet_locator": "Search note 2",
+        "anchor_text": "Write an algorithm to implement a binary search"
+      }
+    }
+  ]
+}

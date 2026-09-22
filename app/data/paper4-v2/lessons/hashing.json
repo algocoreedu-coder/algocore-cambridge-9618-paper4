@@ -1,0 +1,2226 @@
+{
+  "schema_version": "paper4-v2-lesson-dto-v1",
+  "identity": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
+    "package_id": "ac-9618-p4-2026-python.package.dictionary",
+    "slug": "hashing",
+    "version": "pilot-v1",
+    "label": "hashing",
+    "title": {
+      "vi": "Bảng băm và xử lý va chạm trong đề thi",
+      "en": "Hash tables and exam collision schemes"
+    },
+    "scope": {
+      "role": "corpus_support",
+      "exam_year": 2026,
+      "programming_language": "Python",
+      "objective_mapping_status": "LEAD_MAPPED"
+    }
+  },
+  "authority": {
+    "official_pattern_ids": [
+      "HASH_FUNCTION",
+      "HASH_INSERT",
+      "HASH_SEARCH",
+      "HASH_SETUP"
+    ],
+    "approved_association_pattern_ids": [],
+    "association_scope": "official_pattern_owner",
+    "cambridge_marking_chain_ids": [
+      "paper4-2026.marking-chain.hash-function",
+      "paper4-2026.marking-chain.hash-insert",
+      "paper4-2026.marking-chain.hash-search",
+      "paper4-2026.marking-chain.hash-setup"
+    ]
+  },
+  "sections": [
+    {
+      "section_id": "paper4.section.recognition",
+      "kind": "recognition",
+      "order": 1,
+      "data_keys": [
+        "identity",
+        "authority"
+      ]
+    },
+    {
+      "section_id": "paper4.section.exam-cues",
+      "kind": "exam-cues",
+      "order": 2,
+      "data_keys": [
+        "theory.knowledge_units[].exam_signals"
+      ]
+    },
+    {
+      "section_id": "paper4.section.knowledge",
+      "kind": "knowledge",
+      "order": 3,
+      "data_keys": [
+        "theory.knowledge_units"
+      ]
+    },
+    {
+      "section_id": "paper4.section.method",
+      "kind": "method",
+      "order": 4,
+      "data_keys": [
+        "theory.knowledge_units[].python_connection",
+        "theory.knowledge_units[].invariant_or_rule"
+      ]
+    },
+    {
+      "section_id": "paper4.section.worked-example",
+      "kind": "worked-example",
+      "order": 5,
+      "data_keys": [
+        "theory.knowledge_units[].micro_example"
+      ]
+    },
+    {
+      "section_id": "paper4.section.action-view",
+      "kind": "action-view",
+      "order": 6,
+      "data_keys": [
+        "python",
+        "tests",
+        "visual"
+      ]
+    },
+    {
+      "section_id": "paper4.section.marking-pitfalls",
+      "kind": "marking-pitfalls",
+      "order": 7,
+      "data_keys": [
+        "marking",
+        "errors"
+      ]
+    },
+    {
+      "section_id": "paper4.section.practice",
+      "kind": "practice",
+      "order": 8,
+      "data_keys": [
+        "practice"
+      ]
+    },
+    {
+      "section_id": "paper4.section.retrieval",
+      "kind": "retrieval",
+      "order": 9,
+      "data_keys": [
+        "retrieval"
+      ]
+    },
+    {
+      "section_id": "paper4.section.next-and-sources",
+      "kind": "next-and-sources",
+      "order": 10,
+      "data_keys": [
+        "navigation",
+        "sources"
+      ]
+    }
+  ],
+  "theory": {
+    "knowledge_units": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.find-collisions",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-13.2-03",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 32,
+              "printed_page": "32",
+              "heading": "File organisation and access",
+              "bullet_locator": "Hashing objective",
+              "anchor_text": "Show understanding of hashing algorithms"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-13-HASH",
+            "chapter": 13,
+            "printed_pages": [
+              310,
+              311
+            ],
+            "pdf_pages": [
+              326,
+              327
+            ],
+            "relationship": "component_foundation"
+          },
+          {
+            "section_id": "BOOK-19-LINEAR",
+            "chapter": 19,
+            "printed_pages": [
+              451,
+              452,
+              453,
+              454
+            ],
+            "pdf_pages": [
+              467,
+              468,
+              469,
+              470
+            ],
+            "relationship": "component_foundation"
+          }
+        ],
+        "title": {
+          "en": "Finding a key across table and collision storage",
+          "vi": "Tìm khóa qua bảng và vùng va chạm"
+        },
+        "explanation": {
+          "vi": "Search phải theo cùng hash function và collision sequence đã dùng khi insert. Với linear probing không xóa tombstone, gặp ô chưa dùng chứng minh key không thể nằm xa hơn; nếu không gặp, dừng sau một vòng.",
+          "en": "Search must follow the same hash function and collision sequence used by insertion. With linear probing and no deletion tombstones, an unused cell proves the key cannot lie farther along; otherwise stop after one full cycle."
+        },
+        "python_connection": {
+          "vi": "L028 lấy start; L029–L031 tạo cùng probe sequence với insert; L032–L033 dừng ở ô trống; L034–L035 trả index khi bằng; L036 là not-found sau một vòng.",
+          "en": "L028 obtains start; L029-L031 create the same probe sequence as insertion; L032-L033 stop at an empty cell; L034-L035 return the index on equality; L036 is not-found after one cycle."
+        },
+        "representation": {
+          "vi": "Hiển thị key cần tìm và đường probe; tại mỗi ô ghi một trong ba quyết định: empty-stop, equal-found, occupied-continue.",
+          "en": "Show the search key and probe path; label each slot with one of three decisions: empty-stop, equal-found, or occupied-continue."
+        },
+        "invariant_or_rule": {
+          "vi": "Search không thay đổi table; kiểm tra key bằng equality; trả found index hoặc not-found sentinel theo contract.",
+          "en": "Search does not mutate the table; keys are checked by equality; return the found index or the contract's not-found sentinel."
+        },
+        "misconceptions": [
+          {
+            "vi": "Chỉ kiểm tra hash address rồi kết luận not found sau collision.",
+            "en": "Checking only the hash address and declaring not found after a collision."
+          },
+          {
+            "vi": "Dùng collision order khác insert.",
+            "en": "Using a different collision order from insertion."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề yêu cầu locate/find key trong hash storage có collision.",
+            "en": "The task asks to locate/find a key in hashed storage with collisions."
+          },
+          {
+            "vi": "Cần trả index/sentinel và không cập nhật dữ liệu.",
+            "en": "An index/sentinel must be returned without changing data."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "Table có 7 ở slot 2, 12 ở slot 3; tìm 12.",
+            "en": "The table has 7 at slot 2 and 12 at slot 3; search for 12."
+          },
+          "walkthrough": {
+            "vi": "Hash về 2, so sánh 7 rồi probe 3 và tìm thấy 12.",
+            "en": "Hash to 2, compare 7, then probe 3 and find 12."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.hashing.pilot-v1"
+          ],
+          "active_line_ids": [
+            "hashing.v1.L028",
+            "hashing.v1.L029",
+            "hashing.v1.L030",
+            "hashing.v1.L032",
+            "hashing.v1.L034",
+            "hashing.v1.L036"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Khi nào `None` cho phép dừng sớm trong pilot?",
+            "en": "When does `None` allow an early stop in the pilot?"
+          },
+          "answer": {
+            "vi": "Khi không có deletion/tombstone và insert/search dùng cùng linear-probe sequence.",
+            "en": "When there is no deletion/tombstone and insertion/search use the same linear-probe sequence."
+          },
+          "rationale": {
+            "vi": "Nếu contract có deletion, quy tắc sentinel phải được xem lại.",
+            "en": "If the contract includes deletion, sentinel rules must be reconsidered."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.hash-address",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-13.2-03",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 32,
+              "printed_page": "32",
+              "heading": "File organisation and access",
+              "bullet_locator": "Hashing objective",
+              "anchor_text": "Show understanding of hashing algorithms"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-13-HASH",
+            "chapter": 13,
+            "printed_pages": [
+              310,
+              311
+            ],
+            "pdf_pages": [
+              326,
+              327
+            ],
+            "relationship": "direct_concept"
+          },
+          {
+            "section_id": "BOOK-11-BASICS",
+            "chapter": 11,
+            "printed_pages": [
+              265,
+              266,
+              267,
+              268,
+              269
+            ],
+            "pdf_pages": [
+              281,
+              282,
+              283,
+              284,
+              285
+            ],
+            "relationship": "direct_concept"
+          }
+        ],
+        "title": {
+          "en": "Computing a hash address from the given rule",
+          "vi": "Tính địa chỉ băm theo công thức đề"
+        },
+        "explanation": {
+          "vi": "Hash function biến key thành địa chỉ hợp lệ. Với công thức modulo, địa chỉ là `key % table_size`; cần table_size dương và key thuộc kiểu mà công thức định nghĩa.",
+          "en": "A hash function maps a key to a valid address. For a modulo rule, the address is `key % table_size`; table_size must be positive and the key must have the type required by the rule."
+        },
+        "python_connection": {
+          "vi": "L012–L013 triển khai `key % len(self.slots)`; L007–L009 đảm bảo size dương trước khi dùng. L041 từ chối key không phải integer cho contract của pilot.",
+          "en": "L012-L013 implement `key % len(self.slots)`; L007-L009 ensure a positive size first. L041 rejects non-integer keys under the pilot contract."
+        },
+        "representation": {
+          "vi": "Hiển thị key, divisor/table size, quotient/remainder và mũi tên tới index bằng remainder.",
+          "en": "Show the key, divisor/table size, quotient/remainder, and an arrow to the index equal to the remainder."
+        },
+        "invariant_or_rule": {
+          "vi": "Với size dương, `0 <= address < size`; cùng key và cùng size luôn tạo cùng address ban đầu.",
+          "en": "For positive size, `0 <= address < size`; the same key and size always produce the same initial address."
+        },
+        "misconceptions": [
+          {
+            "vi": "Dùng phép chia thường hoặc quotient làm address.",
+            "en": "Using normal division or the quotient as the address."
+          },
+          {
+            "vi": "Dùng modulo một hằng khác với capacity được giao.",
+            "en": "Taking modulo by a constant different from the supplied capacity."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề cho key và công thức/modulus để tính vị trí.",
+            "en": "The task gives a key and a formula/modulus for its position."
+          },
+          {
+            "vi": "Cần viết riêng hash function hoặc hoàn thiện address expression.",
+            "en": "A hash function or address expression must be written."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "Tính địa chỉ cho key=23 trong bảng có size=7.",
+            "en": "Calculate the address for key=23 in a table of size=7."
+          },
+          "walkthrough": {
+            "vi": "`23 % 7 = 2`, nên address hợp lệ là index 2.",
+            "en": "`23 % 7 = 2`, so the valid address is index 2."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.hashing.pilot-v1"
+          ],
+          "active_line_ids": [
+            "hashing.v1.L007",
+            "hashing.v1.L009",
+            "hashing.v1.L012",
+            "hashing.v1.L013",
+            "hashing.v1.L041"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Tại sao constructor chặn size=0?",
+            "en": "Why does the constructor reject size=0?"
+          },
+          "answer": {
+            "vi": "Modulo 0 không xác định và không có index hợp lệ.",
+            "en": "Modulo zero is undefined and there is no valid index."
+          },
+          "rationale": {
+            "vi": "Tiền điều kiện của representation bảo vệ hash calculation.",
+            "en": "The representation precondition protects the hash calculation."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.insert-collisions",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-13.2-03",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 32,
+              "printed_page": "32",
+              "heading": "File organisation and access",
+              "bullet_locator": "Hashing objective",
+              "anchor_text": "Show understanding of hashing algorithms"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-13-HASH",
+            "chapter": 13,
+            "printed_pages": [
+              310,
+              311
+            ],
+            "pdf_pages": [
+              326,
+              327
+            ],
+            "relationship": "concept_and_adaptation"
+          },
+          {
+            "section_id": "BOOK-10-ARRAYS",
+            "chapter": 10,
+            "printed_pages": [
+              241,
+              242,
+              243
+            ],
+            "pdf_pages": [
+              257,
+              258,
+              259
+            ],
+            "relationship": "concept_and_adaptation"
+          }
+        ],
+        "title": {
+          "en": "Inserting and handling the prescribed collisions",
+          "vi": "Chèn và xử lý va chạm theo cấu trúc đề"
+        },
+        "explanation": {
+          "vi": "Insert tính địa chỉ ban đầu rồi theo collision sequence đến ô trống hoặc key đã có. Thuật toán phải dừng sau số vị trí hữu hạn và báo thất bại khi không còn ô phù hợp.",
+          "en": "Insertion computes the initial address and follows the collision sequence to an empty cell or the existing key. It must stop after finitely many positions and report failure when no suitable cell remains."
+        },
+        "python_connection": {
+          "vi": "L016 tính start; L017 giới hạn tối đa size bước; L018 wrap index; L020–L022 ghi vào ô trống; L023–L024 xử lý duplicate; L025 trả -1 khi đầy.",
+          "en": "L016 computes start; L017 limits probing to size steps; L018 wraps the index; L020-L022 write to an empty cell; L023-L024 handle a duplicate; L025 returns -1 when full."
+        },
+        "representation": {
+          "vi": "Vẽ probe path theo sequence và đánh dấu mỗi comparison; phân biệt kết quả inserted, already present và full.",
+          "en": "Draw the probe path in sequence and mark every comparison; distinguish inserted, already present, and full outcomes."
+        },
+        "invariant_or_rule": {
+          "vi": "Không ghi đè key khác; chỉ ghi vào sentinel rỗng; probe tối đa capacity vị trí; returned index khớp vị trí key cuối cùng.",
+          "en": "Do not overwrite another key; write only to an empty sentinel; probe at most capacity positions; the returned index matches the key's final location."
+        },
+        "misconceptions": [
+          {
+            "vi": "Ghi đè ngay tại hash address khi collision.",
+            "en": "Overwriting the hash address immediately on collision."
+          },
+          {
+            "vi": "Probe vô hạn khi bảng không còn ô trống.",
+            "en": "Probing forever when no empty slot remains."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề yêu cầu insert và mô tả collision/full behaviour.",
+            "en": "The task asks for insertion and defines collision/full behaviour."
+          },
+          {
+            "vi": "Cần trả index/status hoặc cập nhật overflow structure.",
+            "en": "An index/status must be returned or an overflow structure updated."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "size=5, insert 7 rồi 12; cả hai hash về 2.",
+            "en": "size=5, insert 7 then 12; both hash to 2."
+          },
+          "walkthrough": {
+            "vi": "7 vào slot 2; 12 probe slot 2 rồi vào slot 3 theo linear probing.",
+            "en": "7 enters slot 2; 12 probes slot 2 then enters slot 3 under linear probing."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.hashing.pilot-v1"
+          ],
+          "active_line_ids": [
+            "hashing.v1.L016",
+            "hashing.v1.L017",
+            "hashing.v1.L018",
+            "hashing.v1.L020",
+            "hashing.v1.L021",
+            "hashing.v1.L025"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Điều gì giới hạn insert khi bảng đầy?",
+            "en": "What bounds insertion when the table is full?"
+          },
+          "answer": {
+            "vi": "`range(len(self.slots))` ở L017 chỉ cho tối đa capacity lần kiểm tra.",
+            "en": "`range(len(self.slots))` at L017 allows at most capacity checks."
+          },
+          "rationale": {
+            "vi": "Bounded probe tạo failure path rõ ràng.",
+            "en": "Bounded probing creates an explicit failure path."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.table-storage",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-13.2-03",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 32,
+              "printed_page": "32",
+              "heading": "File organisation and access",
+              "bullet_locator": "Hashing objective",
+              "anchor_text": "Show understanding of hashing algorithms"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-13-HASH",
+            "chapter": 13,
+            "printed_pages": [
+              310,
+              311
+            ],
+            "pdf_pages": [
+              326,
+              327
+            ],
+            "relationship": "concept_and_adaptation"
+          },
+          {
+            "section_id": "BOOK-10-ARRAYS",
+            "chapter": 10,
+            "printed_pages": [
+              241,
+              242,
+              243
+            ],
+            "pdf_pages": [
+              257,
+              258,
+              259
+            ],
+            "relationship": "concept_and_adaptation"
+          },
+          {
+            "section_id": "BOOK-10-RECORDS",
+            "chapter": 10,
+            "printed_pages": [
+              240,
+              241
+            ],
+            "pdf_pages": [
+              256,
+              257
+            ],
+            "relationship": "concept_and_adaptation"
+          }
+        ],
+        "title": {
+          "en": "Hash-table storage and prescribed collision areas",
+          "vi": "Bảng băm và vùng va chạm được chỉ định"
+        },
+        "explanation": {
+          "vi": "Hash table có capacity cố định và quy ước ô rỗng; collision xảy ra khi hai key có cùng địa chỉ ban đầu. Cách lưu collision phải theo đúng cấu trúc được giao, như probing, bucket hoặc vùng spare, vì các cách này có invariants khác nhau.",
+          "en": "A hash table has fixed capacity and an empty-slot convention; a collision occurs when keys share an initial address. Collision storage must follow the supplied structure, such as probing, buckets, or a spare area, because their invariants differ."
+        },
+        "python_connection": {
+          "vi": "Pilot tạo `slots=[None]*size` ở L009 và dùng linear probing trong cùng array ở L017–L024. Nó không triển khai `Spare` array/bucket riêng; bài yêu cầu cấu trúc đó cần artifact khác hoặc mở rộng đã kiểm chứng.",
+          "en": "The pilot creates `slots=[None]*size` at L009 and uses linear probing in the same array at L017-L024. It does not implement a separate `Spare` array or bucket; a task requiring that structure needs another or extended verified artifact."
+        },
+        "representation": {
+          "vi": "Vẽ index 0..size-1, giá trị/sentinel mỗi ô và đường từ hash address tới chuỗi probe. Ghi rõ collision policy ở tiêu đề.",
+          "en": "Draw indices 0..size-1, each value/sentinel, and a path from the hash address through the probe sequence. State the collision policy in the title."
+        },
+        "invariant_or_rule": {
+          "vi": "Mỗi key lưu ở một vị trí reachable theo collision policy; `None` biểu thị chưa dùng trong pilot; số bước probe không vượt size.",
+          "en": "Every stored key occupies a position reachable under the collision policy; `None` means unused in the pilot; probing takes at most size steps."
+        },
+        "misconceptions": [
+          {
+            "vi": "Trộn linear probing với spare-array layout trong cùng lời giải.",
+            "en": "Mixing linear probing with a spare-array layout in one solution."
+          },
+          {
+            "vi": "Không giới hạn số lần probe khi bảng đầy.",
+            "en": "Failing to bound probes when the table is full."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề cung cấp table size, sentinel và collision strategy.",
+            "en": "The task supplies table size, sentinel, and collision strategy."
+          },
+          {
+            "vi": "Có từ khóa bucket, overflow/spare hoặc probing.",
+            "en": "Keywords include bucket, overflow/spare, or probing."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "size=5, key 7 có address 2 nhưng slot 2 đã dùng.",
+            "en": "size=5, key 7 hashes to address 2 but slot 2 is occupied."
+          },
+          "walkthrough": {
+            "vi": "Với pilot linear probing, kiểm tra 3,4,0,1 tối đa một vòng; không tự chuyển sang spare array.",
+            "en": "Under pilot linear probing, inspect 3, 4, 0, and 1 for at most one cycle; do not silently switch to a spare array."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.hashing.pilot-v1"
+          ],
+          "active_line_ids": [
+            "hashing.v1.L009",
+            "hashing.v1.L017",
+            "hashing.v1.L018",
+            "hashing.v1.L020",
+            "hashing.v1.L025"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Artifact pilot dùng collision policy nào?",
+            "en": "Which collision policy does the pilot use?"
+          },
+          "answer": {
+            "vi": "Linear probing trong cùng `slots`, với wraparound modulo.",
+            "en": "Linear probing inside the same `slots` array with modulo wraparound."
+          },
+          "rationale": {
+            "vi": "Policy được chứng minh bởi L017–L020, không phải chỉ bởi tên HashTable.",
+            "en": "The policy is evidenced by L017-L020, not merely by the name HashTable."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      }
+    ]
+  },
+  "python": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
+    "pattern_ids": [
+      "HASH_FUNCTION",
+      "HASH_INSERT",
+      "HASH_SEARCH",
+      "HASH_SETUP"
+    ],
+    "version": "pilot-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "hashing.v1.L001",
+        "order": 1,
+        "text": "import json"
+      },
+      {
+        "line_id": "hashing.v1.L002",
+        "order": 2,
+        "text": "import sys"
+      },
+      {
+        "line_id": "hashing.v1.L003",
+        "order": 3,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L004",
+        "order": 4,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L005",
+        "order": 5,
+        "text": "class HashTable:"
+      },
+      {
+        "line_id": "hashing.v1.L006",
+        "order": 6,
+        "text": "    def __init__(self, size, trace):"
+      },
+      {
+        "line_id": "hashing.v1.L007",
+        "order": 7,
+        "text": "        if size <= 0:"
+      },
+      {
+        "line_id": "hashing.v1.L008",
+        "order": 8,
+        "text": "            raise ValueError(\"size must be positive\")"
+      },
+      {
+        "line_id": "hashing.v1.L009",
+        "order": 9,
+        "text": "        self.slots = [None] * size"
+      },
+      {
+        "line_id": "hashing.v1.L010",
+        "order": 10,
+        "text": "        self.trace = trace"
+      },
+      {
+        "line_id": "hashing.v1.L011",
+        "order": 11,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L012",
+        "order": 12,
+        "text": "    def address(self, key):"
+      },
+      {
+        "line_id": "hashing.v1.L013",
+        "order": 13,
+        "text": "        return key % len(self.slots)"
+      },
+      {
+        "line_id": "hashing.v1.L014",
+        "order": 14,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L015",
+        "order": 15,
+        "text": "    def insert(self, key):"
+      },
+      {
+        "line_id": "hashing.v1.L016",
+        "order": 16,
+        "text": "        start = self.address(key)"
+      },
+      {
+        "line_id": "hashing.v1.L017",
+        "order": 17,
+        "text": "        for step in range(len(self.slots)):"
+      },
+      {
+        "line_id": "hashing.v1.L018",
+        "order": 18,
+        "text": "            index = (start + step) % len(self.slots)"
+      },
+      {
+        "line_id": "hashing.v1.L019",
+        "order": 19,
+        "text": "            self.trace.append({\"event\": \"probe_insert\", \"key\": key, \"index\": index, \"step\": step})"
+      },
+      {
+        "line_id": "hashing.v1.L020",
+        "order": 20,
+        "text": "            if self.slots[index] is None:"
+      },
+      {
+        "line_id": "hashing.v1.L021",
+        "order": 21,
+        "text": "                self.slots[index] = key"
+      },
+      {
+        "line_id": "hashing.v1.L022",
+        "order": 22,
+        "text": "                return index"
+      },
+      {
+        "line_id": "hashing.v1.L023",
+        "order": 23,
+        "text": "            if self.slots[index] == key:"
+      },
+      {
+        "line_id": "hashing.v1.L024",
+        "order": 24,
+        "text": "                return index"
+      },
+      {
+        "line_id": "hashing.v1.L025",
+        "order": 25,
+        "text": "        return -1"
+      },
+      {
+        "line_id": "hashing.v1.L026",
+        "order": 26,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L027",
+        "order": 27,
+        "text": "    def search(self, key):"
+      },
+      {
+        "line_id": "hashing.v1.L028",
+        "order": 28,
+        "text": "        start = self.address(key)"
+      },
+      {
+        "line_id": "hashing.v1.L029",
+        "order": 29,
+        "text": "        for step in range(len(self.slots)):"
+      },
+      {
+        "line_id": "hashing.v1.L030",
+        "order": 30,
+        "text": "            index = (start + step) % len(self.slots)"
+      },
+      {
+        "line_id": "hashing.v1.L031",
+        "order": 31,
+        "text": "            self.trace.append({\"event\": \"probe_search\", \"key\": key, \"index\": index, \"step\": step})"
+      },
+      {
+        "line_id": "hashing.v1.L032",
+        "order": 32,
+        "text": "            if self.slots[index] is None:"
+      },
+      {
+        "line_id": "hashing.v1.L033",
+        "order": 33,
+        "text": "                return -1"
+      },
+      {
+        "line_id": "hashing.v1.L034",
+        "order": 34,
+        "text": "            if self.slots[index] == key:"
+      },
+      {
+        "line_id": "hashing.v1.L035",
+        "order": 35,
+        "text": "                return index"
+      },
+      {
+        "line_id": "hashing.v1.L036",
+        "order": 36,
+        "text": "        return -1"
+      },
+      {
+        "line_id": "hashing.v1.L037",
+        "order": 37,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L038",
+        "order": 38,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L039",
+        "order": 39,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "hashing.v1.L040",
+        "order": 40,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "hashing.v1.L041",
+        "order": 41,
+        "text": "    if not all(isinstance(key, int) for key in fixture[\"insert_keys\"] + [fixture[\"search_key\"]]):"
+      },
+      {
+        "line_id": "hashing.v1.L042",
+        "order": 42,
+        "text": "        trace.append({\"event\": \"reject_non_integer_key\"})"
+      },
+      {
+        "line_id": "hashing.v1.L043",
+        "order": 43,
+        "text": "        return {\"status\": \"INVALID_KEY\", \"trace\": trace}"
+      },
+      {
+        "line_id": "hashing.v1.L044",
+        "order": 44,
+        "text": "    try:"
+      },
+      {
+        "line_id": "hashing.v1.L045",
+        "order": 45,
+        "text": "        table = HashTable(fixture[\"size\"], trace)"
+      },
+      {
+        "line_id": "hashing.v1.L046",
+        "order": 46,
+        "text": "    except ValueError as error:"
+      },
+      {
+        "line_id": "hashing.v1.L047",
+        "order": 47,
+        "text": "        return {\"status\": \"INVALID_SIZE\", \"message\": str(error), \"trace\": trace}"
+      },
+      {
+        "line_id": "hashing.v1.L048",
+        "order": 48,
+        "text": "    inserted_at = []"
+      },
+      {
+        "line_id": "hashing.v1.L049",
+        "order": 49,
+        "text": "    for key in fixture[\"insert_keys\"]:"
+      },
+      {
+        "line_id": "hashing.v1.L050",
+        "order": 50,
+        "text": "        inserted_at.append(table.insert(key))"
+      },
+      {
+        "line_id": "hashing.v1.L051",
+        "order": 51,
+        "text": "    found_at = table.search(fixture[\"search_key\"])"
+      },
+      {
+        "line_id": "hashing.v1.L052",
+        "order": 52,
+        "text": "    return {"
+      },
+      {
+        "line_id": "hashing.v1.L053",
+        "order": 53,
+        "text": "        \"status\": \"OK\","
+      },
+      {
+        "line_id": "hashing.v1.L054",
+        "order": 54,
+        "text": "        \"inserted_at\": inserted_at,"
+      },
+      {
+        "line_id": "hashing.v1.L055",
+        "order": 55,
+        "text": "        \"found_at\": found_at,"
+      },
+      {
+        "line_id": "hashing.v1.L056",
+        "order": 56,
+        "text": "        \"slots\": table.slots,"
+      },
+      {
+        "line_id": "hashing.v1.L057",
+        "order": 57,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "hashing.v1.L058",
+        "order": 58,
+        "text": "    }"
+      },
+      {
+        "line_id": "hashing.v1.L059",
+        "order": 59,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L060",
+        "order": 60,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L061",
+        "order": 61,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "hashing.v1.L062",
+        "order": 62,
+        "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
+      },
+      {
+        "line_id": "hashing.v1.L063",
+        "order": 63,
+        "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
+      },
+      {
+        "line_id": "hashing.v1.L064",
+        "order": 64,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "00acfb5f4c6320ceb5714cba3060f8ec6777ec6a386dc08b6bb3a3d3ead38707",
+    "caption": {
+      "vi": "Bảng băm dùng phép chia dư, dò tuyến tính, chèn và tìm kiếm có giới hạn.",
+      "en": "A hash table using remainder addressing and bounded linear probing for insert and search."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r2.a3.hashing.pilot-v1.author-run",
+      "independent_rerun_ref": "p4r2.a3.hashing.pilot-v1.independent-rerun",
+      "execution_log_sha256": "1de2ed8b3ec907eed9c74ae8b6bf8deaeee0fe4c32480f0924a1091d4b613cab"
+    }
+  },
+  "tests": {
+    "fixtures": [
+      {
+        "fixture_id": "hashing.normal",
+        "case_kind": "normal",
+        "input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        }
+      },
+      {
+        "fixture_id": "hashing.boundary",
+        "case_kind": "boundary",
+        "input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        }
+      },
+      {
+        "fixture_id": "hashing.failure",
+        "case_kind": "failure",
+        "input": {
+          "insert_keys": [
+            10,
+            "seventeen"
+          ],
+          "search_key": 10,
+          "size": 7
+        }
+      }
+    ],
+    "expected_outputs": [
+      {
+        "expected_output_id": "hashing.normal.expected-output",
+        "fixture_ref": "hashing.normal",
+        "value": {
+          "found_at": 4,
+          "inserted_at": [
+            3,
+            4,
+            5
+          ],
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            24,
+            null
+          ],
+          "status": "OK",
+          "trace": [
+            {
+              "event": "probe_insert",
+              "index": 3,
+              "key": 10,
+              "step": 0
+            },
+            {
+              "event": "probe_insert",
+              "index": 3,
+              "key": 17,
+              "step": 0
+            },
+            {
+              "event": "probe_insert",
+              "index": 4,
+              "key": 17,
+              "step": 1
+            },
+            {
+              "event": "probe_insert",
+              "index": 3,
+              "key": 24,
+              "step": 0
+            },
+            {
+              "event": "probe_insert",
+              "index": 4,
+              "key": 24,
+              "step": 1
+            },
+            {
+              "event": "probe_insert",
+              "index": 5,
+              "key": 24,
+              "step": 2
+            },
+            {
+              "event": "probe_search",
+              "index": 3,
+              "key": 17,
+              "step": 0
+            },
+            {
+              "event": "probe_search",
+              "index": 4,
+              "key": 17,
+              "step": 1
+            }
+          ]
+        }
+      },
+      {
+        "expected_output_id": "hashing.boundary.expected-output",
+        "fixture_ref": "hashing.boundary",
+        "value": {
+          "found_at": -1,
+          "inserted_at": [
+            0,
+            1,
+            2,
+            -1
+          ],
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "status": "OK",
+          "trace": [
+            {
+              "event": "probe_insert",
+              "index": 0,
+              "key": 0,
+              "step": 0
+            },
+            {
+              "event": "probe_insert",
+              "index": 1,
+              "key": 1,
+              "step": 0
+            },
+            {
+              "event": "probe_insert",
+              "index": 2,
+              "key": 2,
+              "step": 0
+            },
+            {
+              "event": "probe_insert",
+              "index": 0,
+              "key": 3,
+              "step": 0
+            },
+            {
+              "event": "probe_insert",
+              "index": 1,
+              "key": 3,
+              "step": 1
+            },
+            {
+              "event": "probe_insert",
+              "index": 2,
+              "key": 3,
+              "step": 2
+            },
+            {
+              "event": "probe_search",
+              "index": 0,
+              "key": 9,
+              "step": 0
+            },
+            {
+              "event": "probe_search",
+              "index": 1,
+              "key": 9,
+              "step": 1
+            },
+            {
+              "event": "probe_search",
+              "index": 2,
+              "key": 9,
+              "step": 2
+            }
+          ]
+        }
+      },
+      {
+        "expected_output_id": "hashing.failure.expected-output",
+        "fixture_ref": "hashing.failure",
+        "value": {
+          "status": "INVALID_KEY",
+          "trace": [
+            {
+              "event": "reject_non_integer_key"
+            }
+          ]
+        }
+      }
+    ],
+    "normal_boundary_failure_coverage": {
+      "normal": true,
+      "boundary": true,
+      "failure": true
+    },
+    "author_run_ref": "p4r2.a3.hashing.pilot-v1.author-run",
+    "independent_rerun_ref": "p4r2.a3.hashing.pilot-v1.independent-rerun",
+    "execution_log_sha256": "1de2ed8b3ec907eed9c74ae8b6bf8deaeee0fe4c32480f0924a1091d4b613cab"
+  },
+  "visual": {
+    "owned_patterns": [
+      {
+        "pattern_id": "HASH_FUNCTION",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
+        "owner_lesson_slug": "hashing",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+        "trace_url": "/paper4-v2/traces/hash-function.json",
+        "scenario_count": 3,
+        "event_count": 18
+      },
+      {
+        "pattern_id": "HASH_INSERT",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
+        "owner_lesson_slug": "hashing",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+        "trace_url": "/paper4-v2/traces/hash-insert.json",
+        "scenario_count": 3,
+        "event_count": 18
+      },
+      {
+        "pattern_id": "HASH_SEARCH",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
+        "owner_lesson_slug": "hashing",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+        "trace_url": "/paper4-v2/traces/hash-search.json",
+        "scenario_count": 3,
+        "event_count": 18
+      },
+      {
+        "pattern_id": "HASH_SETUP",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
+        "owner_lesson_slug": "hashing",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+        "trace_url": "/paper4-v2/traces/hash-setup.json",
+        "scenario_count": 3,
+        "event_count": 18
+      }
+    ],
+    "approved_static_or_representational_support": []
+  },
+  "marking": {
+    "chains": [
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.hash-function",
+        "pattern_id": "HASH_FUNCTION",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-13.2-03",
+        "method_step_refs": [
+          "B5-HASH_FUNCTION-S01",
+          "B5-HASH_FUNCTION-S02",
+          "B5-HASH_FUNCTION-S03",
+          "B5-HASH_FUNCTION-S04"
+        ],
+        "error_ref": "B5-ERR-HASH_FUNCTION-01",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B5-ERR-HASH_FUNCTION-01, B5-ERR-HASH_FUNCTION-02, B5-ERR-HASH_FUNCTION-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B5-ERR-HASH_FUNCTION-01, B5-ERR-HASH_FUNCTION-02, B5-ERR-HASH_FUNCTION-03."
+        },
+        "marking_atoms": [
+          {
+            "atom_id": "9618_s25_42_2-c-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Function header (and close where appropriate), taking one (integer) parameter and returning the calculated value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Function header (and close where appropriate), taking one (integer) parameter and returning the calculated value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 24,
+              "heading": "9618_s25_42 9618_s25_42_2(c)",
+              "bullet_locator": "9618_s25_42_2(c).mp.01",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 7 requirement req-9618-s25-42-2(c)-01; MS 9618_s25_ms_42 pdf 24"
+            }
+          },
+          {
+            "atom_id": "9618_s25_42_2-c-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Calculation of parameter MOD 200 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Calculation of parameter MOD 200 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 24,
+              "heading": "9618_s25_42 9618_s25_42_2(c)",
+              "bullet_locator": "9618_s25_42_2(c).mp.02",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 7 requirement req-9618-s25-42-2(c)-01; MS 9618_s25_ms_42 pdf 24"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-c-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Function header (and end) taking one parameter and returning calculated hash [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Function header (and end) taking one parameter and returning calculated hash [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 28,
+              "heading": "9618_w25_41 9618_w25_41_3(c)",
+              "bullet_locator": "9618_w25_41_3(c).mp.01",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 10 requirement req-9618-w25-41-3(c)-01; MS 9618_w25_ms_41 pdf 28"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-c-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "…. hash calculated correctly from parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_w25_41_3(c).mp.01\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "…. hash calculated correctly from parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_w25_41_3(c).mp.01\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 28,
+              "heading": "9618_w25_41 9618_w25_41_3(c)",
+              "bullet_locator": "9618_w25_41_3(c).mp.02",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 10 requirement req-9618-w25-41-3(c)-01; MS 9618_w25_ms_41 pdf 28"
+            }
+          }
+        ],
+        "limited_evidence": false,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 0 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 0 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.hash-insert",
+        "pattern_id": "HASH_INSERT",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-13.2-03",
+        "method_step_refs": [
+          "B5-HASH_INSERT-S01",
+          "B5-HASH_INSERT-S02",
+          "B5-HASH_INSERT-S03",
+          "B5-HASH_INSERT-S04",
+          "B5-HASH_INSERT-S05",
+          "B5-HASH_INSERT-S06",
+          "B5-HASH_INSERT-S07"
+        ],
+        "error_ref": "B5-ERR-HASH_INSERT-01",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B5-ERR-HASH_INSERT-01, B5-ERR-HASH_INSERT-02, B5-ERR-HASH_INSERT-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B5-ERR-HASH_INSERT-01, B5-ERR-HASH_INSERT-02, B5-ERR-HASH_INSERT-03."
+        },
+        "marking_atoms": [
+          {
+            "atom_id": "9618_s25_42_2-d-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Procedure header (and end where appropriate) taking one record as a parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Procedure header (and end where appropriate) taking one record as a parameter [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 25,
+              "heading": "9618_s25_42 9618_s25_42_2(d)",
+              "bullet_locator": "9618_s25_42_2(d).mp.01",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 7 requirement req-9618-s25-42-2(d)-01; MS 9618_s25_ms_42 pdf 25,26,27"
+            }
+          },
+          {
+            "atom_id": "9618_s25_42_2-d-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Calling CalculateHash() with key from parameter record and storing/using return value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Calling CalculateHash() with key from parameter record and storing/using return value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 25,
+              "heading": "9618_s25_42 9618_s25_42_2(d)",
+              "bullet_locator": "9618_s25_42_2(d).mp.02",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 7 requirement req-9618-s25-42-2(d)-01; MS 9618_s25_ms_42 pdf 25,26,27"
+            }
+          },
+          {
+            "atom_id": "9618_s25_42_2-d-.mp.03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Checking if HashTable at return value from CalculateHash is empty record … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Checking if HashTable at return value from CalculateHash is empty record … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 25,
+              "heading": "9618_s25_42 9618_s25_42_2(d)",
+              "bullet_locator": "9618_s25_42_2(d).mp.03",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 7 requirement req-9618-s25-42-2(d)-01; MS 9618_s25_ms_42 pdf 25,26,27"
+            }
+          },
+          {
+            "atom_id": "9618_s25_42_2-d-.mp.04",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… if it is empty, store parameter in location [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_42_2(d).mp.03\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… if it is empty, store parameter in location [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_42_2(d).mp.03\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 25,
+              "heading": "9618_s25_42 9618_s25_42_2(d)",
+              "bullet_locator": "9618_s25_42_2(d).mp.04",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 7 requirement req-9618-s25-42-2(d)-01; MS 9618_s25_ms_42 pdf 25,26,27"
+            }
+          },
+          {
+            "atom_id": "9618_s25_42_2-d-.mp.05",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… otherwise, locating next free space in Spare … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_42_2(d).mp.04\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… otherwise, locating next free space in Spare … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_42_2(d).mp.04\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 25,
+              "heading": "9618_s25_42 9618_s25_42_2(d)",
+              "bullet_locator": "9618_s25_42_2(d).mp.05",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 7 requirement req-9618-s25-42-2(d)-01; MS 9618_s25_ms_42 pdf 25,26,27"
+            }
+          },
+          {
+            "atom_id": "9618_s25_42_2-d-.mp.06",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… and storing in that index only (i.e. not in all other free spaces) [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_42_2(d).mp.05\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… and storing in that index only (i.e. not in all other free spaces) [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_42_2(d).mp.05\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 25,
+              "heading": "9618_s25_42 9618_s25_42_2(d)",
+              "bullet_locator": "9618_s25_42_2(d).mp.06",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 7 requirement req-9618-s25-42-2(d)-01; MS 9618_s25_ms_42 pdf 25,26,27"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-d-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Declare the procedure with one Record parameter. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Declare the procedure with one Record parameter. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 29,
+              "heading": "9618_w25_41 9618_w25_41_3(d)",
+              "bullet_locator": "9618_w25_41_3(d).mp.01",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 10 requirement req-9618-w25-41-3(d)-01; MS 9618_w25_ms_41 pdf 29,30"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-d-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Call Hash with the parameter key and retain or use the returned address. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=alternative; alternatives=[\"Accept an equivalent route only where the official wording permits it; Lead must preserve the QP contract.\"]. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Call Hash with the parameter key and retain or use the returned address. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=alternative; alternatives=[\"Accept an equivalent route only where the official wording permits it; Lead must preserve the QP contract.\"]. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 29,
+              "heading": "9618_w25_41 9618_w25_41_3(d)",
+              "bullet_locator": "9618_w25_41_3(d).mp.02",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 10 requirement req-9618-w25-41-3(d)-01; MS 9618_w25_ms_41 pdf 29,30"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-d-.mp.03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Use bucket position zero when it is empty. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Use bucket position zero when it is empty. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 29,
+              "heading": "9618_w25_41 9618_w25_41_3(d)",
+              "bullet_locator": "9618_w25_41_3(d).mp.03",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 10 requirement req-9618-w25-41-3(d)-01; MS 9618_w25_ms_41 pdf 29,30"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-d-.mp.04",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "On collision, scan the bucket's second dimension for an empty position and store the record there. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "On collision, scan the bucket's second dimension for an empty position and store the record there. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 29,
+              "heading": "9618_w25_41 9618_w25_41_3(d)",
+              "bullet_locator": "9618_w25_41_3(d).mp.04",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 10 requirement req-9618-w25-41-3(d)-01; MS 9618_w25_ms_41 pdf 29,30"
+            }
+          }
+        ],
+        "limited_evidence": false,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 0 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 0 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.hash-search",
+        "pattern_id": "HASH_SEARCH",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-13.2-03",
+        "method_step_refs": [
+          "B5-HASH_SEARCH-S01",
+          "B5-HASH_SEARCH-S02",
+          "B5-HASH_SEARCH-S03",
+          "B5-HASH_SEARCH-S04",
+          "B5-HASH_SEARCH-S05",
+          "B5-HASH_SEARCH-S06"
+        ],
+        "error_ref": "B5-ERR-HASH_SEARCH-01",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B5-ERR-HASH_SEARCH-01, B5-ERR-HASH_SEARCH-02, B5-ERR-HASH_SEARCH-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B5-ERR-HASH_SEARCH-01, B5-ERR-HASH_SEARCH-02, B5-ERR-HASH_SEARCH-03."
+        },
+        "marking_atoms": [
+          {
+            "atom_id": "9618_w25_41_3-f-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Function header (and end) taking one parameter and returning string in all cases [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Function header (and end) taking one parameter and returning string in all cases [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 33,
+              "heading": "9618_w25_41 9618_w25_41_3(f)",
+              "bullet_locator": "9618_w25_41_3(f).mp.01",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 11 requirement req-9618-w25-41-3(f)-01; MS 9618_w25_ms_41 pdf 33,34"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-f-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Calling Hash() with parameter and storing/using return value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Calling Hash() with parameter and storing/using return value [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 33,
+              "heading": "9618_w25_41 9618_w25_41_3(f)",
+              "bullet_locator": "9618_w25_41_3(f).mp.02",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 11 requirement req-9618-w25-41-3(f)-01; MS 9618_w25_ms_41 pdf 33,34"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-f-.mp.03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Iterating through 2nd dimension at HashTable[return value] and comparison to parameter … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Iterating through 2nd dimension at HashTable[return value] and comparison to parameter … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 33,
+              "heading": "9618_w25_41 9618_w25_41_3(f)",
+              "bullet_locator": "9618_w25_41_3(f).mp.03",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 11 requirement req-9618-w25-41-3(f)-01; MS 9618_w25_ms_41 pdf 33,34"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-f-.mp.04",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… returning data if found/equal [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_w25_41_3(f).mp.03\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… returning data if found/equal [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_w25_41_3(f).mp.03\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 33,
+              "heading": "9618_w25_41 9618_w25_41_3(f)",
+              "bullet_locator": "9618_w25_41_3(f).mp.04",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 11 requirement req-9618-w25-41-3(f)-01; MS 9618_w25_ms_41 pdf 33,34"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-f-.mp.05",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… returning \"Not found\" if not found by the end of the dimension [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_w25_41_3(f).mp.04\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… returning \"Not found\" if not found by the end of the dimension [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_w25_41_3(f).mp.04\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 33,
+              "heading": "9618_w25_41 9618_w25_41_3(f)",
+              "bullet_locator": "9618_w25_41_3(f).mp.05",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 11 requirement req-9618-w25-41-3(f)-01; MS 9618_w25_ms_41 pdf 33,34"
+            }
+          }
+        ],
+        "limited_evidence": false,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 0 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 0 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.hash-setup",
+        "pattern_id": "HASH_SETUP",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-13.2-03",
+        "method_step_refs": [
+          "B5-HASH_SETUP-S01",
+          "B5-HASH_SETUP-S02",
+          "B5-HASH_SETUP-S03",
+          "B5-HASH_SETUP-S04",
+          "B5-HASH_SETUP-S05"
+        ],
+        "error_ref": "B5-ERR-HASH_SETUP-01",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B5-ERR-HASH_SETUP-01, B5-ERR-HASH_SETUP-02, B5-ERR-HASH_SETUP-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B5-ERR-HASH_SETUP-01, B5-ERR-HASH_SETUP-02, B5-ERR-HASH_SETUP-03."
+        },
+        "marking_atoms": [
+          {
+            "atom_id": "9618_s25_42_2-b-i-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "HashTable (200 records) and Spare (100 records) declared as (global) arrays [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "HashTable (200 records) and Spare (100 records) declared as (global) arrays [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 21,
+              "heading": "9618_s25_42 9618_s25_42_2(b)(i)",
+              "bullet_locator": "9618_s25_42_2(b)(i).mp.01",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 6 requirement req-9618-s25-42-2(b)(i)-01; MS 9618_s25_ms_42 pdf 21"
+            }
+          },
+          {
+            "atom_id": "9618_s25_42_2-b-ii-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Procedure Initialise() header (and close where appropriate) that initialises all elements in both arrays … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Procedure Initialise() header (and close where appropriate) that initialises all elements in both arrays … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 22,
+              "heading": "9618_s25_42 9618_s25_42_2(b)(ii)",
+              "bullet_locator": "9618_s25_42_2(b)(ii).mp.01",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 6 requirement req-9618-s25-42-2(b)(ii)-01; MS 9618_s25_ms_42 pdf 22,23"
+            }
+          },
+          {
+            "atom_id": "9618_s25_42_2-b-ii-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… to an empty record with –1 in each of the 3 fields/elements [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_42_2(b)(ii).mp.01\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… to an empty record with –1 in each of the 3 fields/elements [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_42_2(b)(ii).mp.01\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_42",
+              "pdf_page": 22,
+              "heading": "9618_s25_42 9618_s25_42_2(b)(ii)",
+              "bullet_locator": "9618_s25_42_2(b)(ii).mp.02",
+              "anchor_text": "QP 9618_s25_qp_42 pdf 6 requirement req-9618-s25-42-2(b)(ii)-01; MS 9618_s25_ms_42 pdf 22,23"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-b-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "2D array of 100  10 elements of type Record [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "2D array of 100  10 elements of type Record [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 27,
+              "heading": "9618_w25_41 9618_w25_41_3(b)",
+              "bullet_locator": "9618_w25_41_3(b).mp.01",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 10 requirement req-9618-w25-41-3(b)-01; MS 9618_w25_ms_41 pdf 27"
+            }
+          },
+          {
+            "atom_id": "9618_w25_41_3-b-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Procedure InitialiseHashTable() header (and end) and initialises each element in the 2D array to an empty/null record in procedure [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Procedure InitialiseHashTable() header (and end) and initialises each element in the 2D array to an empty/null record in procedure [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_41",
+              "pdf_page": 27,
+              "heading": "9618_w25_41 9618_w25_41_3(b)",
+              "bullet_locator": "9618_w25_41_3(b).mp.02",
+              "anchor_text": "QP 9618_w25_qp_41 pdf 10 requirement req-9618-w25-41-3(b)-01; MS 9618_w25_ms_41 pdf 27"
+            }
+          }
+        ],
+        "limited_evidence": false,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 0 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 0 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      }
+    ]
+  },
+  "errors": {
+    "error_refs": [
+      "B5-ERR-HASH_FUNCTION-01",
+      "B5-ERR-HASH_INSERT-01",
+      "B5-ERR-HASH_SEARCH-01",
+      "B5-ERR-HASH_SETUP-01"
+    ],
+    "misconceptions": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.find-collisions",
+        "vi": "Chỉ kiểm tra hash address rồi kết luận not found sau collision.",
+        "en": "Checking only the hash address and declaring not found after a collision."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.find-collisions",
+        "vi": "Dùng collision order khác insert.",
+        "en": "Using a different collision order from insertion."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.hash-address",
+        "vi": "Dùng phép chia thường hoặc quotient làm address.",
+        "en": "Using normal division or the quotient as the address."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.hash-address",
+        "vi": "Dùng modulo một hằng khác với capacity được giao.",
+        "en": "Taking modulo by a constant different from the supplied capacity."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.insert-collisions",
+        "vi": "Ghi đè ngay tại hash address khi collision.",
+        "en": "Overwriting the hash address immediately on collision."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.insert-collisions",
+        "vi": "Probe vô hạn khi bảng không còn ô trống.",
+        "en": "Probing forever when no empty slot remains."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.table-storage",
+        "vi": "Trộn linear probing với spare-array layout trong cùng lời giải.",
+        "en": "Mixing linear probing with a spare-array layout in one solution."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.table-storage",
+        "vi": "Không giới hạn số lần probe khi bảng đầy.",
+        "en": "Failing to bound probes when the table is full."
+      }
+    ],
+    "checks": [
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.hash-function",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B5-ERR-HASH_FUNCTION-01, B5-ERR-HASH_FUNCTION-02, B5-ERR-HASH_FUNCTION-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B5-ERR-HASH_FUNCTION-01, B5-ERR-HASH_FUNCTION-02, B5-ERR-HASH_FUNCTION-03."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.hash-insert",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B5-ERR-HASH_INSERT-01, B5-ERR-HASH_INSERT-02, B5-ERR-HASH_INSERT-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B5-ERR-HASH_INSERT-01, B5-ERR-HASH_INSERT-02, B5-ERR-HASH_INSERT-03."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.hash-search",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B5-ERR-HASH_SEARCH-01, B5-ERR-HASH_SEARCH-02, B5-ERR-HASH_SEARCH-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B5-ERR-HASH_SEARCH-01, B5-ERR-HASH_SEARCH-02, B5-ERR-HASH_SEARCH-03."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.hash-setup",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: B5-ERR-HASH_SETUP-01, B5-ERR-HASH_SETUP-02, B5-ERR-HASH_SETUP-03.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: B5-ERR-HASH_SETUP-01, B5-ERR-HASH_SETUP-02, B5-ERR-HASH_SETUP-03."
+        }
+      }
+    ]
+  },
+  "practice": {
+    "items": [
+      {
+        "assessment_item_id": "ac-9618-p4-2026-python.lesson.hashing.practice.faded",
+        "pattern_ids": [
+          "HASH_FUNCTION",
+          "HASH_INSERT",
+          "HASH_SEARCH"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-13.2-03"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.hashing.assessment.progression",
+        "level": "faded",
+        "prompt": {
+          "vi": "Hoàn thiện linear probing có wrap-around và giới hạn tối đa `size` probe. Với fixture boundary, chỉ ra insert nào trả -1 và vì sao search 9 kết thúc; nộp Python, bảng probe và kiểm tra không lặp vô hạn.",
+          "en": "Complete linear probing with wrap-around and a maximum of `size` probes. For the boundary fixture, identify which insert returns -1 and why searching for 9 terminates; submit Python, a probe table, and a no-infinite-loop check."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+          "hashing.boundary",
+          "hashing.boundary.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Bản sửa Python chạy được, output fixture thực tế, trace trước/sau và ghi chú sửa lỗi.",
+          "en": "Runnable Python repair, actual fixture output, before/after trace, and error-repair note."
+        },
+        "hint": {
+          "vi": "Bắt đầu tại `key % size`, probe tối đa `size` ô và wrap bằng modulo.",
+          "en": "Start at `key % size`, probe at most `size` cells, and wrap with modulo."
+        },
+        "feedback": {
+          "vi": "Nếu sai vị trí hoặc lặp, kiểm tra start address, modulo wrap, điều kiện dừng khi gặp `None` và giới hạn số probe.",
+          "en": "If a position is wrong or probing loops, check the start address, modulo wrap, stop-on-`None`, and the probe limit."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "hashing.faded.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho HASH_FUNCTION, HASH_INSERT, HASH_SEARCH và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for HASH_FUNCTION, HASH_INSERT, HASH_SEARCH with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "hashing.faded.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.hashing.pilot-v1, hashing.boundary, hashing.boundary.expected-output."
+            },
+            {
+              "criterion_id": "hashing.faded.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      },
+      {
+        "assessment_item_id": "ac-9618-p4-2026-python.lesson.hashing.practice.guided",
+        "pattern_ids": [
+          "HASH_SETUP",
+          "HASH_FUNCTION",
+          "HASH_INSERT",
+          "HASH_SEARCH"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-13.2-03"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.hashing.assessment.progression",
+        "level": "guided",
+        "prompt": {
+          "vi": "Với fixture normal, tính địa chỉ ban đầu của 10, 17 và 24, rồi trace từng probe khi insert và search 17. Ghi trạng thái bảng sau mỗi insert và giải thích vì sao các khóa va chạm.",
+          "en": "For the normal fixture, calculate the initial addresses of 10, 17, and 24, then trace every probe while inserting and searching for 17. Record the table after each insert and explain why the keys collide."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+          "hashing.normal",
+          "hashing.normal.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Trace song ngữ có chú thích, dự đoán, chuyển trạng thái thực tế và một kiểm tra bất biến.",
+          "en": "Bilingual annotated trace with predictions, actual state transitions, and one invariant check."
+        },
+        "hint": {
+          "vi": "Bắt đầu tại `key % size`, probe tối đa `size` ô và wrap bằng modulo.",
+          "en": "Start at `key % size`, probe at most `size` cells, and wrap with modulo."
+        },
+        "feedback": {
+          "vi": "Nếu sai vị trí hoặc lặp, kiểm tra start address, modulo wrap, điều kiện dừng khi gặp `None` và giới hạn số probe.",
+          "en": "If a position is wrong or probing loops, check the start address, modulo wrap, stop-on-`None`, and the probe limit."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "hashing.guided.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho HASH_SETUP, HASH_FUNCTION, HASH_INSERT, HASH_SEARCH và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for HASH_SETUP, HASH_FUNCTION, HASH_INSERT, HASH_SEARCH with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "hashing.guided.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.hashing.pilot-v1, hashing.normal, hashing.normal.expected-output."
+            },
+            {
+              "criterion_id": "hashing.guided.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      },
+      {
+        "assessment_item_id": "ac-9618-p4-2026-python.lesson.hashing.practice.independent",
+        "pattern_ids": [
+          "HASH_SETUP",
+          "HASH_FUNCTION",
+          "HASH_INSERT",
+          "HASH_SEARCH"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-13.2-03"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.hashing.assessment.progression",
+        "level": "independent",
+        "prompt": {
+          "vi": "Cài đặt hash table gồm setup, hash function, collision insert và search; chạy normal/boundary/failure. Nộp code, output thực tế, probe traces, assertions về wrap/full/not-found và bằng chứng invalid key bị từ chối trước mutation.",
+          "en": "Implement a hash table with setup, hash function, collision-resolving insert, and search; run normal/boundary/failure. Submit code, actual outputs, probe traces, assertions for wrap/full/not-found, and evidence that an invalid key is rejected before mutation."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+          "hashing.normal",
+          "hashing.normal.expected-output",
+          "hashing.boundary",
+          "hashing.boundary.expected-output",
+          "hashing.failure",
+          "hashing.failure.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Lời giải Python chạy được, output normal-boundary-failure, assertions và bản tự kiểm.",
+          "en": "Runnable Python solution, normal-boundary-failure outputs, assertions, and self-audit."
+        },
+        "hint": {
+          "vi": "Bắt đầu tại `key % size`, probe tối đa `size` ô và wrap bằng modulo.",
+          "en": "Start at `key % size`, probe at most `size` cells, and wrap with modulo."
+        },
+        "feedback": {
+          "vi": "Nếu sai vị trí hoặc lặp, kiểm tra start address, modulo wrap, điều kiện dừng khi gặp `None` và giới hạn số probe.",
+          "en": "If a position is wrong or probing loops, check the start address, modulo wrap, stop-on-`None`, and the probe limit."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "hashing.independent.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho HASH_SETUP, HASH_FUNCTION, HASH_INSERT, HASH_SEARCH và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for HASH_SETUP, HASH_FUNCTION, HASH_INSERT, HASH_SEARCH with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "hashing.independent.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.hashing.pilot-v1, hashing.normal, hashing.normal.expected-output, hashing.boundary, hashing.boundary.expected-output, hashing.failure, hashing.failure.expected-output."
+            },
+            {
+              "criterion_id": "hashing.independent.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            },
+            {
+              "criterion_id": "hashing.independent.rubric.transfer",
+              "description": {
+                "vi": "Lời giải chạy đủ normal, boundary và failure mà không dùng đáp án được mở sẵn.",
+                "en": "The solution runs normal, boundary, and failure cases without a pre-revealed answer."
+              },
+              "evidence_required": "Three actual outputs and assertions covering acceptance, boundary behaviour, and rejection."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 4/4 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 4/4 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      }
+    ]
+  },
+  "retrieval": {
+    "release_refs": [],
+    "items": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.find-collisions",
+        "prompt": {
+          "vi": "Khi nào `None` cho phép dừng sớm trong pilot?",
+          "en": "When does `None` allow an early stop in the pilot?"
+        },
+        "answer": {
+          "vi": "Khi không có deletion/tombstone và insert/search dùng cùng linear-probe sequence.",
+          "en": "When there is no deletion/tombstone and insertion/search use the same linear-probe sequence."
+        },
+        "rationale": {
+          "vi": "Nếu contract có deletion, quy tắc sentinel phải được xem lại.",
+          "en": "If the contract includes deletion, sentinel rules must be reconsidered."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check"
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.hash-address",
+        "prompt": {
+          "vi": "Tại sao constructor chặn size=0?",
+          "en": "Why does the constructor reject size=0?"
+        },
+        "answer": {
+          "vi": "Modulo 0 không xác định và không có index hợp lệ.",
+          "en": "Modulo zero is undefined and there is no valid index."
+        },
+        "rationale": {
+          "vi": "Tiền điều kiện của representation bảo vệ hash calculation.",
+          "en": "The representation precondition protects the hash calculation."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check"
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.insert-collisions",
+        "prompt": {
+          "vi": "Điều gì giới hạn insert khi bảng đầy?",
+          "en": "What bounds insertion when the table is full?"
+        },
+        "answer": {
+          "vi": "`range(len(self.slots))` ở L017 chỉ cho tối đa capacity lần kiểm tra.",
+          "en": "`range(len(self.slots))` at L017 allows at most capacity checks."
+        },
+        "rationale": {
+          "vi": "Bounded probe tạo failure path rõ ràng.",
+          "en": "Bounded probing creates an explicit failure path."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check"
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.table-storage",
+        "prompt": {
+          "vi": "Artifact pilot dùng collision policy nào?",
+          "en": "Which collision policy does the pilot use?"
+        },
+        "answer": {
+          "vi": "Linear probing trong cùng `slots`, với wraparound modulo.",
+          "en": "Linear probing inside the same `slots` array with modulo wraparound."
+        },
+        "rationale": {
+          "vi": "Policy được chứng minh bởi L017–L020, không phải chỉ bởi tên HashTable.",
+          "en": "The policy is evidenced by L017-L020, not merely by the name HashTable."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check"
+      }
+    ]
+  },
+  "navigation": {
+    "previous_slug": "dictionary",
+    "next_slug": "oop-model"
+  },
+  "sources": [
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 257,
+        "printed_page": 241,
+        "heading": "10.2.1-10.2.2 1D arrays; 2D arrays",
+        "anchor_text": "BOOK-10-ARRAYS"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 256,
+        "printed_page": 240,
+        "heading": "10.1.2 Records",
+        "anchor_text": "BOOK-10-RECORDS"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 281,
+        "printed_page": 265,
+        "heading": "11.1.1 Constants and variables; Example 11.1",
+        "anchor_text": "BOOK-11-BASICS"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 326,
+        "printed_page": 310,
+        "heading": "13.2.2 Hashing algorithms",
+        "anchor_text": "BOOK-13-HASH"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 467,
+        "printed_page": 451,
+        "heading": "19.1.1 Understanding linear and binary searching methods: Linear search",
+        "anchor_text": "BOOK-19-LINEAR"
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 32,
+        "printed_page": "32",
+        "heading": "File organisation and access",
+        "bullet_locator": "Hashing objective",
+        "anchor_text": "Show understanding of hashing algorithms"
+      }
+    }
+  ]
+}
