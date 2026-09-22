@@ -1,0 +1,413 @@
+{
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.object-files.pilot-v1",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.object-files",
+  "pattern_ids": [
+    "FILE_READ_OBJECTS"
+  ],
+  "version": "pilot-v1",
+  "filename": "content/paper4/python/pilot/object-files/source.py",
+  "language": "python",
+  "lines": [
+    {
+      "line_id": "object-files.v1.L001",
+      "order": 1,
+      "text": "import csv"
+    },
+    {
+      "line_id": "object-files.v1.L002",
+      "order": 2,
+      "text": "import json"
+    },
+    {
+      "line_id": "object-files.v1.L003",
+      "order": 3,
+      "text": "import sys"
+    },
+    {
+      "line_id": "object-files.v1.L004",
+      "order": 4,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "object-files.v1.L005",
+      "order": 5,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L006",
+      "order": 6,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L007",
+      "order": 7,
+      "text": "class Book:"
+    },
+    {
+      "line_id": "object-files.v1.L008",
+      "order": 8,
+      "text": "    def __init__(self, title, pages):"
+    },
+    {
+      "line_id": "object-files.v1.L009",
+      "order": 9,
+      "text": "        self.Title = title"
+    },
+    {
+      "line_id": "object-files.v1.L010",
+      "order": 10,
+      "text": "        self.Pages = pages"
+    },
+    {
+      "line_id": "object-files.v1.L011",
+      "order": 11,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L012",
+      "order": 12,
+      "text": "    def as_record(self):"
+    },
+    {
+      "line_id": "object-files.v1.L013",
+      "order": 13,
+      "text": "        return {\"title\": self.Title, \"pages\": self.Pages}"
+    },
+    {
+      "line_id": "object-files.v1.L014",
+      "order": 14,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L015",
+      "order": 15,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L016",
+      "order": 16,
+      "text": "def read_books(csv_path, trace):"
+    },
+    {
+      "line_id": "object-files.v1.L017",
+      "order": 17,
+      "text": "    books = []"
+    },
+    {
+      "line_id": "object-files.v1.L018",
+      "order": 18,
+      "text": "    with open(csv_path, \"r\", encoding=\"utf-8\", newline=\"\") as csv_file:"
+    },
+    {
+      "line_id": "object-files.v1.L019",
+      "order": 19,
+      "text": "        reader = csv.reader(csv_file)"
+    },
+    {
+      "line_id": "object-files.v1.L020",
+      "order": 20,
+      "text": "        for line_number, fields in enumerate(reader, start=1):"
+    },
+    {
+      "line_id": "object-files.v1.L021",
+      "order": 21,
+      "text": "            trace.append({\"event\": \"read_record\", \"line\": line_number, \"fields\": fields})"
+    },
+    {
+      "line_id": "object-files.v1.L022",
+      "order": 22,
+      "text": "            if len(fields) != 2 or fields[0] == \"\":"
+    },
+    {
+      "line_id": "object-files.v1.L023",
+      "order": 23,
+      "text": "                return None, f\"INVALID_RECORD_AT_LINE_{line_number}\""
+    },
+    {
+      "line_id": "object-files.v1.L024",
+      "order": 24,
+      "text": "            try:"
+    },
+    {
+      "line_id": "object-files.v1.L025",
+      "order": 25,
+      "text": "                pages = int(fields[1])"
+    },
+    {
+      "line_id": "object-files.v1.L026",
+      "order": 26,
+      "text": "            except ValueError:"
+    },
+    {
+      "line_id": "object-files.v1.L027",
+      "order": 27,
+      "text": "                return None, f\"INVALID_PAGES_AT_LINE_{line_number}\""
+    },
+    {
+      "line_id": "object-files.v1.L028",
+      "order": 28,
+      "text": "            books.append(Book(fields[0], pages))"
+    },
+    {
+      "line_id": "object-files.v1.L029",
+      "order": 29,
+      "text": "            trace.append({\"event\": \"construct_object\", \"line\": line_number, \"title\": fields[0]})"
+    },
+    {
+      "line_id": "object-files.v1.L030",
+      "order": 30,
+      "text": "    return books, \"OK\""
+    },
+    {
+      "line_id": "object-files.v1.L031",
+      "order": 31,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L032",
+      "order": 32,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L033",
+      "order": 33,
+      "text": "def run(fixture, fixture_path):"
+    },
+    {
+      "line_id": "object-files.v1.L034",
+      "order": 34,
+      "text": "    trace = []"
+    },
+    {
+      "line_id": "object-files.v1.L035",
+      "order": 35,
+      "text": "    csv_path = Path(fixture_path).parent / fixture[\"csv_file\"]"
+    },
+    {
+      "line_id": "object-files.v1.L036",
+      "order": 36,
+      "text": "    books, status = read_books(csv_path, trace)"
+    },
+    {
+      "line_id": "object-files.v1.L037",
+      "order": 37,
+      "text": "    if books is None:"
+    },
+    {
+      "line_id": "object-files.v1.L038",
+      "order": 38,
+      "text": "        return {\"status\": status, \"books\": [], \"trace\": trace}"
+    },
+    {
+      "line_id": "object-files.v1.L039",
+      "order": 39,
+      "text": "    lookup_title = fixture[\"lookup_title\"]"
+    },
+    {
+      "line_id": "object-files.v1.L040",
+      "order": 40,
+      "text": "    found = None"
+    },
+    {
+      "line_id": "object-files.v1.L041",
+      "order": 41,
+      "text": "    for book in books:"
+    },
+    {
+      "line_id": "object-files.v1.L042",
+      "order": 42,
+      "text": "        if book.Title == lookup_title:"
+    },
+    {
+      "line_id": "object-files.v1.L043",
+      "order": 43,
+      "text": "            found = book.as_record()"
+    },
+    {
+      "line_id": "object-files.v1.L044",
+      "order": 44,
+      "text": "            break"
+    },
+    {
+      "line_id": "object-files.v1.L045",
+      "order": 45,
+      "text": "    trace.append({\"event\": \"lookup\", \"title\": lookup_title, \"found\": found is not None})"
+    },
+    {
+      "line_id": "object-files.v1.L046",
+      "order": 46,
+      "text": "    return {\"status\": status, \"books\": [book.as_record() for book in books], \"found\": found, \"trace\": trace}"
+    },
+    {
+      "line_id": "object-files.v1.L047",
+      "order": 47,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L048",
+      "order": 48,
+      "text": ""
+    },
+    {
+      "line_id": "object-files.v1.L049",
+      "order": 49,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "object-files.v1.L050",
+      "order": 50,
+      "text": "    fixture_path = sys.argv[1]"
+    },
+    {
+      "line_id": "object-files.v1.L051",
+      "order": 51,
+      "text": "    with open(fixture_path, \"r\", encoding=\"utf-8\") as fixture_file:"
+    },
+    {
+      "line_id": "object-files.v1.L052",
+      "order": 52,
+      "text": "        print(json.dumps(run(json.load(fixture_file), fixture_path), ensure_ascii=False, sort_keys=True))"
+    },
+    {
+      "line_id": "object-files.v1.L053",
+      "order": 53,
+      "text": ""
+    }
+  ],
+  "entry_point": "run(fixture, fixture_path)",
+  "fixtures": [
+    {
+      "fixture_id": "object-files.normal",
+      "case_kind": "normal",
+      "input": {
+        "csv_file": "normal.csv",
+        "lookup_title": "Algorithms"
+      }
+    },
+    {
+      "fixture_id": "object-files.boundary",
+      "case_kind": "boundary",
+      "input": {
+        "csv_file": "boundary.csv",
+        "lookup_title": "Missing"
+      }
+    },
+    {
+      "fixture_id": "object-files.failure",
+      "case_kind": "failure",
+      "input": {
+        "csv_file": "failure.csv",
+        "lookup_title": "Broken"
+      }
+    }
+  ],
+  "expected_outputs": [
+    {
+      "expected_output_id": "object-files.normal.expected-output",
+      "fixture_ref": "object-files.normal",
+      "value": {
+        "books": [
+          {
+            "pages": 320,
+            "title": "Algorithms"
+          },
+          {
+            "pages": 280,
+            "title": "Data Structures"
+          }
+        ],
+        "found": {
+          "pages": 320,
+          "title": "Algorithms"
+        },
+        "status": "OK",
+        "trace": [
+          {
+            "event": "read_record",
+            "fields": [
+              "Algorithms",
+              "320"
+            ],
+            "line": 1
+          },
+          {
+            "event": "construct_object",
+            "line": 1,
+            "title": "Algorithms"
+          },
+          {
+            "event": "read_record",
+            "fields": [
+              "Data Structures",
+              "280"
+            ],
+            "line": 2
+          },
+          {
+            "event": "construct_object",
+            "line": 2,
+            "title": "Data Structures"
+          },
+          {
+            "event": "lookup",
+            "found": true,
+            "title": "Algorithms"
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "object-files.boundary.expected-output",
+      "fixture_ref": "object-files.boundary",
+      "value": {
+        "books": [],
+        "found": null,
+        "status": "OK",
+        "trace": [
+          {
+            "event": "lookup",
+            "found": false,
+            "title": "Missing"
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "object-files.failure.expected-output",
+      "fixture_ref": "object-files.failure",
+      "value": {
+        "books": [],
+        "status": "INVALID_PAGES_AT_LINE_1",
+        "trace": [
+          {
+            "event": "read_record",
+            "fields": [
+              "Broken",
+              "not-a-number"
+            ],
+            "line": 1
+          }
+        ]
+      }
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "normal": true,
+    "boundary": true,
+    "failure": true
+  },
+  "stage5_source_refs": [
+    "stage5.b7.pattern-provenance"
+  ],
+  "author_run_ref": "p4r2.a3.object-files.pilot-v1.author-run",
+  "independent_rerun_ref": "p4r2.a3.object-files.pilot-v1.independent-rerun",
+  "execution_log_sha256": "abd0e9a1b2a0843bda73ea6964d76624a3f3d27495c962f37f8cde48989c0fc0",
+  "syntax_status": "PASS",
+  "execution_status": "PASS",
+  "code_sha256": "2c215f7f1f8a162e6cb3ebd41ed52bb4f61d84314164792d5a92099b533f2109",
+  "caption": {
+    "vi": "Đọc bản ghi CSV, dựng đối tượng và tra cứu thuộc tính với kiểm tra bản ghi lỗi.",
+    "en": "Read CSV records, construct objects and look up attributes while guarding malformed records."
+  },
+  "status": "independently-rerun"
+}
