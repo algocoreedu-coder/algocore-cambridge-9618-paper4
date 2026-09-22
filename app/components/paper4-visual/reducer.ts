@@ -1,88 +1,34 @@
-import type {
-  Locale,
-  RuntimeAction,
-  RuntimeState,
-} from "./types";
+import type { Locale, RuntimeAction, RuntimeState } from "./types";
 
-export function createInitialRuntimeState(
-  patternId: string,
-  locale: Locale = "vi",
-): RuntimeState {
-  return {
-    patternId,
-    eventIndex: 0,
-    locale,
-    playing: false,
-    predictionStatus: "idle",
-    predictionAnswer: "",
-    inputRevision: 0,
-    inputValue: "",
-  };
+export function createInitialRuntimeState(patternId: string, locale: Locale = "vi"): RuntimeState {
+  return { patternId, scenarioId: "", eventIndex: 0, eventId: "", locale, playing: false, predictionStatus: "idle", predictionAnswer: "", inputRevision: 0 };
 }
 
-export function runtimeReducer(
-  state: RuntimeState,
-  action: RuntimeAction,
-): RuntimeState {
+function resetStepState(state: RuntimeState) {
+  return { ...state, eventIndex: 0, playing: false, predictionStatus: "idle" as const, predictionAnswer: "" };
+}
+
+export function runtimeReducer(state: RuntimeState, action: RuntimeAction): RuntimeState {
   switch (action.type) {
     case "SELECT_PATTERN":
-      if (!action.patternId || action.patternId === state.patternId) return state;
-      return createInitialRuntimeState(action.patternId, state.locale);
-
+      return !action.patternId || action.patternId === state.patternId ? state : createInitialRuntimeState(action.patternId, state.locale);
+    case "TRACE_READY":
+      return action.patternId !== state.patternId ? state : { ...resetStepState(state), scenarioId: action.scenarioId, eventId: action.firstEventId };
     case "PREVIOUS":
-      return {
-        ...state,
-        eventIndex: Math.max(0, state.eventIndex - 1),
-        playing: false,
-        predictionStatus: "idle",
-        predictionAnswer: "",
-      };
-
-    case "NEXT": {
-      const lastIndex = Math.max(0, action.eventCount - 1);
-      const eventIndex = Math.min(lastIndex, state.eventIndex + 1);
-      return {
-        ...state,
-        eventIndex,
-        // Every event is a prediction checkpoint. PLAY advances exactly one
-        // event, then pauses so the learner predicts before continuing.
-        playing: false,
-        predictionStatus: "idle",
-        predictionAnswer: "",
-      };
-    }
-
+      return { ...state, eventIndex: Math.max(0, state.eventIndex - 1), eventId: action.eventId, playing: false, predictionStatus: "idle", predictionAnswer: "" };
+    case "NEXT":
+      return { ...state, eventIndex: state.eventIndex + 1, eventId: action.eventId, playing: false, predictionStatus: "idle", predictionAnswer: "" };
     case "PLAY":
       return state.playing ? state : { ...state, playing: true };
-
     case "PAUSE":
       return state.playing ? { ...state, playing: false } : state;
-
     case "RESET":
-      return createInitialRuntimeState(state.patternId, state.locale);
-
+      return { ...resetStepState(state), eventId: action.firstEventId };
     case "SET_LOCALE":
-      return action.locale === state.locale
-        ? state
-        : { ...state, locale: action.locale };
-
+      return action.locale === state.locale ? state : { ...state, locale: action.locale };
     case "SUBMIT_PREDICTION":
-      return {
-        ...state,
-        playing: false,
-        predictionStatus: action.status,
-        predictionAnswer: action.answer,
-      };
-
+      return { ...state, playing: false, predictionStatus: action.status, predictionAnswer: action.answer };
     case "CHANGE_INPUT":
-      return {
-        ...state,
-        eventIndex: 0,
-        playing: false,
-        predictionStatus: "idle",
-        predictionAnswer: "",
-        inputRevision: state.inputRevision + 1,
-        inputValue: action.value,
-      };
+      return { ...resetStepState(state), scenarioId: action.scenarioId, eventId: action.firstEventId, inputRevision: state.inputRevision + 1 };
   }
 }

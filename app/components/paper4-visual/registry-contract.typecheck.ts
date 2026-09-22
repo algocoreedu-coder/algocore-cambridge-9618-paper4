@@ -1,7 +1,8 @@
-import registry from "../../data/stage8-runtime-registry.json";
+import lesson from "../../data/paper4-v2/lessons/data-models.json";
 
-import type { RuntimeRegistry } from "./types";
+import type { PatternMetadata, PythonArtifactDto } from "./types";
 
-// Compile-time assertion only. It prevents the generated registry and the visual
-// runtime from drifting before a route is built.
-export const stage8RegistryContractCheck: RuntimeRegistry = registry;
+// Compile-time sample assertions for the generated v2 DTO boundary. Runtime
+// chunks are fetched lazily and validated by traceLoader instead of imported.
+export const generatedPatternContractCheck: readonly PatternMetadata[] = lesson.visual.owned_patterns;
+export const generatedPythonContractCheck: PythonArtifactDto = lesson.python;
