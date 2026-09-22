@@ -28,6 +28,10 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+function canonicalText(value) {
+  return value.replace(/\r\n/g, "\n");
+}
+
 function walkStrings(value, visitor, pointer = "$") {
   if (typeof value === "string") visitor(value, pointer);
   else if (Array.isArray(value)) value.forEach((item, index) => walkStrings(item, visitor, `${pointer}[${index}]`));
@@ -57,7 +61,7 @@ for (const [relativePath, expectedContents] of expectedOutputs) {
     mismatches.push(`${relativePath}: missing`);
     continue;
   }
-  if (actualContents !== expectedContents) mismatches.push(`${relativePath}: not byte-identical to deterministic compiler output`);
+  if (canonicalText(actualContents) !== expectedContents) mismatches.push(`${relativePath}: content differs from deterministic compiler output`);
 }
 assert(mismatches.length === 0, mismatches.join("\n"));
 

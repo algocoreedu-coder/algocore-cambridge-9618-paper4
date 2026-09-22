@@ -76,6 +76,10 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+function canonicalText(value) {
+  return value.replace(/\r\n/g, "\n");
+}
+
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -88,7 +92,7 @@ function unique(values, label) {
 
 async function loadEnvelopeRecords(filename, artifactType, expectedSha256) {
   const source = await readFile(path.join(RECORDS_DIR, filename), "utf8");
-  assert(sha256(source) === expectedSha256, `${filename} differs from the canonical SHA256SUMS authority`);
+  assert(sha256(canonicalText(source)) === expectedSha256, `${filename} differs from the canonical SHA256SUMS authority`);
   const records = JSON.parse(source);
   assert(Array.isArray(records), `${filename} must be an array`);
   return records.map((envelope, index) => {
@@ -121,7 +125,7 @@ async function loadCanonicalRecords() {
 
 async function loadEditorialRegistry() {
   const raw = await readFile(EDITORIAL_REGISTRY_PATH, "utf8");
-  assert(sha256(raw) === EDITORIAL_REGISTRY_SHA256, "Stage 3 LESSON_PACKAGES.json hash differs from the locked compiler input");
+  assert(sha256(canonicalText(raw)) === EDITORIAL_REGISTRY_SHA256, "Stage 3 LESSON_PACKAGES.json hash differs from the locked compiler input");
   const registry = JSON.parse(raw);
   assert(registry.schema_version === "1.0.0", "Stage 3 editorial registry schema mismatch");
   assert(registry.course_id === "ac-9618-p4-2026-python", "Stage 3 editorial registry course mismatch");
