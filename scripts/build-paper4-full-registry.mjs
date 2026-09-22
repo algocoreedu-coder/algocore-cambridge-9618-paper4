@@ -5,10 +5,9 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CONTENT_ROOT = path.join(ROOT, "content", "paper4");
-const RECORD_ROOT = path.join(CONTENT_ROOT, "records", "pilot");
-const EVIDENCE_ROOT = path.resolve(ROOT, "..", "planning", "paper4", "next-phase", "evidence", "p4r-2", "a4");
+const RECORD_ROOT = path.join(CONTENT_ROOT, "records", "full");
+const EVIDENCE_ROOT = path.resolve(ROOT, "..", "planning", "paper4", "next-phase", "evidence", "p4r-5", "a4");
 
-export const PILOT_SLUGS = ["data-models", "binary-search", "queue", "recursion", "hashing", "object-files"];
 export const RECORD_TYPES = [
   "KnowledgeUnit",
   "PythonArtifact",
@@ -19,13 +18,13 @@ export const RECORD_TYPES = [
   "LessonReleaseRecord",
 ];
 export const EXPECTED_COUNTS = {
-  KnowledgeUnit: 26,
-  PythonArtifact: 6,
-  VisualScenarioTrace: 48,
-  VisualEventBinding: 238,
-  MarkingChain: 16,
-  AssessmentItem: 18,
-  LessonReleaseRecord: 6,
+  KnowledgeUnit: 108,
+  PythonArtifact: 26,
+  VisualScenarioTrace: 174,
+  VisualEventBinding: 589,
+  MarkingChain: 58,
+  AssessmentItem: 78,
+  LessonReleaseRecord: 26,
 };
 export const SECTION_IDS = [
   "paper4.section.recognition",
@@ -40,7 +39,7 @@ export const SECTION_IDS = [
   "paper4.section.next-and-sources",
 ];
 
-const TYPE_FILES = {
+export const TYPE_FILES = {
   KnowledgeUnit: "knowledge-units.json",
   PythonArtifact: "python-artifacts.json",
   VisualScenarioTrace: "visual-scenario-traces.json",
@@ -62,7 +61,7 @@ const TYPE_IDS = {
 const jsonText = (value) => `${JSON.stringify(value, null, 2)}\n`;
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const readJson = async (filename) => JSON.parse(await readFile(filename, "utf8"));
-const lessonId = (slug) => `ac-9618-p4-2026-python.lesson.${slug}`;
+const envelope = (artifact_type, record) => ({ schema_version: "2.0.0", artifact_type, record });
 
 async function filesBelow(directory, suffix) {
   const output = [];
@@ -72,10 +71,6 @@ async function filesBelow(directory, suffix) {
     else if (entry.isFile() && entry.name.endsWith(suffix)) output.push(child);
   }
   return output.sort();
-}
-
-function envelope(type, record) {
-  return { schema_version: "2.0.0", artifact_type: type, record };
 }
 
 function sourceRefsForLesson(lesson) {
@@ -112,20 +107,27 @@ function sourceRefsForLesson(lesson) {
 }
 
 function releaseForLesson(lesson, grouped) {
-  const id = lesson.lesson_id;
-  const knowledge = grouped.KnowledgeUnit.filter((item) => item.record.lesson_id === id);
-  const python = grouped.PythonArtifact.filter((item) => item.record.lesson_id === id);
-  const marking = grouped.MarkingChain.filter((item) => item.record.lesson_id === id);
-  const assessments = grouped.AssessmentItem.filter((item) => item.record.lesson_id === id);
+  const lessonId = lesson.lesson_id;
+  const knowledge = grouped.KnowledgeUnit.filter((item) => item.record.lesson_id === lessonId);
+  const python = grouped.PythonArtifact.filter((item) => item.record.lesson_id === lessonId);
+  const pythonIds = new Set(python.map((item) => item.record.python_artifact_id));
+  const traces = grouped.VisualScenarioTrace.filter((item) => pythonIds.has(item.record.python_artifact_id));
+  const marking = grouped.MarkingChain.filter((item) => item.record.lesson_id === lessonId);
+  const assessments = grouped.AssessmentItem.filter((item) => item.record.lesson_id === lessonId);
   const patterns = [...new Set([
     ...python.flatMap((item) => item.record.pattern_ids),
+    ...traces.map((item) => item.record.pattern_id),
     ...marking.map((item) => item.record.pattern_id),
+    ...assessments.flatMap((item) => item.record.pattern_ids),
   ])].sort();
+  const versions = [...new Set(python.map((item) => item.record.version))];
+  if (versions.length !== 1) throw new Error(`${lessonId}: expected one Python artifact version, found ${versions.join(", ")}.`);
+
   return envelope("LessonReleaseRecord", {
-    lesson_id: id,
+    lesson_id: lessonId,
     package_id: lesson.package_id,
     slug: lesson.slug,
-    version: "pilot-v1",
+    version: versions[0],
     canonical_section_ids: SECTION_IDS,
     knowledge_unit_ids: knowledge.map((item) => item.record.knowledge_unit_id).sort(),
     python_artifact_ids: python.map((item) => item.record.python_artifact_id).sort(),
@@ -139,30 +141,40 @@ function releaseForLesson(lesson, grouped) {
     locale_parity: "PASS",
     academic_review: "PASS",
     execution_review: "PASS",
-    ux_review: "PASS",
+    ux_review: "PENDING",
     lead_gate: "PENDING",
     release_allowed: false,
   });
 }
 
-export async function compilePilotRegistry() {
-  const knowledgeFiles = await filesBelow(path.join(CONTENT_ROOT, "lessons", "pilot"), ".knowledge-unit.json");
+export async function compileFullRegistry() {
+  const knowledgeFiles = await filesBelow(path.join(CONTENT_ROOT, "lessons"), ".knowledge-unit.json");
   const knowledge = await Promise.all(knowledgeFiles.map(readJson));
-  const pythonRecords = await Promise.all(PILOT_SLUGS.map((slug) => readJson(path.join(CONTENT_ROOT, "python", "pilot", slug, "artifact.json"))));
-  const python = pythonRecords.map((record) => envelope("PythonArtifact", record));
-  const visualBundles = await Promise.all(PILOT_SLUGS.map((slug) => readJson(path.join(CONTENT_ROOT, "visuals", "pilot", slug, "visuals.json"))));
+
+  const pythonFiles = await filesBelow(path.join(CONTENT_ROOT, "python"), "artifact.json");
+  const python = (await Promise.all(pythonFiles.map(readJson))).map((record) => envelope("PythonArtifact", record));
+
+  const visualFiles = await filesBelow(path.join(CONTENT_ROOT, "visuals"), "visuals.json");
+  const visualBundles = await Promise.all(visualFiles.map(readJson));
   const visual = visualBundles.flatMap((bundle) => [...bundle.traces, ...bundle.events]);
-  const marking = await readJson(path.join(CONTENT_ROOT, "assessments", "pilot", "marking-chains.json"));
-  const assessments = await readJson(path.join(CONTENT_ROOT, "assessments", "pilot", "assessment-items.json"));
+
+  const marking = [
+    ...await readJson(path.join(CONTENT_ROOT, "assessments", "pilot", "marking-chains.json")),
+    ...await readJson(path.join(CONTENT_ROOT, "assessments", "production", "marking-chains.json")),
+  ];
+  const assessments = [
+    ...await readJson(path.join(CONTENT_ROOT, "assessments", "pilot", "assessment-items.json")),
+    ...await readJson(path.join(CONTENT_ROOT, "assessments", "production", "assessment-items.json")),
+  ];
   const sourceMap = await readJson(path.join(CONTENT_ROOT, "mappings", "lesson-source-map.json"));
-  const pilotLessonIds = new Set(PILOT_SLUGS.map(lessonId));
-  const sourceLessons = sourceMap.lessons.filter((lesson) => pilotLessonIds.has(lesson.lesson_id)).sort((a, b) => a.slug.localeCompare(b.slug));
 
   const documents = [...knowledge, ...python, ...visual, ...marking, ...assessments];
   const grouped = Object.fromEntries(RECORD_TYPES.map((type) => [type, documents.filter((item) => item.artifact_type === type)]));
-  grouped.LessonReleaseRecord = sourceLessons.map((lesson) => releaseForLesson(lesson, grouped));
-  for (const type of RECORD_TYPES) grouped[type].sort((a, b) => String(a.record[TYPE_IDS[type]]).localeCompare(String(b.record[TYPE_IDS[type]])));
-  return { grouped, sourceMap, sourceLessons };
+  grouped.LessonReleaseRecord = sourceMap.lessons.map((lesson) => releaseForLesson(lesson, grouped));
+  for (const type of RECORD_TYPES) {
+    grouped[type].sort((a, b) => String(a.record[TYPE_IDS[type]]).localeCompare(String(b.record[TYPE_IDS[type]])));
+  }
+  return { grouped, sourceMap };
 }
 
 export function renderRegistryFiles(grouped) {
@@ -170,33 +182,42 @@ export function renderRegistryFiles(grouped) {
 }
 
 export function registryDigest(files) {
-  const fileHashes = Object.fromEntries(Object.entries(files).sort(([a], [b]) => a.localeCompare(b)).map(([filename, text]) => [filename, sha256(text)]));
+  const fileHashes = Object.fromEntries(Object.entries(files).sort(([a], [b]) => a.localeCompare(b)).map(([filename, value]) => [filename, sha256(value)]));
   const aggregate = sha256(Object.entries(fileHashes).map(([filename, digest]) => `${digest}  ${filename}\n`).join(""));
   return { fileHashes, aggregate };
 }
 
+export function hashManifest(digest) {
+  return Object.entries(digest.fileHashes).map(([filename, value]) => `${value}  ${filename}`).join("\n") + `\n${digest.aggregate}  REGISTRY-AGGREGATE\n`;
+}
+
 async function main() {
-  const { grouped } = await compilePilotRegistry();
+  const first = await compileFullRegistry();
+  const second = await compileFullRegistry();
+  const files = renderRegistryFiles(first.grouped);
+  const secondFiles = renderRegistryFiles(second.grouped);
+  if (JSON.stringify(files) !== JSON.stringify(secondFiles)) throw new Error("Two in-memory rebuilds were not byte-identical.");
   for (const type of RECORD_TYPES) {
-    if (grouped[type].length !== EXPECTED_COUNTS[type]) throw new Error(`${type}: expected ${EXPECTED_COUNTS[type]}, found ${grouped[type].length}.`);
+    if (first.grouped[type].length !== EXPECTED_COUNTS[type]) throw new Error(`${type}: expected ${EXPECTED_COUNTS[type]}, found ${first.grouped[type].length}.`);
   }
-  const files = renderRegistryFiles(grouped);
   const digest = registryDigest(files);
   await mkdir(RECORD_ROOT, { recursive: true });
   await mkdir(EVIDENCE_ROOT, { recursive: true });
-  for (const [filename, text] of Object.entries(files)) await writeFile(path.join(RECORD_ROOT, filename), text);
-  const hashText = Object.entries(digest.fileHashes).map(([filename, value]) => `${value}  ${filename}`).join("\n") + `\n${digest.aggregate}  REGISTRY-AGGREGATE\n`;
-  await writeFile(path.join(RECORD_ROOT, "SHA256SUMS.txt"), hashText);
+  for (const [filename, value] of Object.entries(files)) await writeFile(path.join(RECORD_ROOT, filename), value);
+  await writeFile(path.join(RECORD_ROOT, "SHA256SUMS.txt"), hashManifest(digest));
 
   const result = {
-    schema_version: "paper4-p4r2-a4-build-v1",
+    schema_version: "paper4-p4r5-a4-build-v1",
     decision: "BUILT_PENDING_READ_ONLY_CHECK",
     target_release: "paper4-2026-s9-v2",
-    generated_by: "scripts/build-p4r2-pilot-registry.mjs",
-    lessons: PILOT_SLUGS.map(lessonId).sort(),
-    counts: Object.fromEntries(RECORD_TYPES.map((type) => [type, grouped[type].length])),
+    generated_by: "scripts/build-paper4-full-registry.mjs",
+    deterministic_rebuild: "PASS_BYTE_IDENTICAL",
+    lessons: first.grouped.LessonReleaseRecord.map((item) => item.record.lesson_id),
+    counts: Object.fromEntries(RECORD_TYPES.map((type) => [type, first.grouped[type].length])),
+    total_records: RECORD_TYPES.reduce((sum, type) => sum + first.grouped[type].length, 0),
     registry_file_sha256: digest.fileHashes,
     registry_aggregate_sha256: digest.aggregate,
+    release_policy: { pending_lead_gates: 26, release_allowed_true: 0 },
   };
   await writeFile(path.join(EVIDENCE_ROOT, "BUILD_RESULT.json"), jsonText(result));
   console.log(jsonText(result).trim());

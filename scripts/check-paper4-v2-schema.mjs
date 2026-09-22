@@ -53,7 +53,7 @@ const REQUIRED = {
     "lesson_id", "package_id", "slug", "version", "canonical_section_ids", "knowledge_unit_ids",
     "python_artifact_ids", "pattern_ids", "method_refs", "marking_refs", "error_refs",
     "practice_refs", "retrieval_refs", "source_refs", "locale_parity", "academic_review",
-    "execution_review", "ux_review", "lead_gate",
+    "execution_review", "ux_review", "lead_gate", "release_allowed",
   ],
   MarkingChain: [
     "marking_chain_id", "pattern_id", "lesson_id", "requirement_ref", "method_step_refs",
@@ -258,6 +258,11 @@ function validateLessonRelease(record, errors) {
     }
     if (!preciseLocator(source?.locator)) errors.push(issue("SOURCE_LOCATOR_UNRESOLVED", `/record/source_refs/${index}/locator`, "Release source requires a precise locator."));
   }
+  if (typeof record.release_allowed !== "boolean") {
+    errors.push(issue("RELEASE_ALLOWED_INVALID", "/record/release_allowed", "release_allowed must be a boolean."));
+  } else if (record.release_allowed && record.lead_gate !== "PASS") {
+    errors.push(issue("PREMATURE_RELEASE_ALLOWED", "/record/release_allowed", "Release remains blocked until A8 and Lead sign the final gate."));
+  }
 }
 
 function validateMarkingChain(record, errors) {
@@ -371,7 +376,10 @@ export function validateRegistry(documents) {
   for (const { record: assessment, index } of byType.AssessmentItem.values()) {
     for (const requirementId of assessment.assessment_requirement_ids ?? []) {
       const joined = [...byType.MarkingChain.values()].some(({ record: chain }) => chain.lesson_id === assessment.lesson_id && chain.requirement_ref === requirementId && assessment.pattern_ids.includes(chain.pattern_id));
-      if (!joined) errors.push({ ...issue("ASSESSMENT_REQUIREMENT_JOIN_INVALID", "/record/assessment_requirement_ids", `Requirement ${requirementId} has no marking chain for this lesson and pattern.`), document: index });
+      const representationalOnly = assessment.self_rubric?.authority === "AlgoCore_authored_rubric"
+        && assessment.self_rubric?.official_marks === null
+        && assessment.self_rubric?.pattern_authority === "AlgoCore_representational_workflow_only";
+      if (!joined && !representationalOnly) errors.push({ ...issue("ASSESSMENT_REQUIREMENT_JOIN_INVALID", "/record/assessment_requirement_ids", `Requirement ${requirementId} has no marking chain for this lesson and pattern.`), document: index });
     }
   }
   return errors;
@@ -432,7 +440,7 @@ function validContractRegistry() {
     { schema_version: SCHEMA_VERSION, artifact_type: "LessonReleaseRecord", record: {
       lesson_id: "binary-search", package_id: "searching", slug: "binary-search", version: "2.0.0", canonical_section_ids: ["why", "recognise", "knowledge", "method", "worked-example", "visual", "mistakes", "practice", "retrieval", "sources"],
       knowledge_unit_ids: ["ku.binary-search.invariant"], python_artifact_ids: ["py.binary-search.v2"], pattern_ids: ["pattern.binary-search"], method_refs: ["method.binary-search"], marking_refs: ["marking.binary-search"], error_refs: ["error.binary-search.bounds"], practice_refs: ["assessment.binary-search.guided"], retrieval_refs: ["retrieval.binary-search.01"],
-      source_refs: [{ source_id: "cambridge.syllabus.2026", authority: "Cambridge_syllabus", access_mode: "public-citation", locator: sourceLocator }], locale_parity: "PASS", academic_review: "PASS", execution_review: "PASS", ux_review: "PASS", lead_gate: "PASS",
+      source_refs: [{ source_id: "cambridge.syllabus.2026", authority: "Cambridge_syllabus", access_mode: "public-citation", locator: sourceLocator }], locale_parity: "PASS", academic_review: "PASS", execution_review: "PASS", ux_review: "PASS", lead_gate: "PASS", release_allowed: false,
     } },
     { schema_version: SCHEMA_VERSION, artifact_type: "MarkingChain", record: {
       marking_chain_id: "marking.binary-search", pattern_id: "pattern.binary-search", lesson_id: "binary-search", requirement_ref: "requirement.search.01", method_step_refs: ["method.binary-search.bounds"], error_ref: "error.binary-search.bounds",
@@ -492,14 +500,25 @@ async function main() {
   }
 
   const recordFiles = await jsonFiles(RECORD_DIR);
-  const canonicalDocuments = [];
+  const registryFiles = new Map();
   for (const recordPath of recordFiles) {
-    const value = JSON.parse(await readFile(recordPath, "utf8"));
-    if (Array.isArray(value)) canonicalDocuments.push(...value);
-    else canonicalDocuments.push(value);
+    const relative = path.relative(RECORD_DIR, recordPath);
+    const registryName = relative.split(path.sep)[0];
+    if (!registryFiles.has(registryName)) registryFiles.set(registryName, []);
+    registryFiles.get(registryName).push(recordPath);
   }
-  const canonicalErrors = validateRegistry(canonicalDocuments);
-  if (canonicalErrors.length) throw new Error(`Canonical Paper 4 records failed validation:\n${JSON.stringify(canonicalErrors, null, 2)}`);
+  const registryResults = [];
+  for (const [registryName, files] of [...registryFiles].sort(([a], [b]) => a.localeCompare(b))) {
+    const documents = [];
+    for (const recordPath of files) {
+      const value = JSON.parse(await readFile(recordPath, "utf8"));
+      if (Array.isArray(value)) documents.push(...value);
+      else documents.push(value);
+    }
+    const canonicalErrors = validateRegistry(documents);
+    if (canonicalErrors.length) throw new Error(`Canonical Paper 4 registry ${registryName} failed validation:\n${JSON.stringify(canonicalErrors, null, 2)}`);
+    registryResults.push({ registry: registryName, files: files.length, records: documents.length });
+  }
 
   const schemaSha256 = createHash("sha256").update(schemaText).digest("hex");
   console.log(JSON.stringify({
@@ -509,8 +528,9 @@ async function main() {
     schema_sha256: schemaSha256,
     artifact_types: TYPES.length,
     negative_fixtures_rejected: fixtureResults.length,
+    canonical_registries: registryResults,
     canonical_record_files: recordFiles.length,
-    canonical_records_validated: canonicalDocuments.length,
+    canonical_records_validated: registryResults.reduce((sum, item) => sum + item.records, 0),
     fixtures: fixtureResults,
   }, null, 2));
 }
