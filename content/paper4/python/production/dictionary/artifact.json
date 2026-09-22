@@ -1,0 +1,386 @@
+{
+  "author_run_ref": "p4r3.a3.dictionary.production-v1.author-run",
+  "caption": {
+    "en": "A dictionary ADT with CRUD and frequency aggregation.",
+    "vi": "Dictionary ADT với CRUD và đếm tần suất."
+  },
+  "code_sha256": "a1501fe442b0d4c9f52227cf83f71c013538d5bb29231e1251f14c5ab8a83290",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "1a60f0e673d56fe927e08c7c273ee077c2a03338bb33477427a9b74e2e5790e0",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "dictionary.normal.expected-output",
+      "fixture_ref": "dictionary.normal",
+      "value": {
+        "before": [
+          [
+            "A",
+            1
+          ],
+          [
+            "B",
+            2
+          ]
+        ],
+        "deleted": true,
+        "entries": [
+          [
+            "B",
+            2
+          ],
+          [
+            "C",
+            3
+          ]
+        ],
+        "found": 3,
+        "frequency": {
+          "x": 2,
+          "y": 1
+        },
+        "inserted": true,
+        "status": "OK",
+        "trace": [
+          {
+            "event": "insert",
+            "success": true
+          },
+          {
+            "event": "delete",
+            "success": true
+          },
+          {
+            "event": "aggregate",
+            "groups": 2
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "dictionary.boundary.expected-output",
+      "fixture_ref": "dictionary.boundary",
+      "value": {
+        "before": [],
+        "deleted": false,
+        "entries": [
+          [
+            "A",
+            0
+          ]
+        ],
+        "found": 0,
+        "frequency": {},
+        "inserted": true,
+        "status": "OK",
+        "trace": [
+          {
+            "event": "insert",
+            "success": true
+          },
+          {
+            "event": "delete",
+            "success": false
+          },
+          {
+            "event": "aggregate",
+            "groups": 0
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "dictionary.failure.expected-output",
+      "fixture_ref": "dictionary.failure",
+      "value": {
+        "before": [
+          [
+            "A",
+            1
+          ]
+        ],
+        "deleted": false,
+        "entries": [
+          [
+            "A",
+            1
+          ]
+        ],
+        "found": null,
+        "frequency": {
+          "x": 1
+        },
+        "inserted": false,
+        "status": "OK",
+        "trace": [
+          {
+            "event": "insert",
+            "success": false
+          },
+          {
+            "event": "delete",
+            "success": false
+          },
+          {
+            "event": "aggregate",
+            "groups": 1
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/dictionary/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "dictionary.normal",
+      "input": {
+        "delete": "A",
+        "find": "C",
+        "initial": [
+          [
+            "A",
+            1
+          ],
+          [
+            "B",
+            2
+          ]
+        ],
+        "insert": [
+          "C",
+          3
+        ],
+        "tokens": [
+          "x",
+          "y",
+          "x"
+        ]
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "dictionary.boundary",
+      "input": {
+        "delete": "missing",
+        "find": "A",
+        "initial": [],
+        "insert": [
+          "A",
+          0
+        ],
+        "tokens": []
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "dictionary.failure",
+      "input": {
+        "delete": "missing",
+        "find": "missing",
+        "initial": [
+          [
+            "A",
+            1
+          ]
+        ],
+        "insert": [
+          "A",
+          9
+        ],
+        "tokens": [
+          "x"
+        ]
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.dictionary.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.dictionary",
+  "lines": [
+    {
+      "line_id": "dictionary.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "dictionary.production-v1.L002",
+      "order": 2,
+      "text": ""
+    },
+    {
+      "line_id": "dictionary.production-v1.L003",
+      "order": 3,
+      "text": "class DictionaryADT:"
+    },
+    {
+      "line_id": "dictionary.production-v1.L004",
+      "order": 4,
+      "text": "    def __init__(self): self.entries = []"
+    },
+    {
+      "line_id": "dictionary.production-v1.L005",
+      "order": 5,
+      "text": "    def find(self, key):"
+    },
+    {
+      "line_id": "dictionary.production-v1.L006",
+      "order": 6,
+      "text": "        return next((value for stored, value in self.entries if stored == key), None)"
+    },
+    {
+      "line_id": "dictionary.production-v1.L007",
+      "order": 7,
+      "text": "    def insert(self, key, value):"
+    },
+    {
+      "line_id": "dictionary.production-v1.L008",
+      "order": 8,
+      "text": "        if self.find(key) is not None: return False"
+    },
+    {
+      "line_id": "dictionary.production-v1.L009",
+      "order": 9,
+      "text": "        self.entries.append([key, value]); return True"
+    },
+    {
+      "line_id": "dictionary.production-v1.L010",
+      "order": 10,
+      "text": "    def delete(self, key):"
+    },
+    {
+      "line_id": "dictionary.production-v1.L011",
+      "order": 11,
+      "text": "        for index, pair in enumerate(self.entries):"
+    },
+    {
+      "line_id": "dictionary.production-v1.L012",
+      "order": 12,
+      "text": "            if pair[0] == key: self.entries.pop(index); return True"
+    },
+    {
+      "line_id": "dictionary.production-v1.L013",
+      "order": 13,
+      "text": "        return False"
+    },
+    {
+      "line_id": "dictionary.production-v1.L014",
+      "order": 14,
+      "text": ""
+    },
+    {
+      "line_id": "dictionary.production-v1.L015",
+      "order": 15,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "dictionary.production-v1.L016",
+      "order": 16,
+      "text": "    table, trace = DictionaryADT(), []"
+    },
+    {
+      "line_id": "dictionary.production-v1.L017",
+      "order": 17,
+      "text": "    for key, value in fixture.get(\"initial\", []): table.insert(key, value)"
+    },
+    {
+      "line_id": "dictionary.production-v1.L018",
+      "order": 18,
+      "text": "    before = [list(pair) for pair in table.entries]"
+    },
+    {
+      "line_id": "dictionary.production-v1.L019",
+      "order": 19,
+      "text": "    inserted = table.insert(fixture[\"insert\"][0], fixture[\"insert\"][1])"
+    },
+    {
+      "line_id": "dictionary.production-v1.L020",
+      "order": 20,
+      "text": "    deleted = table.delete(fixture[\"delete\"])"
+    },
+    {
+      "line_id": "dictionary.production-v1.L021",
+      "order": 21,
+      "text": "    frequency = {}"
+    },
+    {
+      "line_id": "dictionary.production-v1.L022",
+      "order": 22,
+      "text": "    for token in fixture.get(\"tokens\", []): frequency[token] = frequency.get(token, 0) + 1"
+    },
+    {
+      "line_id": "dictionary.production-v1.L023",
+      "order": 23,
+      "text": "    trace += [{\"event\": \"insert\", \"success\": inserted}, {\"event\": \"delete\", \"success\": deleted}, {\"event\": \"aggregate\", \"groups\": len(frequency)}]"
+    },
+    {
+      "line_id": "dictionary.production-v1.L024",
+      "order": 24,
+      "text": "    return {\"status\": \"OK\", \"before\": before, \"entries\": table.entries, \"inserted\": inserted, \"deleted\": deleted, \"found\": table.find(fixture[\"find\"]), \"frequency\": frequency, \"trace\": trace}"
+    },
+    {
+      "line_id": "dictionary.production-v1.L025",
+      "order": 25,
+      "text": ""
+    },
+    {
+      "line_id": "dictionary.production-v1.L026",
+      "order": 26,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "dictionary.production-v1.L027",
+      "order": 27,
+      "text": "    import json"
+    },
+    {
+      "line_id": "dictionary.production-v1.L028",
+      "order": 28,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "dictionary.production-v1.L029",
+      "order": 29,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "dictionary.production-v1.L030",
+      "order": 30,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "dictionary.production-v1.L031",
+      "order": 31,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "dictionary.production-v1.L032",
+      "order": 32,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "dictionary.production-v1.L033",
+      "order": 33,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "dictionary.production-v1.L034",
+      "order": 34,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "ALGORITHM_TRANSLATE",
+    "GROUP_AGGREGATE"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.dictionary.production-v1",
+  "stage5_source_refs": [],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

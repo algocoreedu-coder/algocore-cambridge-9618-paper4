@@ -1,0 +1,327 @@
+{
+  "author_run_ref": "p4r3.a3.text-files.production-v1.author-run",
+  "caption": {
+    "en": "Safe sequential reading, parsing, overwrite and append.",
+    "vi": "Đọc tuần tự, parse, overwrite và append an toàn."
+  },
+  "code_sha256": "487434f138c8cedb9bda366fa55f4116e54701049279c9db78728eb10e818c06",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "675cb995d6a70d63e13e52a99814d65c64d2da8e9c865bc7a81c4a4d4b64a948",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "text-files.normal.expected-output",
+      "fixture_ref": "text-files.normal",
+      "value": {
+        "output": "Ada:90\nLin:80\nEND:2\n",
+        "records": [
+          {
+            "name": "Ada",
+            "score": 90
+          },
+          {
+            "name": "Lin",
+            "score": 80
+          }
+        ],
+        "status": "OK",
+        "trace": [
+          {
+            "event": "load",
+            "records": 2
+          },
+          {
+            "event": "overwrite"
+          },
+          {
+            "event": "append"
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "text-files.boundary.expected-output",
+      "fixture_ref": "text-files.boundary",
+      "value": {
+        "output": "Solo:0\n",
+        "records": [
+          {
+            "name": "Solo",
+            "score": 0
+          }
+        ],
+        "status": "OK",
+        "trace": [
+          {
+            "event": "load",
+            "records": 1
+          },
+          {
+            "event": "overwrite"
+          },
+          {
+            "event": "append"
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "text-files.failure.expected-output",
+      "fixture_ref": "text-files.failure",
+      "value": {
+        "output": "SAFE\n",
+        "status": "INVALID_FILE",
+        "trace": [
+          {
+            "event": "reject",
+            "type": "ValueError"
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/text-files/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "text-files.normal",
+      "input": {
+        "append": "END:2\n",
+        "content": "Ada,90\nLin,80\n"
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "text-files.boundary",
+      "input": {
+        "append": "",
+        "content": "Solo,0"
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "text-files.failure",
+      "input": {
+        "append": "",
+        "committed": "SAFE\n",
+        "content": "Ada,90,EXTRA\n"
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.text-files.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.text-files",
+  "lines": [
+    {
+      "line_id": "text-files.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "text-files.production-v1.L002",
+      "order": 2,
+      "text": "from tempfile import TemporaryDirectory"
+    },
+    {
+      "line_id": "text-files.production-v1.L003",
+      "order": 3,
+      "text": ""
+    },
+    {
+      "line_id": "text-files.production-v1.L004",
+      "order": 4,
+      "text": "def parse_records(text):"
+    },
+    {
+      "line_id": "text-files.production-v1.L005",
+      "order": 5,
+      "text": "    records = []"
+    },
+    {
+      "line_id": "text-files.production-v1.L006",
+      "order": 6,
+      "text": "    for raw in text.splitlines():"
+    },
+    {
+      "line_id": "text-files.production-v1.L007",
+      "order": 7,
+      "text": "        if raw == \"\": continue"
+    },
+    {
+      "line_id": "text-files.production-v1.L008",
+      "order": 8,
+      "text": "        fields = raw.split(\",\")"
+    },
+    {
+      "line_id": "text-files.production-v1.L009",
+      "order": 9,
+      "text": "        if len(fields) != 2: raise ValueError(\"malformed record\")"
+    },
+    {
+      "line_id": "text-files.production-v1.L010",
+      "order": 10,
+      "text": "        records.append({\"name\": fields[0], \"score\": int(fields[1])})"
+    },
+    {
+      "line_id": "text-files.production-v1.L011",
+      "order": 11,
+      "text": "    return records"
+    },
+    {
+      "line_id": "text-files.production-v1.L012",
+      "order": 12,
+      "text": ""
+    },
+    {
+      "line_id": "text-files.production-v1.L013",
+      "order": 13,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "text-files.production-v1.L014",
+      "order": 14,
+      "text": "    trace = []"
+    },
+    {
+      "line_id": "text-files.production-v1.L015",
+      "order": 15,
+      "text": "    with TemporaryDirectory() as directory:"
+    },
+    {
+      "line_id": "text-files.production-v1.L016",
+      "order": 16,
+      "text": "        source, output = Path(directory) / \"input.txt\", Path(directory) / \"output.txt\""
+    },
+    {
+      "line_id": "text-files.production-v1.L017",
+      "order": 17,
+      "text": "        source.write_text(fixture[\"content\"], encoding=\"utf-8\", newline=\"\\n\")"
+    },
+    {
+      "line_id": "text-files.production-v1.L018",
+      "order": 18,
+      "text": "        committed = fixture.get(\"committed\", \"SAFE\\n\")"
+    },
+    {
+      "line_id": "text-files.production-v1.L019",
+      "order": 19,
+      "text": "        output.write_text(committed, encoding=\"utf-8\", newline=\"\\n\")"
+    },
+    {
+      "line_id": "text-files.production-v1.L020",
+      "order": 20,
+      "text": "        try:"
+    },
+    {
+      "line_id": "text-files.production-v1.L021",
+      "order": 21,
+      "text": "            records = parse_records(source.read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "text-files.production-v1.L022",
+      "order": 22,
+      "text": "            rendered = \"\".join(f\"{record['name']}:{record['score']}\\n\" for record in records)"
+    },
+    {
+      "line_id": "text-files.production-v1.L023",
+      "order": 23,
+      "text": "            output.write_text(rendered, encoding=\"utf-8\", newline=\"\\n\")"
+    },
+    {
+      "line_id": "text-files.production-v1.L024",
+      "order": 24,
+      "text": "            with output.open(\"a\", encoding=\"utf-8\", newline=\"\\n\") as handle: handle.write(fixture.get(\"append\", \"\"))"
+    },
+    {
+      "line_id": "text-files.production-v1.L025",
+      "order": 25,
+      "text": "            trace += [{\"event\": \"load\", \"records\": len(records)}, {\"event\": \"overwrite\"}, {\"event\": \"append\"}]"
+    },
+    {
+      "line_id": "text-files.production-v1.L026",
+      "order": 26,
+      "text": "            return {\"status\": \"OK\", \"records\": records, \"output\": output.read_text(encoding=\"utf-8\"), \"trace\": trace}"
+    },
+    {
+      "line_id": "text-files.production-v1.L027",
+      "order": 27,
+      "text": "        except (OSError, UnicodeError, ValueError) as error:"
+    },
+    {
+      "line_id": "text-files.production-v1.L028",
+      "order": 28,
+      "text": "            trace.append({\"event\": \"reject\", \"type\": type(error).__name__})"
+    },
+    {
+      "line_id": "text-files.production-v1.L029",
+      "order": 29,
+      "text": "            return {\"status\": \"INVALID_FILE\", \"output\": output.read_text(encoding=\"utf-8\"), \"trace\": trace}"
+    },
+    {
+      "line_id": "text-files.production-v1.L030",
+      "order": 30,
+      "text": ""
+    },
+    {
+      "line_id": "text-files.production-v1.L031",
+      "order": 31,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "text-files.production-v1.L032",
+      "order": 32,
+      "text": "    import json"
+    },
+    {
+      "line_id": "text-files.production-v1.L033",
+      "order": 33,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "text-files.production-v1.L034",
+      "order": 34,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "text-files.production-v1.L035",
+      "order": 35,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "text-files.production-v1.L036",
+      "order": 36,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "text-files.production-v1.L037",
+      "order": 37,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "text-files.production-v1.L038",
+      "order": 38,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "text-files.production-v1.L039",
+      "order": 39,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "FILE_READ_ARRAY",
+    "FILE_WRITE"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.text-files.production-v1",
+  "stage5_source_refs": [
+    "stage5.b7.pattern-provenance"
+  ],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

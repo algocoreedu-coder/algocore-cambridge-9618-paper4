@@ -1,0 +1,413 @@
+{
+  "author_run_ref": "p4r3.a3.testing.production-v1.author-run",
+  "caption": {
+    "en": "Test design, divergence detection, repair and regression.",
+    "vi": "Thiết kế test, phát hiện sai khác, sửa lỗi và regression."
+  },
+  "code_sha256": "6ce072a5f13a54810283fe698b6bad0c5f5491c34706cb49a9ab403dafce5c76",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "87ab37a3d6791274637acdc71ab6e4d9c321c11e27ac1aabe5d9ea0997c1b3cb",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "testing.normal.expected-output",
+      "fixture_ref": "testing.normal",
+      "value": {
+        "after": [
+          {
+            "actual": "PASS",
+            "expected": "PASS",
+            "input": 55,
+            "passed": true
+          },
+          {
+            "actual": "RETRY",
+            "expected": "RETRY",
+            "input": 20,
+            "passed": true
+          }
+        ],
+        "before": [
+          {
+            "actual": "PASS",
+            "expected": "PASS",
+            "input": 55,
+            "passed": true
+          },
+          {
+            "actual": "RETRY",
+            "expected": "RETRY",
+            "input": 20,
+            "passed": true
+          }
+        ],
+        "failed_before_repair": false,
+        "first_divergence": -1,
+        "status": "PASS",
+        "trace": [
+          {
+            "event": "defect_run",
+            "first_divergence": -1
+          },
+          {
+            "event": "repair"
+          },
+          {
+            "all_pass": true,
+            "event": "regression"
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "testing.boundary.expected-output",
+      "fixture_ref": "testing.boundary",
+      "value": {
+        "after": [
+          {
+            "actual": "PASS",
+            "expected": "PASS",
+            "input": 40,
+            "passed": true
+          },
+          {
+            "actual": "RETRY",
+            "expected": "RETRY",
+            "input": 0,
+            "passed": true
+          },
+          {
+            "actual": "PASS",
+            "expected": "PASS",
+            "input": 100,
+            "passed": true
+          }
+        ],
+        "before": [
+          {
+            "actual": "RETRY",
+            "expected": "PASS",
+            "input": 40,
+            "passed": false
+          },
+          {
+            "actual": "RETRY",
+            "expected": "RETRY",
+            "input": 0,
+            "passed": true
+          },
+          {
+            "actual": "PASS",
+            "expected": "PASS",
+            "input": 100,
+            "passed": true
+          }
+        ],
+        "failed_before_repair": true,
+        "first_divergence": 0,
+        "status": "PASS",
+        "trace": [
+          {
+            "event": "defect_run",
+            "first_divergence": 0
+          },
+          {
+            "event": "repair"
+          },
+          {
+            "all_pass": true,
+            "event": "regression"
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "testing.failure.expected-output",
+      "fixture_ref": "testing.failure",
+      "value": {
+        "after": [
+          {
+            "actual": "INVALID",
+            "expected": "INVALID",
+            "input": -1,
+            "passed": true
+          },
+          {
+            "actual": "INVALID",
+            "expected": "INVALID",
+            "input": 101,
+            "passed": true
+          }
+        ],
+        "before": [
+          {
+            "actual": "RETRY",
+            "expected": "INVALID",
+            "input": -1,
+            "passed": false
+          },
+          {
+            "actual": "PASS",
+            "expected": "INVALID",
+            "input": 101,
+            "passed": false
+          }
+        ],
+        "failed_before_repair": true,
+        "first_divergence": 0,
+        "status": "PASS",
+        "trace": [
+          {
+            "event": "defect_run",
+            "first_divergence": 0
+          },
+          {
+            "event": "repair"
+          },
+          {
+            "all_pass": true,
+            "event": "regression"
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/testing/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "testing.normal",
+      "input": {
+        "cases": [
+          {
+            "expected": "PASS",
+            "input": 55
+          },
+          {
+            "expected": "RETRY",
+            "input": 20
+          }
+        ]
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "testing.boundary",
+      "input": {
+        "cases": [
+          {
+            "expected": "PASS",
+            "input": 40
+          },
+          {
+            "expected": "RETRY",
+            "input": 0
+          },
+          {
+            "expected": "PASS",
+            "input": 100
+          }
+        ]
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "testing.failure",
+      "input": {
+        "cases": [
+          {
+            "expected": "INVALID",
+            "input": -1
+          },
+          {
+            "expected": "INVALID",
+            "input": 101
+          }
+        ]
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.testing.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.testing",
+  "lines": [
+    {
+      "line_id": "testing.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "testing.production-v1.L002",
+      "order": 2,
+      "text": ""
+    },
+    {
+      "line_id": "testing.production-v1.L003",
+      "order": 3,
+      "text": "def defective_grade(score):"
+    },
+    {
+      "line_id": "testing.production-v1.L004",
+      "order": 4,
+      "text": "    return \"PASS\" if score > 40 else \"RETRY\""
+    },
+    {
+      "line_id": "testing.production-v1.L005",
+      "order": 5,
+      "text": ""
+    },
+    {
+      "line_id": "testing.production-v1.L006",
+      "order": 6,
+      "text": "def repaired_grade(score):"
+    },
+    {
+      "line_id": "testing.production-v1.L007",
+      "order": 7,
+      "text": "    if score < 0 or score > 100:"
+    },
+    {
+      "line_id": "testing.production-v1.L008",
+      "order": 8,
+      "text": "        return \"INVALID\""
+    },
+    {
+      "line_id": "testing.production-v1.L009",
+      "order": 9,
+      "text": "    return \"PASS\" if score >= 40 else \"RETRY\""
+    },
+    {
+      "line_id": "testing.production-v1.L010",
+      "order": 10,
+      "text": ""
+    },
+    {
+      "line_id": "testing.production-v1.L011",
+      "order": 11,
+      "text": "def run_suite(cases, function):"
+    },
+    {
+      "line_id": "testing.production-v1.L012",
+      "order": 12,
+      "text": "    rows = []"
+    },
+    {
+      "line_id": "testing.production-v1.L013",
+      "order": 13,
+      "text": "    for case in cases:"
+    },
+    {
+      "line_id": "testing.production-v1.L014",
+      "order": 14,
+      "text": "        actual = function(case[\"input\"])"
+    },
+    {
+      "line_id": "testing.production-v1.L015",
+      "order": 15,
+      "text": "        rows.append({\"input\": case[\"input\"], \"expected\": case[\"expected\"], \"actual\": actual, \"passed\": actual == case[\"expected\"]})"
+    },
+    {
+      "line_id": "testing.production-v1.L016",
+      "order": 16,
+      "text": "    return rows"
+    },
+    {
+      "line_id": "testing.production-v1.L017",
+      "order": 17,
+      "text": ""
+    },
+    {
+      "line_id": "testing.production-v1.L018",
+      "order": 18,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "testing.production-v1.L019",
+      "order": 19,
+      "text": "    before = run_suite(fixture[\"cases\"], defective_grade)"
+    },
+    {
+      "line_id": "testing.production-v1.L020",
+      "order": 20,
+      "text": "    first_divergence = next((index for index, row in enumerate(before) if not row[\"passed\"]), -1)"
+    },
+    {
+      "line_id": "testing.production-v1.L021",
+      "order": 21,
+      "text": "    after = run_suite(fixture[\"cases\"], repaired_grade)"
+    },
+    {
+      "line_id": "testing.production-v1.L022",
+      "order": 22,
+      "text": "    trace = [{\"event\": \"defect_run\", \"first_divergence\": first_divergence}, {\"event\": \"repair\"}, {\"event\": \"regression\", \"all_pass\": all(row[\"passed\"] for row in after)}]"
+    },
+    {
+      "line_id": "testing.production-v1.L023",
+      "order": 23,
+      "text": "    return {\"status\": \"PASS\" if all(row[\"passed\"] for row in after) else \"FAIL\", \"failed_before_repair\": first_divergence >= 0, \"first_divergence\": first_divergence, \"before\": before, \"after\": after, \"trace\": trace}"
+    },
+    {
+      "line_id": "testing.production-v1.L024",
+      "order": 24,
+      "text": ""
+    },
+    {
+      "line_id": "testing.production-v1.L025",
+      "order": 25,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "testing.production-v1.L026",
+      "order": 26,
+      "text": "    import json"
+    },
+    {
+      "line_id": "testing.production-v1.L027",
+      "order": 27,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "testing.production-v1.L028",
+      "order": 28,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "testing.production-v1.L029",
+      "order": 29,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "testing.production-v1.L030",
+      "order": 30,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "testing.production-v1.L031",
+      "order": 31,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "testing.production-v1.L032",
+      "order": 32,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "testing.production-v1.L033",
+      "order": 33,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "EVIDENCE_RUN"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.testing.production-v1",
+  "stage5_source_refs": [],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

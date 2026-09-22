@@ -1,0 +1,403 @@
+{
+  "author_run_ref": "p4r3.a3.graphs.production-v1.author-run",
+  "caption": {
+    "en": "Adjacency list/matrix representations with explicit edge policies.",
+    "vi": "Adjacency list/matrix với chính sách cạnh rõ ràng."
+  },
+  "code_sha256": "ab06bd2fa94884bc0f129f730668df1527280d3670cd03651b214d411813630e",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "130a97748323791c62680e65cfec2341774715cfc9b4c21011a79fa891fc3062",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "graphs.normal.expected-output",
+      "fixture_ref": "graphs.normal",
+      "value": {
+        "adjacency": {
+          "A": [
+            "B"
+          ],
+          "B": [
+            "A",
+            "C"
+          ],
+          "C": [
+            "B"
+          ]
+        },
+        "edge_slots": 4,
+        "matrix": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0
+          ]
+        ],
+        "matrix_slots": 9,
+        "status": "OK",
+        "trace": [
+          {
+            "added": true,
+            "edge": [
+              "A",
+              "B"
+            ],
+            "event": "add_edge",
+            "unchanged_on_reject": true
+          },
+          {
+            "added": true,
+            "edge": [
+              "B",
+              "C"
+            ],
+            "event": "add_edge",
+            "unchanged_on_reject": true
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "graphs.boundary.expected-output",
+      "fixture_ref": "graphs.boundary",
+      "value": {
+        "adjacency": {
+          "A": [
+            "A"
+          ]
+        },
+        "edge_slots": 1,
+        "matrix": [
+          [
+            1
+          ]
+        ],
+        "matrix_slots": 1,
+        "status": "OK",
+        "trace": [
+          {
+            "added": true,
+            "edge": [
+              "A",
+              "A"
+            ],
+            "event": "add_edge",
+            "unchanged_on_reject": true
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "graphs.failure.expected-output",
+      "fixture_ref": "graphs.failure",
+      "value": {
+        "adjacency": {
+          "A": [
+            "B"
+          ],
+          "B": [
+            "A"
+          ]
+        },
+        "edge_slots": 2,
+        "matrix": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "matrix_slots": 4,
+        "status": "OK",
+        "trace": [
+          {
+            "added": false,
+            "edge": [
+              "A",
+              "Z"
+            ],
+            "event": "add_edge",
+            "unchanged_on_reject": true
+          },
+          {
+            "added": true,
+            "edge": [
+              "A",
+              "B"
+            ],
+            "event": "add_edge",
+            "unchanged_on_reject": true
+          },
+          {
+            "added": false,
+            "edge": [
+              "A",
+              "B"
+            ],
+            "event": "add_edge",
+            "unchanged_on_reject": true
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/graphs/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "graphs.normal",
+      "input": {
+        "directed": false,
+        "edges": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "B",
+            "C"
+          ]
+        ],
+        "vertices": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "graphs.boundary",
+      "input": {
+        "directed": true,
+        "edges": [
+          [
+            "A",
+            "A"
+          ]
+        ],
+        "vertices": [
+          "A"
+        ]
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "graphs.failure",
+      "input": {
+        "directed": false,
+        "edges": [
+          [
+            "A",
+            "Z"
+          ],
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "vertices": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.graphs.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.graphs",
+  "lines": [
+    {
+      "line_id": "graphs.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "graphs.production-v1.L002",
+      "order": 2,
+      "text": ""
+    },
+    {
+      "line_id": "graphs.production-v1.L003",
+      "order": 3,
+      "text": "class Graph:"
+    },
+    {
+      "line_id": "graphs.production-v1.L004",
+      "order": 4,
+      "text": "    def __init__(self, vertices, directed): self.adj, self.directed = {v: [] for v in vertices}, directed"
+    },
+    {
+      "line_id": "graphs.production-v1.L005",
+      "order": 5,
+      "text": "    def add_edge(self, start, end):"
+    },
+    {
+      "line_id": "graphs.production-v1.L006",
+      "order": 6,
+      "text": "        if start not in self.adj or end not in self.adj: return False"
+    },
+    {
+      "line_id": "graphs.production-v1.L007",
+      "order": 7,
+      "text": "        if end in self.adj[start]: return False"
+    },
+    {
+      "line_id": "graphs.production-v1.L008",
+      "order": 8,
+      "text": "        self.adj[start].append(end); self.adj[start].sort()"
+    },
+    {
+      "line_id": "graphs.production-v1.L009",
+      "order": 9,
+      "text": "        if not self.directed and start != end:"
+    },
+    {
+      "line_id": "graphs.production-v1.L010",
+      "order": 10,
+      "text": "            self.adj[end].append(start); self.adj[end].sort()"
+    },
+    {
+      "line_id": "graphs.production-v1.L011",
+      "order": 11,
+      "text": "        return True"
+    },
+    {
+      "line_id": "graphs.production-v1.L012",
+      "order": 12,
+      "text": ""
+    },
+    {
+      "line_id": "graphs.production-v1.L013",
+      "order": 13,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "graphs.production-v1.L014",
+      "order": 14,
+      "text": "    graph, trace = Graph(fixture[\"vertices\"], fixture[\"directed\"]), []"
+    },
+    {
+      "line_id": "graphs.production-v1.L015",
+      "order": 15,
+      "text": "    for start, end in fixture.get(\"edges\", []):"
+    },
+    {
+      "line_id": "graphs.production-v1.L016",
+      "order": 16,
+      "text": "        before = {key: list(value) for key, value in graph.adj.items()}"
+    },
+    {
+      "line_id": "graphs.production-v1.L017",
+      "order": 17,
+      "text": "        added = graph.add_edge(start, end)"
+    },
+    {
+      "line_id": "graphs.production-v1.L018",
+      "order": 18,
+      "text": "        trace.append({\"event\": \"add_edge\", \"edge\": [start, end], \"added\": added, \"unchanged_on_reject\": added or before == graph.adj})"
+    },
+    {
+      "line_id": "graphs.production-v1.L019",
+      "order": 19,
+      "text": "    vertices = fixture[\"vertices\"]"
+    },
+    {
+      "line_id": "graphs.production-v1.L020",
+      "order": 20,
+      "text": "    matrix = [[1 if right in graph.adj[left] else 0 for right in vertices] for left in vertices]"
+    },
+    {
+      "line_id": "graphs.production-v1.L021",
+      "order": 21,
+      "text": "    edge_slots = sum(len(neighbours) for neighbours in graph.adj.values())"
+    },
+    {
+      "line_id": "graphs.production-v1.L022",
+      "order": 22,
+      "text": "    return {\"status\": \"OK\", \"adjacency\": graph.adj, \"matrix\": matrix, \"edge_slots\": edge_slots, \"matrix_slots\": len(vertices) ** 2, \"trace\": trace}"
+    },
+    {
+      "line_id": "graphs.production-v1.L023",
+      "order": 23,
+      "text": ""
+    },
+    {
+      "line_id": "graphs.production-v1.L024",
+      "order": 24,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "graphs.production-v1.L025",
+      "order": 25,
+      "text": "    import json"
+    },
+    {
+      "line_id": "graphs.production-v1.L026",
+      "order": 26,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "graphs.production-v1.L027",
+      "order": 27,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "graphs.production-v1.L028",
+      "order": 28,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "graphs.production-v1.L029",
+      "order": 29,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "graphs.production-v1.L030",
+      "order": 30,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "graphs.production-v1.L031",
+      "order": 31,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "graphs.production-v1.L032",
+      "order": 32,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "DATA_STORAGE",
+    "ALGORITHM_TRANSLATE",
+    "EVIDENCE_RUN"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.graphs.production-v1",
+  "stage5_source_refs": [],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

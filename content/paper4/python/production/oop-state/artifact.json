@@ -1,0 +1,285 @@
+{
+  "author_run_ref": "p4r3.a3.oop-state.production-v1.author-run",
+  "caption": {
+    "en": "Encapsulation through getters, setters and rule updates.",
+    "vi": "Encapsulation bằng getter, setter và rule update."
+  },
+  "code_sha256": "d40ba5a86768a1fb1345c71ae13a8d6cb8d4650eb30a85edbf6005052e9f919b",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "2e56133a61aae6a729a1a68837d5a7be1a691d93284548db3080ee1c85c1bc7b",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "oop-state.normal.expected-output",
+      "fixture_ref": "oop-state.normal",
+      "value": {
+        "balance": 50,
+        "old": 20,
+        "preserved_after_failed_update": true,
+        "setter_ok": true,
+        "status": "OK",
+        "trace": [
+          {
+            "balance": 40,
+            "event": "setter",
+            "success": true
+          },
+          {
+            "balance": 50,
+            "event": "rule_update",
+            "success": true
+          }
+        ],
+        "update_ok": true
+      }
+    },
+    {
+      "expected_output_id": "oop-state.boundary.expected-output",
+      "fixture_ref": "oop-state.boundary",
+      "value": {
+        "balance": 100,
+        "old": 0,
+        "preserved_after_failed_update": true,
+        "setter_ok": true,
+        "status": "OK",
+        "trace": [
+          {
+            "balance": 100,
+            "event": "setter",
+            "success": true
+          },
+          {
+            "balance": 100,
+            "event": "rule_update",
+            "success": true
+          }
+        ],
+        "update_ok": true
+      }
+    },
+    {
+      "expected_output_id": "oop-state.failure.expected-output",
+      "fixture_ref": "oop-state.failure",
+      "value": {
+        "balance": 50,
+        "old": 30,
+        "preserved_after_failed_update": true,
+        "setter_ok": true,
+        "status": "OK",
+        "trace": [
+          {
+            "balance": 50,
+            "event": "setter",
+            "success": true
+          },
+          {
+            "balance": 50,
+            "event": "rule_update",
+            "success": false
+          }
+        ],
+        "update_ok": false
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/oop-state/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "oop-state.normal",
+      "input": {
+        "delta": 10,
+        "limit": 100,
+        "replacement": 40,
+        "start": 20
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "oop-state.boundary",
+      "input": {
+        "delta": 0,
+        "limit": 100,
+        "replacement": 100,
+        "start": 0
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "oop-state.failure",
+      "input": {
+        "delta": 60,
+        "limit": 100,
+        "replacement": 50,
+        "start": 30
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.oop-state.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.oop-state",
+  "lines": [
+    {
+      "line_id": "oop-state.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "oop-state.production-v1.L002",
+      "order": 2,
+      "text": ""
+    },
+    {
+      "line_id": "oop-state.production-v1.L003",
+      "order": 3,
+      "text": "class Account:"
+    },
+    {
+      "line_id": "oop-state.production-v1.L004",
+      "order": 4,
+      "text": "    def __init__(self, balance, limit): self.__balance, self.__limit = balance, limit"
+    },
+    {
+      "line_id": "oop-state.production-v1.L005",
+      "order": 5,
+      "text": "    def get_balance(self): return self.__balance"
+    },
+    {
+      "line_id": "oop-state.production-v1.L006",
+      "order": 6,
+      "text": "    def set_balance(self, value):"
+    },
+    {
+      "line_id": "oop-state.production-v1.L007",
+      "order": 7,
+      "text": "        if not 0 <= value <= self.__limit: return False"
+    },
+    {
+      "line_id": "oop-state.production-v1.L008",
+      "order": 8,
+      "text": "        self.__balance = value; return True"
+    },
+    {
+      "line_id": "oop-state.production-v1.L009",
+      "order": 9,
+      "text": "    def apply_change(self, delta): return self.set_balance(self.__balance + delta)"
+    },
+    {
+      "line_id": "oop-state.production-v1.L010",
+      "order": 10,
+      "text": ""
+    },
+    {
+      "line_id": "oop-state.production-v1.L011",
+      "order": 11,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "oop-state.production-v1.L012",
+      "order": 12,
+      "text": "    account, trace = Account(fixture[\"start\"], fixture[\"limit\"]), []"
+    },
+    {
+      "line_id": "oop-state.production-v1.L013",
+      "order": 13,
+      "text": "    old = account.get_balance()"
+    },
+    {
+      "line_id": "oop-state.production-v1.L014",
+      "order": 14,
+      "text": "    setter_ok = account.set_balance(fixture[\"replacement\"])"
+    },
+    {
+      "line_id": "oop-state.production-v1.L015",
+      "order": 15,
+      "text": "    trace.append({\"event\": \"setter\", \"success\": setter_ok, \"balance\": account.get_balance()})"
+    },
+    {
+      "line_id": "oop-state.production-v1.L016",
+      "order": 16,
+      "text": "    before_update = account.get_balance()"
+    },
+    {
+      "line_id": "oop-state.production-v1.L017",
+      "order": 17,
+      "text": "    update_ok = account.apply_change(fixture[\"delta\"])"
+    },
+    {
+      "line_id": "oop-state.production-v1.L018",
+      "order": 18,
+      "text": "    trace.append({\"event\": \"rule_update\", \"success\": update_ok, \"balance\": account.get_balance()})"
+    },
+    {
+      "line_id": "oop-state.production-v1.L019",
+      "order": 19,
+      "text": "    return {\"status\": \"OK\", \"old\": old, \"balance\": account.get_balance(), \"setter_ok\": setter_ok, \"update_ok\": update_ok, \"preserved_after_failed_update\": update_ok or account.get_balance() == before_update, \"trace\": trace}"
+    },
+    {
+      "line_id": "oop-state.production-v1.L020",
+      "order": 20,
+      "text": ""
+    },
+    {
+      "line_id": "oop-state.production-v1.L021",
+      "order": 21,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "oop-state.production-v1.L022",
+      "order": 22,
+      "text": "    import json"
+    },
+    {
+      "line_id": "oop-state.production-v1.L023",
+      "order": 23,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "oop-state.production-v1.L024",
+      "order": 24,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "oop-state.production-v1.L025",
+      "order": 25,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "oop-state.production-v1.L026",
+      "order": 26,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "oop-state.production-v1.L027",
+      "order": 27,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "oop-state.production-v1.L028",
+      "order": 28,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "oop-state.production-v1.L029",
+      "order": 29,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "OOP_GET",
+    "OOP_SET",
+    "OOP_UPDATE"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-state.production-v1",
+  "stage5_source_refs": [
+    "stage5.b6.pattern-provenance"
+  ],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}
