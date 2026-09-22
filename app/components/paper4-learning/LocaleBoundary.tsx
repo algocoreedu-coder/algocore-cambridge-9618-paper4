@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type MouseEvent, type ReactNode, useEffect, useRef } from "react";
+import { type MouseEvent, type ReactNode, useEffect } from "react";
 
 import { localeChangeEvent } from "@/app/AppProviders";
 import type { LearningLocale } from "./types";
@@ -11,23 +11,15 @@ export function LocaleBoundary({
   children,
   locale,
 }: {
-  readonly children: ReactNode;
+  readonly children?: ReactNode;
   readonly locale: LearningLocale;
 }) {
-  const boundary = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     document.documentElement.lang = locale;
     window.dispatchEvent(new CustomEvent<LearningLocale>(localeChangeEvent, { detail: locale }));
-    const localeControl = boundary.current?.querySelector<HTMLButtonElement>(
-      `[data-action="locale-${locale}"]`,
-    );
-    if (localeControl?.getAttribute("aria-pressed") !== "true") {
-      localeControl?.click();
-    }
   }, [locale]);
 
-  return <div ref={boundary} lang={locale} style={{ display: "contents" }}>{children}</div>;
+  return children ? <div lang={locale} style={{ display: "contents" }}>{children}</div> : null;
 }
 
 export function LocaleLink({
@@ -43,13 +35,16 @@ export function LocaleLink({
   const href = `/paper-4/lessons/${slug}?lang=${locale}`;
   const onNavigate = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
+    const query = new URLSearchParams(window.location.search);
+    query.set("lang", locale);
     window.dispatchEvent(new CustomEvent<LearningLocale>(localeChangeEvent, { detail: locale }));
-    router.push(`${href}${window.location.hash}`);
+    router.push(`/paper-4/lessons/${slug}?${query.toString()}${window.location.hash}`, { scroll: false });
   };
 
   return (
     <Link
       href={href}
+      data-locale-switch
       hrefLang={locale}
       lang={locale}
       aria-current={currentLocale === locale ? "page" : undefined}

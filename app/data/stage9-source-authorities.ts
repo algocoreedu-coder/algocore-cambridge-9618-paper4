@@ -2,6 +2,7 @@ import type { Localized } from "@/app/components/paper4-learning/types";
 
 export type SourceAuthorityClass =
   | "official-exam"
+  | "official-curriculum"
   | "coursebook"
   | "algocore-editorial"
   | "internal-evidence"
@@ -20,6 +21,14 @@ export const sourceAuthorityCatalog: readonly SourceAuthorityDefinition[] = [
     description: {
       vi: "Question paper hoặc mark scheme Cambridge đã được corpus nội bộ đối chiếu. Mã nguồn và locator là trích dẫn; quyền truy cập tệp vẫn do kho nguồn quản lý.",
       en: "A Cambridge question paper or mark scheme checked in the internal corpus. The source ID and locator are citations; file access remains controlled by the source repository.",
+    },
+  },
+  {
+    id: "official-curriculum",
+    label: { vi: "Syllabus chính thức", en: "Official syllabus" },
+    description: {
+      vi: "Mục tiêu hoặc yêu cầu trong syllabus Cambridge 9618 năm 2026, được hiển thị dưới dạng citation kiểm chứng.",
+      en: "An objective or requirement from the official 2026 Cambridge 9618 syllabus, shown as a verifiable citation.",
     },
   },
   {
@@ -59,6 +68,7 @@ export const sourceAuthorityCatalog: readonly SourceAuthorityDefinition[] = [
 export function classifySourceAuthority(authority: string): SourceAuthorityClass {
   const normalized = authority.trim().toLowerCase();
   if (/^(official[_ -]?)?(qp|ms)$/.test(normalized)) return "official-exam";
+  if (normalized.includes("syllabus")) return "official-curriculum";
   if (normalized.includes("coursebook")) return "coursebook";
   if (normalized.includes("algocore")) return "algocore-editorial";
   if (/^(stage\d|stage\s|stage-|stage_)/.test(normalized)) return "internal-evidence";

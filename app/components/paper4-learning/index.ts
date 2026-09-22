@@ -2,12 +2,13 @@ export { LessonLearningPage } from "./LessonLearningPage";
 export { LocaleBoundary, LocaleLink } from "./LocaleBoundary";
 export { SourceReferences, resolveSourceReference } from "./SourceReferences";
 export type {
-  LearningBlock,
   LearningBlockKind,
-  LearningContent,
-  LearningLesson,
   LearningLocale,
-  LearningPackage,
-  LearningRegistry,
+  CourseManifest,
+  KnowledgeUnit,
+  LessonDto,
+  LessonSection,
+  Localized,
   LearningSourceReference,
+  SourceLocator,
 } from "./types";

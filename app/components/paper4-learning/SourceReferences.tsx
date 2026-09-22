@@ -4,7 +4,7 @@ import {
   sourceAuthorityDefinition,
   type SourceAuthorityClass,
 } from "@/app/data/stage9-source-authorities";
-import type { LearningLocale, LearningSourceReference } from "./types";
+import type { LearningLocale, LearningSourceReference, SourceLocator } from "./types";
 import styles from "./SourceReferences.module.css";
 
 type SourceAccessMode = "internal-citation" | "verified-external";
@@ -49,62 +49,34 @@ const copy = {
   },
 } as const;
 
-function readString(value: unknown) {
-  return typeof value === "string" && value.trim() ? value.trim() : undefined;
-}
-
-function isVerifiedHttpsUrl(value: string | undefined) {
-  if (!value) return false;
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === "https:" && Boolean(parsed.hostname);
-  } catch {
-    return false;
-  }
+function locatorText(locator: SourceLocator) {
+  const parts = [
+    locator.heading,
+    locator.bullet_locator,
+    locator.pdf_page !== undefined ? `PDF p. ${locator.pdf_page}` : undefined,
+    locator.printed_page !== undefined ? `printed p. ${locator.printed_page}` : undefined,
+    locator.anchor_text,
+  ];
+  return parts.filter((value): value is string => typeof value === "string" && value.trim().length > 0).join(" · ");
 }
 
 /** Resolve a citation without ever treating its locator as a URL. */
 export function resolveSourceReference(
-  reference: LearningSourceReference | string,
+  reference: LearningSourceReference,
   locale: LearningLocale,
 ): ResolvedSourceReference {
-  if (typeof reference === "string") {
-    return {
-      sourceId: reference,
-      authority: "internal-evidence",
-      authorityClass: "internal-evidence",
-      label: reference,
-      status: "INTERNAL_CITATION",
-      accessMode: "internal-citation",
-    };
-  }
-
-  const sourceId = readString(reference.sourceId)
-    ?? readString(reference.source_id)
-    ?? "UNSPECIFIED_SOURCE";
-  const authority = readString(reference.authority) ?? "unclassified";
+  const sourceId = reference.source_id;
+  const authority = reference.authority;
   const authorityDefinition = sourceAuthorityDefinition(authority);
-  const status = readString(reference.status) ?? "INTERNAL_CITATION";
-  const requestedMode = readString(reference.accessMode)
-    ?? readString(reference.access_mode);
-  const externalUrl = readString(reference.externalUrl)
-    ?? readString(reference.external_url)
-    ?? readString(reference.url);
-  const verifiedFlag = reference.urlVerified === true || reference.url_verified === true;
-  const verifiedStatus = /(^|[_ -])VERIFIED([_ -]|$)/i.test(status);
-  const mayLinkExternally = requestedMode === "verified-external"
-    && isVerifiedHttpsUrl(externalUrl)
-    && (verifiedFlag || verifiedStatus);
 
   return {
     sourceId,
     authority,
     authorityClass: authorityDefinition.id,
-    label: reference.label?.[locale] ?? sourceId,
-    locator: readString(reference.citation) ?? readString(reference.locator),
-    status,
-    accessMode: mayLinkExternally ? "verified-external" : "internal-citation",
-    externalUrl: mayLinkExternally ? externalUrl : undefined,
+    label: reference.locator.heading ?? sourceId,
+    locator: locatorText(reference.locator),
+    status: "CITATION_ONLY",
+    accessMode: "internal-citation",
   };
 }
 
@@ -112,7 +84,7 @@ export function SourceReferences({
   references,
   locale,
 }: {
-  readonly references: readonly (LearningSourceReference | string)[];
+  readonly references: readonly LearningSourceReference[];
   readonly locale: LearningLocale;
 }) {
   if (references.length === 0) return null;

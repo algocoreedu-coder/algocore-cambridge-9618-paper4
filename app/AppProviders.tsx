@@ -34,6 +34,24 @@ export function AppProviders({
   }, [locale]);
 
   useEffect(() => {
+    const preservePaper4Locale = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest<HTMLAnchorElement>("a[href]");
+      if (!anchor || anchor.target || anchor.hasAttribute("download") || anchor.hasAttribute("data-locale-switch")) return;
+      if (!anchor.closest("#nd-sidebar, [data-sidebar-panel]")) return;
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin || !url.pathname.startsWith("/paper-4")) return;
+      if (url.searchParams.get("lang") === locale) return;
+      url.searchParams.set("lang", locale);
+      anchor.href = `${url.pathname}?${url.searchParams.toString()}${url.hash}`;
+    };
+    document.addEventListener("click", preservePaper4Locale, true);
+    return () => document.removeEventListener("click", preservePaper4Locale, true);
+  }, [locale]);
+
+  useEffect(() => {
     const updateFromHistory = () => setLocale(localeFromLocation(initialLocale));
     const updateFromLesson = (event: Event) => {
       const requested = (event as CustomEvent<LearningLocale>).detail;
