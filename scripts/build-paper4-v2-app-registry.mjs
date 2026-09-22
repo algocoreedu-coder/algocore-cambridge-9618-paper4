@@ -125,7 +125,7 @@ async function loadCanonicalRecords() {
 
 async function loadEditorialRegistry() {
   const raw = await readFile(EDITORIAL_REGISTRY_PATH, "utf8");
-  assert(sha256(canonicalText(raw)) === EDITORIAL_REGISTRY_SHA256, "Stage 3 LESSON_PACKAGES.json hash differs from the locked compiler input");
+  assert(sha256(raw) === EDITORIAL_REGISTRY_SHA256, "Stage 3 LESSON_PACKAGES.json hash differs from the locked compiler input");
   const registry = JSON.parse(raw);
   assert(registry.schema_version === "1.0.0", "Stage 3 editorial registry schema mismatch");
   assert(registry.course_id === "ac-9618-p4-2026-python", "Stage 3 editorial registry course mismatch");
