@@ -75,16 +75,16 @@
       "vi": "Gộp khóa trùng và cập nhật tổng"
     },
     "explanation": {
-      "vi": "Gộp khóa trùng và cập nhật tổng là một hợp đồng kiến thức riêng trong Paper 4. Học sinh cần xác định dữ liệu và trạng thái trước thao tác, mô tả chính xác điều kiện cùng bước cập nhật, rồi kiểm tra trạng thái sau. Câu trả lời phải giải thích vì sao từng bước thỏa yêu cầu thay vì chỉ chép cú pháp Python.",
-      "en": "Grouping repeated keys and updating totals is a distinct Paper 4 knowledge contract. The learner identifies key lookup, new group, existing group, count aggregation, states the before/after state, and explains why each step satisfies the requirement instead of merely copying Python syntax."
+      "vi": "Gộp khóa trùng và cập nhật tổng tập trung vào một quy tắc có thể kiểm tra: Khóa mới tạo đúng một group; khóa cũ cập nhật group hiện có mà không nhân đôi key. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
+      "en": "Grouping repeated keys and updating totals centres on one checkable rule: A new key creates exactly one group; an existing key updates that group without duplicating the key. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
     },
     "python_connection": {
-      "vi": "Artifact search-collections có routine minh họa “Gộp khóa trùng và cập nhật tổng”. Routine thể hiện quy tắc: Khóa mới tạo đúng một group; khóa cũ cập nhật group hiện có mà không nhân đôi key. Các active line ID bên dưới lấy từ source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-      "en": "The search-collections artifact implements the “group-totals” code role within this flow: Execute full-scan find/count/filter and key-based group aggregation with explicit not-found and new-group behavior. The active line IDs below resolve against the A3-frozen and independently rerun production-v1 source."
+      "vi": "Trong artifact ac-9618-p4-2026-python.artifact.search-collections.production-v1, các dòng search-collections.production-v1.L015 chứa đoạn mã “groups[record[\"group\"]] = groups.get(record[\"group\"], 0) + record[\"amount\"]” và minh họa trực tiếp Gộp khóa trùng và cập nhật tổng: Khóa mới tạo đúng một group; khóa cũ cập nhật group hiện có mà không nhân đôi key. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+      "en": "In artifact ac-9618-p4-2026-python.artifact.search-collections.production-v1, lines search-collections.production-v1.L015 contain “groups[record[\"group\"]] = groups.get(record[\"group\"], 0) + record[\"amount\"]” and directly demonstrate Grouping repeated keys and updating totals: A new key creates exactly one group; an existing key updates that group without duplicating the key. This is the A3-frozen and independently rerun production-v1 source."
     },
     "representation": {
-      "vi": "Với “Gộp khóa trùng và cập nhật tổng”, dùng bảng gồm bước, dữ liệu đang xét, điều kiện hoặc quyết định, thay đổi vừa thực hiện và trạng thái sau. Với cấu trúc liên kết hoặc object, vẽ thêm mũi tên tham chiếu; với thuật toán, đánh dấu rõ miền đã xử lý.",
-      "en": "Use a state table with step, current data, the fields key lookup, new group, existing group, count aggregation, decision, and after-state. Add references/links for linked or object structures, and mark the processed region for algorithms."
+      "vi": "Biểu diễn Gộp khóa trùng và cập nhật tổng bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại search-collections.production-v1.L015, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Khóa mới tạo đúng một group; khóa cũ cập nhật group hiện có mà không nhân đôi key.",
+      "en": "Represent Grouping repeated keys and updating totals with a four-column trace: before-state, condition or decision at search-collections.production-v1.L015, applied change, and after-state. The trace must show that this rule still holds: A new key creates exactly one group; an existing key updates that group without duplicating the key."
     },
     "invariant_or_rule": {
       "vi": "Khóa mới tạo đúng một group; khóa cũ cập nhật group hiện có mà không nhân đôi key.",
@@ -112,8 +112,8 @@
     ],
     "micro_example": {
       "scenario": {
-        "vi": "Case normal: Dùng dữ liệu hợp lệ, thực hiện trọn luồng và đối chiếu trạng thái/output với kết quả mong đợi.",
-        "en": "Normal case: Target occurs once and several records form existing and new groups."
+        "vi": "Fixture search-collections.normal dùng input chính xác {\"records\":[{\"amount\":5,\"group\":\"A\"},{\"amount\":2,\"group\":\"B\"},{\"amount\":4,\"group\":\"A\"}],\"target\":4,\"threshold\":4,\"values\":[4,2,4,8]} để kiểm tra Gộp khóa trùng và cập nhật tổng. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Khóa mới tạo đúng một group; khóa cũ cập nhật group hiện có mà không nhân đôi key.",
+        "en": "Fixture search-collections.normal uses the exact input {\"records\":[{\"amount\":5,\"group\":\"A\"},{\"amount\":2,\"group\":\"B\"},{\"amount\":4,\"group\":\"A\"}],\"target\":4,\"threshold\":4,\"values\":[4,2,4,8]} to test Grouping repeated keys and updating totals. Before running it, the learner predicts the output and after-state from this rule: A new key creates exactly one group; an existing key updates that group without duplicating the key."
       },
       "walkthrough": {
         "vi": "Áp dụng quy tắc của “Gộp khóa trùng và cập nhật tổng”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",

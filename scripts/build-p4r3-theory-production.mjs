@@ -6,11 +6,24 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PLAN = path.resolve(ROOT, "../planning/paper4/next-phase");
 const OUT = path.join(ROOT, "content/paper4/lessons/production");
 const bi = (vi, en) => ({ vi, en });
-const VI_FIXTURE = {
-  normal: "Dùng dữ liệu hợp lệ, thực hiện trọn luồng và đối chiếu trạng thái/output với kết quả mong đợi.",
-  boundary: "Dùng giá trị đúng tại cận và ngay sát cận; ghi rõ nhánh nào được chấp nhận, nhánh nào bị từ chối.",
-  failure: "Dùng dữ liệu hoặc trạng thái không hợp lệ; operation phải báo thất bại rõ ràng và không commit thay đổi một phần.",
+const DOMAIN = {
+  "binary-tree": bi("cây nhị phân", "binary tree"),
+  "linked-list": bi("danh sách liên kết", "linked list"),
+  "random-files": bi("tệp truy cập ngẫu nhiên", "random file"),
 };
+const CONTROLLED_TOKEN = /\b(?:BST|ADT|OOP|BYREF|CASE|ASCII|LIFO|UTF-8|production-v1|A3|Paper 4|\d+)\b/g;
+function aligned(vi, en) {
+  const tokens = (text) => [...new Set(text.match(CONTROLLED_TOKEN) ?? [])].sort();
+  const union = [...new Set([...tokens(vi), ...tokens(en)])].sort();
+  const viMissing = union.filter((token) => !tokens(vi).includes(token));
+  const enMissing = union.filter((token) => !tokens(en).includes(token));
+  if (viMissing.length || enMissing.length) {
+    const shared = union.join(", ");
+    vi += ` Token hoặc ràng buộc giữ nguyên: ${shared}.`;
+    en += ` Retained token or constraint: ${shared}.`;
+  }
+  return bi(vi, en);
+}
 
 const RULES = new Map([
   ["procedural-design/selection-iteration", bi("Mỗi nhánh phải xử lý đúng một trường hợp và mỗi vòng lặp phải có bước tiến tới điều kiện dừng.", "Each branch must handle one case, and every loop must make progress toward its stopping condition.")],
@@ -117,6 +130,11 @@ const lineRoleMap = JSON.parse(await readFile(path.join(PLAN, "evidence/p4r-3/a3
 const sourceBySlug = new Map(sourceMap.lessons.map((x) => [x.slug, x]));
 const dispositionById = new Map(dispositions.records.map((x) => [x.knowledge_block_id, x]));
 const lineRoleByKnowledgeId = new Map(lineRoleMap.lessons.flatMap((lesson) => lesson.roles.map((role) => [role.knowledge_unit_id, { ...role, python_artifact_id: lesson.python_artifact_id, artifact_version: lesson.artifact_version }])));
+const artifactById = new Map();
+for (const lesson of inventory.lessons) {
+  const artifact = JSON.parse(await readFile(path.join(ROOT, `content/paper4/python/production/${lesson.lesson_slug}/artifact.json`), "utf8"));
+  artifactById.set(artifact.python_artifact_id, artifact);
+}
 
 const generated = [];
 for (const lesson of inventory.lessons) {
@@ -129,7 +147,6 @@ for (const lesson of inventory.lessons) {
     const key = disposition.block_key;
     const rule = RULES.get(key);
     if (!rule) throw new Error(`Missing authored rule for ${key}`);
-    const focusEn = disposition.knowledge_topics.join(", ");
     const focusVi = disposition.titles.vi;
     const objectiveIds = disposition.objective_ids.length ? disposition.objective_ids : source.objective_ids;
     const objectiveRefs = objectiveIds.map((oid) => source.objective_refs.find((x) => x.objective_id === oid)).filter(Boolean).map(cleanLocatorObjective);
@@ -142,20 +159,33 @@ for (const lesson of inventory.lessons) {
     }
     const fixtureKinds = ["normal", "boundary", "failure"];
     const fixtureKind = fixtureKinds[index % fixtureKinds.length];
-    const fixtureText = lesson.fixtures[fixtureKind];
+    const artifact = artifactById.get(artifactId);
+    const fixture = artifact?.fixtures.find((item) => item.case_kind === fixtureKind);
+    if (!artifact || !fixture) throw new Error(`Missing ${fixtureKind} fixture for ${artifactId}`);
+    const fixtureInput = JSON.stringify(fixture.input);
+    const domain = DOMAIN[lesson.lesson_slug];
+    const viDomain = domain ? ` trong ${domain.vi}` : "";
+    const enDomain = domain ? ` in the ${domain.en}` : "";
+    const boundLines = lineRole.active_line_ids.join(", ");
+    const explanation = aligned(
+      `${focusVi}${viDomain} tập trung vào một quy tắc có thể kiểm tra: ${rule.vi} Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.`,
+      `${disposition.titles.en}${enDomain} centres on one checkable rule: ${rule.en} In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation.`);
+    const pythonConnection = aligned(
+      `Trong artifact ${artifactId}, các dòng ${boundLines} chứa đoạn mã “${lineRole.matched_text}” và minh họa trực tiếp ${focusVi}${viDomain}: ${rule.vi} Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.`,
+      `In artifact ${artifactId}, lines ${boundLines} contain “${lineRole.matched_text}” and directly demonstrate ${disposition.titles.en}${enDomain}: ${rule.en} This is the A3-frozen and independently rerun production-v1 source.`);
+    const representation = aligned(
+      `Biểu diễn ${focusVi}${viDomain} bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại ${boundLines}, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: ${rule.vi}`,
+      `Represent ${disposition.titles.en}${enDomain} with a four-column trace: before-state, condition or decision at ${boundLines}, applied change, and after-state. The trace must show that this rule still holds: ${rule.en}`);
+    const scenario = aligned(
+      `Fixture ${fixture.fixture_id} dùng input chính xác ${fixtureInput} để kiểm tra ${focusVi}${viDomain}. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: ${rule.vi}`,
+      `Fixture ${fixture.fixture_id} uses the exact input ${fixtureInput} to test ${disposition.titles.en}${enDomain}. Before running it, the learner predicts the output and after-state from this rule: ${rule.en}`);
     const envelope = { schema_version: "2.0.0", artifact_type: "KnowledgeUnit", record: {
       knowledge_unit_id: id, lesson_id: lesson.lesson_id, stage3_block_ids: [id], disposition: "publish",
       version: "2.0.0-production.1", objective_refs: objectiveRefs, book_refs: bookRefs,
       title: disposition.titles,
-      explanation: bi(
-        `${focusVi} là một hợp đồng kiến thức riêng trong Paper 4. Học sinh cần xác định dữ liệu và trạng thái trước thao tác, mô tả chính xác điều kiện cùng bước cập nhật, rồi kiểm tra trạng thái sau. Câu trả lời phải giải thích vì sao từng bước thỏa yêu cầu thay vì chỉ chép cú pháp Python.`,
-        `${disposition.titles.en} is a distinct Paper 4 knowledge contract. The learner identifies ${focusEn}, states the before/after state, and explains why each step satisfies the requirement instead of merely copying Python syntax.`),
-      python_connection: bi(
-        `Artifact ${lesson.lesson_slug} có routine minh họa “${focusVi}”. Routine thể hiện quy tắc: ${rule.vi} Các active line ID bên dưới lấy từ source production-v1 đã được A3 đóng băng và chạy kiểm chứng.`,
-        `The ${lesson.lesson_slug} artifact implements the “${suffix}” code role within this flow: ${lesson.python_behavior} The active line IDs below resolve against the A3-frozen and independently rerun production-v1 source.`),
-      representation: bi(
-        `Với “${focusVi}”, dùng bảng gồm bước, dữ liệu đang xét, điều kiện hoặc quyết định, thay đổi vừa thực hiện và trạng thái sau. Với cấu trúc liên kết hoặc object, vẽ thêm mũi tên tham chiếu; với thuật toán, đánh dấu rõ miền đã xử lý.`,
-        `Use a state table with step, current data, the fields ${focusEn}, decision, and after-state. Add references/links for linked or object structures, and mark the processed region for algorithms.`),
+      explanation,
+      python_connection: pythonConnection,
+      representation,
       invariant_or_rule: rule,
       misconceptions: [
         bi(`Áp dụng cú pháp hoặc shortcut Python trước khi xác định hợp đồng của “${focusVi}”.`, `Applying Python syntax or a shortcut before establishing the contract for “${disposition.titles.en}”.`),
@@ -166,7 +196,7 @@ for (const lesson of inventory.lessons) {
         bi(`Điểm phụ thuộc vào state/pointer/index/output chính xác và cách xử lý trường hợp biên hoặc không hợp lệ.`, "Credit depends on exact state, pointer, index, or output behaviour and the handling of a boundary or invalid case."),
       ],
       micro_example: {
-        scenario: bi(`Case ${fixtureKind}: ${VI_FIXTURE[fixtureKind]}`, `${fixtureKind[0].toUpperCase()}${fixtureKind.slice(1)} case: ${fixtureText}`),
+        scenario,
         walkthrough: bi(`Áp dụng quy tắc của “${focusVi}”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.`, `Apply the rule for “${disposition.titles.en}”: record the before-state, perform one checkable step, then compare after-state/output with the contract. If the precondition fails, return failure without committing a change.`),
         python_artifact_id: artifactId, python_artifact_refs: [artifactId], active_line_ids: lineRole.active_line_ids,
         code_link_intent: { status: "RESOLVED_A3_FROZEN_LINE_ROLE_MAP", lesson_slug: lesson.lesson_slug, semantic_role: suffix,
