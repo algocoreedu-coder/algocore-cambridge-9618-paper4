@@ -8,6 +8,258 @@
     "artifact_version": "production-v1",
     "code_sha256": "d626c4569c0129c1ec8f4efd8e6048501add7bcc8b4f1d3587277b298338c36f"
   },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.text-processing.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.text-processing",
+    "pattern_ids": [
+      "RUN_LENGTH_ENCODE",
+      "STRING_COMPARE",
+      "STRING_ROUTE",
+      "STRING_SPLIT"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "text-processing.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "text-processing.production-v1.L002",
+        "order": 2,
+        "text": ""
+      },
+      {
+        "line_id": "text-processing.production-v1.L003",
+        "order": 3,
+        "text": "def compare_text(left, right):"
+      },
+      {
+        "line_id": "text-processing.production-v1.L004",
+        "order": 4,
+        "text": "    for a, b in zip(left, right):"
+      },
+      {
+        "line_id": "text-processing.production-v1.L005",
+        "order": 5,
+        "text": "        if a != b:"
+      },
+      {
+        "line_id": "text-processing.production-v1.L006",
+        "order": 6,
+        "text": "            return -1 if a < b else 1"
+      },
+      {
+        "line_id": "text-processing.production-v1.L007",
+        "order": 7,
+        "text": "    return (len(left) > len(right)) - (len(left) < len(right))"
+      },
+      {
+        "line_id": "text-processing.production-v1.L008",
+        "order": 8,
+        "text": ""
+      },
+      {
+        "line_id": "text-processing.production-v1.L009",
+        "order": 9,
+        "text": "def run_length_encode(text):"
+      },
+      {
+        "line_id": "text-processing.production-v1.L010",
+        "order": 10,
+        "text": "    if text == \"\":"
+      },
+      {
+        "line_id": "text-processing.production-v1.L011",
+        "order": 11,
+        "text": "        return []"
+      },
+      {
+        "line_id": "text-processing.production-v1.L012",
+        "order": 12,
+        "text": "    encoded, current, count = [], text[0], 1"
+      },
+      {
+        "line_id": "text-processing.production-v1.L013",
+        "order": 13,
+        "text": "    for character in text[1:]:"
+      },
+      {
+        "line_id": "text-processing.production-v1.L014",
+        "order": 14,
+        "text": "        if character == current:"
+      },
+      {
+        "line_id": "text-processing.production-v1.L015",
+        "order": 15,
+        "text": "            count += 1"
+      },
+      {
+        "line_id": "text-processing.production-v1.L016",
+        "order": 16,
+        "text": "        else:"
+      },
+      {
+        "line_id": "text-processing.production-v1.L017",
+        "order": 17,
+        "text": "            encoded.append([current, count])"
+      },
+      {
+        "line_id": "text-processing.production-v1.L018",
+        "order": 18,
+        "text": "            current, count = character, 1"
+      },
+      {
+        "line_id": "text-processing.production-v1.L019",
+        "order": 19,
+        "text": "    encoded.append([current, count])"
+      },
+      {
+        "line_id": "text-processing.production-v1.L020",
+        "order": 20,
+        "text": "    return encoded"
+      },
+      {
+        "line_id": "text-processing.production-v1.L021",
+        "order": 21,
+        "text": ""
+      },
+      {
+        "line_id": "text-processing.production-v1.L022",
+        "order": 22,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "text-processing.production-v1.L023",
+        "order": 23,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "text-processing.production-v1.L024",
+        "order": 24,
+        "text": "    fields = fixture[\"record\"].split(fixture[\"delimiter\"])"
+      },
+      {
+        "line_id": "text-processing.production-v1.L025",
+        "order": 25,
+        "text": "    if len(fields) != 3 or fields[0] not in {\"INT\", \"TEXT\"}:"
+      },
+      {
+        "line_id": "text-processing.production-v1.L026",
+        "order": 26,
+        "text": "        return {\"status\": \"MALFORMED\", \"routed\": {}, \"trace\": [{\"event\": \"reject_fields\", \"fields\": fields}]}"
+      },
+      {
+        "line_id": "text-processing.production-v1.L027",
+        "order": 27,
+        "text": "    try:"
+      },
+      {
+        "line_id": "text-processing.production-v1.L028",
+        "order": 28,
+        "text": "        value = int(fields[2]) if fields[0] == \"INT\" else fields[2]"
+      },
+      {
+        "line_id": "text-processing.production-v1.L029",
+        "order": 29,
+        "text": "    except ValueError:"
+      },
+      {
+        "line_id": "text-processing.production-v1.L030",
+        "order": 30,
+        "text": "        return {\"status\": \"MALFORMED\", \"routed\": {}, \"trace\": [{\"event\": \"reject_conversion\", \"token\": fields[2]}]}"
+      },
+      {
+        "line_id": "text-processing.production-v1.L031",
+        "order": 31,
+        "text": "    routed = {fields[1]: value}"
+      },
+      {
+        "line_id": "text-processing.production-v1.L032",
+        "order": 32,
+        "text": "    trace.append({\"event\": \"route\", \"tag\": fields[0], \"key\": fields[1]})"
+      },
+      {
+        "line_id": "text-processing.production-v1.L033",
+        "order": 33,
+        "text": "    encoded = run_length_encode(fixture[\"text\"])"
+      },
+      {
+        "line_id": "text-processing.production-v1.L034",
+        "order": 34,
+        "text": "    trace.append({\"event\": \"flush_final_run\", \"runs\": len(encoded)})"
+      },
+      {
+        "line_id": "text-processing.production-v1.L035",
+        "order": 35,
+        "text": "    return {\"status\": \"OK\", \"comparison\": compare_text(fixture[\"left\"], fixture[\"right\"]), \"fields\": fields, \"routed\": routed, \"encoded\": encoded, \"trace\": trace}"
+      },
+      {
+        "line_id": "text-processing.production-v1.L036",
+        "order": 36,
+        "text": ""
+      },
+      {
+        "line_id": "text-processing.production-v1.L037",
+        "order": 37,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "text-processing.production-v1.L038",
+        "order": 38,
+        "text": "    import json"
+      },
+      {
+        "line_id": "text-processing.production-v1.L039",
+        "order": 39,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "text-processing.production-v1.L040",
+        "order": 40,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "text-processing.production-v1.L041",
+        "order": 41,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "text-processing.production-v1.L042",
+        "order": 42,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "text-processing.production-v1.L043",
+        "order": 43,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "text-processing.production-v1.L044",
+        "order": 44,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "text-processing.production-v1.L045",
+        "order": 45,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "d626c4569c0129c1ec8f4efd8e6048501add7bcc8b4f1d3587277b298338c36f",
+    "caption": {
+      "en": "Comparison, splitting, typed routing and run-length encoding.",
+      "vi": "So sánh, tách, định tuyến kiểu và mã hóa run-length."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.text-processing.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.text-processing.production-v1.independent-rerun",
+      "execution_log_sha256": "2379530aca5305273bef3915278d964fb2fde37b65677a8d93ccc49e1de7aca2"
+    }
+  },
   "scenarios": [
     {
       "scenario_id": "ac-9618-p4-2026-python.scenario.text-processing.string-split.boundary.production-v1",

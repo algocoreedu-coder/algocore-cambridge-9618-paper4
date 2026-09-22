@@ -8,6 +8,220 @@
     "artifact_version": "production-v1",
     "code_sha256": "c8c3e396c1002fdd91d0aab08b5e7a2036ff4f145793684dc2886383040e83c8"
   },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.procedural-design.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.procedural-design",
+    "pattern_ids": [
+      "ALGORITHM_TRANSLATE"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "procedural-design.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L002",
+        "order": 2,
+        "text": ""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L003",
+        "order": 3,
+        "text": "def classify(score):"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L004",
+        "order": 4,
+        "text": "    if score < 0 or score > 100:"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L005",
+        "order": 5,
+        "text": "        return \"INVALID\""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L006",
+        "order": 6,
+        "text": "    if score >= 70:"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L007",
+        "order": 7,
+        "text": "        return \"DISTINCTION\""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L008",
+        "order": 8,
+        "text": "    if score >= 40:"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L009",
+        "order": 9,
+        "text": "        return \"PASS\""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L010",
+        "order": 10,
+        "text": "    return \"RETRY\""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L011",
+        "order": 11,
+        "text": ""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L012",
+        "order": 12,
+        "text": "def apply_bonus(scores, bonus):"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L013",
+        "order": 13,
+        "text": "    # Return a new list: the caller's list is not Cambridge BYREF data."
+      },
+      {
+        "line_id": "procedural-design.production-v1.L014",
+        "order": 14,
+        "text": "    return [min(100, score + bonus) for score in scores]"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L015",
+        "order": 15,
+        "text": ""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L016",
+        "order": 16,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L017",
+        "order": 17,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L018",
+        "order": 18,
+        "text": "    original = list(fixture.get(\"scores\", []))"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L019",
+        "order": 19,
+        "text": "    if not isinstance(fixture.get(\"bonus\"), int):"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L020",
+        "order": 20,
+        "text": "        return {\"status\": \"INVALID_INPUT\", \"scores\": original, \"caller_unchanged\": True, \"trace\": [{\"event\": \"reject_bonus\"}]}"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L021",
+        "order": 21,
+        "text": "    adjusted = apply_bonus(original, fixture[\"bonus\"])"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L022",
+        "order": 22,
+        "text": "    labels = []"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L023",
+        "order": 23,
+        "text": "    for index, score in enumerate(adjusted):"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L024",
+        "order": 24,
+        "text": "        label = classify(score)"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L025",
+        "order": 25,
+        "text": "        trace.append({\"event\": \"classify\", \"index\": index, \"score\": score, \"label\": label})"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L026",
+        "order": 26,
+        "text": "        labels.append(label)"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L027",
+        "order": 27,
+        "text": "    status = \"OK\" if all(label != \"INVALID\" for label in labels) else \"INVALID_INPUT\""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L028",
+        "order": 28,
+        "text": "    return {\"status\": status, \"adjusted\": adjusted, \"labels\": labels, \"caller_unchanged\": original == fixture.get(\"scores\", []), \"trace\": trace}"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L029",
+        "order": 29,
+        "text": ""
+      },
+      {
+        "line_id": "procedural-design.production-v1.L030",
+        "order": 30,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L031",
+        "order": 31,
+        "text": "    import json"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L032",
+        "order": 32,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L033",
+        "order": 33,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L034",
+        "order": 34,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L035",
+        "order": 35,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L036",
+        "order": 36,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L037",
+        "order": 37,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "procedural-design.production-v1.L038",
+        "order": 38,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "c8c3e396c1002fdd91d0aab08b5e7a2036ff4f145793684dc2886383040e83c8",
+    "caption": {
+      "en": "Verified procedural decomposition, parameters and main flow.",
+      "vi": "Phân rã thủ tục, tham số và luồng chính có kiểm chứng."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.procedural-design.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.procedural-design.production-v1.independent-rerun",
+      "execution_log_sha256": "b7c3571ca21331b4494123f90fe2b4b73f6952f6c48705e97f8282e58a48de61"
+    }
+  },
   "scenarios": [
     {
       "scenario_id": "ac-9618-p4-2026-python.scenario.procedural-design.algorithm-translate.boundary.production-v1",

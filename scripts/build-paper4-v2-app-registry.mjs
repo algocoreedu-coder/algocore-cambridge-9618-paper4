@@ -314,6 +314,7 @@ export async function createPaper4V2Outputs() {
         artifact_version: ownerArtifact.version,
         code_sha256: ownerArtifact.code_sha256,
       },
+      python_artifact: publicPythonArtifact(ownerArtifact),
       scenarios: traces.map((trace) => ({
         scenario_id: trace.scenario_id,
         case_kind: trace.case_kind,

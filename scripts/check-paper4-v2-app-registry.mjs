@@ -172,11 +172,15 @@ for (const patternMeta of manifest.patterns) {
   const relativePath = patternMeta.trace_url.replace(/^\//, "public/");
   const chunk = await readJson(relativePath);
   assert(chunk.pattern_id === patternMeta.pattern_id, `${patternMeta.pattern_id}: chunk identity mismatch`);
+  assert(chunk.python_artifact.python_artifact_id === chunk.owner.python_artifact_id, `${patternMeta.pattern_id}: embedded PythonArtifact identity mismatch`);
+  assert(chunk.python_artifact.version === chunk.owner.artifact_version, `${patternMeta.pattern_id}: embedded PythonArtifact version mismatch`);
+  assert(chunk.python_artifact.code_sha256 === chunk.owner.code_sha256, `${patternMeta.pattern_id}: embedded PythonArtifact hash mismatch`);
+  assert(sha256(chunk.python_artifact.lines.map((line) => line.text).join("\n")) === chunk.owner.code_sha256, `${patternMeta.pattern_id}: embedded Python source hash mismatch`);
   assert(chunk.scenarios.length === 3, `${patternMeta.pattern_id}: expected three scenarios`);
   assert(new Set(chunk.scenarios.map((scenario) => scenario.case_kind)).size === 3, `${patternMeta.pattern_id}: scenario case coverage mismatch`);
   const chunkEvents = new Map(chunk.events.map((event) => [event.event_id, event]));
   assert(chunkEvents.size === chunk.events.length, `${patternMeta.pattern_id}: duplicate chunk event`);
-  const validLineIds = codeLinesByArtifact.get(chunk.owner.python_artifact_id);
+  const validLineIds = new Set(chunk.python_artifact.lines.map((line) => line.line_id));
   assert(validLineIds, `${patternMeta.pattern_id}: owner PythonArtifact is unavailable`);
   for (const scenario of chunk.scenarios) {
     assert(!traceIds.has(scenario.trace_id), `${patternMeta.pattern_id}: duplicate trace ${scenario.trace_id}`);

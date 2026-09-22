@@ -8,6 +8,208 @@
     "artifact_version": "production-v1",
     "code_sha256": "7bc9d023d31808f2f97d0fb5e3d66f2d13d4cc11b05cef4c3ed26aaf066fad8f"
   },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.validation-rules.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.validation-rules",
+    "pattern_ids": [
+      "CHECK_DIGIT",
+      "RULE_COMPUTE",
+      "UNIQUE_SELECTION",
+      "VALIDATE_INPUT"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "validation-rules.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L002",
+        "order": 2,
+        "text": ""
+      },
+      {
+        "line_id": "validation-rules.production-v1.L003",
+        "order": 3,
+        "text": "def check_digit(code, weights, modulus):"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L004",
+        "order": 4,
+        "text": "    if not code.isdigit() or len(code) != len(weights) or modulus <= 1:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L005",
+        "order": 5,
+        "text": "        raise ValueError(\"invalid check-digit contract\")"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L006",
+        "order": 6,
+        "text": "    return sum(int(digit) * weight for digit, weight in zip(code, weights)) % modulus"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L007",
+        "order": 7,
+        "text": ""
+      },
+      {
+        "line_id": "validation-rules.production-v1.L008",
+        "order": 8,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L009",
+        "order": 9,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L010",
+        "order": 10,
+        "text": "    accepted = list(fixture.get(\"accepted\", []))"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L011",
+        "order": 11,
+        "text": "    candidate = fixture.get(\"candidate\")"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L012",
+        "order": 12,
+        "text": "    if not isinstance(candidate, int) or not fixture[\"minimum\"] <= candidate <= fixture[\"maximum\"]:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L013",
+        "order": 13,
+        "text": "        return {\"status\": \"INVALID_INPUT\", \"accepted\": accepted, \"trace\": [{\"event\": \"range_reject\", \"value\": candidate}]}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L014",
+        "order": 14,
+        "text": "    if candidate in accepted:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L015",
+        "order": 15,
+        "text": "        return {\"status\": \"DUPLICATE\", \"accepted\": accepted, \"trace\": [{\"event\": \"duplicate_reject\", \"value\": candidate}]}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L016",
+        "order": 16,
+        "text": "    try:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L017",
+        "order": 17,
+        "text": "        calculated = check_digit(fixture[\"code\"], fixture[\"weights\"], fixture[\"modulus\"])"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L018",
+        "order": 18,
+        "text": "    except (KeyError, TypeError, ValueError) as error:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L019",
+        "order": 19,
+        "text": "        return {\"status\": \"INVALID_CODE\", \"accepted\": accepted, \"message\": str(error), \"trace\": [{\"event\": \"code_reject\"}]}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L020",
+        "order": 20,
+        "text": "    trace.append({\"event\": \"check_digit\", \"calculated\": calculated})"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L021",
+        "order": 21,
+        "text": "    if calculated != fixture[\"supplied_digit\"]:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L022",
+        "order": 22,
+        "text": "        return {\"status\": \"CHECK_DIGIT_MISMATCH\", \"accepted\": accepted, \"calculated\": calculated, \"trace\": trace}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L023",
+        "order": 23,
+        "text": "    accepted.append(candidate)"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L024",
+        "order": 24,
+        "text": "    trace.append({\"event\": \"accept_unique\", \"value\": candidate})"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L025",
+        "order": 25,
+        "text": "    return {\"status\": \"ACCEPTED\", \"accepted\": accepted, \"calculated\": calculated, \"trace\": trace}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L026",
+        "order": 26,
+        "text": ""
+      },
+      {
+        "line_id": "validation-rules.production-v1.L027",
+        "order": 27,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L028",
+        "order": 28,
+        "text": "    import json"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L029",
+        "order": 29,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L030",
+        "order": 30,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L031",
+        "order": 31,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L032",
+        "order": 32,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L033",
+        "order": 33,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L034",
+        "order": 34,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L035",
+        "order": 35,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "7bc9d023d31808f2f97d0fb5e3d66f2d13d4cc11b05cef4c3ed26aaf066fad8f",
+    "caption": {
+      "en": "Validation, unique selection and question-parameterised check digits.",
+      "vi": "Validation, lựa chọn duy nhất và check digit theo tham số đề."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.validation-rules.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.validation-rules.production-v1.independent-rerun",
+      "execution_log_sha256": "a1188909e9c5e0fea0190aef9fb56eea86e3304b2332ccb387a9a69bf7b37b5b"
+    }
+  },
   "scenarios": [
     {
       "scenario_id": "ac-9618-p4-2026-python.scenario.validation-rules.unique-selection.boundary.production-v1",

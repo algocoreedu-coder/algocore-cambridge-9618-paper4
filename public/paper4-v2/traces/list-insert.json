@@ -8,6 +8,273 @@
     "artifact_version": "production-v1",
     "code_sha256": "8aafd850d1dd34f5515286eaa9057765a95a7f8a3e59b491df5e51db0be2aaa9"
   },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.linked-list.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.linked-list",
+    "pattern_ids": [
+      "LIST_INSERT",
+      "LIST_REMOVE",
+      "LIST_SETUP",
+      "LIST_TRAVERSE"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "linked-list.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "linked-list.production-v1.L002",
+        "order": 2,
+        "text": ""
+      },
+      {
+        "line_id": "linked-list.production-v1.L003",
+        "order": 3,
+        "text": "class ArrayList:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L004",
+        "order": 4,
+        "text": "    def __init__(self, capacity):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L005",
+        "order": 5,
+        "text": "        self.data = [None] * capacity"
+      },
+      {
+        "line_id": "linked-list.production-v1.L006",
+        "order": 6,
+        "text": "        self.next = list(range(1, capacity)) + [-1]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L007",
+        "order": 7,
+        "text": "        self.head, self.free = -1, 0 if capacity else -1"
+      },
+      {
+        "line_id": "linked-list.production-v1.L008",
+        "order": 8,
+        "text": "    def insert_head(self, value):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L009",
+        "order": 9,
+        "text": "        if self.free == -1: return False"
+      },
+      {
+        "line_id": "linked-list.production-v1.L010",
+        "order": 10,
+        "text": "        node, self.free = self.free, self.next[self.free]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L011",
+        "order": 11,
+        "text": "        self.data[node], self.next[node], self.head = value, self.head, node"
+      },
+      {
+        "line_id": "linked-list.production-v1.L012",
+        "order": 12,
+        "text": "        return True"
+      },
+      {
+        "line_id": "linked-list.production-v1.L013",
+        "order": 13,
+        "text": "    def traverse(self):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L014",
+        "order": 14,
+        "text": "        output, node, seen = [], self.head, set()"
+      },
+      {
+        "line_id": "linked-list.production-v1.L015",
+        "order": 15,
+        "text": "        while node != -1:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L016",
+        "order": 16,
+        "text": "            if node in seen or node < 0 or node >= len(self.data): raise ValueError(\"corrupt link\")"
+      },
+      {
+        "line_id": "linked-list.production-v1.L017",
+        "order": 17,
+        "text": "            seen.add(node); output.append(self.data[node]); node = self.next[node]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L018",
+        "order": 18,
+        "text": "        return output"
+      },
+      {
+        "line_id": "linked-list.production-v1.L019",
+        "order": 19,
+        "text": "    def remove(self, target):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L020",
+        "order": 20,
+        "text": "        previous, node = -1, self.head"
+      },
+      {
+        "line_id": "linked-list.production-v1.L021",
+        "order": 21,
+        "text": "        while node != -1 and self.data[node] != target: previous, node = node, self.next[node]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L022",
+        "order": 22,
+        "text": "        if node == -1: return False"
+      },
+      {
+        "line_id": "linked-list.production-v1.L023",
+        "order": 23,
+        "text": "        if previous == -1: self.head = self.next[node]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L024",
+        "order": 24,
+        "text": "        else: self.next[previous] = self.next[node]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L025",
+        "order": 25,
+        "text": "        self.data[node], self.next[node], self.free = None, self.free, node"
+      },
+      {
+        "line_id": "linked-list.production-v1.L026",
+        "order": 26,
+        "text": "        return True"
+      },
+      {
+        "line_id": "linked-list.production-v1.L027",
+        "order": 27,
+        "text": ""
+      },
+      {
+        "line_id": "linked-list.production-v1.L028",
+        "order": 28,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L029",
+        "order": 29,
+        "text": "    linked, trace = ArrayList(fixture[\"capacity\"]), []"
+      },
+      {
+        "line_id": "linked-list.production-v1.L030",
+        "order": 30,
+        "text": "    for value in reversed(fixture.get(\"initial\", [])):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L031",
+        "order": 31,
+        "text": "        trace.append({\"event\": \"insert\", \"value\": value, \"success\": linked.insert_head(value)})"
+      },
+      {
+        "line_id": "linked-list.production-v1.L032",
+        "order": 32,
+        "text": "    before = linked.traverse()"
+      },
+      {
+        "line_id": "linked-list.production-v1.L033",
+        "order": 33,
+        "text": "    inserted = linked.insert_head(fixture[\"insert\"])"
+      },
+      {
+        "line_id": "linked-list.production-v1.L034",
+        "order": 34,
+        "text": "    removed = linked.remove(fixture[\"remove\"])"
+      },
+      {
+        "line_id": "linked-list.production-v1.L035",
+        "order": 35,
+        "text": "    try: after, status = linked.traverse(), \"OK\""
+      },
+      {
+        "line_id": "linked-list.production-v1.L036",
+        "order": 36,
+        "text": "    except ValueError: after, status = before, \"CORRUPT\""
+      },
+      {
+        "line_id": "linked-list.production-v1.L037",
+        "order": 37,
+        "text": "    trace += [{\"event\": \"insert_requested\", \"success\": inserted}, {\"event\": \"remove_requested\", \"success\": removed}]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L038",
+        "order": 38,
+        "text": "    return {\"status\": status, \"before\": before, \"after\": after, \"inserted\": inserted, \"removed\": removed, \"head\": linked.head, \"free\": linked.free, \"trace\": trace}"
+      },
+      {
+        "line_id": "linked-list.production-v1.L039",
+        "order": 39,
+        "text": ""
+      },
+      {
+        "line_id": "linked-list.production-v1.L040",
+        "order": 40,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "linked-list.production-v1.L041",
+        "order": 41,
+        "text": "    import json"
+      },
+      {
+        "line_id": "linked-list.production-v1.L042",
+        "order": 42,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "linked-list.production-v1.L043",
+        "order": 43,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "linked-list.production-v1.L044",
+        "order": 44,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "linked-list.production-v1.L045",
+        "order": 45,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L046",
+        "order": 46,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "linked-list.production-v1.L047",
+        "order": 47,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "linked-list.production-v1.L048",
+        "order": 48,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "8aafd850d1dd34f5515286eaa9057765a95a7f8a3e59b491df5e51db0be2aaa9",
+    "caption": {
+      "en": "An array linked list with a recyclable free list.",
+      "vi": "Linked list trên mảng và free list có tái sử dụng node."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.linked-list.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.linked-list.production-v1.independent-rerun",
+      "execution_log_sha256": "95007303fd8aec4c7405d502f912df1b9486432e6d798aeccc31eff3156ca5f3"
+    }
+  },
   "scenarios": [
     {
       "scenario_id": "ac-9618-p4-2026-python.scenario.linked-list.list-insert.boundary.production-v1",
