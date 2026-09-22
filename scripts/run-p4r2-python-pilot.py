@@ -8,6 +8,7 @@ with the author-produced PythonArtifact before recording independent evidence.
 from __future__ import annotations
 
 import argparse
+import difflib
 import hashlib
 import json
 import os
@@ -53,8 +54,8 @@ LESSONS = {
             "en": "Binary search with an interval invariant and a sorted-input precondition.",
         },
         "checks": {
-            "normal": {"status": "FOUND", "index": 4},
-            "boundary": {"status": "NOT_FOUND", "index": -1},
+            "normal": {"status": "FOUND", "index": 4, "recursive_index": 4},
+            "boundary": {"status": "NOT_FOUND", "index": -1, "recursive_index": -1},
             "failure": {"status": "UNSORTED", "index": -1},
         },
     },
@@ -101,13 +102,13 @@ LESSONS = {
         "patterns": ["FILE_READ_OBJECTS"],
         "batch": "b7",
         "caption": {
-            "vi": "Đọc bản ghi CSV, dựng đối tượng và tra cứu thuộc tính với kiểm tra bản ghi lỗi.",
-            "en": "Read CSV records, construct objects and look up attributes while guarding malformed records.",
+            "vi": "Đọc CSV theo discriminator BOOK/EBOOK, dựng base/subclass và tra cứu, cập nhật qua method có validation.",
+            "en": "Read CSV with BOOK/EBOOK discriminators, construct base/subclass objects, and validate lookup updates through a method.",
         },
         "checks": {
-            "normal": {"status": "OK", "found": {"title": "Algorithms", "pages": 320}},
-            "boundary": {"status": "OK", "books": [], "found": None},
-            "failure": {"status": "INVALID_PAGES_AT_LINE_1", "books": []},
+            "normal": {"status": "UPDATED", "found": {"type": "BOOK", "title": "Algorithms", "pages": 350}},
+            "boundary": {"status": "NOT_FOUND", "books": [], "found": None},
+            "failure": {"status": "INVALID_UPDATE", "found": {"type": "BOOK", "title": "Algorithms", "pages": 320}},
         },
     },
 }
@@ -166,21 +167,57 @@ def run_case(source: Path, fixture: Path) -> dict:
     }
 
 
-def source_record(slug: str) -> tuple[Path, bytes, list[dict]]:
+def source_record(slug: str) -> tuple[Path, bytes, list[dict], dict]:
     source = PILOT_ROOT / slug / "source.py"
     source_bytes = source.read_bytes()
     if b"\r\n" in source_bytes or not source_bytes.endswith(b"\n"):
         raise AssertionError(f"{slug}: canonical source must use LF and one final newline")
     text = source_bytes.decode("utf-8")
     compile(text, str(source), "exec")
-    lines = [
-        {"line_id": f"{slug}.v1.L{order:03d}", "order": order, "text": line}
-        for order, line in enumerate(text.split("\n"), start=1)
-    ]
+    new_texts = text.split("\n")
+    artifact_path = source.parent / "artifact.json"
+    previous_artifact = None
+    previous_artifact_sha256 = None
+    if artifact_path.exists():
+        previous_bytes = artifact_path.read_bytes()
+        previous_artifact = json.loads(previous_bytes.decode("utf-8"))
+        previous_artifact_sha256 = sha256(previous_bytes)
+    previous_lines = previous_artifact.get("lines", []) if previous_artifact else []
+    previous_texts = [line["text"] for line in previous_lines]
+    preserved_by_new_index = {}
+    matcher = difflib.SequenceMatcher(a=previous_texts, b=new_texts, autojunk=False)
+    for old_start, new_start, length in matcher.get_matching_blocks():
+        for offset in range(length):
+            preserved_by_new_index[new_start + offset] = previous_lines[old_start + offset]["line_id"]
+    max_suffix = 0
+    for line in previous_lines:
+        suffix = line["line_id"].rsplit("L", 1)[-1]
+        if suffix.isdigit():
+            max_suffix = max(max_suffix, int(suffix))
+    lines = []
+    added_line_ids = []
+    for index, line_text in enumerate(new_texts):
+        line_id = preserved_by_new_index.get(index)
+        if line_id is None:
+            max_suffix += 1
+            line_id = f"{slug}.v1.L{max_suffix:03d}"
+            added_line_ids.append(line_id)
+        lines.append({"line_id": line_id, "order": index + 1, "text": line_text})
     reconstructed = "\n".join(line["text"] for line in lines).encode("utf-8")
     if reconstructed != source_bytes:
         raise AssertionError(f"{slug}: stable-line reconstruction differs from source bytes")
-    return source, source_bytes, lines
+    current_ids = {line["line_id"] for line in lines}
+    previous_ids = {line["line_id"] for line in previous_lines}
+    line_migration = {
+        "lesson_id": f"ac-9618-p4-2026-python.lesson.{slug}",
+        "previous_artifact_sha256": previous_artifact_sha256,
+        "previous_code_sha256": previous_artifact.get("code_sha256") if previous_artifact else None,
+        "new_code_sha256": sha256(source_bytes),
+        "preserved_line_ids": sorted(current_ids & previous_ids),
+        "added_line_ids": added_line_ids,
+        "retired_line_ids": sorted(previous_ids - current_ids),
+    }
+    return source, source_bytes, lines, line_migration
 
 
 def stage5_refs(meta: dict) -> list[str]:
@@ -248,8 +285,10 @@ def artifact_for(
 
 def execute(mode: str) -> None:
     run_lessons = []
+    line_migrations = []
     for slug, meta in LESSONS.items():
-        source, source_bytes, lines = source_record(slug)
+        source, source_bytes, lines, line_migration = source_record(slug)
+        line_migrations.append(line_migration)
         cases = []
         for case_kind in CASES:
             case = run_case(source, source.parent / "fixtures" / f"{case_kind}.json")
@@ -310,6 +349,15 @@ def execute(mode: str) -> None:
     }
     filename = "AUTHOR_RUN.json" if mode == "author" else "INDEPENDENT_RERUN.json"
     write_json(EVIDENCE_ROOT / filename, evidence)
+    if mode == "author":
+        write_json(
+            EVIDENCE_ROOT / "LINE_ID_MIGRATION.json",
+            {
+                "schema_version": "p4r2-a3-line-id-migration-v1",
+                "policy": "Exact unchanged lines retain their prior stable IDs; inserted or edited lines receive new IDs above the previous maximum.",
+                "lessons": line_migrations,
+            },
+        )
     if mode == "independent":
         author_path = EVIDENCE_ROOT / "AUTHOR_RUN.json"
         independent_path = EVIDENCE_ROOT / "INDEPENDENT_RERUN.json"

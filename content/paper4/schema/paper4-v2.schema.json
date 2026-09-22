@@ -58,6 +58,28 @@
         "en": { "$ref": "#/$defs/NonEmptyString" }
       }
     },
+    "VisualAccessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accessible_label", "action_description", "interaction_role", "keyboard_instruction", "focus_target", "focus_order", "live_status"],
+      "properties": {
+        "accessible_label": { "$ref": "#/$defs/Bilingual" },
+        "action_description": { "$ref": "#/$defs/Bilingual" },
+        "interaction_role": { "enum": ["status", "step", "control", "code-line", "diagram-node"] },
+        "keyboard_instruction": { "$ref": "#/$defs/Bilingual" },
+        "focus_target": { "$ref": "#/$defs/StableId" },
+        "focus_order": { "type": "integer", "minimum": 0 },
+        "live_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "message"],
+          "properties": {
+            "mode": { "enum": ["off", "polite", "assertive"] },
+            "message": { "$ref": "#/$defs/Bilingual" }
+          }
+        }
+      }
+    },
     "SourceLocator": {
       "type": "object",
       "additionalProperties": false,
@@ -224,7 +246,7 @@
     },
     "VisualEventBinding": {
       "type": "object", "additionalProperties": false,
-      "required": ["event_id", "trace_id", "sequence", "event_type", "active_line_ids", "before", "delta", "after", "output_delta", "invariant_or_criterion", "prediction", "feedback", "visual_targets"],
+      "required": ["event_id", "trace_id", "sequence", "event_type", "active_line_ids", "before", "delta", "after", "output_delta", "invariant_or_criterion", "prediction", "feedback", "visual_targets", "accessibility"],
       "properties": {
         "event_id": { "$ref": "#/$defs/StableId" },
         "trace_id": { "$ref": "#/$defs/StableId" },
@@ -232,10 +254,11 @@
         "event_type": { "$ref": "#/$defs/StableId" },
         "active_line_ids": { "$ref": "#/$defs/StableIdArray" },
         "before": {}, "delta": {}, "after": {}, "output_delta": {},
-        "invariant_or_criterion": { "$ref": "#/$defs/NonEmptyString" },
+        "invariant_or_criterion": { "$ref": "#/$defs/Bilingual" },
         "prediction": { "$ref": "#/$defs/Bilingual" },
         "feedback": { "$ref": "#/$defs/Bilingual" },
-        "visual_targets": { "$ref": "#/$defs/StableIdArray" }
+        "visual_targets": { "$ref": "#/$defs/StableIdArray" },
+        "accessibility": { "$ref": "#/$defs/VisualAccessibility" }
       }
     },
     "SourceRef": {
@@ -266,11 +289,11 @@
         "practice_refs": { "$ref": "#/$defs/StableIdArray" },
         "retrieval_refs": { "$ref": "#/$defs/StableIdArray" },
         "source_refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/SourceRef" } },
-        "locale_parity": { "enum": ["PASS", "FAIL"] },
-        "academic_review": { "enum": ["PASS", "FAIL"] },
-        "execution_review": { "enum": ["PASS", "FAIL"] },
-        "ux_review": { "enum": ["PASS", "FAIL"] },
-        "lead_gate": { "enum": ["PASS", "FAIL"] }
+        "locale_parity": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "academic_review": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "execution_review": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "ux_review": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "lead_gate": { "enum": ["PASS", "FAIL", "PENDING"] }
       }
     },
     "MarkingAtom": {
@@ -314,7 +337,7 @@
         "level": { "enum": ["guided", "faded", "independent", "retrieval"] },
         "prompt": { "$ref": "#/$defs/Bilingual" },
         "shared_fixture_code_data_ids": { "$ref": "#/$defs/StableIdArray" },
-        "expected_artifact": { "$ref": "#/$defs/NonEmptyString" },
+        "expected_artifact": { "$ref": "#/$defs/Bilingual" },
         "hint": { "$ref": "#/$defs/Bilingual" },
         "feedback": { "$ref": "#/$defs/Bilingual" },
         "self_rubric": { "type": "object" },

@@ -47,7 +47,7 @@ const REQUIRED = {
   ],
   VisualEventBinding: [
     "event_id", "trace_id", "sequence", "event_type", "active_line_ids", "before", "delta",
-    "after", "output_delta", "invariant_or_criterion", "prediction", "feedback", "visual_targets",
+    "after", "output_delta", "invariant_or_criterion", "prediction", "feedback", "visual_targets", "accessibility",
   ],
   LessonReleaseRecord: [
     "lesson_id", "package_id", "slug", "version", "canonical_section_ids", "knowledge_unit_ids",
@@ -69,9 +69,9 @@ const REQUIRED = {
 const BILINGUAL_FIELDS = {
   KnowledgeUnit: ["title", "explanation", "python_connection", "representation", "invariant_or_rule"],
   PythonArtifact: ["caption"],
-  VisualEventBinding: ["prediction", "feedback"],
+  VisualEventBinding: ["invariant_or_criterion", "prediction", "feedback"],
   MarkingChain: ["detection_check", "repair_check", "transfer_limit"],
-  AssessmentItem: ["prompt", "hint", "feedback"],
+  AssessmentItem: ["prompt", "expected_artifact", "hint", "feedback"],
 };
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
@@ -223,6 +223,26 @@ function validateEvent(record, errors) {
   validateId(record.event_type, "/record/event_type", errors);
   validateIdArray(record.active_line_ids, "/record/active_line_ids", errors);
   validateIdArray(record.visual_targets, "/record/visual_targets", errors);
+  const accessibility = record.accessibility;
+  if (!isObject(accessibility)) {
+    errors.push(issue("VISUAL_ACCESSIBILITY_MISSING", "/record/accessibility", "Visual events require learner-facing accessibility metadata."));
+    return;
+  }
+  validateBilingual(accessibility.accessible_label, "/record/accessibility/accessible_label", errors);
+  validateBilingual(accessibility.action_description, "/record/accessibility/action_description", errors);
+  validateBilingual(accessibility.keyboard_instruction, "/record/accessibility/keyboard_instruction", errors);
+  validateId(accessibility.focus_target, "/record/accessibility/focus_target", errors);
+  if (!Number.isInteger(accessibility.focus_order) || accessibility.focus_order < 0) {
+    errors.push(issue("VISUAL_FOCUS_ORDER_INVALID", "/record/accessibility/focus_order", "Focus order must be a non-negative integer."));
+  }
+  if (!["status", "step", "control", "code-line", "diagram-node"].includes(accessibility.interaction_role)) {
+    errors.push(issue("VISUAL_INTERACTION_ROLE_INVALID", "/record/accessibility/interaction_role", "Visual event interaction role is not supported."));
+  }
+  if (!isObject(accessibility.live_status) || !["off", "polite", "assertive"].includes(accessibility.live_status.mode)) {
+    errors.push(issue("VISUAL_LIVE_STATUS_INVALID", "/record/accessibility/live_status", "Visual event live status requires a supported announcement mode."));
+  } else {
+    validateBilingual(accessibility.live_status.message, "/record/accessibility/live_status/message", errors);
+  }
 }
 
 function validateLessonRelease(record, errors) {
@@ -406,7 +426,8 @@ function validContractRegistry() {
     } },
     { schema_version: SCHEMA_VERSION, artifact_type: "VisualEventBinding", record: {
       event_id: "event.binary-search.001", trace_id: "trace.binary-search.normal", sequence: 0, event_type: "compare", active_line_ids: ["L003"], before: { low: 0, high: 2 }, delta: { mid: 1 }, after: { low: 0, high: 2, mid: 1 }, output_delta: null,
-      invariant_or_criterion: "The target remains in the closed interval.", prediction: bi("Dự đoán mid.", "Predict mid."), feedback: bi("mid bằng 1.", "mid is 1."), visual_targets: ["array", "code"],
+      invariant_or_criterion: bi("Mục tiêu vẫn nằm trong khoảng đóng.", "The target remains in the closed interval."), prediction: bi("Dự đoán mid.", "Predict mid."), feedback: bi("mid bằng 1.", "mid is 1."), visual_targets: ["array", "code"],
+      accessibility: { accessible_label: bi("Bước so sánh tại mid", "Comparison step at mid"), action_description: bi("So sánh mục tiêu với phần tử giữa.", "Compare the target with the middle item."), interaction_role: "step", keyboard_instruction: bi("Dùng phím mũi tên trái và phải để đổi bước.", "Use the left and right arrow keys to change step."), focus_target: "visual.binary-search.event-001", focus_order: 0, live_status: { mode: "polite", message: bi("Đã chọn bước so sánh tại mid.", "Comparison step at mid selected.") } },
     } },
     { schema_version: SCHEMA_VERSION, artifact_type: "LessonReleaseRecord", record: {
       lesson_id: "binary-search", package_id: "searching", slug: "binary-search", version: "2.0.0", canonical_section_ids: ["why", "recognise", "knowledge", "method", "worked-example", "visual", "mistakes", "practice", "retrieval", "sources"],
@@ -421,7 +442,7 @@ function validContractRegistry() {
     } },
     { schema_version: SCHEMA_VERSION, artifact_type: "AssessmentItem", record: {
       assessment_item_id: "assessment.binary-search.guided", lesson_id: "binary-search", pattern_ids: ["pattern.binary-search"], assessment_requirement_ids: ["requirement.search.01"], destination_id: "practice.guided", level: "guided",
-      prompt: bi("Hoàn thiện cập nhật biên.", "Complete the bound update."), shared_fixture_code_data_ids: ["fixture.normal", "py.binary-search.v2"], expected_artifact: "Python expression", hint: bi("So sánh với phần tử giữa.", "Compare with the middle item."), feedback: bi("Loại cả phần tử giữa.", "Exclude the middle item."), self_rubric: { criteria: ["correct bound"] },
+      prompt: bi("Hoàn thiện cập nhật biên.", "Complete the bound update."), shared_fixture_code_data_ids: ["fixture.normal", "py.binary-search.v2"], expected_artifact: bi("Biểu thức Python", "Python expression"), hint: bi("So sánh với phần tử giữa.", "Compare with the middle item."), feedback: bi("Loại cả phần tử giữa.", "Exclude the middle item."), self_rubric: { criteria: ["correct bound"] },
       disclosure_contract: { answer_hidden_initially: true, hint_hidden_initially: true, feedback_after_attempt: true },
     } },
   ];
