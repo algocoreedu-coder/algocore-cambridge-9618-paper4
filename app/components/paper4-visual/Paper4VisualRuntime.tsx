@@ -92,7 +92,7 @@ function V2Runtime(props: V2Props) {
       if (current) setLoadState({ status: "error", message: reason instanceof Error ? reason.message : String(reason) });
     });
     return () => { current = false; };
-  }, [loadRevision, pattern, preloadArtifact]);
+  }, [loadRevision, pattern?.pattern_id, pattern?.trace_url, preloadArtifact?.code_sha256]);
 
   const scenarioEvents = useMemo(() => {
     if (!loadState.chunk || !state.scenarioId) return [];
