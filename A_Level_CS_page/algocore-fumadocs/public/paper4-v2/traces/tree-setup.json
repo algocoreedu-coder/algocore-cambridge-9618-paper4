@@ -1,0 +1,2768 @@
+{
+  "schema_version": "paper4-v2-trace-chunk-v1",
+  "pattern_id": "TREE_SETUP",
+  "owner": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.binary-tree",
+    "lesson_slug": "binary-tree",
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-tree.production-v1",
+    "artifact_version": "production-v1",
+    "code_sha256": "62f2cc9745e84f0dc6317d671c85a50c34d726b6d4ad9f33bf2612d21757a30c"
+  },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-tree.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.binary-tree",
+    "pattern_ids": [
+      "TREE_INSERT",
+      "TREE_SEARCH",
+      "TREE_SETUP",
+      "TREE_TRAVERSE"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "binary-tree.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L002",
+        "order": 2,
+        "text": ""
+      },
+      {
+        "line_id": "binary-tree.production-v1.L003",
+        "order": 3,
+        "text": "class Node:"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L004",
+        "order": 4,
+        "text": "    def __init__(self, value): self.value, self.left, self.right = value, None, None"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L005",
+        "order": 5,
+        "text": ""
+      },
+      {
+        "line_id": "binary-tree.production-v1.L006",
+        "order": 6,
+        "text": "def insert(root, value):"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L007",
+        "order": 7,
+        "text": "    if root is None: return Node(value), True"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L008",
+        "order": 8,
+        "text": "    current = root"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L009",
+        "order": 9,
+        "text": "    while True:"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L010",
+        "order": 10,
+        "text": "        if value == current.value: return root, False"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L011",
+        "order": 11,
+        "text": "        side = \"left\" if value < current.value else \"right\""
+      },
+      {
+        "line_id": "binary-tree.production-v1.L012",
+        "order": 12,
+        "text": "        child = getattr(current, side)"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L013",
+        "order": 13,
+        "text": "        if child is None: setattr(current, side, Node(value)); return root, True"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L014",
+        "order": 14,
+        "text": "        current = child"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L015",
+        "order": 15,
+        "text": ""
+      },
+      {
+        "line_id": "binary-tree.production-v1.L016",
+        "order": 16,
+        "text": "def traverse(node, order):"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L017",
+        "order": 17,
+        "text": "    if node is None: return []"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L018",
+        "order": 18,
+        "text": "    if order == \"pre\": return [node.value] + traverse(node.left, order) + traverse(node.right, order)"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L019",
+        "order": 19,
+        "text": "    if order == \"post\": return traverse(node.left, order) + traverse(node.right, order) + [node.value]"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L020",
+        "order": 20,
+        "text": "    return traverse(node.left, order) + [node.value] + traverse(node.right, order)"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L021",
+        "order": 21,
+        "text": ""
+      },
+      {
+        "line_id": "binary-tree.production-v1.L022",
+        "order": 22,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L023",
+        "order": 23,
+        "text": "    root, trace = None, []"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L024",
+        "order": 24,
+        "text": "    for value in fixture.get(\"values\", []):"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L025",
+        "order": 25,
+        "text": "        root, added = insert(root, value); trace.append({\"event\": \"insert\", \"value\": value, \"added\": added})"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L026",
+        "order": 26,
+        "text": "    before = traverse(root, \"in\")"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L027",
+        "order": 27,
+        "text": "    root, added = insert(root, fixture[\"insert\"])"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L028",
+        "order": 28,
+        "text": "    current, found = root, False"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L029",
+        "order": 29,
+        "text": "    while current is not None:"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L030",
+        "order": 30,
+        "text": "        trace.append({\"event\": \"search\", \"node\": current.value})"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L031",
+        "order": 31,
+        "text": "        if fixture[\"target\"] == current.value: found = True; break"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L032",
+        "order": 32,
+        "text": "        current = current.left if fixture[\"target\"] < current.value else current.right"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L033",
+        "order": 33,
+        "text": "    return {\"status\": \"FOUND\" if found else \"NOT_FOUND\", \"inserted\": added, \"unchanged_on_duplicate\": added or before == traverse(root, \"in\"), \"inorder\": traverse(root, \"in\"), \"preorder\": traverse(root, \"pre\"), \"postorder\": traverse(root, \"post\"), \"trace\": trace}"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L034",
+        "order": 34,
+        "text": ""
+      },
+      {
+        "line_id": "binary-tree.production-v1.L035",
+        "order": 35,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L036",
+        "order": 36,
+        "text": "    import json"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L037",
+        "order": 37,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L038",
+        "order": 38,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L039",
+        "order": 39,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L040",
+        "order": 40,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L041",
+        "order": 41,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L042",
+        "order": 42,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "binary-tree.production-v1.L043",
+        "order": 43,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "62f2cc9745e84f0dc6317d671c85a50c34d726b6d4ad9f33bf2612d21757a30c",
+    "caption": {
+      "en": "A BST with insert, search and three traversals.",
+      "vi": "BST với insert, search và ba phép duyệt."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.binary-tree.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.binary-tree.production-v1.independent-rerun",
+      "execution_log_sha256": "dcf9f4132f0f31d2af4b574387d7ab3e4e71c6f9e6b9d1253a0d7a70042c5d6c"
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.binary-tree.tree-setup.boundary.production-v1",
+      "case_kind": "boundary",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.boundary.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-tree.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "binary-tree.boundary",
+        "fixture_input": {
+          "insert": 7,
+          "target": 7,
+          "values": []
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "FOUND"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.boundary.production-v1.event-001"
+      ],
+      "expected_output_ref": "binary-tree.boundary.expected-output",
+      "fixture_ref": "binary-tree.boundary"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.binary-tree.tree-setup.failure.production-v1",
+      "case_kind": "failure",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-tree.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "NOT_FOUND"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-002",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-003",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-004",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-005"
+      ],
+      "expected_output_ref": "binary-tree.failure.expected-output",
+      "fixture_ref": "binary-tree.failure"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.binary-tree.tree-setup.normal.production-v1",
+      "case_kind": "normal",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.binary-tree.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "FOUND"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-002",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-003",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-004",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-005",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-006",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-007",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-008",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-009",
+        "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-010"
+      ],
+      "expected_output_ref": "binary-tree.normal.expected-output",
+      "fixture_ref": "binary-tree.normal"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.boundary.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.boundary.production-v1",
+      "sequence": 0,
+      "event_type": "compare",
+      "active_line_ids": [
+        "binary-tree.production-v1.L030",
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L022",
+        "binary-tree.production-v1.L033"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.boundary",
+        "fixture_input": {
+          "insert": 7,
+          "target": 7,
+          "values": []
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "search",
+          "node": 7
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.boundary",
+        "fixture_input": {
+          "insert": 7,
+          "target": 7,
+          "values": []
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "search",
+            "node": 7
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "FOUND",
+        "verified_result": {
+          "inorder": [
+            7
+          ],
+          "inserted": true,
+          "postorder": [
+            7
+          ],
+          "preorder": [
+            7
+          ],
+          "status": "FOUND",
+          "unchanged_on_duplicate": true
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "search",
+          "node": 7
+        },
+        "final_result": {
+          "inorder": [
+            7
+          ],
+          "inserted": true,
+          "postorder": [
+            7
+          ],
+          "preorder": [
+            7
+          ],
+          "status": "FOUND",
+          "unchanged_on_duplicate": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện search phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event search must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+        "en": "Which branch will the comparison select? (search)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: search",
+          "en": "Step 1: search"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+          "en": "Which branch will the comparison select? (search)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.boundary.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1",
+      "sequence": 0,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "NOT_FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 5
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "NOT_FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 5
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: insert",
+          "en": "Step 1: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1",
+      "sequence": 1,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "NOT_FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 3
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 3
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "NOT_FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 3
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: insert",
+          "en": "Step 2: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1",
+      "sequence": 2,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 3
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "NOT_FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 7
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 3
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 7
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "NOT_FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 7
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: insert",
+          "en": "Step 3: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-004",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1",
+      "sequence": 3,
+      "event_type": "compare",
+      "active_line_ids": [
+        "binary-tree.production-v1.L030",
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 3
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 7
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "NOT_FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "search",
+          "node": 5
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 3
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 7
+          },
+          {
+            "event": "search",
+            "node": 5
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "NOT_FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "search",
+          "node": 5
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện search phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event search must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+        "en": "Which branch will the comparison select? (search)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: search",
+          "en": "Step 4: search"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+          "en": "Which branch will the comparison select? (search)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1",
+      "sequence": 4,
+      "event_type": "compare",
+      "active_line_ids": [
+        "binary-tree.production-v1.L030",
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L022",
+        "binary-tree.production-v1.L033"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 3
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 7
+          },
+          {
+            "event": "search",
+            "node": 5
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "NOT_FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "search",
+          "node": 7
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.failure",
+        "fixture_input": {
+          "insert": 3,
+          "target": 9,
+          "values": [
+            5,
+            3,
+            7
+          ]
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 5
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 3
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 7
+          },
+          {
+            "event": "search",
+            "node": 5
+          },
+          {
+            "event": "search",
+            "node": 7
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "NOT_FOUND",
+        "verified_result": {
+          "inorder": [
+            3,
+            5,
+            7
+          ],
+          "inserted": false,
+          "postorder": [
+            3,
+            7,
+            5
+          ],
+          "preorder": [
+            5,
+            3,
+            7
+          ],
+          "status": "NOT_FOUND",
+          "unchanged_on_duplicate": true
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "search",
+          "node": 7
+        },
+        "final_result": {
+          "inorder": [
+            3,
+            5,
+            7
+          ],
+          "inserted": false,
+          "postorder": [
+            3,
+            7,
+            5
+          ],
+          "preorder": [
+            5,
+            3,
+            7
+          ],
+          "status": "NOT_FOUND",
+          "unchanged_on_duplicate": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện search phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event search must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+        "en": "Which branch will the comparison select? (search)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: search",
+          "en": "Step 5: search"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+          "en": "Which branch will the comparison select? (search)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.failure.production-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 0,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 8
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 8
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: insert",
+          "en": "Step 1: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 1,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 4
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 4
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: insert",
+          "en": "Step 2: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 2,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 12
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 12
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: insert",
+          "en": "Step 3: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-004",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 3,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 2
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: insert",
+          "en": "Step 4: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 4,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 6
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 6
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: insert",
+          "en": "Step 5: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-006",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 5,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 10
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 6,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 10
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 6: insert",
+          "en": "Step 6: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-006.focus",
+        "focus_order": 5,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-007",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 6,
+      "event_type": "write",
+      "active_line_ids": [
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L027",
+        "binary-tree.production-v1.L006"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 6,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 14
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 7,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 14
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "added": true,
+          "event": "insert",
+          "value": 14
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+        "en": "Which value will be written or updated? (insert)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 7: insert",
+          "en": "Step 7: insert"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
+          "en": "Which value will be written or updated? (insert)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-007.focus",
+        "focus_order": 6,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-008",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 7,
+      "event_type": "compare",
+      "active_line_ids": [
+        "binary-tree.production-v1.L030",
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 7,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 14
+          }
+        ],
+        "latest_event": "insert",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "search",
+          "node": 8
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 8,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 14
+          },
+          {
+            "event": "search",
+            "node": 8
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "search",
+          "node": 8
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện search phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event search must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+        "en": "Which branch will the comparison select? (search)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 8: search",
+          "en": "Step 8: search"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+          "en": "Which branch will the comparison select? (search)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-008.focus",
+        "focus_order": 7,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-009",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 8,
+      "event_type": "compare",
+      "active_line_ids": [
+        "binary-tree.production-v1.L030",
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 8,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 14
+          },
+          {
+            "event": "search",
+            "node": 8
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "search",
+          "node": 12
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 9,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 14
+          },
+          {
+            "event": "search",
+            "node": 8
+          },
+          {
+            "event": "search",
+            "node": 12
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "FOUND"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "search",
+          "node": 12
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện search phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event search must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+        "en": "Which branch will the comparison select? (search)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 9: search",
+          "en": "Step 9: search"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+          "en": "Which branch will the comparison select? (search)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-009.focus",
+        "focus_order": 8,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-010",
+      "trace_id": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1",
+      "sequence": 9,
+      "event_type": "compare",
+      "active_line_ids": [
+        "binary-tree.production-v1.L030",
+        "binary-tree.production-v1.L025",
+        "binary-tree.production-v1.L022",
+        "binary-tree.production-v1.L033"
+      ],
+      "before": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 9,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 14
+          },
+          {
+            "event": "search",
+            "node": 8
+          },
+          {
+            "event": "search",
+            "node": 12
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "FOUND"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "search",
+          "node": 10
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "binary-tree.normal",
+        "fixture_input": {
+          "insert": 5,
+          "target": 10,
+          "values": [
+            8,
+            4,
+            12,
+            2,
+            6,
+            10,
+            14
+          ]
+        },
+        "trace_cursor": 10,
+        "history": [
+          {
+            "added": true,
+            "event": "insert",
+            "value": 8
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 4
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 12
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 2
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 6
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 10
+          },
+          {
+            "added": true,
+            "event": "insert",
+            "value": 14
+          },
+          {
+            "event": "search",
+            "node": 8
+          },
+          {
+            "event": "search",
+            "node": 12
+          },
+          {
+            "event": "search",
+            "node": 10
+          }
+        ],
+        "latest_event": "search",
+        "execution_status": "FOUND",
+        "verified_result": {
+          "inorder": [
+            2,
+            4,
+            5,
+            6,
+            8,
+            10,
+            12,
+            14
+          ],
+          "inserted": true,
+          "postorder": [
+            2,
+            5,
+            6,
+            4,
+            10,
+            14,
+            12,
+            8
+          ],
+          "preorder": [
+            8,
+            4,
+            2,
+            6,
+            5,
+            12,
+            10,
+            14
+          ],
+          "status": "FOUND",
+          "unchanged_on_duplicate": true
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "search",
+          "node": 10
+        },
+        "final_result": {
+          "inorder": [
+            2,
+            4,
+            5,
+            6,
+            8,
+            10,
+            12,
+            14
+          ],
+          "inserted": true,
+          "postorder": [
+            2,
+            5,
+            6,
+            4,
+            10,
+            14,
+            12,
+            8
+          ],
+          "preorder": [
+            8,
+            4,
+            2,
+            6,
+            5,
+            12,
+            10,
+            14
+          ],
+          "status": "FOUND",
+          "unchanged_on_duplicate": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "TREE_SETUP: sự kiện search phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "TREE_SETUP: event search must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+        "en": "Which branch will the comparison select? (search)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+      },
+      "visual_targets": [
+        "visual.tree-setup.state",
+        "visual.tree-setup.search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 10: search",
+          "en": "Step 10: search"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (search)",
+          "en": "Which branch will the comparison select? (search)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.binary-tree.tree-setup.normal.production-v1.event-010.focus",
+        "focus_order": 9,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: search.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: search."
+          }
+        }
+      }
+    }
+  ]
+}

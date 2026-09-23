@@ -1,0 +1,339 @@
+{
+  "author_run_ref": "p4r3.a3.oop-inheritance.production-v1.author-run",
+  "caption": {
+    "en": "Inheritance, overriding and dynamic dispatch.",
+    "vi": "Kế thừa, override và dynamic dispatch."
+  },
+  "code_sha256": "ab6c449e327fe607c48c5f508a37aaad7b4fda82e7e64e991a01cbac4a2ad528",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "16b37d516f6d9aa8afc20b8e178445d4e79fcb775438860d23a1db298417d78c",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "oop-inheritance.normal.expected-output",
+      "fixture_ref": "oop-inheritance.normal",
+      "value": {
+        "outputs": [
+          {
+            "area": 0,
+            "name": "base"
+          },
+          {
+            "area": 12,
+            "name": "rectangle"
+          },
+          {
+            "area": 12.56,
+            "name": "circle"
+          }
+        ],
+        "rejected": 0,
+        "status": "OK",
+        "trace": [
+          {
+            "event": "dynamic_dispatch",
+            "runtime_type": "Shape"
+          },
+          {
+            "event": "dynamic_dispatch",
+            "runtime_type": "Rectangle"
+          },
+          {
+            "event": "dynamic_dispatch",
+            "runtime_type": "Circle"
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "oop-inheritance.boundary.expected-output",
+      "fixture_ref": "oop-inheritance.boundary",
+      "value": {
+        "outputs": [
+          {
+            "area": 0,
+            "name": "base"
+          },
+          {
+            "area": 0,
+            "name": "rectangle"
+          }
+        ],
+        "rejected": 0,
+        "status": "OK",
+        "trace": [
+          {
+            "event": "dynamic_dispatch",
+            "runtime_type": "Shape"
+          },
+          {
+            "event": "dynamic_dispatch",
+            "runtime_type": "Rectangle"
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "oop-inheritance.failure.expected-output",
+      "fixture_ref": "oop-inheritance.failure",
+      "value": {
+        "outputs": [
+          {
+            "area": 0,
+            "name": "base"
+          }
+        ],
+        "rejected": 1,
+        "status": "REJECTED_INVALID_SUBCLASS",
+        "trace": [
+          {
+            "event": "dynamic_dispatch",
+            "runtime_type": "Shape"
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/oop-inheritance/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "oop-inheritance.normal",
+      "input": {
+        "shapes": [
+          {
+            "height": 4,
+            "type": "rectangle",
+            "width": 3
+          },
+          {
+            "radius": 2,
+            "type": "circle"
+          }
+        ]
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "oop-inheritance.boundary",
+      "input": {
+        "shapes": [
+          {
+            "height": 0,
+            "type": "rectangle",
+            "width": 0
+          }
+        ]
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "oop-inheritance.failure",
+      "input": {
+        "shapes": [
+          {
+            "height": 4,
+            "type": "rectangle",
+            "width": -1
+          }
+        ]
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.oop-inheritance.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.oop-inheritance",
+  "lines": [
+    {
+      "line_id": "oop-inheritance.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L002",
+      "order": 2,
+      "text": ""
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L003",
+      "order": 3,
+      "text": "class Shape:"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L004",
+      "order": 4,
+      "text": "    def __init__(self, name): self.name = name"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L005",
+      "order": 5,
+      "text": "    def area(self): return 0"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L006",
+      "order": 6,
+      "text": "class Rectangle(Shape):"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L007",
+      "order": 7,
+      "text": "    def __init__(self, width, height):"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L008",
+      "order": 8,
+      "text": "        if width < 0 or height < 0: raise ValueError(\"negative size\")"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L009",
+      "order": 9,
+      "text": "        super().__init__(\"rectangle\"); self.width, self.height = width, height"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L010",
+      "order": 10,
+      "text": "    def area(self): return self.width * self.height"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L011",
+      "order": 11,
+      "text": "class Circle(Shape):"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L012",
+      "order": 12,
+      "text": "    def __init__(self, radius):"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L013",
+      "order": 13,
+      "text": "        if radius < 0: raise ValueError(\"negative size\")"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L014",
+      "order": 14,
+      "text": "        super().__init__(\"circle\"); self.radius = radius"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L015",
+      "order": 15,
+      "text": "    def area(self): return round(3.14 * self.radius * self.radius, 2)"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L016",
+      "order": 16,
+      "text": ""
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L017",
+      "order": 17,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L018",
+      "order": 18,
+      "text": "    shapes, rejected, trace = [Shape(\"base\")], 0, []"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L019",
+      "order": 19,
+      "text": "    for record in fixture.get(\"shapes\", []):"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L020",
+      "order": 20,
+      "text": "        try: shapes.append(Rectangle(record[\"width\"], record[\"height\"]) if record[\"type\"] == \"rectangle\" else Circle(record[\"radius\"]))"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L021",
+      "order": 21,
+      "text": "        except (KeyError, ValueError): rejected += 1"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L022",
+      "order": 22,
+      "text": "    outputs = []"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L023",
+      "order": 23,
+      "text": "    for shape in shapes:"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L024",
+      "order": 24,
+      "text": "        outputs.append({\"name\": shape.name, \"area\": shape.area()}); trace.append({\"event\": \"dynamic_dispatch\", \"runtime_type\": type(shape).__name__})"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L025",
+      "order": 25,
+      "text": "    return {\"status\": \"OK\" if rejected == 0 else \"REJECTED_INVALID_SUBCLASS\", \"outputs\": outputs, \"rejected\": rejected, \"trace\": trace}"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L026",
+      "order": 26,
+      "text": ""
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L027",
+      "order": 27,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L028",
+      "order": 28,
+      "text": "    import json"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L029",
+      "order": 29,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L030",
+      "order": 30,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L031",
+      "order": 31,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L032",
+      "order": 32,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L033",
+      "order": 33,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L034",
+      "order": 34,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "oop-inheritance.production-v1.L035",
+      "order": 35,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "OOP_OVERRIDE",
+    "OOP_SUBCLASS"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-inheritance.production-v1",
+  "stage5_source_refs": [
+    "stage5.b6.pattern-provenance"
+  ],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

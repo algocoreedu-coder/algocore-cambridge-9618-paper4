@@ -1,0 +1,143 @@
+{
+  "schema_version": "s6-a8-final-qa-v1",
+  "stage": 6,
+  "wave": "S6-F",
+  "release_id": "paper4-2026-s5-v1",
+  "reviewer": "A8_INDEPENDENT_QA",
+  "scope": {
+    "packages": [
+      "ac-9618-p4-2026-python.package.files",
+      "ac-9618-p4-2026-python.package.support"
+    ],
+    "patterns": [
+      "FILE_READ_ARRAY",
+      "FILE_READ_OBJECTS",
+      "FILE_WRITE"
+    ],
+    "lessons": 6
+  },
+  "checks": {
+    "stage5_obligations_exact_once": {
+      "expected": 390,
+      "observed": 390,
+      "unique": 390,
+      "status": "PASS"
+    },
+    "stage3_requirements_accounted": {
+      "expected": 28,
+      "observed": 28,
+      "unique": 28,
+      "status": "PASS"
+    },
+    "support_dispositions_explicit": {
+      "expected": 29,
+      "observed": 29,
+      "status": "PASS"
+    },
+    "support_random_files_not_misclassified": {
+      "status": "FAIL",
+      "finding_id": "S6F-A8-001"
+    },
+    "bilingual_parity_blocks": {
+      "expected": 60,
+      "observed": 60,
+      "vi_present": 60,
+      "en_present": 60,
+      "status": "PASS"
+    },
+    "retrieval_practice": {
+      "expected": 18,
+      "observed": 18,
+      "modes_per_pattern": 6,
+      "status": "PASS"
+    },
+    "visual_storyboards": {
+      "expected": 21,
+      "observed": 21,
+      "exact_stage5_event_ids": true,
+      "trace_hashes_match": true,
+      "status": "PASS"
+    },
+    "visual_controls": {
+      "required": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "all_present": true,
+      "status": "PASS"
+    },
+    "source_hash_joins": {
+      "stage5_obligation_hashes_match": true,
+      "stage3_requirement_hashes_match": true,
+      "status": "PASS"
+    },
+    "source_ref_statuses": {
+      "verified_stage4_stage5_or_labelled_inference": true,
+      "status": "PASS"
+    },
+    "official_marks": {
+      "synthetic_marks": false,
+      "join_only": true,
+      "status": "PASS"
+    },
+    "method_schema": {
+      "three_patterns_have_required_fields": true,
+      "marking_atoms_source_backed": true,
+      "error_joins_source_backed": true,
+      "status": "PASS"
+    },
+    "visual_fallbacks": {
+      "all_static_fallbacks_present": true,
+      "status": "PASS"
+    }
+  },
+  "findings": [
+    {
+      "finding_id": "S6F-A8-001",
+      "severity": "P1",
+      "status": "REWORK_REQUIRED",
+      "title": "Core random-files lesson is incorrectly labelled support-only",
+      "evidence": [
+        "Stage 3 lesson ac-9618-p4-2026-python.lesson.random-files has scope.role=core and package_id=ac-9618-p4-2026-python.package.files.",
+        "LESSON_SKELETON_MANIFEST.json marks support_only=true.",
+        "BILINGUAL_PARITY.json marks all 10 random-files blocks support_only=true.",
+        "DISPOSITIONS.json includes its four assessment requirements and three blocks as support-only dispositions."
+      ],
+      "impact": "This changes the pedagogical role and falsely communicates that a core Paper 4 lesson is optional support. It can also hide intended conceptual coverage even though no Stage 5 executable pattern is assigned to the lesson.",
+      "required_fix": "Classify support_only from Stage 3 scope.role, so only performance and graphs are support-only. Keep random-files as core conceptual/non-executable content and account for its requirements using an explicit non-code/core disposition or a proper Stage 5 pattern join if Lead confirms one. Regenerate skeleton, parity, dispositions, coverage and summary, then rerun A8.",
+      "recheck": "python -I -B build_s6f.py; independently verify random-files support_only=false, no fabricated pattern IDs, and all 4 random-files requirements remain accounted."
+    },
+    {
+      "finding_id": "S6F-A8-002",
+      "severity": "P1",
+      "status": "REWORK_REQUIRED",
+      "title": "Core exceptions lesson is also inferred as support-only by the same rule",
+      "evidence": [
+        "Stage 3 lesson ac-9618-p4-2026-python.lesson.exceptions has scope.role=core and package_id=ac-9618-p4-2026-python.package.files, but the S6-F manifest and dispositions classify it as support-only."
+      ],
+      "impact": "The same role classification defect affects another core lesson and would propagate to Stage 7 handoff.",
+      "required_fix": "Apply the same role-aware classification to exceptions. Preserve explicit non-code disposition if no Stage 5 executable pattern is assigned; do not fabricate coverage.",
+      "recheck": "Verify exceptions support_only=false and its four requirements remain exactly once in the corrected matrix."
+    }
+  ],
+  "verified_counts": {
+    "stage5_obligations": 390,
+    "stage3_assessment_requirements": 28,
+    "support_dispositions": 29,
+    "lessons": 6,
+    "blocks": 60,
+    "method_entries": 3,
+    "marking_error_entries": 3,
+    "retrieval_items": 18,
+    "visual_storyboards": 21,
+    "bilingual_blocks": 60,
+    "trace_count": 21
+  },
+  "result": "REWORK_REQUIRED",
+  "release_blocked": true,
+  "upstream_edits_made": false
+}

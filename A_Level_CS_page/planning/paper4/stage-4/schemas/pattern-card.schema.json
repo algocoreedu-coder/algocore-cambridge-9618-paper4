@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://algocore.local/schemas/paper4-stage4/pattern-card-v1.json",
+  "title": "AlgoCore Paper 4 Stage 4 pattern card",
+  "type": "object",
+  "required": ["card_id", "pattern_id", "version", "status", "package_id", "lesson_id", "titles", "recognition", "source_scope", "applicability", "method_steps", "authority_labels", "downstream_status"],
+  "properties": {
+    "card_id": {"type": "string", "minLength": 1},
+    "pattern_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"},
+    "version": {"type": "string"},
+    "status": {"enum": ["DRAFT", "SUBMITTED", "NEEDS_REWORK", "DESIGN_REVIEWED"]},
+    "package_id": {"type": "string"},
+    "lesson_id": {"type": "string"},
+    "knowledge_block_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+    "objective_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "titles": {"$ref": "#/$defs/bilingual"},
+    "recognition": {"$ref": "#/$defs/bilingual"},
+    "source_scope": {
+      "type": "object",
+      "required": ["assessed_part_ids", "representative_parts", "corpus_limit"],
+      "properties": {
+        "assessed_part_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+        "representative_parts": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+        "corpus_limit": {"type": "string", "minLength": 1}
+      }
+    },
+    "confusable_pattern_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "source_issue_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "applicability": {
+      "type": "object",
+      "required": ["preconditions", "representation", "conventions", "variant_axes", "decision_rule"],
+      "properties": {
+        "preconditions": {"type": "array", "items": {"type": "string"}},
+        "representation": {"type": "array", "items": {"type": "string"}},
+        "conventions": {"type": "array", "items": {"type": "string"}},
+        "variant_axes": {"type": "array", "items": {"type": "string"}},
+        "decision_rule": {"$ref": "#/$defs/bilingual"}
+      }
+    },
+    "method_steps": {
+      "type": "array", "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["step_id", "sequence", "action", "why", "reads", "writes", "invariant", "guard", "termination_role", "check"],
+        "properties": {
+          "step_id": {"type": "string"}, "sequence": {"type": "integer", "minimum": 1},
+          "action": {"$ref": "#/$defs/bilingual"}, "why": {"$ref": "#/$defs/bilingual"},
+          "reads": {"type": "array", "items": {"type": "string"}},
+          "writes": {"type": "array", "items": {"type": "string"}},
+          "invariant": {"type": "string"}, "guard": {"type": "string"},
+          "termination_role": {"type": "string"}, "check": {"$ref": "#/$defs/bilingual"},
+          "marking_point_refs": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "assessment_requirement_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "error_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "solution_design_ref": {"type": "string"},
+    "visual_brief_ref": {"type": "string"},
+    "authority_labels": {"type": "array", "minItems": 1, "items": {"enum": ["official_qp", "official_ms", "official_syllabus", "official_er_observation", "coursebook_foundation", "AlgoCore_original", "AlgoCore_inference", "AlgoCore_risk"]}},
+    "downstream_status": {"const": "PENDING_STAGE5_EXECUTION_VERIFICATION"}
+  },
+  "$defs": {
+    "bilingual": {"type": "object", "required": ["vi", "en"], "properties": {"vi": {"type": "string", "minLength": 1}, "en": {"type": "string", "minLength": 1}}, "additionalProperties": false}
+  }
+}

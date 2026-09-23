@@ -1,0 +1,231 @@
+import { createHash } from "node:crypto";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const CONTENT_ROOT = path.join(ROOT, "content", "paper4");
+const RECORD_ROOT = path.join(CONTENT_ROOT, "records", "full");
+const EVIDENCE_ROOT = path.resolve(ROOT, "..", "planning", "paper4", "next-phase", "evidence", "p4r-5", "a4");
+
+export const RECORD_TYPES = [
+  "KnowledgeUnit",
+  "PythonArtifact",
+  "VisualScenarioTrace",
+  "VisualEventBinding",
+  "MarkingChain",
+  "AssessmentItem",
+  "LessonReleaseRecord",
+];
+export const EXPECTED_COUNTS = {
+  KnowledgeUnit: 108,
+  PythonArtifact: 26,
+  VisualScenarioTrace: 174,
+  VisualEventBinding: 589,
+  MarkingChain: 58,
+  AssessmentItem: 78,
+  LessonReleaseRecord: 26,
+};
+export const SECTION_IDS = [
+  "paper4.section.recognition",
+  "paper4.section.exam-cues",
+  "paper4.section.knowledge",
+  "paper4.section.method",
+  "paper4.section.worked-example",
+  "paper4.section.action-view",
+  "paper4.section.marking-pitfalls",
+  "paper4.section.practice",
+  "paper4.section.retrieval",
+  "paper4.section.next-and-sources",
+];
+
+export const TYPE_FILES = {
+  KnowledgeUnit: "knowledge-units.json",
+  PythonArtifact: "python-artifacts.json",
+  VisualScenarioTrace: "visual-scenario-traces.json",
+  VisualEventBinding: "visual-event-bindings.json",
+  MarkingChain: "marking-chains.json",
+  AssessmentItem: "assessment-items.json",
+  LessonReleaseRecord: "lesson-release-records.json",
+};
+const TYPE_IDS = {
+  KnowledgeUnit: "knowledge_unit_id",
+  PythonArtifact: "python_artifact_id",
+  VisualScenarioTrace: "trace_id",
+  VisualEventBinding: "event_id",
+  MarkingChain: "marking_chain_id",
+  AssessmentItem: "assessment_item_id",
+  LessonReleaseRecord: "lesson_id",
+};
+
+const jsonText = (value) => `${JSON.stringify(value, null, 2)}\n`;
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+const readJson = async (filename) => JSON.parse(await readFile(filename, "utf8"));
+const envelope = (artifact_type, record) => ({ schema_version: "2.0.0", artifact_type, record });
+
+async function filesBelow(directory, suffix) {
+  const output = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const child = path.join(directory, entry.name);
+    if (entry.isDirectory()) output.push(...await filesBelow(child, suffix));
+    else if (entry.isFile() && entry.name.endsWith(suffix)) output.push(child);
+  }
+  return output.sort();
+}
+
+function sourceRefsForLesson(lesson) {
+  const syllabus = lesson.objective_refs.map((ref) => ({
+    source_id: ref.source.source_id,
+    authority: "Cambridge_syllabus",
+    access_mode: "public-citation",
+    locator: {
+      source_id: ref.source.source_id,
+      pdf_page: ref.source.pdf_page,
+      printed_page: ref.source.printed_page,
+      heading: ref.source.heading,
+      bullet_locator: ref.source.bullet_locator,
+      anchor_text: ref.source.anchor_text,
+    },
+  }));
+  const coursebook = lesson.book_refs.map((ref) => ({
+    source_id: ref.source_id,
+    authority: "Cambridge_coursebook",
+    access_mode: "licensed-internal",
+    locator: {
+      source_id: ref.source_id,
+      pdf_page: ref.pdf_pages[0],
+      printed_page: ref.printed_pages[0],
+      heading: `${ref.section} ${ref.subheading}`,
+      anchor_text: ref.section_id,
+    },
+  }));
+  return [...syllabus, ...coursebook].sort((a, b) => {
+    const left = `${a.authority}|${a.locator.anchor_text}|${a.locator.pdf_page}`;
+    const right = `${b.authority}|${b.locator.anchor_text}|${b.locator.pdf_page}`;
+    return left.localeCompare(right);
+  });
+}
+
+function releaseForLesson(lesson, grouped) {
+  const lessonId = lesson.lesson_id;
+  const knowledge = grouped.KnowledgeUnit.filter((item) => item.record.lesson_id === lessonId);
+  const python = grouped.PythonArtifact.filter((item) => item.record.lesson_id === lessonId);
+  const pythonIds = new Set(python.map((item) => item.record.python_artifact_id));
+  const traces = grouped.VisualScenarioTrace.filter((item) => pythonIds.has(item.record.python_artifact_id));
+  const marking = grouped.MarkingChain.filter((item) => item.record.lesson_id === lessonId);
+  const assessments = grouped.AssessmentItem.filter((item) => item.record.lesson_id === lessonId);
+  const patterns = [...new Set([
+    ...python.flatMap((item) => item.record.pattern_ids),
+    ...traces.map((item) => item.record.pattern_id),
+    ...marking.map((item) => item.record.pattern_id),
+    ...assessments.flatMap((item) => item.record.pattern_ids),
+  ])].sort();
+  const versions = [...new Set(python.map((item) => item.record.version))];
+  if (versions.length !== 1) throw new Error(`${lessonId}: expected one Python artifact version, found ${versions.join(", ")}.`);
+
+  return envelope("LessonReleaseRecord", {
+    lesson_id: lessonId,
+    package_id: lesson.package_id,
+    slug: lesson.slug,
+    version: versions[0],
+    canonical_section_ids: SECTION_IDS,
+    knowledge_unit_ids: knowledge.map((item) => item.record.knowledge_unit_id).sort(),
+    python_artifact_ids: python.map((item) => item.record.python_artifact_id).sort(),
+    pattern_ids: patterns,
+    method_refs: [...new Set(marking.flatMap((item) => item.record.method_step_refs))].sort(),
+    marking_refs: marking.map((item) => item.record.marking_chain_id).sort(),
+    error_refs: [...new Set(marking.map((item) => item.record.error_ref))].sort(),
+    practice_refs: assessments.filter((item) => item.record.level !== "retrieval").map((item) => item.record.assessment_item_id).sort(),
+    retrieval_refs: assessments.filter((item) => item.record.level === "retrieval").map((item) => item.record.assessment_item_id).sort(),
+    source_refs: sourceRefsForLesson(lesson),
+    locale_parity: "PASS",
+    academic_review: "PASS",
+    execution_review: "PASS",
+    ux_review: "PENDING",
+    lead_gate: "PENDING",
+    release_allowed: false,
+  });
+}
+
+export async function compileFullRegistry() {
+  const knowledgeFiles = await filesBelow(path.join(CONTENT_ROOT, "lessons"), ".knowledge-unit.json");
+  const knowledge = await Promise.all(knowledgeFiles.map(readJson));
+
+  const pythonFiles = await filesBelow(path.join(CONTENT_ROOT, "python"), "artifact.json");
+  const python = (await Promise.all(pythonFiles.map(readJson))).map((record) => envelope("PythonArtifact", record));
+
+  const visualFiles = await filesBelow(path.join(CONTENT_ROOT, "visuals"), "visuals.json");
+  const visualBundles = await Promise.all(visualFiles.map(readJson));
+  const visual = visualBundles.flatMap((bundle) => [...bundle.traces, ...bundle.events]);
+
+  const marking = [
+    ...await readJson(path.join(CONTENT_ROOT, "assessments", "pilot", "marking-chains.json")),
+    ...await readJson(path.join(CONTENT_ROOT, "assessments", "production", "marking-chains.json")),
+  ];
+  const assessments = [
+    ...await readJson(path.join(CONTENT_ROOT, "assessments", "pilot", "assessment-items.json")),
+    ...await readJson(path.join(CONTENT_ROOT, "assessments", "production", "assessment-items.json")),
+  ];
+  const sourceMap = await readJson(path.join(CONTENT_ROOT, "mappings", "lesson-source-map.json"));
+
+  const documents = [...knowledge, ...python, ...visual, ...marking, ...assessments];
+  const grouped = Object.fromEntries(RECORD_TYPES.map((type) => [type, documents.filter((item) => item.artifact_type === type)]));
+  grouped.LessonReleaseRecord = sourceMap.lessons.map((lesson) => releaseForLesson(lesson, grouped));
+  for (const type of RECORD_TYPES) {
+    grouped[type].sort((a, b) => String(a.record[TYPE_IDS[type]]).localeCompare(String(b.record[TYPE_IDS[type]])));
+  }
+  return { grouped, sourceMap };
+}
+
+export function renderRegistryFiles(grouped) {
+  return Object.fromEntries(RECORD_TYPES.map((type) => [TYPE_FILES[type], jsonText(grouped[type])]));
+}
+
+export function registryDigest(files) {
+  const fileHashes = Object.fromEntries(Object.entries(files).sort(([a], [b]) => a.localeCompare(b)).map(([filename, value]) => [filename, sha256(value)]));
+  const aggregate = sha256(Object.entries(fileHashes).map(([filename, digest]) => `${digest}  ${filename}\n`).join(""));
+  return { fileHashes, aggregate };
+}
+
+export function hashManifest(digest) {
+  return Object.entries(digest.fileHashes).map(([filename, value]) => `${value}  ${filename}`).join("\n") + `\n${digest.aggregate}  REGISTRY-AGGREGATE\n`;
+}
+
+async function main() {
+  const first = await compileFullRegistry();
+  const second = await compileFullRegistry();
+  const files = renderRegistryFiles(first.grouped);
+  const secondFiles = renderRegistryFiles(second.grouped);
+  if (JSON.stringify(files) !== JSON.stringify(secondFiles)) throw new Error("Two in-memory rebuilds were not byte-identical.");
+  for (const type of RECORD_TYPES) {
+    if (first.grouped[type].length !== EXPECTED_COUNTS[type]) throw new Error(`${type}: expected ${EXPECTED_COUNTS[type]}, found ${first.grouped[type].length}.`);
+  }
+  const digest = registryDigest(files);
+  await mkdir(RECORD_ROOT, { recursive: true });
+  await mkdir(EVIDENCE_ROOT, { recursive: true });
+  for (const [filename, value] of Object.entries(files)) await writeFile(path.join(RECORD_ROOT, filename), value);
+  await writeFile(path.join(RECORD_ROOT, "SHA256SUMS.txt"), hashManifest(digest));
+
+  const result = {
+    schema_version: "paper4-p4r5-a4-build-v1",
+    decision: "BUILT_PENDING_READ_ONLY_CHECK",
+    target_release: "paper4-2026-s9-v2",
+    generated_by: "scripts/build-paper4-full-registry.mjs",
+    deterministic_rebuild: "PASS_BYTE_IDENTICAL",
+    lessons: first.grouped.LessonReleaseRecord.map((item) => item.record.lesson_id),
+    counts: Object.fromEntries(RECORD_TYPES.map((type) => [type, first.grouped[type].length])),
+    total_records: RECORD_TYPES.reduce((sum, type) => sum + first.grouped[type].length, 0),
+    registry_file_sha256: digest.fileHashes,
+    registry_aggregate_sha256: digest.aggregate,
+    release_policy: { pending_lead_gates: 26, release_allowed_true: 0 },
+  };
+  await writeFile(path.join(EVIDENCE_ROOT, "BUILD_RESULT.json"), jsonText(result));
+  console.log(jsonText(result).trim());
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.stack ?? error.message);
+    process.exitCode = 1;
+  });
+}

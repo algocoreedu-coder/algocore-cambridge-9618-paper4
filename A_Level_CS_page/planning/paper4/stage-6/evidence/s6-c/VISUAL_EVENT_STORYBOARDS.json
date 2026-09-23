@@ -1,0 +1,836 @@
+{
+  "schema_version": "s6-c-visual-event-storyboards-v1",
+  "stage": 6,
+  "wave": "S6-C",
+  "release_id": "paper4-2026-s5-v1",
+  "entries": [
+    {
+      "visual_id": "s6c.visual.queue_setup",
+      "scenario_id": "visual-scenario:b3.visual.queue-setup:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.queue-setup:event:001:DECLARE_STORAGE",
+        "visual-event:b3.visual.queue-setup:event:002:SELECT_QUEUE_MODEL",
+        "visual-event:b3.visual.queue-setup:event:003:SET_POINTERS",
+        "visual-event:b3.visual.queue-setup:event:004:MARK_LIVE_RANGE",
+        "visual-event:b3.visual.queue-setup:event:005:CHECK_EMPTY_FULL"
+      ],
+      "example_id": "b3.example.queue-setup",
+      "pattern_id": "QUEUE_SETUP",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Trích đúng kiểu queue, sức chứa, kiểu phần tử, tên biến và ý nghĩa head/tail/count từ đề.",
+        "en": "Extract queue kind, capacity, element type, identifiers and the meaning of head/tail/count from the task."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "Exactly one source-defined queue model and pointer convention is active.",
+        "en": "Exactly one source-defined queue model and pointer convention is active."
+      },
+      "code_highlight": "queue-setup.step.contract",
+      "prediction": {
+        "vi": "Viết một câu cho từng con trỏ và đánh dấu queue tuyến tính hay vòng.",
+        "en": "Write one sentence for each pointer and label the queue linear or circular."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động QUEUE_SETUP: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated QUEUE_SETUP diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "QUEUE_SETUP: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "QUEUE_SETUP: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_s22_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_SETUP]/source_scope/representative_parts/9618_s22_41_3(a)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_s22_ms_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_SETUP]/source_scope/representative_parts/9618_s22_41_3(a)/ms_atoms/mp-9618-s22-41-3-a-01",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "QP",
+          "source_id": "9618_w22_qp_42",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_SETUP]/source_scope/representative_parts/9618_w22_42_3(a)",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6c.visual.queue_enqueue",
+      "scenario_id": "visual-scenario:b3.visual.queue-enqueue:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.queue-enqueue:event:001:CHECK_FULL",
+        "visual-event:b3.visual.queue-enqueue:event:002:SELECT_WRITE_INDEX",
+        "visual-event:b3.visual.queue-enqueue:event:003:WRITE_ITEM",
+        "visual-event:b3.visual.queue-enqueue:event:004:MOVE_TAIL",
+        "visual-event:b3.visual.queue-enqueue:event:005:SET_FIRST_HEAD",
+        "visual-event:b3.visual.queue-enqueue:event:006:INCREMENT_COUNT",
+        "visual-event:b3.visual.queue-enqueue:event:007:RETURN_RESULT"
+      ],
+      "example_id": "b3.example.queue-enqueue",
+      "pattern_id": "QUEUE_ENQUEUE",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Ghi full condition, tail-role, wrap rule và kết quả success/failure đúng theo đề.",
+        "en": "Record the exact full condition, tail role, wrap rule and success/failure result."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "The selected full test and result type belong to the same source convention.",
+        "en": "The selected full test and result type belong to the same source convention."
+      },
+      "code_highlight": "queue-enqueue.step.contract",
+      "prediction": {
+        "vi": "Đặt cạnh hai nhánh full/not-full và ghi type/literal phải trả.",
+        "en": "Place full and not-full branches side by side and write the required return type/literal."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động QUEUE_ENQUEUE: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated QUEUE_ENQUEUE diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "QUEUE_ENQUEUE: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "QUEUE_ENQUEUE: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_s22_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_ENQUEUE]/source_scope/representative_parts/9618_s22_41_3(b)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_s22_ms_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_ENQUEUE]/source_scope/representative_parts/9618_s22_41_3(b)/ms_atoms/mp-9618-s22-41-3-b-completed-statements",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "QP",
+          "source_id": "9618_w22_qp_42",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_ENQUEUE]/source_scope/representative_parts/9618_w22_42_3(b)",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6c.visual.queue_dequeue",
+      "scenario_id": "visual-scenario:b3.visual.queue-dequeue:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.queue-dequeue:event:001:CHECK_EMPTY",
+        "visual-event:b3.visual.queue-dequeue:event:002:READ_HEAD",
+        "visual-event:b3.visual.queue-dequeue:event:003:SAVE_ITEM",
+        "visual-event:b3.visual.queue-dequeue:event:004:MOVE_HEAD",
+        "visual-event:b3.visual.queue-dequeue:event:005:DECREMENT_COUNT",
+        "visual-event:b3.visual.queue-dequeue:event:006:RESET_OR_WRAP",
+        "visual-event:b3.visual.queue-dequeue:event:007:RETURN_ITEM"
+      ],
+      "example_id": "b3.example.queue-dequeue",
+      "pattern_id": "QUEUE_DEQUEUE",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Ghi empty condition, chỉ số đọc, wrap/reset policy và sentinel đúng kiểu.",
+        "en": "Record the empty condition, read index, wrap/reset policy and correctly typed sentinel."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "One empty predicate and one return contract govern the operation.",
+        "en": "One empty predicate and one return contract govern the operation."
+      },
+      "code_highlight": "queue-dequeue.step.contract",
+      "prediction": {
+        "vi": "Lập bảng empty-result gồm value, type, output/return và mutation cho part đang làm.",
+        "en": "Create an empty-result table with value, type, output/return and mutation for the current part."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động QUEUE_DEQUEUE: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated QUEUE_DEQUEUE diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "QUEUE_DEQUEUE: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "QUEUE_DEQUEUE: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_s22_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_DEQUEUE]/source_scope/representative_parts/9618_s22_41_3(c)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_s22_ms_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_DEQUEUE]/source_scope/representative_parts/9618_s22_41_3(c)/ms_atoms/mp-9618-s22-41-3-c-01",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "QP",
+          "source_id": "9618_s23_qp_42",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_DEQUEUE]/source_scope/representative_parts/9618_s23_42_2(d)",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6c.visual.queue_inspect",
+      "scenario_id": "visual-scenario:b3.visual.queue-inspect:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.queue-inspect:event:001:SET_LOCAL_CURSOR",
+        "visual-event:b3.visual.queue-inspect:event:002:READ_LIVE_ITEM",
+        "visual-event:b3.visual.queue-inspect:event:003:APPEND_DELIMITER",
+        "visual-event:b3.visual.queue-inspect:event:004:ADVANCE_CURSOR",
+        "visual-event:b3.visual.queue-inspect:event:005:RETURN_TEXT",
+        "visual-event:b3.visual.queue-inspect:event:006:COMPARE_SNAPSHOT"
+      ],
+      "example_id": "b3.example.queue-inspect",
+      "pattern_id": "QUEUE_INSPECT",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Xác định live range, thứ tự FIFO, delimiter và yêu cầu không phá hủy queue.",
+        "en": "Identify the live range, FIFO order, delimiter and non-destructive requirement."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "Iteration covers each and only live item in FIFO order.",
+        "en": "Iteration covers each and only live item in FIFO order."
+      },
+      "code_highlight": "queue-inspect.step.contract",
+      "prediction": {
+        "vi": "Viết first index, stop condition và expected item count.",
+        "en": "Write the first index, stop condition and expected item count."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động QUEUE_INSPECT: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated QUEUE_INSPECT diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "QUEUE_INSPECT: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "QUEUE_INSPECT: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_w24_qp_42",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_INSPECT]/source_scope/representative_parts/9618_w24_42_2(d)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_w24_ms_42",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_INSPECT]/source_scope/representative_parts/9618_w24_42_2(d)/ms_atoms/MP-9618-W24-42-2-D-01",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "coursebook",
+          "source_id": "coursebook_watson_williams",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_INSPECT]/book_foundation_refs/BOOK-19-QUEUE",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6c.visual.queue_reduce",
+      "scenario_id": "visual-scenario:b3.visual.queue-reduce:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.queue-reduce:event:001:SELECT_MODE",
+        "visual-event:b3.visual.queue-reduce:event:002:READ_OR_DEQUEUE",
+        "visual-event:b3.visual.queue-reduce:event:003:UPDATE_ACCUMULATOR",
+        "visual-event:b3.visual.queue-reduce:event:004:ADVANCE_OR_RECURSE",
+        "visual-event:b3.visual.queue-reduce:event:005:FLUSH_FINAL_RUN",
+        "visual-event:b3.visual.queue-reduce:event:006:CHECK_POST_STATE"
+      ],
+      "example_id": "b3.example.queue-reduce",
+      "pattern_id": "QUEUE_REDUCE",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Chọn mode theo QP: đọc không phá hủy bằng index/đệ quy, hay consume bằng Dequeue; ghi accumulator và sentinel.",
+        "en": "Select the QP mode: read-only index/recursion or destructive Dequeue; record accumulator and sentinel."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "Exactly one termination source and mutation policy governs the reduction.",
+        "en": "Exactly one termination source and mutation policy governs the reduction."
+      },
+      "code_highlight": "queue-reduce.step.mode",
+      "prediction": {
+        "vi": "Ghi rõ queue sau hàm phải giữ nguyên hay rỗng.",
+        "en": "State explicitly whether the queue must remain unchanged or end empty."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động QUEUE_REDUCE: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated QUEUE_REDUCE diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "QUEUE_REDUCE: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "QUEUE_REDUCE: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_w22_qp_42",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_REDUCE]/source_scope/representative_parts/9618_w22_42_3(d)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_w22_ms_42",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_REDUCE]/source_scope/representative_parts/9618_w22_42_3(d)/ms_atoms/mp-9618-w22-42-3-d-01",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "QP",
+          "source_id": "9618_s25_qp_43",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[QUEUE_REDUCE]/source_scope/representative_parts/9618_s25_43_1(e)(i)",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6c.visual.list_setup",
+      "scenario_id": "visual-scenario:b3.visual.list-setup:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.list-setup:event:001:CREATE_NODES",
+        "visual-event:b3.visual.list-setup:event:002:SET_HEAD",
+        "visual-event:b3.visual.list-setup:event:003:LINK_LIVE_CHAIN",
+        "visual-event:b3.visual.list-setup:event:004:SET_FREE_HEAD",
+        "visual-event:b3.visual.list-setup:event:005:LINK_FREE_CHAIN",
+        "visual-event:b3.visual.list-setup:event:006:CHECK_PARTITION"
+      ],
+      "example_id": "b3.example.list-setup",
+      "pattern_id": "LIST_SETUP",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Xác định array-record/2D-array hay object nodes, null sentinel, head và có free-list hay không.",
+        "en": "Identify array records/2D arrays versus object nodes, the null sentinel, head and whether a free list exists."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "One node representation and null convention governs every link.",
+        "en": "One node representation and null convention governs every link."
+      },
+      "code_highlight": "list-setup.step.contract",
+      "prediction": {
+        "vi": "Vẽ một node mẫu và ghi type của Data/Next.",
+        "en": "Draw one node and label Data/Next types."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động LIST_SETUP: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated LIST_SETUP diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "LIST_SETUP: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "LIST_SETUP: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_s21_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_SETUP]/source_scope/representative_parts/9618_s21_41_1(b)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_s21_ms_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_SETUP]/source_scope/representative_parts/9618_s21_41_1(b)/ms_atoms/mp-9618-s21-41-1-b-01",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "QP",
+          "source_id": "9618_w24_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_SETUP]/source_scope/representative_parts/9618_w24_41_3(a)",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6c.visual.list_traverse",
+      "scenario_id": "visual-scenario:b3.visual.list-traverse:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.list-traverse:event:001:SET_CURSOR_HEAD",
+        "visual-event:b3.visual.list-traverse:event:002:VISIT_NODE",
+        "visual-event:b3.visual.list-traverse:event:003:EMIT_DATA",
+        "visual-event:b3.visual.list-traverse:event:004:FOLLOW_NEXT",
+        "visual-event:b3.visual.list-traverse:event:005:STOP_AT_NULL"
+      ],
+      "example_id": "b3.example.list-traverse",
+      "pattern_id": "LIST_TRAVERSE",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Chọn head, null sentinel và format output; tách logical order khỏi physical index order.",
+        "en": "Select head, null sentinel and output format; separate logical order from physical index order."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "Cursor is null or names the next live node to visit.",
+        "en": "Cursor is null or names the next live node to visit."
+      },
+      "code_highlight": "list-traverse.step.contract",
+      "prediction": {
+        "vi": "Viết chuỗi index/reference dự kiến từ head đến null.",
+        "en": "Write the expected index/reference chain from head to null."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động LIST_TRAVERSE: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated LIST_TRAVERSE diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "LIST_TRAVERSE: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "LIST_TRAVERSE: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_s21_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_TRAVERSE]/source_scope/representative_parts/9618_s21_41_1(c)(i)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_s21_ms_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_TRAVERSE]/source_scope/representative_parts/9618_s21_41_1(c)(i)/ms_atoms/mp-9618-s21-41-1-c-i-01",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "QP",
+          "source_id": "9618_w24_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_TRAVERSE]/source_scope/representative_parts/9618_w24_41_3(c)(i)",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6c.visual.list_insert",
+      "scenario_id": "visual-scenario:b3.visual.list-insert:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.list-insert:event:001:CHECK_FULL",
+        "visual-event:b3.visual.list-insert:event:002:SAVE_FREE_NEXT",
+        "visual-event:b3.visual.list-insert:event:003:RESERVE_NODE",
+        "visual-event:b3.visual.list-insert:event:004:WRITE_DATA",
+        "visual-event:b3.visual.list-insert:event:005:SET_NEW_NEXT",
+        "visual-event:b3.visual.list-insert:event:006:LINK_FRONT_OR_TAIL",
+        "visual-event:b3.visual.list-insert:event:007:CHECK_PARTITION"
+      ],
+      "example_id": "b3.example.list-insert",
+      "pattern_id": "LIST_INSERT",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Xác định chèn đầu hay cuối, array/free-list hay object, full case và return contract.",
+        "en": "Identify front versus tail insertion, array/free-list versus objects, full handling and return contract."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "One insertion position and allocation model is selected before mutation.",
+        "en": "One insertion position and allocation model is selected before mutation."
+      },
+      "code_highlight": "list-insert.step.contract",
+      "prediction": {
+        "vi": "Vẽ before/after chỉ với head, predecessor/tail, new node và free head.",
+        "en": "Draw before/after using only head, predecessor/tail, new node and free head."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động LIST_INSERT: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated LIST_INSERT diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "LIST_INSERT: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "LIST_INSERT: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_s21_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_INSERT]/source_scope/representative_parts/9618_s21_41_1(d)(i)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_s21_ms_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_INSERT]/source_scope/representative_parts/9618_s21_41_1(d)(i)/ms_atoms/mp-9618-s21-41-1-d-i-01",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "QP",
+          "source_id": "9618_w24_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_INSERT]/source_scope/representative_parts/9618_w24_41_3(b)",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6c.visual.list_remove",
+      "scenario_id": "visual-scenario:b3.visual.list-remove:boundary",
+      "event_ids": [
+        "visual-event:b3.visual.list-remove:event:001:SEARCH_NODE",
+        "visual-event:b3.visual.list-remove:event:002:CLASSIFY_HEAD_OR_INTERIOR",
+        "visual-event:b3.visual.list-remove:event:003:SAVE_SUCCESSOR",
+        "visual-event:b3.visual.list-remove:event:004:UNLINK_LIVE",
+        "visual-event:b3.visual.list-remove:event:005:RECYCLE_NODE",
+        "visual-event:b3.visual.list-remove:event:006:RETURN_RESULT",
+        "visual-event:b3.visual.list-remove:event:007:CHECK_PARTITION"
+      ],
+      "example_id": "b3.example.list-remove",
+      "pattern_id": "LIST_REMOVE",
+      "before": {
+        "vi": "Trạng thái trước bước; dùng exact trace bundle của Stage5.",
+        "en": "State before the step; use the exact Stage5 trace bundle."
+      },
+      "delta": {
+        "vi": "Xác định xóa first occurrence, giả định có/không có target, free-list policy và Boolean/void contract.",
+        "en": "Identify first-occurrence deletion, target-presence assumption, free-list policy and Boolean/void contract."
+      },
+      "after": {
+        "vi": "Trạng thái sau bước phải giữ bất biến.",
+        "en": "After-state must preserve the invariant."
+      },
+      "invariant": {
+        "vi": "Search and return behaviour match one source contract.",
+        "en": "Search and return behaviour match one source contract."
+      },
+      "code_highlight": "list-remove.step.contract",
+      "prediction": {
+        "vi": "Liệt kê bốn case: empty, head, interior/tail, not-found và đánh dấu case nguồn cho phép.",
+        "en": "List empty, head, interior/tail and not-found; mark which cases the source permits."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event trace và invariant; nếu sai dùng Reset rồi replay.",
+        "en": "Compare the event trace and invariant; if wrong, Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đổi đúng event; replay giữ cùng input.",
+        "en": "Play runs events in order; Previous/Next select one event; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về before state; change_input tạo fixture đã có trong Stage5.",
+        "en": "Reset returns to before state; change_input selects a Stage5 fixture."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after + caption tĩnh.",
+        "en": "Static before/delta/after table plus caption."
+      },
+      "alt": {
+        "vi": "Sơ đồ động LIST_REMOVE: trạng thái trước, cập nhật và trạng thái sau.",
+        "en": "Animated LIST_REMOVE diagram: before state, update and after state."
+      },
+      "caption": {
+        "vi": "LIST_REMOVE: dự đoán bước tiếp theo rồi kiểm bất biến.",
+        "en": "LIST_REMOVE: predict the next step, then check the invariant."
+      },
+      "source_refs": [
+        {
+          "authority": "QP",
+          "source_id": "9618_w24_qp_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_REMOVE]/source_scope/representative_parts/9618_w24_41_3(d)(i)",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "MS",
+          "source_id": "9618_w24_ms_41",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_REMOVE]/source_scope/representative_parts/9618_w24_41_3(d)(i)/ms_atoms/MP-9618-W24-41-3-D-I-01",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "QP",
+          "source_id": "9618_s25_qp_43",
+          "locator": "stage-4/PATTERN_CARDS.json#/pattern_cards[LIST_REMOVE]/source_scope/representative_parts/9618_s25_43_3(b)(iv)",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "status": "Stage6_specified",
+      "author": "A6_S6C",
+      "reviewer": "A0_LEAD_PENDING"
+    }
+  ],
+  "checks": {
+    "event_ids_from_stage5_inventory": true,
+    "required_controls": true,
+    "static_fallback": true,
+    "same_example_state": true
+  },
+  "status": "CANDIDATE_PENDING_A8"
+}

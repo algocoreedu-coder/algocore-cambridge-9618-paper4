@@ -1,0 +1,278 @@
+{
+  "schema_version": "s4-schema-v1-b7-submission-1",
+  "status": "SUBMITTED",
+  "batch_id": "B7-files",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-1/SOURCE_ISSUES.json",
+      "sha256": "7e9a8677b345327847d52a2aa88f293dc6898ef17944a63e6e05bb99daf9f588"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    },
+    {
+      "path": "stage-4/SOURCE_ADJUDICATIONS.json",
+      "sha256": "a52fc89677a5d5d0b873e2930b2b80545b4be71db5ea22a0e21c434389ebfd5e"
+    }
+  ],
+  "visual_briefs": [
+    {
+      "visual_brief_id": "b7.visual.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "method_step_refs": [
+        "file-read-array.step.contract",
+        "file-read-array.step.open",
+        "file-read-array.step.read-commit",
+        "file-read-array.step.close-outcome"
+      ],
+      "error_refs": [
+        "b7.file-read-array.error.partial-record",
+        "b7.file-read-array.error.termination-scope"
+      ],
+      "learning_question": {
+        "vi": "Một group line trở thành đúng một destination item ở event nào, và guard nào chặn read/commit tiếp theo?",
+        "en": "At which event does one line group become exactly one destination item, and which guard blocks the next read/commit?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "An input-file lifecycle plus a record buffer, converted fields, destination array/record/ADT and committed-record count.",
+        "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "OPEN_INPUT_FILE",
+        "READ_RECORD_LINE",
+        "COMPLETE_RECORD_BUFFER",
+        "CONVERT_RECORD_FIELD",
+        "CHECK_DESTINATION_CAPACITY",
+        "COMMIT_DESTINATION_ITEM",
+        "CLOSE_INPUT_FILE",
+        "EMIT_READ_ERROR"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "boundary_case": {
+        "vi": "So EOF sau một record rưỡi, capacity đầy trước EOF và open failure; không path nào commit half-record hoặc vượt capacity, và error output đúng contract.",
+        "en": "Compare EOF after one-and-a-half records, capacity full before EOF and open failure; no path commits a half-record or exceeds capacity, and error output follows the contract."
+      },
+      "failure_case": {
+        "vi": "Commit field/array element trước khi đọc đủ mọi line của record.",
+        "en": "Committing a field/array element before all lines of the record have been read."
+      },
+      "representation_and_convention": [
+        "open before the first read and close on every required completion path",
+        "group all lines of one record before conversion/commit",
+        "EOF/fixed count and capacity are independent guards",
+        "exception output remains source-bound"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b7.visual.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "method_step_refs": [
+        "file-read-objects.step.schema",
+        "file-read-objects.step.open-group",
+        "file-read-objects.step.construct-update",
+        "file-read-objects.step.commit-close"
+      ],
+      "error_refs": [
+        "b7.file-read-objects.error.record-desync",
+        "b7.file-read-objects.error.wrong-object-route"
+      ],
+      "learning_question": {
+        "vi": "Record buffer nào chọn constructor hoặc target object nào, và khi nào object state mới được commit?",
+        "en": "Which constructor or target object does the record buffer select, and when is object state committed?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A complete typed record buffer mapped to one object constructor/subclass or to one located existing object, followed by a single object commit/update.",
+        "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "OPEN_OBJECT_FILE",
+        "BUFFER_OBJECT_RECORD",
+        "CONVERT_OBJECT_FIELDS",
+        "SELECT_OBJECT_ROUTE",
+        "CONSTRUCT_OBJECT_CANDIDATE",
+        "LOOKUP_UPDATE_TARGET",
+        "COMMIT_OBJECT_STATE",
+        "CLOSE_OBJECT_FILE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "boundary_case": {
+        "vi": "Đối chiếu record subtype khác, lookup key không tồn tại và final record thiếu field; route/lookup phải rõ và không case thất bại nào tạo partial object.",
+        "en": "Contrast a different subtype record, a missing lookup key and a final record missing one field; route/lookup must be explicit and no failure creates a partial object."
+      },
+      "failure_case": {
+        "vi": "Đọc sai số line/record làm field record sau trượt sang record trước.",
+        "en": "Reading the wrong number of lines per record so a later field shifts into the previous record."
+      },
+      "representation_and_convention": [
+        "construct only after complete typed record parsing",
+        "subclass discriminator selects one source-permitted constructor",
+        "create and update paths have distinct postconditions",
+        "count increases only for created/stored objects"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b7.visual.file-write",
+      "pattern_id": "FILE_WRITE",
+      "method_step_refs": [
+        "file-write.step.contract",
+        "file-write.step.open",
+        "file-write.step.format-write",
+        "file-write.step.close-outcome"
+      ],
+      "error_refs": [
+        "b7.file-write.error.wrong-mode",
+        "b7.file-write.error.format-order"
+      ],
+      "learning_question": {
+        "vi": "Open mode biến đổi pre-file state thế nào, và mỗi formatted line được commit theo order nào trước close?",
+        "en": "How does open mode transform pre-file state, and in what order is each formatted line committed before close?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "An output-file lifecycle plus an ordered stream of formatted record lines derived from source state.",
+        "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "SELECT_OUTPUT_MODE",
+        "OPEN_OUTPUT_FILE",
+        "SELECT_OUTPUT_RECORD",
+        "FORMAT_OUTPUT_LINE",
+        "WRITE_OUTPUT_LINE",
+        "CLOSE_OUTPUT_FILE",
+        "EMIT_WRITE_ERROR"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "boundary_case": {
+        "vi": "Với pre-file có prefix sentinel, append phải giữ prefix còn overwrite phải bỏ; physical tree rows phải ra triples theo row dù inorder khác.",
+        "en": "With a pre-file sentinel prefix, append must preserve it while overwrite removes it; physical tree rows must emit row triples even when inorder differs."
+      },
+      "failure_case": {
+        "vi": "Dùng overwrite khi phải append hoặc append khi phải tạo output mới.",
+        "en": "Using overwrite when append is required, or append when a new output is required."
+      },
+      "representation_and_convention": [
+        "append preserves existing content; write/overwrite starts the source-required new output",
+        "field and newline grammar is source-bound",
+        "physical storage rows and logical traversal/order are distinct",
+        "close occurs after the final write or on the required handled path"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    }
+  ],
+  "self_checks": {
+    "brief_count": 3,
+    "event_driven_count": 3
+  }
+}

@@ -1,0 +1,2036 @@
+{
+  "lessons": [
+    {
+      "id": "13.1.1",
+      "section": "13.1",
+      "title": "Why create a data type?",
+      "goal": "Choose a data type that fits the facts you need to store.",
+      "html": "<p>A <strong>data type</strong> states which values an item can hold and which operations make sense. INTEGER, REAL, CHAR, STRING, BOOLEAN and DATE are familiar examples. A <strong>user-defined type</strong> gives a new name to a useful set of values or a data structure.</p>\n<p>Think of a school record. A name, a phone number and a lesson count belong to one learner. A record makes that link clear. A named type can be reused and can help the program check types. It does not replace input checks: a lesson count may still need a check that it is not negative.</p>\n<table>\n<thead>\n<tr>\n<th>Type</th>\n<th>Main job</th>\n<th>Cambridge group</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Enumerated</td>\n<td>Choose one named value from a fixed list</td>\n<td>Non-composite</td>\n</tr>\n<tr>\n<td>Pointer</td>\n<td>Hold the address of data of a given type</td>\n<td>Non-composite</td>\n</tr>\n<tr>\n<td>Record</td>\n<td>Group related fields, which may have different types</td>\n<td>Composite</td>\n</tr>\n<tr>\n<td>Set</td>\n<td>Hold unique items of one type, with no order</td>\n<td>Composite</td>\n</tr>\n<tr>\n<td>Class / object</td>\n<td>Keep state and methods together</td>\n<td>Composite</td>\n</tr>\n</tbody>\n</table>\n<p><strong>Composite</strong> means that parts are grouped under one name. A pointer refers to another type, but this does not make it composite in this course.</p>\n<p>Say it simply: “A new type gives our data a clear meaning.”</p>",
+      "visuals": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "lab": "types",
+      "terms": [
+        "data type",
+        "composite"
+      ],
+      "quiz": {
+        "question": "Which item is non-composite in this course?",
+        "options": [
+          "Record",
+          "Set",
+          "Pointer"
+        ],
+        "answer": 2,
+        "explanation": "A pointer holds an address. Cambridge places it in the non-composite group."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.1.2",
+      "section": "13.1",
+      "title": "Enumerated types",
+      "goal": "Define an enum, declare a variable and assign a valid value.",
+      "html": "<p>An <strong>enumerated type</strong>, or <strong>enum</strong>, lists all allowed named values in an order.</p>\n<pre><code class=\"language-text\">TYPE TStudyStatus = (Active, Paused, Completed)\nDECLARE Status : TStudyStatus\nStatus ← Active\n</code></pre>\n<p>TStudyStatus is a <strong>type</strong>. Status is a <strong>variable</strong>. Active is a <strong>value</strong>. Active is not the string \"Active\". Use an enum for a study status or a day of the week. A person's name is not a good enum field because the list of names is not fixed.</p>\n<p>The list has a declared order and no repeated values. In the book's ordinal example, moving one place after Wednesday gives Thursday:</p>\n<pre><code class=\"language-text\">TYPE TDay = (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)\nDECLARE Today : TDay\nDECLARE Tomorrow : TDay\nToday ← Wednesday\nTomorrow ← Today + 1\n</code></pre>\n<p>Do not assume that the list wraps by itself. To make Sunday lead to Monday, state the rule:</p>\n<pre><code class=\"language-text\">IF Today = Sunday THEN\n   Tomorrow ← Monday\nELSE\n   Tomorrow ← Today + 1\nENDIF\n</code></pre>\n<p>This is the book's enum order model. A real language may provide a different enum operation. A program also needs its own rule for a change of status; Completed does not automatically become Active.</p>\n<p>Exam habit: when asked to define a type, start with TYPE; when asked for a variable, use DECLARE.</p>",
+      "visuals": [
+        5
+      ],
+      "lab": "enum",
+      "terms": [
+        "enumerated",
+        "ordinal"
+      ],
+      "quiz": {
+        "question": "Which assignment fits an enum variable Status?",
+        "options": [
+          "Status ← \"Active\"",
+          "Status ← Active",
+          "TStudyStatus ← Status"
+        ],
+        "answer": 1,
+        "explanation": "Active is a named enum value. Quotes would make it a STRING."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.1.3",
+      "section": "13.1",
+      "title": "Records and fields",
+      "goal": "Define a record and use its fields without mixing up type and variable names.",
+      "html": "<p>A <strong>record</strong> groups related fields. Each field has a name and a type. Different fields can use different types.</p>\n<pre><code class=\"language-text\">TYPE TStudent\n   DECLARE StudentID : STRING\n   DECLARE FullName : STRING\n   DECLARE Phone : STRING\n   DECLARE LessonsAttended : INTEGER\n   DECLARE Status : TStudyStatus\nENDTYPE\nDECLARE Learner : TStudent\nLearner.StudentID ← &quot;AC027&quot;\nLearner.FullName ← &quot;Minh&quot;\nLearner.Phone ← &quot;0901234567&quot;\nLearner.LessonsAttended ← 8\nLearner.Status ← Active\nOUTPUT Learner.FullName\n</code></pre>\n<p>The output is Minh. The dot selects a field: <strong>variable.field</strong>. Do not write TStudent.FullName when you mean a field of Learner.</p>\n<p>Phone uses STRING to keep the leading zero and a possible + sign. We do not calculate with it. LessonsAttended is a count, so INTEGER fits. Dates use DATE, true/false values use BOOLEAN and a field with fixed choices can use an enum defined earlier.</p>\n<p>One record represents one learner. <strong>ARRAY[1:20] OF TStudent</strong> holds 20 records. An array has items of one type; a record can have fields of different types. To access a field in an array of records, use ClassList[2].FullName.</p>\n<p>Exam habit: check TYPE/ENDTYPE, DECLARE, every requested field, field types and exact names.</p>",
+      "visuals": [
+        6,
+        7
+      ],
+      "lab": "record",
+      "terms": [
+        "record",
+        "field"
+      ],
+      "quiz": {
+        "question": "Why store a phone number as STRING?",
+        "options": [
+          "To keep a leading zero",
+          "To add two phone numbers",
+          "Because STRING is always faster"
+        ],
+        "answer": 0,
+        "explanation": "A phone number is an identifier, not an amount to calculate with."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.1.4",
+      "section": "13.1",
+      "title": "Pointers",
+      "goal": "Tell an address apart from the value stored at that address.",
+      "html": "<p>A <strong>pointer</strong> stores a memory address. The data at that address has a given type.</p>\n<pre><code class=\"language-text\">TYPE TIntPointer = ^INTEGER\nDECLARE Score : INTEGER\nDECLARE ScorePointer : TIntPointer\nScore ← 42\nScorePointer ← ^Score\nOUTPUT ScorePointer^\n</code></pre>\n<p>The output is 42. Read the three uses of ^ with care:</p>\n<table>\n<thead>\n<tr>\n<th>Form</th>\n<th>Meaning</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>^INTEGER in TYPE</td>\n<td>The pointer points to an INTEGER</td>\n</tr>\n<tr>\n<td>^Score</td>\n<td>Get the address of Score</td>\n</tr>\n<tr>\n<td>ScorePointer^</td>\n<td>Read the value at the address held by the pointer</td>\n</tr>\n</tbody>\n</table>\n<p>Reading through a pointer is called <strong>dereferencing</strong>. If Score changes to 50, ScorePointer^ now reads 50. The pointer is not a copy of the old value 42.</p>\n<p>Set a valid target before reading through a pointer. Only use a numerical address when the question gives one; the addresses in diagrams are examples.</p>",
+      "visuals": [
+        8,
+        9
+      ],
+      "lab": "pointer",
+      "terms": [
+        "pointer",
+        "dereference"
+      ],
+      "quiz": {
+        "question": "P points to Score. Score changes from 42 to 50. What is P^?",
+        "options": [
+          "42",
+          "50",
+          "The address of P"
+        ],
+        "answer": 1,
+        "explanation": "Dereferencing reads the current value at the target address."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.1.5",
+      "section": "13.1",
+      "title": "Sets",
+      "goal": "Define a set and find its union and intersection.",
+      "html": "<p>A <strong>set</strong> holds items of the same type. There are no repeated items and no order.</p>\n<pre><code class=\"language-text\">TYPE TSkillSet = SET OF STRING\nDEFINE SkillsA (&quot;Binary&quot;, &quot;Files&quot;) : TSkillSet\nDEFINE SkillsB (&quot;Files&quot;, &quot;Records&quot;) : TSkillSet\n</code></pre>\n<ul>\n<li><strong>Intersection</strong> means items in both sets: {Files}.</li>\n<li><strong>Union</strong> means items in either set: {Binary, Files, Records}.</li>\n<li><strong>Difference A − B</strong> means items in A but not B: {Binary}.</li>\n<li>Adding Files to SkillsA again does not add a second Files item.</li>\n</ul>\n<p>Braces here are mathematical set notation, not a new pseudocode assignment rule. For exam declarations, use TYPE … = SET OF … and the DEFINE form required by the question.</p>\n<p>An enum variable chooses <strong>one</strong> allowed value. A set can hold <strong>several</strong> items at once. Use an enum for one current status, and a set for several completed skills. CHAR items use single quotes; STRING items use double quotes.</p>",
+      "visuals": [
+        10,
+        11
+      ],
+      "lab": "sets",
+      "terms": [
+        "set",
+        "union",
+        "intersection"
+      ],
+      "quiz": {
+        "question": "A={1,3,5}, B={3,4,5}. What is A ∩ B?",
+        "options": [
+          "{1,3,4,5}",
+          "{3,5}",
+          "{1}"
+        ],
+        "answer": 1,
+        "explanation": "Intersection keeps items that are present in both sets."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.1.6",
+      "section": "13.1",
+      "title": "Classes and objects",
+      "goal": "Explain how an object keeps its own state and uses methods.",
+      "html": "<p>A record mainly groups data. A <strong>class</strong> also defines methods that work on that data. An <strong>object</strong> is an instance of a class. Each object has its own state.</p>\n<pre><code class=\"language-text\">CLASS TCounter\n   PRIVATE Value : INTEGER\n   PUBLIC PROCEDURE NEW()\n      Value ← 0\n   ENDPROCEDURE\n   PUBLIC PROCEDURE Increment()\n      Value ← Value + 1\n   ENDPROCEDURE\n   PUBLIC FUNCTION GetValue() RETURNS INTEGER\n      RETURN Value\n   ENDFUNCTION\nENDCLASS\nCounterA ← NEW TCounter()\nCounterB ← NEW TCounter()\nCounterA.Increment()\nOUTPUT CounterA.GetValue()\nOUTPUT CounterB.GetValue()\n</code></pre>\n<p>The outputs are 1 and 0. NEW sets the starting state. PRIVATE blocks direct access from code outside the class. Public methods provide controlled access. Putting state and methods together, with controlled access, is <strong>encapsulation</strong>; it is not encryption.</p>\n<p>Chapter 13 needs simple class choices, definitions and traces. Inheritance and polymorphism are studied in more depth in Further Programming / Unit 20.</p>",
+      "visuals": [
+        12
+      ],
+      "lab": "objects",
+      "terms": [
+        "class",
+        "object",
+        "method"
+      ],
+      "quiz": {
+        "question": "Only CounterA is incremented once. What does CounterB return?",
+        "options": [
+          "1",
+          "0",
+          "An address"
+        ],
+        "answer": 1,
+        "explanation": "Separate objects have their own state. CounterB stays at zero."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.2.1",
+      "section": "13.2",
+      "title": "File organisation",
+      "goal": "Choose how records should be stored for a task.",
+      "html": "<p><strong>Organisation</strong> asks “How are records stored?” <strong>Access</strong> asks “How do we reach a record?” Keep these two questions separate.</p>\n<table>\n<thead>\n<tr>\n<th>Organisation</th>\n<th>Order</th>\n<th>Add a record</th>\n<th>Useful example</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Serial</td>\n<td>Order of arrival, not sorted by key</td>\n<td>Add to the end (append)</td>\n<td>An event log</td>\n</tr>\n<tr>\n<td>Sequential</td>\n<td>In key order</td>\n<td>Insert in the right place; the file may need to be rebuilt</td>\n<td>Process records in order</td>\n</tr>\n<tr>\n<td>Random</td>\n<td>A location is found from the key, often by a hash</td>\n<td>Store at the calculated location; handle a collision</td>\n<td>Find or update one record</td>\n</tr>\n</tbody>\n</table>\n<p>Random does not mean choosing a new random place on every search. The same hash rule gives the same starting location for a key.</p>\n<p>For a new key 18: a serial file 31,12,25 becomes 31,12,25,18. A sequential file 12,25,31 becomes 12,18,25,31. State the reason for a choice, not just “it is fast”.</p>",
+      "visuals": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "lab": "organisation",
+      "terms": [
+        "serial",
+        "sequential"
+      ],
+      "quiz": {
+        "question": "Where does a serial file add a new record?",
+        "options": [
+          "At the end",
+          "In key order",
+          "At a new random place each time"
+        ],
+        "answer": 0,
+        "explanation": "Serial organisation appends in order of arrival."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.2.2",
+      "section": "13.2",
+      "title": "File access and hit rate",
+      "goal": "Trace a search and explain when direct access helps.",
+      "html": "<p><strong>Sequential access</strong> reads records one after another from the start. Stop when the key is found or the file ends. In a file sorted in ascending key order, also stop when the current key is greater than the target.</p>\n<p>To find 20 in 12,18,25,31: read 12, then 18, then 25. Stop: 25 &gt; 20. Do not use this early stop in an unsorted serial file. For descending order, reverse the comparison.</p>\n<p><strong>Direct access</strong> uses a location without reading every earlier record. A sequential file can have an <strong>index</strong> mapping key to address. A random file can use a <strong>hash</strong> to calculate a location. A collision may need extra reads; direct access does not promise exactly one read.</p>\n<p><strong>File-processing hit rate</strong> = records used in a task ÷ total records × 100. This is not cache hit rate.</p>\n<table>\n<thead>\n<tr>\n<th>Task in a file of 1000 learners</th>\n<th>Hit rate</th>\n<th>Suitable access</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Process all 1000 records</td>\n<td>100%</td>\n<td>Sequential</td>\n</tr>\n<tr>\n<td>Update 5 phone numbers</td>\n<td>0.5%</td>\n<td>Direct, if an index/hash is available</td>\n</tr>\n</tbody>\n</table>\n<p>A high hit rate favours reading continuously. A low hit rate can favour finding selected addresses. Hit rate alone does not decide the file organisation; consider order, updates and available structures too.</p>",
+      "visuals": [
+        17,
+        18
+      ],
+      "lab": "search",
+      "terms": [
+        "direct access",
+        "hit rate"
+      ],
+      "quiz": {
+        "question": "Find 20 in 12,18,25,31. Which is the final record read?",
+        "options": [
+          "18",
+          "25",
+          "31"
+        ],
+        "answer": 1,
+        "explanation": "In ascending order, 25 > 20 proves that 20 is absent."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.2.3",
+      "section": "13.2",
+      "title": "Hashing and addresses",
+      "goal": "Calculate a hash, then convert a slot into a byte address when asked.",
+      "html": "<p>A <strong>hash function</strong> maps a record key to a starting slot. MOD gives a remainder, not a quotient.</p>\n<pre><code class=\"language-text\">Slot ← Key MOD N\nAddress ← BaseAddress + Slot * RecordSize\n</code></pre>\n<p>This formula assumes slots 0 to N−1. If the question numbers slots from 1, follow its rule instead. Base address and record size must use the same address units.</p>\n<p>With key 127, 10 slots, base byte 1000 and 20 bytes per record:</p>\n<pre><code class=\"language-text\">127 MOD 10 = 7\nAddress = 1000 + 7 × 20 = 1140 bytes\n</code></pre>\n<p>Slot 7 is not byte address 1140. Only calculate an address if that is requested. For MOD N, check that 0 ≤ result &lt; N.</p>\n<p>A simple string hash can add character codes then take MOD N. With A=65 and C=67, AC gives (65+67) MOD 10 = 2. CA also gives 2. Different keys can share a hash value.</p>",
+      "visuals": [
+        19,
+        20
+      ],
+      "lab": "hash",
+      "terms": [
+        "hash",
+        "remainder"
+      ],
+      "quiz": {
+        "question": "Key127, N10, base1000, size20. Which byte address?",
+        "options": [
+          "7",
+          "1020",
+          "1140"
+        ],
+        "answer": 2,
+        "explanation": "127 MOD10=7; 1000+7×20=1140 bytes."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.2.4",
+      "section": "13.2",
+      "title": "Collisions",
+      "goal": "Trace both insertion and search after a hash collision.",
+      "html": "<p>A <strong>collision</strong> occurs when different keys give the same hash location. With key MOD 5, the keys 12,17,22 all start at slot 2.</p>\n<p><strong>Linear probing:</strong> test the starting slot, then the next slot. Wrap to slot 0 after the last slot. Stop at an empty slot when inserting. After inserting 12,17,22 into an empty five-slot table:</p>\n<table>\n<thead>\n<tr>\n<th>Slot</th>\n<th>0</th>\n<th>1</th>\n<th>2</th>\n<th>3</th>\n<th>4</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Key</td>\n<td>Empty</td>\n<td>Empty</td>\n<td>12</td>\n<td>17</td>\n<td>22</td>\n</tr>\n</tbody>\n</table>\n<p>To find 22: hash to 2 → compare 12 with 22 → try 3 → compare 17 → try 4 → match 22. Never use a record just because its hash matches.</p>\n<p><strong>Overflow area:</strong> keep colliding records in a separate area. A search checks the main location and then finds the matching key in the overflow area using the chosen structure. A chain can link records with the same hash.</p>\n<p>Use the same hash and collision rule for storing and finding. Never overwrite a different key. Stop after a full loop if the table is full. In an insert-only table, a never-used empty slot means the key is absent. After deletion, special markers may be needed so the search path is not broken.</p>\n<p>Some sources use open/closed hashing names differently. Explain the actual mechanism and follow a definition given in the question.</p>",
+      "visuals": [
+        21,
+        22,
+        23
+      ],
+      "lab": "hash",
+      "terms": [
+        "collision",
+        "linear probing"
+      ],
+      "quiz": {
+        "question": "During a search, the hash slot holds a different key. What next?",
+        "options": [
+          "Return that record",
+          "Follow the same collision rule and compare keys",
+          "Overwrite it"
+        ],
+        "answer": 1,
+        "explanation": "A matching hash is only a starting location; the record key must match."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.3.1",
+      "section": "13.3",
+      "title": "The floating-point model",
+      "goal": "Read the mantissa and exponent without using the wrong number model.",
+      "html": "<p><strong>X = M × 2^E</strong>. The <strong>mantissa M</strong> holds the signed value. The <strong>exponent E</strong> scales it by a power of two. Both parts use two's complement in this Cambridge model. The binary point in M is immediately after its leftmost bit.</p>\n<p>This is like scientific notation: 4800 = 4.8 × 10^3 separates a value from its scale. Binary floating-point uses powers of 2 instead of powers of 10: 6.5 = 0.8125 × 2^3. The stored mantissa follows the binary point rule below.</p>\n<p>Our small examples use 8 bits for M and 4 for E. Always read the actual question: it may use 8+8, 10+6, 12+6, 16+8 or another split. Do not replace this model with IEEE 754 rules.</p>\n<table>\n<thead>\n<tr>\n<th>M bit</th>\n<th>0</th>\n<th>1</th>\n<th>2</th>\n<th>3</th>\n<th>4</th>\n<th>5</th>\n<th>6</th>\n<th>7</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Weight</td>\n<td>−1</td>\n<td>1/2</td>\n<td>1/4</td>\n<td>1/8</td>\n<td>1/16</td>\n<td>1/32</td>\n<td>1/64</td>\n<td>1/128</td>\n</tr>\n</tbody>\n</table>\n<p>A four-bit E has weights −8,4,2,1, so −8 ≤ E ≤ 7. A negative E makes the magnitude smaller. It does not make X negative: the sign comes from M.</p>",
+      "visuals": [
+        24,
+        25
+      ],
+      "lab": "float",
+      "terms": [
+        "mantissa",
+        "exponent"
+      ],
+      "quiz": {
+        "question": "What does a negative exponent do?",
+        "options": [
+          "Always makes X negative",
+          "Reduces the magnitude",
+          "Turns M into an address"
+        ],
+        "answer": 1,
+        "explanation": "2 to a negative power is positive but smaller than one. M determines the sign."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.3.2",
+      "section": "13.3",
+      "title": "Decode a floating-point number",
+      "goal": "Convert a given M/E pair to denary and show working.",
+      "html": "<p>Method: split the fields → calculate M → read E as a signed integer → multiply.</p>\n<pre><code class=\"language-text\">M = 01101000 = 1/2 + 1/4 + 1/16 = 0.8125\nE = 0011 = 3\nX = 0.8125 × 8 = 6.5\n\nM = 10011000 = -1 + 1/8 + 1/16 = -0.8125\nE = 0011 = 3\nX = -0.8125 × 8 = -6.5\n\nM = 01010000 = 0.625\nE = 1110 = -8 + 4 + 2 = -2\nX = 0.625 × 2^-2 = 0.15625\n</code></pre>\n<p><strong>Quick method:</strong> read the mantissa bit string as a signed integer I. With m mantissa bits, M = I / 2^(m−1). Then X = I × 2^(E−(m−1)). Still show I or M and E separately for method marks.</p>\n<p><strong>Binary-point method:</strong> for positive M, move the point right E places for a positive E, or left |E| places for a negative E. 0.1101000₂ with E=3 becomes 0110.1000₂ = 6.5. 0.1010000₂ with E=−2 becomes 0.001010000₂ = 0.15625.</p>\n<p>For negative M, take its magnitude with two's complement, move the point, then keep the minus sign. 10110000/1110 gives −0.15625. Special case: M=10000000 means −1, whose positive magnitude does not fit this signed fractional field. Use −1 × 2^E directly.</p>",
+      "visuals": [
+        26,
+        27,
+        28
+      ],
+      "lab": "float",
+      "terms": [
+        "denary",
+        "two’s complement"
+      ],
+      "quiz": {
+        "question": "M10110000 / E1110 in M8/E4 represents what?",
+        "options": [
+          "-0.15625",
+          "0.15625",
+          "-2.5"
+        ],
+        "answer": 0,
+        "explanation": "I=-80, M=-80/128, E=-2, so X=-0.15625."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.3.3",
+      "section": "13.3",
+      "title": "Encode a denary number",
+      "goal": "Build a normalised bit pattern from a number.",
+      "html": "<p>For +6.5 in M8/E4:</p>\n<ol>\n<li>Convert to binary: 110.1₂.</li>\n<li>Write 0.1101₂ × 2^3.</li>\n<li>Fill M to eight bits: 01101000.</li>\n<li>Write E=3 in four-bit two's complement: 0011.</li>\n<li>Decode to check: 6.5.</li>\n</ol>\n<p>For −6.5, invert the positive M and add one. Keep E=3.</p>\n<pre><code class=\"language-text\">01101000 → invert: 10010111 → add 1: 10011000\nAnswer: 10011000 / 0011\n</code></pre>\n<p>Do not just change the sign bit. For 0.15625: 0.00101₂ = 0.101₂ × 2^-2, giving 01010000/1110. For −0.5, check normalisation after making M negative: 11000000/0000 must become 10000000/1111.</p>\n<p><strong>Fraction method:</strong> 6.5=13/2. Divide M by 2 and increase E until M fits the normalised interval: 13/2 at E0 → 13/4 at E1 → 13/8 at E2 → 13/16 at E3. The product stays 6.5. 13/16=0.1101₂. For 5/32, multiply M by 2 twice and reduce E twice: 5/32 → 5/16 → 5/8, with E0 → −1 → −2.</p>\n<p><strong>Make fractional bits:</strong> multiply the remaining fraction by two. Keep the integer part (0 or 1) as the next bit; repeat with the fraction left over.</p>\n<table>\n<thead>\n<tr>\n<th>Fraction</th>\n<th>×2</th>\n<th>Next bit</th>\n<th>Remainder</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>0.375</td>\n<td>0.75</td>\n<td>0</td>\n<td>0.75</td>\n</tr>\n<tr>\n<td>0.75</td>\n<td>1.5</td>\n<td>1</td>\n<td>0.5</td>\n</tr>\n<tr>\n<td>0.5</td>\n<td>1.0</td>\n<td>1</td>\n<td>0</td>\n</tr>\n</tbody>\n</table>\n<p>So 0.375=0.011₂ and 13.375=1101.011₂. With 0.1, remainders repeat: 0.1 → 0.2 → 0.4 → 0.8 → 0.6 → 0.2… . Its binary digits continue forever. Decide which bits fit <strong>after normalising</strong> M. For rounding, inspect the discarded part too.</p>",
+      "visuals": [
+        29
+      ],
+      "lab": "encode",
+      "terms": [
+        "binary fraction",
+        "mantissa"
+      ],
+      "quiz": {
+        "question": "What is E for normalised -6.5 in M8/E4?",
+        "options": [
+          "1101",
+          "0011",
+          "1111"
+        ],
+        "answer": 1,
+        "explanation": "The negative sign changes M, not E. The scale remains 2^3."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.3.4",
+      "section": "13.3",
+      "title": "Normalisation",
+      "goal": "Use significant bits well while keeping the same value.",
+      "html": "<p>For a non-zero normalised M, the first two bits differ: positive starts <strong>01</strong>, negative starts <strong>10</strong>. 00 or 11 means that redundant sign bits remain.</p>\n<p>Shift M left k places, fill the right with zeros, and <strong>decrease E by k</strong>. M grows by 2^k, so 2^E must shrink by 2^k. Check that the new E still fits.</p>\n<pre><code class=\"language-text\">Positive: 00101000 / 0100 → 01010000 / 0011\n          0.3125 × 16 = 5 → 0.625 × 8 = 5\n\nNegative: 11101000 / 0101 → 10100000 / 0011\n          -0.1875 × 32 = -6 → -0.75 × 8 = -6\n</code></pre>\n<p>The negative example shifts M twice, so E falls from 5 to 3. A raw binary fraction is a different starting point: 0.00011₂ = 0.11₂ × 2^-3. Do not assume its E started at the value in a separate M/E question.</p>\n<p>Normalisation frees space for useful bits. It cannot restore bits already lost. Zero cannot start 01 or 10, so it needs a separate rule, such as an all-zero mantissa. This does not mean a computer cannot store zero.</p>",
+      "visuals": [
+        30,
+        31,
+        38
+      ],
+      "lab": "normalise",
+      "terms": [
+        "normalise",
+        "sign bit"
+      ],
+      "quiz": {
+        "question": "M is shifted left twice. How must E change?",
+        "options": [
+          "Increase by 2",
+          "Stay the same",
+          "Decrease by 2"
+        ],
+        "answer": 2,
+        "explanation": "M is multiplied by four; the scale must be divided by four."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.3.5",
+      "section": "13.3",
+      "title": "Precision, range and limits",
+      "goal": "Explain a bit trade-off and find the limits for a stated format.",
+      "html": "<p><strong>Precision</strong> is the detail a value can keep. More mantissa bits give a smaller gap between nearby values at a fixed E. <strong>Range</strong> is the spread of magnitudes. More exponent bits allow larger E and more negative E.</p>\n<p>With a fixed total, more bits for one field leave fewer for the other. M12/E4 → M10/E6 reduces precision but increases range. More exponent bits do not make every fraction exact.</p>\n<p>For m M bits and e E bits: <strong>Emin = −2^(e−1)</strong> and <strong>Emax = 2^(e−1)−1</strong>.</p>\n<table>\n<thead>\n<tr>\n<th>Normalised limit</th>\n<th>M pattern</th>\n<th>E</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Largest positive</td>\n<td>0 then all 1s</td>\n<td>Emax</td>\n</tr>\n<tr>\n<td>Smallest positive</td>\n<td>01 then all 0s</td>\n<td>Emin</td>\n</tr>\n<tr>\n<td>Most negative</td>\n<td>1 then all 0s</td>\n<td>Emax</td>\n</tr>\n<tr>\n<td>Negative nearest zero</td>\n<td>10 then all 1s</td>\n<td>Emin</td>\n</tr>\n</tbody>\n</table>\n<p>For M8/E4 these give 127, 1/512, −128 and −65/32768. Positive and negative limits are not exactly symmetric. “Most negative” is different from “negative with the smallest magnitude”. If unnormalised numbers are allowed, the smallest non-zero value can differ.</p>\n<p>Largest positive = (1−2^−(m−1)) × 2^Emax. Smallest normalised positive = 0.5 × 2^Emin.</p>\n<table>\n<thead>\n<tr>\n<th>Format</th>\n<th>Value</th>\n<th>M</th>\n<th>E</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>8+8</td>\n<td>6.5</td>\n<td>01101000</td>\n<td>00000011</td>\n</tr>\n<tr>\n<td>12+6</td>\n<td>−8.375</td>\n<td>101111010000</td>\n<td>000100</td>\n</tr>\n<tr>\n<td>16+8</td>\n<td>−0.15625</td>\n<td>1011000000000000</td>\n<td>11111110</td>\n</tr>\n</tbody>\n</table>\n<p>For −8.375: 8.375=0.1000011₂×2^4. The positive 12-bit M is 010000110000; invert and add one to get 101111010000. Its signed integer is −1072; −1072/2048×16=−8.375. For the 16+8 example, E=−2 is 11111110, not 00000010. Both M and E are negative, but X is negative only once because 2^-2 is positive.</p>\n<p>In M10/E6, Emin=−32 and Emax=31. The four limits are (511/512)×2^31, 2^-33, −2^31 and (−257/512)×2^-32. Knowing only “32-bit word” is not enough: M24/E8 and M16/E16 have different limits.</p>",
+      "visuals": [
+        32,
+        33
+      ],
+      "lab": "limits",
+      "terms": [
+        "precision",
+        "range"
+      ],
+      "quiz": {
+        "question": "A fixed 16-bit word changes from M12/E4 to M10/E6. What happens?",
+        "options": [
+          "Precision rises, range falls",
+          "Precision falls, range rises",
+          "Both stay the same"
+        ],
+        "answer": 1,
+        "explanation": "Two fewer mantissa bits keep less detail. Two more exponent bits widen the range."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.3.6",
+      "section": "13.3",
+      "title": "Approximation and rounding",
+      "goal": "Explain why bits are lost and calculate the stored value.",
+      "html": "<p>Two common causes of approximation are different:</p>\n<ol>\n<li>The binary fraction has no end, such as 0.1.</li>\n<li>The binary fraction ends, but needs more M bits than available.</li>\n</ol>\n<p>For 13.375 with six M bits: 13.375=0.1101011₂×2^4. Only five fractional bits fit. <strong>Truncate</strong> to 0.11010₂×16=13.0. <strong>Round to nearest</strong> to 0.11011₂×16=13.5. The absolute errors are 0.375 and 0.125. There is no tie here.</p>\n<p>Follow the stated rounding rule. Do not silently round a question that uses truncation. In a selected past-paper example, M8/E8 truncates 113.75 to 113; rounding to nearest would give 114.</p>\n<p>For negative numbers, dropping low bits from two's complement is not the same as rounding towards zero. In M10/E6, −5.38 with E3 has exact mantissa integer −344.32. Nearest chooses −344 (M1010101000), storing −5.375. Dropping low bits keeps −345 (M1010100111), storing −5.390625. For +2.88 at E2, nearest chooses 369 (M0101110001), storing 2.8828125; truncation chooses 368, storing 2.875.</p>\n<p><strong>Accumulated error:</strong> in M8/E4, the nearest value to 0.1 is 01100110/1101 = 0.099609375. If only the input is rounded once and sums are then exact:</p>\n<table>\n<thead>\n<tr>\n<th>Additions</th>\n<th>Ideal sum</th>\n<th>Sum of rounded inputs</th>\n<th>Error</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>1</td>\n<td>0.1</td>\n<td>0.099609375</td>\n<td>−0.000390625</td>\n</tr>\n<tr>\n<td>2</td>\n<td>0.2</td>\n<td>0.19921875</td>\n<td>−0.00078125</td>\n</tr>\n<tr>\n<td>3</td>\n<td>0.3</td>\n<td>0.298828125</td>\n<td>−0.001171875</td>\n</tr>\n</tbody>\n</table>\n<p>Do not claim the last exact sum fits M8/E4. If each addition is rounded again, the third sum is halfway between 0.296875 and 0.30078125. <strong>Ties-to-even</strong> chooses an even mantissa integer, giving 0.296875. Keep these two models separate.</p>\n<p>Double and quadruple precision usually offer more bits, but layouts and support depend on the format. They are not automatically the Cambridge two's-complement M/E model. A finite binary format still cannot store 0.1 exactly. Reduce error by choosing enough precision, integer units where suitable, or exact decimal arithmetic when needed. Rounding the displayed text does not remove internal calculation error.</p>",
+      "visuals": [
+        34,
+        35,
+        36
+      ],
+      "lab": "rounding",
+      "terms": [
+        "truncate",
+        "round"
+      ],
+      "quiz": {
+        "question": "Why can a finite binary format not store 0.1 exactly?",
+        "options": [
+          "It is negative",
+          "Its binary fraction repeats forever",
+          "It has a decimal point"
+        ],
+        "answer": 1,
+        "explanation": "0.1 has an infinite repeating binary expansion. A finite M cannot hold every bit."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "id": "13.3.7",
+      "section": "13.3",
+      "title": "Overflow and underflow",
+      "goal": "Link a calculation to the limit it crosses.",
+      "html": "<p><strong>Overflow:</strong> a result is beyond the format's range. In normalised M8/E4, 100×2=200 is larger than the maximum positive value 127.</p>\n<p><strong>Underflow:</strong> a non-zero result is too close to zero for the stated format. (1/512)÷2=1/1024 is below the smallest normalised positive value.</p>\n<p>Underflow does not mean “the result is negative”. Overflow does not mean “there was a carry” by itself. Name the calculation, compare the result with the limit, and explain that the valid representation does not fit.</p>\n<p>The system may signal an error, use a special value or round according to its rules. Do not claim that every system always returns zero. Division by zero is a separate case, not an ordinary finite result crossing a range limit.</p>",
+      "visuals": [
+        37,
+        39,
+        40
+      ],
+      "lab": "limits",
+      "terms": [
+        "overflow",
+        "underflow"
+      ],
+      "quiz": {
+        "question": "In normalised M8/E4, (1/512)/2 causes which issue?",
+        "options": [
+          "Overflow",
+          "Underflow",
+          "A negative sign"
+        ],
+        "answer": 1,
+        "explanation": "The non-zero result is smaller than the least positive normalised value."
+      },
+      "examRefs": [],
+      "theory": []
+    },
+    {
+      "code": "E01",
+      "title": "Explain and compare data types",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.1"
+      ],
+      "lab": "types",
+      "quiz": {
+        "question": "Which comparison explains a real difference?",
+        "options": [
+          "Records are better.",
+          "A record groups fields; an enum variable chooses one named value.",
+          "Both are always strings."
+        ],
+        "answer": 1,
+        "explanation": "Give a feature of each side on the same basis."
+      },
+      "id": "13.4.E01",
+      "section": "13.4",
+      "visuals": [
+        41,
+        42
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_w23_qp_32.pdf#page=3",
+          "label": "Oct/Nov 2023 · Paper 32 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_w23_ms_32.pdf#page=3",
+          "label": "Oct/Nov 2023 · Paper 32 · MS · p. 3"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for define, describe, compare, composite or non-composite.</p>\n<h3>A quick method</h3>\n<ol>\n<li>State what each type holds.</li>\n<li>Compare both types using the same feature.</li>\n<li>Give an example in the correct group.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Do not stop at “it has many variables”. A composite type groups components under one name. A pointer is non-composite in this course. In O/N 2023/32 Q2, the four marks are split across the two sides.</p>\n<h3>A worked example</h3>\n<p>“A record groups related fields under one name; its fields may have different types. An enum variable holds one value from a named list.”</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E02",
+      "title": "Define an enum",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.2"
+      ],
+      "lab": "enum",
+      "quiz": {
+        "question": "Which defines a new enum type?",
+        "options": [
+          "TYPE TStatus = (Active, Paused)",
+          "DECLARE TStatus ← Active",
+          "TYPE TStatus = \"Active\""
+        ],
+        "answer": 0,
+        "explanation": "TYPE creates the named list. DECLARE creates a variable."
+      },
+      "id": "13.4.E02",
+      "section": "13.4",
+      "visuals": [
+        43
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_31.pdf#page=2",
+          "label": "May/June 2025 · Paper 31 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_s25_ms_31.pdf#page=6",
+          "label": "May/June 2025 · Paper 31 · MS · p. 6"
+        },
+        {
+          "url": "/papers/9618_w25_qp_33.pdf#page=2",
+          "label": "Oct/Nov 2025 · Paper 33 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_w25_ms_33.pdf#page=6",
+          "label": "Oct/Nov 2025 · Paper 33 · MS · p. 6"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for a new type name and a fixed list of allowed values, or a question about enum order.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Write TYPE, the type name, = and the values in parentheses.</li>\n<li>Check names, order and repeated values.</li>\n<li>If a variable is requested, add a separate DECLARE line.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Do not put enum values in quotes. Do not replace TYPE with DECLARE. The list does not automatically wrap. M/J 2025/31 Q1(a) uses two marks for the declaration and value list.</p>\n<h3>A worked example</h3>\n<pre><code class=\"language-text\">TYPE TStatus = (Active, Paused, Completed)\nDECLARE Status : TStatus\nStatus ← Paused\n</code></pre>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E03",
+      "title": "Choose a field for an enum",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.2",
+        "13.1.3"
+      ],
+      "lab": "record",
+      "quiz": {
+        "question": "Which field is the best enum choice?",
+        "options": [
+          "FullName",
+          "Phone",
+          "StudyStatus"
+        ],
+        "answer": 2,
+        "explanation": "StudyStatus has a defined list of choices; names and phone numbers do not."
+      },
+      "id": "13.4.E03",
+      "section": "13.4",
+      "visuals": [
+        44
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_33.pdf#page=2",
+          "label": "May/June 2025 · Paper 33 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_s25_ms_33.pdf#page=6",
+          "label": "May/June 2025 · Paper 33 · MS · p. 6"
+        },
+        {
+          "url": "/papers/9618_s25_qp_32.pdf#page=2",
+          "label": "May/June 2025 · Paper 32 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_s25_ms_32.pdf#page=4",
+          "label": "May/June 2025 · Paper 32 · MS · p. 4"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for identify a field, give a reason, or change a STRING field to an enum.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Choose a field with a small, fixed set of valid choices.</li>\n<li>Explain why this list fits the task.</li>\n<li>Define the enum and replace the field type when asked.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>A few names in a sample table do not make every name an enum choice. Do not define the enum but leave the field as STRING. Answer only the change requested. M/J 2025/33 Q1(b) awards a choice and a reason.</p>\n<h3>A worked example</h3>\n<p>Define the enum first:</p>\n<pre><code class=\"language-text\">TYPE TStatus = (Active, Paused, Completed)\n</code></pre>\n<p>Inside the existing record definition, replace its old STRING field with:</p>\n<pre><code class=\"language-text\">DECLARE Status : TStatus\n</code></pre>\n<p>For a declared record variable Learner, assign <code>Learner.Status ← Active</code>. Status suits an enum because only these named study states are valid.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E04",
+      "title": "Define a record",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.3"
+      ],
+      "lab": "record",
+      "quiz": {
+        "question": "Which field should use INTEGER?",
+        "options": [
+          "Phone",
+          "LessonsAttended",
+          "FullName"
+        ],
+        "answer": 1,
+        "explanation": "LessonsAttended is a count."
+      },
+      "id": "13.4.E04",
+      "section": "13.4",
+      "visuals": [
+        45
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_31.pdf#page=2",
+          "label": "May/June 2025 · Paper 31 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_s25_ms_31.pdf#page=6",
+          "label": "May/June 2025 · Paper 31 · MS · p. 6"
+        },
+        {
+          "url": "/papers/9618_w24_qp_32.pdf#page=3",
+          "label": "Oct/Nov 2024 · Paper 32 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_w24_ms_32.pdf#page=5",
+          "label": "Oct/Nov 2024 · Paper 32 · MS · p. 5"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for declare a composite data type plus a list of fields or sample data.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Write the TYPE/ENDTYPE frame.</li>\n<li>Add every requested field with DECLARE.</li>\n<li>Check each field type, including any enum from the previous part.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Keep IDs or phone numbers as STRING where their format needs it. Counts use INTEGER, dates DATE and flags BOOLEAN. Follow explicit constraints in the question. In M/J 2025/31 Q1(b), marks cover the frame, DECLARE and groups of fields.</p>\n<h3>A worked example</h3>\n<pre><code class=\"language-text\">TYPE TLearner\n   DECLARE ID : STRING\n   DECLARE Lessons : INTEGER\n   DECLARE Status : TStatus\nENDTYPE\n</code></pre>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E05",
+      "title": "Declare a record variable and assign fields",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.3"
+      ],
+      "lab": "record",
+      "quiz": {
+        "question": "Learner is the variable. Which assignment is correct?",
+        "options": [
+          "TLearner.ID ← \"AC027\"",
+          "Learner.ID ← \"AC027\"",
+          "ID.Learner ← \"AC027\""
+        ],
+        "answer": 1,
+        "explanation": "Use the variable name, then a dot, then the field name."
+      },
+      "id": "13.4.E05",
+      "section": "13.4",
+      "visuals": [
+        46
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_32.pdf#page=2",
+          "label": "May/June 2025 · Paper 32 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_s25_ms_32.pdf#page=4",
+          "label": "May/June 2025 · Paper 32 · MS · p. 4"
+        },
+        {
+          "url": "/papers/9618_w22_qp_32.pdf#page=4",
+          "label": "Oct/Nov 2022 · Paper 32 · QP · p. 4"
+        },
+        {
+          "url": "/papers/9618_w22_ms_32.pdf#page=6",
+          "label": "Oct/Nov 2022 · Paper 32 · MS · p. 6"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>The record type is already defined. The question asks for a variable or values in its fields.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Use DECLARE Variable : Type when a variable is needed.</li>\n<li>Assign each requested value to Variable.Field.</li>\n<li>Check quotes, dates, enum values and exact field names.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Do not write Type.Field instead of Variable.Field. Do not rewrite the TYPE definition and forget the requested assignment. M/J 2025/32 Q1(a) checks variable/field use, STRING assignments and the date.</p>\n<h3>A worked example</h3>\n<pre><code class=\"language-text\">DECLARE Learner : TLearner\nLearner.ID ← &quot;AC027&quot;\nLearner.Lessons ← 8\nLearner.Status ← Active\n</code></pre>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E06",
+      "title": "Declare and use a pointer",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.4"
+      ],
+      "lab": "pointer",
+      "quiz": {
+        "question": "What does ^Score mean in P ← ^Score?",
+        "options": [
+          "The address of Score",
+          "The value of Score",
+          "The address of P"
+        ],
+        "answer": 0,
+        "explanation": "The prefix ^ gets the target address; the suffix ^ dereferences a pointer."
+      },
+      "id": "13.4.E06",
+      "section": "13.4",
+      "visuals": [
+        47
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_w21_qp_31.pdf#page=3",
+          "label": "Oct/Nov 2021 · Paper 31 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_w21_ms_31.pdf#page=4",
+          "label": "Oct/Nov 2021 · Paper 31 · MS · p. 4"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for pointer type, memory location, address, reference or value at an address.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Find the target data type.</li>\n<li>Use ^TargetType in the pointer type definition.</li>\n<li>Separate variable declaration, address assignment and dereference.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Do not place ^ everywhere. A target must be valid before reading through a pointer. O/N 2021/31 Q3(b) checks the pointer declaration and the target type from the previous part.</p>\n<h3>A worked example</h3>\n<pre><code class=\"language-text\">TYPE TIntPointer = ^INTEGER\nDECLARE P : TIntPointer\nP ← ^Score\nOUTPUT P^\n</code></pre>\n<p>Score must already be declared and hold a valid INTEGER.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E07",
+      "title": "Describe and define a set",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.5"
+      ],
+      "lab": "sets",
+      "quiz": {
+        "question": "A set already contains 3. Add 3 again. What changes?",
+        "options": [
+          "Its size rises by one.",
+          "Nothing: items are unique.",
+          "All values become strings."
+        ],
+        "answer": 1,
+        "explanation": "A set does not contain duplicates."
+      },
+      "id": "13.4.E07",
+      "section": "13.4",
+      "visuals": [
+        48
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s24_qp_32.pdf#page=4",
+          "label": "May/June 2024 · Paper 32 · QP · p. 4"
+        },
+        {
+          "url": "/papers/9618_s24_ms_32.pdf#page=5",
+          "label": "May/June 2024 · Paper 32 · MS · p. 5"
+        },
+        {
+          "url": "/papers/9618_w24_qp_31.pdf#page=5",
+          "label": "Oct/Nov 2024 · Paper 31 · QP · p. 5"
+        },
+        {
+          "url": "/papers/9618_w24_ms_31.pdf#page=7",
+          "label": "Oct/Nov 2024 · Paper 31 · MS · p. 7"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for SET, several items at once, unordered items, union or intersection.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Write TYPE Name = SET OF ElementType.</li>\n<li>Use DEFINE for the named set when required.</li>\n<li>Link the set back to its type and check every item.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Keep SET OF, DEFINE, the set name and the type after the colon. CHAR values need single quotes. A set is not an enum just because both display a list. M/J 2024/32 Q3(b) checks these declaration parts.</p>\n<h3>A worked example</h3>\n<pre><code class=\"language-text\">TYPE TUnitSet = SET OF INTEGER\nDEFINE Completed (1, 3, 5) : TUnitSet\n</code></pre>\n<p>Adding 3 again does not change the set.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E08",
+      "title": "Choose or compare file organisation",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.2.1"
+      ],
+      "lab": "organisation",
+      "quiz": {
+        "question": "Which organisation naturally fits an unsorted event log?",
+        "options": [
+          "Serial",
+          "Sequential by learner ID",
+          "Randomly choose a new slot each time"
+        ],
+        "answer": 0,
+        "explanation": "Appending events preserves their arrival order."
+      },
+      "id": "13.4.E08",
+      "section": "13.4",
+      "visuals": [
+        49
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_w21_qp_31.pdf#page=6",
+          "label": "Oct/Nov 2021 · Paper 31 · QP · p. 6"
+        },
+        {
+          "url": "/papers/9618_w21_ms_31.pdf#page=5",
+          "label": "Oct/Nov 2021 · Paper 31 · MS · p. 5"
+        },
+        {
+          "url": "/papers/9618_w24_qp_32.pdf#page=2",
+          "label": "Oct/Nov 2024 · Paper 32 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_w24_ms_32.pdf#page=5",
+          "label": "Oct/Nov 2024 · Paper 32 · MS · p. 5"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for serial, sequential or random organisation, record order, insertion or a use case.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Compare storage order.</li>\n<li>Explain how a new record is added.</li>\n<li>Link that behaviour to the task.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Answer organisation with an organisation, and access with an access method. “Fast” alone does not explain a mechanism. O/N 2021/31 Q5 compares serial and sequential; O/N 2024/32 Q2 asks about serial and a use.</p>\n<h3>A worked example</h3>\n<p>“A serial file appends events as they arrive. A sequential file keeps key order, so a new key must be inserted in the correct place.”</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E09",
+      "title": "Trace a sequential search",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.2.2"
+      ],
+      "lab": "search",
+      "quiz": {
+        "question": "When can current key > target prove that the target is absent?",
+        "options": [
+          "In every serial file",
+          "In an ascending sorted file",
+          "Only in an empty file"
+        ],
+        "answer": 1,
+        "explanation": "The conclusion depends on the order of the file."
+      },
+      "id": "13.4.E09",
+      "section": "13.4",
+      "visuals": [
+        50
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s24_qp_31.pdf#page=4",
+          "label": "May/June 2024 · Paper 31 · QP · p. 4"
+        },
+        {
+          "url": "/papers/9618_s24_ms_31.pdf#page=7",
+          "label": "May/June 2024 · Paper 31 · MS · p. 7"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for one record after another or a difference between searching serial and sequential files.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Start at the first record.</li>\n<li>Read and compare each key.</li>\n<li>State the correct stop conditions for the file order.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>A sorted ascending file can stop when current key &gt; target. An unsorted file cannot. Reverse the comparison for descending order. M/J 2024/31 Q4 checks the method and the different stopping conditions.</p>\n<h3>A worked example</h3>\n<p>Find 20 in 12,18,25,31: read 12 → 18 → 25 → stop. No later key can be 20. In 31,12,25,18, read all four before saying it is absent.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E10",
+      "title": "Explain direct access",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.2.2",
+        "13.2.3"
+      ],
+      "lab": "hash",
+      "quiz": {
+        "question": "What does an index normally link?",
+        "options": [
+          "Key to address",
+          "Date to rounding mode",
+          "Mantissa to exponent"
+        ],
+        "answer": 0,
+        "explanation": "An index lets a key locate its record address."
+      },
+      "id": "13.4.E10",
+      "section": "13.4",
+      "visuals": [
+        51
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s24_qp_32.pdf#page=8",
+          "label": "May/June 2024 · Paper 32 · QP · p. 8"
+        },
+        {
+          "url": "/papers/9618_s24_ms_32.pdf#page=8",
+          "label": "May/June 2024 · Paper 32 · MS · p. 8"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for locate one record directly, sometimes comparing sequential and random files.</p>\n<h3>A quick method</h3>\n<ol>\n<li>For an indexed file: key → index → address → record.</li>\n<li>For a hashed file: key → hash → starting slot → compare key.</li>\n<li>Explain any extra lookup needed after a collision.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Do not just say “go straight there”. If two organisations are named, explain both mechanisms. Direct access may take more than one read. M/J 2024/32 Q7(b) separates the index and hash cases.</p>\n<h3>A worked example</h3>\n<p>An index contains 25 → 0x 1040. Read the record at that address. With key MOD7, key 25 starts at slot 4; check the stored key before using it.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E11",
+      "title": "Calculate a hash and an address",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.2.3"
+      ],
+      "lab": "hash",
+      "quiz": {
+        "question": "What is 1030 MOD 3?",
+        "options": [
+          "343",
+          "1",
+          "3"
+        ],
+        "answer": 1,
+        "explanation": "The remainder is 1; 343 is the quotient."
+      },
+      "id": "13.4.E11",
+      "section": "13.4",
+      "visuals": [
+        52
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s23_qp_31.pdf#page=4",
+          "label": "May/June 2023 · Paper 31 · QP · p. 4"
+        },
+        {
+          "url": "/papers/9618_s23_ms_31.pdf#page=4",
+          "label": "May/June 2023 · Paper 31 · MS · p. 4"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for MOD, a key table, a base address or record size.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Find the greatest whole multiple of N that does not exceed the key.</li>\n<li>Subtract it to get the remainder.</li>\n<li>Use Base + Slot × Size only if a byte address is requested and slots start at zero.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>MOD is not integer division. Keep 0 ≤ remainder &lt; N and the correct units. Do not invent a new hash when a function is given. M/J 2023/31 Q3(a) uses MOD3.</p>\n<h3>A worked example</h3>\n<p>1030 = 343×3 + 1, so the slot is 1. In a separate address example with base 4096 and size 64, address = 4096+1×64 = 4160 bytes.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E12",
+      "title": "Handle a collision when storing and finding",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.2.4"
+      ],
+      "lab": "hash",
+      "quiz": {
+        "question": "Why must a search compare the full record key?",
+        "options": [
+          "Different keys can have the same hash.",
+          "MOD always gives a negative result.",
+          "Every record is stored twice."
+        ],
+        "answer": 0,
+        "explanation": "A hash location is not a unique identity."
+      },
+      "id": "13.4.E12",
+      "section": "13.4",
+      "visuals": [
+        53
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s23_qp_31.pdf#page=4",
+          "label": "May/June 2023 · Paper 31 · QP · p. 4"
+        },
+        {
+          "url": "/papers/9618_s23_ms_31.pdf#page=4",
+          "label": "May/June 2023 · Paper 31 · MS · p. 4"
+        },
+        {
+          "url": "/papers/9618_w23_qp_32.pdf#page=3",
+          "label": "Oct/Nov 2023 · Paper 32 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_w23_ms_32.pdf#page=3",
+          "label": "Oct/Nov 2023 · Paper 32 · MS · p. 3"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Different keys have the same starting location, or the hash slot is already occupied.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Name the collision: different keys, same hash location.</li>\n<li>For storage, follow the rule until a free slot or overflow position is found.</li>\n<li>For search, follow the same rule and compare the full key.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Do not overwrite a different key or return the first record only because its hash matches. If asked for storage and retrieval, cover both. Explain the mechanism before any open/closed label; source labels vary. M/J 2023/31 Q3(b) covers both operations.</p>\n<h3>A worked example</h3>\n<p>27 and 37 both hash to 7 under MOD10. Store 27 at 7 and 37 at 8. Search 37: slot 7 has 27 → slot 8 has 37 → found.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E13",
+      "title": "Encode denary as floating-point",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.3.1",
+        "13.3.3"
+      ],
+      "lab": "encode",
+      "quiz": {
+        "question": "Which pair is normalised −0.5 in M8/E4?",
+        "options": [
+          "11000000/0000",
+          "10000000/1111",
+          "01000000/0000"
+        ],
+        "answer": 1,
+        "explanation": "The second pair starts 10 and means −1×2^-1."
+      },
+      "id": "13.4.E13",
+      "section": "13.4",
+      "visuals": [
+        54,
+        55
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_31.pdf#page=3",
+          "label": "May/June 2025 · Paper 31 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_s25_ms_31.pdf#page=7",
+          "label": "May/June 2025 · Paper 31 · MS · p. 7"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>A denary value and field lengths are given. The question asks for a normalised representation.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Write the field lengths and convert the magnitude to binary.</li>\n<li>Move the point to a normalised mantissa; record E.</li>\n<li>Fill M, apply two’s complement if negative, then check 01/10.</li>\n<li>Encode E to the correct width and decode to check.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Keep working. Do not merely flip the first bit, or make E negative just because X is negative. Check the −0.5 boundary after negation. M/J 2025/31 Q2(b) has separate method and final-field marks.</p>\n<h3>A worked example</h3>\n<p>−6.5 in M8/E4: 6.5=110.1₂=0.1101₂×2^3. Positive M01101000 → negative M10011000; E0011. Check: (−104/128)×8=−6.5.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E14",
+      "title": "Decode floating-point to denary",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.3.2"
+      ],
+      "lab": "float",
+      "quiz": {
+        "question": "For an eight-bit M, divide its signed integer by what?",
+        "options": [
+          "256",
+          "128",
+          "8"
+        ],
+        "answer": 1,
+        "explanation": "There are seven fractional positions after the sign bit."
+      },
+      "id": "13.4.E14",
+      "section": "13.4",
+      "visuals": [
+        56
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_32.pdf#page=3",
+          "label": "May/June 2025 · Paper 32 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_s25_ms_32.pdf#page=5",
+          "label": "May/June 2025 · Paper 32 · MS · p. 5"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>A mantissa and exponent bit pattern is given. You need a denary value.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Read M as signed integer I.</li>\n<li>Compute M=I/2^(m−1) and read signed E.</li>\n<li>Use X=M×2^E, keeping intermediate values visible.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>The denominator is 2^(m−1), not 2^m. E is signed. A negative E does not add a second minus sign to X. M/J 2025/32 Q2(b) rewards working and the final value.</p>\n<h3>A worked example</h3>\n<p>M10110000/E1110: I=−80, M=−80/128, E=−2. X=−80/512=−0.15625.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E15",
+      "title": "Normalise the given value",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.3.4"
+      ],
+      "lab": "normalise",
+      "quiz": {
+        "question": "0.00011₂ = 0.11₂ × 2^E. What is E?",
+        "options": [
+          "3",
+          "−3",
+          "0"
+        ],
+        "answer": 1,
+        "explanation": "The mantissa is eight times larger, so the scale is one eighth."
+      },
+      "id": "13.4.E15",
+      "section": "13.4",
+      "visuals": [
+        57,
+        58
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_31.pdf#page=3",
+          "label": "May/June 2025 · Paper 31 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_s25_ms_31.pdf#page=7",
+          "label": "May/June 2025 · Paper 31 · MS · p. 7"
+        },
+        {
+          "url": "/papers/9618_w21_qp_31.pdf#page=2",
+          "label": "Oct/Nov 2021 · Paper 31 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_w21_ms_31.pdf#page=3",
+          "label": "Oct/Nov 2021 · Paper 31 · MS · p. 3"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>The input may be an existing M/E pair or a raw binary number with a point.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Identify which input form you have.</li>\n<li>For an M/E pair, shift M left k and subtract k from E.</li>\n<li>For a raw binary value, derive E from the point movement.</li>\n<li>Check bit lengths and that the value is unchanged.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Do not add to E when shifting M left. Do not confuse normalisation with rounding or claim that it restores lost bits. M/J 2025/31 Q2(a) starts with a small raw binary value.</p>\n<h3>A worked example</h3>\n<p>0.00011₂ = 0.11₂×2^-3. In M8/E4, M01100000/E1101 gives 3/32. For an existing pair 00011000/0100, shift left 2 and reduce E2 to get 01100000/0010; both are 3.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E16",
+      "title": "Find the largest or smallest value",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.3.5"
+      ],
+      "lab": "limits",
+      "quiz": {
+        "question": "Which eight-bit exponent is the largest signed value?",
+        "options": [
+          "11111111",
+          "01111111",
+          "10000000"
+        ],
+        "answer": 1,
+        "explanation": "01111111 is +127. 11111111 is −1."
+      },
+      "id": "13.4.E16",
+      "section": "13.4",
+      "visuals": [
+        59
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_33.pdf#page=3",
+          "label": "May/June 2025 · Paper 33 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_s25_ms_33.pdf#page=7",
+          "label": "May/June 2025 · Paper 33 · MS · p. 7"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for largest positive, smallest positive, most negative or negative nearest zero.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Find Emin and Emax from the exponent width.</li>\n<li>Choose the correct normalised M pattern.</li>\n<li>Combine M and E and write an exact fraction or power of two.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Most negative and negative with the smallest magnitude are different. The largest positive E begins with 0, not 1. M/J 2025/33 Q2(a) asks for both the pattern and the value.</p>\n<h3>A worked example</h3>\n<p>For M8/E8, largest positive M01111111/E01111111 = (127/128)×2^127. In M8/E4, most negative is−128, while negative nearest zero is−65/32768.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E17",
+      "title": "Explain a change in bit allocation",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.3.5"
+      ],
+      "lab": "limits",
+      "quiz": {
+        "question": "With a fixed16-bit word, M changes from12 to10. How many E bits remain?",
+        "options": [
+          "4",
+          "6",
+          "10"
+        ],
+        "answer": 1,
+        "explanation": "16−10=6."
+      },
+      "id": "13.4.E17",
+      "section": "13.4",
+      "visuals": [
+        60
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_w25_qp_33.pdf#page=3",
+          "label": "Oct/Nov 2025 · Paper 33 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_w25_ms_33.pdf#page=7",
+          "label": "Oct/Nov 2025 · Paper 33 · MS · p. 7"
+        },
+        {
+          "url": "/papers/9618_s23_qp_31.pdf#page=2",
+          "label": "May/June 2023 · Paper 31 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_s23_ms_31.pdf#page=3",
+          "label": "May/June 2023 · Paper 31 · MS · p. 3"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>The total word stays fixed while M and E receive different numbers of bits.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Write the old split and new split.</li>\n<li>Explain M change → significant bits → precision.</li>\n<li>Explain E change → exponent limits → range.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Discuss both precision and range when asked. More E bits do not make every fraction exact. If total width is not fixed, do not assume one field must shrink. O/N 2025/33 Q2(a) uses M12 to M10 in a 16-bit word.</p>\n<h3>A worked example</h3>\n<p>M12/E4 → M10/E6: fewer significant bits, so lower precision; E grows from four to six bits, so a wider range.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E18",
+      "title": "Explain and calculate approximation",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.3.3",
+        "13.3.6"
+      ],
+      "lab": "rounding",
+      "quiz": {
+        "question": "113.75 truncated in M8/E8 becomes what?",
+        "options": [
+          "113",
+          "114",
+          "113.75"
+        ],
+        "answer": 0,
+        "explanation": "Keep the eight M bits: 01110001 with E7 represents113."
+      },
+      "id": "13.4.E18",
+      "section": "13.4",
+      "visuals": [
+        61
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s23_qp_31.pdf#page=2",
+          "label": "May/June 2023 · Paper 31 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_s23_ms_31.pdf#page=3",
+          "label": "May/June 2023 · Paper 31 · MS · p. 3"
+        },
+        {
+          "url": "/papers/9618_w24_qp_31.pdf#page=2",
+          "label": "Oct/Nov 2024 · Paper 31 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_w24_ms_31.pdf#page=4",
+          "label": "Oct/Nov 2024 · Paper 31 · MS · p. 4"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for not exact, approximation, too few mantissa bits or two formats storing the same value.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Decide whether the binary fraction repeats or merely needs more bits.</li>\n<li>Normalise and mark the kept and discarded bits.</li>\n<li>Apply the required truncation or rounding rule.</li>\n<li>Decode the stored value and find the error if asked.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Not every decimal-point number has an infinite binary fraction. Do not use range errors as a precision explanation. M/J 2023/31 Q1 uses 113.75, a finite binary fraction that does not fit M8 exactly; its MS shows truncation.</p>\n<h3>A worked example</h3>\n<p>113.75=0.111000111₂×2^7. M8 keeps 01110001 and stores 113 if truncated. Nearest uses 01110010 and stores 114. The rule changes the answer.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "E19",
+      "title": "Explain overflow or underflow",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.3.5",
+        "13.3.7"
+      ],
+      "lab": "limits",
+      "quiz": {
+        "question": "Which is an overflow example in normalised M8/E4?",
+        "options": [
+          "100×2",
+          "−6.5",
+          "(1/512)/2"
+        ],
+        "answer": 0,
+        "explanation": "200 exceeds the maximum positive value127."
+      },
+      "id": "13.4.E19",
+      "section": "13.4",
+      "visuals": [
+        62,
+        66
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_w25_qp_33.pdf#page=3",
+          "label": "Oct/Nov 2025 · Paper 33 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_w25_ms_33.pdf#page=7",
+          "label": "Oct/Nov 2025 · Paper 33 · MS · p. 7"
+        },
+        {
+          "url": "/papers/9618_w22_qp_32.pdf#page=2",
+          "label": "Oct/Nov 2022 · Paper 32 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_w22_ms_32.pdf#page=4",
+          "label": "Oct/Nov 2022 · Paper 32 · MS · p. 4"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>The question asks when a result becomes too large or too close to zero, sometimes with a consequence.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Give a valid calculation.</li>\n<li>Compare the non-zero result with the correct format limit.</li>\n<li>State that the representation does not fit; describe a handling rule only when known.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Underflow is not simply a negative result. Overflow is not just a carry. Do not assert that every system returns 0, or use division by 0 as an ordinary finite range example. O/N 2025/33 Q2(b) asks for situation and consequence.</p>\n<h3>A worked example</h3>\n<p>M8/E4 normalised:100×2=200&gt;127 is overflow. (1/512)/2=1/1024 is below the smallest positive normalised value, so underflow.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "X01",
+      "title": "Crossover: subrange and array fields",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.3"
+      ],
+      "lab": "record",
+      "quiz": {
+        "question": "Which structure holds several ordered accession numbers?",
+        "options": [
+          "An INTEGER array",
+          "A single enum value",
+          "A pointer address alone"
+        ],
+        "answer": 0,
+        "explanation": "An array contains multiple indexed items of one type."
+      },
+      "id": "13.4.X01",
+      "section": "13.4",
+      "visuals": [
+        63
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s22_qp_31.pdf#page=2",
+          "label": "May/June 2022 · Paper 31 · QP · p. 2"
+        },
+        {
+          "url": "/papers/9618_s22_ms_31.pdf#page=4",
+          "label": "May/June 2022 · Paper 31 · MS · p. 4"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>A record field is restricted to a range, or a record must store several child IDs.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Decide: one limited value, or several stored values?</li>\n<li>Write the exact replacement/additional field requested.</li>\n<li>Use the syntax of that historical question.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>M/J 2022/31 Q1(b) asks for subrange and array fields, not SET. Do not call it a set just because there are several accession numbers. This is crossover practice with AS arrays and historical syntax.</p>\n<h3>A worked example</h3>\n<pre><code class=\"language-text\">DECLARE NumberOfCopies : 1 .. 10\nDECLARE AccessionNumber : ARRAY[1:NumberOfCopies] OF INTEGER\n</code></pre>\n<p>One copy count controls the number of array items.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "X02",
+      "title": "Crossover: PRIVATE in a class",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.6"
+      ],
+      "lab": "objects",
+      "quiz": {
+        "question": "Why make a property PRIVATE?",
+        "options": [
+          "To encrypt it",
+          "To control outside access through methods",
+          "To make every value zero"
+        ],
+        "answer": 1,
+        "explanation": "Encapsulation controls direct access; it is not encryption."
+      },
+      "id": "13.4.X02",
+      "section": "13.4",
+      "visuals": [
+        64
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s22_qp_32.pdf#page=3",
+          "label": "May/June 2022 · Paper 32 · QP · p. 3"
+        },
+        {
+          "url": "/papers/9618_s22_ms_32.pdf#page=4",
+          "label": "May/June 2022 · Paper 32 · MS · p. 4"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>A record question changes to a class, property, PRIVATE or encapsulation.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Identify the property and its type.</li>\n<li>Write the requested access keyword and declaration.</li>\n<li>Explain outside access through methods, not directly to private state.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>PRIVATE does not encrypt the data. If one line is asked for, do not rewrite a whole class. Further inheritance and polymorphism need Unit 20. M/J 2022/32 Q1(c) connects a record with class properties.</p>\n<h3>A worked example</h3>\n<pre><code class=\"language-text\">PRIVATE Name : STRING\n</code></pre>\n<p>Outside code should use a public method, such as GetName(), rather than reading the private field directly.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    },
+    {
+      "code": "X03",
+      "title": "Crossover: random-file pseudocode",
+      "goal": "Recognise the task, choose a method and show the steps that earn marks.",
+      "theory": [
+        "13.1.3",
+        "13.2.2",
+        "13.2.4"
+      ],
+      "lab": "fileio",
+      "quiz": {
+        "question": "Which command reads a record into ThisRecord?",
+        "options": [
+          "PUTRECORD File, ThisRecord",
+          "GETRECORD File, ThisRecord",
+          "SEEK ThisRecord, File"
+        ],
+        "answer": 1,
+        "explanation": "GETRECORD reads from the file. PUTRECORD writes to it."
+      },
+      "id": "13.4.X03",
+      "section": "13.4",
+      "visuals": [
+        65
+      ],
+      "terms": [],
+      "examRefs": [
+        {
+          "url": "/papers/9618_s25_qp_32.pdf#page=13",
+          "label": "May/June 2025 · Paper 32 · QP · p. 13"
+        },
+        {
+          "url": "/papers/9618_s25_ms_32.pdf#page=12",
+          "label": "May/June 2025 · Paper 32 · MS · p. 12"
+        },
+        {
+          "url": "/papers/9618_s25_qp_33.pdf#page=13",
+          "label": "May/June 2025 · Paper 33 · QP · p. 13"
+        },
+        {
+          "url": "/papers/9618_s25_ms_33.pdf#page=14",
+          "label": "May/June 2025 · Paper 33 · MS · p. 14"
+        },
+        {
+          "url": "/papers/9618_s23_qp_32.pdf#page=7",
+          "label": "May/June 2023 · Paper 32 · QP · p. 7"
+        },
+        {
+          "url": "/papers/9618_s23_ms_32.pdf#page=7",
+          "label": "May/June 2023 · Paper 32 · MS · p. 7"
+        }
+      ],
+      "html": "<h3>Spot the task</h3>\n<p>Look for OPENFILE FOR RANDOM, SEEK, GETRECORD, PUTRECORD, loops or a stored flag.</p>\n<h3>A quick method</h3>\n<ol>\n<li>Name the source file, target file and record variable.</li>\n<li>SEEK in the correct file before the read or write.</li>\n<li>GETRECORD reads into a variable; PUTRECORD writes from it.</li>\n<li>Keep loop bounds, position changes, stop flags and CLOSEFILE.</li>\n</ol>\n<h3>Keep the marks</h3>\n<p>Do not mix up a filename and a record variable, or read from the target file. If looking for an empty slot, preserve the Stored flag and full-table stop. M/J 2025/32 Q13 copies 50 records; M/J 2025/33 Q11 finds a free position.</p>\n<h3>A worked example</h3>\n<pre><code class=\"language-text\">FOR i ← 1 TO 50\n   SEEK SourceFile, i\n   GETRECORD SourceFile, ThisRecord\n   SEEK TargetFile, i\n   PUTRECORD TargetFile, ThisRecord\nNEXT i\n</code></pre>\n<p>Both files must be opened in RANDOM mode before the loop and closed after it.</p>\n<h3>Use the real paper</h3>\n<p>Open the question paper first. Try the linked question before opening its mark scheme. Mark schemes can group several facts into one mark; these steps are not a promise of one mark per line.</p>"
+    }
+  ],
+  "visuals": [
+    {
+      "id": 1,
+      "title": "Chapter 13 at a glance",
+      "src": "/visuals/v01.svg",
+      "width": 1008.0,
+      "height": 316.0
+    },
+    {
+      "id": 2,
+      "title": "From AS skills to A Level",
+      "src": "/visuals/v02.svg",
+      "width": 838.0,
+      "height": 525.0
+    },
+    {
+      "id": 3,
+      "title": "Why group related data?",
+      "src": "/visuals/v03.svg",
+      "width": 1206.0,
+      "height": 322.0
+    },
+    {
+      "id": 4,
+      "title": "Composite and non-composite types",
+      "src": "/visuals/v04.svg",
+      "width": 1223.0,
+      "height": 417.0
+    },
+    {
+      "id": 5,
+      "title": "Enum: type, variable, value",
+      "src": "/visuals/v05.svg",
+      "width": 771.0,
+      "height": 432.0
+    },
+    {
+      "id": 6,
+      "title": "A record and its fields",
+      "src": "/visuals/v06.svg",
+      "width": 1131.0,
+      "height": 413.0
+    },
+    {
+      "id": 7,
+      "title": "An array of records",
+      "src": "/visuals/v07.svg",
+      "width": 970.0,
+      "height": 461.0
+    },
+    {
+      "id": 8,
+      "title": "Address and pointed-to value",
+      "src": "/visuals/v08.svg",
+      "width": 843.0,
+      "height": 371.0
+    },
+    {
+      "id": 9,
+      "title": "A pointer follows a changed value",
+      "src": "/visuals/v09.svg",
+      "width": 894.0,
+      "height": 357.0
+    },
+    {
+      "id": 10,
+      "title": "Set union and intersection",
+      "src": "/visuals/v10.svg",
+      "width": 896.0,
+      "height": 415.0
+    },
+    {
+      "id": 11,
+      "title": "Enum compared with a set",
+      "src": "/visuals/v11.svg",
+      "width": 896.0,
+      "height": 229.0
+    },
+    {
+      "id": 12,
+      "title": "Two objects, two states",
+      "src": "/visuals/v12.svg",
+      "width": 1008.0,
+      "height": 454.0
+    },
+    {
+      "id": 13,
+      "title": "Organisation or access?",
+      "src": "/visuals/v13.svg",
+      "width": 928.0,
+      "height": 447.0
+    },
+    {
+      "id": 14,
+      "title": "Three file organisations",
+      "src": "/visuals/v14.svg",
+      "width": 951.0,
+      "height": 555.0
+    },
+    {
+      "id": 15,
+      "title": "Append to a serial file",
+      "src": "/visuals/v15.svg",
+      "width": 883.0,
+      "height": 354.0
+    },
+    {
+      "id": 16,
+      "title": "Insert in key order",
+      "src": "/visuals/v16.svg",
+      "width": 619.0,
+      "height": 450.0
+    },
+    {
+      "id": 17,
+      "title": "A sequential search",
+      "src": "/visuals/v17.svg",
+      "width": 791.0,
+      "height": 471.0
+    },
+    {
+      "id": 18,
+      "title": "Direct access with an index",
+      "src": "/visuals/v18.svg",
+      "width": 968.0,
+      "height": 485.0
+    },
+    {
+      "id": 19,
+      "title": "Hash a key to an address",
+      "src": "/visuals/v19.svg",
+      "width": 1119.0,
+      "height": 435.0
+    },
+    {
+      "id": 20,
+      "title": "Hash a string key",
+      "src": "/visuals/v20.svg",
+      "width": 1068.0,
+      "height": 341.0
+    },
+    {
+      "id": 21,
+      "title": "Collision during insertion",
+      "src": "/visuals/v21.svg",
+      "width": 868.0,
+      "height": 348.0
+    },
+    {
+      "id": 22,
+      "title": "Follow the same search path",
+      "src": "/visuals/v22.svg",
+      "width": 1008.0,
+      "height": 776.0
+    },
+    {
+      "id": 23,
+      "title": "Use an overflow area",
+      "src": "/visuals/v23.svg",
+      "width": 1021.0,
+      "height": 428.0
+    },
+    {
+      "id": 24,
+      "title": "Mantissa times a power of two",
+      "src": "/visuals/v24.svg",
+      "width": 792.0,
+      "height": 356.0
+    },
+    {
+      "id": 25,
+      "title": "The weights of M and E",
+      "src": "/visuals/v25.svg",
+      "width": 748.0,
+      "height": 372.0
+    },
+    {
+      "id": 26,
+      "title": "Decode a positive value",
+      "src": "/visuals/v26.svg",
+      "width": 668.0,
+      "height": 480.0
+    },
+    {
+      "id": 27,
+      "title": "Decode a negative value",
+      "src": "/visuals/v27.svg",
+      "width": 668.0,
+      "height": 480.0
+    },
+    {
+      "id": 28,
+      "title": "A negative exponent",
+      "src": "/visuals/v28.svg",
+      "width": 883.0,
+      "height": 554.0
+    },
+    {
+      "id": 29,
+      "title": "Encode positive and negative numbers",
+      "src": "/visuals/v29.svg",
+      "width": 798.0,
+      "height": 617.0
+    },
+    {
+      "id": 30,
+      "title": "Normalise a positive number",
+      "src": "/visuals/v30.svg",
+      "width": 921.0,
+      "height": 468.0
+    },
+    {
+      "id": 31,
+      "title": "Normalise a negative number",
+      "src": "/visuals/v31.svg",
+      "width": 1087.0,
+      "height": 866.0
+    },
+    {
+      "id": 32,
+      "title": "Precision and range",
+      "src": "/visuals/v32.svg",
+      "width": 952.0,
+      "height": 668.0
+    },
+    {
+      "id": 33,
+      "title": "Four normalised limits",
+      "src": "/visuals/v33.svg",
+      "width": 1136.0,
+      "height": 1021.0
+    },
+    {
+      "id": 34,
+      "title": "A binary fraction that repeats",
+      "src": "/visuals/v34.svg",
+      "width": 801.0,
+      "height": 551.0
+    },
+    {
+      "id": 35,
+      "title": "Truncate or round?",
+      "src": "/visuals/v35.svg",
+      "width": 1056.0,
+      "height": 626.0
+    },
+    {
+      "id": 36,
+      "title": "Error from rounded inputs",
+      "src": "/visuals/v36.svg",
+      "width": 1013.0,
+      "height": 698.0
+    },
+    {
+      "id": 37,
+      "title": "Overflow and underflow",
+      "src": "/visuals/v37.svg",
+      "width": 1056.0,
+      "height": 619.0
+    },
+    {
+      "id": 38,
+      "title": "Zero and normalisation",
+      "src": "/visuals/v38.svg",
+      "width": 761.0,
+      "height": 510.0
+    },
+    {
+      "id": 39,
+      "title": "A method for Paper 3",
+      "src": "/visuals/v39.svg",
+      "width": 949.0,
+      "height": 605.0
+    },
+    {
+      "id": 40,
+      "title": "Link the chapter skills",
+      "src": "/visuals/v40.svg",
+      "width": 1185.0,
+      "height": 751.0
+    },
+    {
+      "id": 41,
+      "title": "Read the action, result and limits",
+      "src": "/visuals/v41.svg",
+      "width": 836.5,
+      "height": 400.0
+    },
+    {
+      "id": 42,
+      "title": "One value or several fields?",
+      "src": "/visuals/v42.svg",
+      "width": 823.0,
+      "height": 373.0
+    },
+    {
+      "id": 43,
+      "title": "Enum order and one choice",
+      "src": "/visuals/v43.svg",
+      "width": 738.0,
+      "height": 456.0
+    },
+    {
+      "id": 44,
+      "title": "Choose an enum field",
+      "src": "/visuals/v44.svg",
+      "width": 940.0,
+      "height": 464.0
+    },
+    {
+      "id": 45,
+      "title": "Turn field needs into a record",
+      "src": "/visuals/v45.svg",
+      "width": 769.0,
+      "height": 443.0
+    },
+    {
+      "id": 46,
+      "title": "Type, record variable and field",
+      "src": "/visuals/v46.svg",
+      "width": 780.0,
+      "height": 518.0
+    },
+    {
+      "id": 47,
+      "title": "Pointer: address and value",
+      "src": "/visuals/v47.svg",
+      "width": 943.0,
+      "height": 461.0
+    },
+    {
+      "id": 48,
+      "title": "A set does not repeat items",
+      "src": "/visuals/v48.svg",
+      "width": 571.0,
+      "height": 513.0
+    },
+    {
+      "id": 49,
+      "title": "Insert into three file organisations",
+      "src": "/visuals/v49.svg",
+      "width": 879.0,
+      "height": 550.0
+    },
+    {
+      "id": 50,
+      "title": "Know when to stop searching",
+      "src": "/visuals/v50.svg",
+      "width": 745.0,
+      "height": 539.0
+    },
+    {
+      "id": 51,
+      "title": "Two routes to direct access",
+      "src": "/visuals/v51.svg",
+      "width": 968.0,
+      "height": 540.0
+    },
+    {
+      "id": 52,
+      "title": "MOD, slot and byte address",
+      "src": "/visuals/v52.svg",
+      "width": 723.0,
+      "height": 570.0
+    },
+    {
+      "id": 53,
+      "title": "Store and search after a collision",
+      "src": "/visuals/v53.svg",
+      "width": 694.0,
+      "height": 519.0
+    },
+    {
+      "id": 54,
+      "title": "Show working for a negative number",
+      "src": "/visuals/v54.svg",
+      "width": 627.0,
+      "height": 545.0
+    },
+    {
+      "id": 55,
+      "title": "The -0.5 normalisation trap",
+      "src": "/visuals/v55.svg",
+      "width": 867.0,
+      "height": 422.0
+    },
+    {
+      "id": 56,
+      "title": "Decode M and E by their weights",
+      "src": "/visuals/v56.svg",
+      "width": 683.0,
+      "height": 476.0
+    },
+    {
+      "id": 57,
+      "title": "Normalise an existing M/E pair",
+      "src": "/visuals/v57.svg",
+      "width": 892.0,
+      "height": 450.0
+    },
+    {
+      "id": 58,
+      "title": "Normalise a small binary fraction",
+      "src": "/visuals/v58.svg",
+      "width": 610.0,
+      "height": 514.0
+    },
+    {
+      "id": 59,
+      "title": "Choose bits for four limits",
+      "src": "/visuals/v59.svg",
+      "width": 1070.0,
+      "height": 715.0
+    },
+    {
+      "id": 60,
+      "title": "Share 16 bits between M and E",
+      "src": "/visuals/v60.svg",
+      "width": 802.0,
+      "height": 457.0
+    },
+    {
+      "id": 61,
+      "title": "Truncation and rounding differ",
+      "src": "/visuals/v61.svg",
+      "width": 912.0,
+      "height": 587.0
+    },
+    {
+      "id": 62,
+      "title": "Two different range errors",
+      "src": "/visuals/v62.svg",
+      "width": 845.0,
+      "height": 451.0
+    },
+    {
+      "id": 63,
+      "title": "A subrange is not an array",
+      "src": "/visuals/v63.svg",
+      "width": 836.0,
+      "height": 535.0
+    },
+    {
+      "id": 64,
+      "title": "PRIVATE and method access",
+      "src": "/visuals/v64.svg",
+      "width": 968.0,
+      "height": 483.0
+    },
+    {
+      "id": 65,
+      "title": "Read and write the correct file",
+      "src": "/visuals/v65.svg",
+      "width": 998.0,
+      "height": 537.0
+    },
+    {
+      "id": 66,
+      "title": "Decode to check your answer",
+      "src": "/visuals/v66.svg",
+      "width": 610.0,
+      "height": 561.0
+    }
+  ],
+  "glossary": [
+    {
+      "term": "data type",
+      "say": "DAY-tuh type",
+      "meaning": "A rule for values and operations."
+    },
+    {
+      "term": "composite",
+      "say": "kuhm-POZ-it",
+      "meaning": "Made from several parts under one name."
+    },
+    {
+      "term": "enumerated",
+      "say": "ee-NYOO-muh-ray-tid",
+      "meaning": "A type with a list of named values."
+    },
+    {
+      "term": "ordinal",
+      "say": "OR-di-nuhl",
+      "meaning": "Related to a position in an order."
+    },
+    {
+      "term": "record",
+      "say": "REK-ord",
+      "meaning": "A group of related fields."
+    },
+    {
+      "term": "field",
+      "say": "feeld",
+      "meaning": "One named part of a record."
+    },
+    {
+      "term": "pointer",
+      "say": "POYN-tuh",
+      "meaning": "A value that holds an address."
+    },
+    {
+      "term": "dereference",
+      "say": "dee-REF-er-ens",
+      "meaning": "Read the value at a pointed-to address."
+    },
+    {
+      "term": "set",
+      "say": "set",
+      "meaning": "A group of unique items with no order."
+    },
+    {
+      "term": "union",
+      "say": "YOO-nyun",
+      "meaning": "Items in either set."
+    },
+    {
+      "term": "intersection",
+      "say": "in-ter-SEK-shun",
+      "meaning": "Items shared by both sets."
+    },
+    {
+      "term": "class",
+      "say": "klahs",
+      "meaning": "A definition of state and methods."
+    },
+    {
+      "term": "object",
+      "say": "OB-jekt",
+      "meaning": "An instance of a class."
+    },
+    {
+      "term": "method",
+      "say": "METH-ud",
+      "meaning": "An operation defined by a class."
+    },
+    {
+      "term": "serial",
+      "say": "SEER-ee-uhl",
+      "meaning": "Stored in order of arrival."
+    },
+    {
+      "term": "sequential",
+      "say": "sih-KWEN-shul",
+      "meaning": "Following an order; check whether the question means organisation or access."
+    },
+    {
+      "term": "direct access",
+      "say": "dy-REKT AK-ses",
+      "meaning": "Reach a record through a location."
+    },
+    {
+      "term": "hit rate",
+      "say": "hit rayt",
+      "meaning": "The share of records used in a task."
+    },
+    {
+      "term": "hash",
+      "say": "hash",
+      "meaning": "Map a key to a starting location."
+    },
+    {
+      "term": "remainder",
+      "say": "rih-MAYN-duh",
+      "meaning": "What is left after whole-number division."
+    },
+    {
+      "term": "collision",
+      "say": "kuh-LIZH-un",
+      "meaning": "Different keys share a hash location."
+    },
+    {
+      "term": "linear probing",
+      "say": "LIN-ee-uh PROH-bing",
+      "meaning": "Check the next slot until a match or valid stop."
+    },
+    {
+      "term": "mantissa",
+      "say": "man-TIS-uh",
+      "meaning": "The signed value part of this floating-point format."
+    },
+    {
+      "term": "exponent",
+      "say": "ik-SPOH-nent",
+      "meaning": "The power used to scale a value."
+    },
+    {
+      "term": "denary",
+      "say": "DEE-nuh-ree",
+      "meaning": "Base ten."
+    },
+    {
+      "term": "two’s complement",
+      "say": "tooz KOM-pluh-ment",
+      "meaning": "A binary way to represent signed values."
+    },
+    {
+      "term": "binary fraction",
+      "say": "BY-nuh-ree FRAK-shun",
+      "meaning": "A fraction written in base two."
+    },
+    {
+      "term": "normalise",
+      "say": "NOR-muh-lyz",
+      "meaning": "Remove redundant sign bits while keeping the value."
+    },
+    {
+      "term": "sign bit",
+      "say": "syn bit",
+      "meaning": "The bit with a negative weight in two’s complement."
+    },
+    {
+      "term": "precision",
+      "say": "prih-SIZH-un",
+      "meaning": "How much detail a value can keep."
+    },
+    {
+      "term": "range",
+      "say": "raynj",
+      "meaning": "The spread of values a format can represent."
+    },
+    {
+      "term": "truncate",
+      "say": "TRUNG-kayt",
+      "meaning": "Drop extra low bits."
+    },
+    {
+      "term": "round",
+      "say": "rownd",
+      "meaning": "Choose a nearby value using a stated rule."
+    },
+    {
+      "term": "overflow",
+      "say": "OH-ver-floh",
+      "meaning": "A result is outside the large-value limit."
+    },
+    {
+      "term": "underflow",
+      "say": "UN-der-floh",
+      "meaning": "A non-zero result is too close to zero."
+    }
+  ]
+}

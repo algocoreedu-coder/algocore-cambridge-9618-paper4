@@ -1,0 +1,113 @@
+{
+  "schema_version": "s4-a8-p0-pilot-qa-v1",
+  "status": "PASS_RECOMMENDED",
+  "recommendation": "PASS_RECOMMENDED",
+  "scope": "Independent semantic QA of the P0 Stack pilot after author rework round 2",
+  "reviewed_utc": "2026-09-21T15:00:00Z",
+  "reviewed_artifact_hashes": {
+    "PATTERN_CARDS.json": "a949df0367b64e9e16513f784090a441f61c7de167d4c752c5dbcee79d7b7f2e",
+    "VARIANT_INVARIANT_REGISTER.json": "e6b68fedd015ea673491beff53affa08ccc0bbc4113ab4935d85799c25610469",
+    "ERROR_PREVENTION.json": "1dbc2006d3ab51288962d444a88d1c4378eb0b6790f7ddb1c37cb1437b689e64",
+    "SOLUTION_DESIGNS.json": "160a9738b03bd88a09ab0e1ddba4f2a3cd5345cf95929a26bda5956e536761c7",
+    "WORKED_EXAMPLE_SPECS.json": "c8adc48a3c0860fe4a251123cb7dc9872bc5150664a3e81862fd3597b8a38b65",
+    "VISUAL_BRIEFS.json": "ca38a8d009a3b0cc3f51f8cdc051d55a3a6071383fe845345e71e6b22a2614cd",
+    "REVIEW.md": "afbc352630004d828b785852c59d222beb29760ef1f8ea1840400f7497cddfc3",
+    "REWORK_RESPONSE.json": "20fd236a9d759108e81a0af26bdd013407f32a505491e7ef73e7b10b4c635944",
+    "VALIDATION.json": "9e3d268dbc7925393d0f692a09f12194b816633c3a1353b32cd3d1c014094e35"
+  },
+  "independent_validator": {
+    "path": "stage-4/evidence/qa/pilot/validate_pilot_independent.py",
+    "status": "PASS",
+    "checks": 71,
+    "passed": 71,
+    "failed": 0
+  },
+  "verified_counts": {
+    "pattern_ids": 5,
+    "part_pattern_relations": 27,
+    "unique_assessed_parts": 25,
+    "official_atom_ownership_relations": 91,
+    "pattern_cards": 5,
+    "error_rows": 14,
+    "solution_designs": 5,
+    "worked_example_specs": 5,
+    "visual_briefs": 5
+  },
+  "findings": [
+    {
+      "finding_id": "A8-P0-VIS-001",
+      "severity": "BLOCKING",
+      "status": "CLOSED",
+      "category": "visual_semantic_specificity",
+      "artifact": "VISUAL_BRIEFS.json",
+      "affected_ids": [
+        "p0.stack.visual.stack-setup",
+        "p0.stack.visual.stack-push",
+        "p0.stack.visual.stack-pop",
+        "p0.stack.visual.stack-pair",
+        "p0.stack.visual.stack-reduce"
+      ],
+      "affected_fields": [
+        "normal_case.vi/en",
+        "boundary_case.vi/en",
+        "failure_case.vi/en"
+      ],
+      "observed": "All five briefs repeat the same generic three-case template. The text mentions enough space/data, empty/full/one-item/one-free-slot, and a failed guard or one-sided transaction regardless of pattern. In STACK_SETUP and STACK_REDUCE, several phrases are semantically inapplicable; in the other briefs the template does not identify the exact state transition that Stage 7 must storyboard.",
+      "expected_correction_semantics": {
+        "p0.stack.visual.stack-setup": "Specify the two empty-state convention snapshots as the normal comparison; capacity 1 and required-versus-unspecified cell initialisation as boundaries; mixed convention/capacity-index mismatch as the failure demonstration.",
+        "p0.stack.visual.stack-push": "Specify a successful Push under both top conventions; one-free-slot and full boundaries; a full call that preserves every cell/top plus wrong update order/result contract as failure demonstrations.",
+        "p0.stack.visual.stack-pop": "Specify a successful Pop from two distinct items; one-item and empty boundaries under both conventions; exact sentinel plus unchanged empty state and wrong-read-index as failure demonstrations.",
+        "p0.stack.visual.stack-pair": "Specify both-live commit; both one-sided-empty rollback cases; both-empty no-restore/no-mutation/no-sentinel case with the AlgoCore-inference message boundary.",
+        "p0.stack.visual.stack-reduce": "Specify a multi-pair non-commutative left fold and a mixed extrema scan; single-value, one complete operator-number pair and all-negative boundaries; reversed operands, sentinel-as-data and malformed-input-outside-source-contract distinctions as counterexamples/failure handling.",
+        "parity": "Replace each affected field in both Vietnamese and English with matching meaning. Do not change status from PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD or add trace/run claims."
+      },
+      "acceptance_test": "The five (normal_case, boundary_case, failure_case) triples are pattern-specific, VI/EN-complete, consistent with each card/error/example, and no longer duplicate a shared generic triple.",
+      "closure_evidence": "VISUAL_BRIEFS.json sha256 ca38a8d009a3b0cc3f51f8cdc051d55a3a6071383fe845345e71e6b22a2614cd supplies distinct concrete case triples for all five patterns; independent validator semantic.visual_cases_pattern_specific now passes."
+    }
+  ],
+  "closed_observations": [
+    {
+      "observation_id": "A8-P0-CLOSED-INPUT-DRIFT",
+      "status": "CLOSED",
+      "detail": "Rework round 2 records current S4-S2/S4-S3 hashes in all six generated artifacts; independent recomputation found zero drift."
+    },
+    {
+      "observation_id": "A8-P0-CLOSED-SOURCE-POLICY",
+      "status": "CLOSED",
+      "detail": "S4-S2-LAYOUT-CODE-FIDELITY no longer appears in generated source_issue_refs. S4-S2-POLICY-LAYOUT-CODE-FIDELITY is explicitly is_source_issue=false."
+    },
+    {
+      "observation_id": "A8-P0-CLOSED-STACK-REDUCE-ATOMS",
+      "status": "CLOSED",
+      "detail": "The seven 9618_s25_42_1(e) atoms now match the live resubmission: explicit value 1 on all seven, mp.05 discrete, and continuation dependencies preserved."
+    },
+    {
+      "observation_id": "A8-P0-CLOSED-PAIR-DECISION",
+      "status": "CLOSED",
+      "detail": "Rework round 2 removes pending-adjudication wording. The four-case decision commits both successes, restores exactly the sole successful item, and treats both-empty as no restore/no mutation/no sentinel under AlgoCore_inference."
+    },
+    {
+      "observation_id": "A8-P0-CLOSED-METHOD-BOUNDARIES",
+      "status": "CLOSED",
+      "detail": "Top-pointer equations and mutation order, Push/Pop guards, reduction operand order/termination, authority labels, VI/EN parity, Stage 5 solution boundary, Stage 7 visual boundary, and absence of executable/run claims all passed independent checks."
+    }
+  ],
+  "facsimiles_inspected": [
+    {
+      "source_id": "9618_s25_qp_42",
+      "pdf_pages": [4],
+      "reason": "STACK_REDUCE source grammar and left-to-right total/operator/number order"
+    },
+    {
+      "source_id": "9618_s25_ms_42",
+      "pdf_pages": [14],
+      "reason": "STACK_REDUCE explicit seven one-mark criteria"
+    },
+    {
+      "source_id": "9618_s23_ms_41",
+      "pdf_pages": [36],
+      "reason": "STACK_PAIR one-sided rollback and official both-empty boundary"
+    }
+  ],
+  "gate_note": "A8 recommends PILOT_GATE=PASS for the reviewed hashes. Final gate authority remains with Lead."
+}

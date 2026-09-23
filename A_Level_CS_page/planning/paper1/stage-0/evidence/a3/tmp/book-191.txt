@@ -1,0 +1,45 @@
+175
+6.2 Data integrity
+6
+A careful study of the table shows that
+» byte 8 (row 8) has incorrect parity (there are three 1-bits)
+» bit 5 (column 5) also has incorrect parity (there are five 1-bits).
+First, the table shows that an error has occurred following data transmission.
+Second, at the intersection of row 8 and column 5, the position of the incorrect 
+bit value (which caused the error) can be found. This means that byte 8 should 
+have been:
+0 0 0 1 0 0 1 0
+which would also correct column 5 giving an even vertical parity (now has four 
+1-bits).
+This byte could, therefore, be corrected automatically, as shown above, or an 
+error message could be relayed back to the sender asking them to re-transmit 
+the block of data. One final point; if two of the bits change value following 
+data transmission, it may be impossible to locate the error using the above 
+method.
+For example, using the above example again:
+0 1 0 1 1 1 0 0
+This byte could reach the destination as:
+0 1 1 1 1 1 0 1
+or: 0 1 0 1 0 0 0 0
+or: 0 1 0 1 0 1 1 0
+All three are clearly incorrect, but they have retained even parity so will 
+not trigger an error message at the receiving end. Clearly, other methods to 
+complement parity when it comes to error checking of transmitted data are 
+required (such as checksum).
+Automatic repeat request (ARQ)
+Automatic repeat request (ARQ) is another method to check data following 
+data transmission. This method can be summarised as follows:
+» ARQ uses acknowledgement (a message sent to the receiver indicating that 
+data has been received correctly) and timeout (the time interval allowed to 
+elapse before an acknowledgement is received).
+» When the receiving device detects an error following data transmission, it 
+asks for the data packet to be re-sent.
+» If no error is detected, a positive acknowledgement is sent to the sender.
+» The sending device will re-send the data package if
+–
+ it receives a request to re-send the data, or
+– a timeout has occurred.
+» The whole process is continuous until the data packet received is correct or 
+until the ARQ time limit (timeout) is reached.
+» ARQ is often used by mobile phone networks to guarantee data integrity.
+457591_06_CI_AS & A_Level_CS_159-177.indd   175 25/04/19   9:35 AM

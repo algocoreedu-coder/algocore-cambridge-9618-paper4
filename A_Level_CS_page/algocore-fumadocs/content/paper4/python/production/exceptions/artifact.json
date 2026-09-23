@@ -1,0 +1,302 @@
+{
+  "author_run_ref": "p4r3.a3.exceptions.production-v1.author-run",
+  "caption": {
+    "en": "Specific exception handling, state recovery and cleanup.",
+    "vi": "Bắt exception cụ thể, phục hồi trạng thái và cleanup."
+  },
+  "code_sha256": "181d5bf3eb98793caa95896a314061ce71770b325a25db117eedda45a1d3129e",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "df87b225f242177ef910b252e6efc8e14964beb38a6ba731874e5b92aeed6ccd",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "exceptions.normal.expected-output",
+      "fixture_ref": "exceptions.normal",
+      "value": {
+        "closed": true,
+        "preserved_on_failure": true,
+        "status": "OK",
+        "trace": [
+          {
+            "event": "read"
+          },
+          {
+            "closed": true,
+            "event": "cleanup"
+          }
+        ],
+        "value": 42
+      }
+    },
+    {
+      "expected_output_id": "exceptions.boundary.expected-output",
+      "fixture_ref": "exceptions.boundary",
+      "value": {
+        "closed": true,
+        "preserved_on_failure": true,
+        "status": "VALUE_ERROR",
+        "trace": [
+          {
+            "event": "read"
+          },
+          {
+            "event": "recover_value",
+            "message": "empty value"
+          },
+          {
+            "closed": true,
+            "event": "cleanup"
+          }
+        ],
+        "value": 0
+      }
+    },
+    {
+      "expected_output_id": "exceptions.failure.expected-output",
+      "fixture_ref": "exceptions.failure",
+      "value": {
+        "closed": true,
+        "preserved_on_failure": true,
+        "status": "IO_ERROR",
+        "trace": [
+          {
+            "event": "recover_io",
+            "message": "injected"
+          },
+          {
+            "closed": true,
+            "event": "cleanup"
+          }
+        ],
+        "value": 12
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/exceptions/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "exceptions.normal",
+      "input": {
+        "content": "42\n",
+        "previous": 7
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "exceptions.boundary",
+      "input": {
+        "content": "   ",
+        "previous": 0
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "exceptions.failure",
+      "input": {
+        "content": "99",
+        "inject_io": true,
+        "previous": 12
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.exceptions.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.exceptions",
+  "lines": [
+    {
+      "line_id": "exceptions.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "exceptions.production-v1.L002",
+      "order": 2,
+      "text": "from io import StringIO"
+    },
+    {
+      "line_id": "exceptions.production-v1.L003",
+      "order": 3,
+      "text": ""
+    },
+    {
+      "line_id": "exceptions.production-v1.L004",
+      "order": 4,
+      "text": "class InjectedReadError(OSError): pass"
+    },
+    {
+      "line_id": "exceptions.production-v1.L005",
+      "order": 5,
+      "text": ""
+    },
+    {
+      "line_id": "exceptions.production-v1.L006",
+      "order": 6,
+      "text": "class DemoStream(StringIO):"
+    },
+    {
+      "line_id": "exceptions.production-v1.L007",
+      "order": 7,
+      "text": "    def __init__(self, text, fail=False): super().__init__(text); self.fail = fail"
+    },
+    {
+      "line_id": "exceptions.production-v1.L008",
+      "order": 8,
+      "text": "    def read(self, *args):"
+    },
+    {
+      "line_id": "exceptions.production-v1.L009",
+      "order": 9,
+      "text": "        if self.fail: raise InjectedReadError(\"injected\")"
+    },
+    {
+      "line_id": "exceptions.production-v1.L010",
+      "order": 10,
+      "text": "        return super().read(*args)"
+    },
+    {
+      "line_id": "exceptions.production-v1.L011",
+      "order": 11,
+      "text": ""
+    },
+    {
+      "line_id": "exceptions.production-v1.L012",
+      "order": 12,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "exceptions.production-v1.L013",
+      "order": 13,
+      "text": "    previous, trace, stream = fixture[\"previous\"], [], DemoStream(fixture.get(\"content\", \"\"), fixture.get(\"inject_io\", False))"
+    },
+    {
+      "line_id": "exceptions.production-v1.L014",
+      "order": 14,
+      "text": "    try:"
+    },
+    {
+      "line_id": "exceptions.production-v1.L015",
+      "order": 15,
+      "text": "        with stream:"
+    },
+    {
+      "line_id": "exceptions.production-v1.L016",
+      "order": 16,
+      "text": "            text = stream.read().strip(); trace.append({\"event\": \"read\"})"
+    },
+    {
+      "line_id": "exceptions.production-v1.L017",
+      "order": 17,
+      "text": "            if text == \"\": raise ValueError(\"empty value\")"
+    },
+    {
+      "line_id": "exceptions.production-v1.L018",
+      "order": 18,
+      "text": "            value = int(text)"
+    },
+    {
+      "line_id": "exceptions.production-v1.L019",
+      "order": 19,
+      "text": "        status = \"OK\""
+    },
+    {
+      "line_id": "exceptions.production-v1.L020",
+      "order": 20,
+      "text": "    except ValueError as error:"
+    },
+    {
+      "line_id": "exceptions.production-v1.L021",
+      "order": 21,
+      "text": "        value, status = previous, \"VALUE_ERROR\"; trace.append({\"event\": \"recover_value\", \"message\": str(error)})"
+    },
+    {
+      "line_id": "exceptions.production-v1.L022",
+      "order": 22,
+      "text": "    except InjectedReadError as error:"
+    },
+    {
+      "line_id": "exceptions.production-v1.L023",
+      "order": 23,
+      "text": "        value, status = previous, \"IO_ERROR\"; trace.append({\"event\": \"recover_io\", \"message\": str(error)})"
+    },
+    {
+      "line_id": "exceptions.production-v1.L024",
+      "order": 24,
+      "text": "    finally:"
+    },
+    {
+      "line_id": "exceptions.production-v1.L025",
+      "order": 25,
+      "text": "        trace.append({\"event\": \"cleanup\", \"closed\": stream.closed})"
+    },
+    {
+      "line_id": "exceptions.production-v1.L026",
+      "order": 26,
+      "text": "    return {\"status\": status, \"value\": value, \"preserved_on_failure\": status == \"OK\" or value == previous, \"closed\": stream.closed, \"trace\": trace}"
+    },
+    {
+      "line_id": "exceptions.production-v1.L027",
+      "order": 27,
+      "text": ""
+    },
+    {
+      "line_id": "exceptions.production-v1.L028",
+      "order": 28,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "exceptions.production-v1.L029",
+      "order": 29,
+      "text": "    import json"
+    },
+    {
+      "line_id": "exceptions.production-v1.L030",
+      "order": 30,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "exceptions.production-v1.L031",
+      "order": 31,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "exceptions.production-v1.L032",
+      "order": 32,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "exceptions.production-v1.L033",
+      "order": 33,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "exceptions.production-v1.L034",
+      "order": 34,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "exceptions.production-v1.L035",
+      "order": 35,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "exceptions.production-v1.L036",
+      "order": 36,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "ALGORITHM_TRANSLATE",
+    "EVIDENCE_RUN"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.exceptions.production-v1",
+  "stage5_source_refs": [],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

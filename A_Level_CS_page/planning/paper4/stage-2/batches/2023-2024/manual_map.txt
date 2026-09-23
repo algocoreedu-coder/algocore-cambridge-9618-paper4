@@ -1,0 +1,210 @@
+# Fields: paper (header), part|assessed (primary first)|context|task_mode|MS distinguishing requirement|row-specific variants semicolon-separated key=value
+[s23_41]
+1(a)(i)|DATA_STORAGE||declare_initialize|Named integer array with capacity 25.|scope=local;capacity=25
+1(a)(ii)|FILE_READ_ARRAY|DATA_STORAGE|implement|Read every line into the array with file opening, closing and error-handling credit.|file=Data.txt;record_shape=one_integer_per_line
+1(b)(i)|OUTPUT_FORMAT|DATA_STORAGE|output|Procedure accepts an integer array and outputs all values on one line.|layout=one_line_in_array_order
+1(b)(ii)|MAIN_FLOW|OUTPUT_FORMAT,FILE_READ_ARRAY|integrate|Call PrintArray with the populated array as argument.|call=PrintArray
+1(b)(iii)|EVIDENCE_RUN|FILE_READ_ARRAY,OUTPUT_FORMAT|test_evidence|Screenshot shows the array contents.|test=populated_array
+1(c)|COUNT_OCCURRENCES|DATA_STORAGE|implement|Loop over all elements, count matches and return the count.|misleading_name=LinearSearch;result=count;implementation=iterative
+1(d)(i)|VALIDATE_INPUT,MAIN_FLOW,OUTPUT_FORMAT|COUNT_OCCURRENCES|integrate|Prompt and validate a whole number in range, call the function and output the prescribed sentence combining the search value and returned count.|range=0..100_inclusive;validation=whole_number;output_shape=fixed_sentence_with_search_value_and_count
+1(d)(ii)|EVIDENCE_RUN|VALIDATE_INPUT,COUNT_OCCURRENCES,MAIN_FLOW|test_evidence|Screenshot for search input 12.|search_value=12
+2(a)(i)|OOP_CLASS||declare_initialize|Private attributes, constructor parameters and zero-initialised current speed and position.|class=Vehicle;visibility=private
+2(a)(ii)|OOP_GET|OOP_CLASS|implement|Four getters return their respective stored attributes without changing them.|getters=4
+2(a)(iii)|OOP_SET|OOP_CLASS|implement|Two setter methods directly assign parameter values to attributes.|setters=2;update=direct_replacement
+2(a)(iv)|OOP_UPDATE|OOP_CLASS|implement|Increase current speed with maximum limit and update horizontal position in every case.|update=relative_and_capped;state=current_speed,horizontal_position
+2(b)(i)|OOP_SUBCLASS|OOP_CLASS|declare_initialize|Declare inheritance, initialise additional attributes and call the parent constructor.|subclass=Helicopter;parent=Vehicle
+2(b)(ii)|OOP_OVERRIDE,OOP_UPDATE|OOP_SUBCLASS|implement|Override speed increase, cap vertical height and preserve the horizontal update.|caps=max_height,max_speed;override=IncreaseSpeed
+2(c)|OUTPUT_FORMAT|OOP_CLASS,OOP_SUBCLASS,OOP_GET|output|Output speed and horizontal position, and vertical position only for a helicopter.|dispatch=vehicle_or_helicopter
+2(d)(i)|OOP_INSTANTIATE,MAIN_FLOW|OOP_CLASS,OOP_SUBCLASS,OOP_UPDATE,OUTPUT_FORMAT|integrate|Instantiate both objects with prescribed values, increase each speed twice and output each.|objects=Tiger,Lion;speed_calls_per_object=2
+2(d)(ii)|EVIDENCE_RUN|OOP_INSTANTIATE,OOP_UPDATE,OOP_OVERRIDE,OUTPUT_FORMAT|test_evidence|Screenshot of both vehicles after their method calls.|test=car_and_helicopter
+3(a)|STACK_SETUP||declare_initialize|Two string arrays with capacities 20 and 10 and both top pointers initialised to zero.|capacities=Animal20,Colour10
+3(b)(i)|STACK_PUSH|STACK_SETUP|translate_pseudocode|Check full, store data, advance next-free pointer and return Boolean success.|target=Animal;result=Boolean;algorithm_source=supplied_pseudocode
+3(b)(ii)|STACK_POP|STACK_SETUP|translate_pseudocode|Check empty, return top item and decrement pointer; empty returns empty string.|target=Animal;empty_result=empty_string;algorithm_source=supplied_pseudocode
+3(b)(iii)|FILE_READ_ARRAY|STACK_PUSH|implement|Read animals to EOF, call PushAnimal for each, close and handle file errors.|file=AnimalData.txt;target=Animal;write_operation=call_existing_push
+3(b)(iv)|STACK_PUSH,STACK_POP|STACK_SETUP|adapt|Implement both colour-stack operations by adapting the animal-stack versions.|target=Colour;adapt_from=Animal;capacity=10
+3(b)(v)|FILE_READ_ARRAY|STACK_PUSH|adapt|Read colours with file handling and call PushColour for every line.|file=ColourData.txt;target=Colour
+3(c)|STACK_PAIR|STACK_POP,STACK_PUSH|implement|Pop both items, output a pair when available or restore the unmatched item and message.|restoration=unmatched_item;pair=colour_animal
+3(d)(i)|MAIN_FLOW|FILE_READ_ARRAY,STACK_PAIR|integrate|Read initial stack data then call OutputItem four times.|calls=ReadData_then_OutputItem_x4
+3(d)(ii)|EVIDENCE_RUN|FILE_READ_ARRAY,STACK_PAIR|test_evidence|Screenshot of four paired outputs.|test=paired_stacks
+[s23_42]
+1(a)|DATA_STORAGE||declare_initialize|Global Animals array has ten string elements.|scope=global;capacity=10;data_type=string
+1(b)|DATA_STORAGE||declare_initialize|Store all ten specified lower-case animal names in the given order.|input=fixed_supplied_names
+1(c)|BUBBLE_SORT|DATA_STORAGE|complete_pseudocode|Complete missing statements and preserve supplied loops and first-character access.|direction=descending;key=first_character;algorithm_source=incomplete_pseudocode
+1(d)(i)|MAIN_FLOW,OUTPUT_FORMAT|BUBBLE_SORT|integrate|Call the sorting procedure and output each animal on a new line.|layout=one_item_per_line
+1(d)(ii)|EVIDENCE_RUN|BUBBLE_SORT,OUTPUT_FORMAT|test_evidence|Screenshot of sorted animals.|test=descending_first_character
+2(a)|DATA_RECORD||declare_initialize|Record or record-substitute class contains string ID and integer quantity.|representation=record_or_record_substitute;fields=ID,quantity
+2(b)|QUEUE_SETUP|DATA_RECORD|declare_initialize|Five sale-record slots, empty record initialisation and head, tail, count set to zero.|capacity=5;empty_record=ID_empty_quantity_minus1
+2(c)|QUEUE_ENQUEUE|QUEUE_SETUP,DATA_RECORD|implement|Check full, insert at tail, wrap tail, increment count and return status.|full_result=-1;success_result=1
+2(d)|QUEUE_DEQUEUE|QUEUE_SETUP,DATA_RECORD|implement|Return empty record when empty; otherwise advance/wrap head and decrement count.|empty_result=null_or_empty_record
+2(e)|MAIN_FLOW|QUEUE_ENQUEUE,DATA_RECORD|implement|Input ID and quantity, construct a sale record, call Enqueue and output Full or Stored.|creation=record_from_input;call=Enqueue
+2(f)(i)|MAIN_FLOW,OUTPUT_FORMAT|QUEUE_ENQUEUE,QUEUE_DEQUEUE|integrate|Call entry six times, dequeue and report, retry LLP, then output stored array records.|display=physical_array_records;scenario=full_then_dequeue_then_enqueue
+2(f)(ii)|EVIDENCE_RUN|QUEUE_ENQUEUE,QUEUE_DEQUEUE,MAIN_FLOW|test_evidence|Screenshot includes full-queue response, removed record, successful retry and records.|test=wrap_and_full_scenario
+3(a)(i)|OOP_CLASS,DATA_STORAGE||declare_initialize|Declare Employee attributes including the 52-real array; constructor assigns parameters and separately initialises every pay entry to zero.|class=Employee;composition=52_element_pay_array;array_initialisation=all_52_real_values_0.0;constructed_child_objects=none
+3(a)(ii)|OOP_GET|OOP_CLASS|implement|Return the employee-number attribute without mutation.|attribute=EmployeeNumber
+3(a)(iii)|OOP_UPDATE,RULE_COMPUTE|OOP_CLASS|implement|Calculate hours times hourly pay and store the result at the correct week index.|update=indexed_week_pay;formula=hours_times_rate
+3(a)(iv)|RULE_COMPUTE|OOP_CLASS|implement|Total all weekly pay entries and return the calculated total.|aggregation=sum_array;not_direct_getter=true
+3(b)(i)|OOP_SUBCLASS|OOP_CLASS|declare_initialize|Manager inherits Employee, calls its constructor and stores bonus value.|subclass=Manager;parent=Employee
+3(b)(ii)|OOP_OVERRIDE,RULE_COMPUTE|OOP_SUBCLASS,OOP_UPDATE|implement|Adjust hours by bonus percentage and call parent SetPay with week and adjusted hours.|override=SetPay;parent_method_call=true;state_storage=performed_by_existing_parent_method
+3(c)|FILE_READ_OBJECTS,OOP_INSTANTIATE,DATA_STORAGE|OOP_CLASS,OOP_SUBCLASS|implement|Read each employee record and store a Manager when bonus is present, Employee otherwise, in the declared eight-object array.|file=Employees.txt;record_count=8;dispatch=bonus_present;array_scope=global
+3(d)|FILE_READ_OBJECTS,LINEAR_SEARCH|OOP_GET,OOP_UPDATE|implement|Read hours, locate employee by number using its getter, and call SetPay for week one.|file=HoursWeek1.txt;lookup_key=employee_number;update=call_existing_SetPay
+3(e)(i)|MAIN_FLOW,OUTPUT_FORMAT|FILE_READ_OBJECTS,RULE_COMPUTE,OOP_GET|integrate|Call EnterHours and output each employee number and total pay using methods.|outputs=eight_employees
+3(e)(ii)|EVIDENCE_RUN|FILE_READ_OBJECTS,OOP_OVERRIDE,RULE_COMPUTE,MAIN_FLOW|test_evidence|Screenshot of each employee's total pay.|test=employee_and_manager_pay
+[w23_41]
+1(a)(i)|COUNT_OCCURRENCES||translate_pseudocode|Preserve supplied vowel-counting algorithm with loop, first-character check and string reduction.|implementation=iterative;unit=lowercase_vowels;algorithm_source=supplied_pseudocode
+1(a)(ii)|MAIN_FLOW|COUNT_OCCURRENCES|integrate|Call IterativeVowels with house and output the returned count.|input=house
+1(a)(iii)|EVIDENCE_RUN|COUNT_OCCURRENCES|test_evidence|Screenshot shows the result for house.|test=house
+1(b)(i)|COUNT_OCCURRENCES,ALGORITHM_REWRITE||transform|Use empty-string base case and recursive calls on the shorter string with vowel-dependent increment.|transformation=iterative_to_recursive;reduction=remove_first_character
+1(b)(ii)|MAIN_FLOW|COUNT_OCCURRENCES|integrate|Call RecursiveVowels with imagine and output its return value.|input=imagine
+1(b)(iii)|EVIDENCE_RUN|COUNT_OCCURRENCES,ALGORITHM_REWRITE|test_evidence|Screenshot shows recursive result for imagine.|test=imagine
+2(a)(i)|QUEUE_SETUP||declare_initialize|Declare 50-string queue, head minus one and next-free tail zero.|capacity=50
+2(a)(ii)|QUEUE_ENQUEUE|QUEUE_SETUP|implement|Check full, insert at tail and increment it; set head for the first item.|full_result=message;first_item=head_to_zero
+2(a)(iii)|QUEUE_DEQUEUE|QUEUE_SETUP|implement|Empty gives a message and Empty string; otherwise return head data and advance head.|empty_result=Empty_string
+2(b)|FILE_READ_ARRAY|QUEUE_ENQUEUE|implement|Read all IDs with file handling and call Enqueue for each value.|file=QueueData.txt
+2(c)(i)|DATA_RECORD||declare_initialize|Declare RecordData with string ID and integer Total.|fields=ID,Total;representation=record_or_record_substitute
+2(c)(ii)|DATA_STORAGE|DATA_RECORD|declare_initialize|Declare a record array and initialise its record count to zero.|capacity=50;scope=global
+2(c)(iii)|GROUP_AGGREGATE|QUEUE_DEQUEUE,DATA_RECORD|translate_pseudocode|Dequeue one ID, search existing groups, increment its total or append a new group.|aggregation=count_per_ID;algorithm_source=supplied_pseudocode;consumption=one_dequeue_per_call
+2(d)|OUTPUT_FORMAT|GROUP_AGGREGATE,DATA_RECORD|output|Output every stored record's ID and Total in the required format.|layout=ID_Total_records
+2(e)(i)|MAIN_FLOW|FILE_READ_ARRAY,GROUP_AGGREGATE,OUTPUT_FORMAT|integrate|Read data first, call TotalData for every queue entry, then output records.|calls=read_then_group_each_then_output
+2(e)(ii)|EVIDENCE_RUN|FILE_READ_ARRAY,GROUP_AGGREGATE,OUTPUT_FORMAT|test_evidence|Screenshot of grouped game IDs and totals.|test=game_ID_frequencies
+3(a)(i)|OOP_CLASS||declare_initialize|Character constructor stores name and both starting coordinates.|class=Character;attributes=Name,XPosition,YPosition
+3(a)(ii)|OOP_GET|OOP_CLASS|implement|Both position getters return their stored attributes.|getters=2
+3(a)(iii)|OOP_UPDATE|OOP_CLASS|implement|Add parameter to each coordinate and clamp to zero through ten thousand.|update=relative_and_clamped;bounds=0..10000
+3(a)(iv)|OOP_UPDATE||implement|Implement the direction-to-axis and signed-change rule inside Move, using existing coordinate-update helpers.|movement_step=10;update=call_existing_coordinate_update;new_behaviour=direction_to_axis_and_signed_delta;helper_behaviour=coordinate_storage_and_clamping_already_implemented
+3(b)|OOP_INSTANTIATE|OOP_CLASS|declare_initialize|Instantiate Jack with the supplied name and starting coordinates.|object=Jack;position=50,50
+3(c)(i)|OOP_SUBCLASS|OOP_CLASS|declare_initialize|BikeCharacter inherits Character and calls its parent constructor.|subclass=BikeCharacter;parent=Character
+3(c)(ii)|OOP_OVERRIDE,OOP_UPDATE|OOP_SUBCLASS|adapt|Override Move and change directional movement to twenty through existing coordinate helpers.|movement_step=20;override=Move;new_behaviour=directional_move_delta20;helper_behaviour=coordinate_storage_and_clamping_already_implemented
+3(d)|OOP_INSTANTIATE|OOP_SUBCLASS|declare_initialize|Instantiate Karla with the supplied values.|object=Karla;position=100,50
+3(e)(i)|VALIDATE_INPUT,MAIN_FLOW,OUTPUT_FORMAT|OOP_UPDATE,OOP_OVERRIDE,OOP_GET|integrate|Validate character and direction, call Move and output new coordinates using getters.|validation=allowed_character_and_direction
+3(e)(ii)|EVIDENCE_RUN|VALIDATE_INPUT,OOP_UPDATE,OOP_OVERRIDE,MAIN_FLOW|test_evidence|Two tests use jack/right and karla/down.|test=two_prescribed_moves
+[w23_42]
+1(a)(i)|STACK_SETUP||declare_initialize|Declare both named arrays with 100 letter slots each.|capacity=100_each;state_component=arrays
+1(a)(ii)|STACK_SETUP||declare_initialize|Declare both global integer top pointers and initialise them to zero.|state_component=next_free_pointers
+1(b)(i)|STACK_PUSH|STACK_SETUP|implement|Classify a supplied letter as vowel or consonant, push into that stack, handle full and advance its top.|routing=vowel_or_consonant;parameter_validation=not_required
+1(b)(ii)|FILE_READ_ARRAY|STACK_PUSH|implement|Read all letters with missing-file handling and call PushData for each.|file=StackData.txt;items=100
+1(c)|STACK_POP|STACK_SETUP|implement|Implement both pop functions with empty detection and pointer decrement.|empty_result=No_data_string;operations=both_stacks
+1(d)(i)|MAIN_FLOW,OUTPUT_FORMAT|FILE_READ_ARRAY,STACK_POP|integrate|Load data, repeat choices until five successful pops, handle empty responses and output letters together.|success_count=5;termination=successful_returns_not_attempts
+1(d)(ii)|EVIDENCE_RUN|MAIN_FLOW,STACK_POP|test_evidence|Use vowel, consonant, consonant, vowel, vowel in that order.|test=prescribed_five_choices
+2(a)(i)|ALGORITHM_TRANSLATE,RULE_COMPUTE||translate_pseudocode|Follow the supplied loop and modulus test, accumulating divisors and returning their sum.|algorithm=sum_divisors;implementation=iterative
+2(a)(ii)|MAIN_FLOW|RULE_COMPUTE,ALGORITHM_TRANSLATE|integrate|Call IterativeCalculate with ten and output its result.|input=10
+2(a)(iii)|EVIDENCE_RUN|RULE_COMPUTE,ALGORITHM_TRANSLATE|test_evidence|Screenshot of the calculation with parameter ten.|test=10
+2(b)(i)|ALGORITHM_TRANSLATE,RULE_COMPUTE||complete_pseudocode|Complete five gaps and preserve both recursive calls and the remainder of the supplied recursive function.|algorithm=sum_divisors;implementation=recursive;supplied_transformation=iterative_to_recursive;algorithm_source=incomplete_pseudocode
+2(b)(ii)|MAIN_FLOW|RULE_COMPUTE,ALGORITHM_TRANSLATE|integrate|Call RecursiveValue with both arguments fifty and output its result.|inputs=50,50
+2(b)(iii)|EVIDENCE_RUN|RULE_COMPUTE,ALGORITHM_TRANSLATE|test_evidence|Screenshot of recursive divisor sum for fifty.|test=50,50
+3(a)(i)|OOP_CLASS||declare_initialize|Declare Character attributes with their types and constructor assignments.|class=Character;date_type=DATE
+3(a)(ii)|OOP_GET|OOP_CLASS|implement|Implement both getters returning intelligence and name.|getters=2
+3(a)(iii)|OOP_SET|OOP_CLASS|implement|SetIntelligence assigns the parameter directly.|update=direct_replacement
+3(a)(iv)|OOP_UPDATE|OOP_CLASS|implement|Multiply intelligence by the stated increase and store it.|update=percentage_increase;percent=10
+3(a)(v)|RULE_COMPUTE|OOP_CLASS|implement|Extract birth year and subtract it from the fixed year 2023.|current_year=2023;date_scope=year_only;not_direct_getter=true
+3(b)(i)|OOP_INSTANTIATE|OOP_CLASS|declare_initialize|Create FirstCharacter with prescribed Royal values.|object=FirstCharacter;name=Royal
+3(b)(ii)|MAIN_FLOW,OUTPUT_FORMAT|OOP_UPDATE,RULE_COMPUTE,OOP_GET|integrate|Call Learn and output name, age and intelligence through the appropriate methods.|call=Learn;output=name_age_intelligence
+3(b)(iii)|EVIDENCE_RUN|OOP_UPDATE,RULE_COMPUTE,OUTPUT_FORMAT|test_evidence|Screenshot shows Royal's updated intelligence and age.|test=FirstCharacter
+3(c)(i)|OOP_SUBCLASS|OOP_CLASS|declare_initialize|MagicCharacter inherits Character, calls the parent and stores Element.|subclass=MagicCharacter;parent=Character
+3(c)(ii)|OOP_OVERRIDE,OOP_UPDATE|OOP_SUBCLASS|implement|Override Learn and apply the element-dependent intelligence increase.|override=Learn;percentages=fire_water20_earth30_other10
+3(d)(i)|OOP_INSTANTIATE|OOP_SUBCLASS|declare_initialize|Create FirstMagic with prescribed Light values and fire element.|object=FirstMagic;element=fire
+3(d)(ii)|MAIN_FLOW,OUTPUT_FORMAT|OOP_OVERRIDE,OOP_UPDATE,RULE_COMPUTE,OOP_GET|integrate|Call Learn on FirstMagic and output its required properties.|call=Learn
+3(d)(iii)|EVIDENCE_RUN|OOP_OVERRIDE,OOP_UPDATE,RULE_COMPUTE,OUTPUT_FORMAT|test_evidence|Screenshot of the magic character's resulting data.|test=FirstMagic
+[s24_41]
+1(a)|DATA_STORAGE||declare_initialize|Declare the global integer array and item counter.|capacity=20;scope=global
+1(b)|VALIDATE_INPUT|DATA_STORAGE|implement|Request quantity, repeat until it is within the stated bounds, and read that many integers into storage.|range=1..20_inclusive;validated_value=quantity
+1(c)(i)|MAIN_FLOW,OUTPUT_FORMAT|VALIDATE_INPUT,DATA_STORAGE|integrate|Set counter to zero, call Initialise, then output populated array contents.|layout=array_contents
+1(c)(ii)|EVIDENCE_RUN|VALIDATE_INPUT,OUTPUT_FORMAT|test_evidence|Show invalid quantity 30, accepted quantity 5 and the entered array.|test=invalid_then_valid_quantity
+1(d)(i)|BUBBLE_SORT|DATA_STORAGE|implement|Implement nested bubble-sort passes with comparison and swaps.|direction=ascending;key=integer_value;algorithm_source=authored
+1(d)(ii)|MAIN_FLOW,OUTPUT_FORMAT|BUBBLE_SORT|integrate|Call BubbleSort then output the array contents.|layout=sorted_array
+1(d)(iii)|EVIDENCE_RUN|BUBBLE_SORT,OUTPUT_FORMAT|test_evidence|Screenshot of prescribed input data sorted in correct order.|test=five_integer_sort
+1(e)(i)|BINARY_SEARCH|BUBBLE_SORT|implement|Iterative interval reduction, midpoint checks and index or minus-one return.|implementation=iterative;result=index_or_minus1;storage=populated_array_prefix
+1(e)(ii)|MAIN_FLOW|BINARY_SEARCH|integrate|Input a number, call BinarySearch with it and output the returned value.|input=user_search_value
+1(e)(iii)|EVIDENCE_RUN|BINARY_SEARCH,BUBBLE_SORT|test_evidence|Two prescribed tests demonstrate a found and a missing value.|test=search2_then_search7
+2(a)(i)|OOP_CLASS||declare_initialize|Private Tree attributes and constructor assignments for the five parameters.|class=Tree;domain=botanical_tree_not_binary_tree
+2(a)(ii)|OOP_GET|OOP_CLASS|implement|Five getters return the corresponding attributes.|getters=5
+2(b)|FILE_READ_OBJECTS,OOP_INSTANTIATE,DATA_STORAGE|OOP_CLASS|implement|Declare a Tree-object array, read and split records, convert numeric fields, construct and store objects, then return the array with file handling.|file=Trees.txt;items=9;delimiter=comma;array_type=Tree
+2(c)|OUTPUT_FORMAT|OOP_GET|output|Output attributes through getters and select wording by evergreen status.|message=evergreen_or_loses_leaves
+2(d)(i)|MAIN_FLOW|FILE_READ_OBJECTS,OUTPUT_FORMAT|integrate|Read the array and call PrintTrees on its first object.|calls=ReadData_then_PrintTrees_first
+2(d)(ii)|EVIDENCE_RUN|FILE_READ_OBJECTS,OUTPUT_FORMAT|test_evidence|Screenshot of the first tree's formatted data.|test=first_tree
+2(e)(i)|FILTER_RECORDS|OOP_GET,OUTPUT_FORMAT|implement|Compare all three requirements, retain matching Tree objects and report matches or no suitable tree.|predicate=height_AND_width_AND_evergreen;selection=all_matches
+2(e)(ii)|RULE_COMPUTE,LINEAR_SEARCH|FILTER_RECORDS,OOP_GET|adapt|Find the chosen tree and calculate years from its starting height, maximum height and annual growth.|lookup_key=tree_name;formula=remaining_height_divided_by_growth
+2(e)(iii)|EVIDENCE_RUN,MAIN_FLOW|FILTER_RECORDS,RULE_COMPUTE,LINEAR_SEARCH,OUTPUT_FORMAT|mixed|Capture both the requirements/matching trees and the chosen-tree growth calculation.|test=evergreen400x200_BlueConifer100;source_name_caveat=ChooseTrees_vs_ChooseTree
+3(a)|QUEUE_SETUP||declare_initialize|Initialise all twenty string slots to null and both pointers to minus one.|capacity=20;head_initial=-1;tail_initial=-1
+3(b)|QUEUE_ENQUEUE|QUEUE_SETUP|implement|Check full, write at tail plus one, advance tail and initialise head for first data.|success_result=Boolean;full_result=False
+3(c)|QUEUE_DEQUEUE|QUEUE_SETUP|implement|Return string false when empty or return next data with head update.|empty_result=string_false
+3(d)(i)|CHECK_DIGIT,MAIN_FLOW|QUEUE_ENQUEUE|implement|Apply alternating weights, divide total by ten and round down, handle X, enqueue valid payloads and count invalid entries.|weights=1,3,1,3,1,3;rule=floor_weighted_sum_div10;special=10_maps_to_X;inputs=10
+3(d)(ii)|MAIN_FLOW|CHECK_DIGIT,QUEUE_DEQUEUE|integrate|Call StoreItems and Dequeue, then distinguish empty from returned data.|calls=StoreItems_then_Dequeue
+3(d)(iii)|EVIDENCE_RUN|CHECK_DIGIT,QUEUE_ENQUEUE,QUEUE_DEQUEUE|test_evidence|Prescribed ten inputs show invalid count and returned valid data.|test=ten_check_digit_strings
+[s24_42]
+1(a)|FILE_READ_ARRAY||implement|Read all file words, preserve the first word and count answers separately, with file handling.|files=Easy.txt,Medium.txt,Hard.txt;first_record=main_word_excluded_from_answer_count
+1(b)|MAIN_FLOW|FILE_READ_ARRAY|integrate|Prompt for difficulty, map it to the correct file and call ReadWords.|selection=easy_medium_hard;retry_validation=not_explicitly_required
+1(c)(i)|UNIQUE_SELECTION,LINEAR_SEARCH,MAIN_FLOW|FILE_READ_ARRAY|implement|Search entered words against answers, report matches, replace accepted answers with null, count them and stop on no.|used_marker=null_value;input_sentinel=no;matching=exclude_main_word
+1(c)(ii)|RULE_COMPUTE,OUTPUT_FORMAT|UNIQUE_SELECTION,LINEAR_SEARCH|adapt|Calculate percentage found and output all remaining unanswered words.|formula=correct_divided_by_NumberWords_times100;output=skip_null_and_main_word
+1(d)(i)|MAIN_FLOW|FILE_READ_ARRAY,UNIQUE_SELECTION,LINEAR_SEARCH|adapt|Call Play after reading the full word file.|call=Play_after_loading
+1(d)(ii)|EVIDENCE_RUN|FILE_READ_ARRAY,UNIQUE_SELECTION,LINEAR_SEARCH,RULE_COMPUTE|test_evidence|Screenshot uses easy, she, out and no.|test=easy_words
+1(d)(iii)|EVIDENCE_RUN|FILE_READ_ARRAY,UNIQUE_SELECTION,LINEAR_SEARCH,RULE_COMPUTE|test_evidence|Screenshot uses hard, fine, fined, idea and no.|test=hard_words
+2(a)(i)|OOP_CLASS||declare_initialize|Node constructor stores data and initialises both child pointers to minus one.|class=Node;attributes=LeftPointer,Data,RightPointer;null_pointer=-1
+2(a)(ii)|OOP_GET|OOP_CLASS|implement|Implement three getters for the node fields.|getters=3
+2(a)(iii)|OOP_SET|OOP_CLASS|implement|Implement three direct parameter-to-attribute setters.|setters=3
+2(b)(i)|TREE_SETUP,OOP_CLASS,OOP_INSTANTIATE|OOP_CLASS|declare_initialize|TreeClass constructor creates twenty empty Node objects and initialises root and node count.|class=TreeClass;capacity=20;root_initial=-1;count_initial=0;composition=array_of_Node
+2(b)(ii)|TREE_INSERT|TREE_SETUP,OOP_GET,OOP_SET|implement|Insert at next array slot, follow comparison-selected child links and update the parent's pointer.|placement=BST_child_link;allocation=NumberNodes;empty_case=root_index_zero
+2(b)(iii)|OUTPUT_FORMAT|TREE_SETUP,OOP_GET|output|Output left pointer, data and right pointer for used array entries in array order, or No nodes.|order=physical_array_not_tree_traversal;empty_output=No_nodes
+2(c)(i)|OOP_INSTANTIATE|TREE_SETUP,OOP_CLASS|declare_initialize|Create TheTree as a TreeClass instance.|object=TheTree
+2(c)(ii)|MAIN_FLOW,OOP_INSTANTIATE|TREE_INSERT,OUTPUT_FORMAT|integrate|Create Node objects for the seven values, call InsertNode for each and OutputTree.|inputs=10,11,5,1,20,7,15
+2(c)(iii)|EVIDENCE_RUN|TREE_INSERT,OUTPUT_FORMAT,MAIN_FLOW|test_evidence|Screenshot of the array-backed tree rows after insertions.|test=seven_nodes
+3(a)|DATA_STORAGE||declare_initialize|Local NumberArray contains the seven prescribed integers in order.|capacity=7;scope=local;values=100,85,644,22,15,8,1
+3(b)(i)|INSERTION_SORT|DATA_STORAGE|translate_pseudocode|Follow supplied recursive insertion structure, base case and inner shift loop.|implementation=recursive;algorithm_source=supplied_pseudocode;direction=ascending
+3(b)(ii)|MAIN_FLOW,OUTPUT_FORMAT|INSERTION_SORT|integrate|Call RecursiveInsertion and output Recursive followed by the returned array.|layout=label_then_array
+3(b)(iii)|EVIDENCE_RUN|INSERTION_SORT,OUTPUT_FORMAT|test_evidence|Screenshot of labelled recursively sorted array.|test=recursive_sort
+3(c)(i)|INSERTION_SORT,ALGORITHM_REWRITE|INSERTION_SORT|transform|Preserve insertion logic but replace recursion with iteration.|transformation=recursive_to_iterative;direction=ascending
+3(c)(ii)|MAIN_FLOW,OUTPUT_FORMAT|INSERTION_SORT|integrate|Call the iterative function on the original unsorted array and output label and result.|input=original_unsorted_array;layout=label_then_array
+3(c)(iii)|EVIDENCE_RUN|INSERTION_SORT,ALGORITHM_REWRITE,OUTPUT_FORMAT|test_evidence|Screenshot shows the required recursive and iterative results.|test=both_sort_implementations
+3(d)(i)|BINARY_SEARCH|INSERTION_SORT|implement|Use four parameters, recursive bound changes, matching midpoint return and not-found base case.|implementation=recursive;parameters=array,first,last,to_find;result=index_or_minus1
+3(d)(ii)|MAIN_FLOW|BINARY_SEARCH|integrate|Search sorted data for 644 and branch on not-found versus returned index.|search_value=644
+3(d)(iii)|EVIDENCE_RUN|BINARY_SEARCH|test_evidence|Screenshot of the binary-search result.|test=search644
+[w24_41]
+1(a)|FILE_READ_ARRAY||implement|Read all forty-five strings into a local array and return it with file-handling credit.|file=Data.txt;capacity=45;data_type=string
+1(b)(i)|OUTPUT_FORMAT|DATA_STORAGE|output|Concatenate array elements with spaces and return the resulting string.|result=concatenated_string;delimiter=space
+1(b)(ii)|MAIN_FLOW|FILE_READ_ARRAY,OUTPUT_FORMAT|integrate|Call ReadData, store its result and pass it to FormatArray for output.|calls=ReadData_then_FormatArray
+1(b)(iii)|EVIDENCE_RUN|FILE_READ_ARRAY,OUTPUT_FORMAT|test_evidence|Screenshot shows all colours in one string.|test=unsorted_colours
+1(c)|STRING_COMPARE||implement|Compare corresponding characters until different and return which parameter comes first.|comparison=manual_character_by_character;assumptions=lowercase_and_difference_before_end;result=1_or_2
+1(d)(i)|BUBBLE_SORT|STRING_COMPARE|implement|Use CompareStrings in a working bubble sort and return sorted array.|direction=ascending;key=full_string;comparator=provided_own_CompareStrings
+1(d)(ii)|MAIN_FLOW|BUBBLE_SORT,OUTPUT_FORMAT|integrate|Pass unsorted data to Bubble, then sorted data to FormatArray and output.|calls=Bubble_then_FormatArray
+1(d)(iii)|EVIDENCE_RUN|BUBBLE_SORT,STRING_COMPARE,OUTPUT_FORMAT|test_evidence|Screenshot of alphabetically sorted strings.|test=sorted_colours
+2(a)(i)|OOP_CLASS||declare_initialize|Horse has three private attributes and constructor parameter assignments.|class=Horse;visibility=private
+2(a)(ii)|OOP_GET|OOP_CLASS|implement|Return the name and maximum fence height in two getters.|getters=2
+2(b)(i)|OOP_INSTANTIATE,OUTPUT_FORMAT|OOP_CLASS,OOP_GET|declare_initialize|Create Beauty and Jet in Horses and output both names using getters.|objects=Beauty,Jet;storage=local_object_array
+2(b)(ii)|EVIDENCE_RUN|OOP_INSTANTIATE,OUTPUT_FORMAT|test_evidence|Screenshot shows both horse names.|test=horse_names
+2(c)(i)|OOP_CLASS,OOP_GET||declare_initialize|Fence contains private height and risk, constructor and both getters; no inheritance.|class=Fence;visibility=private;compound=constructor_and_getters
+2(c)(ii)|VALIDATE_INPUT,OOP_INSTANTIATE|OOP_CLASS|integrate|Validate height and risk repeatedly, create four Fence objects and store in Course.|height_range=70..180;integer_risk_range=1..5;objects=4
+2(d)|RULE_COMPUTE|OOP_CLASS|implement|Return chance using maximum-height comparison and risk modifier table with correct parameters and attributes.|rule=over_height_20percent_else_risk_modifier;result=real_percentage
+2(e)(i)|MAIN_FLOW,OUTPUT_FORMAT|RULE_COMPUTE,OOP_GET|integrate|Call Success for every horse/fence pair and output horse name, fence number and chance.|pairs=2_horses_x4_fences
+2(e)(ii)|RULE_COMPUTE,OUTPUT_FORMAT|RULE_COMPUTE,OOP_GET|adapt|Calculate each horse's average across four fences, compare averages and output the winner.|aggregation=arithmetic_mean;comparison=max_average;assumption=no_tied_averages
+2(e)(iii)|EVIDENCE_RUN|RULE_COMPUTE,VALIDATE_INPUT,OUTPUT_FORMAT|test_evidence|Show supplied fence values, per-fence chances, averages and highest-average horse.|test=four_fence_table
+3(a)|LIST_SETUP||declare_initialize|Initialise a twenty-by-two linked array, all free links, head minus one and first free zero.|capacity=20;representation=2D_array;initialisation=linked_free_list
+3(b)|LIST_INSERT|LIST_SETUP|implement|For five inputs allocate a free node, link it at the front and update pointers; stop when full.|position=front;allocation=free_list;inputs=5;full_action=end_procedure
+3(c)(i)|LIST_TRAVERSE|LIST_SETUP|implement|Output data by following next links from FirstNode until the null pointer.|order=logical_link_order
+3(c)(ii)|MAIN_FLOW|LIST_INSERT,LIST_TRAVERSE|integrate|Call InsertData then OutputLinkedList.|calls=insert_then_traverse
+3(c)(iii)|EVIDENCE_RUN|LIST_INSERT,LIST_TRAVERSE|test_evidence|Screenshot for five prescribed inputs and pointer-ordered output.|test=5,1,2,3,8
+3(d)(i)|LIST_REMOVE|LIST_SETUP|implement|Find first occurrence, unlink it including head case and return node to the free list.|occurrence=first;assumption=present;recycle=free_list
+3(d)(ii)|MAIN_FLOW|LIST_REMOVE,LIST_TRAVERSE|integrate|Remove five, output After, then call traversal.|remove_value=5
+3(d)(iii)|EVIDENCE_RUN|LIST_REMOVE,LIST_TRAVERSE|test_evidence|Screenshots for both datasets after removal.|test=two_prescribed_datasets
+[w24_42]
+1(a)(i)|OOP_CLASS||declare_initialize|Declare EventItem with private attributes and constructor assignments.|class=EventItem
+1(a)(ii)|OOP_GET|OOP_CLASS|implement|Three getter methods return stored event properties.|getters=3
+1(b)(i)|DATA_STORAGE|OOP_CLASS|declare_initialize|Declare local Group array with five EventItem positions.|scope=local;capacity=5;data_type=EventItem
+1(b)(ii)|OOP_INSTANTIATE|DATA_STORAGE,OOP_CLASS|declare_initialize|Construct and store all five supplied events with parameters in correct order.|objects=5;input=fixed_event_table
+1(c)|OOP_CLASS,OOP_GET||declare_initialize|Declare Character, its five private attributes, constructor and name getter.|class=Character;compound=constructor_and_getter
+1(d)|RULE_COMPUTE|OOP_CLASS|implement|Select relevant skill, compare with difficulty and return the defined chance.|rule=skill_difficulty_difference_table;result=integer_percentage
+1(e)(i)|OOP_INSTANTIATE|OOP_CLASS|declare_initialize|Construct Tarz and Geni with their prescribed skills.|objects=Tarz,Geni
+1(e)(ii)|RULE_COMPUTE,MAIN_FLOW,OUTPUT_FORMAT|RULE_COMPUTE,OOP_GET|integrate|For each event compare both chances, accumulate winner points, handle draws and decide the group winner.|aggregation=event_points;tie_handling=event_and_group;calls=CalculateScore
+1(e)(iii)|EVIDENCE_RUN|RULE_COMPUTE,MAIN_FLOW,OUTPUT_FORMAT|test_evidence|Screenshot shows per-event and overall winners and points.|test=five_event_group
+2(a)|DATA_RECORD||declare_initialize|Queue record/class contains one integer array and two integer pointer fields.|representation=record_wrapper;array_capacity=100
+2(b)|QUEUE_SETUP|DATA_RECORD|declare_initialize|Create TheQueue, fill slots with minus one, set head minus one and tail zero.|capacity=100;wrapper=TheQueue
+2(c)|QUEUE_ENQUEUE|QUEUE_SETUP,DATA_RECORD|complete_pseudocode|Complete supplied assignments and full-boundary condition, return codes and retain structure.|algorithm_source=incomplete_pseudocode;full_result=-1;success_result=1
+2(d)|QUEUE_INSPECT|QUEUE_SETUP|implement|Concatenate the live queue range beginning at head, without removing data.|order=live_range;operation=non_destructive;delimiter=space
+2(e)(i)|VALIDATE_INPUT,MAIN_FLOW|QUEUE_ENQUEUE,QUEUE_INSPECT|integrate|Repeat invalid inputs until ten nonnegative integers are enqueued, report status and call ReturnAllData.|valid_inputs=10;range=integer_ge0
+2(e)(ii)|EVIDENCE_RUN|VALIDATE_INPUT,QUEUE_ENQUEUE,QUEUE_INSPECT|test_evidence|Screenshot proves minus one is rejected and ten valid values are stored.|test=invalid_minus1_then_ten_valid
+2(f)|QUEUE_DEQUEUE|QUEUE_SETUP|implement|Return minus one if empty or next data and advance head without changing the stored slot.|empty_result=-1;slot_policy=do_not_delete_or_replace
+2(g)(i)|MAIN_FLOW|QUEUE_DEQUEUE,QUEUE_INSPECT|integrate|Call Dequeue twice with result messages and ReturnAllData at the end.|dequeue_calls=2
+2(g)(ii)|EVIDENCE_RUN|QUEUE_DEQUEUE,QUEUE_INSPECT,MAIN_FLOW|test_evidence|Screenshot shows prescribed input and the two returned values.|test=10_down_to1
+3(a)|DATA_STORAGE||declare_initialize|Initialise local seven-by-three string array with empty values.|shape=7x3;scope=local;all_fields=string
+3(b)|FILE_READ_ARRAY|DATA_STORAGE|implement|Read groups of three fields into a two-dimensional array, with file exception handling.|file=HighScoreTable.txt;record_shape=ID_level_score_three_lines
+3(c)|OUTPUT_FORMAT|DATA_STORAGE|output|Output each player's ID, level and score in the required sentence.|layout=player_reached_level_with_score
+3(d)|BUBBLE_SORT|DATA_STORAGE|implement|Compare level first and score on ties, swapping complete records into required order.|keys=level_desc_then_score_desc;representation=2D_string_records;swap=all_three_fields
+3(e)(i)|MAIN_FLOW|FILE_READ_ARRAY,OUTPUT_FORMAT,BUBBLE_SORT|integrate|Read, label Before and output, sort, label After and output in the prescribed sequence.|flow=before_after_sort
+3(e)(ii)|EVIDENCE_RUN|FILE_READ_ARRAY,BUBBLE_SORT,OUTPUT_FORMAT|test_evidence|Screenshot shows both unsorted and sorted high-score tables.|test=before_after_tables

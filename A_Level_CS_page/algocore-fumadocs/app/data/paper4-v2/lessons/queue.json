@@ -1,0 +1,2792 @@
+{
+  "schema_version": "paper4-v2-lesson-dto-v1",
+  "identity": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.queue",
+    "package_id": "ac-9618-p4-2026-python.package.queue",
+    "slug": "queue",
+    "version": "pilot-v1",
+    "label": "queue",
+    "title": {
+      "vi": "Hàng đợi tuyến tính và vòng",
+      "en": "Linear and circular queues"
+    },
+    "scope": {
+      "role": "core",
+      "exam_year": 2026,
+      "programming_language": "Python",
+      "objective_mapping_status": "LEAD_MAPPED"
+    }
+  },
+  "authority": {
+    "official_pattern_ids": [
+      "QUEUE_DEQUEUE",
+      "QUEUE_ENQUEUE",
+      "QUEUE_INSPECT",
+      "QUEUE_REDUCE",
+      "QUEUE_SETUP"
+    ],
+    "approved_association_pattern_ids": [],
+    "association_scope": "official_pattern_owner",
+    "cambridge_marking_chain_ids": [
+      "paper4-2026.marking-chain.queue-dequeue",
+      "paper4-2026.marking-chain.queue-enqueue",
+      "paper4-2026.marking-chain.queue-inspect",
+      "paper4-2026.marking-chain.queue-reduce",
+      "paper4-2026.marking-chain.queue-setup"
+    ]
+  },
+  "sections": [
+    {
+      "section_id": "paper4.section.recognition",
+      "kind": "recognition",
+      "order": 1,
+      "data_keys": [
+        "identity",
+        "authority"
+      ]
+    },
+    {
+      "section_id": "paper4.section.exam-cues",
+      "kind": "exam-cues",
+      "order": 2,
+      "data_keys": [
+        "theory.knowledge_units[].exam_signals"
+      ]
+    },
+    {
+      "section_id": "paper4.section.knowledge",
+      "kind": "knowledge",
+      "order": 3,
+      "data_keys": [
+        "theory.knowledge_units"
+      ]
+    },
+    {
+      "section_id": "paper4.section.method",
+      "kind": "method",
+      "order": 4,
+      "data_keys": [
+        "theory.knowledge_units[].python_connection",
+        "theory.knowledge_units[].invariant_or_rule"
+      ]
+    },
+    {
+      "section_id": "paper4.section.worked-example",
+      "kind": "worked-example",
+      "order": 5,
+      "data_keys": [
+        "theory.knowledge_units[].micro_example"
+      ]
+    },
+    {
+      "section_id": "paper4.section.action-view",
+      "kind": "action-view",
+      "order": 6,
+      "data_keys": [
+        "python",
+        "tests",
+        "visual"
+      ]
+    },
+    {
+      "section_id": "paper4.section.marking-pitfalls",
+      "kind": "marking-pitfalls",
+      "order": 7,
+      "data_keys": [
+        "marking",
+        "errors"
+      ]
+    },
+    {
+      "section_id": "paper4.section.practice",
+      "kind": "practice",
+      "order": 8,
+      "data_keys": [
+        "practice"
+      ]
+    },
+    {
+      "section_id": "paper4.section.retrieval",
+      "kind": "retrieval",
+      "order": 9,
+      "data_keys": [
+        "retrieval"
+      ]
+    },
+    {
+      "section_id": "paper4.section.next-and-sources",
+      "kind": "next-and-sources",
+      "order": 10,
+      "data_keys": [
+        "navigation",
+        "sources"
+      ]
+    }
+  ],
+  "theory": {
+    "knowledge_units": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.dequeue",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-19.1-16",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 37,
+              "printed_page": "37",
+              "heading": "Algorithms",
+              "bullet_locator": "ADT delete list, queue facet",
+              "anchor_text": "Write algorithms to delete an item from each of the following: stack, queue, linked list"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-19-QUEUE",
+            "chapter": 19,
+            "printed_pages": [
+              466,
+              467,
+              468,
+              469
+            ],
+            "pdf_pages": [
+              482,
+              483,
+              484,
+              485
+            ],
+            "relationship": "direct_algorithm"
+          }
+        ],
+        "title": {
+          "en": "Dequeue, empty state and return contract",
+          "vi": "Dequeue, rỗng và giá trị trả về"
+        },
+        "explanation": {
+          "vi": "Dequeue kiểm tra rỗng trước, đọc item tại front, tùy representation có thể xóa dấu vết ô, rồi dịch front và giảm count. Giá trị được đọc trước khi xóa phải được trả về cho caller.",
+          "en": "Dequeue checks for empty first, reads the item at front, may clear the cell according to the representation, then advances front and decreases count. The value read before clearing must be returned to the caller."
+        },
+        "python_connection": {
+          "vi": "L028–L030 xử lý underflow bằng `None`; L031–L033 lưu item rồi xóa ô; L034–L035 cập nhật front/count; L037 trả item.",
+          "en": "L028-L030 handle underflow with `None`; L031-L033 save the item then clear the cell; L034-L035 update front/count; L037 returns the item."
+        },
+        "representation": {
+          "vi": "Đánh sáng ô front trước thao tác; sau thao tác chuyển mũi tên front, giảm count và ghi riêng returned item.",
+          "en": "Highlight the front cell before the operation; afterwards move the front arrow, reduce count, and show the returned item separately."
+        },
+        "invariant_or_rule": {
+          "vi": "Nếu rỗng, không đổi queue; nếu thành công, trả đúng phần tử lâu nhất, front tiến một modulo capacity và count giảm một.",
+          "en": "If empty, do not change the queue; if successful, return the oldest item, advance front by one modulo capacity, and decrease count by one."
+        },
+        "misconceptions": [
+          {
+            "vi": "Xóa ô trước khi lưu item nên trả `None`.",
+            "en": "Clearing the cell before saving the item, then returning `None`."
+          },
+          {
+            "vi": "Giảm count khi queue đã rỗng.",
+            "en": "Decreasing count when the queue is already empty."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề yêu cầu delete/dequeue và trả phần tử bị lấy.",
+            "en": "The task asks for delete/dequeue and the removed item must be returned."
+          },
+          {
+            "vi": "Cần xử lý underflow hoặc sentinel khi rỗng.",
+            "en": "Underflow or an empty sentinel must be handled."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "front=2, capacity=4, item tại index 2 là 'A'.",
+            "en": "front=2, capacity=4, and index 2 contains 'A'."
+          },
+          "walkthrough": {
+            "vi": "Lưu 'A', xóa index 2, front thành 3, giảm count và trả 'A'.",
+            "en": "Save 'A', clear index 2, set front to 3, decrease count, and return 'A'."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.queue.pilot-v1"
+          ],
+          "active_line_ids": [
+            "queue.v1.L028",
+            "queue.v1.L031",
+            "queue.v1.L032",
+            "queue.v1.L033",
+            "queue.v1.L034",
+            "queue.v1.L037"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Vì sao L032 phải chạy trước L033?",
+            "en": "Why must L032 run before L033?"
+          },
+          "answer": {
+            "vi": "L032 giữ giá trị cần trả trước khi L033 xóa ô.",
+            "en": "L032 preserves the return value before L033 clears the cell."
+          },
+          "rationale": {
+            "vi": "Thứ tự cập nhật là một phần của contract thao tác.",
+            "en": "Update order is part of the operation contract."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.enqueue",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-19.1-12",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 37,
+              "printed_page": "37",
+              "heading": "Algorithms",
+              "bullet_locator": "ADT insert list, queue facet",
+              "anchor_text": "Write algorithms to insert an item into each of the following: stack, queue, linked list, binary tree"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-19-QUEUE",
+            "chapter": 19,
+            "printed_pages": [
+              466,
+              467,
+              468,
+              469
+            ],
+            "pdf_pages": [
+              482,
+              483,
+              484,
+              485
+            ],
+            "relationship": "direct_algorithm"
+          }
+        ],
+        "title": {
+          "en": "Enqueue, full state and wrapping",
+          "vi": "Enqueue, đầy và vòng chỉ số"
+        },
+        "explanation": {
+          "vi": "Enqueue kiểm tra đầy trước khi ghi, đặt item vào `rear`, dịch rear theo vòng và tăng count. Thứ tự cập nhật cần giữ để trace chỉ ra đúng ô vừa thay đổi.",
+          "en": "Enqueue checks for full before writing, places the item at `rear`, advances rear circularly, and increments count. The update order must remain clear so a trace identifies the changed cell."
+        },
+        "python_connection": {
+          "vi": "L017–L019 bảo vệ overflow; L020 giữ insert index; L021 ghi item; L022 wrap rear; L023 tăng count. L024 ghi trace bằng index trước khi rear đổi.",
+          "en": "L017-L019 protect against overflow; L020 saves the insertion index; L021 writes the item; L022 wraps rear; L023 increments count. L024 records the old index after rear changes."
+        },
+        "representation": {
+          "vi": "Hiển thị trạng thái trước/sau gồm items, front, rear, count và đánh sáng đúng ô `insert_index`.",
+          "en": "Show before/after states for items, front, rear, and count, highlighting exactly `insert_index`."
+        },
+        "invariant_or_rule": {
+          "vi": "Nếu đầy, trạng thái không đổi và trả thất bại; nếu thành công, đúng một ô nhận item, rear tiến một bước modulo capacity và count tăng một.",
+          "en": "If full, state remains unchanged and failure is returned; if successful, exactly one cell receives the item, rear advances one modulo capacity, and count increases by one."
+        },
+        "misconceptions": [
+          {
+            "vi": "Ghi đè phần tử khi queue đầy.",
+            "en": "Overwriting an item when the queue is full."
+          },
+          {
+            "vi": "Tăng rear không modulo nên vượt chỉ số cuối.",
+            "en": "Incrementing rear without modulo and moving past the last index."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề yêu cầu insert/enqueue và chỉ rõ hành vi khi đầy.",
+            "en": "The task asks for insert/enqueue and specifies full-state behaviour."
+          },
+          {
+            "vi": "Rear/tail ở cuối array cần quay về 0.",
+            "en": "Rear/tail at the array end must wrap to 0."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "Queue có capacity=3, rear=2, count=2; thực hiện enqueue giá trị 9.",
+            "en": "A queue has capacity=3, rear=2, and count=2; enqueue the value 9."
+          },
+          "walkthrough": {
+            "vi": "Ghi 9 vào index 2, rear thành `(2+1)%3=0`, count thành 3.",
+            "en": "Write 9 at index 2, set rear to `(2+1)%3=0`, and count to 3."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.queue.pilot-v1"
+          ],
+          "active_line_ids": [
+            "queue.v1.L017",
+            "queue.v1.L020",
+            "queue.v1.L021",
+            "queue.v1.L022",
+            "queue.v1.L023"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Tại sao lưu `insert_index` trước khi đổi rear?",
+            "en": "Why save `insert_index` before changing rear?"
+          },
+          "answer": {
+            "vi": "Để ghi và trace đúng ô được dùng cho lần enqueue hiện tại.",
+            "en": "To write and trace the cell used by the current enqueue."
+          },
+          "rationale": {
+            "vi": "Rear sau cập nhật đã chỉ thao tác kế tiếp.",
+            "en": "After the update, rear points to the next operation."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.inspect-live-items",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-20.1-04",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 38,
+              "printed_page": "38",
+              "heading": "Programming Paradigms",
+              "bullet_locator": "Imperative note 2, constructs facet",
+              "anchor_text": "programming code that uses variables, constructs, procedures and functions."
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-19-QUEUE",
+            "chapter": 19,
+            "printed_pages": [
+              466,
+              467,
+              468,
+              469
+            ],
+            "pdf_pages": [
+              482,
+              483,
+              484,
+              485
+            ],
+            "relationship": "component_foundation"
+          },
+          {
+            "section_id": "BOOK-11-CONSTRUCTS",
+            "chapter": 11,
+            "printed_pages": [
+              271,
+              272,
+              273,
+              274,
+              275
+            ],
+            "pdf_pages": [
+              287,
+              288,
+              289,
+              290,
+              291
+            ],
+            "relationship": "component_foundation"
+          }
+        ],
+        "title": {
+          "en": "Inspecting live items without removal",
+          "vi": "Đọc các phần tử đang dùng mà không xóa"
+        },
+        "explanation": {
+          "vi": "Duyệt queue không phá hủy phải đọc đúng `count` phần tử theo logical order từ front và không thay đổi front/rear/count. Với circular array, index vật lý của offset là `(front + offset) % capacity`.",
+          "en": "A non-destructive queue traversal reads exactly `count` items in logical order from front without changing front/rear/count. In a circular array, the physical index for an offset is `(front + offset) % capacity`."
+        },
+        "python_connection": {
+          "vi": "L039–L044 tạo list mới; L041 lặp đúng count lần và L042 ánh xạ offset qua modulo. Không line nào gán lại front, rear hoặc count.",
+          "en": "L039-L044 build a new list; L041 iterates exactly count times and L042 maps each offset with modulo. No line reassigns front, rear, or count."
+        },
+        "representation": {
+          "vi": "Đánh số logical offset 0..count-1 phía trên các ô vật lý tương ứng; bỏ qua ô `None` không thuộc tập live thay vì quét toàn array.",
+          "en": "Label logical offsets 0..count-1 over their corresponding physical cells; ignore non-live `None` cells rather than scanning the whole array."
+        },
+        "invariant_or_rule": {
+          "vi": "Kết quả có đúng count phần tử theo FIFO order; toàn bộ trạng thái queue trước và sau giống nhau.",
+          "en": "The result contains exactly count items in FIFO order; the complete queue state is identical before and after inspection."
+        },
+        "misconceptions": [
+          {
+            "vi": "Duyệt toàn bộ array rồi loại `None`, sai nếu `None` là dữ liệu hợp lệ hoặc thứ tự đã wrap.",
+            "en": "Scanning the whole array and filtering `None`, which fails if `None` is valid data or order has wrapped."
+          },
+          {
+            "vi": "Gọi dequeue để xem dữ liệu nhưng không khôi phục queue.",
+            "en": "Calling dequeue to inspect data without restoring the queue."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề yêu cầu display/total/search nhưng phải giữ queue.",
+            "en": "The task asks to display/total/search while preserving the queue."
+          },
+          {
+            "vi": "Có count và front cho phép duyệt logical items.",
+            "en": "Count and front are available for traversing logical items."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "Xét queue vòng có front=3, count=3 và capacity=5.",
+            "en": "Consider a circular queue with front=3, count=3, and capacity=5."
+          },
+          "walkthrough": {
+            "vi": "Các index lần lượt là 3,4,0; front/rear/count không đổi sau khi tạo list kết quả.",
+            "en": "The indices are 3, 4, and 0; front/rear/count remain unchanged after building the result list."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.queue.pilot-v1"
+          ],
+          "active_line_ids": [
+            "queue.v1.L039",
+            "queue.v1.L041",
+            "queue.v1.L042",
+            "queue.v1.L044"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Vì sao lặp theo count thay vì đến khi gặp `None`?",
+            "en": "Why iterate by count instead of stopping at `None`?"
+          },
+          "answer": {
+            "vi": "Count là số phần tử sống theo representation; sentinel trong array không phải contract tổng quát cho dữ liệu.",
+            "en": "Count is the live-item total under this representation; an array sentinel is not a general data contract."
+          },
+          "rationale": {
+            "vi": "Dùng metadata của ADT giữ đúng thứ tự và số lượng.",
+            "en": "Using ADT metadata preserves order and cardinality."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.reduce-consume",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-20.1-04",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 38,
+              "printed_page": "38",
+              "heading": "Programming Paradigms",
+              "bullet_locator": "Imperative note 2, constructs facet",
+              "anchor_text": "programming code that uses variables, constructs, procedures and functions."
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-19-QUEUE",
+            "chapter": 19,
+            "printed_pages": [
+              466,
+              467,
+              468,
+              469
+            ],
+            "pdf_pages": [
+              482,
+              483,
+              484,
+              485
+            ],
+            "relationship": "component_foundation"
+          },
+          {
+            "section_id": "BOOK-09-ACCUMULATE",
+            "chapter": 9,
+            "printed_pages": [
+              227,
+              228,
+              229
+            ],
+            "pdf_pages": [
+              243,
+              244,
+              245
+            ],
+            "relationship": "component_foundation"
+          },
+          {
+            "section_id": "BOOK-19-RECURSION",
+            "chapter": 19,
+            "printed_pages": [
+              490,
+              491,
+              492,
+              493
+            ],
+            "pdf_pages": [
+              506,
+              507,
+              508,
+              509
+            ],
+            "relationship": "component_foundation"
+          }
+        ],
+        "title": {
+          "en": "Reducing queue data by inspection or consumption",
+          "vi": "Tổng hợp queue bằng đọc hoặc tiêu thụ dữ liệu"
+        },
+        "explanation": {
+          "vi": "Reduce gộp nhiều item thành một kết quả, ví dụ tổng; trước tiên phải quyết định thao tác chỉ đọc hay tiêu thụ queue. Nếu tiêu thụ, termination dựa vào trạng thái rỗng; nếu giữ nguyên, duyệt đúng live items mà không gọi dequeue.",
+          "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing."
+        },
+        "python_connection": {
+          "vi": "Pilot chọn preserve: L062 gọi `live_items`, rồi L063 tính tổng số từ bản sao logical. Không dequeue trong bước reduce, nên queue vẫn giữ dữ liệu; artifact chưa triển khai biến thể recursive consuming.",
+          "en": "The pilot chooses preserve: L062 calls `live_items`, then L063 totals numeric values from the logical copy. It does not dequeue during reduction, so the queue is preserved; the artifact does not implement a recursive consuming variant."
+        },
+        "representation": {
+          "vi": "Ghi accumulator cùng item đang xử lý và đánh dấu rõ policy `preserve` hoặc `consume`; với recursion, mỗi frame giữ phần còn chờ cộng.",
+          "en": "Show the accumulator and current item, and label the policy as `preserve` or `consume`; with recursion, each frame holds the pending combination."
+        },
+        "invariant_or_rule": {
+          "vi": "Kết quả bằng fold trên đúng logical items; policy trạng thái sau phải khớp yêu cầu: nguyên vẹn nếu preserve, rỗng nếu consume hết.",
+          "en": "The result equals a fold over exactly the logical items; final state must match the policy: unchanged for preserve, empty after full consumption."
+        },
+        "misconceptions": [
+          {
+            "vi": "Vô tình làm rỗng queue khi đề yêu cầu giữ nguyên.",
+            "en": "Accidentally emptying the queue when the task requires preservation."
+          },
+          {
+            "vi": "Cộng cả ô không sử dụng hoặc dữ liệu không phải số.",
+            "en": "Adding unused cells or non-numeric data."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề yêu cầu total/count/find trên queue và có từ khóa giữ nguyên hoặc remove.",
+            "en": "The task asks for total/count/find on a queue and includes preserve/remove language."
+          },
+          {
+            "vi": "Có thể yêu cầu recursive processing của ADT.",
+            "en": "Recursive processing of the ADT may be required."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "Queue logical `[2,'x',5]`, policy preserve.",
+            "en": "Logical queue `[2,'x',5]`, preserve policy."
+          },
+          "walkthrough": {
+            "vi": "Lọc giá trị số rồi tổng bằng 7; trạng thái queue không đổi.",
+            "en": "Filter numeric values and total 7; the queue state remains unchanged."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.queue.pilot-v1"
+          ],
+          "active_line_ids": [
+            "queue.v1.L062",
+            "queue.v1.L063",
+            "queue.v1.L027",
+            "queue.v1.L039"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Artifact pilot đang dùng policy nào, và line nào chứng minh?",
+            "en": "Which policy does the pilot use, and which lines establish it?"
+          },
+          "answer": {
+            "vi": "Preserve; L062 lấy bản sao từ `live_items` và L063 reduce bản sao, không gọi dequeue.",
+            "en": "Preserve; L062 obtains a copy from `live_items` and L063 reduces that copy without calling dequeue."
+          },
+          "rationale": {
+            "vi": "Policy phải được đọc từ source contract trước khi chọn thuật toán.",
+            "en": "The policy must be read from the source contract before choosing an algorithm."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions",
+        "disposition": "publish",
+        "version": "2.0.0-pilot.1",
+        "objective_refs": [
+          {
+            "objective_id": "SYL-19.1-22",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 37,
+              "printed_page": "37",
+              "heading": "Algorithms",
+              "bullet_locator": "ADT implementation list, queue facet",
+              "anchor_text": "Describe the following ADTs and demonstrate how they can be implemented from appropriate built-in types or other ADTs: stack, queue, linked list, dictionary, binary tree"
+            }
+          },
+          {
+            "objective_id": "SYL-10.4-01",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 29,
+              "printed_page": "29",
+              "heading": "Introduction to Abstract Data Types (ADT)",
+              "bullet_locator": "ADT opening objective",
+              "anchor_text": "an ADT is a collection of data and a set of operations on those data"
+            }
+          },
+          {
+            "objective_id": "SYL-10.4-02",
+            "syllabus_version": "2026",
+            "locator": {
+              "source_id": "syllabus_2026_v2",
+              "pdf_page": 29,
+              "printed_page": "29",
+              "heading": "Introduction to Abstract Data Types (ADT)",
+              "bullet_locator": "ADT array objective; AS no-pseudocode note does not remove ALevel implementation",
+              "anchor_text": "Describe how a queue, stack and linked list can be implemented using arrays"
+            }
+          }
+        ],
+        "book_refs": [
+          {
+            "section_id": "BOOK-19-QUEUE",
+            "chapter": 19,
+            "printed_pages": [
+              466,
+              467,
+              468,
+              469
+            ],
+            "pdf_pages": [
+              482,
+              483,
+              484,
+              485
+            ],
+            "relationship": "direct_algorithm"
+          },
+          {
+            "section_id": "BOOK-10-ADT",
+            "chapter": 10,
+            "printed_pages": [
+              250,
+              251
+            ],
+            "pdf_pages": [
+              266,
+              267
+            ],
+            "relationship": "direct_algorithm"
+          }
+        ],
+        "title": {
+          "en": "Head, tail, count and empty conventions",
+          "vi": "Head, tail, count và quy ước rỗng"
+        },
+        "explanation": {
+          "vi": "Queue là FIFO: phần tử vào trước ra trước. Với circular array, `front` chỉ phần tử sẽ lấy, `rear` chỉ ô sẽ chèn kế tiếp và `count` phân biệt rỗng với đầy khi hai chỉ số bằng nhau.",
+          "en": "A queue is FIFO: the first item inserted is the first removed. In a circular array, `front` points to the next item to remove, `rear` to the next insertion cell, and `count` distinguishes empty from full when the indices coincide."
+        },
+        "python_connection": {
+          "vi": "L010–L013 khởi tạo array, front, rear, count; L022/L034 dùng modulo để quay vòng. Representation của pilot chọn `rear` là next insertion index và `count` là logical size.",
+          "en": "L010-L013 initialise the array, front, rear, and count; L022/L034 use modulo for wraparound. The pilot representation defines `rear` as the next insertion index and `count` as logical size."
+        },
+        "representation": {
+          "vi": "Vẽ vòng các ô 0..capacity-1, hai mũi tên front/rear và nhãn count. Liệt kê logical order bắt đầu ở front, không theo thứ tự vật lý mặc định.",
+          "en": "Draw cells 0..capacity-1 in a ring, add front/rear arrows and count. List logical order starting at front rather than assuming physical array order."
+        },
+        "invariant_or_rule": {
+          "vi": "`0 <= count <= capacity`; nếu count>0 thì front trỏ phần tử sống đầu; rear luôn là ô chèn kế tiếp theo quy ước pilot.",
+          "en": "`0 <= count <= capacity`; when count>0, front points to the first live item; rear is always the next insertion cell under the pilot convention."
+        },
+        "misconceptions": [
+          {
+            "vi": "Cho rằng front==rear luôn có nghĩa là rỗng dù không xét count.",
+            "en": "Assuming front==rear always means empty without considering count."
+          },
+          {
+            "vi": "Đọc queue theo index 0..count-1 khi front đã wrap.",
+            "en": "Reading the queue at indices 0..count-1 after front has wrapped."
+          }
+        ],
+        "exam_signals": [
+          {
+            "vi": "Đề cho array cùng head/front, tail/rear hoặc count.",
+            "en": "The task provides an array plus head/front, tail/rear, or count."
+          },
+          {
+            "vi": "Cần nêu quy ước empty/full trước khi viết thao tác.",
+            "en": "Empty/full conventions must be stated before implementing operations."
+          }
+        ],
+        "micro_example": {
+          "scenario": {
+            "vi": "Xét queue có capacity=4, front=3, rear=1 và count=2.",
+            "en": "Consider a queue with capacity=4, front=3, rear=1, and count=2."
+          },
+          "walkthrough": {
+            "vi": "Hai phần tử sống nằm ở index 3 rồi 0; rear=1 là ô chèn kế tiếp.",
+            "en": "The two live items are at indices 3 then 0; rear=1 is the next insertion cell."
+          },
+          "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+          "python_artifact_refs": [
+            "ac-9618-p4-2026-python.artifact.queue.pilot-v1"
+          ],
+          "active_line_ids": [
+            "queue.v1.L010",
+            "queue.v1.L011",
+            "queue.v1.L012",
+            "queue.v1.L013",
+            "queue.v1.L022"
+          ],
+          "authority": "AlgoCore_authored_teaching_example"
+        },
+        "self_check": {
+          "prompt": {
+            "vi": "Vì sao count cần thiết khi front và rear đều bằng 0?",
+            "en": "Why is count needed when both front and rear equal 0?"
+          },
+          "answer": {
+            "vi": "Cùng trạng thái chỉ số có thể là rỗng (count=0) hoặc đầy sau một vòng (count=capacity).",
+            "en": "The same index state may mean empty (count=0) or full after a wrap (count=capacity)."
+          },
+          "rationale": {
+            "vi": "Phải đọc cả ba biến theo cùng convention.",
+            "en": "All three variables must be interpreted under one convention."
+          },
+          "answer_hidden_initially": true,
+          "authority": "AlgoCore_authored_self_check"
+        }
+      }
+    ]
+  },
+  "python": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.queue",
+    "pattern_ids": [
+      "QUEUE_DEQUEUE",
+      "QUEUE_ENQUEUE",
+      "QUEUE_INSPECT",
+      "QUEUE_REDUCE",
+      "QUEUE_SETUP"
+    ],
+    "version": "pilot-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "queue.v1.L001",
+        "order": 1,
+        "text": "import json"
+      },
+      {
+        "line_id": "queue.v1.L002",
+        "order": 2,
+        "text": "import sys"
+      },
+      {
+        "line_id": "queue.v1.L003",
+        "order": 3,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L004",
+        "order": 4,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L005",
+        "order": 5,
+        "text": "class CircularQueue:"
+      },
+      {
+        "line_id": "queue.v1.L006",
+        "order": 6,
+        "text": "    def __init__(self, capacity, trace):"
+      },
+      {
+        "line_id": "queue.v1.L007",
+        "order": 7,
+        "text": "        if capacity <= 0:"
+      },
+      {
+        "line_id": "queue.v1.L008",
+        "order": 8,
+        "text": "            trace.append({\"event\": \"reject_invalid_capacity\", \"capacity\": capacity})"
+      },
+      {
+        "line_id": "queue.v1.L009",
+        "order": 9,
+        "text": "            raise ValueError(\"capacity must be positive\")"
+      },
+      {
+        "line_id": "queue.v1.L010",
+        "order": 10,
+        "text": "        self.items = [None] * capacity"
+      },
+      {
+        "line_id": "queue.v1.L011",
+        "order": 11,
+        "text": "        self.front = 0"
+      },
+      {
+        "line_id": "queue.v1.L012",
+        "order": 12,
+        "text": "        self.rear = 0"
+      },
+      {
+        "line_id": "queue.v1.L013",
+        "order": 13,
+        "text": "        self.count = 0"
+      },
+      {
+        "line_id": "queue.v1.L014",
+        "order": 14,
+        "text": "        self.trace = trace"
+      },
+      {
+        "line_id": "queue.v1.L015",
+        "order": 15,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L016",
+        "order": 16,
+        "text": "    def enqueue(self, item):"
+      },
+      {
+        "line_id": "queue.v1.L017",
+        "order": 17,
+        "text": "        self.trace.append({\"event\": \"check_full\", \"count\": self.count, \"capacity\": len(self.items)})"
+      },
+      {
+        "line_id": "queue.v1.L018",
+        "order": 18,
+        "text": "        if self.count == len(self.items):"
+      },
+      {
+        "line_id": "queue.v1.L019",
+        "order": 19,
+        "text": "            return False"
+      },
+      {
+        "line_id": "queue.v1.L020",
+        "order": 20,
+        "text": "        insert_index = self.rear"
+      },
+      {
+        "line_id": "queue.v1.L021",
+        "order": 21,
+        "text": "        self.items[insert_index] = item"
+      },
+      {
+        "line_id": "queue.v1.L022",
+        "order": 22,
+        "text": "        self.rear = (self.rear + 1) % len(self.items)"
+      },
+      {
+        "line_id": "queue.v1.L023",
+        "order": 23,
+        "text": "        self.count += 1"
+      },
+      {
+        "line_id": "queue.v1.L024",
+        "order": 24,
+        "text": "        self.trace.append({\"event\": \"enqueue\", \"index\": insert_index, \"item\": item})"
+      },
+      {
+        "line_id": "queue.v1.L025",
+        "order": 25,
+        "text": "        return True"
+      },
+      {
+        "line_id": "queue.v1.L026",
+        "order": 26,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L027",
+        "order": 27,
+        "text": "    def dequeue(self):"
+      },
+      {
+        "line_id": "queue.v1.L028",
+        "order": 28,
+        "text": "        self.trace.append({\"event\": \"check_empty\", \"count\": self.count})"
+      },
+      {
+        "line_id": "queue.v1.L029",
+        "order": 29,
+        "text": "        if self.count == 0:"
+      },
+      {
+        "line_id": "queue.v1.L030",
+        "order": 30,
+        "text": "            return None"
+      },
+      {
+        "line_id": "queue.v1.L031",
+        "order": 31,
+        "text": "        remove_index = self.front"
+      },
+      {
+        "line_id": "queue.v1.L032",
+        "order": 32,
+        "text": "        item = self.items[remove_index]"
+      },
+      {
+        "line_id": "queue.v1.L033",
+        "order": 33,
+        "text": "        self.items[remove_index] = None"
+      },
+      {
+        "line_id": "queue.v1.L034",
+        "order": 34,
+        "text": "        self.front = (self.front + 1) % len(self.items)"
+      },
+      {
+        "line_id": "queue.v1.L035",
+        "order": 35,
+        "text": "        self.count -= 1"
+      },
+      {
+        "line_id": "queue.v1.L036",
+        "order": 36,
+        "text": "        self.trace.append({\"event\": \"dequeue\", \"index\": remove_index, \"item\": item})"
+      },
+      {
+        "line_id": "queue.v1.L037",
+        "order": 37,
+        "text": "        return item"
+      },
+      {
+        "line_id": "queue.v1.L038",
+        "order": 38,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L039",
+        "order": 39,
+        "text": "    def live_items(self):"
+      },
+      {
+        "line_id": "queue.v1.L040",
+        "order": 40,
+        "text": "        values = []"
+      },
+      {
+        "line_id": "queue.v1.L041",
+        "order": 41,
+        "text": "        for offset in range(self.count):"
+      },
+      {
+        "line_id": "queue.v1.L042",
+        "order": 42,
+        "text": "            values.append(self.items[(self.front + offset) % len(self.items)])"
+      },
+      {
+        "line_id": "queue.v1.L043",
+        "order": 43,
+        "text": "        self.trace.append({\"event\": \"inspect\", \"values\": values})"
+      },
+      {
+        "line_id": "queue.v1.L044",
+        "order": 44,
+        "text": "        return values"
+      },
+      {
+        "line_id": "queue.v1.L045",
+        "order": 45,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L046",
+        "order": 46,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L047",
+        "order": 47,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "queue.v1.L048",
+        "order": 48,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "queue.v1.L049",
+        "order": 49,
+        "text": "    try:"
+      },
+      {
+        "line_id": "queue.v1.L050",
+        "order": 50,
+        "text": "        queue = CircularQueue(fixture[\"capacity\"], trace)"
+      },
+      {
+        "line_id": "queue.v1.L051",
+        "order": 51,
+        "text": "    except ValueError as error:"
+      },
+      {
+        "line_id": "queue.v1.L052",
+        "order": 52,
+        "text": "        return {\"status\": \"INVALID_CAPACITY\", \"message\": str(error), \"trace\": trace}"
+      },
+      {
+        "line_id": "queue.v1.L053",
+        "order": 53,
+        "text": "    removed = []"
+      },
+      {
+        "line_id": "queue.v1.L054",
+        "order": 54,
+        "text": "    operation_results = []"
+      },
+      {
+        "line_id": "queue.v1.L055",
+        "order": 55,
+        "text": "    for operation in fixture[\"operations\"]:"
+      },
+      {
+        "line_id": "queue.v1.L056",
+        "order": 56,
+        "text": "        if operation[0] == \"enqueue\":"
+      },
+      {
+        "line_id": "queue.v1.L057",
+        "order": 57,
+        "text": "            operation_results.append(queue.enqueue(operation[1]))"
+      },
+      {
+        "line_id": "queue.v1.L058",
+        "order": 58,
+        "text": "        elif operation[0] == \"dequeue\":"
+      },
+      {
+        "line_id": "queue.v1.L059",
+        "order": 59,
+        "text": "            removed.append(queue.dequeue())"
+      },
+      {
+        "line_id": "queue.v1.L060",
+        "order": 60,
+        "text": "        else:"
+      },
+      {
+        "line_id": "queue.v1.L061",
+        "order": 61,
+        "text": "            return {\"status\": \"UNKNOWN_OPERATION\", \"operation\": operation[0], \"trace\": trace}"
+      },
+      {
+        "line_id": "queue.v1.L062",
+        "order": 62,
+        "text": "    live = queue.live_items()"
+      },
+      {
+        "line_id": "queue.v1.L063",
+        "order": 63,
+        "text": "    numeric_total = sum(item for item in live if isinstance(item, (int, float)))"
+      },
+      {
+        "line_id": "queue.v1.L064",
+        "order": 64,
+        "text": "    return {"
+      },
+      {
+        "line_id": "queue.v1.L065",
+        "order": 65,
+        "text": "        \"status\": \"OK\","
+      },
+      {
+        "line_id": "queue.v1.L066",
+        "order": 66,
+        "text": "        \"operation_results\": operation_results,"
+      },
+      {
+        "line_id": "queue.v1.L067",
+        "order": 67,
+        "text": "        \"removed\": removed,"
+      },
+      {
+        "line_id": "queue.v1.L068",
+        "order": 68,
+        "text": "        \"live\": live,"
+      },
+      {
+        "line_id": "queue.v1.L069",
+        "order": 69,
+        "text": "        \"numeric_total\": numeric_total,"
+      },
+      {
+        "line_id": "queue.v1.L070",
+        "order": 70,
+        "text": "        \"front\": queue.front,"
+      },
+      {
+        "line_id": "queue.v1.L071",
+        "order": 71,
+        "text": "        \"rear\": queue.rear,"
+      },
+      {
+        "line_id": "queue.v1.L072",
+        "order": 72,
+        "text": "        \"count\": queue.count,"
+      },
+      {
+        "line_id": "queue.v1.L073",
+        "order": 73,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "queue.v1.L074",
+        "order": 74,
+        "text": "    }"
+      },
+      {
+        "line_id": "queue.v1.L075",
+        "order": 75,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L076",
+        "order": 76,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L077",
+        "order": 77,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "queue.v1.L078",
+        "order": 78,
+        "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
+      },
+      {
+        "line_id": "queue.v1.L079",
+        "order": 79,
+        "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
+      },
+      {
+        "line_id": "queue.v1.L080",
+        "order": 80,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "70b10587cc66936da9dbbd65d3af17bba8842c95b18d39b23ca770877f13c52a",
+    "caption": {
+      "vi": "Hàng đợi vòng duy trì front, rear và count qua enqueue, dequeue, inspect và reduce.",
+      "en": "A circular queue maintaining front, rear and count through enqueue, dequeue, inspect and reduce."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r2.a3.queue.pilot-v1.author-run",
+      "independent_rerun_ref": "p4r2.a3.queue.pilot-v1.independent-rerun",
+      "execution_log_sha256": "86163a0e755b9f768508381036a1e13ed715645c428bc19408de53a376917d5e"
+    }
+  },
+  "tests": {
+    "fixtures": [
+      {
+        "fixture_id": "queue.normal",
+        "case_kind": "normal",
+        "input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ]
+        }
+      },
+      {
+        "fixture_id": "queue.boundary",
+        "case_kind": "boundary",
+        "input": {
+          "capacity": 2,
+          "operations": [
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              5
+            ],
+            [
+              "enqueue",
+              6
+            ],
+            [
+              "enqueue",
+              7
+            ]
+          ]
+        }
+      },
+      {
+        "fixture_id": "queue.failure",
+        "case_kind": "failure",
+        "input": {
+          "capacity": 0,
+          "operations": []
+        }
+      }
+    ],
+    "expected_outputs": [
+      {
+        "expected_output_id": "queue.normal.expected-output",
+        "fixture_ref": "queue.normal",
+        "value": {
+          "count": 3,
+          "front": 1,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "numeric_total": 90,
+          "operation_results": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "rear": 1,
+          "removed": [
+            10
+          ],
+          "status": "OK",
+          "trace": [
+            {
+              "capacity": 3,
+              "count": 0,
+              "event": "check_full"
+            },
+            {
+              "event": "enqueue",
+              "index": 0,
+              "item": 10
+            },
+            {
+              "capacity": 3,
+              "count": 1,
+              "event": "check_full"
+            },
+            {
+              "event": "enqueue",
+              "index": 1,
+              "item": 20
+            },
+            {
+              "count": 2,
+              "event": "check_empty"
+            },
+            {
+              "event": "dequeue",
+              "index": 0,
+              "item": 10
+            },
+            {
+              "capacity": 3,
+              "count": 1,
+              "event": "check_full"
+            },
+            {
+              "event": "enqueue",
+              "index": 2,
+              "item": 30
+            },
+            {
+              "capacity": 3,
+              "count": 2,
+              "event": "check_full"
+            },
+            {
+              "event": "enqueue",
+              "index": 0,
+              "item": 40
+            },
+            {
+              "event": "inspect",
+              "values": [
+                20,
+                30,
+                40
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "expected_output_id": "queue.boundary.expected-output",
+        "fixture_ref": "queue.boundary",
+        "value": {
+          "count": 2,
+          "front": 0,
+          "live": [
+            5,
+            6
+          ],
+          "numeric_total": 11,
+          "operation_results": [
+            true,
+            true,
+            false
+          ],
+          "rear": 0,
+          "removed": [
+            null
+          ],
+          "status": "OK",
+          "trace": [
+            {
+              "count": 0,
+              "event": "check_empty"
+            },
+            {
+              "capacity": 2,
+              "count": 0,
+              "event": "check_full"
+            },
+            {
+              "event": "enqueue",
+              "index": 0,
+              "item": 5
+            },
+            {
+              "capacity": 2,
+              "count": 1,
+              "event": "check_full"
+            },
+            {
+              "event": "enqueue",
+              "index": 1,
+              "item": 6
+            },
+            {
+              "capacity": 2,
+              "count": 2,
+              "event": "check_full"
+            },
+            {
+              "event": "inspect",
+              "values": [
+                5,
+                6
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "expected_output_id": "queue.failure.expected-output",
+        "fixture_ref": "queue.failure",
+        "value": {
+          "message": "capacity must be positive",
+          "status": "INVALID_CAPACITY",
+          "trace": [
+            {
+              "capacity": 0,
+              "event": "reject_invalid_capacity"
+            }
+          ]
+        }
+      }
+    ],
+    "normal_boundary_failure_coverage": {
+      "normal": true,
+      "boundary": true,
+      "failure": true
+    },
+    "author_run_ref": "p4r2.a3.queue.pilot-v1.author-run",
+    "independent_rerun_ref": "p4r2.a3.queue.pilot-v1.independent-rerun",
+    "execution_log_sha256": "86163a0e755b9f768508381036a1e13ed715645c428bc19408de53a376917d5e"
+  },
+  "visual": {
+    "owned_patterns": [
+      {
+        "pattern_id": "QUEUE_DEQUEUE",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.queue",
+        "owner_lesson_slug": "queue",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+        "trace_url": "/paper4-v2/traces/queue-dequeue.json",
+        "scenario_count": 3,
+        "event_count": 19
+      },
+      {
+        "pattern_id": "QUEUE_ENQUEUE",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.queue",
+        "owner_lesson_slug": "queue",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+        "trace_url": "/paper4-v2/traces/queue-enqueue.json",
+        "scenario_count": 3,
+        "event_count": 19
+      },
+      {
+        "pattern_id": "QUEUE_INSPECT",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.queue",
+        "owner_lesson_slug": "queue",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+        "trace_url": "/paper4-v2/traces/queue-inspect.json",
+        "scenario_count": 3,
+        "event_count": 19
+      },
+      {
+        "pattern_id": "QUEUE_REDUCE",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.queue",
+        "owner_lesson_slug": "queue",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+        "trace_url": "/paper4-v2/traces/queue-reduce.json",
+        "scenario_count": 3,
+        "event_count": 19
+      },
+      {
+        "pattern_id": "QUEUE_SETUP",
+        "owner_lesson_id": "ac-9618-p4-2026-python.lesson.queue",
+        "owner_lesson_slug": "queue",
+        "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+        "trace_url": "/paper4-v2/traces/queue-setup.json",
+        "scenario_count": 3,
+        "event_count": 19
+      }
+    ],
+    "approved_static_or_representational_support": []
+  },
+  "marking": {
+    "chains": [
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-dequeue",
+        "pattern_id": "QUEUE_DEQUEUE",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-16",
+        "method_step_refs": [
+          "queue-dequeue.step.contract",
+          "queue-dequeue.step.empty-guard",
+          "queue-dequeue.step.save-item",
+          "queue-dequeue.step.advance",
+          "queue-dequeue.step.return"
+        ],
+        "error_ref": "b3.queue-dequeue.error.read-after-advance",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-dequeue.error.read-after-advance, b3.queue-dequeue.error.sentinel-or-reset, b3.queue-dequeue.error.published-example.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-dequeue.error.read-after-advance, b3.queue-dequeue.error.sentinel-or-reset, b3.queue-dequeue.error.published-example."
+        },
+        "marking_atom_count": 54,
+        "marking_atom_selection": "representative_public_sample",
+        "marking_atoms": [
+          {
+            "atom_id": "mp-9618-s22-41-3-c-01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Credit for function header and end. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=group_max; group=grp-9618-s22-41-3-c; group_max=6; source_issues=S22-41-3C-DEQUEUE. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Credit for function header and end. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=group_max; group=grp-9618-s22-41-3-c; group_max=6; source_issues=S22-41-3C-DEQUEUE. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s22_ms_41",
+              "pdf_page": 30,
+              "heading": "9618_s22_41 9618_s22_41_3(c)",
+              "bullet_locator": "mp-9618-s22-41-3-c-01",
+              "anchor_text": "QP 9618_s22_qp_41 pdf 9 requirement req-9618-s22-41-3(c)-01; MS 9618_s22_ms_41 pdf 30,31"
+            }
+          },
+          {
+            "atom_id": "9618_s25_41_1-d-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Returning data at HeadPointer [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Returning data at HeadPointer [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_41",
+              "pdf_page": 13,
+              "heading": "9618_s25_41 9618_s25_41_1(d)",
+              "bullet_locator": "9618_s25_41_1(d).mp.02",
+              "anchor_text": "QP 9618_s25_qp_41 pdf 3 requirement req-9618-s25-41-1(d)-01; MS 9618_s25_ms_41 pdf 13,14,15"
+            }
+          },
+          {
+            "atom_id": "9618_w25_43_2-c-.mp.03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Incrementing QueueHead, decrementing NumberItems [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Incrementing QueueHead, decrementing NumberItems [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_43",
+              "pdf_page": 24,
+              "heading": "9618_w25_43 9618_w25_43_2(c)",
+              "bullet_locator": "9618_w25_43_2(c).mp.03",
+              "anchor_text": "QP 9618_w25_qp_43 pdf 9 requirement req-9618-w25-43-2(c)-01; MS 9618_w25_ms_43 pdf 24,25"
+            }
+          }
+        ],
+        "limited_evidence": true,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 14 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 14 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-enqueue",
+        "pattern_id": "QUEUE_ENQUEUE",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-12",
+        "method_step_refs": [
+          "queue-enqueue.step.contract",
+          "queue-enqueue.step.full-guard",
+          "queue-enqueue.step.write",
+          "queue-enqueue.step.advance",
+          "queue-enqueue.step.result"
+        ],
+        "error_ref": "b3.queue-enqueue.error.mutate-before-full",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-enqueue.error.mutate-before-full, b3.queue-enqueue.error.wrong-tail-update, b3.queue-enqueue.error.wrong-result-contract, b3.queue-enqueue.error.scope-sample, b3.queue-enqueue.error.missing-full-guard.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-enqueue.error.mutate-before-full, b3.queue-enqueue.error.wrong-tail-update, b3.queue-enqueue.error.wrong-result-contract, b3.queue-enqueue.error.scope-sample, b3.queue-enqueue.error.missing-full-guard."
+        },
+        "marking_atom_count": 54,
+        "marking_atom_selection": "representative_public_sample",
+        "marking_atoms": [
+          {
+            "atom_id": "mp-9618-s22-41-3-b-completed-statements",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Complete the 5 source-supplied statements accurately. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=group_max; group=grp-9618-s22-41-3-b-completed-statements; group_max=5. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Complete the 5 source-supplied statements accurately. [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=group_max; group=grp-9618-s22-41-3-b-completed-statements; group_max=5. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s22_ms_41",
+              "pdf_page": 28,
+              "heading": "9618_s22_41 9618_s22_41_3(b)",
+              "bullet_locator": "mp-9618-s22-41-3-b-completed-statements",
+              "anchor_text": "QP 9618_s22_qp_41 pdf 9 requirement req-9618-s22-41-3(b)-01; MS 9618_s22_ms_41 pdf 28,29"
+            }
+          },
+          {
+            "atom_id": "9618_s25_43_1-b-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Checking if Queue is full … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Checking if Queue is full … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 9,
+              "heading": "9618_s25_43 9618_s25_43_1(b)",
+              "bullet_locator": "9618_s25_43_1(b).mp.02",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 2 requirement req-9618-s25-43-1(b)-01; MS 9618_s25_ms_43 pdf 9,10,11"
+            }
+          },
+          {
+            "atom_id": "9618_w25_43_2-b-.mp.05",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Return TRUE in all cases when inserted [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=discrete; source_issues=W25-43-Q2B-FULL-GUARD. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Return TRUE in all cases when inserted [disposition=RETAIN_WITH_SOURCE_CAVEAT; award_semantics=discrete; source_issues=W25-43-Q2B-FULL-GUARD. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_43",
+              "pdf_page": 22,
+              "heading": "9618_w25_43 9618_w25_43_2(b)",
+              "bullet_locator": "9618_w25_43_2(b).mp.05",
+              "anchor_text": "QP 9618_w25_qp_43 pdf 9 requirement req-9618-w25-43-2(b)-01; MS 9618_w25_ms_43 pdf 22,23"
+            }
+          }
+        ],
+        "limited_evidence": true,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 14 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 14 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-inspect",
+        "pattern_id": "QUEUE_INSPECT",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04",
+        "method_step_refs": [
+          "queue-inspect.step.contract",
+          "queue-inspect.step.iterate",
+          "queue-inspect.step.format",
+          "queue-inspect.step.preservation"
+        ],
+        "error_ref": "b3.queue-inspect.error.physical-scan",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-inspect.error.physical-scan, b3.queue-inspect.error.destructive-inspect.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-inspect.error.physical-scan, b3.queue-inspect.error.destructive-inspect."
+        },
+        "marking_atom_count": 3,
+        "marking_atom_selection": "representative_public_sample",
+        "marking_atoms": [
+          {
+            "atom_id": "MP-9618-W24-42-2-D-01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Function header (and end) iterating through each element in the queue [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-W24-42-2-D; group_max=3. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Function header (and end) iterating through each element in the queue [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-W24-42-2-D; group_max=3. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w24_ms_42",
+              "pdf_page": 22,
+              "heading": "9618_w24_42 9618_w24_42_2(d)",
+              "bullet_locator": "MP-9618-W24-42-2-D-01",
+              "anchor_text": "QP 9618_w24_qp_42 pdf 9 requirement req-9618-w24-42-2(d)-01; MS 9618_w24_ms_42 pdf 22,23"
+            }
+          },
+          {
+            "atom_id": "MP-9618-W24-42-2-D-02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Starting at HeadPointer and incrementing until TailPointer – 1 … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-W24-42-2-D; group_max=3. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Starting at HeadPointer and incrementing until TailPointer – 1 … [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-W24-42-2-D; group_max=3. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w24_ms_42",
+              "pdf_page": 22,
+              "heading": "9618_w24_42 9618_w24_42_2(d)",
+              "bullet_locator": "MP-9618-W24-42-2-D-02",
+              "anchor_text": "QP 9618_w24_qp_42 pdf 9 requirement req-9618-w24-42-2(d)-01; MS 9618_w24_ms_42 pdf 22,23"
+            }
+          },
+          {
+            "atom_id": "MP-9618-W24-42-2-D-03",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… concatenating and returning all integer values with a space between [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-W24-42-2-D; group_max=3. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… concatenating and returning all integer values with a space between [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=group_max; group=MPG-9618-W24-42-2-D; group_max=3. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w24_ms_42",
+              "pdf_page": 22,
+              "heading": "9618_w24_42 9618_w24_42_2(d)",
+              "bullet_locator": "MP-9618-W24-42-2-D-03",
+              "anchor_text": "QP 9618_w24_qp_42 pdf 9 requirement req-9618-w24-42-2(d)-01; MS 9618_w24_ms_42 pdf 22,23"
+            }
+          }
+        ],
+        "limited_evidence": false,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 0 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 0 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-reduce",
+        "pattern_id": "QUEUE_REDUCE",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04",
+        "method_step_refs": [
+          "queue-reduce.step.mode",
+          "queue-reduce.step.initialise",
+          "queue-reduce.step.iterate",
+          "queue-reduce.step.terminate",
+          "queue-reduce.step.postcheck"
+        ],
+        "error_ref": "b3.queue-reduce.error.wrong-mode",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-reduce.error.wrong-mode, b3.queue-reduce.error.sentinel-as-data, b3.queue-reduce.error.missing-final-run.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-reduce.error.wrong-mode, b3.queue-reduce.error.sentinel-as-data, b3.queue-reduce.error.missing-final-run."
+        },
+        "marking_atom_count": 11,
+        "marking_atom_selection": "representative_public_sample",
+        "marking_atoms": [
+          {
+            "atom_id": "9618_s25_43_1-e-i-.mp.01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Calling CreateQueue() [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Calling CreateQueue() [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 17,
+              "heading": "9618_s25_43 9618_s25_43_1(e)(i)",
+              "bullet_locator": "9618_s25_43_1(e)(i).mp.01",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 3 requirement req-9618-s25-43-1(e)(i)-01; MS 9618_s25_ms_43 pdf 17,18"
+            }
+          },
+          {
+            "atom_id": "mp-9618-w22-42-3-d-01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Credit for function call (and end where appropriate) taking a parameter. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Credit for function call (and end where appropriate) taking a parameter. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w22_ms_42",
+              "pdf_page": 23,
+              "heading": "9618_w22_42 9618_w22_42_3(d)",
+              "bullet_locator": "mp-9618-w22-42-3-d-01",
+              "anchor_text": "QP 9618_w22_qp_42 pdf 9 requirement req-9618-w22-42-3(d)-01; MS 9618_w22_ms_42 pdf 23"
+            }
+          },
+          {
+            "atom_id": "mp-9618-w22-42-3-d-06",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Continuation criterion: returning the final total. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"mp-9618-w22-42-3-d-05\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Continuation criterion: returning the final total. [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"mp-9618-w22-42-3-d-05\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w22_ms_42",
+              "pdf_page": 23,
+              "heading": "9618_w22_42 9618_w22_42_3(d)",
+              "bullet_locator": "mp-9618-w22-42-3-d-06",
+              "anchor_text": "QP 9618_w22_qp_42 pdf 9 requirement req-9618-w22-42-3(d)-01; MS 9618_w22_ms_42 pdf 23"
+            }
+          }
+        ],
+        "limited_evidence": false,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 0 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 0 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-setup",
+        "pattern_id": "QUEUE_SETUP",
+        "requirement_ref": "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-22",
+        "method_step_refs": [
+          "queue-setup.step.contract",
+          "queue-setup.step.storage",
+          "queue-setup.step.pointers",
+          "queue-setup.step.consistency"
+        ],
+        "error_ref": "b3.queue-setup.error.mixed-convention",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-setup.error.mixed-convention, b3.queue-setup.error.invented-wrap.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-setup.error.mixed-convention, b3.queue-setup.error.invented-wrap."
+        },
+        "marking_atom_count": 27,
+        "marking_atom_selection": "representative_public_sample",
+        "marking_atoms": [
+          {
+            "atom_id": "mp-9618-s22-41-3-a-01",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "Credit for declaring variables: head pointer, tail pointer and number of items all initialised as 0 (integer). [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "Credit for declaring variables: head pointer, tail pointer and number of items all initialised as 0 (integer). [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s22_ms_41",
+              "pdf_page": 27,
+              "heading": "9618_s22_41 9618_s22_41_3(a)",
+              "bullet_locator": "mp-9618-s22-41-3-a-01",
+              "anchor_text": "QP 9618_s22_qp_41 pdf 8 requirement req-9618-s22-41-3(a)-01; MS 9618_s22_ms_41 pdf 27"
+            }
+          },
+          {
+            "atom_id": "9618_s25_43_1-a-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "… all initialised to –1 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_1(a).mp.01\". Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "… all initialised to –1 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=dependent; dependency=\"9618_s25_43_1(a).mp.01\". Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_s25_ms_43",
+              "pdf_page": 7,
+              "heading": "9618_s25_43 9618_s25_43_1(a)",
+              "bullet_locator": "9618_s25_43_1(a).mp.02",
+              "anchor_text": "QP 9618_s25_qp_43 pdf 2 requirement req-9618-s25-43-1(a)-01; MS 9618_s25_ms_43 pdf 7,8"
+            }
+          },
+          {
+            "atom_id": "9618_w25_43_2-a-.mp.02",
+            "authority": "Cambridge_QP_MS",
+            "criterion": {
+              "vi": "QueueHead and QueueTail initialised with –1, NumberItems initialised to 0 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Diễn giải biên tập chỉ dùng trong ngữ cảnh đã dẫn; phải xem QP/MS và giữ quy tắc group/dependency. Không suy ra số điểm tại đây.]",
+              "en": "QueueHead and QueueTail initialised with –1, NumberItems initialised to 0 [disposition=RETAIN_DIRECT_OFFICIAL_ATOM; award_semantics=discrete. Context-bound editorial paraphrase; consult the cited QP/MS and preserve its grouping/dependency rules. No mark allocation is inferred here.]"
+            },
+            "locator": {
+              "source_id": "9618_w25_ms_43",
+              "pdf_page": 20,
+              "heading": "9618_w25_43 9618_w25_43_2(a)",
+              "bullet_locator": "9618_w25_43_2(a).mp.02",
+              "anchor_text": "QP 9618_w25_qp_43 pdf 9 requirement req-9618-w25-43-2(a)-01; MS 9618_w25_ms_43 pdf 20,21"
+            }
+          }
+        ],
+        "limited_evidence": false,
+        "transfer_limit": {
+          "vi": "Chain chỉ đại diện các part đã dẫn nguồn; biến thể mới cần kiểm lại QP/MS của chính biến thể đó. 0 atom có caveat được gắn ngay trong criterion; không cộng các atom thành tổng điểm mới.",
+          "en": "The chain represents only cited parts; a new variant requires its own QP/MS check. 0 caveated atoms are labelled inside their criteria; atoms must not be summed into a new mark total."
+        }
+      }
+    ]
+  },
+  "errors": {
+    "error_refs": [
+      "b3.queue-dequeue.error.read-after-advance",
+      "b3.queue-enqueue.error.mutate-before-full",
+      "b3.queue-inspect.error.physical-scan",
+      "b3.queue-reduce.error.wrong-mode",
+      "b3.queue-setup.error.mixed-convention"
+    ],
+    "misconceptions": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.dequeue",
+        "vi": "Xóa ô trước khi lưu item nên trả `None`.",
+        "en": "Clearing the cell before saving the item, then returning `None`."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.dequeue",
+        "vi": "Giảm count khi queue đã rỗng.",
+        "en": "Decreasing count when the queue is already empty."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.enqueue",
+        "vi": "Ghi đè phần tử khi queue đầy.",
+        "en": "Overwriting an item when the queue is full."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.enqueue",
+        "vi": "Tăng rear không modulo nên vượt chỉ số cuối.",
+        "en": "Incrementing rear without modulo and moving past the last index."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.inspect-live-items",
+        "vi": "Duyệt toàn bộ array rồi loại `None`, sai nếu `None` là dữ liệu hợp lệ hoặc thứ tự đã wrap.",
+        "en": "Scanning the whole array and filtering `None`, which fails if `None` is valid data or order has wrapped."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.inspect-live-items",
+        "vi": "Gọi dequeue để xem dữ liệu nhưng không khôi phục queue.",
+        "en": "Calling dequeue to inspect data without restoring the queue."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.reduce-consume",
+        "vi": "Vô tình làm rỗng queue khi đề yêu cầu giữ nguyên.",
+        "en": "Accidentally emptying the queue when the task requires preservation."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.reduce-consume",
+        "vi": "Cộng cả ô không sử dụng hoặc dữ liệu không phải số.",
+        "en": "Adding unused cells or non-numeric data."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions",
+        "vi": "Cho rằng front==rear luôn có nghĩa là rỗng dù không xét count.",
+        "en": "Assuming front==rear always means empty without considering count."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions",
+        "vi": "Đọc queue theo index 0..count-1 khi front đã wrap.",
+        "en": "Reading the queue at indices 0..count-1 after front has wrapped."
+      }
+    ],
+    "checks": [
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-dequeue",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-dequeue.error.read-after-advance, b3.queue-dequeue.error.sentinel-or-reset, b3.queue-dequeue.error.published-example.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-dequeue.error.read-after-advance, b3.queue-dequeue.error.sentinel-or-reset, b3.queue-dequeue.error.published-example."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-enqueue",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-enqueue.error.mutate-before-full, b3.queue-enqueue.error.wrong-tail-update, b3.queue-enqueue.error.wrong-result-contract, b3.queue-enqueue.error.scope-sample, b3.queue-enqueue.error.missing-full-guard.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-enqueue.error.mutate-before-full, b3.queue-enqueue.error.wrong-tail-update, b3.queue-enqueue.error.wrong-result-contract, b3.queue-enqueue.error.scope-sample, b3.queue-enqueue.error.missing-full-guard."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-inspect",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-inspect.error.physical-scan, b3.queue-inspect.error.destructive-inspect.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-inspect.error.physical-scan, b3.queue-inspect.error.destructive-inspect."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-reduce",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-reduce.error.wrong-mode, b3.queue-reduce.error.sentinel-as-data, b3.queue-reduce.error.missing-final-run.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-reduce.error.wrong-mode, b3.queue-reduce.error.sentinel-as-data, b3.queue-reduce.error.missing-final-run."
+        }
+      },
+      {
+        "marking_chain_id": "paper4-2026.marking-chain.queue-setup",
+        "detection_check": {
+          "vi": "Đối chiếu từng tiêu chí với đúng QP/MS locator và giữ nguyên dependency/group semantics.",
+          "en": "Check each criterion against its QP/MS locator and preserve dependency/group semantics."
+        },
+        "repair_check": {
+          "vi": "Không suy điểm Cambridge từ method step hoặc rubric AlgoCore; mở lại nguồn khi atom có caveat. Error refs được giữ trong nguồn: b3.queue-setup.error.mixed-convention, b3.queue-setup.error.invented-wrap.",
+          "en": "Do not infer Cambridge marks from a method step or AlgoCore rubric; reopen the source for caveated atoms. Source-preserved error refs: b3.queue-setup.error.mixed-convention, b3.queue-setup.error.invented-wrap."
+        }
+      }
+    ]
+  },
+  "practice": {
+    "items": [
+      {
+        "assessment_item_id": "ac-9618-p4-2026-python.lesson.queue.practice.faded",
+        "pattern_ids": [
+          "QUEUE_ENQUEUE",
+          "QUEUE_DEQUEUE",
+          "QUEUE_INSPECT",
+          "QUEUE_REDUCE"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-12",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-16",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.queue.assessment.progression",
+        "level": "faded",
+        "prompt": {
+          "vi": "Dùng fixture boundary để hoàn thiện guard empty/full, phép inspect không phá hủy và phép reduce trên các phần tử sống. Nộp đoạn Python còn thiếu, trace trước/sau cho lần dequeue rỗng và enqueue đầy, cùng phép kiểm tra `count <= capacity`.",
+          "en": "Use the boundary fixture to complete the empty/full guards, non-destructive inspection, and reduction over live items. Submit the missing Python, before/after traces for empty dequeue and full enqueue, and a `count <= capacity` check."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+          "queue.boundary",
+          "queue.boundary.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Bản sửa Python chạy được, output fixture thực tế, trace trước/sau và ghi chú sửa lỗi.",
+          "en": "Runnable Python repair, actual fixture output, before/after trace, and error-repair note."
+        },
+        "hint": {
+          "vi": "Kiểm tra guard trước mutation; mọi chỉ số vòng dùng modulo capacity.",
+          "en": "Check the guard before mutation; every circular index uses modulo capacity."
+        },
+        "feedback": {
+          "vi": "Nếu FIFO/state sai, khoanh event đầu tiên làm sai front, rear hoặc count; guard phải xảy ra trước write/read và rejected operation không đổi state.",
+          "en": "If FIFO/state is wrong, locate the first event that corrupts front, rear, or count; guards must precede writes/reads and rejected operations must not mutate state."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "queue.faded.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho QUEUE_ENQUEUE, QUEUE_DEQUEUE, QUEUE_INSPECT, QUEUE_REDUCE và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for QUEUE_ENQUEUE, QUEUE_DEQUEUE, QUEUE_INSPECT, QUEUE_REDUCE with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "queue.faded.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.queue.pilot-v1, queue.boundary, queue.boundary.expected-output."
+            },
+            {
+              "criterion_id": "queue.faded.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      },
+      {
+        "assessment_item_id": "ac-9618-p4-2026-python.lesson.queue.practice.guided",
+        "pattern_ids": [
+          "QUEUE_SETUP",
+          "QUEUE_ENQUEUE",
+          "QUEUE_DEQUEUE"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-22",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-12",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-16"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.queue.assessment.progression",
+        "level": "guided",
+        "prompt": {
+          "vi": "Với fixture normal, vẽ trạng thái `items/front/rear/count` sau từng enqueue và dequeue. Đánh dấu ô được ghi hoặc đọc, chỉ ra thời điểm wrap-around và kiểm tra phần tử trả về giữ đúng FIFO.",
+          "en": "For the normal fixture, draw `items/front/rear/count` after each enqueue and dequeue. Mark the cell written or read, identify wrap-around, and check that the returned item preserves FIFO order."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+          "queue.normal",
+          "queue.normal.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Trace song ngữ có chú thích, dự đoán, chuyển trạng thái thực tế và một kiểm tra bất biến.",
+          "en": "Bilingual annotated trace with predictions, actual state transitions, and one invariant check."
+        },
+        "hint": {
+          "vi": "Kiểm tra guard trước mutation; mọi chỉ số vòng dùng modulo capacity.",
+          "en": "Check the guard before mutation; every circular index uses modulo capacity."
+        },
+        "feedback": {
+          "vi": "Nếu FIFO/state sai, khoanh event đầu tiên làm sai front, rear hoặc count; guard phải xảy ra trước write/read và rejected operation không đổi state.",
+          "en": "If FIFO/state is wrong, locate the first event that corrupts front, rear, or count; guards must precede writes/reads and rejected operations must not mutate state."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "queue.guided.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho QUEUE_SETUP, QUEUE_ENQUEUE, QUEUE_DEQUEUE và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for QUEUE_SETUP, QUEUE_ENQUEUE, QUEUE_DEQUEUE with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "queue.guided.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.queue.pilot-v1, queue.normal, queue.normal.expected-output."
+            },
+            {
+              "criterion_id": "queue.guided.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      },
+      {
+        "assessment_item_id": "ac-9618-p4-2026-python.lesson.queue.practice.independent",
+        "pattern_ids": [
+          "QUEUE_SETUP",
+          "QUEUE_ENQUEUE",
+          "QUEUE_DEQUEUE",
+          "QUEUE_INSPECT",
+          "QUEUE_REDUCE"
+        ],
+        "assessment_requirement_ids": [
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-22",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-12",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-16",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04"
+        ],
+        "destination_id": "ac-9618-p4-2026-python.lesson.queue.assessment.progression",
+        "level": "independent",
+        "prompt": {
+          "vi": "Tự cài đặt circular queue hoàn chỉnh gồm setup, enqueue, dequeue, inspect và reduce; chạy normal/boundary/failure. Nộp code, output thực tế, trace wrap-around, assertions FIFO và bằng chứng mọi thao tác bị từ chối đều giữ nguyên trạng thái.",
+          "en": "Implement a complete circular queue with setup, enqueue, dequeue, inspect, and reduce; run normal/boundary/failure. Submit code, actual outputs, a wrap-around trace, FIFO assertions, and evidence that every rejected operation leaves state unchanged."
+        },
+        "shared_fixture_code_data_ids": [
+          "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
+          "queue.normal",
+          "queue.normal.expected-output",
+          "queue.boundary",
+          "queue.boundary.expected-output",
+          "queue.failure",
+          "queue.failure.expected-output"
+        ],
+        "expected_artifact": {
+          "vi": "Lời giải Python chạy được, output normal-boundary-failure, assertions và bản tự kiểm.",
+          "en": "Runnable Python solution, normal-boundary-failure outputs, assertions, and self-audit."
+        },
+        "hint": {
+          "vi": "Kiểm tra guard trước mutation; mọi chỉ số vòng dùng modulo capacity.",
+          "en": "Check the guard before mutation; every circular index uses modulo capacity."
+        },
+        "feedback": {
+          "vi": "Nếu FIFO/state sai, khoanh event đầu tiên làm sai front, rear hoặc count; guard phải xảy ra trước write/read và rejected operation không đổi state.",
+          "en": "If FIFO/state is wrong, locate the first event that corrupts front, rear, or count; guards must precede writes/reads and rejected operations must not mutate state."
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "queue.independent.rubric.requirement",
+              "description": {
+                "vi": "Prompt được trả lời đủ cho QUEUE_SETUP, QUEUE_ENQUEUE, QUEUE_DEQUEUE, QUEUE_INSPECT, QUEUE_REDUCE và có bằng chứng riêng cho từng pattern.",
+                "en": "The prompt is fully answered for QUEUE_SETUP, QUEUE_ENQUEUE, QUEUE_DEQUEUE, QUEUE_INSPECT, QUEUE_REDUCE with distinct evidence for every pattern."
+              },
+              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+            },
+            {
+              "criterion_id": "queue.independent.rubric.execution",
+              "description": {
+                "vi": "Output nộp khớp fixture và expected output canonical được tham chiếu.",
+                "en": "Submitted output matches the referenced canonical fixture and expected output."
+              },
+              "evidence_required": "Actual run evidence resolving ac-9618-p4-2026-python.artifact.queue.pilot-v1, queue.normal, queue.normal.expected-output, queue.boundary, queue.boundary.expected-output, queue.failure, queue.failure.expected-output."
+            },
+            {
+              "criterion_id": "queue.independent.rubric.trace",
+              "description": {
+                "vi": "Trace xác định đúng state đầu, event có ý nghĩa, state cuối và invariant/error check.",
+                "en": "The trace identifies the initial state, meaningful events, final state, and invariant/error check."
+              },
+              "evidence_required": "Before/event/after trace plus the first-error diagnosis when applicable."
+            },
+            {
+              "criterion_id": "queue.independent.rubric.transfer",
+              "description": {
+                "vi": "Lời giải chạy đủ normal, boundary và failure mà không dùng đáp án được mở sẵn.",
+                "en": "The solution runs normal, boundary, and failure cases without a pre-revealed answer."
+              },
+              "evidence_required": "Three actual outputs and assertions covering acceptance, boundary behaviour, and rejection."
+            }
+          ],
+          "pass_rule": {
+            "vi": "Đạt khi có bằng chứng cho toàn bộ 4/4 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
+            "en": "Pass only with evidence for all 4/4 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+          },
+          "retry_rule": {
+            "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
+            "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
+          }
+        },
+        "disclosure_contract": {
+          "answer_hidden_initially": true,
+          "hint_hidden_initially": true,
+          "feedback_after_attempt": true
+        }
+      }
+    ]
+  },
+  "retrieval": {
+    "release_refs": [],
+    "items": [
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.dequeue",
+        "prompt": {
+          "vi": "Vì sao L032 phải chạy trước L033?",
+          "en": "Why must L032 run before L033?"
+        },
+        "answer": {
+          "vi": "L032 giữ giá trị cần trả trước khi L033 xóa ô.",
+          "en": "L032 preserves the return value before L033 clears the cell."
+        },
+        "rationale": {
+          "vi": "Thứ tự cập nhật là một phần của contract thao tác.",
+          "en": "Update order is part of the operation contract."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check",
+        "response_contract": {
+          "mode": "recall_then_trace",
+          "prompt": {
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: queue.v1.L028, queue.v1.L031, queue.v1.L032, queue.v1.L033, queue.v1.L034, queue.v1.L037.",
+            "en": "Answer from memory, state the rule, and trace at least one line: queue.v1.L028, queue.v1.L031, queue.v1.L032, queue.v1.L033, queue.v1.L034, queue.v1.L037."
+          },
+          "evidence_refs": [
+            "queue.v1.L028",
+            "queue.v1.L031",
+            "queue.v1.L032",
+            "queue.v1.L033",
+            "queue.v1.L034",
+            "queue.v1.L037"
+          ],
+          "submit_before_answer": true
+        },
+        "diagnosis": {
+          "prompt": {
+            "vi": "So sánh câu trả lời đã ghi nhận với đáp án và rationale. Xác định ý còn thiếu hoặc bước trace đầu tiên bị sai.",
+            "en": "Compare the recorded response with the answer and rationale. Identify the missing idea or the first incorrect trace step."
+          },
+          "misconception_to_check": {
+            "vi": "Xóa ô trước khi lưu item nên trả `None`.",
+            "en": "Clearing the cell before saving the item, then returning `None`."
+          }
+        },
+        "repair": {
+          "action": {
+            "vi": "Viết lại câu trả lời bằng quy tắc này rồi kiểm tra lại với code/trace: Nếu rỗng, không đổi queue; nếu thành công, trả đúng phần tử lâu nhất, front tiến một modulo capacity và count giảm một.",
+            "en": "Rewrite the answer using this rule, then check it against the code or trace: If empty, do not change the queue; if successful, return the oldest item, advance front by one modulo capacity, and decrease count by one."
+          },
+          "retry_rule": {
+            "vi": "Chọn Thử lại, trả lời không nhìn đáp án, rồi chỉ đạt khi đủ ý chính, lý do và bằng chứng dòng/trace hoặc quy tắc.",
+            "en": "Choose Try again, answer without viewing the model answer, and pass only when the key idea, reason, and line/trace or rule evidence are present."
+          }
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_self_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.dequeue.retrieval.key-idea",
+              "description": {
+                "vi": "Nêu đúng ý cốt lõi của đáp án.",
+                "en": "States the answer's key idea accurately."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.dequeue.retrieval.reason",
+              "description": {
+                "vi": "Giải thích vì sao quy tắc tạo ra kết quả.",
+                "en": "Explains why the rule produces the result."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.dequeue.retrieval.evidence",
+              "description": {
+                "vi": "Đối chiếu đúng ít nhất một line ID hoặc bước trace.",
+                "en": "Checks at least one correct line ID or trace step."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.enqueue",
+        "prompt": {
+          "vi": "Tại sao lưu `insert_index` trước khi đổi rear?",
+          "en": "Why save `insert_index` before changing rear?"
+        },
+        "answer": {
+          "vi": "Để ghi và trace đúng ô được dùng cho lần enqueue hiện tại.",
+          "en": "To write and trace the cell used by the current enqueue."
+        },
+        "rationale": {
+          "vi": "Rear sau cập nhật đã chỉ thao tác kế tiếp.",
+          "en": "After the update, rear points to the next operation."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check",
+        "response_contract": {
+          "mode": "recall_then_trace",
+          "prompt": {
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: queue.v1.L017, queue.v1.L020, queue.v1.L021, queue.v1.L022, queue.v1.L023.",
+            "en": "Answer from memory, state the rule, and trace at least one line: queue.v1.L017, queue.v1.L020, queue.v1.L021, queue.v1.L022, queue.v1.L023."
+          },
+          "evidence_refs": [
+            "queue.v1.L017",
+            "queue.v1.L020",
+            "queue.v1.L021",
+            "queue.v1.L022",
+            "queue.v1.L023"
+          ],
+          "submit_before_answer": true
+        },
+        "diagnosis": {
+          "prompt": {
+            "vi": "So sánh câu trả lời đã ghi nhận với đáp án và rationale. Xác định ý còn thiếu hoặc bước trace đầu tiên bị sai.",
+            "en": "Compare the recorded response with the answer and rationale. Identify the missing idea or the first incorrect trace step."
+          },
+          "misconception_to_check": {
+            "vi": "Ghi đè phần tử khi queue đầy.",
+            "en": "Overwriting an item when the queue is full."
+          }
+        },
+        "repair": {
+          "action": {
+            "vi": "Viết lại câu trả lời bằng quy tắc này rồi kiểm tra lại với code/trace: Nếu đầy, trạng thái không đổi và trả thất bại; nếu thành công, đúng một ô nhận item, rear tiến một bước modulo capacity và count tăng một.",
+            "en": "Rewrite the answer using this rule, then check it against the code or trace: If full, state remains unchanged and failure is returned; if successful, exactly one cell receives the item, rear advances one modulo capacity, and count increases by one."
+          },
+          "retry_rule": {
+            "vi": "Chọn Thử lại, trả lời không nhìn đáp án, rồi chỉ đạt khi đủ ý chính, lý do và bằng chứng dòng/trace hoặc quy tắc.",
+            "en": "Choose Try again, answer without viewing the model answer, and pass only when the key idea, reason, and line/trace or rule evidence are present."
+          }
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_self_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.enqueue.retrieval.key-idea",
+              "description": {
+                "vi": "Nêu đúng ý cốt lõi của đáp án.",
+                "en": "States the answer's key idea accurately."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.enqueue.retrieval.reason",
+              "description": {
+                "vi": "Giải thích vì sao quy tắc tạo ra kết quả.",
+                "en": "Explains why the rule produces the result."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.enqueue.retrieval.evidence",
+              "description": {
+                "vi": "Đối chiếu đúng ít nhất một line ID hoặc bước trace.",
+                "en": "Checks at least one correct line ID or trace step."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.inspect-live-items",
+        "prompt": {
+          "vi": "Vì sao lặp theo count thay vì đến khi gặp `None`?",
+          "en": "Why iterate by count instead of stopping at `None`?"
+        },
+        "answer": {
+          "vi": "Count là số phần tử sống theo representation; sentinel trong array không phải contract tổng quát cho dữ liệu.",
+          "en": "Count is the live-item total under this representation; an array sentinel is not a general data contract."
+        },
+        "rationale": {
+          "vi": "Dùng metadata của ADT giữ đúng thứ tự và số lượng.",
+          "en": "Using ADT metadata preserves order and cardinality."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check",
+        "response_contract": {
+          "mode": "recall_then_trace",
+          "prompt": {
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: queue.v1.L039, queue.v1.L041, queue.v1.L042, queue.v1.L044.",
+            "en": "Answer from memory, state the rule, and trace at least one line: queue.v1.L039, queue.v1.L041, queue.v1.L042, queue.v1.L044."
+          },
+          "evidence_refs": [
+            "queue.v1.L039",
+            "queue.v1.L041",
+            "queue.v1.L042",
+            "queue.v1.L044"
+          ],
+          "submit_before_answer": true
+        },
+        "diagnosis": {
+          "prompt": {
+            "vi": "So sánh câu trả lời đã ghi nhận với đáp án và rationale. Xác định ý còn thiếu hoặc bước trace đầu tiên bị sai.",
+            "en": "Compare the recorded response with the answer and rationale. Identify the missing idea or the first incorrect trace step."
+          },
+          "misconception_to_check": {
+            "vi": "Duyệt toàn bộ array rồi loại `None`, sai nếu `None` là dữ liệu hợp lệ hoặc thứ tự đã wrap.",
+            "en": "Scanning the whole array and filtering `None`, which fails if `None` is valid data or order has wrapped."
+          }
+        },
+        "repair": {
+          "action": {
+            "vi": "Viết lại câu trả lời bằng quy tắc này rồi kiểm tra lại với code/trace: Kết quả có đúng count phần tử theo FIFO order; toàn bộ trạng thái queue trước và sau giống nhau.",
+            "en": "Rewrite the answer using this rule, then check it against the code or trace: The result contains exactly count items in FIFO order; the complete queue state is identical before and after inspection."
+          },
+          "retry_rule": {
+            "vi": "Chọn Thử lại, trả lời không nhìn đáp án, rồi chỉ đạt khi đủ ý chính, lý do và bằng chứng dòng/trace hoặc quy tắc.",
+            "en": "Choose Try again, answer without viewing the model answer, and pass only when the key idea, reason, and line/trace or rule evidence are present."
+          }
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_self_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.inspect-live-items.retrieval.key-idea",
+              "description": {
+                "vi": "Nêu đúng ý cốt lõi của đáp án.",
+                "en": "States the answer's key idea accurately."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.inspect-live-items.retrieval.reason",
+              "description": {
+                "vi": "Giải thích vì sao quy tắc tạo ra kết quả.",
+                "en": "Explains why the rule produces the result."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.inspect-live-items.retrieval.evidence",
+              "description": {
+                "vi": "Đối chiếu đúng ít nhất một line ID hoặc bước trace.",
+                "en": "Checks at least one correct line ID or trace step."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.reduce-consume",
+        "prompt": {
+          "vi": "Artifact pilot đang dùng policy nào, và line nào chứng minh?",
+          "en": "Which policy does the pilot use, and which lines establish it?"
+        },
+        "answer": {
+          "vi": "Preserve; L062 lấy bản sao từ `live_items` và L063 reduce bản sao, không gọi dequeue.",
+          "en": "Preserve; L062 obtains a copy from `live_items` and L063 reduces that copy without calling dequeue."
+        },
+        "rationale": {
+          "vi": "Policy phải được đọc từ source contract trước khi chọn thuật toán.",
+          "en": "The policy must be read from the source contract before choosing an algorithm."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check",
+        "response_contract": {
+          "mode": "recall_then_trace",
+          "prompt": {
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: queue.v1.L062, queue.v1.L063, queue.v1.L027, queue.v1.L039.",
+            "en": "Answer from memory, state the rule, and trace at least one line: queue.v1.L062, queue.v1.L063, queue.v1.L027, queue.v1.L039."
+          },
+          "evidence_refs": [
+            "queue.v1.L062",
+            "queue.v1.L063",
+            "queue.v1.L027",
+            "queue.v1.L039"
+          ],
+          "submit_before_answer": true
+        },
+        "diagnosis": {
+          "prompt": {
+            "vi": "So sánh câu trả lời đã ghi nhận với đáp án và rationale. Xác định ý còn thiếu hoặc bước trace đầu tiên bị sai.",
+            "en": "Compare the recorded response with the answer and rationale. Identify the missing idea or the first incorrect trace step."
+          },
+          "misconception_to_check": {
+            "vi": "Vô tình làm rỗng queue khi đề yêu cầu giữ nguyên.",
+            "en": "Accidentally emptying the queue when the task requires preservation."
+          }
+        },
+        "repair": {
+          "action": {
+            "vi": "Viết lại câu trả lời bằng quy tắc này rồi kiểm tra lại với code/trace: Kết quả bằng fold trên đúng logical items; policy trạng thái sau phải khớp yêu cầu: nguyên vẹn nếu preserve, rỗng nếu consume hết.",
+            "en": "Rewrite the answer using this rule, then check it against the code or trace: The result equals a fold over exactly the logical items; final state must match the policy: unchanged for preserve, empty after full consumption."
+          },
+          "retry_rule": {
+            "vi": "Chọn Thử lại, trả lời không nhìn đáp án, rồi chỉ đạt khi đủ ý chính, lý do và bằng chứng dòng/trace hoặc quy tắc.",
+            "en": "Choose Try again, answer without viewing the model answer, and pass only when the key idea, reason, and line/trace or rule evidence are present."
+          }
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_self_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.reduce-consume.retrieval.key-idea",
+              "description": {
+                "vi": "Nêu đúng ý cốt lõi của đáp án.",
+                "en": "States the answer's key idea accurately."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.reduce-consume.retrieval.reason",
+              "description": {
+                "vi": "Giải thích vì sao quy tắc tạo ra kết quả.",
+                "en": "Explains why the rule produces the result."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.reduce-consume.retrieval.evidence",
+              "description": {
+                "vi": "Đối chiếu đúng ít nhất một line ID hoặc bước trace.",
+                "en": "Checks at least one correct line ID or trace step."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions",
+        "prompt": {
+          "vi": "Vì sao count cần thiết khi front và rear đều bằng 0?",
+          "en": "Why is count needed when both front and rear equal 0?"
+        },
+        "answer": {
+          "vi": "Cùng trạng thái chỉ số có thể là rỗng (count=0) hoặc đầy sau một vòng (count=capacity).",
+          "en": "The same index state may mean empty (count=0) or full after a wrap (count=capacity)."
+        },
+        "rationale": {
+          "vi": "Phải đọc cả ba biến theo cùng convention.",
+          "en": "All three variables must be interpreted under one convention."
+        },
+        "answer_hidden_initially": true,
+        "authority": "AlgoCore_authored_self_check",
+        "response_contract": {
+          "mode": "recall_then_trace",
+          "prompt": {
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: queue.v1.L010, queue.v1.L011, queue.v1.L012, queue.v1.L013, queue.v1.L022.",
+            "en": "Answer from memory, state the rule, and trace at least one line: queue.v1.L010, queue.v1.L011, queue.v1.L012, queue.v1.L013, queue.v1.L022."
+          },
+          "evidence_refs": [
+            "queue.v1.L010",
+            "queue.v1.L011",
+            "queue.v1.L012",
+            "queue.v1.L013",
+            "queue.v1.L022"
+          ],
+          "submit_before_answer": true
+        },
+        "diagnosis": {
+          "prompt": {
+            "vi": "So sánh câu trả lời đã ghi nhận với đáp án và rationale. Xác định ý còn thiếu hoặc bước trace đầu tiên bị sai.",
+            "en": "Compare the recorded response with the answer and rationale. Identify the missing idea or the first incorrect trace step."
+          },
+          "misconception_to_check": {
+            "vi": "Cho rằng front==rear luôn có nghĩa là rỗng dù không xét count.",
+            "en": "Assuming front==rear always means empty without considering count."
+          }
+        },
+        "repair": {
+          "action": {
+            "vi": "Viết lại câu trả lời bằng quy tắc này rồi kiểm tra lại với code/trace: `0 <= count <= capacity`; nếu count>0 thì front trỏ phần tử sống đầu; rear luôn là ô chèn kế tiếp theo quy ước pilot.",
+            "en": "Rewrite the answer using this rule, then check it against the code or trace: `0 <= count <= capacity`; when count>0, front points to the first live item; rear is always the next insertion cell under the pilot convention."
+          },
+          "retry_rule": {
+            "vi": "Chọn Thử lại, trả lời không nhìn đáp án, rồi chỉ đạt khi đủ ý chính, lý do và bằng chứng dòng/trace hoặc quy tắc.",
+            "en": "Choose Try again, answer without viewing the model answer, and pass only when the key idea, reason, and line/trace or rule evidence are present."
+          }
+        },
+        "self_rubric": {
+          "authority": "AlgoCore_authored_self_rubric",
+          "official_marks": null,
+          "criteria": [
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions.retrieval.key-idea",
+              "description": {
+                "vi": "Nêu đúng ý cốt lõi của đáp án.",
+                "en": "States the answer's key idea accurately."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions.retrieval.reason",
+              "description": {
+                "vi": "Giải thích vì sao quy tắc tạo ra kết quả.",
+                "en": "Explains why the rule produces the result."
+              }
+            },
+            {
+              "criterion_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions.retrieval.evidence",
+              "description": {
+                "vi": "Đối chiếu đúng ít nhất một line ID hoặc bước trace.",
+                "en": "Checks at least one correct line ID or trace step."
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "navigation": {
+    "previous_slug": "stack",
+    "next_slug": "linked-list"
+  },
+  "sources": [
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 243,
+        "printed_page": 227,
+        "heading": "9.2.2 Average algorithm and input checks",
+        "anchor_text": "BOOK-09-ACCUMULATE"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 266,
+        "printed_page": 250,
+        "heading": "10.4 Abstract data types (ADTs)",
+        "anchor_text": "BOOK-10-ADT"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 287,
+        "printed_page": 271,
+        "heading": "11.2.1-11.2.2 CASE and IF; Loops",
+        "anchor_text": "BOOK-11-CONSTRUCTS"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 482,
+        "printed_page": 466,
+        "heading": "19.1.3 Queues",
+        "anchor_text": "BOOK-19-QUEUE"
+      }
+    },
+    {
+      "source_id": "coursebook_watson_williams",
+      "authority": "Cambridge_coursebook",
+      "locator": {
+        "source_id": "coursebook_watson_williams",
+        "pdf_page": 506,
+        "printed_page": 490,
+        "heading": "19.2.1 Understanding recursion",
+        "anchor_text": "BOOK-19-RECURSION"
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 29,
+        "printed_page": "29",
+        "heading": "Introduction to Abstract Data Types (ADT)",
+        "bullet_locator": "ADT opening objective",
+        "anchor_text": "an ADT is a collection of data and a set of operations on those data"
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 29,
+        "printed_page": "29",
+        "heading": "Introduction to Abstract Data Types (ADT)",
+        "bullet_locator": "ADT array objective; AS no-pseudocode note does not remove ALevel implementation",
+        "anchor_text": "Describe how a queue, stack and linked list can be implemented using arrays"
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 37,
+        "printed_page": "37",
+        "heading": "Algorithms",
+        "bullet_locator": "ADT implementation list, queue facet",
+        "anchor_text": "Describe the following ADTs and demonstrate how they can be implemented from appropriate built-in types or other ADTs: stack, queue, linked list, dictionary, binary tree"
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 38,
+        "printed_page": "38",
+        "heading": "Programming Paradigms",
+        "bullet_locator": "Imperative note 2, constructs facet",
+        "anchor_text": "programming code that uses variables, constructs, procedures and functions."
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 37,
+        "printed_page": "37",
+        "heading": "Algorithms",
+        "bullet_locator": "ADT delete list, queue facet",
+        "anchor_text": "Write algorithms to delete an item from each of the following: stack, queue, linked list"
+      }
+    },
+    {
+      "source_id": "syllabus_2026_v2",
+      "authority": "Cambridge_syllabus",
+      "locator": {
+        "source_id": "syllabus_2026_v2",
+        "pdf_page": 37,
+        "printed_page": "37",
+        "heading": "Algorithms",
+        "bullet_locator": "ADT insert list, queue facet",
+        "anchor_text": "Write algorithms to insert an item into each of the following: stack, queue, linked list, binary tree"
+      }
+    }
+  ]
+}

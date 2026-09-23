@@ -1,0 +1,293 @@
+{
+  "author_run_ref": "p4r3.a3.oop-aggregation.production-v1.author-run",
+  "caption": {
+    "en": "A has-a relationship and bounded object references.",
+    "vi": "Quan hệ has-a và bounded object references."
+  },
+  "code_sha256": "3c4eb116b80309a684b4f1d4deff4c813eb296bcb948c0f252e909085e6cec1e",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "e819cc36ec97f40ccb0429b2a492f4baa934a0bf099f6cbc8d444cc6edae5f26",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "oop-aggregation.normal.expected-output",
+      "fixture_ref": "oop-aggregation.normal",
+      "value": {
+        "capacity": 3,
+        "count": 2,
+        "labels": [
+          "ALGORITHMS",
+          "DATA"
+        ],
+        "status": "OK",
+        "trace": [
+          {
+            "count": 1,
+            "event": "bounded_add",
+            "success": true,
+            "unchanged_on_reject": true
+          },
+          {
+            "count": 2,
+            "event": "bounded_add",
+            "success": true,
+            "unchanged_on_reject": true
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "oop-aggregation.boundary.expected-output",
+      "fixture_ref": "oop-aggregation.boundary",
+      "value": {
+        "capacity": 1,
+        "count": 1,
+        "labels": [
+          "ONLY"
+        ],
+        "status": "OK",
+        "trace": [
+          {
+            "count": 1,
+            "event": "bounded_add",
+            "success": true,
+            "unchanged_on_reject": true
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "oop-aggregation.failure.expected-output",
+      "fixture_ref": "oop-aggregation.failure",
+      "value": {
+        "capacity": 1,
+        "count": 1,
+        "labels": [
+          "FIRST"
+        ],
+        "status": "OK",
+        "trace": [
+          {
+            "count": 1,
+            "event": "bounded_add",
+            "success": true,
+            "unchanged_on_reject": true
+          },
+          {
+            "count": 1,
+            "event": "bounded_add",
+            "success": false,
+            "unchanged_on_reject": true
+          },
+          {
+            "count": 1,
+            "event": "bounded_add",
+            "success": false,
+            "unchanged_on_reject": true
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/oop-aggregation/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "oop-aggregation.normal",
+      "input": {
+        "capacity": 3,
+        "items": [
+          "Algorithms",
+          "Data"
+        ]
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "oop-aggregation.boundary",
+      "input": {
+        "capacity": 1,
+        "items": [
+          "Only"
+        ]
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "oop-aggregation.failure",
+      "input": {
+        "capacity": 1,
+        "items": [
+          "First",
+          "Second",
+          42
+        ]
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.oop-aggregation.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.oop-aggregation",
+  "lines": [
+    {
+      "line_id": "oop-aggregation.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L002",
+      "order": 2,
+      "text": ""
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L003",
+      "order": 3,
+      "text": "class Book:"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L004",
+      "order": 4,
+      "text": "    def __init__(self, title): self.title = title"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L005",
+      "order": 5,
+      "text": "    def label(self): return self.title.upper()"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L006",
+      "order": 6,
+      "text": "class Shelf:"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L007",
+      "order": 7,
+      "text": "    def __init__(self, capacity): self.capacity, self.books = capacity, []"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L008",
+      "order": 8,
+      "text": "    def add(self, book):"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L009",
+      "order": 9,
+      "text": "        if not isinstance(book, Book) or len(self.books) == self.capacity: return False"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L010",
+      "order": 10,
+      "text": "        self.books.append(book); return True"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L011",
+      "order": 11,
+      "text": "    def labels(self): return [book.label() for book in self.books]"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L012",
+      "order": 12,
+      "text": ""
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L013",
+      "order": 13,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L014",
+      "order": 14,
+      "text": "    shelf, trace = Shelf(fixture[\"capacity\"]), []"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L015",
+      "order": 15,
+      "text": "    for value in fixture.get(\"items\", []):"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L016",
+      "order": 16,
+      "text": "        item = Book(value) if isinstance(value, str) else value"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L017",
+      "order": 17,
+      "text": "        before = len(shelf.books); success = shelf.add(item)"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L018",
+      "order": 18,
+      "text": "        trace.append({\"event\": \"bounded_add\", \"success\": success, \"count\": len(shelf.books), \"unchanged_on_reject\": success or before == len(shelf.books)})"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L019",
+      "order": 19,
+      "text": "    return {\"status\": \"OK\", \"count\": len(shelf.books), \"labels\": shelf.labels(), \"capacity\": shelf.capacity, \"trace\": trace}"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L020",
+      "order": 20,
+      "text": ""
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L021",
+      "order": 21,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L022",
+      "order": 22,
+      "text": "    import json"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L023",
+      "order": 23,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L024",
+      "order": 24,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L025",
+      "order": 25,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L026",
+      "order": 26,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L027",
+      "order": 27,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L028",
+      "order": 28,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L029",
+      "order": 29,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "OOP_CAPACITY_ADD"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-aggregation.production-v1",
+  "stage5_source_refs": [
+    "stage5.b6.pattern-provenance"
+  ],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

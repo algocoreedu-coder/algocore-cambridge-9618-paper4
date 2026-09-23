@@ -1,0 +1,163 @@
+# B22-A2-v2 unresolved register
+
+- `9618_s22_qp_11-q1-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q1-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q1-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q1-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q2-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q2-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q2-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_s22_qp_11-q2-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q3-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q3-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q4-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q4-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q4-pci` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q4-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q5-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q5-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q5-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q6-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q6-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_s22_qp_11-q6-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_11-q6-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q1-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q1-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q1-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_s22_qp_12-q1-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q1-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q2-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q2-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q2-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q3-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q3-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q3-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q3-pe` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q4-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q4-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q4-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q5-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q5-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q5-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q5-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q5-pe` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q6-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q6-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q6-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q9-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_12-q9-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q1-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q1-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q1-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_s22_qp_13-q1-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q2-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q3-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q3-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q4-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q4-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q4-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q4-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_s22_qp_13-q5-pai` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q5-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q5-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q5-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_s22_qp_13-q6-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q6-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q6-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q6-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_s22_qp_13-q6-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q7-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q8-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q8-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_s22_qp_13-q8-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q1-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q1-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q1-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q1-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q1-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_11-q3-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q4-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q4-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q4-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q4-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q4-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_11-q4-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q5-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q5-pb` / `ms_locator_or_null`: Part label occurs on multiple MS pages; exact stable locator requires reviewer resolution.
+- `9618_w22_qp_11-q5-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q5-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_11-q5-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q5-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q6-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q6-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q6-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_11-q6-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q6-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q7-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q7-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q7-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q7-pe` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q9-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q9-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q1-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q1-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q1-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_12-q1-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q1-pc` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_12-q2-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q4-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q4-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q5-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q5-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q5-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q5-pdi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q6-pa` / `ms_locator_or_null`: Part label occurs on multiple MS pages; exact stable locator requires reviewer resolution.
+- `9618_w22_qp_12-q6-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q6-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_12-q6-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q7-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q7-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q7-pb` / `ms_locator_or_null`: Part label occurs on multiple MS pages; exact stable locator requires reviewer resolution.
+- `9618_w22_qp_12-q7-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q7-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_12-q7-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q8-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q8-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q8-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q8-pc` / `ms_locator_or_null`: Part label occurs on multiple MS pages; exact stable locator requires reviewer resolution.
+- `9618_w22_qp_12-q8-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q8-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_12-q10-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q10-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q10-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_12-q10-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_13-q1-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q1-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q1-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q2-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q2-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q2-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q2-pd` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q2-pe` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q2-pf` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q4-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q4-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_13-q4-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q4-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q5-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q6-pa` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q6-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q6-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_13-q6-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q6-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q7-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q7-pc` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q7-pc` / `ms_locator_or_null`: Part label occurs on multiple MS pages; exact stable locator requires reviewer resolution.
+- `9618_w22_qp_13-q7-pi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q7-pi` / `ms_locator_or_null`: No unique exact MS part-label match in searchable MS text.
+- `9618_w22_qp_13-q8-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q9-pb` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_13-q10-pbi` / `marks_displayed_or_null`: No explicit displayed mark reliably isolated from searchable text; retain null for visual retest.
+- `9618_w22_qp_11-q4` / `context_required/dependency_refs`: Cross-page context repaired from independently cited source pages.
+- `9618_w22_qp_12-q7` / `context_required/dependency_refs`: Cross-page context repaired from independently cited source pages.
+

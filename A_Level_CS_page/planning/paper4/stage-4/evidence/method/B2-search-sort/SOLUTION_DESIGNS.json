@@ -1,0 +1,794 @@
+{
+  "schema_version": "s4-schema-v1",
+  "status": "SUBMITTED",
+  "batch_id": "B2-search-sort",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-1/SOURCE_ISSUES.json",
+      "sha256": "7e9a8677b345327847d52a2aa88f293dc6898ef17944a63e6e05bb99daf9f588"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    }
+  ],
+  "solution_designs": [
+    {
+      "solution_design_id": "B2-SD-ORDERED_INSERT",
+      "pattern_id": "ORDERED_INSERT",
+      "variant_id": "B2-V01-ordered-policy",
+      "input_contract": "Fix the key, direction, equal-key rule, capacity limit, and fields that move with the record.",
+      "output_contract": "Place the new record exactly once and trim any overflow when required.",
+      "state_model": [
+        "ordered",
+        "qualification",
+        "insertion_index",
+        "shifted_suffix",
+        "final_sequence"
+      ],
+      "representation": [
+        "Python-oriented pseudocode",
+        "explicit live ranges",
+        "complete-record movement where records are used"
+      ],
+      "preconditions": [
+        "Fix the key, direction, equal-key rule, capacity limit, and fields that move with the record."
+      ],
+      "postconditions": [
+        "the retained live sequence remains ordered"
+      ],
+      "invariants": [
+        "the existing live sequence is ordered",
+        "retained items still satisfy the capacity policy",
+        "all positions before the cursor remain before the new item",
+        "the shifted suffix preserves order and whole-record integrity",
+        "the retained live sequence remains ordered"
+      ],
+      "ordered_method_step_ids": [
+        "B2-ORDERED_INSERT-S01",
+        "B2-ORDERED_INSERT-S02",
+        "B2-ORDERED_INSERT-S03",
+        "B2-ORDERED_INSERT-S04",
+        "B2-ORDERED_INSERT-S05"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the declared state at each step.",
+        "Preserve complete records and all data outside the live region.",
+        "Do not duplicate ownership of co-tagged official atoms."
+      ],
+      "termination_argument": "Every progress step strictly advances a cursor, shrinks an interval/boundary, grows a sorted prefix, or consumes exactly one item; a finite live range therefore reaches the termination guard.",
+      "failure_paths": [
+        "B2-ERR-ORDERED_INSERT-01",
+        "B2-ERR-ORDERED_INSERT-02",
+        "B2-ERR-ORDERED_INSERT-03"
+      ],
+      "alternative_designs": [
+        "B2-V01-ordered-policy",
+        "B2-V07-insert-vs-sort"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Trace at least one interior match/move/update with every invariant visible."
+        ],
+        "boundary": [
+          "empty",
+          "one item",
+          "first position",
+          "last position",
+          "duplicate/equal key",
+          "no match where applicable"
+        ],
+        "counterexample": [
+          "Run each linked error trigger and prove the detection check catches it."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_s22_41_1(e)(ii) under its exact source convention.",
+          "Reproduce official part 9618_s22_43_1(e)(ii) under its exact source convention."
+        ]
+      },
+      "source_constraints": [],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B2-SD-LINEAR_SEARCH",
+      "pattern_id": "LINEAR_SEARCH",
+      "variant_id": "B2-V02-linear-result",
+      "input_contract": "Fix the search key, live range, case normalization, accessor, and result contract.",
+      "output_contract": "Return or use the result contract for both found and absent cases.",
+      "state_model": [
+        "search_contract",
+        "result_state",
+        "cursor",
+        "candidate_key",
+        "final_result"
+      ],
+      "representation": [
+        "Python-oriented pseudocode",
+        "explicit live ranges",
+        "complete-record movement where records are used"
+      ],
+      "preconditions": [
+        "Fix the search key, live range, case normalization, accessor, and result contract."
+      ],
+      "postconditions": [
+        "all required candidates were checked or a permitted early match ended the scan"
+      ],
+      "invariants": [
+        "the target and result convention stay fixed",
+        "no unvisited element has influenced the result",
+        "all earlier live elements have been checked",
+        "the comparison uses the fixed equality rule",
+        "a stored first match remains the first match",
+        "all required candidates were checked or a permitted early match ended the scan"
+      ],
+      "ordered_method_step_ids": [
+        "B2-LINEAR_SEARCH-S01",
+        "B2-LINEAR_SEARCH-S02",
+        "B2-LINEAR_SEARCH-S03",
+        "B2-LINEAR_SEARCH-S04",
+        "B2-LINEAR_SEARCH-S05",
+        "B2-LINEAR_SEARCH-S06"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the declared state at each step.",
+        "Preserve complete records and all data outside the live region.",
+        "Do not duplicate ownership of co-tagged official atoms."
+      ],
+      "termination_argument": "Every progress step strictly advances a cursor, shrinks an interval/boundary, grows a sorted prefix, or consumes exactly one item; a finite live range therefore reaches the termination guard.",
+      "failure_paths": [
+        "B2-ERR-LINEAR_SEARCH-01",
+        "B2-ERR-LINEAR_SEARCH-02",
+        "B2-ERR-LINEAR_SEARCH-03"
+      ],
+      "alternative_designs": [
+        "B2-V02-linear-result",
+        "B2-V06-search-choice"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Trace at least one interior match/move/update with every invariant visible."
+        ],
+        "boundary": [
+          "empty",
+          "one item",
+          "first position",
+          "last position",
+          "duplicate/equal key",
+          "no match where applicable"
+        ],
+        "counterexample": [
+          "Run each linked error trigger and prove the detection check catches it."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_s21_41_2(b)(i) under its exact source convention.",
+          "Reproduce official part 9618_s21_42_2(b)(i) under its exact source convention.",
+          "Reproduce official part 9618_s21_43_2(b)(i) under its exact source convention.",
+          "Reproduce official part 9618_w22_42_2(e) under its exact source convention.",
+          "Reproduce official part 9618_s23_42_3(d) under its exact source convention.",
+          "Reproduce official part 9618_s24_41_2(e)(ii) under its exact source convention.",
+          "Reproduce official part 9618_s24_42_1(c)(i) under its exact source convention.",
+          "Reproduce official part 9618_s24_43_2(e)(ii) under its exact source convention."
+        ]
+      },
+      "source_constraints": [],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B2-SD-COUNT_OCCURRENCES",
+      "pattern_id": "COUNT_OCCURRENCES",
+      "variant_id": "B2-V03-count-control",
+      "input_contract": "Fix the match predicate, live range, and iterative or recursive variant.",
+      "output_contract": "Return the final total after the complete range has been processed.",
+      "state_model": [
+        "count_contract",
+        "partial_count",
+        "cursor_or_subproblem",
+        "remaining_range",
+        "final_count"
+      ],
+      "representation": [
+        "Python-oriented pseudocode",
+        "explicit live ranges",
+        "complete-record movement where records are used"
+      ],
+      "preconditions": [
+        "Fix the match predicate, live range, and iterative or recursive variant."
+      ],
+      "postconditions": [
+        "the count equals all matching live elements"
+      ],
+      "invariants": [
+        "the predicate and range remain fixed",
+        "the count equals matches in the processed empty prefix",
+        "the partial count covers exactly the processed elements",
+        "partial count equals the number of matches processed so far",
+        "processed and remaining ranges partition the live data",
+        "the count equals all matching live elements"
+      ],
+      "ordered_method_step_ids": [
+        "B2-COUNT_OCCURRENCES-S01",
+        "B2-COUNT_OCCURRENCES-S02",
+        "B2-COUNT_OCCURRENCES-S03",
+        "B2-COUNT_OCCURRENCES-S04",
+        "B2-COUNT_OCCURRENCES-S05",
+        "B2-COUNT_OCCURRENCES-S06"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the declared state at each step.",
+        "Preserve complete records and all data outside the live region.",
+        "Do not duplicate ownership of co-tagged official atoms."
+      ],
+      "termination_argument": "Every progress step strictly advances a cursor, shrinks an interval/boundary, grows a sorted prefix, or consumes exactly one item; a finite live range therefore reaches the termination guard.",
+      "failure_paths": [
+        "B2-ERR-COUNT_OCCURRENCES-01",
+        "B2-ERR-COUNT_OCCURRENCES-02",
+        "B2-ERR-COUNT_OCCURRENCES-03"
+      ],
+      "alternative_designs": [
+        "B2-V03-count-control"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Trace at least one interior match/move/update with every invariant visible."
+        ],
+        "boundary": [
+          "empty",
+          "one item",
+          "first position",
+          "last position",
+          "duplicate/equal key",
+          "no match where applicable"
+        ],
+        "counterexample": [
+          "Run each linked error trigger and prove the detection check catches it."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_w22_41_1(c) under its exact source convention.",
+          "Reproduce official part 9618_w22_43_1(c) under its exact source convention.",
+          "Reproduce official part 9618_s23_41_1(c) under its exact source convention.",
+          "Reproduce official part 9618_s23_43_1(c) under its exact source convention.",
+          "Reproduce official part 9618_w23_41_1(a)(i) under its exact source convention.",
+          "Reproduce official part 9618_w23_41_1(b)(i) under its exact source convention.",
+          "Reproduce official part 9618_w23_43_1(a)(i) under its exact source convention.",
+          "Reproduce official part 9618_w23_43_1(b)(i) under its exact source convention.",
+          "Reproduce official part 9618_w25_43_3(a)(i) under its exact source convention."
+        ]
+      },
+      "source_constraints": [
+        {
+          "source_issue_id": "W22-41-1C-RANGE",
+          "disposition": "Retain the official source caveat and verify the intended invariant in Stage 5."
+        },
+        {
+          "source_issue_id": "S4-S2-W23-41-43-MS-CONTINUATIONS",
+          "disposition": "Use Stage 1 page ownership; continuation content stays with the preceding part and creates no duplicate mark."
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "source_issue_id": "W22-41-1C-RANGE",
+          "stage5_obligation": "Test both the literal source behavior and the corrected invariant-preserving behavior; do not silently normalize."
+        },
+        {
+          "source_issue_id": "S4-S2-W23-41-43-MS-CONTINUATIONS",
+          "stage5_obligation": "Verify any assembled example code independently; continuation layout is not executable proof."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B2-SD-FILTER_RECORDS",
+      "pattern_id": "FILTER_RECORDS",
+      "variant_id": "B2-V04-filter-predicate",
+      "input_contract": "Fix the fields, AND predicate, normalization, and whether matches are output or collected.",
+      "output_contract": "After the full scan, handle an empty result explicitly according to the contract.",
+      "state_model": [
+        "filter_contract",
+        "result_set",
+        "candidate_record",
+        "predicate_result",
+        "final_result"
+      ],
+      "representation": [
+        "Python-oriented pseudocode",
+        "explicit live ranges",
+        "complete-record movement where records are used"
+      ],
+      "preconditions": [
+        "Fix the fields, AND predicate, normalization, and whether matches are output or collected."
+      ],
+      "postconditions": [
+        "result contains all and only matching live records"
+      ],
+      "invariants": [
+        "the full predicate remains fixed",
+        "the result contains exactly accepted processed records",
+        "all earlier records have been classified",
+        "no partial clause can accept a record",
+        "result equals all matching processed records",
+        "result contains all and only matching live records"
+      ],
+      "ordered_method_step_ids": [
+        "B2-FILTER_RECORDS-S01",
+        "B2-FILTER_RECORDS-S02",
+        "B2-FILTER_RECORDS-S03",
+        "B2-FILTER_RECORDS-S04",
+        "B2-FILTER_RECORDS-S05",
+        "B2-FILTER_RECORDS-S06"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the declared state at each step.",
+        "Preserve complete records and all data outside the live region.",
+        "Do not duplicate ownership of co-tagged official atoms."
+      ],
+      "termination_argument": "Every progress step strictly advances a cursor, shrinks an interval/boundary, grows a sorted prefix, or consumes exactly one item; a finite live range therefore reaches the termination guard.",
+      "failure_paths": [
+        "B2-ERR-FILTER_RECORDS-01",
+        "B2-ERR-FILTER_RECORDS-02",
+        "B2-ERR-FILTER_RECORDS-03"
+      ],
+      "alternative_designs": [
+        "B2-V04-filter-predicate"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Trace at least one interior match/move/update with every invariant visible."
+        ],
+        "boundary": [
+          "empty",
+          "one item",
+          "first position",
+          "last position",
+          "duplicate/equal key",
+          "no match where applicable"
+        ],
+        "counterexample": [
+          "Run each linked error trigger and prove the detection check catches it."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_w21_41_2(g) under its exact source convention.",
+          "Reproduce official part 9618_w21_42_2(g) under its exact source convention.",
+          "Reproduce official part 9618_s24_41_2(e)(i) under its exact source convention.",
+          "Reproduce official part 9618_s24_43_2(e)(i) under its exact source convention."
+        ]
+      },
+      "source_constraints": [],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B2-SD-GROUP_AGGREGATE",
+      "pattern_id": "GROUP_AGGREGATE",
+      "variant_id": "B2-V05-group-branch",
+      "input_contract": "Fix the group key, aggregate, group representation, and live group count.",
+      "output_contract": "Finish when the current item has updated or created one group, then check key uniqueness.",
+      "state_model": [
+        "group_contract",
+        "current_item",
+        "group_cursor",
+        "matched_group",
+        "new_group",
+        "final_groups"
+      ],
+      "representation": [
+        "Python-oriented pseudocode",
+        "explicit live ranges",
+        "complete-record movement where records are used"
+      ],
+      "preconditions": [
+        "Fix the group key, aggregate, group representation, and live group count."
+      ],
+      "postconditions": [
+        "each processed input contributes once to exactly one group"
+      ],
+      "invariants": [
+        "each key names at most one live group",
+        "unprocessed inputs remain unchanged",
+        "no earlier group matches the current key",
+        "all other groups remain unchanged",
+        "one live group exists for every processed key",
+        "each processed input contributes once to exactly one group"
+      ],
+      "ordered_method_step_ids": [
+        "B2-GROUP_AGGREGATE-S01",
+        "B2-GROUP_AGGREGATE-S02",
+        "B2-GROUP_AGGREGATE-S03",
+        "B2-GROUP_AGGREGATE-S04",
+        "B2-GROUP_AGGREGATE-S05",
+        "B2-GROUP_AGGREGATE-S06"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the declared state at each step.",
+        "Preserve complete records and all data outside the live region.",
+        "Do not duplicate ownership of co-tagged official atoms."
+      ],
+      "termination_argument": "Every progress step strictly advances a cursor, shrinks an interval/boundary, grows a sorted prefix, or consumes exactly one item; a finite live range therefore reaches the termination guard.",
+      "failure_paths": [
+        "B2-ERR-GROUP_AGGREGATE-01",
+        "B2-ERR-GROUP_AGGREGATE-02",
+        "B2-ERR-GROUP_AGGREGATE-03"
+      ],
+      "alternative_designs": [
+        "B2-V05-group-branch"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Trace at least one interior match/move/update with every invariant visible."
+        ],
+        "boundary": [
+          "empty",
+          "one item",
+          "first position",
+          "last position",
+          "duplicate/equal key",
+          "no match where applicable"
+        ],
+        "counterexample": [
+          "Run each linked error trigger and prove the detection check catches it."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_w23_41_2(c)(iii) under its exact source convention.",
+          "Reproduce official part 9618_w23_43_2(c)(iii) under its exact source convention."
+        ]
+      },
+      "source_constraints": [
+        {
+          "source_issue_id": "S4-S2-W23-41-43-MS-CONTINUATIONS",
+          "disposition": "Use Stage 1 page ownership; continuation content stays with the preceding part and creates no duplicate mark."
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "source_issue_id": "S4-S2-W23-41-43-MS-CONTINUATIONS",
+          "stage5_obligation": "Verify any assembled example code independently; continuation layout is not executable proof."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B2-SD-BUBBLE_SORT",
+      "pattern_id": "BUBBLE_SORT",
+      "variant_id": "B2-V09-bubble-policy",
+      "input_contract": "Fix the key, direction, live range, whole-record rule, and any ban on built-in sort.",
+      "output_contract": "Stop when at most one unfixed item remains or a valid pass makes no swaps.",
+      "state_model": [
+        "sort_contract",
+        "pass_boundary",
+        "pair",
+        "records_and_flag",
+        "final_sequence"
+      ],
+      "representation": [
+        "Python-oriented pseudocode",
+        "explicit live ranges",
+        "complete-record movement where records are used"
+      ],
+      "preconditions": [
+        "Fix the key, direction, live range, whole-record rule, and any ban on built-in sort."
+      ],
+      "postconditions": [
+        "the whole live sequence is ordered and records are preserved"
+      ],
+      "invariants": [
+        "the multiset of complete records is preserved",
+        "the suffix beyond the boundary is already final",
+        "all pairs before the cursor have been processed this pass",
+        "the multiset of records is unchanged",
+        "the fixed suffix is ordered and final",
+        "the whole live sequence is ordered and records are preserved"
+      ],
+      "ordered_method_step_ids": [
+        "B2-BUBBLE_SORT-S01",
+        "B2-BUBBLE_SORT-S02",
+        "B2-BUBBLE_SORT-S03",
+        "B2-BUBBLE_SORT-S04",
+        "B2-BUBBLE_SORT-S05",
+        "B2-BUBBLE_SORT-S06"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the declared state at each step.",
+        "Preserve complete records and all data outside the live region.",
+        "Do not duplicate ownership of co-tagged official atoms."
+      ],
+      "termination_argument": "Every progress step strictly advances a cursor, shrinks an interval/boundary, grows a sorted prefix, or consumes exactly one item; a finite live range therefore reaches the termination guard.",
+      "failure_paths": [
+        "B2-ERR-BUBBLE_SORT-01",
+        "B2-ERR-BUBBLE_SORT-02",
+        "B2-ERR-BUBBLE_SORT-03"
+      ],
+      "alternative_designs": [
+        "B2-V08-sort-family",
+        "B2-V09-bubble-policy"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Trace at least one interior match/move/update with every invariant visible."
+        ],
+        "boundary": [
+          "empty",
+          "one item",
+          "first position",
+          "last position",
+          "duplicate/equal key",
+          "no match where applicable"
+        ],
+        "counterexample": [
+          "Run each linked error trigger and prove the detection check catches it."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_s21_41_2(c) under its exact source convention.",
+          "Reproduce official part 9618_s21_42_2(c) under its exact source convention.",
+          "Reproduce official part 9618_s21_43_2(c) under its exact source convention.",
+          "Reproduce official part 9618_s22_42_2(b)(i) under its exact source convention.",
+          "Reproduce official part 9618_w22_41_1(e) under its exact source convention.",
+          "Reproduce official part 9618_w22_43_1(e) under its exact source convention.",
+          "Reproduce official part 9618_s23_42_1(c) under its exact source convention.",
+          "Reproduce official part 9618_s24_41_1(d)(i) under its exact source convention.",
+          "Reproduce official part 9618_s24_43_1(d)(i) under its exact source convention.",
+          "Reproduce official part 9618_w24_41_1(d)(i) under its exact source convention.",
+          "Reproduce official part 9618_w24_42_3(d) under its exact source convention.",
+          "Reproduce official part 9618_w24_43_1(d)(i) under its exact source convention.",
+          "Reproduce official part 9618_w25_42_2(c) under its exact source convention."
+        ]
+      },
+      "source_constraints": [
+        {
+          "source_issue_id": "S21-2C-NAME",
+          "disposition": "Retain the official source caveat and verify the intended invariant in Stage 5."
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "source_issue_id": "S21-2C-NAME",
+          "stage5_obligation": "Test both the literal source behavior and the corrected invariant-preserving behavior; do not silently normalize."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B2-SD-INSERTION_SORT",
+      "pattern_id": "INSERTION_SORT",
+      "variant_id": "B2-V10-insertion-control",
+      "input_contract": "Fix the key, direction, live range, whole-record rule, and iterative, recursive, or non-recursive-rewrite variant.",
+      "output_contract": "Expand the prefix or propagate the recursive result until the full range is sorted.",
+      "state_model": [
+        "sort_contract",
+        "sorted_prefix",
+        "key_record",
+        "shift_cursor",
+        "final_sequence"
+      ],
+      "representation": [
+        "Python-oriented pseudocode",
+        "explicit live ranges",
+        "complete-record movement where records are used"
+      ],
+      "preconditions": [
+        "Fix the key, direction, live range, whole-record rule, and iterative, recursive, or non-recursive-rewrite variant."
+      ],
+      "postconditions": [
+        "the complete live sequence is ordered"
+      ],
+      "invariants": [
+        "the multiset of complete records is preserved",
+        "the prefix is ordered and preserves its records",
+        "the saved key is not lost during shifts",
+        "the gap and shifted suffix are ordered relative to the key",
+        "the enlarged prefix is ordered and preserves its records",
+        "the complete live sequence is ordered"
+      ],
+      "ordered_method_step_ids": [
+        "B2-INSERTION_SORT-S01",
+        "B2-INSERTION_SORT-S02",
+        "B2-INSERTION_SORT-S03",
+        "B2-INSERTION_SORT-S04",
+        "B2-INSERTION_SORT-S05",
+        "B2-INSERTION_SORT-S06"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the declared state at each step.",
+        "Preserve complete records and all data outside the live region.",
+        "Do not duplicate ownership of co-tagged official atoms."
+      ],
+      "termination_argument": "Every progress step strictly advances a cursor, shrinks an interval/boundary, grows a sorted prefix, or consumes exactly one item; a finite live range therefore reaches the termination guard.",
+      "failure_paths": [
+        "B2-ERR-INSERTION_SORT-01",
+        "B2-ERR-INSERTION_SORT-02",
+        "B2-ERR-INSERTION_SORT-03"
+      ],
+      "alternative_designs": [
+        "B2-V07-insert-vs-sort",
+        "B2-V08-sort-family",
+        "B2-V10-insertion-control"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Trace at least one interior match/move/update with every invariant visible."
+        ],
+        "boundary": [
+          "empty",
+          "one item",
+          "first position",
+          "last position",
+          "duplicate/equal key",
+          "no match where applicable"
+        ],
+        "counterexample": [
+          "Run each linked error trigger and prove the detection check catches it."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_w22_42_1(e) under its exact source convention.",
+          "Reproduce official part 9618_s24_42_3(b)(i) under its exact source convention.",
+          "Reproduce official part 9618_s24_42_3(c)(i) under its exact source convention.",
+          "Reproduce official part 9618_s25_43_2(b) under its exact source convention."
+        ]
+      },
+      "source_constraints": [],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B2-SD-BINARY_SEARCH",
+      "pattern_id": "BINARY_SEARCH",
+      "variant_id": "B2-V11-binary-control",
+      "input_contract": "Confirm the data is sorted by the same comparator; fix inclusive bounds and the result contract.",
+      "output_contract": "Iterate or recurse until found or the interval is empty, then return the agreed sentinel.",
+      "state_model": [
+        "search_contract",
+        "interval",
+        "mid",
+        "comparison",
+        "final_result"
+      ],
+      "representation": [
+        "Python-oriented pseudocode",
+        "explicit live ranges",
+        "complete-record movement where records are used"
+      ],
+      "preconditions": [
+        "Confirm the data is sorted by the same comparator; fix inclusive bounds and the result contract."
+      ],
+      "postconditions": [
+        "the result is a valid match or the agreed absent value"
+      ],
+      "invariants": [
+        "the target can only lie inside the current interval",
+        "no discarded position can contain the target",
+        "mid belongs to the candidate interval",
+        "the target, if present, remains inside the interval",
+        "the result is a valid match or the agreed absent value"
+      ],
+      "ordered_method_step_ids": [
+        "B2-BINARY_SEARCH-S01",
+        "B2-BINARY_SEARCH-S02",
+        "B2-BINARY_SEARCH-S03",
+        "B2-BINARY_SEARCH-S04",
+        "B2-BINARY_SEARCH-S05",
+        "B2-BINARY_SEARCH-S06"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the declared state at each step.",
+        "Preserve complete records and all data outside the live region.",
+        "Do not duplicate ownership of co-tagged official atoms."
+      ],
+      "termination_argument": "Every progress step strictly advances a cursor, shrinks an interval/boundary, grows a sorted prefix, or consumes exactly one item; a finite live range therefore reaches the termination guard.",
+      "failure_paths": [
+        "B2-ERR-BINARY_SEARCH-01",
+        "B2-ERR-BINARY_SEARCH-02",
+        "B2-ERR-BINARY_SEARCH-03"
+      ],
+      "alternative_designs": [
+        "B2-V06-search-choice",
+        "B2-V11-binary-control",
+        "B2-V12-binary-bounds"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Trace at least one interior match/move/update with every invariant visible."
+        ],
+        "boundary": [
+          "empty",
+          "one item",
+          "first position",
+          "last position",
+          "duplicate/equal key",
+          "no match where applicable"
+        ],
+        "counterexample": [
+          "Run each linked error trigger and prove the detection check catches it."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_s22_42_2(c)(i) under its exact source convention.",
+          "Reproduce official part 9618_s24_41_1(e)(i) under its exact source convention.",
+          "Reproduce official part 9618_s24_42_3(d)(i) under its exact source convention.",
+          "Reproduce official part 9618_s24_43_1(e)(i) under its exact source convention.",
+          "Reproduce official part 9618_s25_43_2(e) under its exact source convention.",
+          "Reproduce official part 9618_w25_42_2(e) under its exact source convention."
+        ]
+      },
+      "source_constraints": [
+        {
+          "source_issue_id": "S22-42-2CI-GUARD",
+          "disposition": "Retain the official source caveat and verify the intended invariant in Stage 5."
+        },
+        {
+          "source_issue_id": "S22-42-2CI-MID",
+          "disposition": "Retain the official source caveat and verify the intended invariant in Stage 5."
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "source_issue_id": "S22-42-2CI-GUARD",
+          "stage5_obligation": "Test both the literal source behavior and the corrected invariant-preserving behavior; do not silently normalize."
+        },
+        {
+          "source_issue_id": "S22-42-2CI-MID",
+          "stage5_obligation": "Test both the literal source behavior and the corrected invariant-preserving behavior; do not silently normalize."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    }
+  ],
+  "self_checks": {
+    "design_count": 8,
+    "all_pending_stage5": true
+  }
+}

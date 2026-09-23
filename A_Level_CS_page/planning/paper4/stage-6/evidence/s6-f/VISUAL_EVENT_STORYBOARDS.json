@@ -1,0 +1,3055 @@
+{
+  "schema_version": "s6-visual-storyboard-v1",
+  "stage": 6,
+  "wave": "S6-F",
+  "release_id": "paper4-2026-s5-v1",
+  "entries": [
+    {
+      "visual_id": "s6f.visual.file_read_array.01",
+      "scenario_id": "visual-scenario:b7.visual.file-read-array:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-array:event:001:OPEN_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:002:READ_RECORD_LINE",
+        "visual-event:b7.visual.file-read-array:event:003:COMPLETE_RECORD_BUFFER",
+        "visual-event:b7.visual.file-read-array:event:004:CONVERT_RECORD_FIELD",
+        "visual-event:b7.visual.file-read-array:event:005:CHECK_DESTINATION_CAPACITY",
+        "visual-event:b7.visual.file-read-array:event:006:COMMIT_DESTINATION_ITEM",
+        "visual-event:b7.visual.file-read-array:event:007:CLOSE_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:008:EMIT_READ_ERROR"
+      ],
+      "example_id": "b7.example.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 4,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 4,
+            "field_types": [
+              "str",
+              "int"
+            ],
+            "lines": [
+              "Ava",
+              "10",
+              "Ben",
+              "20"
+            ],
+            "record_size": 2
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            [
+              "Ava",
+              10
+            ],
+            [
+              "Ben",
+              20
+            ]
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 2,
+            "error": null,
+            "records": [
+              [
+                "Ava",
+                10
+              ],
+              [
+                "Ben",
+                20
+              ]
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "code_highlight": "B7-FILE_READ_ARRAY-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_ARRAY với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_ARRAY with before, delta and after states."
+      },
+      "caption": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.001",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.001]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-array",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_ARRAY]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "01e44d23655b45644fd7211a68bb1f73fcaf5c08c72943f48cc0947d3eb57df1",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_array.02",
+      "scenario_id": "visual-scenario:b7.visual.file-read-array:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-array:event:001:OPEN_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:002:READ_RECORD_LINE",
+        "visual-event:b7.visual.file-read-array:event:003:COMPLETE_RECORD_BUFFER",
+        "visual-event:b7.visual.file-read-array:event:004:CONVERT_RECORD_FIELD",
+        "visual-event:b7.visual.file-read-array:event:005:CHECK_DESTINATION_CAPACITY",
+        "visual-event:b7.visual.file-read-array:event:006:COMMIT_DESTINATION_ITEM",
+        "visual-event:b7.visual.file-read-array:event:007:CLOSE_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:008:EMIT_READ_ERROR"
+      ],
+      "example_id": "b7.example.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 4,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 4,
+            "field_types": [
+              "str",
+              "int"
+            ],
+            "lines": [
+              "Ava",
+              "10",
+              "Ben"
+            ],
+            "record_size": 2
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            [
+              "Ava",
+              10
+            ]
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 1,
+            "error": null,
+            "records": [
+              [
+                "Ava",
+                10
+              ]
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "code_highlight": "B7-FILE_READ_ARRAY-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_ARRAY với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_ARRAY with before, delta and after states."
+      },
+      "caption": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.002",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.002]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-array",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_ARRAY]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "f5450a507202e01ab131d4478cbe8027255fbc8f1ee22e75fe422af2ab899b4c",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_array.03",
+      "scenario_id": "visual-scenario:b7.visual.file-read-array:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-array:event:001:OPEN_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:002:READ_RECORD_LINE",
+        "visual-event:b7.visual.file-read-array:event:003:COMPLETE_RECORD_BUFFER",
+        "visual-event:b7.visual.file-read-array:event:004:CONVERT_RECORD_FIELD",
+        "visual-event:b7.visual.file-read-array:event:005:CHECK_DESTINATION_CAPACITY",
+        "visual-event:b7.visual.file-read-array:event:006:COMMIT_DESTINATION_ITEM",
+        "visual-event:b7.visual.file-read-array:event:007:CLOSE_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:008:EMIT_READ_ERROR"
+      ],
+      "example_id": "b7.example.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 4,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 4,
+            "field_types": [
+              "str",
+              "int"
+            ],
+            "lines": [
+              "Ava",
+              "10",
+              "Bad",
+              "oops"
+            ],
+            "record_size": 2
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            [
+              "Ava",
+              10
+            ]
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 1,
+            "error": "READ_ERROR",
+            "records": [
+              [
+                "Ava",
+                10
+              ]
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "code_highlight": "B7-FILE_READ_ARRAY-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_ARRAY với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_ARRAY with before, delta and after states."
+      },
+      "caption": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.003",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.003]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-array",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_ARRAY]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "565f62083c2731ef6742b5e9d0b5fff8198a2dc0196c25845187a6e7a64f7aed",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_array.04",
+      "scenario_id": "visual-scenario:b7.visual.file-read-array:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-array:event:001:OPEN_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:002:READ_RECORD_LINE",
+        "visual-event:b7.visual.file-read-array:event:003:COMPLETE_RECORD_BUFFER",
+        "visual-event:b7.visual.file-read-array:event:004:CONVERT_RECORD_FIELD",
+        "visual-event:b7.visual.file-read-array:event:005:CHECK_DESTINATION_CAPACITY",
+        "visual-event:b7.visual.file-read-array:event:006:COMMIT_DESTINATION_ITEM",
+        "visual-event:b7.visual.file-read-array:event:007:CLOSE_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:008:EMIT_READ_ERROR"
+      ],
+      "example_id": "b7.example.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 2,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 2,
+            "field_types": [
+              "str",
+              "int"
+            ],
+            "lines": [
+              "Ava",
+              "10",
+              "Ben",
+              "20",
+              "Cara",
+              "30"
+            ],
+            "record_size": 2
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            [
+              "Ava",
+              10
+            ],
+            [
+              "Ben",
+              20
+            ]
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 2,
+            "error": null,
+            "records": [
+              [
+                "Ava",
+                10
+              ],
+              [
+                "Ben",
+                20
+              ]
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "code_highlight": "B7-FILE_READ_ARRAY-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_ARRAY với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_ARRAY with before, delta and after states."
+      },
+      "caption": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.004",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.004]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-array",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_ARRAY]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "edcc67d68fba57448d785a84b22e9ac6d3a8d829435dfccee4eb7954dfa3b2d8",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_array.05",
+      "scenario_id": "visual-scenario:b7.visual.file-read-array:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-array:event:001:OPEN_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:002:READ_RECORD_LINE",
+        "visual-event:b7.visual.file-read-array:event:003:COMPLETE_RECORD_BUFFER",
+        "visual-event:b7.visual.file-read-array:event:004:CONVERT_RECORD_FIELD",
+        "visual-event:b7.visual.file-read-array:event:005:CHECK_DESTINATION_CAPACITY",
+        "visual-event:b7.visual.file-read-array:event:006:COMMIT_DESTINATION_ITEM",
+        "visual-event:b7.visual.file-read-array:event:007:CLOSE_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:008:EMIT_READ_ERROR"
+      ],
+      "example_id": "b7.example.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 4,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 4,
+            "destination": "ADT",
+            "field_types": [
+              "str",
+              "int"
+            ],
+            "lines": [
+              "Ava",
+              "10",
+              "Ben",
+              "20"
+            ],
+            "record_size": 2
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            [
+              "Ava",
+              10
+            ],
+            [
+              "Ben",
+              20
+            ]
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 2,
+            "error": null,
+            "records": [
+              [
+                "Ava",
+                10
+              ],
+              [
+                "Ben",
+                20
+              ]
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "code_highlight": "B7-FILE_READ_ARRAY-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_ARRAY với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_ARRAY with before, delta and after states."
+      },
+      "caption": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.013",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.013]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-array",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_ARRAY]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "12c18780ae0788436d2aa0cdf7e669637975c9fd820119d75c815a5b175cce4a",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_array.06",
+      "scenario_id": "visual-scenario:b7.visual.file-read-array:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-array:event:001:OPEN_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:002:READ_RECORD_LINE",
+        "visual-event:b7.visual.file-read-array:event:003:COMPLETE_RECORD_BUFFER",
+        "visual-event:b7.visual.file-read-array:event:004:CONVERT_RECORD_FIELD",
+        "visual-event:b7.visual.file-read-array:event:005:CHECK_DESTINATION_CAPACITY",
+        "visual-event:b7.visual.file-read-array:event:006:COMMIT_DESTINATION_ITEM",
+        "visual-event:b7.visual.file-read-array:event:007:CLOSE_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:008:EMIT_READ_ERROR"
+      ],
+      "example_id": "b7.example.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 4,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 4,
+            "field_types": [
+              "str",
+              "int"
+            ],
+            "lines": [
+              "Ava",
+              "10",
+              "Ben",
+              "20",
+              "Partial"
+            ],
+            "record_size": 2
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            [
+              "Ava",
+              10
+            ],
+            [
+              "Ben",
+              20
+            ]
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 2,
+            "error": null,
+            "records": [
+              [
+                "Ava",
+                10
+              ],
+              [
+                "Ben",
+                20
+              ]
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "code_highlight": "B7-FILE_READ_ARRAY-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_ARRAY với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_ARRAY with before, delta and after states."
+      },
+      "caption": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.014",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.014]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-array",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_ARRAY]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "13b2ca6fa022db565f394178825d8fcd84f30e37fe77ef745cd3bc9d9507ceee",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_array.07",
+      "scenario_id": "visual-scenario:b7.visual.file-read-array:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-array:event:001:OPEN_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:002:READ_RECORD_LINE",
+        "visual-event:b7.visual.file-read-array:event:003:COMPLETE_RECORD_BUFFER",
+        "visual-event:b7.visual.file-read-array:event:004:CONVERT_RECORD_FIELD",
+        "visual-event:b7.visual.file-read-array:event:005:CHECK_DESTINATION_CAPACITY",
+        "visual-event:b7.visual.file-read-array:event:006:COMMIT_DESTINATION_ITEM",
+        "visual-event:b7.visual.file-read-array:event:007:CLOSE_INPUT_FILE",
+        "visual-event:b7.visual.file-read-array:event:008:EMIT_READ_ERROR"
+      ],
+      "example_id": "b7.example.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 4,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 4,
+            "field_types": [
+              "str",
+              "int"
+            ],
+            "fixed_count": 1,
+            "lines": [
+              "Ava",
+              "10",
+              "Ben",
+              "20"
+            ],
+            "record_size": 2
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            [
+              "Ava",
+              10
+            ]
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 1,
+            "error": null,
+            "records": [
+              [
+                "Ava",
+                10
+              ]
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "code_highlight": "B7-FILE_READ_ARRAY-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_ARRAY với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_ARRAY with before, delta and after states."
+      },
+      "caption": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.015",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.015]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-array",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_ARRAY]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "e36f9d32d3fe3b090b943c97b70524c131af377fcb4d5b860782c644c4916a60",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_objects.01",
+      "scenario_id": "visual-scenario:b7.visual.file-read-objects:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-objects:event:001:OPEN_OBJECT_FILE",
+        "visual-event:b7.visual.file-read-objects:event:002:BUFFER_OBJECT_RECORD",
+        "visual-event:b7.visual.file-read-objects:event:003:CONVERT_OBJECT_FIELDS",
+        "visual-event:b7.visual.file-read-objects:event:004:SELECT_OBJECT_ROUTE",
+        "visual-event:b7.visual.file-read-objects:event:005:CONSTRUCT_OBJECT_CANDIDATE",
+        "visual-event:b7.visual.file-read-objects:event:006:LOOKUP_UPDATE_TARGET",
+        "visual-event:b7.visual.file-read-objects:event:007:COMMIT_OBJECT_STATE",
+        "visual-event:b7.visual.file-read-objects:event:008:CLOSE_OBJECT_FILE"
+      ],
+      "example_id": "b7.example.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 3,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 3,
+            "class_name": "TreasureChest",
+            "lines": [
+              "Ava",
+              "10",
+              "1",
+              "Ben",
+              "20",
+              "2"
+            ],
+            "record_size": 3
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 2,
+            "error": null,
+            "objects": [
+              {
+                "answer": 10,
+                "class_name": "TreasureChest",
+                "points": 1,
+                "question": "Ava"
+              },
+              {
+                "answer": 20,
+                "class_name": "TreasureChest",
+                "points": 2,
+                "question": "Ben"
+              }
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "code_highlight": "B7-FILE_READ_OBJECTS-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_OBJECTS với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_OBJECTS with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.005",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.005]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-objects",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_OBJECTS]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "b0f1a6d04f0f1c4aab80e432cd3c003dc6a74023177e12aabad8a8e80db40fdc",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_objects.02",
+      "scenario_id": "visual-scenario:b7.visual.file-read-objects:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-objects:event:001:OPEN_OBJECT_FILE",
+        "visual-event:b7.visual.file-read-objects:event:002:BUFFER_OBJECT_RECORD",
+        "visual-event:b7.visual.file-read-objects:event:003:CONVERT_OBJECT_FIELDS",
+        "visual-event:b7.visual.file-read-objects:event:004:SELECT_OBJECT_ROUTE",
+        "visual-event:b7.visual.file-read-objects:event:005:CONSTRUCT_OBJECT_CANDIDATE",
+        "visual-event:b7.visual.file-read-objects:event:006:LOOKUP_UPDATE_TARGET",
+        "visual-event:b7.visual.file-read-objects:event:007:COMMIT_OBJECT_STATE",
+        "visual-event:b7.visual.file-read-objects:event:008:CLOSE_OBJECT_FILE"
+      ],
+      "example_id": "b7.example.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 2,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 2,
+            "class_name": "TreasureChest",
+            "lines": [
+              "Ava",
+              "10",
+              "1",
+              "Ben",
+              "20",
+              "2"
+            ],
+            "record_size": 3
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 2,
+            "error": null,
+            "objects": [
+              {
+                "answer": 10,
+                "class_name": "TreasureChest",
+                "points": 1,
+                "question": "Ava"
+              },
+              {
+                "answer": 20,
+                "class_name": "TreasureChest",
+                "points": 2,
+                "question": "Ben"
+              }
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "code_highlight": "B7-FILE_READ_OBJECTS-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_OBJECTS với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_OBJECTS with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.006",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.006]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-objects",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_OBJECTS]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "f5ff6fd7cd3625d525ebaa5aa05c6808006cb12986357cece56f7db81cc8c4d4",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_objects.03",
+      "scenario_id": "visual-scenario:b7.visual.file-read-objects:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-objects:event:001:OPEN_OBJECT_FILE",
+        "visual-event:b7.visual.file-read-objects:event:002:BUFFER_OBJECT_RECORD",
+        "visual-event:b7.visual.file-read-objects:event:003:CONVERT_OBJECT_FIELDS",
+        "visual-event:b7.visual.file-read-objects:event:004:SELECT_OBJECT_ROUTE",
+        "visual-event:b7.visual.file-read-objects:event:005:CONSTRUCT_OBJECT_CANDIDATE",
+        "visual-event:b7.visual.file-read-objects:event:006:LOOKUP_UPDATE_TARGET",
+        "visual-event:b7.visual.file-read-objects:event:007:COMMIT_OBJECT_STATE",
+        "visual-event:b7.visual.file-read-objects:event:008:CLOSE_OBJECT_FILE"
+      ],
+      "example_id": "b7.example.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 2,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 2,
+            "class_name": "TreasureChest",
+            "lines": [
+              "Ava",
+              "10",
+              "1",
+              "Broken",
+              "x",
+              "2"
+            ],
+            "record_size": 3
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 1,
+            "error": "READ_ERROR",
+            "objects": [
+              {
+                "answer": 10,
+                "class_name": "TreasureChest",
+                "points": 1,
+                "question": "Ava"
+              }
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "code_highlight": "B7-FILE_READ_OBJECTS-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_OBJECTS với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_OBJECTS with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.007",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.007]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-objects",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_OBJECTS]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "bbfea8474fa9882242d0982481740f9986224fdc4c8b1a0372862757da111d8e",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_objects.04",
+      "scenario_id": "visual-scenario:b7.visual.file-read-objects:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-objects:event:001:OPEN_OBJECT_FILE",
+        "visual-event:b7.visual.file-read-objects:event:002:BUFFER_OBJECT_RECORD",
+        "visual-event:b7.visual.file-read-objects:event:003:CONVERT_OBJECT_FIELDS",
+        "visual-event:b7.visual.file-read-objects:event:004:SELECT_OBJECT_ROUTE",
+        "visual-event:b7.visual.file-read-objects:event:005:CONSTRUCT_OBJECT_CANDIDATE",
+        "visual-event:b7.visual.file-read-objects:event:006:LOOKUP_UPDATE_TARGET",
+        "visual-event:b7.visual.file-read-objects:event:007:COMMIT_OBJECT_STATE",
+        "visual-event:b7.visual.file-read-objects:event:008:CLOSE_OBJECT_FILE"
+      ],
+      "example_id": "b7.example.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 1,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 1,
+            "class_name": "TreasureChest",
+            "lines": [
+              "Ava",
+              "10",
+              "1"
+            ],
+            "record_size": 3,
+            "subclass": "GoldenChest"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 1,
+            "error": null,
+            "objects": [
+              {
+                "answer": 10,
+                "class_name": "GoldenChest",
+                "points": 1,
+                "question": "Ava"
+              }
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "code_highlight": "B7-FILE_READ_OBJECTS-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_OBJECTS với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_OBJECTS with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.008",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.008]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-objects",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_OBJECTS]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "78f3ad22b09c9a158a3c577b3d6f4f946120287e4bcb6eb175ab3298cefa49c3",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_objects.05",
+      "scenario_id": "visual-scenario:b7.visual.file-read-objects:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-objects:event:001:OPEN_OBJECT_FILE",
+        "visual-event:b7.visual.file-read-objects:event:002:BUFFER_OBJECT_RECORD",
+        "visual-event:b7.visual.file-read-objects:event:003:CONVERT_OBJECT_FIELDS",
+        "visual-event:b7.visual.file-read-objects:event:004:SELECT_OBJECT_ROUTE",
+        "visual-event:b7.visual.file-read-objects:event:005:CONSTRUCT_OBJECT_CANDIDATE",
+        "visual-event:b7.visual.file-read-objects:event:006:LOOKUP_UPDATE_TARGET",
+        "visual-event:b7.visual.file-read-objects:event:007:COMMIT_OBJECT_STATE",
+        "visual-event:b7.visual.file-read-objects:event:008:CLOSE_OBJECT_FILE"
+      ],
+      "example_id": "b7.example.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 3,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 3,
+            "class_name": "TreasureChest",
+            "lines": [
+              "Ava",
+              "10",
+              "1",
+              "Ben",
+              "20",
+              "2"
+            ],
+            "record_size": 3
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 2,
+            "error": null,
+            "objects": [
+              {
+                "answer": 10,
+                "class_name": "TreasureChest",
+                "points": 1,
+                "question": "Ava"
+              },
+              {
+                "answer": 20,
+                "class_name": "TreasureChest",
+                "points": 2,
+                "question": "Ben"
+              }
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "code_highlight": "B7-FILE_READ_OBJECTS-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_OBJECTS với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_OBJECTS with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.016",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.016]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-objects",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_OBJECTS]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "4088c92109056a7d634c2119a4a9c07ecbac3655830810f440e09130050a8495",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_objects.06",
+      "scenario_id": "visual-scenario:b7.visual.file-read-objects:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-objects:event:001:OPEN_OBJECT_FILE",
+        "visual-event:b7.visual.file-read-objects:event:002:BUFFER_OBJECT_RECORD",
+        "visual-event:b7.visual.file-read-objects:event:003:CONVERT_OBJECT_FIELDS",
+        "visual-event:b7.visual.file-read-objects:event:004:SELECT_OBJECT_ROUTE",
+        "visual-event:b7.visual.file-read-objects:event:005:CONSTRUCT_OBJECT_CANDIDATE",
+        "visual-event:b7.visual.file-read-objects:event:006:LOOKUP_UPDATE_TARGET",
+        "visual-event:b7.visual.file-read-objects:event:007:COMMIT_OBJECT_STATE",
+        "visual-event:b7.visual.file-read-objects:event:008:CLOSE_OBJECT_FILE"
+      ],
+      "example_id": "b7.example.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 3,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 3,
+            "class_name": "TreasureChest",
+            "existing": [
+              {
+                "answer": 10,
+                "points": 1,
+                "question": "Ava"
+              }
+            ],
+            "lines": [
+              "Ava",
+              "10",
+              "1",
+              "Ben",
+              "20",
+              "2"
+            ],
+            "record_size": 3,
+            "route": "lookup_update"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 1,
+            "error": "OBJECT_NOT_FOUND",
+            "objects": [
+              {
+                "answer": 10,
+                "points": 1,
+                "question": "Ava"
+              }
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "code_highlight": "B7-FILE_READ_OBJECTS-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_OBJECTS với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_OBJECTS with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.017",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.017]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-objects",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_OBJECTS]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "f638fe73502c7bfffc7242b47fa40b94285533658e01958eb5e2e9e2425ebb35",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_read_objects.07",
+      "scenario_id": "visual-scenario:b7.visual.file-read-objects:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-read-objects:event:001:OPEN_OBJECT_FILE",
+        "visual-event:b7.visual.file-read-objects:event:002:BUFFER_OBJECT_RECORD",
+        "visual-event:b7.visual.file-read-objects:event:003:CONVERT_OBJECT_FIELDS",
+        "visual-event:b7.visual.file-read-objects:event:004:SELECT_OBJECT_ROUTE",
+        "visual-event:b7.visual.file-read-objects:event:005:CONSTRUCT_OBJECT_CANDIDATE",
+        "visual-event:b7.visual.file-read-objects:event:006:LOOKUP_UPDATE_TARGET",
+        "visual-event:b7.visual.file-read-objects:event:007:COMMIT_OBJECT_STATE",
+        "visual-event:b7.visual.file-read-objects:event:008:CLOSE_OBJECT_FILE"
+      ],
+      "example_id": "b7.example.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": 3,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "capacity": 3,
+            "class_name": "TreasureChest",
+            "lines": [
+              "Ava",
+              "10",
+              "1",
+              "Ben",
+              "20",
+              "2"
+            ],
+            "record_size": 3,
+            "subclass": "GoldenChest"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "count": 2,
+            "error": null,
+            "objects": [
+              {
+                "answer": 10,
+                "class_name": "GoldenChest",
+                "points": 1,
+                "question": "Ava"
+              },
+              {
+                "answer": 20,
+                "class_name": "GoldenChest",
+                "points": 2,
+                "question": "Ben"
+              }
+            ]
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "code_highlight": "B7-FILE_READ_OBJECTS-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_READ_OBJECTS với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_READ_OBJECTS with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.018",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.018]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-read-objects",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_READ_OBJECTS]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "0e3a57e8f34200d28026b77d9fc3e7f60ae408806410a04a38facb0dbe1a2bb5",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_write.01",
+      "scenario_id": "visual-scenario:b7.visual.file-write:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-write:event:001:SELECT_OUTPUT_MODE",
+        "visual-event:b7.visual.file-write:event:002:OPEN_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:003:SELECT_OUTPUT_RECORD",
+        "visual-event:b7.visual.file-write:event:004:FORMAT_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:005:WRITE_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:006:CLOSE_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:007:EMIT_WRITE_ERROR"
+      ],
+      "example_id": "b7.example.file-write",
+      "pattern_id": "FILE_WRITE",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            {
+              "score": 10,
+              "username": "Ava"
+            },
+            {
+              "score": 20,
+              "username": "Ben"
+            }
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "existing_text": "IGNORED\n",
+            "fields": [
+              "username",
+              "score"
+            ],
+            "mode": "w",
+            "records": [
+              {
+                "score": 10,
+                "username": "Ava"
+              },
+              {
+                "score": 20,
+                "username": "Ben"
+              }
+            ],
+            "target": "b7-normal.txt"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": "Ava 10\nBen 20\n",
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "line_count": 2,
+            "mode": "w",
+            "target": "b7-normal.txt",
+            "text": "Ava 10\nBen 20\n"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "code_highlight": "B7-FILE_WRITE-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_WRITE với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_WRITE with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.009",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.009]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-write",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_WRITE]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "16472ebedd918a7d9b2f2ca674dcf0962e56292cb845285bca66c4c3e9a204cc",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_write.02",
+      "scenario_id": "visual-scenario:b7.visual.file-write:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-write:event:001:SELECT_OUTPUT_MODE",
+        "visual-event:b7.visual.file-write:event:002:OPEN_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:003:SELECT_OUTPUT_RECORD",
+        "visual-event:b7.visual.file-write:event:004:FORMAT_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:005:WRITE_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:006:CLOSE_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:007:EMIT_WRITE_ERROR"
+      ],
+      "example_id": "b7.example.file-write",
+      "pattern_id": "FILE_WRITE",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            {
+              "score": 10,
+              "username": "Ava"
+            }
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "existing_text": "HEADER\n",
+            "fields": [
+              "username",
+              "score"
+            ],
+            "mode": "a",
+            "records": [
+              {
+                "score": 10,
+                "username": "Ava"
+              }
+            ],
+            "target": "b7-boundary.txt"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": "HEADER\nAva 10\n",
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "line_count": 1,
+            "mode": "a",
+            "target": "b7-boundary.txt",
+            "text": "HEADER\nAva 10\n"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "code_highlight": "B7-FILE_WRITE-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_WRITE với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_WRITE with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.010",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.010]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-write",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_WRITE]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "76c06e2d5aca15ac5a2aeae74f6741fac08ae3bdf8a41f601a0820e8dde05e0f",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_write.03",
+      "scenario_id": "visual-scenario:b7.visual.file-write:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-write:event:001:SELECT_OUTPUT_MODE",
+        "visual-event:b7.visual.file-write:event:002:OPEN_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:003:SELECT_OUTPUT_RECORD",
+        "visual-event:b7.visual.file-write:event:004:FORMAT_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:005:WRITE_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:006:CLOSE_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:007:EMIT_WRITE_ERROR"
+      ],
+      "example_id": "b7.example.file-write",
+      "pattern_id": "FILE_WRITE",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            {
+              "score": 10,
+              "username": "Ava"
+            },
+            {
+              "score": 20,
+              "username": "Ben"
+            }
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "existing_text": "STALE\n",
+            "fields": [
+              "score",
+              "username"
+            ],
+            "mode": "w",
+            "records": [
+              {
+                "score": 10,
+                "username": "Ava"
+              },
+              {
+                "score": 20,
+                "username": "Ben"
+              }
+            ],
+            "target": "b7-counterexample.txt"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": "10 Ava\n20 Ben\n",
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "line_count": 2,
+            "mode": "w",
+            "target": "b7-counterexample.txt",
+            "text": "10 Ava\n20 Ben\n"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "code_highlight": "B7-FILE_WRITE-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_WRITE với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_WRITE with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.011",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.011]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-write",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_WRITE]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "d75b69876c6bdfdb8a5e642b9f4077f94a7a67dce5859743897b3362108e4879",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_write.04",
+      "scenario_id": "visual-scenario:b7.visual.file-write:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-write:event:001:SELECT_OUTPUT_MODE",
+        "visual-event:b7.visual.file-write:event:002:OPEN_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:003:SELECT_OUTPUT_RECORD",
+        "visual-event:b7.visual.file-write:event:004:FORMAT_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:005:WRITE_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:006:CLOSE_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:007:EMIT_WRITE_ERROR"
+      ],
+      "example_id": "b7.example.file-write",
+      "pattern_id": "FILE_WRITE",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            {
+              "score": 10,
+              "username": "Ava"
+            },
+            {
+              "score": 20,
+              "username": "Ben"
+            }
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "existing_text": "PREFIX\n",
+            "fields": [
+              "username",
+              "score"
+            ],
+            "mode": "a",
+            "records": [
+              {
+                "score": 10,
+                "username": "Ava"
+              },
+              {
+                "score": 20,
+                "username": "Ben"
+              }
+            ],
+            "target": "b7-source.txt"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": "PREFIX\nAva 10\nBen 20\n",
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "line_count": 2,
+            "mode": "a",
+            "target": "b7-source.txt",
+            "text": "PREFIX\nAva 10\nBen 20\n"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "code_highlight": "B7-FILE_WRITE-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_WRITE với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_WRITE with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.012",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.012]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-write",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_WRITE]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "7b5d18331e4f3f186782f93f471f83827774e0c912ecb00da4c0b3dd127bd66a",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_write.05",
+      "scenario_id": "visual-scenario:b7.visual.file-write:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-write:event:001:SELECT_OUTPUT_MODE",
+        "visual-event:b7.visual.file-write:event:002:OPEN_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:003:SELECT_OUTPUT_RECORD",
+        "visual-event:b7.visual.file-write:event:004:FORMAT_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:005:WRITE_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:006:CLOSE_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:007:EMIT_WRITE_ERROR"
+      ],
+      "example_id": "b7.example.file-write",
+      "pattern_id": "FILE_WRITE",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            {
+              "score": 10,
+              "username": "Ava"
+            },
+            {
+              "score": 20,
+              "username": "Ben"
+            }
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "existing_text": "PREFIX\n",
+            "fields": [
+              "username",
+              "score"
+            ],
+            "mode": "a",
+            "records": [
+              {
+                "score": 10,
+                "username": "Ava"
+              },
+              {
+                "score": 20,
+                "username": "Ben"
+              }
+            ],
+            "target": "b7-normal.txt"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": "PREFIX\nAva 10\nBen 20\n",
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "line_count": 2,
+            "mode": "a",
+            "target": "b7-normal.txt",
+            "text": "PREFIX\nAva 10\nBen 20\n"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "code_highlight": "B7-FILE_WRITE-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_WRITE với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_WRITE with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.019",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.019]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-write",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_WRITE]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "4d79bdd895750beb7a1a79a1b1d7e0b1c772e31fdfc10683dbc7eeb616797d90",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_write.06",
+      "scenario_id": "visual-scenario:b7.visual.file-write:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-write:event:001:SELECT_OUTPUT_MODE",
+        "visual-event:b7.visual.file-write:event:002:OPEN_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:003:SELECT_OUTPUT_RECORD",
+        "visual-event:b7.visual.file-write:event:004:FORMAT_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:005:WRITE_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:006:CLOSE_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:007:EMIT_WRITE_ERROR"
+      ],
+      "example_id": "b7.example.file-write",
+      "pattern_id": "FILE_WRITE",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            {
+              "score": 10,
+              "username": "Ava"
+            },
+            {
+              "score": 20,
+              "username": "Ben"
+            }
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "existing_text": "STALE\n",
+            "fields": [
+              "username",
+              "score"
+            ],
+            "mode": "w",
+            "records": [
+              {
+                "score": 10,
+                "username": "Ava"
+              },
+              {
+                "score": 20,
+                "username": "Ben"
+              }
+            ],
+            "target": "b7-normal.txt"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": "Ava 10\nBen 20\n",
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "line_count": 2,
+            "mode": "w",
+            "target": "b7-normal.txt",
+            "text": "Ava 10\nBen 20\n"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "code_highlight": "B7-FILE_WRITE-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_WRITE với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_WRITE with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.020",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.020]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-write",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_WRITE]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "351582cb796094cdaf504aa9c1afa6d61c075f890533116ec48ac173af8f59e3",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6f.visual.file_write.07",
+      "scenario_id": "visual-scenario:b7.visual.file-write:normal",
+      "event_ids": [
+        "visual-event:b7.visual.file-write:event:001:SELECT_OUTPUT_MODE",
+        "visual-event:b7.visual.file-write:event:002:OPEN_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:003:SELECT_OUTPUT_RECORD",
+        "visual-event:b7.visual.file-write:event:004:FORMAT_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:005:WRITE_OUTPUT_LINE",
+        "visual-event:b7.visual.file-write:event:006:CLOSE_OUTPUT_FILE",
+        "visual-event:b7.visual.file-write:event:007:EMIT_WRITE_ERROR"
+      ],
+      "example_id": "b7.example.file-write",
+      "pattern_id": "FILE_WRITE",
+      "before": {
+        "vi": "Snapshot trước event theo trace Stage 5.",
+        "en": "State before the event from the Stage 5 trace.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": [
+            {
+              "score": 10,
+              "username": "Ava"
+            },
+            {
+              "score": 20,
+              "username": "Ben"
+            }
+          ],
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": null,
+          "return_value": null,
+          "storage": {
+            "existing_text": "IGNORED\n",
+            "fields": [
+              "username",
+              "score"
+            ],
+            "mode": "w",
+            "records": [
+              {
+                "score": 10,
+                "username": "Ava"
+              },
+              {
+                "score": 20,
+                "username": "Ben"
+              }
+            ],
+            "target": "b7-normal.txt"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "delta": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "after": {
+        "vi": "Snapshot sau event cuối, đối chiếu bất biến.",
+        "en": "State after the final event; check the invariant.",
+        "state": {
+          "additional_declared_fields": {},
+          "capacity": null,
+          "file_state": [],
+          "items_in_logical_order": null,
+          "live_range": null,
+          "object_type": "file_operation_state",
+          "output": "Ava 10\nBen 20\n",
+          "return_value": null,
+          "storage": {
+            "closed": true,
+            "line_count": 2,
+            "mode": "w",
+            "target": "b7-normal.txt",
+            "text": "Ava 10\nBen 20\n"
+          },
+          "success_flags": {},
+          "top_pointer": null
+        }
+      },
+      "invariant": {
+        "vi": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "code_highlight": "B7-FILE_WRITE-S01",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot trước; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the before snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Chuỗi event cho FILE_WRITE với trạng thái trước, thay đổi và sau.",
+        "en": "Event sequence for FILE_WRITE with before, delta and after states."
+      },
+      "caption": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "source_refs": [
+        {
+          "authority": "Stage5_trace",
+          "source_id": "trace.b7.021",
+          "locator": "stage-5/evidence/b7/traces/TRACE_BUNDLE.json#/traces[trace.b7.021]",
+          "status": "VERIFIED_STAGE5"
+        },
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b7.visual.file-write",
+          "locator": "stage-4/evidence/method/B7-files/VISUAL_BRIEFS.json#/visual_briefs[FILE_WRITE]",
+          "status": "VERIFIED_STAGE4"
+        }
+      ],
+      "trace_sha256": "ea5bfc2bfa95f3c8806376d40d8e8ff4bd64b4c91c81e88050fd9dcd4409b4cf",
+      "status": "Stage6_specified",
+      "author": "A6_S6F",
+      "reviewer": "A0_LEAD_PENDING"
+    }
+  ],
+  "checks": {
+    "event_ids_exact_stage5": true,
+    "all_controls_present": true,
+    "static_fallback_present": true,
+    "trace_result_pass": true
+  },
+  "status": "COMPOSED_CANDIDATE"
+}

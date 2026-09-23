@@ -1,0 +1,176 @@
+{
+  "schema_version": "s8-accessibility-requirements-v1",
+  "stage": 8,
+  "wave": "S8-C",
+  "source_contract": {
+    "stage7_matrix_files": 4,
+    "stage7_accessibility_entries": 169,
+    "pattern_denominator": 58,
+    "required_locales": ["vi", "en"],
+    "required_focus_sequence": ["code", "state", "output", "prediction", "feedback", "control_bar"],
+    "required_narrow_order": ["code", "state", "output", "prediction", "feedback"],
+    "reduced_motion_rule": "preserve checkpoints; no auto-skip"
+  },
+  "selector_contract": {
+    "root": "[data-testid=\"paper4-visual-lab\"]",
+    "pattern_select": "#pattern-select, [data-testid=\"pattern-select\"]",
+    "event_progress": "[data-testid=\"event-progress\"]",
+    "announcer": "[data-testid=\"runtime-announcer\"][aria-live]",
+    "static_fallback": "[data-testid=\"static-fallback\"]",
+    "memory_cue": "[data-testid=\"memory-cue\"]",
+    "panels": "[data-panel=\"code\"], [data-panel=\"state\"], [data-panel=\"trace\"], [data-panel=\"output\"], [data-panel=\"invariant\"], [data-panel=\"prediction\"], [data-panel=\"feedback\"]",
+    "actions": "[data-action=\"locale-vi\"], [data-action=\"locale-en\"], [data-action=\"previous\"], [data-action=\"next\"], [data-action=\"play\"], [data-action=\"pause\"], [data-action=\"reset\"], [data-action=\"change-input\"]"
+  },
+  "requirements": [
+    {
+      "id": "S8C-A11Y-001",
+      "category": "bilingual",
+      "selector": "[data-action=\"locale-vi\"], [data-action=\"locale-en\"]",
+      "method": "Select the same pattern/event and toggle VI to EN to VI.",
+      "expected": "Pattern ID, event ID, event index, code lines and data values are unchanged; learner-facing title, purpose, prompts, feedback, invariant, controls and memory cue use the active locale.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-002",
+      "category": "accessible-name",
+      "selector": "button, select, input, [role=\"button\"]",
+      "method": "Inspect computed accessible name in VI and EN.",
+      "expected": "Every operable element has a unique, meaningful name in the active locale; Python identifiers may remain unchanged.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-003",
+      "category": "keyboard",
+      "selector": "[data-testid=\"paper4-visual-lab\"] :is(button, select, input, [tabindex])",
+      "method": "Traverse with Tab/Shift+Tab and activate with Enter/Space without pointer input.",
+      "expected": "All interactive elements are reachable and operable in a logical task order, with no keyboard trap.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-004",
+      "category": "focus-visible",
+      "selector": "[data-testid=\"paper4-visual-lab\"] :focus-visible",
+      "method": "Inspect every keyboard focus stop in light and dark themes.",
+      "expected": "A persistent outline or equivalent indicator is clearly visible and is not clipped.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-005",
+      "category": "disabled-state",
+      "selector": "[data-action=\"previous\"], [data-action=\"next\"], [data-action=\"play\"], [data-action=\"pause\"]",
+      "method": "Inspect event-zero, playing and final-event boundaries.",
+      "expected": "Unavailable actions use native disabled or aria-disabled semantics, expose state without colour alone and do not mutate runtime state.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-006",
+      "category": "live-region",
+      "selector": "[data-testid=\"runtime-announcer\"]",
+      "method": "Inspect before and after Next, Previous, Reset, locale, change-input and Pause actions.",
+      "expected": "A pre-existing polite, atomic live region emits one concise action result and current step where relevant; routine progress is not assertive.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-007",
+      "category": "reduced-motion",
+      "selector": "[data-testid=\"paper4-visual-lab\"]",
+      "method": "Run Reset-to-final replay with prefers-reduced-motion reduce and no-preference.",
+      "expected": "Both modes visit the same ordered event IDs and final state. Reduce disables decorative motion without skipping checkpoints.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-008",
+      "category": "non-colour",
+      "selector": "[data-current], [data-changed], [data-status], [aria-current]",
+      "method": "Inspect current/changed/correct/incorrect/warning states in grayscale or high contrast.",
+      "expected": "Text, icon, border/pattern, position or ARIA semantics retain every meaning when colour is unavailable.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-009",
+      "category": "panel-semantics",
+      "selector": "[data-panel]",
+      "method": "Inspect role, heading and accessible-name relationships for every panel.",
+      "expected": "Code, state, trace, output, invariant, prediction and feedback are identifiable regions or groups with visible headings and programmatic names.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-010",
+      "category": "responsive-320",
+      "selector": "html, body, [data-testid=\"paper4-visual-lab\"]",
+      "method": "Use a 320 by 800 viewport in VI and EN and traverse all controls/panels.",
+      "expected": "No horizontal page scrolling, overlap or essential truncation; labelled code panels may scroll internally; controls remain at least visibly separable and operable.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-011",
+      "category": "mobile-order",
+      "selector": "[data-panel], [data-testid=\"memory-cue\"], [data-role=\"control-bar\"]",
+      "method": "At 320 px compare visual and DOM reading order.",
+      "expected": "Core sequence is code, state/trace, output, prediction, feedback, controls; invariant and memory cue stay adjacent to the transition they explain.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-012",
+      "category": "zoom",
+      "selector": "[data-testid=\"paper4-visual-lab\"]",
+      "method": "Set desktop browser zoom to 200 percent and operate every control.",
+      "expected": "Content reflows without lost text/control/focus indicator and ordinary content does not require two-dimensional scrolling.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-013",
+      "category": "static-fallback",
+      "selector": "[data-testid=\"static-fallback\"]",
+      "method": "Inspect server-rendered/no-script and reduced-motion views.",
+      "expected": "A labelled bilingual before/delta/after explanation includes code locator, guard/invariant and does not present itself as an interactive trace.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-014",
+      "category": "synchrony",
+      "selector": "[data-panel=\"code\"], [data-panel=\"state\"], [data-panel=\"trace\"], [data-panel=\"output\"], [data-panel=\"invariant\"], [data-testid=\"event-progress\"]",
+      "method": "Advance exactly one event and compare panel identity/current index.",
+      "expected": "All panels render the same event and input revision; code highlight, state delta, trace/output and invariant describe one transition with no stale values.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-015",
+      "category": "prediction-timing",
+      "selector": "[data-panel=\"prediction\"], [data-panel=\"feedback\"], [data-action=\"play\"]",
+      "method": "Enter a prediction checkpoint from its preceding event while playback is active.",
+      "expected": "Playback pauses and the prompt appears before target state/output and corrective feedback are disclosed.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-016",
+      "category": "prediction-feedback",
+      "selector": "[data-panel=\"prediction\"], [data-panel=\"feedback\"]",
+      "method": "Submit correct and incorrect predictions using keyboard only.",
+      "expected": "Feedback names the relevant transition or invariant and a next action, uses non-colour correctness cues, and does not change event identity.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-017",
+      "category": "memory-cue",
+      "selector": "[data-testid=\"memory-cue\"]",
+      "method": "Inspect at event zero, a boundary event and final event in VI and EN.",
+      "expected": "Cue is concise, meaning-equivalent across locales and tells the learner what to check or how to avoid losing a Paper 4 mark; it is more than a value restatement.",
+      "severity_if_failed": "required"
+    },
+    {
+      "id": "S8C-A11Y-018",
+      "category": "change-input",
+      "selector": "[data-action=\"change-input\"], [data-testid=\"event-progress\"], [data-panel]",
+      "method": "Advance, predict, then activate change input.",
+      "expected": "Input revision is exposed, event resets to its documented start, stale feedback clears and all synchronized panels use the new revision.",
+      "severity_if_failed": "required"
+    }
+  ],
+  "gate_rule": {
+    "required_findings_open": 0,
+    "result_owner": "A8 or Lead independent of implementation owner",
+    "status_before_runtime_audit": "TEST_PLAN_READY"
+  }
+}
+

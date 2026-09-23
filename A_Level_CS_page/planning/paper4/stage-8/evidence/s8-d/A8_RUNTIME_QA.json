@@ -1,0 +1,145 @@
+{
+  "schema_version": "s8-runtime-qa-v1",
+  "stage": 8,
+  "wave": "S8-D",
+  "status": "PASS",
+  "input_release_id": "paper4-2026-s7-v1",
+  "input_manifest_sha256": "3ed03798f614b22307e07034ec36326af13cda58fd68dc6fd65dd3feb73cb01f",
+  "runtime_registry_sha256": "4a5a9b154d2b1de8197d42c7c900e2cd738238ddaddac9842ccd40246e2ffc34",
+  "runtime_component_sha256": "9361f9a13cae091374aeb91c706919478e5b69ffa1798d68f3b3c1a07f0cbaab",
+  "runtime_types_sha256": "57edb9c8ddc5e31dcba203390092294236a2a91387205edd3a8c05ed64f79518",
+  "reducer_sha256": "1d7690e3233d44860686ae7ed167affb33dec1c6ff765594f31dcd7ace64b925",
+  "localization_overlay_sha256": "840692e3199359a693ba528232683495d9d6218c25b7d5ab3ecf89bc0ab91337",
+  "localization_verifier_sha256": "bdaf00f82a6606d5e181d6f67fc5b5c9d72244acf2fccb44d9d0471b736c7186",
+  "owner": "A8_INDEPENDENT_QA",
+  "reviewer": "A0_LEAD_READY",
+  "timestamp": "2026-09-22T15:07:45.3531508+07:00",
+  "commands": [
+    {
+      "command": "npm run verify:stage8",
+      "exit_code": 0,
+      "result": "PASS: registry, reducer, localization, typecheck and production build completed sequentially"
+    },
+    {
+      "command": "npm run stage8:registry",
+      "exit_code": 0,
+      "result": "PASS: exact 58 patterns, 174 scenarios and 331 unique events; source hashes, mutation fixture and deterministic rebuild pass"
+    },
+    {
+      "command": "npm run stage8:reducer",
+      "exit_code": 0,
+      "result": "PASS: 9 reducer actions and 27 assertions"
+    },
+    {
+      "command": "npm run stage8:localization",
+      "exit_code": 0,
+      "result": "PASS: 103 locale-array events, 202 equal-locale source events, 56 Vietnamese overlay entries, 0 unresolved English invariant items"
+    },
+    {
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "npm run build",
+      "exit_code": 0,
+      "result": "PASS: Next.js production build; /paper-4 prerendered static"
+    }
+  ],
+  "counts": {
+    "patterns": 58,
+    "scenarios": 174,
+    "unique_events": 331,
+    "reducer_actions": 9,
+    "reducer_assertions": 27,
+    "locale_array_events": 103,
+    "equal_locale_source_events": 202,
+    "vietnamese_overlay_entries": 56,
+    "unresolved_localization_items": 0,
+    "scenario_kinds_per_pattern": 3,
+    "pattern_options_browser": 58,
+    "stable_actions_browser": 8,
+    "required_findings_open": 0
+  },
+  "checks": {
+    "locked_release_and_hashes": "PASS",
+    "registry_exact_58_174_331": "PASS",
+    "registry_deterministic_and_mutation_rejected": "PASS",
+    "scenario_contract_normal_boundary_failure": "PASS",
+    "reducer_contract": "PASS",
+    "localization_contract": "PASS",
+    "typecheck": "PASS",
+    "production_build": "PASS",
+    "route_paper_4_http_200_and_static_prerender": "PASS",
+    "stable_selector_contract": "PASS",
+    "event_identity_preserved_across_vi_en": "PASS",
+    "active_locale_only_for_all_invariants": "PASS",
+    "next_previous_reset_and_play_pause": "PASS",
+    "prediction_correct_incorrect_feedback": "PASS",
+    "change_input_validated_scenario_and_revision_synchrony": "PASS",
+    "aria_live_progress_native_disabled_and_focus": "PASS",
+    "reduced_motion_and_forced_colours_source_contract": "PASS",
+    "responsive_320_no_page_horizontal_overflow_or_control_overlap": "PASS",
+    "static_fallback_server_markup": "PASS",
+    "console_and_hydration_errors": "PASS"
+  },
+  "browser_evidence": [
+    {
+      "viewport": "default desktop",
+      "interaction_sequence": [
+        "load production /paper-4",
+        "select ALGORITHM_REWRITE",
+        "read invariant in VI",
+        "toggle EN",
+        "read the same event invariant"
+      ],
+      "observed": "Event ID and index remained unchanged. VI showed only reviewed Vietnamese text; EN showed only English text. Neither panel exposed vi/en JSON branches.",
+      "status": "PASS"
+    },
+    {
+      "viewport": "default desktop",
+      "interaction_sequence": [
+        "inspect scenario selector",
+        "advance to event 2",
+        "select boundary and apply",
+        "advance and create incorrect prediction feedback",
+        "select failure and apply"
+      ],
+      "observed": "Selector exposed exactly normal, boundary and failure traces. Boundary reset to index 0 with revision 1 and shared boundary scenario ID/kind on root plus five panels. Failure reset to index 0, cleared feedback, incremented revision to 2 and shared failure scenario ID/kind on root plus five panels. Visible run context named each selected scenario.",
+      "status": "PASS"
+    },
+    {
+      "viewport": "320x800",
+      "interaction_sequence": [
+        "inspect document/runtime geometry",
+        "inspect scenario selector width",
+        "inspect every action rectangle",
+        "inspect console"
+      ],
+      "observed": "document clientWidth and scrollWidth both 305, horizontal overflow false, control overlap pairs empty, scenario selector width 213.4 px, console errors empty",
+      "status": "PASS"
+    }
+  ],
+  "finding_rechecks": [
+    {
+      "finding_id": "S8D-A8-001",
+      "previous_status": "OPEN_REQUIRED",
+      "correction_verified": "Free-form note was replaced by the three validated registry scenarios. Boundary and failure selections reset the event, clear stale feedback, increment revision and expose one shared scenario ID/kind on root and all five synchronized panels.",
+      "status": "CLOSED_VERIFIED",
+      "verified_by": "A8_INDEPENDENT_QA"
+    },
+    {
+      "finding_id": "S8D-A8-002",
+      "previous_status": "OPEN_REQUIRED",
+      "correction_verified": "Renderer selects localized strings and arrays recursively; localization verifier reports zero unresolved items; sampled VI/EN invariant bodies contain only the active locale and preserve event identity.",
+      "status": "CLOSED_VERIFIED",
+      "verified_by": "A8_INDEPENDENT_QA"
+    }
+  ],
+  "gate_decision": {
+    "s8_d": "PASS",
+    "required_findings_open": 0,
+    "a8_signoff": true,
+    "next_action": "Lead may open S8-E aggregate QA and release packaging."
+  }
+}

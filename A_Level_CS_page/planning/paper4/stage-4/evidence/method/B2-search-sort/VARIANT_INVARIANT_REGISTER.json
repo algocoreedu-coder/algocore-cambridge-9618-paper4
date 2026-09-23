@@ -1,0 +1,333 @@
+{
+  "schema_version": "s4-schema-v1",
+  "status": "SUBMITTED",
+  "batch_id": "B2-search-sort",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-1/SOURCE_ISSUES.json",
+      "sha256": "7e9a8677b345327847d52a2aa88f293dc6898ef17944a63e6e05bb99daf9f588"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    }
+  ],
+  "variants": [
+    {
+      "variant_id": "B2-V01-ordered-policy",
+      "pattern_ids": [
+        "ORDERED_INSERT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C10"
+      ],
+      "axis": "qualification-direction-ties-capacity",
+      "decision_rule": {
+        "vi": "Chốt top-N hay không, chiều, vị trí của khóa bằng nhau và cách cắt dung lượng trước khi dịch.",
+        "en": "Fix top-N qualification, direction, equal-key placement, and capacity trimming before shifting."
+      },
+      "cases": [
+        "unbounded insertion",
+        "bounded qualifying insertion",
+        "equal-key before/after policy"
+      ],
+      "invariant": "Existing order and whole-record integrity are preserved.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V02-linear-result",
+      "pattern_ids": [
+        "LINEAR_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07"
+      ],
+      "axis": "result-case-live-range",
+      "decision_rule": {
+        "vi": "Dùng kết quả Boolean, chỉ số, đối tượng hoặc cập nhật đúng như đề; chuẩn hóa chữ chỉ khi đề yêu cầu.",
+        "en": "Use the requested Boolean, index, object, or update result; normalize case only when required."
+      },
+      "cases": [
+        "first-match early exit",
+        "full scan with stored result",
+        "case-normalized accessor comparison"
+      ],
+      "invariant": "Every required live position before termination has been inspected.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V03-count-control",
+      "pattern_ids": [
+        "COUNT_OCCURRENCES"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07",
+        "A3C13"
+      ],
+      "axis": "iterative-recursive",
+      "decision_rule": {
+        "vi": "Chọn vòng lặp với bộ đếm hoặc đệ quy với base case 0 và lời gọi trên bài toán nhỏ hơn.",
+        "en": "Choose a loop with a counter or recursion with a zero base case and a smaller subproblem."
+      },
+      "cases": [
+        "iterative full-range scan",
+        "recursive reduction with returned subtotal"
+      ],
+      "invariant": "The partial result equals matches in exactly the processed portion.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V04-filter-predicate",
+      "pattern_ids": [
+        "FILTER_RECORDS"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07"
+      ],
+      "axis": "compound-predicate-all-matches",
+      "decision_rule": {
+        "vi": "Giữ phép AND và tiếp tục sau mỗi khớp để thu mọi bản ghi.",
+        "en": "Preserve the AND predicate and continue after matches to collect every record."
+      },
+      "cases": [
+        "output matches",
+        "collect matches",
+        "empty-result branch"
+      ],
+      "invariant": "The result contains all and only matching processed records.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V05-group-branch",
+      "pattern_ids": [
+        "GROUP_AGGREGATE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C20"
+      ],
+      "axis": "existing-new-group",
+      "decision_rule": {
+        "vi": "Sau khi quét nhóm sống, cập nhật đúng một nhóm đã có hoặc tạo đúng một nhóm mới.",
+        "en": "After scanning live groups, update one existing group or create exactly one new group."
+      },
+      "cases": [
+        "existing key update",
+        "new key creation"
+      ],
+      "invariant": "One live group exists per processed key.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V06-search-choice",
+      "pattern_ids": [
+        "LINEAR_SEARCH",
+        "BINARY_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07",
+        "A3C08"
+      ],
+      "axis": "linear-vs-binary",
+      "decision_rule": {
+        "vi": "Chỉ chọn nhị phân khi dữ liệu đã sắp theo cùng bộ so sánh; nếu không, duyệt tuyến tính.",
+        "en": "Choose binary search only for data sorted by the same comparator; otherwise scan linearly."
+      },
+      "cases": [
+        "unsorted linear scan",
+        "sorted interval halving"
+      ],
+      "invariant": "The chosen method's precondition remains true.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V07-insert-vs-sort",
+      "pattern_ids": [
+        "ORDERED_INSERT",
+        "INSERTION_SORT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C10"
+      ],
+      "axis": "one-item-insert-vs-full-sort",
+      "decision_rule": {
+        "vi": "Chèn một mục vào dãy đã sắp khác với lặp thao tác chèn để sắp toàn bộ dãy.",
+        "en": "Inserting one item into an ordered sequence differs from repeated insertion used to sort the full sequence."
+      },
+      "cases": [
+        "single ordered insertion",
+        "growing sorted prefix"
+      ],
+      "invariant": "The requested scope—one item or the whole live range—is preserved.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V08-sort-family",
+      "pattern_ids": [
+        "BUBBLE_SORT",
+        "INSERTION_SORT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "adjacent-passes-vs-sorted-prefix",
+      "decision_rule": {
+        "vi": "Bubble sort tạo hậu tố cố định bằng cặp kề; insertion sort mở rộng tiền tố đã sắp bằng dịch và đặt khóa.",
+        "en": "Bubble sort fixes a suffix through adjacent pairs; insertion sort grows a sorted prefix by shifting and placing a key."
+      },
+      "cases": [
+        "bubble adjacent passes",
+        "insertion sorted prefix"
+      ],
+      "invariant": "Complete records and the requested order are preserved.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V09-bubble-policy",
+      "pattern_ids": [
+        "BUBBLE_SORT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "direction-record-early-exit",
+      "decision_rule": {
+        "vi": "Đổi chiều bộ so sánh nhưng giữ biên hợp lệ; chỉ dừng sớm sau một lượt hoàn chỉnh không hoán đổi.",
+        "en": "Reverse the comparator for direction while retaining valid bounds; stop early only after a complete no-swap pass."
+      },
+      "cases": [
+        "ascending",
+        "descending",
+        "whole-record swap",
+        "optional no-swap exit"
+      ],
+      "invariant": "The fixed suffix is final after every completed pass.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V10-insertion-control",
+      "pattern_ids": [
+        "INSERTION_SORT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "iterative-recursive-rewrite",
+      "decision_rule": {
+        "vi": "Biến thể lặp, đệ quy và viết lại không đệ quy phải giữ cùng comparator, dịch bản ghi và hậu điều kiện.",
+        "en": "Iterative, recursive, and non-recursive rewrite variants retain the same comparator, record shifts, and postcondition."
+      },
+      "cases": [
+        "iterative prefix growth",
+        "recursive prefix sort plus insert",
+        "explicit-loop rewrite"
+      ],
+      "invariant": "The sorted prefix grows and preserves all records.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V11-binary-control",
+      "pattern_ids": [
+        "BINARY_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C08"
+      ],
+      "axis": "iterative-recursive",
+      "decision_rule": {
+        "vi": "Vòng lặp cập nhật biên tại chỗ; đệ quy truyền biên mới và phải return kết quả lời gọi con.",
+        "en": "Iteration updates bounds in place; recursion passes new bounds and must return the child result."
+      },
+      "cases": [
+        "iterative inclusive bounds",
+        "recursive inclusive bounds"
+      ],
+      "invariant": "The target, if present, remains inside a strictly smaller interval.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B2-V12-binary-bounds",
+      "pattern_ids": [
+        "BINARY_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C08"
+      ],
+      "axis": "inclusive-bounds-midpoint-return",
+      "decision_rule": {
+        "vi": "Với biên bao hàm, dùng midpoint nguyên và loại mid bằng ±1; giữ sentinel nhất quán.",
+        "en": "With inclusive bounds, use an integer midpoint and exclude mid with ±1; preserve the result sentinel."
+      },
+      "cases": [
+        "found at midpoint",
+        "empty interval",
+        "absent target",
+        "ascending/descending comparator"
+      ],
+      "invariant": "low and high delimit exactly the remaining candidate interval.",
+      "method_changing": true
+    }
+  ],
+  "self_checks": {
+    "variant_count": 12,
+    "patterns_covered": [
+      "ORDERED_INSERT",
+      "LINEAR_SEARCH",
+      "COUNT_OCCURRENCES",
+      "FILTER_RECORDS",
+      "GROUP_AGGREGATE",
+      "BUBBLE_SORT",
+      "INSERTION_SORT",
+      "BINARY_SEARCH"
+    ]
+  }
+}

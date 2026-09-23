@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "work_order_id": "P1-S2-A4-REVIEW-GLOSSARY-v2",
+  "artifact_reviewed": "glossary-v2",
+  "reviewer_role": "independent A4 pattern/exam-language reviewer; not the A6 author",
+  "result": "CHANGES_REQUIRED",
+  "finding_counts": {
+    "critical_open": 0,
+    "major_open": 2,
+    "minor_open": 1
+  },
+  "findings": [
+    {
+      "finding_id": "A4-GLO-V2-001",
+      "severity": "Major",
+      "status": "OPEN",
+      "title": "Semicolon-delimited command observations leave 63 supported command-word pattern links missing",
+      "locators": [
+        "A_Level_CS_page/planning/paper1/stage-2/evidence/a6/glossary-v2/GLOSSARY_SEED_V2.jsonl",
+        "A_Level_CS_page/planning/paper1/stage-2/evidence/a4/pattern-final-v1/PATTERN_CATALOG.json"
+      ],
+      "evidence": {
+        "missing_pair_count": 63,
+        "affected_commands": {
+          "Calculate": 1,
+          "Complete": 17,
+          "Describe": 10,
+          "Explain": 1,
+          "Give": 4,
+          "Identify": 13,
+          "Justify": 4,
+          "State": 4,
+          "Write": 9
+        },
+        "decisive_no_link_error": {
+          "term_id": "TERM-CW-JUSTIFY",
+          "current_status": "RECONCILED_NO_LINK",
+          "supported_pattern_ids": [
+            "PAT-C3A2-0028",
+            "PAT-C3A2-0075",
+            "PAT-C3A2-0142",
+            "PAT-C3A2-0192"
+          ],
+          "raw_observations": [
+            "Give; Justify",
+            "Identify; Justify",
+            "State; Justify",
+            "Circle; Justify"
+          ]
+        },
+        "machine_check_reference": "MACHINE_CHECKS.json#semantic_command_token_review"
+      },
+      "impact": "Glossary-to-pattern coverage is incomplete and one no-link disposition is false. Downstream trace and learning metadata would omit observed assessment language.",
+      "required_fix": "Tokenize accepted semicolon-delimited command observations into exact trimmed command tokens without fuzzy expansion; add all 63 supported pairs and evidence records; change TERM-CW-JUSTIFY to RECONCILED; update the reconciliation delta, QA, manifests and handoff.",
+      "required_retest": "Fresh independent A4 reviewer must reconstruct command-token membership from the accepted pattern catalog and confirm zero missing or extra command-word pairs across all 504 patterns.",
+      "owner": "A6 terminology editor"
+    },
+    {
+      "finding_id": "A4-GLO-V2-002",
+      "severity": "Major",
+      "status": "OPEN",
+      "title": "Qualifier leakage creates nine unsupported check-digit pattern links",
+      "locators": [
+        "A_Level_CS_page/planning/paper1/stage-2/evidence/a6/glossary-v2/GLOSSARY_SEED_V2.jsonl#TERM-VAL-CHECK-DIGIT",
+        "A_Level_CS_page/planning/paper1/stage-2/evidence/a3/foundation-v1/OBJECTIVE_REQUIREMENTS.jsonl#REQ-6.2-02-01..07",
+        "A_Level_CS_page/planning/paper1/stage-2/evidence/a4/pattern-final-v1/PATTERN_CATALOG.json"
+      ],
+      "evidence": {
+        "unsupported_pattern_ids": [
+          "PAT-C3A2-0362",
+          "PAT-C3A2-0394",
+          "PAT-C3A2-0395",
+          "PAT-C3A2-0396",
+          "PAT-C3A2-0397",
+          "PAT-C3A2-0398",
+          "PAT-C3A2-0399",
+          "PAT-C3A2-0400",
+          "PAT-C3A2-0401"
+        ],
+        "required_check_digit_requirement": "REQ-6.2-02-07",
+        "unsupported_link_requirement_set": [
+          "REQ-6.2-02-01",
+          "REQ-6.2-02-02",
+          "REQ-6.2-02-03",
+          "REQ-6.2-02-04",
+          "REQ-6.2-02-05"
+        ],
+        "surplus_objective_evidence_requirement_ids": [
+          "REQ-6.2-02-01",
+          "REQ-6.2-02-02",
+          "REQ-6.2-02-03",
+          "REQ-6.2-02-04",
+          "REQ-6.2-02-05",
+          "REQ-6.2-02-06"
+        ],
+        "source_review": "Accepted official examples for the nine patterns assess presence/double-entry association or range, format, length, presence and existence validation. None has REQ-6.2-02-07 or source evidence assessing check digit."
+      },
+      "impact": "The glossary falsely presents sibling validation patterns as check-digit assessment patterns, violating the ban on keyword-only linking and the stated check-digit boundary.",
+      "required_fix": "Remove the nine pattern IDs and their evidence from TERM-VAL-CHECK-DIGIT. Keep AC26-6.2-02 supported only by the focus-bearing REQ-6.2-02-07 evidence; remove the six qualifier-only objective-evidence records. Update delta, QA, manifests and handoff.",
+      "required_retest": "Fresh independent A4 reviewer must inspect every corrected check-digit bridge against pattern requirements and official examples and confirm no qualifier-only link remains.",
+      "owner": "A6 terminology editor"
+    },
+    {
+      "finding_id": "A4-GLO-V2-003",
+      "severity": "Minor",
+      "status": "OPEN",
+      "title": "Boundary markdown contains control-character escape corruption",
+      "locators": [
+        "A_Level_CS_page/planning/paper1/stage-2/evidence/a6/glossary-v2/CONFLICTS_AND_BOUNDARIES.md"
+      ],
+      "evidence": {
+        "corrupted_token_count": 15,
+        "non_text_control_byte_count": 9,
+        "affected_labels": [
+          "requirement_ids",
+          "b",
+          "validation",
+          "verification",
+          "bit",
+          "byte",
+          "accuracy",
+          "table",
+          "record",
+          "field",
+          "attribute",
+          "relationship",
+          "normalisation",
+          "normalised"
+        ],
+        "raw_control_bytes": {
+          "carriage_return": 3,
+          "line_feed_from_escape": 2,
+          "tab": 1,
+          "backspace": 4,
+          "vertical_tab": 2,
+          "form_feed": 1,
+          "bell": 2
+        }
+      },
+      "impact": "The required human-readable terminology-boundary artifact displays damaged labels and cannot be relied on as a clean review record.",
+      "required_fix": "Regenerate the markdown with literal text and no control characters, preserving the intended boundaries and correcting the output manifest/handoff hashes.",
+      "required_retest": "Fresh review must scan the corrected UTF-8 bytes for forbidden controls and read every protected-boundary statement.",
+      "owner": "A6 terminology editor"
+    }
+  ],
+  "reviewer_stop": "Freeze exactly six outputs in the assigned review directory. Do not edit author inputs, trackers, A0 evidence, split, trace, lessons, app, or Stage 3 artifacts."
+}

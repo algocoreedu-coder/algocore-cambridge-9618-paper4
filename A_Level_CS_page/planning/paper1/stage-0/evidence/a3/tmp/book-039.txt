@@ -1,0 +1,54 @@
+23
+11.3 File compression
+Using RLE on text data
+Consider the text string ‘aaaaabbbbccddddd’.
+Assuming each character requires 1 byte, then this string needs 16 bytes. If we 
+assume ASCII code is being used, then the string can be coded as follows:
+a a a a a b b b b c c d d d d d
+05 97 04 98 02 99 05 100
+This means we have five characters with ASCII code 97, four characters with 
+ASCII code 98, two characters with ASCII code 99, and five characters with 
+ASCII code 100. Assuming each number in the second row requires 1
+ byte of 
+memory, the RLE code will need 8 bytes. This is half the original file size.
+One issue occurs with a string such as ‘cdcdcdcdcd’, where compression is not 
+very effective. To cope with this we use a flag. A flag preceding data indicates 
+that what follows are the number of repeating units (for example, 255 05 97 
+where 255 is the flag and the other two numbers indicate that there are five 
+items with ASCII code 97). When a flag is not used, the next byte(s) are taken 
+with their face value and a run of 1 (for example, 01 99 means one character 
+with ASCII code 99 follows).
+Consider this example:
+String aaaaaaaa bbbbbbbbbb c d c d c d eeeeeeee
+Code 08 97 10 98 01 99 01 100 01 99 01 100 01 99 01 100 08 101
+The original string contains 32 characters and would occupy 32 bytes of 
+storage.
+The coded version contains 18 values and would require 18
+ bytes of storage.
+Introducing a flag (255 in this case) produces:
+255 08 97 255 10 98 99 100 99 100 99 100 255 08 101
+This has 15 values and would, therefore, require 15
+ bytes of storage. This is a 
+reduction in file size of about 53%.
+Using RLE with images
+Black and white images
+Figure 1.7 shows the letter F in a grid where each square requires 1 byte of 
+storage. A white square has a value 1 and a black square a value of 0.
+1 1 1 1 1 1 1 1 
+1 0 0 0 0 0 0 1
+1 0 1 1 1 1 1 1 
+1 0 1 1 1 1 1 1 
+1 0 0 0 0 0 1 1
+1 0 1 1 1 1 1 1 
+1 0 1 1 1 1 1 1
+1 0 1 1 1 1 1 1
+In compressed RLE format this becomes:
+9W 6B 2W 1B 7W 1B 7W 5B 3W 1B 7W 
+1B 7W 1B 6W
+Using W = 1 and B = 0 we get:
+91 60 21 10 71 10 71 50 31 10 71 10 71
+10 61
+▲ Figure 1.7 Using RLE with a black and white image
+The 8 × 8 grid would need 64 bytes; the compressed RLE format has 30 values, 
+and therefore needs only 30 bytes to store the image.
+457591_01_CI_AS & A_Level_CS_001-026.indd   23 25/04/19   9:11 AM

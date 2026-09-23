@@ -1,0 +1,303 @@
+{
+  "schema_version": "s6-visual-storyboard-v1",
+  "stage": 6,
+  "wave": "S6-G",
+  "release_id": "paper4-2026-s5-v1",
+  "entries": [
+    {
+      "visual_id": "s6g.visual.main_flow.01",
+      "scenario_id": "b8.visual-scenario.main_flow.normal",
+      "event_ids": [
+        "s6g.event.main_flow.01.read_workflow_input",
+        "s6g.event.main_flow.02.check_call_preconditions",
+        "s6g.event.main_flow.03.invoke_dependency_call",
+        "s6g.event.main_flow.04.receive_call_result",
+        "s6g.event.main_flow.05.commit_state_version",
+        "s6g.event.main_flow.06.select_result_branch",
+        "s6g.event.main_flow.07.handoff_to_output_or_evidence"
+      ],
+      "example_id": "b8.example.main-flow",
+      "pattern_id": "MAIN_FLOW",
+      "before": {
+        "vi": "Snapshot trước event theo đặc tả B8; chưa phải runtime capture.",
+        "en": "Pre-event snapshot from the B8 specification; not a runtime capture.",
+        "state": {
+          "status": "PLANNED",
+          "pattern": "MAIN_FLOW"
+        }
+      },
+      "delta": {
+        "vi": "Pipeline Read→Sort→Output dùng state v0→v1→v2: mỗi call chỉ mở khi producer trước hoàn tất và Output nhận đúng v2.",
+        "en": "A Read→Sort→Output pipeline uses state v0→v1→v2: each call unlocks only after its producer completes, and Output receives v2."
+      },
+      "after": {
+        "vi": "Trạng thái đích theo invariant; Stage 7 sẽ triển khai replay.",
+        "en": "Target state under the invariant; Stage 7 will implement replay.",
+        "state": {
+          "status": "PLANNED",
+          "pattern": "MAIN_FLOW"
+        }
+      },
+      "invariant": {
+        "vi": "After each orchestration event, every completed call has received the source-required arguments, its result/state version is owned once, and every pending call still has a satisfiable precondition.",
+        "en": "After each orchestration event, every completed call has received the source-required arguments, its result/state version is owned once, and every pending call still has a satisfiable precondition."
+      },
+      "code_highlight": "main-flow.step.contract",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot đặc tả; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the specified snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Đặc tả chuỗi event cho MAIN_FLOW; chưa khẳng định đã chạy.",
+        "en": "Specified event sequence for MAIN_FLOW; execution is not claimed."
+      },
+      "caption": {
+        "vi": "Pipeline Read→Sort→Output dùng state v0→v1→v2: mỗi call chỉ mở khi producer trước hoàn tất và Output nhận đúng v2.",
+        "en": "A Read→Sort→Output pipeline uses state v0→v1→v2: each call unlocks only after its producer completes, and Output receives v2."
+      },
+      "source_refs": [
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b8.visual.main-flow",
+          "locator": "stage-4/evidence/method/B8-integration/VISUAL_BRIEFS.json#/visual_briefs[MAIN_FLOW]",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "Stage5_B8",
+          "source_id": "CROSS_BATCH_ID_UNION",
+          "locator": "stage-5/evidence/b8/CROSS_BATCH_ID_UNION.json",
+          "status": "VERIFIED_STAGE5_DOCUMENTARY"
+        }
+      ],
+      "trace_sha256": null,
+      "execution_evidence_status": "NOT_AVAILABLE",
+      "status": "Stage6_specified",
+      "author": "A6_S6G",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6g.visual.output_format.01",
+      "scenario_id": "b8.visual-scenario.output_format.normal",
+      "event_ids": [
+        "s6g.event.output_format.01.select_output_range",
+        "s6g.event.output_format.02.read_output_item",
+        "s6g.event.output_format.03.build_format_fragment",
+        "s6g.event.output_format.04.emit_output_fragment",
+        "s6g.event.output_format.05.advance_output_position",
+        "s6g.event.output_format.06.audit_rendered_sequence"
+      ],
+      "example_id": "b8.example.output-format",
+      "pattern_id": "OUTPUT_FORMAT",
+      "before": {
+        "vi": "Snapshot trước event theo đặc tả B8; chưa phải runtime capture.",
+        "en": "Pre-event snapshot from the B8 specification; not a runtime capture.",
+        "state": {
+          "status": "PLANNED",
+          "pattern": "OUTPUT_FORMAT"
+        }
+      },
+      "delta": {
+        "vi": "Hai record có field phân biệt được render thành hai labelled lines; event sequence phải giữ exact literal, separator, order và source state unchanged.",
+        "en": "Render two records with distinct fields as two labelled lines; events must preserve exact literals, separators and order while leaving source state unchanged."
+      },
+      "after": {
+        "vi": "Trạng thái đích theo invariant; Stage 7 sẽ triển khai replay.",
+        "en": "Target state under the invariant; Stage 7 will implement replay.",
+        "state": {
+          "status": "PLANNED",
+          "pattern": "OUTPUT_FORMAT"
+        }
+      },
+      "invariant": {
+        "vi": "After k output events, the rendered prefix exactly matches the first k items of the source-selected sequence under the required labels, separators, line breaks and type contract.",
+        "en": "After k output events, the rendered prefix exactly matches the first k items of the source-selected sequence under the required labels, separators, line breaks and type contract."
+      },
+      "code_highlight": "output-format.step.grammar",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot đặc tả; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the specified snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Đặc tả chuỗi event cho OUTPUT_FORMAT; chưa khẳng định đã chạy.",
+        "en": "Specified event sequence for OUTPUT_FORMAT; execution is not claimed."
+      },
+      "caption": {
+        "vi": "Hai record có field phân biệt được render thành hai labelled lines; event sequence phải giữ exact literal, separator, order và source state unchanged.",
+        "en": "Render two records with distinct fields as two labelled lines; events must preserve exact literals, separators and order while leaving source state unchanged."
+      },
+      "source_refs": [
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b8.visual.output-format",
+          "locator": "stage-4/evidence/method/B8-integration/VISUAL_BRIEFS.json#/visual_briefs[OUTPUT_FORMAT]",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "Stage5_B8",
+          "source_id": "CROSS_BATCH_ID_UNION",
+          "locator": "stage-5/evidence/b8/CROSS_BATCH_ID_UNION.json",
+          "status": "VERIFIED_STAGE5_DOCUMENTARY"
+        }
+      ],
+      "trace_sha256": null,
+      "execution_evidence_status": "NOT_AVAILABLE",
+      "status": "Stage6_specified",
+      "author": "A6_S6G",
+      "reviewer": "A0_LEAD_PENDING"
+    },
+    {
+      "visual_id": "s6g.visual.evidence_run.01",
+      "scenario_id": "b8.visual-scenario.evidence_run.normal",
+      "event_ids": [
+        "s6g.event.evidence_run.01.plan_case_setup",
+        "s6g.event.evidence_run.02.plan_run_start",
+        "s6g.event.evidence_run.03.plan_input_visible",
+        "s6g.event.evidence_run.04.plan_output_visible",
+        "s6g.event.evidence_run.05.plan_file_and_filename_visible",
+        "s6g.event.evidence_run.06.plan_capture_slot",
+        "s6g.event.evidence_run.07.plan_stage6_review"
+      ],
+      "example_id": "b8.example.evidence-run",
+      "pattern_id": "EVIDENCE_RUN",
+      "before": {
+        "vi": "Snapshot trước event theo đặc tả B8; chưa phải runtime capture.",
+        "en": "Pre-event snapshot from the B8 specification; not a runtime capture.",
+        "state": {
+          "status": "PLANNED",
+          "pattern": "EVIDENCE_RUN"
+        }
+      },
+      "delta": {
+        "vi": "Thiết kế hai capture slots cho hai prescribed runs: mỗi slot liệt kê reset, visible input, expected output và case id; cả hai vẫn PENDING Stage 5/6.",
+        "en": "Design two capture slots for two prescribed runs: each lists reset, visible input, expected output and case id; both remain PENDING Stage 5/6."
+      },
+      "after": {
+        "vi": "Trạng thái đích theo invariant; Stage 7 sẽ triển khai replay.",
+        "en": "Target state under the invariant; Stage 7 will implement replay.",
+        "state": {
+          "status": "PLANNED",
+          "pattern": "EVIDENCE_RUN"
+        }
+      },
+      "invariant": {
+        "vi": "Every planned capture is attributable to exactly one test case and shows all source-required observable evidence, while no Stage 4 field states that execution, output or screenshot already exists.",
+        "en": "Every planned capture is attributable to exactly one test case and shows all source-required observable evidence, while no Stage 4 field states that execution, output or screenshot already exists."
+      },
+      "code_highlight": "evidence-run.step.obligation",
+      "prediction": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "feedback": {
+        "vi": "Đối chiếu event, bất biến và output; nếu sai dùng Reset rồi replay.",
+        "en": "Compare event, invariant and output; if wrong, use Reset and replay."
+      },
+      "controls": [
+        "Previous",
+        "Next",
+        "Play",
+        "Pause",
+        "Reset",
+        "change_input"
+      ],
+      "replay_semantics": {
+        "vi": "Play chạy tuần tự; Previous/Next đi qua đúng event; replay giữ nguyên input.",
+        "en": "Play runs events in order; Previous/Next selects exact events; replay keeps the same input."
+      },
+      "reset_semantics": {
+        "vi": "Reset về snapshot đặc tả; change_input chỉ dùng fixture Stage 5 đã khóa.",
+        "en": "Reset returns to the specified snapshot; change_input uses only locked Stage 5 fixtures."
+      },
+      "static_fallback": {
+        "status": "provided",
+        "vi": "Bảng before/delta/after cùng guard và invariant.",
+        "en": "Before/delta/after table with guard and invariant."
+      },
+      "alt": {
+        "vi": "Đặc tả chuỗi event cho EVIDENCE_RUN; chưa khẳng định đã chạy.",
+        "en": "Specified event sequence for EVIDENCE_RUN; execution is not claimed."
+      },
+      "caption": {
+        "vi": "Thiết kế hai capture slots cho hai prescribed runs: mỗi slot liệt kê reset, visible input, expected output và case id; cả hai vẫn PENDING Stage 5/6.",
+        "en": "Design two capture slots for two prescribed runs: each lists reset, visible input, expected output and case id; both remain PENDING Stage 5/6."
+      },
+      "source_refs": [
+        {
+          "authority": "AlgoCore_visual_brief",
+          "source_id": "b8.visual.evidence-run",
+          "locator": "stage-4/evidence/method/B8-integration/VISUAL_BRIEFS.json#/visual_briefs[EVIDENCE_RUN]",
+          "status": "VERIFIED_STAGE4"
+        },
+        {
+          "authority": "Stage5_B8",
+          "source_id": "CROSS_BATCH_ID_UNION",
+          "locator": "stage-5/evidence/b8/CROSS_BATCH_ID_UNION.json",
+          "status": "VERIFIED_STAGE5_DOCUMENTARY"
+        }
+      ],
+      "trace_sha256": null,
+      "execution_evidence_status": "NOT_AVAILABLE",
+      "status": "Stage6_specified",
+      "author": "A6_S6G",
+      "reviewer": "A0_LEAD_PENDING"
+    }
+  ],
+  "checks": {
+    "event_ids_stage4_specified": true,
+    "stage5_runtime_trace_required_before_stage7": true,
+    "all_controls_present": true,
+    "static_fallback_present": true,
+    "execution_not_claimed": true
+  },
+  "status": "COMPOSED_CANDIDATE"
+}

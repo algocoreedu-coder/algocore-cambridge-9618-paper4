@@ -1,0 +1,2414 @@
+{
+  "schema_version": "s4-schema-v1-p0-submission-1",
+  "status": "SUBMITTED",
+  "batch_id": "P0-stack",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-1/SOURCE_ISSUES.json",
+      "sha256": "7e9a8677b345327847d52a2aa88f293dc6898ef17944a63e6e05bb99daf9f588"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    }
+  ],
+  "solution_designs": [
+    {
+      "solution_design_id": "p0.stack.solution.stack-setup",
+      "pattern_id": "STACK_SETUP",
+      "variant_id": "p0.stack.variant.top-pointer",
+      "input_contract": {
+        "vi": "Các khai báo trong QP: tên, sức chứa, kiểu phần tử, phạm vi, ý nghĩa top và yêu cầu khởi tạo ô nếu có.",
+        "en": "QP declarations: identifiers, capacity, element type, scope, top meaning and optional initial-cell values."
+      },
+      "output_contract": {
+        "vi": "Một trạng thái stack rỗng dùng mảng, nhất quán với bộ phương trình quy ước đã ghi rõ.",
+        "en": "A coherent empty array-backed stack state with explicit convention equations."
+      },
+      "state_model": "storage[0..capacity-1], top, live-index set",
+      "representation": [
+        "Finite one-dimensional array plus one integer top pointer."
+      ],
+      "preconditions": [
+        "capacity > 0",
+        "exactly one pointer convention selected"
+      ],
+      "postconditions": [
+        "logical size is zero",
+        "all required names/types/scope match QP"
+      ],
+      "invariants": [
+        "next_free: live=[0,top)",
+        "current_top: live=[0,top]",
+        "0 <= logical_size <= capacity"
+      ],
+      "ordered_method_step_ids": [
+        "stack-setup.step.contract",
+        "stack-setup.step.representation",
+        "stack-setup.step.initialise",
+        "stack-setup.step.consistency"
+      ],
+      "mutation_and_preservation_rules": [
+        "Only initial state is established; cell sentinels are written only when explicitly required."
+      ],
+      "termination_argument": "Finite declaration and consistency checklist.",
+      "failure_paths": [
+        "Ambiguous top meaning blocks operation design and must be resolved from QP/facsimile."
+      ],
+      "alternative_designs": [
+        "next_free",
+        "current_top"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "capacity N empty initialisation under each observed convention"
+        ],
+        "boundary": [
+          "capacity 1",
+          "required cell initialisation versus unspecified cells"
+        ],
+        "counterexample": [
+          "top=0 interpreted as current-top",
+          "capacity confused with last index"
+        ],
+        "source_fixture": [
+          "9618_s22_42_1(a)",
+          "9618_s23_41_3(a)",
+          "9618_s23_43_3(a)",
+          "9618_w23_42_1(a)(i)",
+          "9618_w23_42_1(a)(ii)",
+          "9618_s25_42_1(a)",
+          "9618_w25_41_1(a)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s22_42_1(a)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_s22_qp_42",
+            "pdf_pages": [
+              2
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare global ten-integer StackData and StackPointer initialised to the next free slot zero.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-s22-42-1-a-01",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                4
+              ],
+              "criterion_paraphrase": "Credit for declaring array StackData and pointer StackPointer as (global data structures).",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-a-02",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                4
+              ],
+              "criterion_paraphrase": "Credit for stackData has 10 integer elements.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-a-03",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                4
+              ],
+              "criterion_paraphrase": "Credit for stackPointer initialised to 0.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s23_41_3(a)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_41",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare Animal and Colour stacks and next-free pointers with specified capacities and initial values.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-41-3-A-01",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                26
+              ],
+              "criterion_paraphrase": "(Global) Animal array (with 20 string elements)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-A",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-A-02",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                26
+              ],
+              "criterion_paraphrase": "(Global) Colour array (with 10 string elements)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-A",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-A-03",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                26
+              ],
+              "criterion_paraphrase": "(Global) AnimalTopPointer and ColourTopPointer initialised to",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-A",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s23_43_3(a)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_43",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare Animal and Colour stacks and next-free pointers with specified capacities and initial values.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-43-3-A-01",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                26
+              ],
+              "criterion_paraphrase": "(Global) Animal array (with 20 string elements)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-A",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-A-02",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                26
+              ],
+              "criterion_paraphrase": "(Global) Colour array (with 10 string elements)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-A",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-A-03",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                26
+              ],
+              "criterion_paraphrase": "(Global) AnimalTopPointer and ColourTopPointer initialised to",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-A",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_w23_42_1(a)(i)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_w23_qp_42",
+            "pdf_pages": [
+              2
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare global 100-element StackVowel and StackConsonant arrays with Python comments.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-W23-42-1-A-I-01",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                4
+              ],
+              "criterion_paraphrase": "Two arrays with correct identifiers of type string/character",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-A-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-A-I-02",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                4
+              ],
+              "criterion_paraphrase": "Each has 100 elements",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-A-I",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_w23_42_1(a)(ii)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_w23_qp_42",
+            "pdf_pages": [
+              2
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare and initialise next-free VowelTop and ConsonantTop to 0.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-W23-42-1-A-II-01",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                5
+              ],
+              "criterion_paraphrase": "Declaring both variables as type integer global and initialised to",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-A-II",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s25_42_1(a)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_s25_qp_42",
+            "pdf_pages": [
+              2
+            ]
+          },
+          "qp_requirement_paraphrase": "Initialise the global 20-string Stack and TopOfStack pointer.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_s25_42_1(a).mp.01",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                7
+              ],
+              "criterion_paraphrase": "(Global) Stack as 1D array (of strings) with 20 elements initialised to string \"–1\"",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(a).mp.02",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                7
+              ],
+              "criterion_paraphrase": "(Global) TopOfStack initialised to –1",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_w25_41_1(a)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_w25_qp_41",
+            "pdf_pages": [
+              2
+            ]
+          },
+          "qp_requirement_paraphrase": "Initialise a 30-element stack with null values and TopOfStack at -1.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_w25_41_1(a).mp.01",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                6
+              ],
+              "criterion_paraphrase": "(Global) 1D array initialised with 30 null values",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(a).mp.02",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                6
+              ],
+              "criterion_paraphrase": "(Global) TopofStack initialised with –1",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        }
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "p0.stack.solution.stack-push",
+      "pattern_id": "STACK_PUSH",
+      "variant_id": "p0.stack.variant.top-pointer",
+      "input_contract": {
+        "vi": "Một item, trạng thái stack hữu hạn và hợp đồng giá trị trả về/thông báo chính xác.",
+        "en": "One item plus a finite stack state and exact return/message contract."
+      },
+      "output_contract": {
+        "vi": "Kết quả thành công với item đã được commit, hoặc kết quả thất bại với state giữ nguyên.",
+        "en": "Success result with item committed, or failure result with unchanged state."
+      },
+      "state_model": "storage, top, capacity, selected top convention",
+      "representation": [
+        "Mutation of an array-backed finite stack."
+      ],
+      "preconditions": [
+        "stack state satisfies its representation invariant"
+      ],
+      "postconditions": [
+        "success => size+1 and new top item",
+        "failure => identical logical state"
+      ],
+      "invariants": [
+        "older item order is preserved",
+        "top remains within convention bounds"
+      ],
+      "ordered_method_step_ids": [
+        "stack-push.step.contract",
+        "stack-push.step.full-guard",
+        "stack-push.step.failure",
+        "stack-push.step.next-free-success",
+        "stack-push.step.current-top-success",
+        "stack-push.step.return-check"
+      ],
+      "mutation_and_preservation_rules": [
+        "No mutation before the full guard",
+        "Exactly one cell and top change on success"
+      ],
+      "termination_argument": "One full guard followed by one finite success/failure path.",
+      "failure_paths": [
+        "full returns exact contract result without mutation"
+      ],
+      "alternative_designs": [
+        "next-free write-then-increment",
+        "current-top increment-then-write"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "empty to one item",
+          "partially filled success"
+        ],
+        "boundary": [
+          "one free slot",
+          "already full"
+        ],
+        "counterexample": [
+          "copy update order from other convention",
+          "wrong result type"
+        ],
+        "source_fixture": [
+          "9618_s22_42_1(c)",
+          "9618_s23_41_3(b)(i)",
+          "9618_s23_41_3(b)(iv)",
+          "9618_s23_43_3(b)(i)",
+          "9618_s23_43_3(b)(iv)",
+          "9618_w23_42_1(b)(i)",
+          "9618_s25_42_1(b)",
+          "9618_w25_41_1(b)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s22_42_1(c)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_s22_qp_42",
+            "pdf_pages": [
+              2
+            ]
+          },
+          "qp_requirement_paraphrase": "Write Push() to add an integer if space exists, update the pointer and return success or full.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-s22-42-1-c-01",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for function Push() taking an integer parameter.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-c-02",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for checking if stack is full.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-c-03",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Continuation criterion: and returning FALSE.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-s22-42-1-c-02",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-c-04",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for (if not full) storing parameter to stack at StackPointer.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-c-05",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for incrementing StackPointer.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-c-06",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Continuation criterion: returning TRUE.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-s22-42-1-c-05",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s23_41_3(b)(i)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_41",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Translate supplied PushAnimal pseudocode.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-41-3-B-I-01",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "Function header (and close where appropriate) with parameter, checking if full (AnimalTopPointer = 20) and returning false",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-B-I-02",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "If not full, inserting parameter value into AnimalTopPointer",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-B-I-03",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "…incrementing pointer and returning true",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s23_41_3(b)(iv)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_41",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Adapt PushAnimal and PopAnimal into PushColour and PopColour.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-41-3-B-IV-01",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                32,
+                33
+              ],
+              "criterion_paraphrase": "PushColour function",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-B-IV",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S4-S2-S23-QP-ARROW-EXTRACTION"
+          ]
+        },
+        {
+          "part_id": "9618_s23_43_3(b)(i)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_43",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Translate supplied PushAnimal pseudocode.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-43-3-B-I-01",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "Function header (and close where appropriate) with parameter, checking if full (AnimalTopPointer = 20) and returning false",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-B-I-02",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "If not full, inserting parameter value into AnimalTopPointer",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-B-I-03",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "…incrementing pointer and returning true",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s23_43_3(b)(iv)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_43",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Adapt PushAnimal and PopAnimal into PushColour and PopColour.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-43-3-B-IV-01",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                32,
+                33
+              ],
+              "criterion_paraphrase": "PushColour function",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-B-IV",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S4-S2-S23-QP-ARROW-EXTRACTION"
+          ]
+        },
+        {
+          "part_id": "9618_w23_42_1(b)(i)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_w23_qp_42",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement PushData routing each letter to its appropriate stack and handling full stacks.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-W23-42-1-B-I-01",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Procedure PushData() heading (and end where appropriate) taking one parameter",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-B-I-02",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Checking if parameter is a (lowercase) vowel …",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-B-I-03",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "… checking if StackVowel is full and outputting suitable message",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-B-I-04",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "… otherwise inserting parameter in next position",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-B-I-05",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "… incrementing VowelTop",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-B-I-06",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Repeated for Consonant",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s25_42_1(b)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_s25_qp_42",
+            "pdf_pages": [
+              2
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement Push with full detection and integer success/failure result.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_s25_42_1(b).mp.01",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                8,
+                9
+              ],
+              "criterion_paraphrase": "Push function header (and end where appropriate) taking one (string) parameter",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(b).mp.02",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                8,
+                9
+              ],
+              "criterion_paraphrase": "Checking if stack is full and returning integer –1",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(b).mp.03",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                8,
+                9
+              ],
+              "criterion_paraphrase": "(Otherwise) Incrementing TopOfStack",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(b).mp.04",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                8,
+                9
+              ],
+              "criterion_paraphrase": "Storing parameter in the incremented the stack at TopOfStack and returning integer 1",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_w25_41_1(b)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_w25_qp_41",
+            "pdf_pages": [
+              2
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement Push returning Boolean success or failure.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_w25_41_1(b).mp.01",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Function header (and end) taking one parameter, returning Boolean in all instances",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(b).mp.02",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Checking if stack is full (TopOfStack = 29) and, if it is, returning FALSE",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(b).mp.03",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Incrementing TopofStack",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(b).mp.04",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                7,
+                8
+              ],
+              "criterion_paraphrase": "(Otherwise) Storing parameter in incremented TopOfStack position and returning TRUE",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "source_issue_id": "S4-S2-S23-QP-ARROW-EXTRACTION",
+          "stage4_disposition": "Preserve original facsimile locator and do not certify extracted/source code.",
+          "stage5_obligation": "Transcribe from facsimile and execute boundary tests."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "p0.stack.solution.stack-pop",
+      "pattern_id": "STACK_POP",
+      "variant_id": "p0.stack.variant.top-pointer",
+      "input_contract": {
+        "vi": "Trạng thái stack hữu hạn cùng sentinel rỗng và kiểu dữ liệu chính xác.",
+        "en": "A finite stack state plus exact empty sentinel/type."
+      },
+      "output_contract": {
+        "vi": "Item được Push gần nhất với size giảm một, hoặc kết quả empty chính xác và state không đổi.",
+        "en": "Most recently pushed item with size-1, or exact empty result with unchanged state."
+      },
+      "state_model": "storage, top, selected top convention",
+      "representation": [
+        "LIFO read plus pointer mutation; clearing a freed cell is source-dependent and not inherently required."
+      ],
+      "preconditions": [
+        "stack state satisfies its representation invariant"
+      ],
+      "postconditions": [
+        "success => LIFO item and size-1",
+        "empty => unchanged logical state"
+      ],
+      "invariants": [
+        "remaining item order is preserved",
+        "top never moves below empty"
+      ],
+      "ordered_method_step_ids": [
+        "stack-pop.step.contract",
+        "stack-pop.step.empty-guard",
+        "stack-pop.step.failure",
+        "stack-pop.step.next-free-success",
+        "stack-pop.step.current-top-success",
+        "stack-pop.step.return-check"
+      ],
+      "mutation_and_preservation_rules": [
+        "Save the live item before pointer mutation",
+        "Cell clearing is not assumed unless specified"
+      ],
+      "termination_argument": "One empty guard followed by one finite success/failure path.",
+      "failure_paths": [
+        "empty returns exact sentinel without pointer mutation"
+      ],
+      "alternative_designs": [
+        "next-free read top-1",
+        "current-top read top"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "two items then Pop"
+        ],
+        "boundary": [
+          "one item",
+          "empty"
+        ],
+        "counterexample": [
+          "decrement before saving under current-top",
+          "wrong sentinel type"
+        ],
+        "source_fixture": [
+          "9618_s22_42_1(e)(i)",
+          "9618_s23_41_3(b)(ii)",
+          "9618_s23_41_3(b)(iv)",
+          "9618_s23_43_3(b)(ii)",
+          "9618_s23_43_3(b)(iv)",
+          "9618_w23_42_1(c)",
+          "9618_s25_42_1(c)",
+          "9618_w25_41_1(c)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s22_42_1(e)(i)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_s22_qp_42",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Write Pop() to return the top element and update the pointer, or return -1 when empty.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-s22-42-1-e-i-01",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                11,
+                12
+              ],
+              "criterion_paraphrase": "Credit for pop() function header (and close where appropriate) and returning a number in all possible situations.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-e-i-02",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                11,
+                12
+              ],
+              "criterion_paraphrase": "Credit for checking if stack is empty (StackPointer is 0) and returning -1.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-e-i-03",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                11,
+                12
+              ],
+              "criterion_paraphrase": "Credit for (otherwise) accessing the item at the top of the stack.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-e-i-04",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                11,
+                12
+              ],
+              "criterion_paraphrase": "Credit for decrementing the stack pointer.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-s22-42-1-e-i-05",
+              "source_id": "9618_s22_ms_42",
+              "pdf_pages": [
+                11,
+                12
+              ],
+              "criterion_paraphrase": "Continuation criterion: returning the item removed.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-s22-42-1-e-i-04",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s23_41_3(b)(ii)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_41",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Translate supplied PopAnimal pseudocode.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-41-3-B-II-01",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                28,
+                29
+              ],
+              "criterion_paraphrase": "Procedure header (and end where appropriate) with no parameter, checking if empty (AnimalTopPointer = 0) and returning empty string",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-B-II",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-B-II-02",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                28,
+                29
+              ],
+              "criterion_paraphrase": "If not empty returning the top data item (AnimalTopPointer-1)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-B-II",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-B-II-03",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                28,
+                29
+              ],
+              "criterion_paraphrase": "… and decrementing AnimalTopPointer",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-B-II",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S4-S2-S23-QP-ARROW-EXTRACTION"
+          ]
+        },
+        {
+          "part_id": "9618_s23_41_3(b)(iv)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_41",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Adapt PushAnimal and PopAnimal into PushColour and PopColour.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-41-3-B-IV-02",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                32,
+                33
+              ],
+              "criterion_paraphrase": "PopColour function",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-B-IV",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S4-S2-S23-QP-ARROW-EXTRACTION"
+          ]
+        },
+        {
+          "part_id": "9618_s23_43_3(b)(ii)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_43",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Translate supplied PopAnimal pseudocode.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-43-3-B-II-01",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                28,
+                29
+              ],
+              "criterion_paraphrase": "Procedure header (and end where appropriate) with no parameter, checking if empty (AnimalTopPointer = 0) and returning empty string",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-B-II",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-B-II-02",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                28,
+                29
+              ],
+              "criterion_paraphrase": "If not empty returning the top data item (AnimalTopPointer-1)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-B-II",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-B-II-03",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                28,
+                29
+              ],
+              "criterion_paraphrase": "… and decrementing AnimalTopPointer",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-B-II",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S4-S2-S23-QP-ARROW-EXTRACTION"
+          ]
+        },
+        {
+          "part_id": "9618_s23_43_3(b)(iv)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_43",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Adapt PushAnimal and PopAnimal into PushColour and PopColour.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-43-3-B-IV-02",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                32,
+                33
+              ],
+              "criterion_paraphrase": "PopColour function",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-B-IV",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-S23-QP-ARROW-EXTRACTION"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S4-S2-S23-QP-ARROW-EXTRACTION"
+          ]
+        },
+        {
+          "part_id": "9618_w23_42_1(c)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_w23_qp_42",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement PopVowel and PopConsonant, returning No data for an empty stack.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-W23-42-1-C-01",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                10,
+                11,
+                12
+              ],
+              "criterion_paraphrase": "One function header with no parameter",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-C",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-C-02",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                10,
+                11,
+                12
+              ],
+              "criterion_paraphrase": "Checking if stack is empty and returning \"No data\"",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-C",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-C-03",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                10,
+                11,
+                12
+              ],
+              "criterion_paraphrase": "…otherwise, decrementing correct pointer",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-C",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-C-04",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                10,
+                11,
+                12
+              ],
+              "criterion_paraphrase": "Returning value at top of stack",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-C",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-W23-42-1-C-05",
+              "source_id": "9618_w23_ms_42",
+              "pdf_pages": [
+                10,
+                11,
+                12
+              ],
+              "criterion_paraphrase": "2nd function fully correct",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-42-1-C",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s25_42_1(c)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_s25_qp_42",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement Pop, returning the string sentinel when empty.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_s25_42_1(c).mp.01",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                10,
+                11
+              ],
+              "criterion_paraphrase": "Function header (and end where appropriate) and returning a value in all cases.",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(c).mp.02",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                10,
+                11
+              ],
+              "criterion_paraphrase": "Checking if stack is empty and returning string \"–1\"",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(c).mp.03",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                10,
+                11
+              ],
+              "criterion_paraphrase": "(Otherwise) Decrementing TopOfStack",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(c).mp.04",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                10,
+                11
+              ],
+              "criterion_paraphrase": "Returning element in stack at TopOfStack before TopOfStack is decremented",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_w25_41_1(c)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_w25_qp_41",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement Pop returning -999 when the stack is empty.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_w25_41_1(c).mp.01",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                9,
+                10
+              ],
+              "criterion_paraphrase": "Function header (and end) returning integer in all cases",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(c).mp.02",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                9,
+                10
+              ],
+              "criterion_paraphrase": "Checking if stack empty (TopofStack = –1) and returning -999 when true",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(c).mp.03",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                9,
+                10
+              ],
+              "criterion_paraphrase": "(Otherwise) Accessing and returning item at TopOfStack (before it's decremented)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(c).mp.04",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                9,
+                10
+              ],
+              "criterion_paraphrase": "Decrementing TopofStack",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "source_issue_id": "S4-S2-S23-QP-ARROW-EXTRACTION",
+          "stage4_disposition": "Preserve original facsimile locator and do not certify extracted/source code.",
+          "stage5_obligation": "Transcribe from facsimile and execute boundary tests."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "p0.stack.solution.stack-pair",
+      "pattern_id": "STACK_PAIR",
+      "variant_id": "p0.stack.variant.pair-transaction",
+      "input_contract": {
+        "vi": "Hai stack với giao diện Pop/Push và format cặp/thông báo bắt buộc.",
+        "en": "Two stacks with Pop/Push interfaces and required pair/message format."
+      },
+      "output_contract": {
+        "vi": "Một cặp được commit, hoặc thông báo thất bại với cả hai stack được phục hồi.",
+        "en": "One committed pair or a failure message with both stacks restored."
+      },
+      "state_model": "before/after snapshots of stack A and B plus two Pop success flags",
+      "representation": [
+        "A two-resource transaction built from Pop and Push operations."
+      ],
+      "preconditions": [
+        "both stack interfaces are known",
+        "Push can restore a just-popped item"
+      ],
+      "postconditions": [
+        "both success => each size-1",
+        "otherwise => both logical states equal before-state"
+      ],
+      "invariants": [
+        "sentinels are not live items",
+        "rollback target equals successful item's origin"
+      ],
+      "ordered_method_step_ids": [
+        "stack-pair.step.capture",
+        "stack-pair.step.pop-both",
+        "stack-pair.step.case-split-rollback",
+        "stack-pair.step.commit-output",
+        "stack-pair.step.postcheck"
+      ],
+      "mutation_and_preservation_rules": [
+        "Two tentative Pops",
+        "Commit both or restore the sole successful Pop"
+      ],
+      "termination_argument": "Four-case decision table; exactly one disposition per case.",
+      "failure_paths": [
+        "one-sided empty triggers rollback",
+        "both-empty requires no sentinel Push"
+      ],
+      "alternative_designs": [
+        "Pop order may vary only if message priority and rollback remain source-compliant"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "both stacks non-empty"
+        ],
+        "boundary": [
+          "each one-sided empty case",
+          "both empty"
+        ],
+        "counterexample": [
+          "rollback wrong stack",
+          "blindly Push an empty sentinel"
+        ],
+        "source_fixture": [
+          "9618_s23_41_3(c)",
+          "9618_s23_43_3(c)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s23_41_3(c)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_41",
+            "pdf_pages": [
+              10
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement OutputItem: pop both stacks, output the pair or restore the unpaired item and output the specified message.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-41-3-C-01",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "Procedure heading (and close where appropriate) and outputting the colour and animal using PopColour() and PopAnimal() (only if both are successfully popped)",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-C-02",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "Checking if no colour and outputting \"No colour\" …",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-C-03",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "….pushing the removed animal back onto the stack",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-C-04",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "Checking if no animal and outputting \"No animal\" …",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-41-3-C-05",
+              "source_id": "9618_s23_ms_41",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "…pushing the removed colour back onto the stack",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-41-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_s23_43_3(c)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s23_qp_43",
+            "pdf_pages": [
+              10
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement OutputItem: pop both stacks, output the pair or restore the unpaired item and output the specified message.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S23-43-3-C-01",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "Procedure heading (and close where appropriate) and outputting the colour and animal using PopColour() and PopAnimal() (only if both are successfully popped)",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-C-02",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "Checking if no colour and outputting \"No colour\" …",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-C-03",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "….pushing the removed animal back onto the stack",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-C-04",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "Checking if no animal and outputting \"No animal\" …",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S23-43-3-C-05",
+              "source_id": "9618_s23_ms_43",
+              "pdf_pages": [
+                36,
+                37
+              ],
+              "criterion_paraphrase": "…pushing the removed colour back onto the stack",
+              "award_semantics": "dependent",
+              "condition": "Dependency wording exists in the source row; Lead must preserve it during method join.",
+              "alternatives": null,
+              "dependency": "Source row contains dependency/follow-through wording.",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S23-43-3-C",
+              "group_max": 5,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        }
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "p0.stack.solution.stack-reduce",
+      "pattern_id": "STACK_REDUCE",
+      "variant_id": "p0.stack.variant.reduce-protocol",
+      "input_contract": {
+        "vi": "Một stack không rỗng đúng hợp đồng nguồn và hợp đồng Pop; kèm grammar biểu thức hoặc yêu cầu cực trị.",
+        "en": "A non-empty source-conforming stack and Pop contract; expression grammar or extrema requirement."
+      },
+      "output_contract": {
+        "vi": "Total cuối theo left fold hoặc output cực trị bắt buộc; stack đã được lấy hết item live.",
+        "en": "Final left-fold total or required extrema output; stack drained."
+      },
+      "state_model": "top, current Pop result, accumulator, optional operator",
+      "representation": [
+        "Destructive repeated Pop with an accumulator."
+      ],
+      "preconditions": [
+        "source stack is non-empty",
+        "expression source alternates operator then number after first number"
+      ],
+      "postconditions": [
+        "no live items remain",
+        "accumulator covers every original live item exactly once"
+      ],
+      "invariants": [
+        "expression: accumulator is left fold of consumed prefix",
+        "extrema: min/max are extrema of consumed prefix"
+      ],
+      "ordered_method_step_ids": [
+        "stack-reduce.step.contract",
+        "stack-reduce.step.first-value",
+        "stack-reduce.step.consume-next",
+        "stack-reduce.step.apply",
+        "stack-reduce.step.finish"
+      ],
+      "mutation_and_preservation_rules": [
+        "Repeated Pop is destructive",
+        "sentinel is never accumulated"
+      ],
+      "termination_argument": "Each useful Pop reduces logical size; finite capacity implies termination at empty.",
+      "failure_paths": [
+        "malformed operator-number sequence is outside the stated 2025 source precondition",
+        "empty initial input needs an explicit future policy"
+      ],
+      "alternative_designs": [
+        "pointer empty guard or Pop sentinel where source permits",
+        "expression fold versus extrema scan"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "multiple expression pairs",
+          "mixed extrema values"
+        ],
+        "boundary": [
+          "single value",
+          "one operator-number pair",
+          "all-negative extrema"
+        ],
+        "counterexample": [
+          "reversed non-commutative operands",
+          "sentinel as data",
+          "zero extrema initialisation"
+        ],
+        "source_fixture": [
+          "9618_s25_42_1(e)",
+          "9618_w25_41_1(e)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s25_42_1(e)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_s25_qp_42",
+            "pdf_pages": [
+              4
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement Calculate to consume stack numbers/operators and return the total.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_s25_42_1(e).mp.01",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                14,
+                15,
+                16
+              ],
+              "criterion_paraphrase": "Calculate() function header (and end where appropriate)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(e).mp.02",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                14,
+                15,
+                16
+              ],
+              "criterion_paraphrase": "Looping until the stack is empty",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(e).mp.03",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                14,
+                15,
+                16
+              ],
+              "criterion_paraphrase": "Calling Pop() repeatedly within loop and storing/using return value",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(e).mp.04",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                14,
+                15,
+                16
+              ],
+              "criterion_paraphrase": "… working out if return value from Pop() call is an operator or a number / alternating between operator and number",
+              "award_semantics": "dependent",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [
+                "Accept an equivalent route only where the official wording permits it; Lead must preserve the QP contract."
+              ],
+              "dependency": "9618_s25_42_1(e).mp.03",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(e).mp.05",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                14,
+                15,
+                16
+              ],
+              "criterion_paraphrase": "Select to determine if the operator is +, -, /, * or ^ and attempt the matching calculation",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(e).mp.06",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                14,
+                15,
+                16
+              ],
+              "criterion_paraphrase": "… performing correct calculation using operator, number",
+              "award_semantics": "dependent",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_s25_42_1(e).mp.05",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_42_1(e).mp.07",
+              "source_id": "9618_s25_ms_42",
+              "pdf_pages": [
+                14,
+                15,
+                16
+              ],
+              "criterion_paraphrase": "… updating total from previous loops and returning this final value",
+              "award_semantics": "dependent",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_s25_42_1(e).mp.06",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        },
+        {
+          "part_id": "9618_w25_41_1(e)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_w25_qp_41",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement FindValues by draining the stack and reporting its highest/lowest values.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_w25_41_1(e).mp.01",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                12,
+                13
+              ],
+              "criterion_paraphrase": "Procedure header (and end) and output of highest and lowest include appropriate messages",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(e).mp.02",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                12,
+                13
+              ],
+              "criterion_paraphrase": "Calls Pop() until there are no items left in stack (return value = –999 // TopOfStack = -1) and storing/using return values",
+              "award_semantics": "alternative",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [
+                "Accept an equivalent route only where the official wording permits it; Lead must preserve the QP contract."
+              ],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(e).mp.03",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                12,
+                13
+              ],
+              "criterion_paraphrase": "Finds and outputs highest value from returned values",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_41_1(e).mp.04",
+              "source_id": "9618_w25_ms_41",
+              "pdf_pages": [
+                12,
+                13
+              ],
+              "criterion_paraphrase": "Finds and outputs lowest value from returned values",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": []
+        }
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    }
+  ],
+  "self_checks": {
+    "design_count": 5,
+    "all_statuses": [
+      "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    ]
+  }
+}

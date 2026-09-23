@@ -1,0 +1,2963 @@
+{
+  "schema_version": "paper4-v2-trace-chunk-v1",
+  "pattern_id": "HASH_SEARCH",
+  "owner": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
+    "lesson_slug": "hashing",
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+    "artifact_version": "pilot-v1",
+    "code_sha256": "00acfb5f4c6320ceb5714cba3060f8ec6777ec6a386dc08b6bb3a3d3ead38707"
+  },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
+    "pattern_ids": [
+      "HASH_FUNCTION",
+      "HASH_INSERT",
+      "HASH_SEARCH",
+      "HASH_SETUP"
+    ],
+    "version": "pilot-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "hashing.v1.L001",
+        "order": 1,
+        "text": "import json"
+      },
+      {
+        "line_id": "hashing.v1.L002",
+        "order": 2,
+        "text": "import sys"
+      },
+      {
+        "line_id": "hashing.v1.L003",
+        "order": 3,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L004",
+        "order": 4,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L005",
+        "order": 5,
+        "text": "class HashTable:"
+      },
+      {
+        "line_id": "hashing.v1.L006",
+        "order": 6,
+        "text": "    def __init__(self, size, trace):"
+      },
+      {
+        "line_id": "hashing.v1.L007",
+        "order": 7,
+        "text": "        if size <= 0:"
+      },
+      {
+        "line_id": "hashing.v1.L008",
+        "order": 8,
+        "text": "            raise ValueError(\"size must be positive\")"
+      },
+      {
+        "line_id": "hashing.v1.L009",
+        "order": 9,
+        "text": "        self.slots = [None] * size"
+      },
+      {
+        "line_id": "hashing.v1.L010",
+        "order": 10,
+        "text": "        self.trace = trace"
+      },
+      {
+        "line_id": "hashing.v1.L011",
+        "order": 11,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L012",
+        "order": 12,
+        "text": "    def address(self, key):"
+      },
+      {
+        "line_id": "hashing.v1.L013",
+        "order": 13,
+        "text": "        return key % len(self.slots)"
+      },
+      {
+        "line_id": "hashing.v1.L014",
+        "order": 14,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L015",
+        "order": 15,
+        "text": "    def insert(self, key):"
+      },
+      {
+        "line_id": "hashing.v1.L016",
+        "order": 16,
+        "text": "        start = self.address(key)"
+      },
+      {
+        "line_id": "hashing.v1.L017",
+        "order": 17,
+        "text": "        for step in range(len(self.slots)):"
+      },
+      {
+        "line_id": "hashing.v1.L018",
+        "order": 18,
+        "text": "            index = (start + step) % len(self.slots)"
+      },
+      {
+        "line_id": "hashing.v1.L019",
+        "order": 19,
+        "text": "            self.trace.append({\"event\": \"probe_insert\", \"key\": key, \"index\": index, \"step\": step})"
+      },
+      {
+        "line_id": "hashing.v1.L020",
+        "order": 20,
+        "text": "            if self.slots[index] is None:"
+      },
+      {
+        "line_id": "hashing.v1.L021",
+        "order": 21,
+        "text": "                self.slots[index] = key"
+      },
+      {
+        "line_id": "hashing.v1.L022",
+        "order": 22,
+        "text": "                return index"
+      },
+      {
+        "line_id": "hashing.v1.L023",
+        "order": 23,
+        "text": "            if self.slots[index] == key:"
+      },
+      {
+        "line_id": "hashing.v1.L024",
+        "order": 24,
+        "text": "                return index"
+      },
+      {
+        "line_id": "hashing.v1.L025",
+        "order": 25,
+        "text": "        return -1"
+      },
+      {
+        "line_id": "hashing.v1.L026",
+        "order": 26,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L027",
+        "order": 27,
+        "text": "    def search(self, key):"
+      },
+      {
+        "line_id": "hashing.v1.L028",
+        "order": 28,
+        "text": "        start = self.address(key)"
+      },
+      {
+        "line_id": "hashing.v1.L029",
+        "order": 29,
+        "text": "        for step in range(len(self.slots)):"
+      },
+      {
+        "line_id": "hashing.v1.L030",
+        "order": 30,
+        "text": "            index = (start + step) % len(self.slots)"
+      },
+      {
+        "line_id": "hashing.v1.L031",
+        "order": 31,
+        "text": "            self.trace.append({\"event\": \"probe_search\", \"key\": key, \"index\": index, \"step\": step})"
+      },
+      {
+        "line_id": "hashing.v1.L032",
+        "order": 32,
+        "text": "            if self.slots[index] is None:"
+      },
+      {
+        "line_id": "hashing.v1.L033",
+        "order": 33,
+        "text": "                return -1"
+      },
+      {
+        "line_id": "hashing.v1.L034",
+        "order": 34,
+        "text": "            if self.slots[index] == key:"
+      },
+      {
+        "line_id": "hashing.v1.L035",
+        "order": 35,
+        "text": "                return index"
+      },
+      {
+        "line_id": "hashing.v1.L036",
+        "order": 36,
+        "text": "        return -1"
+      },
+      {
+        "line_id": "hashing.v1.L037",
+        "order": 37,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L038",
+        "order": 38,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L039",
+        "order": 39,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "hashing.v1.L040",
+        "order": 40,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "hashing.v1.L041",
+        "order": 41,
+        "text": "    if not all(isinstance(key, int) for key in fixture[\"insert_keys\"] + [fixture[\"search_key\"]]):"
+      },
+      {
+        "line_id": "hashing.v1.L042",
+        "order": 42,
+        "text": "        trace.append({\"event\": \"reject_non_integer_key\"})"
+      },
+      {
+        "line_id": "hashing.v1.L043",
+        "order": 43,
+        "text": "        return {\"status\": \"INVALID_KEY\", \"trace\": trace}"
+      },
+      {
+        "line_id": "hashing.v1.L044",
+        "order": 44,
+        "text": "    try:"
+      },
+      {
+        "line_id": "hashing.v1.L045",
+        "order": 45,
+        "text": "        table = HashTable(fixture[\"size\"], trace)"
+      },
+      {
+        "line_id": "hashing.v1.L046",
+        "order": 46,
+        "text": "    except ValueError as error:"
+      },
+      {
+        "line_id": "hashing.v1.L047",
+        "order": 47,
+        "text": "        return {\"status\": \"INVALID_SIZE\", \"message\": str(error), \"trace\": trace}"
+      },
+      {
+        "line_id": "hashing.v1.L048",
+        "order": 48,
+        "text": "    inserted_at = []"
+      },
+      {
+        "line_id": "hashing.v1.L049",
+        "order": 49,
+        "text": "    for key in fixture[\"insert_keys\"]:"
+      },
+      {
+        "line_id": "hashing.v1.L050",
+        "order": 50,
+        "text": "        inserted_at.append(table.insert(key))"
+      },
+      {
+        "line_id": "hashing.v1.L051",
+        "order": 51,
+        "text": "    found_at = table.search(fixture[\"search_key\"])"
+      },
+      {
+        "line_id": "hashing.v1.L052",
+        "order": 52,
+        "text": "    return {"
+      },
+      {
+        "line_id": "hashing.v1.L053",
+        "order": 53,
+        "text": "        \"status\": \"OK\","
+      },
+      {
+        "line_id": "hashing.v1.L054",
+        "order": 54,
+        "text": "        \"inserted_at\": inserted_at,"
+      },
+      {
+        "line_id": "hashing.v1.L055",
+        "order": 55,
+        "text": "        \"found_at\": found_at,"
+      },
+      {
+        "line_id": "hashing.v1.L056",
+        "order": 56,
+        "text": "        \"slots\": table.slots,"
+      },
+      {
+        "line_id": "hashing.v1.L057",
+        "order": 57,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "hashing.v1.L058",
+        "order": 58,
+        "text": "    }"
+      },
+      {
+        "line_id": "hashing.v1.L059",
+        "order": 59,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L060",
+        "order": 60,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L061",
+        "order": 61,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "hashing.v1.L062",
+        "order": 62,
+        "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
+      },
+      {
+        "line_id": "hashing.v1.L063",
+        "order": 63,
+        "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
+      },
+      {
+        "line_id": "hashing.v1.L064",
+        "order": 64,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "00acfb5f4c6320ceb5714cba3060f8ec6777ec6a386dc08b6bb3a3d3ead38707",
+    "caption": {
+      "vi": "Bảng băm dùng phép chia dư, dò tuyến tính, chèn và tìm kiếm có giới hạn.",
+      "en": "A hash table using remainder addressing and bounded linear probing for insert and search."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r2.a3.hashing.pilot-v1.author-run",
+      "independent_rerun_ref": "p4r2.a3.hashing.pilot-v1.independent-rerun",
+      "execution_log_sha256": "1de2ed8b3ec907eed9c74ae8b6bf8deaeee0fe4c32480f0924a1091d4b613cab"
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.hashing.hash-search.boundary.pilot-v1",
+      "case_kind": "boundary",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+      "artifact_version": "pilot-v1",
+      "initial_state": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "size": 3,
+          "slots": [
+            null,
+            null,
+            null
+          ],
+          "last_probe": null,
+          "status": "READY"
+        }
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-001",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-002",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-003",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-004",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-005",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-006",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-007",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-008",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-009"
+      ],
+      "expected_output_ref": "hashing.boundary.expected-output",
+      "fixture_ref": "hashing.boundary"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.hashing.hash-search.failure.pilot-v1",
+      "case_kind": "failure",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.failure.pilot-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+      "artifact_version": "pilot-v1",
+      "initial_state": {
+        "fixture_ref": "hashing.failure",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            "seventeen"
+          ],
+          "search_key": 10,
+          "size": 7
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "last_probe": null,
+          "status": "READY"
+        }
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.failure.pilot-v1.event-001"
+      ],
+      "expected_output_ref": "hashing.failure.expected-output",
+      "fixture_ref": "hashing.failure"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.hashing.hash-search.normal.pilot-v1",
+      "case_kind": "normal",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
+      "artifact_version": "pilot-v1",
+      "initial_state": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "last_probe": null,
+          "status": "READY"
+        }
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-001",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-002",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-003",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-004",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-005",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-006",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-007",
+        "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-008"
+      ],
+      "expected_output_ref": "hashing.normal.expected-output",
+      "fixture_ref": "hashing.normal"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 0,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L021",
+        "hashing.v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "size": 3,
+          "slots": [
+            null,
+            null,
+            null
+          ],
+          "last_probe": null,
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 0,
+          "key": 0,
+          "step": 0
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 1,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 0,
+            "index": 0,
+            "step": 0,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 0,
+          "key": 0,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: probe_insert",
+          "en": "Step 1: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 1,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L021",
+        "hashing.v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 1,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 0,
+            "index": 0,
+            "step": 0,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 1,
+          "key": 1,
+          "step": 0
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 2,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 1,
+            "index": 1,
+            "step": 0,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 1,
+          "key": 1,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: probe_insert",
+          "en": "Step 2: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 2,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L021",
+        "hashing.v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 2,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 1,
+            "index": 1,
+            "step": 0,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 2,
+          "key": 2,
+          "step": 0
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 3,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 2,
+            "index": 2,
+            "step": 0,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 2,
+          "key": 2,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: probe_insert",
+          "en": "Step 3: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-004",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 3,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L023"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 3,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 2,
+            "index": 2,
+            "step": 0,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 0,
+          "key": 3,
+          "step": 0
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 4,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 3,
+            "index": 0,
+            "step": 0,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 0,
+          "key": 3,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: probe_insert",
+          "en": "Step 4: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 4,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L023"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 4,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 3,
+            "index": 0,
+            "step": 0,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 1,
+          "key": 3,
+          "step": 1
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 5,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 3,
+            "index": 1,
+            "step": 1,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 1,
+          "key": 3,
+          "step": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: probe_insert",
+          "en": "Step 5: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-006",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 5,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L023"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 5,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 3,
+            "index": 1,
+            "step": 1,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 2,
+          "key": 3,
+          "step": 2
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 6,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 3,
+            "index": 2,
+            "step": 2,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 2,
+          "key": 3,
+          "step": 2
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 6: probe_insert",
+          "en": "Step 6: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-006.focus",
+        "focus_order": 5,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-007",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 6,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L028",
+        "hashing.v1.L029",
+        "hashing.v1.L030",
+        "hashing.v1.L031",
+        "hashing.v1.L032",
+        "hashing.v1.L034"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 6,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 3,
+            "index": 2,
+            "step": 2,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_search",
+          "index": 0,
+          "key": 9,
+          "step": 0
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 7,
+        "last_event": "probe_search",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "search",
+            "key": 9,
+            "index": 0,
+            "step": 0,
+            "value": 0
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_search",
+          "index": 0,
+          "key": 9,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_search phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_search must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+        "en": "Does this probe find the key or continue?"
+      },
+      "feedback": {
+        "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+        "en": "Search follows the same probe sequence used during insertion."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 7: probe_search",
+          "en": "Step 7: probe_search"
+        },
+        "action_description": {
+          "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+          "en": "Does this probe find the key or continue?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-007.focus",
+        "focus_order": 6,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+            "en": "Search follows the same probe sequence used during insertion."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-008",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 7,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L028",
+        "hashing.v1.L029",
+        "hashing.v1.L030",
+        "hashing.v1.L031",
+        "hashing.v1.L032",
+        "hashing.v1.L034"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 7,
+        "last_event": "probe_search",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "search",
+            "key": 9,
+            "index": 0,
+            "step": 0,
+            "value": 0
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_search",
+          "index": 1,
+          "key": 9,
+          "step": 1
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 8,
+        "last_event": "probe_search",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "search",
+            "key": 9,
+            "index": 1,
+            "step": 1,
+            "value": 1
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_search",
+          "index": 1,
+          "key": 9,
+          "step": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_search phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_search must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+        "en": "Does this probe find the key or continue?"
+      },
+      "feedback": {
+        "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+        "en": "Search follows the same probe sequence used during insertion."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 8: probe_search",
+          "en": "Step 8: probe_search"
+        },
+        "action_description": {
+          "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+          "en": "Does this probe find the key or continue?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-008.focus",
+        "focus_order": 7,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+            "en": "Search follows the same probe sequence used during insertion."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-009",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1",
+      "sequence": 8,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L028",
+        "hashing.v1.L029",
+        "hashing.v1.L030",
+        "hashing.v1.L031",
+        "hashing.v1.L032",
+        "hashing.v1.L034",
+        "hashing.v1.L051",
+        "hashing.v1.L052",
+        "hashing.v1.L053",
+        "hashing.v1.L054",
+        "hashing.v1.L055",
+        "hashing.v1.L056",
+        "hashing.v1.L057"
+      ],
+      "before": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 8,
+        "last_event": "probe_search",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "search",
+            "key": 9,
+            "index": 1,
+            "step": 1,
+            "value": 1
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_search",
+          "index": 2,
+          "key": 9,
+          "step": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "hashing.boundary",
+        "fixture_input": {
+          "insert_keys": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "search_key": 9,
+          "size": 3
+        },
+        "trace_cursor": 9,
+        "last_event": "probe_search",
+        "domain": {
+          "size": 3,
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "last_probe": {
+            "mode": "search",
+            "key": 9,
+            "index": 2,
+            "step": 2,
+            "value": 2
+          },
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_search",
+          "index": 2,
+          "key": 9,
+          "step": 2
+        },
+        "final_result": {
+          "found_at": -1,
+          "inserted_at": [
+            0,
+            1,
+            2,
+            -1
+          ],
+          "slots": [
+            0,
+            1,
+            2
+          ],
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_search phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_search must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+        "en": "Does this probe find the key or continue?"
+      },
+      "feedback": {
+        "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+        "en": "Search follows the same probe sequence used during insertion."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 9: probe_search",
+          "en": "Step 9: probe_search"
+        },
+        "action_description": {
+          "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+          "en": "Does this probe find the key or continue?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.boundary.pilot-v1.event-009.focus",
+        "focus_order": 8,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+            "en": "Search follows the same probe sequence used during insertion."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.failure.pilot-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.failure.pilot-v1",
+      "sequence": 0,
+      "event_type": "reject",
+      "active_line_ids": [
+        "hashing.v1.L041",
+        "hashing.v1.L042",
+        "hashing.v1.L043"
+      ],
+      "before": {
+        "fixture_ref": "hashing.failure",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            "seventeen"
+          ],
+          "search_key": 10,
+          "size": 7
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "last_probe": null,
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reject_non_integer_key"
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.failure",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            "seventeen"
+          ],
+          "search_key": 10,
+          "size": 7
+        },
+        "trace_cursor": 1,
+        "last_event": "reject_non_integer_key",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "last_probe": null,
+          "status": "INVALID_KEY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reject_non_integer_key"
+        },
+        "final_result": {
+          "status": "INVALID_KEY"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện reject_non_integer_key phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event reject_non_integer_key must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Mọi key có phải số nguyên không?",
+        "en": "Is every key an integer?"
+      },
+      "feedback": {
+        "vi": "Key sai kiểu bị từ chối trước khi tính địa chỉ băm.",
+        "en": "A key of the wrong type is rejected before hashing."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.reject_non_integer_key"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: reject_non_integer_key",
+          "en": "Step 1: reject_non_integer_key"
+        },
+        "action_description": {
+          "vi": "Mọi key có phải số nguyên không?",
+          "en": "Is every key an integer?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.failure.pilot-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "assertive",
+          "message": {
+            "vi": "Key sai kiểu bị từ chối trước khi tính địa chỉ băm.",
+            "en": "A key of the wrong type is rejected before hashing."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "sequence": 0,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L021",
+        "hashing.v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "last_probe": null,
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 3,
+          "key": 10,
+          "step": 0
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 1,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            null,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 10,
+            "index": 3,
+            "step": 0,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 3,
+          "key": 10,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: probe_insert",
+          "en": "Step 1: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "sequence": 1,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L023"
+      ],
+      "before": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 1,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            null,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 10,
+            "index": 3,
+            "step": 0,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 3,
+          "key": 17,
+          "step": 0
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 2,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            null,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 17,
+            "index": 3,
+            "step": 0,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 3,
+          "key": 17,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: probe_insert",
+          "en": "Step 2: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "sequence": 2,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L021",
+        "hashing.v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 2,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            null,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 17,
+            "index": 3,
+            "step": 0,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 4,
+          "key": 17,
+          "step": 1
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 3,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 17,
+            "index": 4,
+            "step": 1,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 4,
+          "key": 17,
+          "step": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: probe_insert",
+          "en": "Step 3: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-004",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "sequence": 3,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L023"
+      ],
+      "before": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 3,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 17,
+            "index": 4,
+            "step": 1,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 3,
+          "key": 24,
+          "step": 0
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 4,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 24,
+            "index": 3,
+            "step": 0,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 3,
+          "key": 24,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: probe_insert",
+          "en": "Step 4: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "sequence": 4,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L023"
+      ],
+      "before": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 4,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 24,
+            "index": 3,
+            "step": 0,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 4,
+          "key": 24,
+          "step": 1
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 5,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 24,
+            "index": 4,
+            "step": 1,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 4,
+          "key": 24,
+          "step": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: probe_insert",
+          "en": "Step 5: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-006",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "sequence": 5,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L016",
+        "hashing.v1.L017",
+        "hashing.v1.L018",
+        "hashing.v1.L019",
+        "hashing.v1.L020",
+        "hashing.v1.L021",
+        "hashing.v1.L022"
+      ],
+      "before": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 5,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            null,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 24,
+            "index": 4,
+            "step": 1,
+            "occupied": true
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_insert",
+          "index": 5,
+          "key": 24,
+          "step": 2
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 6,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            24,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 24,
+            "index": 5,
+            "step": 2,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_insert",
+          "index": 5,
+          "key": 24,
+          "step": 2
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_insert phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_insert must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này va chạm hay tìm được ô trống?",
+        "en": "Does this probe collide or find an empty slot?"
+      },
+      "feedback": {
+        "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+        "en": "Linear probing computes the index; an empty slot receives the key."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_insert"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 6: probe_insert",
+          "en": "Step 6: probe_insert"
+        },
+        "action_description": {
+          "vi": "Probe này va chạm hay tìm được ô trống?",
+          "en": "Does this probe collide or find an empty slot?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-006.focus",
+        "focus_order": 5,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Chỉ số probe được tính bằng linear probing; ô trống nhận key.",
+            "en": "Linear probing computes the index; an empty slot receives the key."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-007",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "sequence": 6,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L028",
+        "hashing.v1.L029",
+        "hashing.v1.L030",
+        "hashing.v1.L031",
+        "hashing.v1.L032",
+        "hashing.v1.L034"
+      ],
+      "before": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 6,
+        "last_event": "probe_insert",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            24,
+            null
+          ],
+          "last_probe": {
+            "mode": "insert",
+            "key": 24,
+            "index": 5,
+            "step": 2,
+            "occupied": false
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_search",
+          "index": 3,
+          "key": 17,
+          "step": 0
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 7,
+        "last_event": "probe_search",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            24,
+            null
+          ],
+          "last_probe": {
+            "mode": "search",
+            "key": 17,
+            "index": 3,
+            "step": 0,
+            "value": 10
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_search",
+          "index": 3,
+          "key": 17,
+          "step": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_search phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_search must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+        "en": "Does this probe find the key or continue?"
+      },
+      "feedback": {
+        "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+        "en": "Search follows the same probe sequence used during insertion."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 7: probe_search",
+          "en": "Step 7: probe_search"
+        },
+        "action_description": {
+          "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+          "en": "Does this probe find the key or continue?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-007.focus",
+        "focus_order": 6,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+            "en": "Search follows the same probe sequence used during insertion."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-008",
+      "trace_id": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1",
+      "sequence": 7,
+      "event_type": "compare",
+      "active_line_ids": [
+        "hashing.v1.L028",
+        "hashing.v1.L029",
+        "hashing.v1.L030",
+        "hashing.v1.L031",
+        "hashing.v1.L032",
+        "hashing.v1.L034",
+        "hashing.v1.L035",
+        "hashing.v1.L051",
+        "hashing.v1.L052",
+        "hashing.v1.L053",
+        "hashing.v1.L054",
+        "hashing.v1.L055",
+        "hashing.v1.L056",
+        "hashing.v1.L057"
+      ],
+      "before": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 7,
+        "last_event": "probe_search",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            24,
+            null
+          ],
+          "last_probe": {
+            "mode": "search",
+            "key": 17,
+            "index": 3,
+            "step": 0,
+            "value": 10
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "probe_search",
+          "index": 4,
+          "key": 17,
+          "step": 1
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "hashing.normal",
+        "fixture_input": {
+          "insert_keys": [
+            10,
+            17,
+            24
+          ],
+          "search_key": 17,
+          "size": 7
+        },
+        "trace_cursor": 8,
+        "last_event": "probe_search",
+        "domain": {
+          "size": 7,
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            24,
+            null
+          ],
+          "last_probe": {
+            "mode": "search",
+            "key": 17,
+            "index": 4,
+            "step": 1,
+            "value": 17
+          },
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "probe_search",
+          "index": 4,
+          "key": 17,
+          "step": 1
+        },
+        "final_result": {
+          "found_at": 4,
+          "inserted_at": [
+            3,
+            4,
+            5
+          ],
+          "slots": [
+            null,
+            null,
+            null,
+            10,
+            17,
+            24,
+            null
+          ],
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "HASH_SEARCH: sự kiện probe_search phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "HASH_SEARCH: event probe_search must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+        "en": "Does this probe find the key or continue?"
+      },
+      "feedback": {
+        "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+        "en": "Search follows the same probe sequence used during insertion."
+      },
+      "visual_targets": [
+        "visual.hashing.state",
+        "visual.hashing.probe_search"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 8: probe_search",
+          "en": "Step 8: probe_search"
+        },
+        "action_description": {
+          "vi": "Probe này tìm thấy key hay phải đi tiếp?",
+          "en": "Does this probe find the key or continue?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.hashing.hash-search.normal.pilot-v1.event-008.focus",
+        "focus_order": 7,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.",
+            "en": "Search follows the same probe sequence used during insertion."
+          }
+        }
+      }
+    }
+  ]
+}

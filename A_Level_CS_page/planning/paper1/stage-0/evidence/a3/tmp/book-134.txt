@@ -1,0 +1,59 @@
+118 	 4	Processor	fundamentals
+4
+RTN can be abstract (generic notation – as shown on page 117) or concrete 
+(specific to a particular machine – example shown below). For example, on a 
+RISC computer:
+instruction _ interpretation := (¬Run/Start →
+Run ← 1; instruction _ interpretation):
+Run → (CIR ← M[PC]:PC ← PC + 4; instruction _ execution)
+Use of interrupts in the fetch-execute cycle
+Section 4.1.7 gives a general overview of how a computer uses interrupts to 
+allow a computer to operate efficiently and to allow it, for example, to carry 
+out multi-tasking functions. Just before we discuss interrupts in this general 
+fashion, the following notes explain how interrupts are specifically used in the 
+fetch-execute cycle.
+A special register called the interrupt register is used in the fetch-execute 
+cycle. While the CPU is in the middle of carrying out this cycle, an interrupt 
+could occur, which will cause one of the bits in the interrupt register to change 
+its status. For example, the initial status might be 0000 0000 and a fault might 
+occur while writing data to the hard drive; this would cause the register to 
+change to 0000 1000. The following sequence now takes place.
+» At the next fetch-execute cycle, the interrupt register is checked bit by bit.
+» The contents 0000 1000 would indicate an interrupt occurred during a 
+previous cycle and it still needs servicing. The CPU would now service this 
+interrupt or ignore it for now, depending on its priority.
+» Once the interrupt is serviced by the CPU, it stops its current task and stores 
+the contents of its registers (see Section 4.1.7 for more details about how 
+this is done).
+» Control is now transferred to the interrupt handler (or interrupt service 
+routine, ISR).
+» Once the interrupt is fully serviced, the register is reset and the contents of 
+registers are restored.
+Figure 4.6 summarises the interrupt process during the fetch-execute cycle.
+Yes
+YesNo
+fetch the
+next
+instructions
+FETCH stage in the cycle EXECUTE stage in the cycle INTERRUPT stage in the cycle
+END
+interrupts
+are
+disabled
+START execute interrupt
+service routine (ISR)
+suspend execution of
+current program/task
+interrupts enabled and
+interrupt priority
+checked
+decode and
+execute the
+instruction
+end of the
+program?
+No
+any
+interrupts?
+▲ Figure 4.6 The interrupt process during the fetch-execute cycle
+457591_04_CI_AS & A_Level_CS_107-135.indd   118 4/30/19   7:49 AM

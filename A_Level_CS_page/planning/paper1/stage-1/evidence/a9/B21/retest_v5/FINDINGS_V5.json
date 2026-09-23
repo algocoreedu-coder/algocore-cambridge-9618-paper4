@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "task_id": "P1-S1-A9-B21-RETEST-V5",
+  "candidate": "B21-A2-v5",
+  "candidate_handoff_sha256": "Compute SHA256 of HANDOFF_CHECK.json after freeze; self hash is excluded from its declared_output_hashes.",
+  "recommendation": "CHANGES_REQUIRED",
+  "findings": [
+    {
+      "id": "A9-B21-CTX-01",
+      "severity": "MAJOR",
+      "status": "OPEN_BLOCKING",
+      "owner": "A2-B21 via A0",
+      "title": "Q8 context evidence includes non-question pages",
+      "summary": "Three Q8 root context records claim four pages after or outside the actual question as continuation/source evidence. The source PDFs show Q8 is complete before those pages; one is explicitly BLANK PAGE and three are copyright/imprint pages. This makes the indexed context locators inaccurate.",
+      "affected_records": [
+        {
+          "question_id": "9618_s21_qp_12-q8",
+          "candidate_context_file": "contexts/9618_s21_qp_12-q8.json",
+          "actual_q8_pages": [
+            14
+          ],
+          "false_pages": [
+            15,
+            16
+          ]
+        },
+        {
+          "question_id": "9618_w21_qp_11-q8",
+          "candidate_context_file": "contexts/9618_w21_qp_11-q8.json",
+          "actual_q8_pages": [
+            15
+          ],
+          "false_pages": [
+            16
+          ]
+        },
+        {
+          "question_id": "9618_w21_qp_13-q8",
+          "candidate_context_file": "contexts/9618_w21_qp_13-q8.json",
+          "actual_q8_pages": [
+            15
+          ],
+          "false_pages": [
+            16
+          ]
+        }
+      ],
+      "false_page_evidence": [
+        {
+          "question_id": "9618_s21_qp_12-q8",
+          "source_id": "9618_s21_qp_12",
+          "pdf_page_1_based": 15,
+          "classification": "literal BLANK PAGE",
+          "why_false": "Q8 is complete on p14; p15 contains only the printed BLANK PAGE notice."
+        },
+        {
+          "question_id": "9618_s21_qp_12-q8",
+          "source_id": "9618_s21_qp_12",
+          "pdf_page_1_based": 16,
+          "classification": "copyright/imprint matter",
+          "why_false": "Q8 is complete on p14; p16 contains publisher/copyright notices and exam-series footer, not Q8."
+        },
+        {
+          "question_id": "9618_w21_qp_11-q8",
+          "source_id": "9618_w21_qp_11",
+          "pdf_page_1_based": 16,
+          "classification": "copyright/imprint matter",
+          "why_false": "Q8 is complete on p15; p16 contains publisher/copyright notices, not Q8."
+        },
+        {
+          "question_id": "9618_w21_qp_13-q8",
+          "source_id": "9618_w21_qp_13",
+          "pdf_page_1_based": 16,
+          "classification": "copyright/imprint matter",
+          "why_false": "Q8 is complete on p15; p16 contains publisher/copyright notices, not Q8."
+        }
+      ],
+      "required_correction": "Remove the non-question pages from continuation_pages, all_context_pages, and source_evidence; retain only source pages that contain the question. Regenerate the affected context records and any derived indexes/manifests in a new immutable candidate version.",
+      "retest_required": [
+        "A0 candidate integrity/schema audit",
+        "A3 same-version context/source retest",
+        "A4 same-version corpus/source retest",
+        "A9 independent exact-version retest"
+      ],
+      "evidence": "Direct full-size renders generated from the Stage 0 hash-verified originals are in full_renders/; hashes and source/page pins are in SOURCE_RENDER_MANIFEST_V5.json. All 154 pages also appear in the 12 reduced-scale contact sheets."
+    }
+  ],
+  "criterion_status": [
+    {
+      "id": "A9-01-frozen-pins",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-02-candidate-all-hashes",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-03-specialist-handoffs",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-04-source-pdf-integrity",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-05-visual-targets",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-06-schema-crossrefs",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-07-unresolved-preservation",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-08-S1-I16-Q1-correction",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-09-six-displayed-mark-sums",
+      "status": "PASS"
+    },
+    {
+      "id": "A9-10-Q7-Q8-context",
+      "status": "FAIL"
+    },
+    {
+      "id": "A9-11-independent-render-evidence",
+      "status": "PASS"
+    }
+  ],
+  "non_blocking_limitations": [
+    "Historic S1-I14 provenance limitation remains open and non-blocking; this review does not recover the A4-v2 digest.",
+    "Local source PDF hashes match Stage 0; remote Cambridge publisher authenticity was not independently checked.",
+    "All-page contact sheets are a reduced-scale screen. 35 designated pages were rendered full size; this is not a full-size visual audit of every page."
+  ],
+  "batch_acceptance_claimed": false,
+  "A0_decision_required": true
+}

@@ -1,0 +1,15 @@
+# B25-A2-v2 unresolved items and review risks
+
+## Extraction-time unresolved mappings
+
+No extraction-time unresolved mappings are recorded; every indexed leaf part and all three unparted whole-question records link to a unique exact paired-MS heading, and all six QP displayed-mark totals equal the printed cover total. The v2 context-boundary and 7(e) excerpt corrections are checked in CORRECTION_CHECKS.json. See `CROSS_REFERENCE_CHECK.json` and `MARK_TOTAL_CHECK.json`.
+
+## Parent labels without separate MS rows
+
+27 printed parent grouping labels contain child parts but do not have a separate exact MS row. They remain `EXTRACTED` with null MS locator and no marking item; child rows retain their own exact QP/MS evidence. This is not treated as an unresolved mark allocation.
+
+## Independent visual review remains open
+
+All 144 risk regions have full-size renders but remain `RENDERED_PENDING_INDEPENDENT_REVIEW`. A2 screened the 12 all-page contact sheets; it did not independently verify every mark-scheme row against a full-size original. See `VISUAL_MANIFEST.json` and `GLYPH_EXTRACTION_REVIEW.json` for the exact renders and glyph scan result.
+
+No source PDF, coursebook, syllabus, lesson, taxonomy, application code, or tracker was edited by this A2 package.

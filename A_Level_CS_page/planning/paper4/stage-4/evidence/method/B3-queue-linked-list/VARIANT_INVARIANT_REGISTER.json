@@ -1,0 +1,325 @@
+{
+  "schema_version": "s4-schema-v1-b3-submission-1",
+  "status": "SUBMITTED",
+  "batch_id": "B3-queue-linked-list",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-4/SOURCE_CAVEAT_CARRYOVER.json",
+      "sha256": "ce6679219bc092c2c4054eb8f6f9528edecd3a3f577410f0f41fb614ba7763ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    }
+  ],
+  "variants": [
+    {
+      "variant_id": "b3.variant.queue-model",
+      "pattern_ids": [
+        "QUEUE_SETUP",
+        "QUEUE_ENQUEUE",
+        "QUEUE_DEQUEUE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C15"
+      ],
+      "axis": "linear_or_circular",
+      "decision_rule": {
+        "vi": "Khóa linear/circular, tail-role và count trước khi chọn equations.",
+        "en": "Lock linear/circular, tail role and count before choosing equations."
+      },
+      "cases": [
+        {
+          "case_id": "linear_next_free",
+          "empty": "head=-1 or source value; tail=0/next free",
+          "full": "tail=capacity",
+          "live_indices": "head..tail-1 when non-empty",
+          "enqueue": "write tail; set first head; tail+=1",
+          "dequeue": "read head; head+=1 or source reset",
+          "observed_parts": [
+            "9618_w22_42_3(a)",
+            "9618_w23_41_2(a)(i)"
+          ]
+        },
+        {
+          "case_id": "linear_last_item",
+          "empty": "head=tail=-1",
+          "full": "tail=capacity-1",
+          "live_indices": "head..tail",
+          "enqueue": "advance/set tail then write",
+          "dequeue": "read head then advance/reset",
+          "observed_parts": [
+            "9618_s24_41_3(a)",
+            "9618_s25_41_1(a)"
+          ]
+        },
+        {
+          "case_id": "circular_count",
+          "empty": "count=0",
+          "full": "count=capacity",
+          "live_indices": "count items from head modulo capacity",
+          "enqueue": "write at next-free tail; wrap; count+=1",
+          "dequeue": "read head; wrap; count-=1",
+          "observed_parts": [
+            "9618_s22_41_3(a)",
+            "9618_s23_42_2(b)"
+          ]
+        }
+      ],
+      "invariant": "Logical size and live order agree with head/tail/count; wrap occurs only in circular case.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b3.variant.queue-results",
+      "pattern_ids": [
+        "QUEUE_ENQUEUE",
+        "QUEUE_DEQUEUE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "return_and_empty_contract",
+      "decision_rule": {
+        "vi": "Lấy value, type và output/return từ từng QP; không chuẩn hóa giữa papers.",
+        "en": "Take value, type and output/return from each QP; do not normalise across papers."
+      },
+      "cases": [
+        {
+          "case_id": "boolean_or_string_false",
+          "contract": "Boolean success/failure or source string FALSE",
+          "observed_parts": [
+            "9618_s22_41_3(b)",
+            "9618_s22_41_3(c)"
+          ]
+        },
+        {
+          "case_id": "numeric",
+          "contract": "1/-1 or integer -1 as explicitly stated",
+          "observed_parts": [
+            "9618_s23_42_2(c)",
+            "9618_s25_43_1(c)"
+          ]
+        },
+        {
+          "case_id": "empty_record_or_message",
+          "contract": "empty record, empty string or message plus return",
+          "observed_parts": [
+            "9618_s23_42_2(d)",
+            "9618_w23_41_2(a)(iii)"
+          ]
+        }
+      ],
+      "invariant": "A branch returns/emits the exact source-defined type and literal and preserves failure state.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b3.variant.queue-processing",
+      "pattern_ids": [
+        "QUEUE_INSPECT",
+        "QUEUE_REDUCE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "destructive_or_readonly",
+      "decision_rule": {
+        "vi": "Chọn traversal theo hậu trạng thái queue mà QP yêu cầu.",
+        "en": "Choose traversal from the queue post-state required by the QP."
+      },
+      "cases": [
+        {
+          "case_id": "inspect_readonly",
+          "mutation": "none",
+          "termination": "live range end",
+          "observed_parts": [
+            "9618_w24_42_2(d)"
+          ]
+        },
+        {
+          "case_id": "recursive_readonly",
+          "mutation": "none",
+          "termination": "base index",
+          "observed_parts": [
+            "9618_w22_42_3(d)"
+          ]
+        },
+        {
+          "case_id": "dequeue_consume",
+          "mutation": "queue consumed",
+          "termination": "exact empty sentinel",
+          "observed_parts": [
+            "9618_s25_43_1(e)(i)",
+            "9618_w25_43_2(e)"
+          ]
+        }
+      ],
+      "invariant": "Every source item contributes once; readonly variants preserve state and consume variants follow their Dequeue contract.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b3.variant.list-representation",
+      "pattern_ids": [
+        "LIST_SETUP",
+        "LIST_TRAVERSE",
+        "LIST_INSERT",
+        "LIST_REMOVE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C17"
+      ],
+      "axis": "array_or_objects",
+      "decision_rule": {
+        "vi": "Giữ riêng index/null/free-list của array và reference/None của object.",
+        "en": "Keep array index/null/free-list rules separate from object reference/None rules."
+      },
+      "cases": [
+        {
+          "case_id": "array_records",
+          "node": "record or two columns",
+          "null": "-1",
+          "allocation": "linked free list",
+          "observed_parts": [
+            "9618_s21_41_1(b)",
+            "9618_w24_41_3(a)"
+          ]
+        },
+        {
+          "case_id": "object_nodes",
+          "node": "object reference",
+          "null": "None/null",
+          "allocation": "construct object; no array free list",
+          "observed_parts": [
+            "9618_s25_43_3(b)(i)"
+          ]
+        }
+      ],
+      "invariant": "Following head/Next visits exactly the live chain; array slots partition into live and free sets.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b3.variant.list-insert-position",
+      "pattern_ids": [
+        "LIST_INSERT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "front_or_tail",
+      "decision_rule": {
+        "vi": "Chọn link commit theo vị trí được yêu cầu sau khi node mới đã hợp lệ.",
+        "en": "Choose the link commit from the requested position after the new node is valid."
+      },
+      "cases": [
+        {
+          "case_id": "front",
+          "links": "new.Next=old head; head=new",
+          "observed_parts": [
+            "9618_w24_41_3(b)",
+            "9618_s25_43_3(b)(ii)"
+          ]
+        },
+        {
+          "case_id": "tail",
+          "links": "find tail; tail.Next=new; new.Next=null; empty updates head",
+          "observed_parts": [
+            "9618_s21_41_1(d)(i)"
+          ]
+        }
+      ],
+      "invariant": "Old live order is preserved and new node appears exactly once at the requested end.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b3.variant.list-remove-case",
+      "pattern_ids": [
+        "LIST_REMOVE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "head_interior_tail_absent",
+      "decision_rule": {
+        "vi": "Phân nhánh theo current=head, predecessor tồn tại và absence contract.",
+        "en": "Branch on current=head, predecessor existence and the absence contract."
+      },
+      "cases": [
+        {
+          "case_id": "head",
+          "unlink": "head=current.Next"
+        },
+        {
+          "case_id": "interior_or_tail",
+          "unlink": "previous.Next=current.Next"
+        },
+        {
+          "case_id": "absent",
+          "unlink": "none; false only when source permits"
+        }
+      ],
+      "invariant": "Successful removal decreases live reachability by one; failure preserves state; recycling happens only after unlink.",
+      "method_changing": true
+    }
+  ],
+  "self_checks": {
+    "variant_count": 6,
+    "patterns_covered": [
+      "LIST_INSERT",
+      "LIST_REMOVE",
+      "LIST_SETUP",
+      "LIST_TRAVERSE",
+      "QUEUE_DEQUEUE",
+      "QUEUE_ENQUEUE",
+      "QUEUE_INSPECT",
+      "QUEUE_REDUCE",
+      "QUEUE_SETUP"
+    ]
+  }
+}

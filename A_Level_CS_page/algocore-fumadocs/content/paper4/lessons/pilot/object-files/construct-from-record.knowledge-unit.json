@@ -1,0 +1,141 @@
+{
+  "schema_version": "2.0.0",
+  "artifact_type": "KnowledgeUnit",
+  "record": {
+    "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.object-files.knowledge.construct-from-record",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.object-files",
+    "stage3_block_ids": [
+      "ac-9618-p4-2026-python.lesson.object-files.knowledge.construct-from-record"
+    ],
+    "disposition": "publish",
+    "version": "2.0.0-pilot.1",
+    "objective_refs": [
+      {
+        "objective_id": "SYL-20.2-05",
+        "syllabus_version": "2026",
+        "locator": {
+          "source_id": "syllabus_2026_v2",
+          "pdf_page": 38,
+          "printed_page": "38",
+          "heading": "File Processing and Exception Handling",
+          "bullet_locator": "File note 2, read facet",
+          "anchor_text": "Read a record from a file and write a record to a file"
+        }
+      }
+    ],
+    "book_refs": [
+      {
+        "section_id": "BOOK-20-FILE-RECORDS",
+        "chapter": 20,
+        "printed_pages": [
+          526,
+          527,
+          528
+        ],
+        "pdf_pages": [
+          542,
+          543,
+          544
+        ],
+        "relationship": "component_foundation"
+      },
+      {
+        "section_id": "BOOK-20-CONSTRUCTORS",
+        "chapter": 20,
+        "printed_pages": [
+          515,
+          516
+        ],
+        "pdf_pages": [
+          531,
+          532
+        ],
+        "relationship": "component_foundation"
+      }
+    ],
+    "title": {
+      "en": "Constructing an object from each record",
+      "vi": "Tạo đối tượng từ từng bản ghi"
+    },
+    "explanation": {
+      "vi": "Đọc record từ tệp gồm parse trường, kiểm tra số lượng/kiểu, chuyển kiểu rồi gọi constructor theo đúng thứ tự tham số. Chỉ append object sau khi toàn bộ record hợp lệ để tránh state nửa hoàn chỉnh.",
+      "en": "Reading a file record involves parsing fields, checking count/types, converting values, then calling the constructor in the required parameter order. Append the object only after the complete record is valid to avoid partial state."
+    },
+    "python_connection": {
+      "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L075–L081 dispatch theo discriminator `BOOK`/`EBOOK`; L077 hoặc L079 gọi đúng constructor, rồi L082–L083 append và ghi loại object đã tạo.",
+      "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L075-L081 dispatch on the `BOOK`/`EBOOK` discriminator; L077 or L079 calls the matching constructor, then L082-L083 append and record the constructed object type."
+    },
+    "representation": {
+      "vi": "Dùng pipeline `CSV fields -> validated typed values -> constructor arguments -> object list`; ghi line number cạnh record để truy lỗi.",
+      "en": "Use a pipeline `CSV fields -> validated typed values -> constructor arguments -> object list`; retain the line number for error tracing."
+    },
+    "invariant_or_rule": {
+      "vi": "Mỗi accepted record tạo đúng một object; constructor nhận đúng thứ tự/kiểu; record lỗi không tạo object và trả failure rõ.",
+      "en": "Each accepted record creates exactly one object; constructor arguments have the correct order/types; an invalid record creates no object and yields an explicit failure."
+    },
+    "misconceptions": [
+      {
+        "vi": "Append object trước khi chuyển kiểu hoàn tất.",
+        "en": "Appending an object before conversion completes."
+      },
+      {
+        "vi": "Đảo `title` và `pages` khi gọi constructor.",
+        "en": "Swapping `title` and `pages` in the constructor call."
+      }
+    ],
+    "exam_signals": [
+      {
+        "vi": "Đề mô tả file record và yêu cầu tạo array/list object.",
+        "en": "The task describes file records and asks for an array/list of objects."
+      },
+      {
+        "vi": "Có bước convert field string sang integer/real/date.",
+        "en": "A field string must be converted to integer/real/date."
+      }
+    ],
+    "micro_example": {
+      "scenario": {
+        "vi": "Đọc hai dòng `BOOK,Algorithms,320` và `EBOOK,Networks,240,PDF`.",
+        "en": "Read `BOOK,Algorithms,320` and `EBOOK,Networks,240,PDF`."
+      },
+      "walkthrough": {
+        "vi": "Đổi field pages sang int, tạo `Book('Algorithms',320)` và `EBook('Networks',240,'PDF')`, rồi append mỗi object đúng một lần.",
+        "en": "Convert each pages field to int, construct `Book('Algorithms',320)` and `EBook('Networks',240,'PDF')`, then append each object exactly once."
+      },
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.object-files.pilot-v1",
+      "python_artifact_refs": [
+        "ac-9618-p4-2026-python.artifact.object-files.pilot-v1"
+      ],
+      "active_line_ids": [
+        "object-files.v1.L018",
+        "object-files.v1.L073",
+        "object-files.v1.L074",
+        "object-files.v1.L075",
+        "object-files.v1.L077",
+        "object-files.v1.L079",
+        "object-files.v1.L082",
+        "object-files.v1.L083"
+      ],
+      "authority": "AlgoCore_authored_teaching_example"
+    },
+    "self_check": {
+      "prompt": {
+        "vi": "Vì sao L077/L079 nằm sau conversion L074?",
+        "en": "Why do L077/L079 come after conversion at L074?"
+      },
+      "answer": {
+        "vi": "Để cả hai constructor chỉ nhận `pages` đã chuyển thành int thành công.",
+        "en": "So both constructors receive `pages` only after successful integer conversion."
+      },
+      "rationale": {
+        "vi": "Validation và dispatch trước mutation giữ list object nhất quán.",
+        "en": "Validation and dispatch before mutation keep the object list consistent."
+      },
+      "answer_hidden_initially": true,
+      "authority": "AlgoCore_authored_self_check"
+    },
+    "author": "AlgoCore A2 bilingual theory author",
+    "reviewer": "PENDING_A1_A6_A7_A8",
+    "status": "draft"
+  }
+}

@@ -1,0 +1,7 @@
+# A0 addendum — B21 A4 v4 retest source mark finding
+
+Date: 2026-09-21. This addendum supplements, but does not edit, `B21_A4_V4_RETEST_DISPATCH.md` (frozen SHA256 `665cdc89b2ab44205b2a41f5d16bfd3fea9b87c05a6e3fd7f6611834b929388e`).
+
+Independent A3 review of the same frozen candidate `B21-A2-v4` returned CHANGES_REQUIRED for A3 gate on Major `A3-B21-MARK-01`. Original source: `Past_Papers/2021/Oct_Nov/9618_w21_qp_12.pdf`, SHA256 `9fa28bfd27645df25197c518aa07573c14ea301a3fe024c23b03c28dadea7b36`, PDF page 2; full-page source render SHA256 `37e7e589bbae1bf665617f1336a6c5b4f2d5f39f08f694bc071e49a7428102f1`. The original page displays Q1 `[2]`; candidate row `9618_w21_qp_12-q1` has a null displayed mark and no child part. A0 previously rendered and inspected the source page; see `evidence/a0/B21_W21QP12_P2_SOURCE.png` and `evidence/a0/B21_MARK_SOURCE_SPOTCHECK_V4.json` (both are pinned in the A3 v4 handoff).
+
+A4 reviewer: independently inspect this exact candidate record against the original source, decide whether the displayed-mark/linkage criterion passes, and record any source-supported disposition without inferring an MS allocation. Preserve the A4 gate-only remit, do not modify the candidate, and report CHANGES_REQUIRED if the missing displayed mark remains. A3 handoff SHA256: `551a2e875239c8ead27988044e43de59ba6029260ca4e8d2d5845a40e14bc11e`. Output allowlist remains `evidence/a4/B21/retest_v4/`; stop after frozen handoff for A0 audit.

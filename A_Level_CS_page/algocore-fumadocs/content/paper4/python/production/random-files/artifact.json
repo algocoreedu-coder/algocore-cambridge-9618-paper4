@@ -1,0 +1,326 @@
+{
+  "author_run_ref": "p4r3.a3.random-files.production-v1.author-run",
+  "caption": {
+    "en": "Fixed records, byte offsets and direct updates.",
+    "vi": "Record cố định, byte offset và cập nhật trực tiếp."
+  },
+  "code_sha256": "eaea76a54a54c166a2b0254c1206545703bb8412aa57459400c37a522bc80a89",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "998e533d4ecd227f13594b8b623c684ea5f240c27b06acd911a67dd45053e66d",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "random-files.normal.expected-output",
+      "fixture_ref": "random-files.normal",
+      "value": {
+        "byte_length": 24,
+        "neighbours_unchanged": true,
+        "new": "DELTA",
+        "old": "BETA",
+        "status": "UPDATED",
+        "trace": [
+          {
+            "event": "seek_read",
+            "offset": 8
+          },
+          {
+            "event": "seek_write",
+            "offset": 8
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "random-files.boundary.expected-output",
+      "fixture_ref": "random-files.boundary",
+      "value": {
+        "byte_length": 10,
+        "neighbours_unchanged": true,
+        "new": "Z",
+        "old": "12345",
+        "status": "UPDATED",
+        "trace": [
+          {
+            "event": "seek_read",
+            "offset": 5
+          },
+          {
+            "event": "seek_write",
+            "offset": 5
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "random-files.failure.expected-output",
+      "fixture_ref": "random-files.failure",
+      "value": {
+        "byte_length": 8,
+        "message": "short read",
+        "status": "ADDRESS_ERROR",
+        "trace": [
+          {
+            "event": "reject_address"
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/random-files/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "random-files.normal",
+      "input": {
+        "address": 1,
+        "record_size": 8,
+        "records": [
+          "ALPHA",
+          "BETA",
+          "GAMMA"
+        ],
+        "replacement": "DELTA"
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "random-files.boundary",
+      "input": {
+        "address": 1,
+        "record_size": 5,
+        "records": [
+          "A",
+          "12345"
+        ],
+        "replacement": "Z"
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "random-files.failure",
+      "input": {
+        "address": 3,
+        "record_size": 4,
+        "records": [
+          "ONE",
+          "TWO"
+        ],
+        "replacement": "BAD"
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.random-files.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.random-files",
+  "lines": [
+    {
+      "line_id": "random-files.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "random-files.production-v1.L002",
+      "order": 2,
+      "text": "from io import BytesIO"
+    },
+    {
+      "line_id": "random-files.production-v1.L003",
+      "order": 3,
+      "text": ""
+    },
+    {
+      "line_id": "random-files.production-v1.L004",
+      "order": 4,
+      "text": "def pack(value, size):"
+    },
+    {
+      "line_id": "random-files.production-v1.L005",
+      "order": 5,
+      "text": "    raw = value.encode(\"ascii\")"
+    },
+    {
+      "line_id": "random-files.production-v1.L006",
+      "order": 6,
+      "text": "    if len(raw) > size: raise ValueError(\"record too long\")"
+    },
+    {
+      "line_id": "random-files.production-v1.L007",
+      "order": 7,
+      "text": "    return raw.ljust(size, b\" \")"
+    },
+    {
+      "line_id": "random-files.production-v1.L008",
+      "order": 8,
+      "text": ""
+    },
+    {
+      "line_id": "random-files.production-v1.L009",
+      "order": 9,
+      "text": "def read_record(handle, address, size):"
+    },
+    {
+      "line_id": "random-files.production-v1.L010",
+      "order": 10,
+      "text": "    if address < 0: raise ValueError(\"negative address\")"
+    },
+    {
+      "line_id": "random-files.production-v1.L011",
+      "order": 11,
+      "text": "    handle.seek(address * size); raw = handle.read(size)"
+    },
+    {
+      "line_id": "random-files.production-v1.L012",
+      "order": 12,
+      "text": "    if len(raw) != size: raise EOFError(\"short read\")"
+    },
+    {
+      "line_id": "random-files.production-v1.L013",
+      "order": 13,
+      "text": "    return raw.rstrip(b\" \").decode(\"ascii\")"
+    },
+    {
+      "line_id": "random-files.production-v1.L014",
+      "order": 14,
+      "text": ""
+    },
+    {
+      "line_id": "random-files.production-v1.L015",
+      "order": 15,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "random-files.production-v1.L016",
+      "order": 16,
+      "text": "    size, trace = fixture[\"record_size\"], []"
+    },
+    {
+      "line_id": "random-files.production-v1.L017",
+      "order": 17,
+      "text": "    try: raw = b\"\".join(pack(value, size) for value in fixture[\"records\"])"
+    },
+    {
+      "line_id": "random-files.production-v1.L018",
+      "order": 18,
+      "text": "    except (UnicodeError, ValueError) as error: return {\"status\": \"INVALID_RECORD\", \"message\": str(error), \"trace\": [{\"event\": \"pack_reject\"}]}"
+    },
+    {
+      "line_id": "random-files.production-v1.L019",
+      "order": 19,
+      "text": "    handle, before = BytesIO(raw), raw"
+    },
+    {
+      "line_id": "random-files.production-v1.L020",
+      "order": 20,
+      "text": "    try:"
+    },
+    {
+      "line_id": "random-files.production-v1.L021",
+      "order": 21,
+      "text": "        old = read_record(handle, fixture[\"address\"], size)"
+    },
+    {
+      "line_id": "random-files.production-v1.L022",
+      "order": 22,
+      "text": "        replacement = pack(fixture[\"replacement\"], size)"
+    },
+    {
+      "line_id": "random-files.production-v1.L023",
+      "order": 23,
+      "text": "        handle.seek(fixture[\"address\"] * size); handle.write(replacement)"
+    },
+    {
+      "line_id": "random-files.production-v1.L024",
+      "order": 24,
+      "text": "        after = handle.getvalue(); new = read_record(handle, fixture[\"address\"], size)"
+    },
+    {
+      "line_id": "random-files.production-v1.L025",
+      "order": 25,
+      "text": "        neighbours_unchanged = before[:fixture[\"address\"]*size] == after[:fixture[\"address\"]*size] and before[(fixture[\"address\"]+1)*size:] == after[(fixture[\"address\"]+1)*size:]"
+    },
+    {
+      "line_id": "random-files.production-v1.L026",
+      "order": 26,
+      "text": "        trace += [{\"event\": \"seek_read\", \"offset\": fixture[\"address\"] * size}, {\"event\": \"seek_write\", \"offset\": fixture[\"address\"] * size}]"
+    },
+    {
+      "line_id": "random-files.production-v1.L027",
+      "order": 27,
+      "text": "        return {\"status\": \"UPDATED\", \"old\": old, \"new\": new, \"byte_length\": len(after), \"neighbours_unchanged\": neighbours_unchanged, \"trace\": trace}"
+    },
+    {
+      "line_id": "random-files.production-v1.L028",
+      "order": 28,
+      "text": "    except (EOFError, UnicodeError, ValueError) as error:"
+    },
+    {
+      "line_id": "random-files.production-v1.L029",
+      "order": 29,
+      "text": "        return {\"status\": \"ADDRESS_ERROR\", \"message\": str(error), \"byte_length\": len(before), \"trace\": [{\"event\": \"reject_address\"}]}"
+    },
+    {
+      "line_id": "random-files.production-v1.L030",
+      "order": 30,
+      "text": ""
+    },
+    {
+      "line_id": "random-files.production-v1.L031",
+      "order": 31,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "random-files.production-v1.L032",
+      "order": 32,
+      "text": "    import json"
+    },
+    {
+      "line_id": "random-files.production-v1.L033",
+      "order": 33,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "random-files.production-v1.L034",
+      "order": 34,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "random-files.production-v1.L035",
+      "order": 35,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "random-files.production-v1.L036",
+      "order": 36,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "random-files.production-v1.L037",
+      "order": 37,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "random-files.production-v1.L038",
+      "order": 38,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "random-files.production-v1.L039",
+      "order": 39,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "ALGORITHM_TRANSLATE",
+    "EVIDENCE_RUN"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.random-files.production-v1",
+  "stage5_source_refs": [],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

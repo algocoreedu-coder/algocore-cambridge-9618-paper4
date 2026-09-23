@@ -1,0 +1,936 @@
+{
+  "schema_version": "paper4-v2-trace-chunk-v1",
+  "pattern_id": "OOP_SET",
+  "owner": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.oop-state",
+    "lesson_slug": "oop-state",
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-state.production-v1",
+    "artifact_version": "production-v1",
+    "code_sha256": "d40ba5a86768a1fb1345c71ae13a8d6cb8d4650eb30a85edbf6005052e9f919b"
+  },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-state.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.oop-state",
+    "pattern_ids": [
+      "OOP_GET",
+      "OOP_SET",
+      "OOP_UPDATE"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "oop-state.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "oop-state.production-v1.L002",
+        "order": 2,
+        "text": ""
+      },
+      {
+        "line_id": "oop-state.production-v1.L003",
+        "order": 3,
+        "text": "class Account:"
+      },
+      {
+        "line_id": "oop-state.production-v1.L004",
+        "order": 4,
+        "text": "    def __init__(self, balance, limit): self.__balance, self.__limit = balance, limit"
+      },
+      {
+        "line_id": "oop-state.production-v1.L005",
+        "order": 5,
+        "text": "    def get_balance(self): return self.__balance"
+      },
+      {
+        "line_id": "oop-state.production-v1.L006",
+        "order": 6,
+        "text": "    def set_balance(self, value):"
+      },
+      {
+        "line_id": "oop-state.production-v1.L007",
+        "order": 7,
+        "text": "        if not 0 <= value <= self.__limit: return False"
+      },
+      {
+        "line_id": "oop-state.production-v1.L008",
+        "order": 8,
+        "text": "        self.__balance = value; return True"
+      },
+      {
+        "line_id": "oop-state.production-v1.L009",
+        "order": 9,
+        "text": "    def apply_change(self, delta): return self.set_balance(self.__balance + delta)"
+      },
+      {
+        "line_id": "oop-state.production-v1.L010",
+        "order": 10,
+        "text": ""
+      },
+      {
+        "line_id": "oop-state.production-v1.L011",
+        "order": 11,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "oop-state.production-v1.L012",
+        "order": 12,
+        "text": "    account, trace = Account(fixture[\"start\"], fixture[\"limit\"]), []"
+      },
+      {
+        "line_id": "oop-state.production-v1.L013",
+        "order": 13,
+        "text": "    old = account.get_balance()"
+      },
+      {
+        "line_id": "oop-state.production-v1.L014",
+        "order": 14,
+        "text": "    setter_ok = account.set_balance(fixture[\"replacement\"])"
+      },
+      {
+        "line_id": "oop-state.production-v1.L015",
+        "order": 15,
+        "text": "    trace.append({\"event\": \"setter\", \"success\": setter_ok, \"balance\": account.get_balance()})"
+      },
+      {
+        "line_id": "oop-state.production-v1.L016",
+        "order": 16,
+        "text": "    before_update = account.get_balance()"
+      },
+      {
+        "line_id": "oop-state.production-v1.L017",
+        "order": 17,
+        "text": "    update_ok = account.apply_change(fixture[\"delta\"])"
+      },
+      {
+        "line_id": "oop-state.production-v1.L018",
+        "order": 18,
+        "text": "    trace.append({\"event\": \"rule_update\", \"success\": update_ok, \"balance\": account.get_balance()})"
+      },
+      {
+        "line_id": "oop-state.production-v1.L019",
+        "order": 19,
+        "text": "    return {\"status\": \"OK\", \"old\": old, \"balance\": account.get_balance(), \"setter_ok\": setter_ok, \"update_ok\": update_ok, \"preserved_after_failed_update\": update_ok or account.get_balance() == before_update, \"trace\": trace}"
+      },
+      {
+        "line_id": "oop-state.production-v1.L020",
+        "order": 20,
+        "text": ""
+      },
+      {
+        "line_id": "oop-state.production-v1.L021",
+        "order": 21,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "oop-state.production-v1.L022",
+        "order": 22,
+        "text": "    import json"
+      },
+      {
+        "line_id": "oop-state.production-v1.L023",
+        "order": 23,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "oop-state.production-v1.L024",
+        "order": 24,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "oop-state.production-v1.L025",
+        "order": 25,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "oop-state.production-v1.L026",
+        "order": 26,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "oop-state.production-v1.L027",
+        "order": 27,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "oop-state.production-v1.L028",
+        "order": 28,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "oop-state.production-v1.L029",
+        "order": 29,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "d40ba5a86768a1fb1345c71ae13a8d6cb8d4650eb30a85edbf6005052e9f919b",
+    "caption": {
+      "en": "Encapsulation through getters, setters and rule updates.",
+      "vi": "Encapsulation bằng getter, setter và rule update."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.oop-state.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.oop-state.production-v1.independent-rerun",
+      "execution_log_sha256": "2e56133a61aae6a729a1a68837d5a7be1a691d93284548db3080ee1c85c1bc7b"
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.oop-state.oop-set.boundary.production-v1",
+      "case_kind": "boundary",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-state.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "oop-state.boundary",
+        "fixture_input": {
+          "delta": 0,
+          "limit": 100,
+          "replacement": 100,
+          "start": 0
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1.event-002"
+      ],
+      "expected_output_ref": "oop-state.boundary.expected-output",
+      "fixture_ref": "oop-state.boundary"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.oop-state.oop-set.failure.production-v1",
+      "case_kind": "failure",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-state.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "oop-state.failure",
+        "fixture_input": {
+          "delta": 60,
+          "limit": 100,
+          "replacement": 50,
+          "start": 30
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1.event-002"
+      ],
+      "expected_output_ref": "oop-state.failure.expected-output",
+      "fixture_ref": "oop-state.failure"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.oop-state.oop-set.normal.production-v1",
+      "case_kind": "normal",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-state.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "oop-state.normal",
+        "fixture_input": {
+          "delta": 10,
+          "limit": 100,
+          "replacement": 40,
+          "start": 20
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1.event-002"
+      ],
+      "expected_output_ref": "oop-state.normal.expected-output",
+      "fixture_ref": "oop-state.normal"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1",
+      "sequence": 0,
+      "event_type": "write",
+      "active_line_ids": [
+        "oop-state.production-v1.L015",
+        "oop-state.production-v1.L018",
+        "oop-state.production-v1.L014"
+      ],
+      "before": {
+        "fixture_ref": "oop-state.boundary",
+        "fixture_input": {
+          "delta": 0,
+          "limit": 100,
+          "replacement": 100,
+          "start": 0
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "balance": 100,
+          "event": "setter",
+          "success": true
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "oop-state.boundary",
+        "fixture_input": {
+          "delta": 0,
+          "limit": 100,
+          "replacement": 100,
+          "start": 0
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "balance": 100,
+            "event": "setter",
+            "success": true
+          }
+        ],
+        "latest_event": "setter",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "balance": 100,
+          "event": "setter",
+          "success": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "OOP_SET: sự kiện setter phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "OOP_SET: event setter must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
+        "en": "Which value will be written or updated? (setter)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: setter.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
+      },
+      "visual_targets": [
+        "visual.oop-set.state",
+        "visual.oop-set.setter"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: setter",
+          "en": "Step 1: setter"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
+          "en": "Which value will be written or updated? (setter)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: setter.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1",
+      "sequence": 1,
+      "event_type": "write",
+      "active_line_ids": [
+        "oop-state.production-v1.L018",
+        "oop-state.production-v1.L015",
+        "oop-state.production-v1.L016",
+        "oop-state.production-v1.L019"
+      ],
+      "before": {
+        "fixture_ref": "oop-state.boundary",
+        "fixture_input": {
+          "delta": 0,
+          "limit": 100,
+          "replacement": 100,
+          "start": 0
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "balance": 100,
+            "event": "setter",
+            "success": true
+          }
+        ],
+        "latest_event": "setter",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "balance": 100,
+          "event": "rule_update",
+          "success": true
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "oop-state.boundary",
+        "fixture_input": {
+          "delta": 0,
+          "limit": 100,
+          "replacement": 100,
+          "start": 0
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "balance": 100,
+            "event": "setter",
+            "success": true
+          },
+          {
+            "balance": 100,
+            "event": "rule_update",
+            "success": true
+          }
+        ],
+        "latest_event": "rule_update",
+        "execution_status": "OK",
+        "verified_result": {
+          "balance": 100,
+          "old": 0,
+          "preserved_after_failed_update": true,
+          "setter_ok": true,
+          "status": "OK",
+          "update_ok": true
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "balance": 100,
+          "event": "rule_update",
+          "success": true
+        },
+        "final_result": {
+          "balance": 100,
+          "old": 0,
+          "preserved_after_failed_update": true,
+          "setter_ok": true,
+          "status": "OK",
+          "update_ok": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "OOP_SET: sự kiện rule_update phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "OOP_SET: event rule_update must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
+        "en": "Which value will be written or updated? (rule update)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: rule update.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
+      },
+      "visual_targets": [
+        "visual.oop-set.state",
+        "visual.oop-set.rule-update"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: rule_update",
+          "en": "Step 2: rule_update"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
+          "en": "Which value will be written or updated? (rule update)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.oop-state.oop-set.boundary.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: rule update.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1",
+      "sequence": 0,
+      "event_type": "write",
+      "active_line_ids": [
+        "oop-state.production-v1.L015",
+        "oop-state.production-v1.L018",
+        "oop-state.production-v1.L014"
+      ],
+      "before": {
+        "fixture_ref": "oop-state.failure",
+        "fixture_input": {
+          "delta": 60,
+          "limit": 100,
+          "replacement": 50,
+          "start": 30
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "balance": 50,
+          "event": "setter",
+          "success": true
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "oop-state.failure",
+        "fixture_input": {
+          "delta": 60,
+          "limit": 100,
+          "replacement": 50,
+          "start": 30
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "balance": 50,
+            "event": "setter",
+            "success": true
+          }
+        ],
+        "latest_event": "setter",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "balance": 50,
+          "event": "setter",
+          "success": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "OOP_SET: sự kiện setter phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "OOP_SET: event setter must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
+        "en": "Which value will be written or updated? (setter)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: setter.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
+      },
+      "visual_targets": [
+        "visual.oop-set.state",
+        "visual.oop-set.setter"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: setter",
+          "en": "Step 1: setter"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
+          "en": "Which value will be written or updated? (setter)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: setter.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1",
+      "sequence": 1,
+      "event_type": "write",
+      "active_line_ids": [
+        "oop-state.production-v1.L018",
+        "oop-state.production-v1.L015",
+        "oop-state.production-v1.L016",
+        "oop-state.production-v1.L019"
+      ],
+      "before": {
+        "fixture_ref": "oop-state.failure",
+        "fixture_input": {
+          "delta": 60,
+          "limit": 100,
+          "replacement": 50,
+          "start": 30
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "balance": 50,
+            "event": "setter",
+            "success": true
+          }
+        ],
+        "latest_event": "setter",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "balance": 50,
+          "event": "rule_update",
+          "success": false
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "oop-state.failure",
+        "fixture_input": {
+          "delta": 60,
+          "limit": 100,
+          "replacement": 50,
+          "start": 30
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "balance": 50,
+            "event": "setter",
+            "success": true
+          },
+          {
+            "balance": 50,
+            "event": "rule_update",
+            "success": false
+          }
+        ],
+        "latest_event": "rule_update",
+        "execution_status": "OK",
+        "verified_result": {
+          "balance": 50,
+          "old": 30,
+          "preserved_after_failed_update": true,
+          "setter_ok": true,
+          "status": "OK",
+          "update_ok": false
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "balance": 50,
+          "event": "rule_update",
+          "success": false
+        },
+        "final_result": {
+          "balance": 50,
+          "old": 30,
+          "preserved_after_failed_update": true,
+          "setter_ok": true,
+          "status": "OK",
+          "update_ok": false
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "OOP_SET: sự kiện rule_update phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "OOP_SET: event rule_update must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
+        "en": "Which value will be written or updated? (rule update)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: rule update.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
+      },
+      "visual_targets": [
+        "visual.oop-set.state",
+        "visual.oop-set.rule-update"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: rule_update",
+          "en": "Step 2: rule_update"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
+          "en": "Which value will be written or updated? (rule update)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.oop-state.oop-set.failure.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: rule update.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1",
+      "sequence": 0,
+      "event_type": "write",
+      "active_line_ids": [
+        "oop-state.production-v1.L015",
+        "oop-state.production-v1.L018",
+        "oop-state.production-v1.L014"
+      ],
+      "before": {
+        "fixture_ref": "oop-state.normal",
+        "fixture_input": {
+          "delta": 10,
+          "limit": 100,
+          "replacement": 40,
+          "start": 20
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "balance": 40,
+          "event": "setter",
+          "success": true
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "oop-state.normal",
+        "fixture_input": {
+          "delta": 10,
+          "limit": 100,
+          "replacement": 40,
+          "start": 20
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "balance": 40,
+            "event": "setter",
+            "success": true
+          }
+        ],
+        "latest_event": "setter",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "balance": 40,
+          "event": "setter",
+          "success": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "OOP_SET: sự kiện setter phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "OOP_SET: event setter must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
+        "en": "Which value will be written or updated? (setter)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: setter.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
+      },
+      "visual_targets": [
+        "visual.oop-set.state",
+        "visual.oop-set.setter"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: setter",
+          "en": "Step 1: setter"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
+          "en": "Which value will be written or updated? (setter)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: setter.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1",
+      "sequence": 1,
+      "event_type": "write",
+      "active_line_ids": [
+        "oop-state.production-v1.L018",
+        "oop-state.production-v1.L015",
+        "oop-state.production-v1.L016",
+        "oop-state.production-v1.L019"
+      ],
+      "before": {
+        "fixture_ref": "oop-state.normal",
+        "fixture_input": {
+          "delta": 10,
+          "limit": 100,
+          "replacement": 40,
+          "start": 20
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "balance": 40,
+            "event": "setter",
+            "success": true
+          }
+        ],
+        "latest_event": "setter",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "balance": 50,
+          "event": "rule_update",
+          "success": true
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "oop-state.normal",
+        "fixture_input": {
+          "delta": 10,
+          "limit": 100,
+          "replacement": 40,
+          "start": 20
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "balance": 40,
+            "event": "setter",
+            "success": true
+          },
+          {
+            "balance": 50,
+            "event": "rule_update",
+            "success": true
+          }
+        ],
+        "latest_event": "rule_update",
+        "execution_status": "OK",
+        "verified_result": {
+          "balance": 50,
+          "old": 20,
+          "preserved_after_failed_update": true,
+          "setter_ok": true,
+          "status": "OK",
+          "update_ok": true
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "balance": 50,
+          "event": "rule_update",
+          "success": true
+        },
+        "final_result": {
+          "balance": 50,
+          "old": 20,
+          "preserved_after_failed_update": true,
+          "setter_ok": true,
+          "status": "OK",
+          "update_ok": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "OOP_SET: sự kiện rule_update phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "OOP_SET: event rule_update must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
+        "en": "Which value will be written or updated? (rule update)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: rule update.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
+      },
+      "visual_targets": [
+        "visual.oop-set.state",
+        "visual.oop-set.rule-update"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: rule_update",
+          "en": "Step 2: rule_update"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
+          "en": "Which value will be written or updated? (rule update)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.oop-state.oop-set.normal.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: rule update.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
+          }
+        }
+      }
+    }
+  ]
+}

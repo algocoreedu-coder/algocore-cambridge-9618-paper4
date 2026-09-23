@@ -1,0 +1,190 @@
+{
+  "schema_version": "s4-schema-v1-b7-submission-1",
+  "status": "SUBMITTED",
+  "batch_id": "B7-files",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-1/SOURCE_ISSUES.json",
+      "sha256": "7e9a8677b345327847d52a2aa88f293dc6898ef17944a63e6e05bb99daf9f588"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    },
+    {
+      "path": "stage-4/SOURCE_ADJUDICATIONS.json",
+      "sha256": "a52fc89677a5d5d0b873e2930b2b80545b4be71db5ea22a0e21c434389ebfd5e"
+    }
+  ],
+  "variants": [
+    {
+      "variant_id": "b7.variant.file-read-array",
+      "pattern_ids": [
+        "FILE_READ_ARRAY"
+      ],
+      "stage2_contrast_refs": [
+        "A3C18"
+      ],
+      "axis": "line_count;record_layout;destination;error_handling",
+      "decision_rule": {
+        "vi": "Chốt record grammar và termination trước khi đọc; chỉ commit sau khi đủ line, convert đúng type và còn capacity.",
+        "en": "Fix record grammar and termination before reading; commit only after all lines exist, conversions succeed and capacity remains."
+      },
+      "cases": [
+        {
+          "case_id": "fixed-record-count",
+          "description": "read exactly the source-stated number of complete records",
+          "observed_parts": []
+        },
+        {
+          "case_id": "eof-driven",
+          "description": "stop at EOF without committing a partial final record",
+          "observed_parts": []
+        },
+        {
+          "case_id": "adt-destination",
+          "description": "call the supplied destination operation once per complete converted record",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+      "invariant_bilingual": {
+        "vi": "Mỗi destination item đã commit tương ứng đúng một record nguồn hoàn chỉnh theo file order; count không vượt capacity và không read ngoài khoảng file mở.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "method_changing": true
+    },
+    {
+      "variant_id": "b7.variant.file-read-objects",
+      "pattern_ids": [
+        "FILE_READ_OBJECTS"
+      ],
+      "stage2_contrast_refs": [
+        "A3C18"
+      ],
+      "axis": "fixed_or_variable_record;subclass_dispatch;create_or_update",
+      "decision_rule": {
+        "vi": "Phân loại create, subclass-dispatch hay lookup-update trước; parse đủ typed record rồi mới construct/update và commit.",
+        "en": "Classify create, subclass-dispatch or lookup-update first; parse the complete typed record before constructing/updating and committing."
+      },
+      "cases": [
+        {
+          "case_id": "fixed-object-record",
+          "description": "group fixed lines and construct one object in exact parameter order",
+          "observed_parts": []
+        },
+        {
+          "case_id": "subclass-dispatch",
+          "description": "a discriminator selects one permitted subtype",
+          "observed_parts": []
+        },
+        {
+          "case_id": "lookup-update",
+          "description": "a record key locates one existing object and changes source-stated fields",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+      "invariant_bilingual": {
+        "vi": "Mỗi record thành công tạo đúng một object hợp lệ hoặc cập nhật đúng một target; partial object không vào destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "method_changing": true
+    },
+    {
+      "variant_id": "b7.variant.file-write",
+      "pattern_ids": [
+        "FILE_WRITE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "append_or_write;provided_or_created_file;physical_or_logical_order",
+      "decision_rule": {
+        "vi": "Chốt append hay overwrite và physical hay logical order trước khi format bất kỳ dòng nào.",
+        "en": "Fix append versus overwrite and physical versus logical order before formatting any line."
+      },
+      "cases": [
+        {
+          "case_id": "overwrite-new-file",
+          "description": "new target contains only the required formatted records",
+          "observed_parts": []
+        },
+        {
+          "case_id": "append-existing",
+          "description": "existing prefix remains and new records form an exact suffix",
+          "observed_parts": []
+        },
+        {
+          "case_id": "physical-tree-rows",
+          "description": "write backing rows as triples when explicitly required, not traversal order",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+      "invariant_bilingual": {
+        "vi": "Output suffix chứa đúng records được chọn theo order/format nguồn; append giữ prefix cũ còn overwrite tuân hợp đồng file mới.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "method_changing": true
+    }
+  ],
+  "self_checks": {
+    "variant_count": 3,
+    "method_changing": 3
+  }
+}

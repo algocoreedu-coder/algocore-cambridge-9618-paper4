@@ -1,0 +1,172 @@
+{
+  "schema_version": "s8-independent-recheck-v1",
+  "stage": 8,
+  "wave": "S8-C",
+  "input_release_id": "paper4-2026-s7-v1",
+  "input_manifest_sha256": "3ed03798f614b22307e07034ec36326af13cda58fd68dc6fd65dd3feb73cb01f",
+  "runtime_registry_sha256": "4a5a9b154d2b1de8197d42c7c900e2cd738238ddaddac9842ccd40246e2ffc34",
+  "implementation_owner": "A2_VISUAL_SYSTEM_ENGINEER",
+  "independent_reviewers": ["A6_BILINGUAL_ACCESSIBILITY_EDITOR", "A7_PEDAGOGY_UX_REVIEWER"],
+  "review_timestamp": "2026-09-22T15:20:00+07:00",
+  "reviewed_source_hashes": {
+    "Paper4VisualRuntime.tsx": "5fbda9b6840ed68f93f4404ab519d81e552a65941dcfb943fc28cd34206c07c0",
+    "reducer.ts": "1d7690e3233d44860686ae7ed167affb33dec1c6ff765594f31dcd7ace64b925",
+    "Paper4VisualRuntime.module.css": "ac12884874cea110ec41e8b47435a8414872dd784bba433f06818433bc611ae1"
+  },
+  "evidence_basis": {
+    "a2_resubmission": "evidence/s8-b/S8B_SELF_VALIDATION.json",
+    "source_review": [
+      "algocore-fumadocs/app/components/paper4-visual/Paper4VisualRuntime.tsx",
+      "algocore-fumadocs/app/components/paper4-visual/Paper4VisualRuntime.module.css",
+      "algocore-fumadocs/app/components/paper4-visual/reducer.ts",
+      "algocore-fumadocs/app/paper-4/page.tsx"
+    ],
+    "lead_browser_observations": {
+      "route": "/paper-4 production build",
+      "pattern_option_count": 58,
+      "interactions_observed": [
+        "Next and Previous by keyboard and accessibility-tree activation",
+        "VI/EN locale switch preserving event identity",
+        "prediction submission and feedback",
+        "Play advancing one step and pausing",
+        "Reset",
+        "select STACK_PUSH",
+        "change-input revision"
+      ],
+      "narrow_viewport": {
+        "width": 320,
+        "height": 800,
+        "document_scroll_width": 305,
+        "horizontal_overflow": false
+      },
+      "console_errors": []
+    },
+    "toolchain": {
+      "typecheck": "PASS",
+      "production_build": "PASS",
+      "production_route": "/paper-4 prerendered static"
+    }
+  },
+  "rework_rechecks": [
+    {
+      "finding_id": "S8B-A6-001",
+      "severity": "required",
+      "finding": "Autoplay crossed prediction checkpoints.",
+      "source_verification": "reducer.ts NEXT always sets playing false; timer dispatches exactly one NEXT.",
+      "runtime_verification": "Lead observed Play advance exactly one step and pause before the next learner decision.",
+      "status": "CLOSED_VERIFIED",
+      "closed_by": "A6_A7_INDEPENDENT_RECHECK"
+    },
+    {
+      "finding_id": "S8B-A7-002",
+      "severity": "required",
+      "finding": "No actionable memory cue.",
+      "source_verification": "Paper4VisualRuntime.tsx renders bilingual data-testid=memory-cue with current event name and the reusable event-predict-invariant-output routine.",
+      "runtime_verification": "Production route rendered the corrected runtime without console errors.",
+      "status": "CLOSED_VERIFIED",
+      "closed_by": "A6_A7_INDEPENDENT_RECHECK"
+    },
+    {
+      "finding_id": "S8B-A6-003",
+      "severity": "required",
+      "finding": "Static fallback was only one line.",
+      "source_verification": "data-testid=static-fallback now contains a heading, code locator, before, change, after and invariant in the current locale.",
+      "runtime_verification": "Production build compiled the noscript branch successfully.",
+      "status": "CLOSED_VERIFIED",
+      "closed_by": "A6_A7_INDEPENDENT_RECHECK"
+    },
+    {
+      "finding_id": "S8B-A6-004",
+      "severity": "required",
+      "finding": "Controls appeared before the learning panels in reading order.",
+      "source_verification": "DOM order is panel grid, prediction/feedback, control bar, input and memory support; narrow CSS collapses grids to one column.",
+      "runtime_verification": "At 320 by 800 the Lead measured document scrollWidth 305 within viewport width 320 and found no overlap/overflow failure.",
+      "status": "CLOSED_VERIFIED",
+      "closed_by": "A6_A7_INDEPENDENT_RECHECK"
+    },
+    {
+      "finding_id": "S8B-QA-005",
+      "severity": "required",
+      "finding": "Browser QA selectors and control-bar role were incomplete.",
+      "source_verification": "Root, pattern, locale, actions, seven panel/status surfaces, progress, announcer, fallback, memory cue and data-role=control-bar selectors are present.",
+      "runtime_verification": "Lead exercised the production route through stable selector and accessibility-tree interactions.",
+      "status": "CLOSED_VERIFIED",
+      "closed_by": "A6_A7_INDEPENDENT_RECHECK"
+    },
+    {
+      "finding_id": "S8B-QA-006",
+      "severity": "required",
+      "finding": "Progress did not expose event identity and index.",
+      "source_verification": "event-progress now exposes data-event-id, zero-based data-event-index and ARIA progress values.",
+      "runtime_verification": "Locale switching preserved the observed event identity; Next/Previous changed progress deterministically.",
+      "status": "CLOSED_VERIFIED",
+      "closed_by": "A6_A7_INDEPENDENT_RECHECK"
+    },
+    {
+      "finding_id": "S8B-A7-007",
+      "severity": "required",
+      "finding": "Code and state were linked by colour only.",
+      "source_verification": "Code and state panels repeat localized synchronized-step text, current step number, event name and identical data-sync-event identity.",
+      "runtime_verification": "Lead exercised deterministic Next/Previous on the same production event model without console/hydration errors.",
+      "status": "CLOSED_VERIFIED",
+      "closed_by": "A6_A7_INDEPENDENT_RECHECK"
+    }
+  ],
+  "accessibility_requirement_results": [
+    {"id": "S8C-A11Y-001", "status": "PASS", "basis": "Lead runtime locale switch retained event identity; reducer preserves pattern/event; bilingual runtime copy and registry text are selected by locale."},
+    {"id": "S8C-A11Y-002", "status": "PASS", "basis": "Source review: native labelled select/input, fieldset legend, named buttons, labelled panels and feedback status in both locales."},
+    {"id": "S8C-A11Y-003", "status": "PASS", "basis": "Native controls plus Lead keyboard/accessibility-tree Next and Previous; all remaining actions use the same native button/input/select semantics."},
+    {"id": "S8C-A11Y-004", "status": "PASS_SOURCE_VERIFIED", "basis": "Scoped 3px focus-visible outline with 3px offset exists for button/input/select and no ancestor clips it."},
+    {"id": "S8C-A11Y-005", "status": "PASS", "basis": "Native disabled boundaries are coded for Previous, Next, Play, Pause and observed during browser transport testing."},
+    {"id": "S8C-A11Y-006", "status": "PASS_SOURCE_VERIFIED", "basis": "Pre-existing polite atomic runtime announcer and separate polite input revision region are present; event action text changes from shared state."},
+    {"id": "S8C-A11Y-007", "status": "PASS_SOURCE_VERIFIED", "basis": "Reduced-motion media rule removes transition/animation duration while reducer event order and one-step checkpoint behavior are unchanged."},
+    {"id": "S8C-A11Y-008", "status": "PASS_SOURCE_VERIFIED", "basis": "Current trace uses aria-current plus Current text and border; completed steps use a check mark; feedback uses check/exclamation and text; sync uses repeated identity text."},
+    {"id": "S8C-A11Y-009", "status": "PASS_SOURCE_VERIFIED", "basis": "Every required panel is a labelled article/section/status surface with a visible or screen-reader heading."},
+    {"id": "S8C-A11Y-010", "status": "PASS", "basis": "Lead runtime measurement at 320 by 800: scrollWidth 305 <= viewport width 320; production console errors empty."},
+    {"id": "S8C-A11Y-011", "status": "PASS", "basis": "Source DOM order places code/state/trace/output/invariant, prediction/feedback and then controls; narrow layout is one column."},
+    {"id": "S8C-A11Y-012", "status": "PASS_INFERRED_PENDING_FINAL_A8_SPOTCHECK", "basis": "Responsive grids collapse at 64rem/42rem and the stricter 320 CSS-pixel runtime test has no horizontal page overflow. Dedicated browser 200 percent zoom remains an S8-D spotcheck."},
+    {"id": "S8C-A11Y-013", "status": "PASS_SOURCE_VERIFIED", "basis": "Noscript fallback includes bilingual heading, code locator, before/change/after and invariant; it explicitly states that interactivity needs JavaScript."},
+    {"id": "S8C-A11Y-014", "status": "PASS", "basis": "All five panels read one event object and Lead exercised deterministic event changes; code/state expose the same data-sync-event."},
+    {"id": "S8C-A11Y-015", "status": "PASS", "basis": "Reducer pauses after one PLAY step and Lead observed one-step pause; prediction appears before manually advancing again."},
+    {"id": "S8C-A11Y-016", "status": "PASS", "basis": "Lead submitted prediction; source feedback names correctness/expected event, includes event feedback, uses text/symbol and does not change event index."},
+    {"id": "S8C-A11Y-017", "status": "PASS", "basis": "Bilingual memory cue names the current event and gives the reusable event-predict-invariant-output action sequence."},
+    {"id": "S8C-A11Y-018", "status": "PASS", "basis": "Lead observed change-input revision; reducer resets event/prediction/play and increments the exposed revision shared by the current runtime."}
+  ],
+  "pedagogy_check_results": [
+    {"id": "S8C-PED-001", "status": "PASS", "basis": "Route gives Paper 4 scope/practice instructions; root heading, pattern selector and progress expose orientation."},
+    {"id": "S8C-PED-002", "status": "PASS", "basis": "Lead observed Play advance one step and pause; learner must predict before another advance."},
+    {"id": "S8C-PED-003", "status": "PASS_SOURCE_VERIFIED", "basis": "Prediction prompt is sourced from the current Stage 7 event and input expects the next event name/type."},
+    {"id": "S8C-PED-004", "status": "PASS", "basis": "Runtime prediction test plus source feedback: correctness, expected event, event explanation and continuation action are present."},
+    {"id": "S8C-PED-005", "status": "PASS", "basis": "One current event drives code/state/trace/output/invariant; deterministic browser transport and data-sync-event confirm the join."},
+    {"id": "S8C-PED-006", "status": "PASS_SOURCE_VERIFIED", "basis": "State panel and fallback visibly label Before, Change and After, with structural sections independent of colour."},
+    {"id": "S8C-PED-007", "status": "PASS_SOURCE_VERIFIED", "basis": "Invariant panel is derived from the current event and remains adjacent to trace/output in the learning grid."},
+    {"id": "S8C-PED-008", "status": "PASS_SOURCE_VERIFIED", "basis": "Memory cue gives a stable four-action solve/check routine in meaning-equivalent VI/EN and prefixes the current event."},
+    {"id": "S8C-PED-009", "status": "PASS", "basis": "Lead exercised Next/Previous, Play one-step pause, Reset, STACK_PUSH selection and change-input revision; all state transitions are deterministic."},
+    {"id": "S8C-PED-010", "status": "PASS", "basis": "Semantic panels keep the current change and actions distinct; 320 px runtime remains within the viewport without page overflow."},
+    {"id": "S8C-PED-011", "status": "PASS", "basis": "Locale runtime test preserves event identity; source selects purpose, prompts, feedback, invariant and memory routine by locale."},
+    {"id": "S8C-PED-012", "status": "PASS", "basis": "Final-event completion, reset, memory routine and observed change-input revision support immediate transfer to a new run."}
+  ],
+  "counts": {
+    "required_rework_findings_reviewed": 7,
+    "required_rework_findings_closed_verified": 7,
+    "required_rework_findings_open": 0,
+    "accessibility_requirements_reviewed": 18,
+    "accessibility_requirements_pass_or_source_verified": 18,
+    "pedagogy_checks_reviewed": 12,
+    "pedagogy_checks_pass_or_source_verified": 12,
+    "production_console_errors": 0
+  },
+  "limitations_carried_to_s8_d": [
+    "A8 should run one named screen-reader/AX announcement spotcheck for Next, Reset and change-input; S8-C verified semantics and Lead accessibility-tree operation.",
+    "A8 should explicitly emulate prefers-reduced-motion and compare event IDs; S8-C verified the media rule and deterministic reducer path.",
+    "A8 should perform a dedicated 200 percent browser zoom spotcheck; S8-C has source reflow evidence and a stricter 320 CSS-pixel no-overflow runtime measurement."
+  ],
+  "gate_decision": {
+    "status": "PASS_CANDIDATE",
+    "required_findings_open": 0,
+    "blocking_findings": [],
+    "next_reviewer": "A8_AND_LEAD",
+    "rationale": "All seven resubmitted required findings are independently closed against source and Lead runtime evidence. All 18 accessibility requirements and 12 pedagogy checks have sufficient S8-C evidence; three explicit environment spotchecks remain assigned to final S8-D QA without reopening an implementation finding."
+  }
+}
+

@@ -1,0 +1,158 @@
+{
+  "schema_version": "stage9-post-release-python-theory-audit-v1",
+  "audit_date": "2026-09-22",
+  "auditor": "independent_content_audit_agent",
+  "scope": {
+    "contract": "stage-0/LEARNING_PAGE_CONTRACT.md",
+    "source_stages": [3, 4, 5, 6, 7, 8],
+    "published_registry": "algocore-fumadocs/app/data/stage9-learning-pages.json",
+    "renderer": "algocore-fumadocs/app/components/paper4-learning/LessonLearningPage.tsx",
+    "live_samples": [
+      "/paper-4/lessons/data-models?lang=en#worked-example",
+      "/paper-4/lessons/queue?lang=en#worked-example",
+      "/paper-4/lessons/binary-tree?lang=en#worked-example"
+    ]
+  },
+  "result": "FAIL_RELEASE_REOPEN_REQUIRED",
+  "headline": "Python source is present in registry records but the learning renderer does not present it as code; theory coverage is compressed far below the Stage 3 knowledge model.",
+  "counts": {
+    "lessons": 26,
+    "lessons_with_some_python_text_in_registry": 26,
+    "lessons_with_semantic_code_block_in_worked_example": 0,
+    "lessons_with_explicit_stage5_execution_reference_in_worked_example": 0,
+    "structured_python_arrays": 15,
+    "structured_code_arrays_with_runnable_claim": 6,
+    "inline_python_or_pseudocode_strings": 5,
+    "registry_code_lines_or_inline_lines": 216,
+    "structured_test_cases": 57,
+    "stage3_knowledge_blocks": 108,
+    "published_structured_knowledge_blocks": 0,
+    "published_knowledge_paragraphs": 26,
+    "published_direct_coursebook_refs_in_knowledge_blocks": 0,
+    "published_direct_syllabus_refs_in_knowledge_blocks": 0,
+    "average_english_knowledge_characters": 217,
+    "theory_ratings": {
+      "brief": 12,
+      "thin": 14,
+      "adequate": 0
+    }
+  },
+  "systemic_findings": [
+    {
+      "id": "PTA-001",
+      "severity": "RELEASE_BLOCKER",
+      "title": "The renderer discards Python code semantics",
+      "evidence": "ContentValue renders every array as <ul><li><p>. On the live data-models page, the six Python lines appear as six bullet points. The worked-example section contains no <pre><code> source block. Inline lessons render backticks as ordinary paragraph characters.",
+      "impact": "Indentation, block structure, copyability as one program, and the visual distinction between explanation and executable Python are lost. A learner can reasonably conclude that no Python code is provided."
+    },
+    {
+      "id": "PTA-002",
+      "severity": "RELEASE_BLOCKER",
+      "title": "Published worked examples do not join to Stage 5 execution evidence",
+      "evidence": "Stage 5 contains author runs, independent reruns and execution_log_sha256 trace evidence, but zero of 26 Stage 9 worked-example sourceRefs point to stage-5/. Some records say runnable_python or list expected output without a verifiable run locator.",
+      "impact": "The Stage 0 rule that Python, trace and output be checked independently is not auditable from a learning page."
+    },
+    {
+      "id": "PTA-003",
+      "severity": "MAJOR",
+      "title": "Theory coverage was flattened during composition/integration",
+      "evidence": "Stage 3 defines 108 sourced knowledge blocks and 55 coursebook sections. Stage 9 exposes one short plain-text knowledge paragraph per lesson (26 total), no structured concept sections, and no direct coursebook or syllabus locator on those knowledge blocks.",
+      "impact": "Definitions, representations, invariants, alternatives, misconceptions and syllabus/coursebook links are not taught at the depth expected for Paper 4."
+    },
+    {
+      "id": "PTA-004",
+      "severity": "MAJOR",
+      "title": "Five lessons contain code only inside prose",
+      "lessons": ["queue", "linked-list", "recursion", "dictionary", "hashing"],
+      "evidence": "The whole worked example is a string. Code is embedded between backticks; linked-list labels its single semicolon-separated line as Python/pseudocode.",
+      "impact": "These lessons cannot support line highlighting, execution provenance, syntax checks or accessible code navigation."
+    },
+    {
+      "id": "PTA-005",
+      "severity": "MAJOR",
+      "title": "Release QA validated shape and routes but missed educational visibility",
+      "evidence": "The released 26/260 registry shape can pass while all worked Python is rendered as bullets or prose. The Visual Lab code panel displays method-step IDs such as array-append.step.contract rather than the worked Python source.",
+      "impact": "RELEASE_LOCKED overstates readiness for a Python-centred Paper 4 course."
+    }
+  ],
+  "stage_assessment": [
+    {
+      "stage": 0,
+      "assessment": "PASS_CONTRACT",
+      "note": "The contract explicitly requires Requirement -> design -> Python -> trace -> output/test -> evidence and selectable code."
+    },
+    {
+      "stage": 3,
+      "assessment": "PASS_SOURCE_MODEL_NOT_PUBLISHED",
+      "note": "The 108 knowledge blocks and 55 book sections are a sound source model, but Stage 9 does not expose their structure."
+    },
+    {
+      "stage": 4,
+      "assessment": "PASS_DESIGN_ONLY",
+      "note": "Method and marking design is useful, while Stage 4 explicitly defers execution verification."
+    },
+    {
+      "stage": 5,
+      "assessment": "PASS_EVIDENCE_STRANDED",
+      "note": "Execution logs and independent reruns exist, but their code/run/fixture identities are not joined to published worked examples."
+    },
+    {
+      "stage": 6,
+      "assessment": "REWORK_COMPOSITION",
+      "note": "Composition artifacts contain method material, but published theory is one paragraph per lesson and code serialization is inconsistent."
+    },
+    {
+      "stage": 7,
+      "assessment": "PASS_VISUAL_SPEC_LIMITED",
+      "note": "Event visuals model state changes; they do not substitute for complete Python source and verified runs."
+    },
+    {
+      "stage": 8,
+      "assessment": "PASS_RUNTIME_LIMITED",
+      "note": "The runtime can replay deterministic events, but its code panel shows step IDs and does not execute or display the full lesson Python."
+    },
+    {
+      "stage": 9,
+      "assessment": "FAIL_RELEASE_REOPEN_REQUIRED",
+      "note": "Integration preserved counts and routes while losing semantic code presentation and theory depth."
+    }
+  ],
+  "lesson_matrix": [
+    {"slug":"data-models","package":"foundations","patterns":4,"theory":"brief","knowledge_chars_en":231,"code_form":"structured_python_array","code_lines":6,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"procedural-design","package":"foundations","patterns":1,"theory":"brief","knowledge_chars_en":252,"code_form":"structured_python_array","code_lines":6,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"validation-rules","package":"foundations","patterns":4,"theory":"brief","knowledge_chars_en":238,"code_form":"structured_python_array","code_lines":5,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"testing","package":"foundations","patterns":0,"theory":"brief","knowledge_chars_en":244,"code_form":"structured_python_array","code_lines":5,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"text-processing","package":"text","patterns":4,"theory":"brief","knowledge_chars_en":248,"code_form":"structured_python_array","code_lines":9,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"search-collections","package":"search-sort","patterns":4,"theory":"brief","knowledge_chars_en":247,"code_form":"structured_python_array","code_lines":7,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"sorting","package":"search-sort","patterns":3,"theory":"brief","knowledge_chars_en":228,"code_form":"structured_python_array","code_lines":8,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"binary-search","package":"search-sort","patterns":1,"theory":"thin","knowledge_chars_en":166,"code_form":"structured_code_array_runnable_claim","code_lines":8,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"stack","package":"stack","patterns":5,"theory":"thin","knowledge_chars_en":175,"code_form":"structured_code_array_runnable_claim","code_lines":9,"trace_items":5,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"queue","package":"queue","patterns":5,"theory":"thin","knowledge_chars_en":192,"code_form":"inline_python_string","code_lines":5,"trace_items":1,"test_items":1,"run_evidence":"missing","rendering":"plain_paragraph","priority":"P0"},
+    {"slug":"linked-list","package":"linked-list","patterns":4,"theory":"brief","knowledge_chars_en":230,"code_form":"inline_python_or_pseudocode_string","code_lines":1,"trace_items":1,"test_items":1,"run_evidence":"missing","rendering":"plain_paragraph","priority":"P0"},
+    {"slug":"recursion","package":"recursion","patterns":1,"theory":"thin","knowledge_chars_en":210,"code_form":"inline_python_string","code_lines":3,"trace_items":0,"test_items":1,"run_evidence":"missing","rendering":"plain_paragraph","priority":"P0"},
+    {"slug":"binary-tree","package":"tree","patterns":4,"theory":"brief","knowledge_chars_en":319,"code_form":"structured_python_array","code_lines":29,"trace_items":6,"test_items":4,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"dictionary","package":"dictionary","patterns":0,"theory":"brief","knowledge_chars_en":221,"code_form":"inline_python_string","code_lines":3,"trace_items":1,"test_items":1,"run_evidence":"missing","rendering":"plain_paragraph","priority":"P0"},
+    {"slug":"hashing","package":"dictionary","patterns":4,"theory":"brief","knowledge_chars_en":247,"code_form":"inline_python_string","code_lines":6,"trace_items":1,"test_items":1,"run_evidence":"missing","rendering":"plain_paragraph","priority":"P0"},
+    {"slug":"oop-model","package":"oop","patterns":2,"theory":"thin","knowledge_chars_en":182,"code_form":"structured_python_array","code_lines":7,"trace_items":3,"test_items":2,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"oop-state","package":"oop","patterns":3,"theory":"thin","knowledge_chars_en":182,"code_form":"structured_python_array","code_lines":10,"trace_items":3,"test_items":2,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"oop-inheritance","package":"oop","patterns":2,"theory":"thin","knowledge_chars_en":199,"code_form":"structured_python_array","code_lines":12,"trace_items":3,"test_items":2,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"oop-aggregation","package":"oop","patterns":1,"theory":"thin","knowledge_chars_en":202,"code_form":"structured_python_array","code_lines":10,"trace_items":3,"test_items":2,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"text-files","package":"files","patterns":2,"theory":"thin","knowledge_chars_en":201,"code_form":"structured_python_array","code_lines":7,"trace_items":3,"test_items":2,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"object-files","package":"files","patterns":1,"theory":"thin","knowledge_chars_en":204,"code_form":"structured_python_array","code_lines":12,"trace_items":3,"test_items":2,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"random-files","package":"files","patterns":0,"theory":"thin","knowledge_chars_en":170,"code_form":"structured_code_array_runnable_claim","code_lines":8,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"exceptions","package":"files","patterns":0,"theory":"thin","knowledge_chars_en":172,"code_form":"structured_code_array_runnable_claim","code_lines":10,"trace_items":3,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"performance","package":"support","patterns":0,"theory":"thin","knowledge_chars_en":168,"code_form":"structured_code_array_runnable_claim","code_lines":14,"trace_items":2,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"graphs","package":"support","patterns":0,"theory":"thin","knowledge_chars_en":209,"code_form":"structured_code_array_runnable_claim","code_lines":6,"trace_items":4,"test_items":3,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"},
+    {"slug":"exam-workflow","package":"integration","patterns":3,"theory":"brief","knowledge_chars_en":245,"code_form":"structured_python_array","code_lines":10,"trace_items":3,"test_items":2,"run_evidence":"missing","rendering":"bulleted_prose","priority":"P0"}
+  ],
+  "remediation_acceptance": [
+    "Reopen Stage 9 release and mark the current manifest superseded until all P0 findings close.",
+    "Define a typed PythonExample contract with language, complete source, line IDs, fixtures, expected output, actual output, Stage 5 run locator and verification hash.",
+    "Render every PythonExample as a single accessible <pre><code> block that preserves indentation, supports horizontal scrolling on small screens, exposes line numbers and remains selectable/copyable.",
+    "Replace the five prose-embedded examples with the typed contract; linked-list must use valid Python or be explicitly labelled pseudocode, never both.",
+    "Create a deterministic join from all published examples to Stage 5 verified code/runs, or independently execute and freeze new examples where Stage 5 has no matching program.",
+    "Expand the knowledge layer from 26 summary paragraphs to a verifiable mapping of all 108 Stage 3 knowledge blocks, including coursebook section/page, syllabus objective, concept explanation, representation/invariant, misconception and a local example where applicable.",
+    "Add automated assertions for 26/26 semantic code blocks, 26/26 run-evidence joins, 108/108 knowledge dispositions, and direct source locators.",
+    "Run independent browser QA that checks what a learner sees, including Python indentation and code/theory visibility in both VI and EN, before issuing a replacement release manifest."
+  ]
+}

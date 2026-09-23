@@ -1,0 +1,3781 @@
+{
+  "schema_version": "s4-visual-brief-v1",
+  "status": "DESIGN_REVIEWED",
+  "counts": {
+    "visuals": 58
+  },
+  "visual_briefs": [
+    {
+      "visual_brief_id": "p0.stack.visual.stack-setup",
+      "pattern_id": "STACK_SETUP",
+      "method_step_refs": [
+        "stack-setup.step.contract",
+        "stack-setup.step.representation",
+        "stack-setup.step.initialise",
+        "stack-setup.step.consistency"
+      ],
+      "error_refs": [
+        "p0.stack.stack-setup.error.mixed-top-convention",
+        "p0.stack.stack-setup.error.capacity-last-index"
+      ],
+      "learning_question": {
+        "vi": "Top đang chỉ điều gì, và điều đó làm thay đổi vùng live thế nào?",
+        "en": "What does top point to, and how does that change the live region?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "storage cells",
+        "top arrow",
+        "live/unused partition",
+        "capacity"
+      ],
+      "proposed_event_types": [
+        "DECLARE_STORAGE",
+        "SET_TOP_CONVENTION",
+        "MARK_LIVE_RANGE",
+        "CHECK_EMPTY_FULL"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán empty, full, read và write index trước khi lộ đáp án.",
+        "en": "Predict empty, full, read and write indices before revealing them."
+      },
+      "normal_case": {
+        "vi": "Cùng capacity và cùng hai item logic: đặt cạnh snapshot next-free và current-top để so sánh top cùng vùng live.",
+        "en": "For the same capacity and two logical items, compare next-free and current-top snapshots, top values and live regions."
+      },
+      "boundary_case": {
+        "vi": "So sánh state rỗng và đầy của cả hai quy ước; từ đó suy empty/full/read/write equations.",
+        "en": "Compare empty and full states under both conventions, then derive empty/full/read/write equations."
+      },
+      "failure_case": {
+        "vi": "Cố ý ghép top khởi tạo của một quy ước với live-range equation của quy ước kia để học sinh phát hiện mâu thuẫn.",
+        "en": "Deliberately combine one convention's initial top with the other's live-range equation so learners detect the contradiction."
+      },
+      "representation_and_convention": [
+        "next_free: empty=0, full=capacity",
+        "current_top: empty=-1, full=capacity-1"
+      ],
+      "static_fallback": {
+        "vi": "Hai snapshot before/after kèm bảng top, vùng live và invariant.",
+        "en": "Two before/after snapshots with a top/live-region/invariant table."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone for live/unused or success/failure.",
+        "Provide text labels for top and indices.",
+        "Expose an event list compatible with keyboard step controls at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "P0"
+    },
+    {
+      "visual_brief_id": "p0.stack.visual.stack-push",
+      "pattern_id": "STACK_PUSH",
+      "method_step_refs": [
+        "stack-push.step.contract",
+        "stack-push.step.full-guard",
+        "stack-push.step.failure",
+        "stack-push.step.next-free-success",
+        "stack-push.step.current-top-success",
+        "stack-push.step.return-check"
+      ],
+      "error_refs": [
+        "p0.stack.stack-push.error.copied-update-order",
+        "p0.stack.stack-push.error.mutates-when-full",
+        "p0.stack.stack-push.error.wrong-result-contract"
+      ],
+      "learning_question": {
+        "vi": "Vì sao một quy ước ghi trước còn quy ước kia tăng top trước?",
+        "en": "Why does one convention write first while the other increments top first?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "before/after top",
+        "written cell",
+        "logical size",
+        "return result"
+      ],
+      "proposed_event_types": [
+        "CHECK_FULL",
+        "MOVE_TOP",
+        "WRITE_CELL",
+        "RETURN_RESULT",
+        "REJECT_FULL"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn event kế tiếp cho từng quy ước ở trạng thái còn một ô.",
+        "en": "Choose the next event for each convention with one free slot."
+      },
+      "normal_case": {
+        "vi": "Stack còn nhiều hơn một ô: dự đoán write-index, top sau thao tác và success result theo quy ước đã chọn.",
+        "en": "With more than one free slot, predict write index, post-operation top and success result under the selected convention."
+      },
+      "boundary_case": {
+        "vi": "Chạy liên tiếp ca còn đúng một ô và ca đã đầy; lần đầu commit một item, lần sau phải giữ nguyên toàn bộ state.",
+        "en": "Run the one-free-slot case followed by the full case; the first commits one item and the second preserves all state."
+      },
+      "failure_case": {
+        "vi": "Cho thứ tự cập nhật của quy ước đối lập hoặc mutation trước full guard để quan sát overwrite/out-of-range và rollback cần thiết.",
+        "en": "Use the opposite convention's update order or mutate before the full guard to expose overwrite/out-of-range behaviour and the required non-mutation."
+      },
+      "representation_and_convention": [
+        "next_free writes then increments",
+        "current_top increments then writes"
+      ],
+      "static_fallback": {
+        "vi": "Hai snapshot before/after kèm bảng top, vùng live và invariant.",
+        "en": "Two before/after snapshots with a top/live-region/invariant table."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone for live/unused or success/failure.",
+        "Provide text labels for top and indices.",
+        "Expose an event list compatible with keyboard step controls at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "P0"
+    },
+    {
+      "visual_brief_id": "p0.stack.visual.stack-pop",
+      "pattern_id": "STACK_POP",
+      "method_step_refs": [
+        "stack-pop.step.contract",
+        "stack-pop.step.empty-guard",
+        "stack-pop.step.failure",
+        "stack-pop.step.next-free-success",
+        "stack-pop.step.current-top-success",
+        "stack-pop.step.return-check"
+      ],
+      "error_refs": [
+        "p0.stack.stack-pop.error.wrong-read-index",
+        "p0.stack.stack-pop.error.sentinel-type",
+        "p0.stack.stack-pop.error.mutates-empty"
+      ],
+      "learning_question": {
+        "vi": "Phải đọc ô nào trước khi cập nhật top để giữ LIFO?",
+        "en": "Which cell must be read before updating top to preserve LIFO?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "before/after top",
+        "read index",
+        "saved item",
+        "sentinel type"
+      ],
+      "proposed_event_types": [
+        "CHECK_EMPTY",
+        "READ_TOP_ITEM",
+        "MOVE_TOP",
+        "RETURN_ITEM",
+        "RETURN_SENTINEL"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn read index và dự đoán state khi chỉ còn một item.",
+        "en": "Choose the read index and predict state when one item remains."
+      },
+      "normal_case": {
+        "vi": "Stack có hai item khác nhau: đánh dấu ô LIFO, item đã lưu và top sau Pop dưới từng quy ước.",
+        "en": "With two distinct items, mark the LIFO cell, saved item and post-Pop top under each convention."
+      },
+      "boundary_case": {
+        "vi": "Từ stack một item thực hiện một Pop thành công rồi một Pop empty; kiểm size về 0 và lần thứ hai không mutation.",
+        "en": "From a one-item stack, perform one successful Pop then one empty Pop; verify size reaches zero and the second call does not mutate state."
+      },
+      "failure_case": {
+        "vi": "Đảo read/update order hoặc dùng sai kiểu sentinel để làm lộ item trả sai và caller không nhận ra empty.",
+        "en": "Reverse read/update order or use the wrong sentinel type to expose an incorrect returned item and failed empty detection by the caller."
+      },
+      "representation_and_convention": [
+        "next_free reads top-1 then decrements",
+        "current_top reads top then decrements"
+      ],
+      "static_fallback": {
+        "vi": "Hai snapshot before/after kèm bảng top, vùng live và invariant.",
+        "en": "Two before/after snapshots with a top/live-region/invariant table."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone for live/unused or success/failure.",
+        "Provide text labels for top and indices.",
+        "Expose an event list compatible with keyboard step controls at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "P0"
+    },
+    {
+      "visual_brief_id": "p0.stack.visual.stack-pair",
+      "pattern_id": "STACK_PAIR",
+      "method_step_refs": [
+        "stack-pair.step.capture",
+        "stack-pair.step.pop-both",
+        "stack-pair.step.case-split-rollback",
+        "stack-pair.step.commit-output",
+        "stack-pair.step.postcheck"
+      ],
+      "error_refs": [
+        "p0.stack.stack-pair.error.missing-rollback",
+        "p0.stack.stack-pair.error.rollback-wrong-side",
+        "p0.stack.stack-pair.error.both-empty-sentinel-push"
+      ],
+      "learning_question": {
+        "vi": "Khi chỉ một Pop thành công, event nào phục hồi giao dịch?",
+        "en": "When only one Pop succeeds, which event restores the transaction?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "both before/after stacks",
+        "two success flags",
+        "tentative removals",
+        "commit/rollback status"
+      ],
+      "proposed_event_types": [
+        "POP_A",
+        "POP_B",
+        "CLASSIFY_PAIR",
+        "ROLLBACK_A",
+        "ROLLBACK_B",
+        "COMMIT_PAIR",
+        "EMIT_MESSAGE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán stack nào phải rollback trong ba failure cases.",
+        "en": "Predict which stack must roll back in the three failure cases."
+      },
+      "normal_case": {
+        "vi": "Cả hai Pop thành công: commit hai lần xóa và emit cặp theo thứ tự nguồn, không rollback.",
+        "en": "Both Pops succeed: commit both removals and emit the pair in source order with no rollback."
+      },
+      "boundary_case": {
+        "vi": "Dùng đủ bốn case: both success; left-only; right-only; both empty. Hai ca một phía restore đúng một lần; both-empty không restore, không mutation.",
+        "en": "Use all four cases: both success, left-only, right-only and both empty. One-sided cases restore exactly once; both-empty performs no restore and no mutation."
+      },
+      "failure_case": {
+        "vi": "Cho rollback nhầm stack hoặc Push sentinel ở both-empty; visual phải chỉ ra state giả và gắn message both-empty tự biên soạn là AlgoCore_inference.",
+        "en": "Restore the wrong stack or Push a sentinel in both-empty; show the fabricated state and label any authored both-empty message AlgoCore_inference."
+      },
+      "representation_and_convention": [
+        "commit only when both Pops succeed",
+        "restore the sole successful Pop on partial failure"
+      ],
+      "static_fallback": {
+        "vi": "Hai snapshot before/after kèm bảng top, vùng live và invariant.",
+        "en": "Two before/after snapshots with a top/live-region/invariant table."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone for live/unused or success/failure.",
+        "Provide text labels for top and indices.",
+        "Expose an event list compatible with keyboard step controls at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "P0"
+    },
+    {
+      "visual_brief_id": "p0.stack.visual.stack-reduce",
+      "pattern_id": "STACK_REDUCE",
+      "method_step_refs": [
+        "stack-reduce.step.contract",
+        "stack-reduce.step.first-value",
+        "stack-reduce.step.consume-next",
+        "stack-reduce.step.apply",
+        "stack-reduce.step.finish"
+      ],
+      "error_refs": [
+        "p0.stack.stack-reduce.error.reversed-operands",
+        "p0.stack.stack-reduce.error.sentinel-as-data",
+        "p0.stack.stack-reduce.error.zero-extrema-initialisation"
+      ],
+      "learning_question": {
+        "vi": "Accumulator đại diện cho prefix nào và item tiếp theo thay đổi nó ra sao?",
+        "en": "Which consumed prefix does the accumulator represent, and how does the next item change it?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "top",
+        "current token",
+        "operator",
+        "accumulator",
+        "consumed/unconsumed partition"
+      ],
+      "proposed_event_types": [
+        "POP_FIRST",
+        "POP_OPERATOR",
+        "POP_OPERAND",
+        "APPLY_LEFT_FOLD",
+        "UPDATE_MIN",
+        "UPDATE_MAX",
+        "DETECT_EMPTY"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán hướng toán hạng cho phép trừ và cách min/max khởi tạo.",
+        "en": "Predict operand direction for subtraction and how min/max should initialise."
+      },
+      "normal_case": {
+        "vi": "Left fold có phép không giao hoán: theo dõi `total_before operator next_number` qua từng cặp operator–number mà chưa chứng nhận output chạy.",
+        "en": "For a non-commutative left fold, track `total_before operator next_number` across each operator-number pair without certifying runtime output."
+      },
+      "boundary_case": {
+        "vi": "Đặt cạnh ca biểu thức chỉ có một số và ca extrema toàn số âm; accumulator/min/max đều khởi tạo từ item live đầu tiên.",
+        "en": "Compare a single-number expression with all-negative extrema; total/min/max all initialise from the first live item."
+      },
+      "failure_case": {
+        "vi": "Chuỗi thiếu number sau operator hoặc stack rỗng ban đầu nằm ngoài precondition nguồn; chỉ ghi thành contract decision và test obligation Stage 5, không gọi là Cambridge requirement.",
+        "en": "An operator lacking a following number or an initially empty stack is outside the source precondition; record it only as a contract decision and Stage 5 test obligation, not a Cambridge requirement."
+      },
+      "representation_and_convention": [
+        "expression is a left fold total operator number",
+        "extrema start from first live value"
+      ],
+      "static_fallback": {
+        "vi": "Hai snapshot before/after kèm bảng top, vùng live và invariant.",
+        "en": "Two before/after snapshots with a top/live-region/invariant table."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone for live/unused or success/failure.",
+        "Provide text labels for top and indices.",
+        "Expose an event list compatible with keyboard step controls at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "P0"
+    },
+    {
+      "visual_brief_id": "b1.visual.data-storage",
+      "pattern_id": "DATA_STORAGE",
+      "method_step_refs": [
+        "data-storage.step.contract",
+        "data-storage.step.shape",
+        "data-storage.step.initialise",
+        "data-storage.step.audit"
+      ],
+      "error_refs": [
+        "b1.data-storage.error.last-index",
+        "b1.data-storage.error.scope-type"
+      ],
+      "learning_question": {
+        "vi": "Shape, scope và giá trị đầu phối hợp thành state nào?",
+        "en": "How do shape, scope and initial values define the state?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Named scalar/array storage with an explicit shape and type.",
+        "Every declared cell belongs to the required shape and accepts only the stated data type.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "DECLARE_STORAGE",
+        "SET_SCOPE",
+        "INITIALISE_CELL",
+        "AUDIT_SHAPE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Dựng mảng 2×3 số nguyên với sáu giá trị đầu khác nhau; event phải tạo đúng sáu cell, đúng row/column và đúng scope.",
+        "en": "Build a 2×3 integer array with six distinct initial values; events must create exactly six cells with the correct row/column order and scope."
+      },
+      "boundary_case": {
+        "vi": "So capacity 1 với last-index 0 và một shape có initial values thiếu; audit phải giữ capacity là số cell và chỉ khởi tạo literal được nguồn nêu.",
+        "en": "Compare capacity 1 with last-index 0 and a shape with partial initial values; the audit must keep capacity as cell count and initialise only source-stated literals."
+      },
+      "failure_case": {
+        "vi": "Nhầm chỉ số cuối với số phần tử.",
+        "en": "Confusing the last index with the number of elements."
+      },
+      "representation_and_convention": [
+        "capacity is a count, not a last index",
+        "scope and initial values are source-bound"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.data-record",
+      "pattern_id": "DATA_RECORD",
+      "method_step_refs": [
+        "data-record.step.contract",
+        "data-record.step.representation",
+        "data-record.step.construct",
+        "data-record.step.audit"
+      ],
+      "error_refs": [
+        "b1.data-record.error.field-swap",
+        "b1.data-record.error.oop-overreach"
+      ],
+      "learning_question": {
+        "vi": "Mỗi input đi vào field nào và được đọc lại ở đâu?",
+        "en": "Which field receives each input and where is it read later?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "One heterogeneous record-like value with named fields.",
+        "Each field has exactly one required name, type and role.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "DECLARE_FIELD",
+        "MAP_PARAMETER",
+        "CREATE_RECORD",
+        "READ_FIELD"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Tạo record ba field khác kiểu bằng ba giá trị phân biệt rồi đọc lại từng field; mapping parameter→field phải một-một.",
+        "en": "Create a three-field heterogeneous record with distinct values and read every field back; parameter-to-field mapping must be one-to-one."
+      },
+      "boundary_case": {
+        "vi": "Với class thay record, chỉ tạo constructor/fields được phép; case hai field cùng kiểu nhưng giá trị khác phải phát hiện swap mà không thêm method nghiệp vụ.",
+        "en": "For a class substitute, create only permitted constructor/fields; a case with two same-typed but distinct values must expose swaps without adding business methods."
+      },
+      "failure_case": {
+        "vi": "Gán nhầm tham số cho field cùng kiểu.",
+        "en": "Assigning a parameter to the wrong same-typed field."
+      },
+      "representation_and_convention": [
+        "record substitute is not automatically a full OOP class",
+        "field names and types remain source-bound"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.array-append",
+      "pattern_id": "ARRAY_APPEND",
+      "method_step_refs": [
+        "array-append.step.contract",
+        "array-append.step.guard",
+        "array-append.step.commit",
+        "array-append.step.result"
+      ],
+      "error_refs": [
+        "b1.array-append.error.increment-before-guard",
+        "b1.array-append.error.ordered-insert-confusion"
+      ],
+      "learning_question": {
+        "vi": "Guard, write và count thay đổi theo thứ tự nào?",
+        "en": "In what order do guard, write and count change?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Bounded array plus logical count/next-free index.",
+        "Live items occupy exactly indices 0..count-1 and 0<=count<=capacity.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "CHECK_CAPACITY",
+        "WRITE_NEXT_FREE",
+        "INCREMENT_COUNT",
+        "RETURN_RESULT"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Với capacity 4 và count 2, append X phải ghi slot 2, giữ prefix 0..1 và đổi count thành 3 trước khi báo success.",
+        "en": "With capacity 4 and count 2, appending X must write slot 2, preserve prefix 0..1 and change count to 3 before reporting success."
+      },
+      "boundary_case": {
+        "vi": "Với count=capacity, capacity guard phải phát failure trước mọi write; toàn bộ array và count sau event phải bằng snapshot ban đầu.",
+        "en": "With count equal to capacity, the capacity guard must fail before any write; the array and count after the event must equal the initial snapshot."
+      },
+      "failure_case": {
+        "vi": "Tăng count trước khi kiểm đầy.",
+        "en": "Incrementing count before checking full."
+      },
+      "representation_and_convention": [
+        "append writes at count",
+        "failure leaves array and count unchanged"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.random-array",
+      "pattern_id": "RANDOM_ARRAY",
+      "method_step_refs": [
+        "random-array.step.contract",
+        "random-array.step.initialise",
+        "random-array.step.generate",
+        "random-array.step.finish"
+      ],
+      "error_refs": [
+        "b1.random-array.error.upper-bound",
+        "b1.random-array.error.unique-loop"
+      ],
+      "learning_question": {
+        "vi": "Candidate nào được accept và khi nào vị trí đích tiến lên?",
+        "en": "Which candidates are accepted, and when does the target position advance?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Finite target array filled from a source-defined random domain.",
+        "Every filled cell is in range; when uniqueness is required, all live values are distinct.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "GENERATE_CANDIDATE",
+        "CHECK_RANGE",
+        "CHECK_DUPLICATE",
+        "COMMIT_VALUE",
+        "REJECT_VALUE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Điền mảng 2×2 từ miền 1..6; mỗi accepted candidate làm filled-count tăng một và mọi cell cuối nằm trong miền.",
+        "en": "Fill a 2×2 array from domain 1..6; each accepted candidate advances filled-count once and every final cell lies in range."
+      },
+      "boundary_case": {
+        "vi": "Khi cần bốn giá trị unique từ miền đúng bốn phần tử, duplicate candidate phải bị reject mà target index không tiến; bốn accepted values phải có set-cardinality 4.",
+        "en": "When four unique values are required from a four-value domain, a duplicate candidate must be rejected without advancing the target index; four accepted values must have set cardinality 4."
+      },
+      "failure_case": {
+        "vi": "Dùng API làm mất hoặc vượt biên trên.",
+        "en": "Using an API call that excludes or exceeds the required upper bound."
+      },
+      "representation_and_convention": [
+        "translate random API bounds to the stated mathematical interval",
+        "uniqueness requires rejection/tracking"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.rule-compute",
+      "pattern_id": "RULE_COMPUTE",
+      "method_step_refs": [
+        "rule-compute.step.contract",
+        "rule-compute.step.select",
+        "rule-compute.step.compute",
+        "rule-compute.step.verify"
+      ],
+      "error_refs": [
+        "b1.rule-compute.error.boundary",
+        "b1.rule-compute.error.invented-rounding"
+      ],
+      "learning_question": {
+        "vi": "Input đi qua nhánh nào và mỗi intermediate giữ unit gì?",
+        "en": "Which branch does the input take, and what unit does each intermediate carry?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Decision rule plus typed operands, units and an output contract.",
+        "Exactly one applicable rule is selected and every operand retains its defined unit/type.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "EVALUATE_PREDICATE",
+        "SELECT_RULE",
+        "COMPUTE_INTERMEDIATE",
+        "APPLY_SOURCE_ROUNDING",
+        "EMIT_RESULT"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Cho input nằm giữa một band, hiển thị predicate được chọn, operand kèm unit và intermediate trước khi phát result đúng type.",
+        "en": "For an input inside one band, show the selected predicate, unit-labelled operands and intermediate value before emitting the correctly typed result."
+      },
+      "boundary_case": {
+        "vi": "Chạy ba input dưới–đúng–trên cùng ngưỡng; mỗi input phải chọn đúng một band và chỉ áp dụng phép chia/rounding được nguồn ghi.",
+        "en": "Run inputs below, at and above one threshold; each must select exactly one band and apply only source-stated division/rounding."
+      },
+      "failure_case": {
+        "vi": "Dùng < thay cho <= ở ngưỡng band.",
+        "en": "Using < instead of <= at a band boundary."
+      },
+      "representation_and_convention": [
+        "boundary inclusion follows the source",
+        "rounding/division is never assumed"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.validate-input",
+      "pattern_id": "VALIDATE_INPUT",
+      "method_step_refs": [
+        "validate-input.step.predicate",
+        "validate-input.step.read",
+        "validate-input.step.loop",
+        "validate-input.step.exit"
+      ],
+      "error_refs": [
+        "b1.validate-input.error.and-or",
+        "b1.validate-input.error.validation-verification"
+      ],
+      "learning_question": {
+        "vi": "Candidate nào bị từ chối và invariant nào giữ qua mỗi lần nhập?",
+        "en": "Which candidates are rejected, and what invariant survives each attempt?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Input loop governed by an explicit validity predicate.",
+        "Before exit, no invalid value is committed; after exit, the retained value satisfies VALID.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "READ_CANDIDATE",
+        "CHECK_TYPE",
+        "CHECK_DOMAIN",
+        "REJECT_AND_RETRY",
+        "COMMIT_VALID"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Chuỗi attempt gồm một value ngoài range rồi một value hợp lệ: attempt đầu không commit, attempt sau commit đúng một lần và thoát với VALID=true.",
+        "en": "Use an attempt sequence with one out-of-range value then a valid value: the first does not commit, the second commits once and exits with VALID=true."
+      },
+      "boundary_case": {
+        "vi": "Kiểm hai endpoint inclusive/exclusive và một conversion failure; không case invalid nào đổi retained state hoặc thoát loop.",
+        "en": "Check both inclusive/exclusive endpoints and one conversion failure; no invalid case may change retained state or exit the loop."
+      },
+      "failure_case": {
+        "vi": "Dùng AND khi điều kiện invalid cần OR, hoặc ngược lại.",
+        "en": "Using AND where invalidity requires OR, or vice versa."
+      },
+      "representation_and_convention": [
+        "continue while invalid",
+        "exit only with a value satisfying the postcondition"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.unique-selection",
+      "pattern_id": "UNIQUE_SELECTION",
+      "method_step_refs": [
+        "unique-selection.step.contract",
+        "unique-selection.step.candidate",
+        "unique-selection.step.availability",
+        "unique-selection.step.finish"
+      ],
+      "error_refs": [
+        "b1.unique-selection.error.mark-before-check",
+        "b1.unique-selection.error.exhausted-loop"
+      ],
+      "learning_question": {
+        "vi": "Range check và used check thay đổi state ở thời điểm nào?",
+        "en": "When do the range and used checks permit a state change?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Validation plus a consumed marker/set for selection without replacement.",
+        "Every committed selection is valid and appears at most once.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "PROPOSE_SELECTION",
+        "CHECK_RANGE",
+        "CHECK_UNUSED",
+        "MARK_USED",
+        "RETRY_SELECTION"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Candidate hợp range và chưa used phải tạo đúng một mark-used và một commit; lần chọn lại cùng candidate phải bị reject không đổi vị trí đích.",
+        "en": "An in-range unused candidate must produce one mark-used and one commit; selecting it again must be rejected without changing the destination position."
+      },
+      "boundary_case": {
+        "vi": "Khi used-set đã phủ toàn bộ miền, availability guard phải dừng theo contract thay vì retry vô hạn; out-of-range candidate cũng không được ghi vào used-set.",
+        "en": "When the used set covers the full domain, the availability guard must terminate under the contract rather than retry forever; an out-of-range candidate must not enter the used set."
+      },
+      "failure_case": {
+        "vi": "Đánh dấu used trước khi candidate hợp lệ.",
+        "en": "Marking used before the candidate is valid."
+      },
+      "representation_and_convention": [
+        "validate before marking",
+        "termination requires at least one available item"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.check-digit",
+      "pattern_id": "CHECK_DIGIT",
+      "method_step_refs": [
+        "check-digit.step.contract",
+        "check-digit.step.accumulate",
+        "check-digit.step.derive",
+        "check-digit.step.compare"
+      ],
+      "error_refs": [
+        "b1.check-digit.error.modulo-assumption",
+        "b1.check-digit.error.payload-offset"
+      ],
+      "learning_question": {
+        "vi": "Mỗi digit đóng góp gì và check digit được tách ở đâu?",
+        "en": "What does each digit contribute, and where is the check digit separated?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Digit sequence split into payload and one compared check digit.",
+        "After k payload digits, the accumulator equals exactly the weighted sum of those k digits.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "SPLIT_PAYLOAD",
+        "MULTIPLY_WEIGHT",
+        "ACCUMULATE_SUM",
+        "DERIVE_CHECK",
+        "COMPARE_CHECK"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Với payload bốn digit, hiển thị từng position×weight, running sum, phép floor/division/modulo đúng nguồn và comparison với supplied check digit.",
+        "en": "For a four-digit payload, show every position×weight, running sum, the exact source floor/division/modulo operation and comparison with the supplied check digit."
+      },
+      "boundary_case": {
+        "vi": "Đổi riêng digit kiểm tra cuối trong khi payload giữ nguyên; weighted sum phải không đổi và kết quả comparison phải chuyển từ valid sang invalid.",
+        "en": "Change only the final check digit while preserving the payload; the weighted sum must stay unchanged and the comparison must switch from valid to invalid."
+      },
+      "failure_case": {
+        "vi": "Mặc định dùng modulo vì nhớ scheme khác.",
+        "en": "Assuming modulo from a different remembered scheme."
+      },
+      "representation_and_convention": [
+        "exclude the supplied check digit from payload sum",
+        "floor/modulo only as stated"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.algorithm-translate",
+      "pattern_id": "ALGORITHM_TRANSLATE",
+      "method_step_refs": [
+        "algorithm-translate.step.contract",
+        "algorithm-translate.step.map",
+        "algorithm-translate.step.flow",
+        "algorithm-translate.step.equivalence"
+      ],
+      "error_refs": [
+        "b1.algorithm-translate.error.syntax-first",
+        "b1.algorithm-translate.error.division-return"
+      ],
+      "learning_question": {
+        "vi": "State nguồn và state đích còn tương đương sau mỗi construct không?",
+        "en": "Do source and target states remain equivalent after each construct?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A semantics-preserving mapping from pseudocode states to Python design.",
+        "After every translated step, target state corresponds to the same source state.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "READ_SOURCE_STEP",
+        "MAP_CONSTRUCT",
+        "UPDATE_ABSTRACT_STATE",
+        "COMPARE_STATES",
+        "CHECK_RETURN"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Ghép trace nguồn–đích qua ba update: assignment, branch và loop/call phải tạo cùng abstract state, side effect và return.",
+        "en": "Pair source and target traces through three updates: assignment, branch and loop/call must produce the same abstract state, side effect and return."
+      },
+      "boundary_case": {
+        "vi": "Với base/zero-iteration input và một phép integer division, target phải giữ đúng stop path, operator semantics và return propagation mà không thêm iteration.",
+        "en": "For a base/zero-iteration input containing integer division, the target must preserve the stop path, operator semantics and return propagation without adding an iteration."
+      },
+      "failure_case": {
+        "vi": "Viết cú pháp đích trước khi hiểu state transition.",
+        "en": "Writing target syntax before understanding state transitions."
+      },
+      "representation_and_convention": [
+        "integer division/modulus retain source meaning",
+        "recursive returns and side effects are preserved"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.string-compare",
+      "pattern_id": "STRING_COMPARE",
+      "method_step_refs": [
+        "string-compare.step.contract",
+        "string-compare.step.scan",
+        "string-compare.step.decide",
+        "string-compare.step.prefix"
+      ],
+      "error_refs": [
+        "b1.string-compare.error.first-char-only",
+        "b1.string-compare.error.prefix-overrun"
+      ],
+      "learning_question": {
+        "vi": "Prefix nào đã được chứng minh equal trước quyết định?",
+        "en": "Which prefix has been proven equal before the decision?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Two strings plus cursor and undecided/equal/order state.",
+        "All character pairs before cursor are equal under the required comparison policy.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "COMPARE_CHARACTERS",
+        "ADVANCE_CURSOR",
+        "DECIDE_DIFFERENCE",
+        "DETECT_PREFIX",
+        "RETURN_ORDER"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "So hai chuỗi có prefix chung ba ký tự rồi khác ở ký tự thứ tư; cursor chỉ tiến qua prefix và mismatch đầu tiên quyết định order.",
+        "en": "Compare strings sharing a three-character prefix and differing at the fourth; the cursor advances only across the prefix and the first mismatch decides the order."
+      },
+      "boundary_case": {
+        "vi": "Đối chiếu equal strings và hai hướng strict-prefix; không event nào đọc quá length, và shorter-prefix chỉ được quyết định sau khi prefix đã equal.",
+        "en": "Contrast equal strings and both strict-prefix directions; no event reads past a length, and shorter-prefix is decided only after proving the prefix equal."
+      },
+      "failure_case": {
+        "vi": "Chỉ so ký tự đầu.",
+        "en": "Comparing only the first character."
+      },
+      "representation_and_convention": [
+        "first differing character decides",
+        "prefix/equality requires explicit termination"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.string-split",
+      "pattern_id": "STRING_SPLIT",
+      "method_step_refs": [
+        "string-split.step.contract",
+        "string-split.step.scan",
+        "string-split.step.delimiter",
+        "string-split.step.flush"
+      ],
+      "error_refs": [
+        "b1.string-split.error.missing-final",
+        "b1.string-split.error.delimiter-policy"
+      ],
+      "learning_question": {
+        "vi": "Khi nào current token được commit và reset?",
+        "en": "When is the current token committed and reset?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Source string, cursor, current token and token list.",
+        "Concatenating committed tokens, delimiters and current token reconstructs the consumed prefix.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "READ_CHARACTER",
+        "APPEND_CHARACTER",
+        "DETECT_DELIMITER",
+        "COMMIT_TOKEN",
+        "FLUSH_FINAL_TOKEN"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Quét `AA;B;CCC`: hai delimiter commit hai token và end-of-input flush token `CCC`; join lại phải phục hồi chuỗi nguồn.",
+        "en": "Scan `AA;B;CCC`: two delimiters commit two tokens and end-of-input flushes `CCC`; joining must reconstruct the source string."
+      },
+      "boundary_case": {
+        "vi": "Dùng delimiter đầu, cuối và hai delimiter liên tiếp; event sequence phải thể hiện chính xác empty-token policy và không làm mất token cuối.",
+        "en": "Use leading, trailing and consecutive delimiters; the event sequence must show the exact empty-token policy and never lose the final token."
+      },
+      "failure_case": {
+        "vi": "Không flush token cuối.",
+        "en": "Failing to flush the final token."
+      },
+      "representation_and_convention": [
+        "delimiter is not part of a token unless stated",
+        "final token must be flushed"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.string-route",
+      "pattern_id": "STRING_ROUTE",
+      "method_step_refs": [
+        "string-route.step.contract",
+        "string-route.step.parse",
+        "string-route.step.convert",
+        "string-route.step.route"
+      ],
+      "error_refs": [
+        "b1.string-route.error.field-index",
+        "b1.string-route.error.cross-route"
+      ],
+      "learning_question": {
+        "vi": "Record đi qua parse, convert và destination nào?",
+        "en": "How does a record move through parse, conversion and destination selection?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Parsed fields converted to typed values and dispatched to destination arrays.",
+        "Every committed record appears in exactly one permitted destination with correctly typed fields.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "PARSE_FIELD",
+        "CONVERT_FIELD",
+        "SELECT_DESTINATION",
+        "CHECK_DESTINATION_CAPACITY",
+        "COMMIT_RECORD"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Parse record ba field, convert field số rồi route theo category vào đúng một destination; chỉ destination đó và counter của nó đổi một.",
+        "en": "Parse a three-field record, convert the numeric field and route by category to exactly one destination; only that destination and its counter change once."
+      },
+      "boundary_case": {
+        "vi": "Với field count sai, conversion lỗi và destination đầy, cả ba path phải dừng trước commit và mọi destination snapshot giữ nguyên.",
+        "en": "For wrong field count, conversion failure and a full destination, all three paths must stop before commit and every destination snapshot must remain unchanged."
+      },
+      "failure_case": {
+        "vi": "Đọc category/value từ sai token.",
+        "en": "Reading category/value from the wrong token."
+      },
+      "representation_and_convention": [
+        "parse before conversion",
+        "route and count update form one commit"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "b1.visual.run-length-encode",
+      "pattern_id": "RUN_LENGTH_ENCODE",
+      "method_step_refs": [
+        "run-length-encode.step.contract",
+        "run-length-encode.step.initialise",
+        "run-length-encode.step.scan",
+        "run-length-encode.step.flush"
+      ],
+      "error_refs": [
+        "b1.run-length-encode.error.frequency",
+        "b1.run-length-encode.error.final-flush"
+      ],
+      "learning_question": {
+        "vi": "Open run đại diện prefix nào trước và sau mỗi symbol?",
+        "en": "Which prefix does the open run represent before and after each symbol?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Current symbol, current run count and emitted runs over an ordered stream.",
+        "Emitted runs plus the open run reconstruct exactly the consumed input prefix.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "READ_SYMBOL",
+        "EXTEND_RUN",
+        "CLOSE_RUN",
+        "OPEN_RUN",
+        "FLUSH_FINAL_RUN"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Với input `AAABB`, event phải emit `(A,3)` tại symbol change và flush `(B,2)` đúng một lần ở cuối; decode phục hồi input.",
+        "en": "For input `AAABB`, events must emit `(A,3)` at the symbol change and flush `(B,2)` exactly once at the end; decoding reconstructs the input."
+      },
+      "boundary_case": {
+        "vi": "So single-item, alternating symbols và empty-policy case; single item có một final flush, alternating có một run mỗi item và empty không dereference item đầu.",
+        "en": "Compare a single item, alternating symbols and the empty-policy case; a single item has one final flush, alternating input has one run per item, and empty input never dereferences a first item."
+      },
+      "failure_case": {
+        "vi": "Đếm tổng frequency thay vì các đoạn liên tiếp.",
+        "en": "Counting total frequency instead of consecutive runs."
+      },
+      "representation_and_convention": [
+        "count consecutive equal symbols",
+        "flush the final run"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B1"
+    },
+    {
+      "visual_brief_id": "B2-VIS-ORDERED_INSERT",
+      "pattern_id": "ORDERED_INSERT",
+      "method_step_refs": [
+        "B2-ORDERED_INSERT-S01",
+        "B2-ORDERED_INSERT-S02",
+        "B2-ORDERED_INSERT-S03",
+        "B2-ORDERED_INSERT-S04",
+        "B2-ORDERED_INSERT-S05"
+      ],
+      "error_refs": [
+        "B2-ERR-ORDERED_INSERT-01",
+        "B2-ERR-ORDERED_INSERT-02",
+        "B2-ERR-ORDERED_INSERT-03"
+      ],
+      "learning_question": {
+        "vi": "Vị trí chèn và hướng dịch nào giữ thứ tự, bản ghi nguyên vẹn và giới hạn dung lượng?",
+        "en": "Which insertion position and shift direction preserve order, whole records, and capacity?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "ordered",
+        "qualification",
+        "insertion_index",
+        "shifted_suffix",
+        "final_sequence"
+      ],
+      "proposed_event_types": [
+        "CHECK_QUALIFICATION",
+        "LOCATE",
+        "SHIFT_RIGHT",
+        "PLACE",
+        "DROP_LAST"
+      ],
+      "predict_prompt": {
+        "vi": "Hãy dự đoán sự kiện và trạng thái tiếp theo trước khi chạy một bước.",
+        "en": "Predict the next event and state before advancing one step."
+      },
+      "normal_case": {
+        "vi": "Chèn giữa dãy còn chỗ.",
+        "en": "Insert into the middle with spare capacity."
+      },
+      "boundary_case": {
+        "vi": "Khóa bằng nhau ở dãy đầy.",
+        "en": "Equal key in a full sequence."
+      },
+      "failure_case": {
+        "vi": "Dịch xuôi làm ghi đè bản ghi.",
+        "en": "Forward shifting overwrites a record."
+      },
+      "representation_and_convention": "Python-oriented pseudocode; explicit live ranges; complete-record movement where records are used; Use source-specific indexing, case, return, direction, and accessor conventions.",
+      "static_fallback": {
+        "vi": "Bảng từng bước có mũi tên, vùng tô màu và cột guard/bất biến bằng văn bản.",
+        "en": "Step table with arrows, shaded regions, and textual guard/invariant columns."
+      },
+      "accessibility_notes": [
+        "Do not encode state by colour alone.",
+        "Announce event name, changed indices, and invariant text.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B2"
+    },
+    {
+      "visual_brief_id": "B2-VIS-LINEAR_SEARCH",
+      "pattern_id": "LINEAR_SEARCH",
+      "method_step_refs": [
+        "B2-LINEAR_SEARCH-S01",
+        "B2-LINEAR_SEARCH-S02",
+        "B2-LINEAR_SEARCH-S03",
+        "B2-LINEAR_SEARCH-S04",
+        "B2-LINEAR_SEARCH-S05",
+        "B2-LINEAR_SEARCH-S06"
+      ],
+      "error_refs": [
+        "B2-ERR-LINEAR_SEARCH-01",
+        "B2-ERR-LINEAR_SEARCH-02",
+        "B2-ERR-LINEAR_SEARCH-03"
+      ],
+      "learning_question": {
+        "vi": "Sau mỗi VISIT_INDEX, ta đã loại trừ những vị trí nào và khi nào hợp đồng cho phép dừng?",
+        "en": "After each VISIT_INDEX, which positions are ruled out and when does the contract permit stopping?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "search_contract",
+        "result_state",
+        "cursor",
+        "candidate_key",
+        "final_result"
+      ],
+      "proposed_event_types": [
+        "VISIT_INDEX",
+        "NORMALIZE_KEY",
+        "COMPARE",
+        "FOUND",
+        "END_NOT_FOUND"
+      ],
+      "predict_prompt": {
+        "vi": "Hãy dự đoán sự kiện và trạng thái tiếp theo trước khi chạy một bước.",
+        "en": "Predict the next event and state before advancing one step."
+      },
+      "normal_case": {
+        "vi": "Tìm thấy ở giữa.",
+        "en": "Target found in the middle."
+      },
+      "boundary_case": {
+        "vi": "Mục tiêu vắng mặt ở phạm vi một phần tử.",
+        "en": "Absent target in a one-item range."
+      },
+      "failure_case": {
+        "vi": "Trả về sau lần không khớp đầu.",
+        "en": "Return after the first non-match."
+      },
+      "representation_and_convention": "Python-oriented pseudocode; explicit live ranges; complete-record movement where records are used; Use source-specific indexing, case, return, direction, and accessor conventions.",
+      "static_fallback": {
+        "vi": "Bảng từng bước có mũi tên, vùng tô màu và cột guard/bất biến bằng văn bản.",
+        "en": "Step table with arrows, shaded regions, and textual guard/invariant columns."
+      },
+      "accessibility_notes": [
+        "Do not encode state by colour alone.",
+        "Announce event name, changed indices, and invariant text.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B2"
+    },
+    {
+      "visual_brief_id": "B2-VIS-COUNT_OCCURRENCES",
+      "pattern_id": "COUNT_OCCURRENCES",
+      "method_step_refs": [
+        "B2-COUNT_OCCURRENCES-S01",
+        "B2-COUNT_OCCURRENCES-S02",
+        "B2-COUNT_OCCURRENCES-S03",
+        "B2-COUNT_OCCURRENCES-S04",
+        "B2-COUNT_OCCURRENCES-S05",
+        "B2-COUNT_OCCURRENCES-S06"
+      ],
+      "error_refs": [
+        "B2-ERR-COUNT_OCCURRENCES-01",
+        "B2-ERR-COUNT_OCCURRENCES-02",
+        "B2-ERR-COUNT_OCCURRENCES-03"
+      ],
+      "learning_question": {
+        "vi": "Mỗi VISIT_OR_RECURSE làm tổng bộ phận khớp với phần dữ liệu đã xử lý như thế nào?",
+        "en": "How does each VISIT_OR_RECURSE keep the partial total equal to matches in the processed data?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "count_contract",
+        "partial_count",
+        "cursor_or_subproblem",
+        "remaining_range",
+        "final_count"
+      ],
+      "proposed_event_types": [
+        "VISIT_OR_RECURSE",
+        "MATCH_RESULT",
+        "INCREMENT",
+        "RETURN_SUBTOTAL"
+      ],
+      "predict_prompt": {
+        "vi": "Hãy dự đoán sự kiện và trạng thái tiếp theo trước khi chạy một bước.",
+        "en": "Predict the next event and state before advancing one step."
+      },
+      "normal_case": {
+        "vi": "Có nhiều khớp xen kẽ.",
+        "en": "Several interleaved matches."
+      },
+      "boundary_case": {
+        "vi": "Khớp duy nhất ở phần tử cuối.",
+        "en": "Only the final element matches."
+      },
+      "failure_case": {
+        "vi": "Dừng tại khớp đầu hoặc bỏ chỉ số cuối.",
+        "en": "Stop at first match or skip the last index."
+      },
+      "representation_and_convention": "Python-oriented pseudocode; explicit live ranges; complete-record movement where records are used; Use source-specific indexing, case, return, direction, and accessor conventions.",
+      "static_fallback": {
+        "vi": "Bảng từng bước có mũi tên, vùng tô màu và cột guard/bất biến bằng văn bản.",
+        "en": "Step table with arrows, shaded regions, and textual guard/invariant columns."
+      },
+      "accessibility_notes": [
+        "Do not encode state by colour alone.",
+        "Announce event name, changed indices, and invariant text.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B2"
+    },
+    {
+      "visual_brief_id": "B2-VIS-FILTER_RECORDS",
+      "pattern_id": "FILTER_RECORDS",
+      "method_step_refs": [
+        "B2-FILTER_RECORDS-S01",
+        "B2-FILTER_RECORDS-S02",
+        "B2-FILTER_RECORDS-S03",
+        "B2-FILTER_RECORDS-S04",
+        "B2-FILTER_RECORDS-S05",
+        "B2-FILTER_RECORDS-S06"
+      ],
+      "error_refs": [
+        "B2-ERR-FILTER_RECORDS-01",
+        "B2-ERR-FILTER_RECORDS-02",
+        "B2-ERR-FILTER_RECORDS-03"
+      ],
+      "learning_question": {
+        "vi": "Tại sao bản ghi chỉ nhận ACCEPT khi mọi mệnh đề AND đúng, và vì sao vẫn phải quét tiếp?",
+        "en": "Why is a record ACCEPTed only when every AND clause holds, and why must the scan continue?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "filter_contract",
+        "result_set",
+        "candidate_record",
+        "predicate_result",
+        "final_result"
+      ],
+      "proposed_event_types": [
+        "READ_FIELDS",
+        "EVALUATE_CLAUSES",
+        "ACCEPT_OR_REJECT",
+        "EMPTY_SUMMARY"
+      ],
+      "predict_prompt": {
+        "vi": "Hãy dự đoán sự kiện và trạng thái tiếp theo trước khi chạy một bước.",
+        "en": "Predict the next event and state before advancing one step."
+      },
+      "normal_case": {
+        "vi": "Nhiều bản ghi thỏa cả hai điều kiện.",
+        "en": "Several records satisfy both clauses."
+      },
+      "boundary_case": {
+        "vi": "Không bản ghi nào thỏa.",
+        "en": "No record matches."
+      },
+      "failure_case": {
+        "vi": "OR nhận bản ghi chỉ thỏa một điều kiện.",
+        "en": "OR accepts a record satisfying one clause."
+      },
+      "representation_and_convention": "Python-oriented pseudocode; explicit live ranges; complete-record movement where records are used; Use source-specific indexing, case, return, direction, and accessor conventions.",
+      "static_fallback": {
+        "vi": "Bảng từng bước có mũi tên, vùng tô màu và cột guard/bất biến bằng văn bản.",
+        "en": "Step table with arrows, shaded regions, and textual guard/invariant columns."
+      },
+      "accessibility_notes": [
+        "Do not encode state by colour alone.",
+        "Announce event name, changed indices, and invariant text.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B2"
+    },
+    {
+      "visual_brief_id": "B2-VIS-GROUP_AGGREGATE",
+      "pattern_id": "GROUP_AGGREGATE",
+      "method_step_refs": [
+        "B2-GROUP_AGGREGATE-S01",
+        "B2-GROUP_AGGREGATE-S02",
+        "B2-GROUP_AGGREGATE-S03",
+        "B2-GROUP_AGGREGATE-S04",
+        "B2-GROUP_AGGREGATE-S05",
+        "B2-GROUP_AGGREGATE-S06"
+      ],
+      "error_refs": [
+        "B2-ERR-GROUP_AGGREGATE-01",
+        "B2-ERR-GROUP_AGGREGATE-02",
+        "B2-ERR-GROUP_AGGREGATE-03"
+      ],
+      "learning_question": {
+        "vi": "Sự kiện nào chứng minh một mục chỉ UPDATE_EXISTING hoặc CREATE_GROUP đúng một lần cho khóa của nó?",
+        "en": "Which event proves that one item performs exactly one UPDATE_EXISTING or CREATE_GROUP for its key?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "group_contract",
+        "current_item",
+        "group_cursor",
+        "matched_group",
+        "new_group",
+        "final_groups"
+      ],
+      "proposed_event_types": [
+        "ACQUIRE_ITEM",
+        "SCAN_GROUP",
+        "UPDATE_EXISTING",
+        "CREATE_GROUP",
+        "VERIFY_UNIQUE_KEY"
+      ],
+      "predict_prompt": {
+        "vi": "Hãy dự đoán sự kiện và trạng thái tiếp theo trước khi chạy một bước.",
+        "en": "Predict the next event and state before advancing one step."
+      },
+      "normal_case": {
+        "vi": "Cập nhật khóa đã có rồi tạo khóa mới.",
+        "en": "Update an existing key then create a new key."
+      },
+      "boundary_case": {
+        "vi": "Khóa khớp ở nhóm cuối.",
+        "en": "Key matches the final live group."
+      },
+      "failure_case": {
+        "vi": "Tạo nhóm trùng khóa.",
+        "en": "Create a duplicate group key."
+      },
+      "representation_and_convention": "Python-oriented pseudocode; explicit live ranges; complete-record movement where records are used; Use source-specific indexing, case, return, direction, and accessor conventions.",
+      "static_fallback": {
+        "vi": "Bảng từng bước có mũi tên, vùng tô màu và cột guard/bất biến bằng văn bản.",
+        "en": "Step table with arrows, shaded regions, and textual guard/invariant columns."
+      },
+      "accessibility_notes": [
+        "Do not encode state by colour alone.",
+        "Announce event name, changed indices, and invariant text.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B2"
+    },
+    {
+      "visual_brief_id": "B2-VIS-BUBBLE_SORT",
+      "pattern_id": "BUBBLE_SORT",
+      "method_step_refs": [
+        "B2-BUBBLE_SORT-S01",
+        "B2-BUBBLE_SORT-S02",
+        "B2-BUBBLE_SORT-S03",
+        "B2-BUBBLE_SORT-S04",
+        "B2-BUBBLE_SORT-S05",
+        "B2-BUBBLE_SORT-S06"
+      ],
+      "error_refs": [
+        "B2-ERR-BUBBLE_SORT-01",
+        "B2-ERR-BUBBLE_SORT-02",
+        "B2-ERR-BUBBLE_SORT-03"
+      ],
+      "learning_question": {
+        "vi": "Sau SHRINK_BOUNDARY, vì sao hậu tố vừa tô đã ở vị trí cuối và không cần so sánh lại?",
+        "en": "After SHRINK_BOUNDARY, why is the highlighted suffix final and no longer compared?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "sort_contract",
+        "pass_boundary",
+        "pair",
+        "records_and_flag",
+        "final_sequence"
+      ],
+      "proposed_event_types": [
+        "START_PASS",
+        "COMPARE_ADJACENT",
+        "SWAP_RECORDS",
+        "SHRINK_BOUNDARY",
+        "STOP_NO_SWAP"
+      ],
+      "predict_prompt": {
+        "vi": "Hãy dự đoán sự kiện và trạng thái tiếp theo trước khi chạy một bước.",
+        "en": "Predict the next event and state before advancing one step."
+      },
+      "normal_case": {
+        "vi": "Hai lượt có hoán đổi.",
+        "en": "Two passes with swaps."
+      },
+      "boundary_case": {
+        "vi": "Dãy đã sắp kết thúc bằng lượt không hoán đổi.",
+        "en": "Already sorted data ends after a no-swap pass."
+      },
+      "failure_case": {
+        "vi": "Biên đọc cặp ngoài mảng hoặc đổi riêng khóa.",
+        "en": "Bounds read outside the array or swap only keys."
+      },
+      "representation_and_convention": "Python-oriented pseudocode; explicit live ranges; complete-record movement where records are used; Use source-specific indexing, case, return, direction, and accessor conventions.",
+      "static_fallback": {
+        "vi": "Bảng từng bước có mũi tên, vùng tô màu và cột guard/bất biến bằng văn bản.",
+        "en": "Step table with arrows, shaded regions, and textual guard/invariant columns."
+      },
+      "accessibility_notes": [
+        "Do not encode state by colour alone.",
+        "Announce event name, changed indices, and invariant text.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B2"
+    },
+    {
+      "visual_brief_id": "B2-VIS-INSERTION_SORT",
+      "pattern_id": "INSERTION_SORT",
+      "method_step_refs": [
+        "B2-INSERTION_SORT-S01",
+        "B2-INSERTION_SORT-S02",
+        "B2-INSERTION_SORT-S03",
+        "B2-INSERTION_SORT-S04",
+        "B2-INSERTION_SORT-S05",
+        "B2-INSERTION_SORT-S06"
+      ],
+      "error_refs": [
+        "B2-ERR-INSERTION_SORT-01",
+        "B2-ERR-INSERTION_SORT-02",
+        "B2-ERR-INSERTION_SORT-03"
+      ],
+      "learning_question": {
+        "vi": "SELECT_KEY, SHIFT_RIGHT và PLACE_KEY mở rộng tiền tố đã sắp mà không làm mất bản ghi ra sao?",
+        "en": "How do SELECT_KEY, SHIFT_RIGHT, and PLACE_KEY enlarge the sorted prefix without losing a record?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "sort_contract",
+        "sorted_prefix",
+        "key_record",
+        "shift_cursor",
+        "final_sequence"
+      ],
+      "proposed_event_types": [
+        "SELECT_KEY",
+        "SHIFT_RIGHT",
+        "PLACE_KEY",
+        "EXPAND_PREFIX",
+        "RETURN_VARIANT"
+      ],
+      "predict_prompt": {
+        "vi": "Hãy dự đoán sự kiện và trạng thái tiếp theo trước khi chạy một bước.",
+        "en": "Predict the next event and state before advancing one step."
+      },
+      "normal_case": {
+        "vi": "Khóa dịch qua nhiều bản ghi.",
+        "en": "A key shifts across several records."
+      },
+      "boundary_case": {
+        "vi": "Khóa bằng nhau hoặc đặt ở đầu.",
+        "en": "Equal key or placement at the start."
+      },
+      "failure_case": {
+        "vi": "Khóa bị ghi đè hoặc đọc chỉ số -1.",
+        "en": "Key is overwritten or index -1 is read."
+      },
+      "representation_and_convention": "Python-oriented pseudocode; explicit live ranges; complete-record movement where records are used; Use source-specific indexing, case, return, direction, and accessor conventions.",
+      "static_fallback": {
+        "vi": "Bảng từng bước có mũi tên, vùng tô màu và cột guard/bất biến bằng văn bản.",
+        "en": "Step table with arrows, shaded regions, and textual guard/invariant columns."
+      },
+      "accessibility_notes": [
+        "Do not encode state by colour alone.",
+        "Announce event name, changed indices, and invariant text.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B2"
+    },
+    {
+      "visual_brief_id": "B2-VIS-BINARY_SEARCH",
+      "pattern_id": "BINARY_SEARCH",
+      "method_step_refs": [
+        "B2-BINARY_SEARCH-S01",
+        "B2-BINARY_SEARCH-S02",
+        "B2-BINARY_SEARCH-S03",
+        "B2-BINARY_SEARCH-S04",
+        "B2-BINARY_SEARCH-S05",
+        "B2-BINARY_SEARCH-S06"
+      ],
+      "error_refs": [
+        "B2-ERR-BINARY_SEARCH-01",
+        "B2-ERR-BINARY_SEARCH-02",
+        "B2-ERR-BINARY_SEARCH-03"
+      ],
+      "learning_question": {
+        "vi": "Mỗi DISCARD_HALF giữ mục tiêu trong biên bao hàm nào và làm độ dài khoảng giảm nghiêm ngặt ra sao?",
+        "en": "How does each DISCARD_HALF retain the target within inclusive bounds while strictly shrinking the interval?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "search_contract",
+        "interval",
+        "mid",
+        "comparison",
+        "final_result"
+      ],
+      "proposed_event_types": [
+        "SET_BOUNDS",
+        "MIDPOINT",
+        "COMPARE",
+        "DISCARD_HALF",
+        "FOUND_OR_NOT_FOUND",
+        "RECURSE_OR_LOOP"
+      ],
+      "predict_prompt": {
+        "vi": "Hãy dự đoán sự kiện và trạng thái tiếp theo trước khi chạy một bước.",
+        "en": "Predict the next event and state before advancing one step."
+      },
+      "normal_case": {
+        "vi": "Tìm thấy sau hai lần loại nửa.",
+        "en": "Found after two interval reductions."
+      },
+      "boundary_case": {
+        "vi": "Khoảng một phần tử rồi rỗng.",
+        "en": "One-item interval becomes empty."
+      },
+      "failure_case": {
+        "vi": "Biên không giảm hoặc midpoint ngoài khoảng.",
+        "en": "Bounds do not shrink or midpoint leaves the interval."
+      },
+      "representation_and_convention": "Python-oriented pseudocode; explicit live ranges; complete-record movement where records are used; Use source-specific indexing, case, return, direction, and accessor conventions.",
+      "static_fallback": {
+        "vi": "Bảng từng bước có mũi tên, vùng tô màu và cột guard/bất biến bằng văn bản.",
+        "en": "Step table with arrows, shaded regions, and textual guard/invariant columns."
+      },
+      "accessibility_notes": [
+        "Do not encode state by colour alone.",
+        "Announce event name, changed indices, and invariant text.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B2"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-setup",
+      "pattern_id": "QUEUE_SETUP",
+      "method_step_refs": [
+        "queue-setup.step.contract",
+        "queue-setup.step.storage",
+        "queue-setup.step.pointers",
+        "queue-setup.step.consistency"
+      ],
+      "error_refs": [
+        "b3.queue-setup.error.mixed-convention",
+        "b3.queue-setup.error.invented-wrap"
+      ],
+      "learning_question": {
+        "vi": "Head/tail/count đang chỉ điều gì?",
+        "en": "What do head/tail/count denote?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "indexed storage",
+        "head/tail arrows",
+        "count",
+        "live/unused partition"
+      ],
+      "proposed_event_types": [
+        "DECLARE_STORAGE",
+        "SELECT_QUEUE_MODEL",
+        "SET_POINTERS",
+        "MARK_LIVE_RANGE",
+        "CHECK_EMPTY_FULL"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán first read/write và full state.",
+        "en": "Predict the first read/write and full state."
+      },
+      "normal_case": {
+        "vi": "Normal: queue rỗng rồi một item dưới ba conventions.",
+        "en": "Normal: empty then one item under three conventions."
+      },
+      "boundary_case": {
+        "vi": "Boundary: capacity 1 và full state.",
+        "en": "Boundary: capacity 1 and full state."
+      },
+      "failure_case": {
+        "vi": "Failure: trộn circular wrap với linear full.",
+        "en": "Failure: mix circular wrap with linear full."
+      },
+      "representation_and_convention": [
+        "linear queues do not wrap unless stated",
+        "circular queues wrap head/tail at capacity",
+        "tail may be next-free or last-item",
+        "count may be authoritative when present"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-enqueue",
+      "pattern_id": "QUEUE_ENQUEUE",
+      "method_step_refs": [
+        "queue-enqueue.step.contract",
+        "queue-enqueue.step.full-guard",
+        "queue-enqueue.step.write",
+        "queue-enqueue.step.advance",
+        "queue-enqueue.step.result"
+      ],
+      "error_refs": [
+        "b3.queue-enqueue.error.mutate-before-full",
+        "b3.queue-enqueue.error.wrong-tail-update",
+        "b3.queue-enqueue.error.wrong-result-contract",
+        "b3.queue-enqueue.error.scope-sample",
+        "b3.queue-enqueue.error.missing-full-guard"
+      ],
+      "learning_question": {
+        "vi": "Item mới được commit ở event nào?",
+        "en": "At which event is the new item committed?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "before/after metadata",
+        "write index",
+        "new item",
+        "result"
+      ],
+      "proposed_event_types": [
+        "CHECK_FULL",
+        "SELECT_WRITE_INDEX",
+        "WRITE_ITEM",
+        "MOVE_TAIL",
+        "SET_FIRST_HEAD",
+        "INCREMENT_COUNT",
+        "RETURN_RESULT"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn event tiếp theo khi còn một ô.",
+        "en": "Choose the next event with one free slot."
+      },
+      "normal_case": {
+        "vi": "Normal: partial queue commit đúng một item.",
+        "en": "Normal: partial queue commits one item."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one-free-slot success rồi full failure zero-mutation.",
+        "en": "Boundary: one-free-slot success then zero-mutation full failure."
+      },
+      "failure_case": {
+        "vi": "Failure: đảo tail-role update hoặc cập nhật trước guard.",
+        "en": "Failure: reverse tail-role update or mutate before guard."
+      },
+      "representation_and_convention": [
+        "next-free tail writes then advances",
+        "last-item tail advances to a free position before/with write",
+        "wrap only for circular queues",
+        "failure is non-mutating"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-dequeue",
+      "pattern_id": "QUEUE_DEQUEUE",
+      "method_step_refs": [
+        "queue-dequeue.step.contract",
+        "queue-dequeue.step.empty-guard",
+        "queue-dequeue.step.save-item",
+        "queue-dequeue.step.advance",
+        "queue-dequeue.step.return"
+      ],
+      "error_refs": [
+        "b3.queue-dequeue.error.read-after-advance",
+        "b3.queue-dequeue.error.sentinel-or-reset",
+        "b3.queue-dequeue.error.published-example"
+      ],
+      "learning_question": {
+        "vi": "Vì sao phải lưu item trước khi dời head?",
+        "en": "Why must the item be saved before moving head?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "head item",
+        "saved value",
+        "metadata transitions",
+        "result/sentinel"
+      ],
+      "proposed_event_types": [
+        "CHECK_EMPTY",
+        "READ_HEAD",
+        "SAVE_ITEM",
+        "MOVE_HEAD",
+        "DECREMENT_COUNT",
+        "RESET_OR_WRAP",
+        "RETURN_ITEM"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán state sau khi lấy item cuối.",
+        "en": "Predict state after removing the final item."
+      },
+      "normal_case": {
+        "vi": "Normal: hai item, trả item FIFO đầu.",
+        "en": "Normal: two items return the oldest FIFO item."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one item to empty, then empty sentinel.",
+        "en": "Boundary: one item to empty, then empty sentinel."
+      },
+      "failure_case": {
+        "vi": "Failure: move head before read hoặc dùng sai sentinel/reset.",
+        "en": "Failure: move head before read or use wrong sentinel/reset."
+      },
+      "representation_and_convention": [
+        "head identifies the first live item in observed sources",
+        "count or pointer relation detects empty",
+        "wrap/reset and slot clearing are source-specific",
+        "empty failure is non-mutating"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-inspect",
+      "pattern_id": "QUEUE_INSPECT",
+      "method_step_refs": [
+        "queue-inspect.step.contract",
+        "queue-inspect.step.iterate",
+        "queue-inspect.step.format",
+        "queue-inspect.step.preservation"
+      ],
+      "error_refs": [
+        "b3.queue-inspect.error.physical-scan",
+        "b3.queue-inspect.error.destructive-inspect"
+      ],
+      "learning_question": {
+        "vi": "Live range khác storage range thế nào?",
+        "en": "How does the live range differ from storage range?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "live/stale cells",
+        "local cursor",
+        "text",
+        "unchanged metadata"
+      ],
+      "proposed_event_types": [
+        "SET_LOCAL_CURSOR",
+        "READ_LIVE_ITEM",
+        "APPEND_DELIMITER",
+        "ADVANCE_CURSOR",
+        "RETURN_TEXT",
+        "COMPARE_SNAPSHOT"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn các ô sẽ xuất trước khi reveal.",
+        "en": "Choose output cells before reveal."
+      },
+      "normal_case": {
+        "vi": "Normal: nonzero head với nhiều live items.",
+        "en": "Normal: non-zero head with multiple live items."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one live item và exact spacing.",
+        "en": "Boundary: one live item and exact spacing."
+      },
+      "failure_case": {
+        "vi": "Failure: in toàn storage hoặc mutate bằng Dequeue.",
+        "en": "Failure: print all storage or mutate via Dequeue."
+      },
+      "representation_and_convention": [
+        "observed source uses linear next-free tail and half-open [head,tail) range",
+        "no Dequeue or metadata mutation"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-reduce",
+      "pattern_id": "QUEUE_REDUCE",
+      "method_step_refs": [
+        "queue-reduce.step.mode",
+        "queue-reduce.step.initialise",
+        "queue-reduce.step.iterate",
+        "queue-reduce.step.terminate",
+        "queue-reduce.step.postcheck"
+      ],
+      "error_refs": [
+        "b3.queue-reduce.error.wrong-mode",
+        "b3.queue-reduce.error.sentinel-as-data",
+        "b3.queue-reduce.error.missing-final-run"
+      ],
+      "learning_question": {
+        "vi": "Accumulator đang tóm tắt prefix nào?",
+        "en": "Which prefix does the accumulator summarise?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "processed/unprocessed items",
+        "accumulator",
+        "sentinel/base",
+        "queue mutation"
+      ],
+      "proposed_event_types": [
+        "SELECT_MODE",
+        "READ_OR_DEQUEUE",
+        "UPDATE_ACCUMULATOR",
+        "ADVANCE_OR_RECURSE",
+        "FLUSH_FINAL_RUN",
+        "CHECK_POST_STATE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán contribution tiếp theo và hậu trạng thái.",
+        "en": "Predict the next contribution and post-state."
+      },
+      "normal_case": {
+        "vi": "Normal: mỗi variant với prefix invariant rõ ràng.",
+        "en": "Normal: each variant with an explicit prefix invariant."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one item/base case/final run.",
+        "en": "Boundary: one item/base case/final run."
+      },
+      "failure_case": {
+        "vi": "Failure: sentinel thành data hoặc wrong mutation mode.",
+        "en": "Failure: sentinel becomes data or wrong mutation mode."
+      },
+      "representation_and_convention": [
+        "read-only recursion preserves queue",
+        "consume mode stops on exact empty result",
+        "run-length mode flushes final run"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b3.visual.list-setup",
+      "pattern_id": "LIST_SETUP",
+      "method_step_refs": [
+        "list-setup.step.contract",
+        "list-setup.step.storage",
+        "list-setup.step.live-head",
+        "list-setup.step.free-chain",
+        "list-setup.step.consistency"
+      ],
+      "error_refs": [
+        "b3.list-setup.error.physical-order",
+        "b3.list-setup.error.broken-free-partition"
+      ],
+      "learning_question": {
+        "vi": "Mỗi index thuộc live hay free chain?",
+        "en": "Does each index belong to the live or free chain?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "node table",
+        "live arrows",
+        "free arrows",
+        "head/free-head",
+        "null"
+      ],
+      "proposed_event_types": [
+        "CREATE_NODES",
+        "SET_HEAD",
+        "LINK_LIVE_CHAIN",
+        "SET_FREE_HEAD",
+        "LINK_FREE_CHAIN",
+        "CHECK_PARTITION"
+      ],
+      "predict_prompt": {
+        "vi": "Phân loại từng slot L/F trước reveal.",
+        "en": "Classify every slot L/F before reveal."
+      },
+      "normal_case": {
+        "vi": "Normal: live/free partition bao phủ capacity.",
+        "en": "Normal: live/free partition covers capacity."
+      },
+      "boundary_case": {
+        "vi": "Boundary: empty list, one free slot, object HeadNode=None.",
+        "en": "Boundary: empty list, one free slot, object HeadNode=None."
+      },
+      "failure_case": {
+        "vi": "Failure: slot trùng/mất hoặc chain có cycle.",
+        "en": "Failure: duplicated/lost slot or cyclic chain."
+      },
+      "representation_and_convention": [
+        "head is the first logical node",
+        "null terminates chains",
+        "array model may partition live/free nodes",
+        "object model uses references and no invented free list"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b3.visual.list-traverse",
+      "pattern_id": "LIST_TRAVERSE",
+      "method_step_refs": [
+        "list-traverse.step.contract",
+        "list-traverse.step.initialise",
+        "list-traverse.step.visit",
+        "list-traverse.step.advance",
+        "list-traverse.step.finish"
+      ],
+      "error_refs": [
+        "b3.list-traverse.error.cursor-plus-one",
+        "b3.list-traverse.error.wrong-stop"
+      ],
+      "learning_question": {
+        "vi": "Next thay đổi logical order ra sao?",
+        "en": "How does Next determine logical order?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "physical table",
+        "cursor",
+        "logical path",
+        "output prefix"
+      ],
+      "proposed_event_types": [
+        "SET_CURSOR_HEAD",
+        "VISIT_NODE",
+        "EMIT_DATA",
+        "FOLLOW_NEXT",
+        "STOP_AT_NULL"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn node kế tiếp, không dựa vào row kế.",
+        "en": "Choose the next node without using the next row."
+      },
+      "normal_case": {
+        "vi": "Normal: logical links nhảy qua physical rows.",
+        "en": "Normal: logical links jump across physical rows."
+      },
+      "boundary_case": {
+        "vi": "Boundary: empty và one-node tại index 0.",
+        "en": "Boundary: empty and one node at index 0."
+      },
+      "failure_case": {
+        "vi": "Failure: cursor+=1 hoặc wrong null check.",
+        "en": "Failure: cursor+=1 or wrong null check."
+      },
+      "representation_and_convention": [
+        "start at head",
+        "visit before advance",
+        "advance via Next",
+        "stop at exact null"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b3.visual.list-insert",
+      "pattern_id": "LIST_INSERT",
+      "method_step_refs": [
+        "list-insert.step.contract",
+        "list-insert.step.capacity-guard",
+        "list-insert.step.reserve",
+        "list-insert.step.write-node",
+        "list-insert.step.link",
+        "list-insert.step.postcheck"
+      ],
+      "error_refs": [
+        "b3.list-insert.error.overwrite-free-next",
+        "b3.list-insert.error.wrong-position",
+        "b3.list-insert.error.full-mutates"
+      ],
+      "learning_question": {
+        "vi": "Khi nào free node đổi quyền sở hữu?",
+        "en": "When does a free node change ownership?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "live/free chains",
+        "new index/object",
+        "saved free successor",
+        "head/tail"
+      ],
+      "proposed_event_types": [
+        "CHECK_FULL",
+        "SAVE_FREE_NEXT",
+        "RESERVE_NODE",
+        "WRITE_DATA",
+        "SET_NEW_NEXT",
+        "LINK_FRONT_OR_TAIL",
+        "CHECK_PARTITION"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán link phải lưu trước write.",
+        "en": "Predict which link must be saved before the write."
+      },
+      "normal_case": {
+        "vi": "Normal: front và tail commit sau reserve.",
+        "en": "Normal: front and tail commit after reservation."
+      },
+      "boundary_case": {
+        "vi": "Boundary: empty, one free node, full.",
+        "en": "Boundary: empty, one free node, full."
+      },
+      "failure_case": {
+        "vi": "Failure: overwrite free Next hoặc link sai vị trí.",
+        "en": "Failure: overwrite free Next or link at wrong position."
+      },
+      "representation_and_convention": [
+        "save free-node successor before overwrite",
+        "front and tail insertion use distinct link commits",
+        "full failure preserves state"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b3.visual.list-remove",
+      "pattern_id": "LIST_REMOVE",
+      "method_step_refs": [
+        "list-remove.step.contract",
+        "list-remove.step.search",
+        "list-remove.step.handle-miss",
+        "list-remove.step.unlink",
+        "list-remove.step.recycle",
+        "list-remove.step.postcheck"
+      ],
+      "error_refs": [
+        "b3.list-remove.error.head-as-interior",
+        "b3.list-remove.error.recycle-before-unlink",
+        "b3.list-remove.error.invented-absence"
+      ],
+      "learning_question": {
+        "vi": "Unlink và recycle phải theo thứ tự nào?",
+        "en": "In what order must unlink and recycle occur?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "previous/current",
+        "successor",
+        "live chain",
+        "free chain",
+        "result"
+      ],
+      "proposed_event_types": [
+        "SEARCH_NODE",
+        "CLASSIFY_HEAD_OR_INTERIOR",
+        "SAVE_SUCCESSOR",
+        "UNLINK_LIVE",
+        "RECYCLE_NODE",
+        "RETURN_RESULT",
+        "CHECK_PARTITION"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn field thay đổi cho head/middle/tail.",
+        "en": "Choose changed fields for head/middle/tail."
+      },
+      "normal_case": {
+        "vi": "Normal: first match ở head/middle/tail.",
+        "en": "Normal: first match at head/middle/tail."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one-node và absent object case.",
+        "en": "Boundary: one-node and absent object case."
+      },
+      "failure_case": {
+        "vi": "Failure: recycle trước unlink tạo lost live suffix.",
+        "en": "Failure: recycle before unlink loses the live suffix."
+      },
+      "representation_and_convention": [
+        "head case updates head",
+        "interior/tail case updates previous.Next",
+        "array model recycles after unlink",
+        "object model does not invent free-list state"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B3"
+    },
+    {
+      "visual_brief_id": "b4.visual.algorithm-rewrite",
+      "pattern_id": "ALGORITHM_REWRITE",
+      "method_step_refs": [
+        "algorithm-rewrite.step.contract",
+        "algorithm-rewrite.step.terminal",
+        "algorithm-rewrite.step.progress",
+        "algorithm-rewrite.step.return"
+      ],
+      "error_refs": [
+        "b4.algorithm-rewrite.error.guard-mismatch",
+        "b4.algorithm-rewrite.error.lost-return-order"
+      ],
+      "learning_question": {
+        "vi": "Mỗi call frame hoặc iteration tương ứng với state nào, và return đi ngược qua đâu?",
+        "en": "Which state corresponds to each call frame or iteration, and how does the return propagate back?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A source-to-target state correspondence covering call frames or loop state, accumulator, observable output and returned value.",
+        "After each target transition, its mapped state and observable prefix equal those of the corresponding source transition.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "CAPTURE_SOURCE_STATE",
+        "TEST_TERMINAL_STATE",
+        "ADVANCE_PROGRESS_MEASURE",
+        "EMIT_OBSERVABLE",
+        "PROPAGATE_RETURN",
+        "COMPARE_MAPPED_STATE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Với input cần ba bước tiến, ghép ba call frame với ba iteration; accumulator, output trung gian và return cuối phải trùng từng checkpoint.",
+        "en": "For an input requiring three progress steps, pair three call frames with three iterations; accumulator, intermediate output and final return must match at every checkpoint."
+      },
+      "boundary_case": {
+        "vi": "Với terminal input và input chỉ cần một bước, terminal test phải tạo 0/1 progress event và return phải truyền về caller ban đầu.",
+        "en": "For a terminal input and a one-step input, the terminal test must produce 0/1 progress events and the return must propagate to the original caller."
+      },
+      "failure_case": {
+        "vi": "Đổi base case thành loop guard phủ sai một state biên.",
+        "en": "Mapping the base case to a loop guard that covers the wrong boundary state."
+      },
+      "representation_and_convention": [
+        "base case and loop exit describe the same terminal states",
+        "recursive return propagation and iterative accumulation preserve evaluation order",
+        "observable output timing is part of behaviour"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B4"
+    },
+    {
+      "visual_brief_id": "b4.visual.tree-setup",
+      "pattern_id": "TREE_SETUP",
+      "method_step_refs": [
+        "tree-setup.step.representation",
+        "tree-setup.step.storage",
+        "tree-setup.step.root-allocation",
+        "tree-setup.step.audit"
+      ],
+      "error_refs": [
+        "b4.tree-setup.error.root-overwrite",
+        "b4.tree-setup.error.shared-or-oob-storage"
+      ],
+      "learning_question": {
+        "vi": "Root, child pointer và free/count đang trỏ vào miền nào sau từng bước khởi tạo?",
+        "en": "Which domain do root, child pointers and free/count refer to after each setup event?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "Either indexed node storage with left/data/right fields plus root/free state, or object nodes with child references plus a tree root/count wrapper.",
+        "Every live root/child reference is null or names a valid node, and allocation state identifies exactly the unused region without inventing a stack-top meaning.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "SELECT_TREE_REPRESENTATION",
+        "CREATE_NODE_STORAGE",
+        "SET_NULL_CHILDREN",
+        "SET_ROOT_STATE",
+        "SET_ALLOCATION_STATE",
+        "FLAG_SOURCE_CAVEAT"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Tạo capacity ba node độc lập, đặt child null, root rỗng và next-free/count ban đầu; mọi pointer phải nằm trong miền hoặc bằng null.",
+        "en": "Create capacity-three independent nodes, set null children, empty root and initial next-free/count; every pointer must be in-domain or null."
+      },
+      "boundary_case": {
+        "vi": "So empty tree với constructor nhận một root node: case đầu giữ root null, case sau phải giữ đúng parameter; capacity không đổi và caveat p35 được gắn cờ.",
+        "en": "Compare an empty tree with a constructor receiving one root node: the first keeps a null root, the second preserves the parameter; capacity stays fixed and the p35 caveat is flagged."
+      },
+      "failure_case": {
+        "vi": "Constructor nhận root node nhưng lại luôn gán root thành null.",
+        "en": "A constructor receives a root node but always overwrites root with null."
+      },
+      "representation_and_convention": [
+        "root, child and free pointers are tree roles rather than a stack top convention",
+        "empty root follows the source parameter/sentinel",
+        "constructor examples with a located source caveat are not silently repaired"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B4"
+    },
+    {
+      "visual_brief_id": "b4.visual.tree-insert",
+      "pattern_id": "TREE_INSERT",
+      "method_step_refs": [
+        "tree-insert.step.guard",
+        "tree-insert.step.empty-root",
+        "tree-insert.step.descend",
+        "tree-insert.step.attach"
+      ],
+      "error_refs": [
+        "b4.tree-insert.error.duplicate-drift",
+        "b4.tree-insert.error.orphan-allocation"
+      ],
+      "learning_question": {
+        "vi": "Comparison nào chọn child tiếp theo, và event nào là commit duy nhất làm cây thay đổi?",
+        "en": "Which comparison selects the next child, and which single event commits the tree change?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A candidate node plus a cursor/parent path over indexed or object child links and one allocation commit.",
+        "The reachable structure is a valid source-ordered BST, every pre-existing link is preserved, and allocation state advances only for one attached node.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "CHECK_TREE_CAPACITY",
+        "COMPARE_INSERT_KEY",
+        "FOLLOW_INSERT_CHILD",
+        "DETECT_EMPTY_CHILD",
+        "ATTACH_NEW_NODE",
+        "ADVANCE_ALLOCATION_STATE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Chèn key vào null child sau hai comparison; chỉ parent link đó và allocation count được đổi, inorder vẫn có thứ tự.",
+        "en": "Insert a key at a null child after two comparisons; only that parent link and allocation count change, and inorder remains ordered."
+      },
+      "boundary_case": {
+        "vi": "Đối chiếu ba state: empty root nhận node đầu, full tree giữ nguyên hoàn toàn, duplicate đi đúng nhánh equal đã khóa.",
+        "en": "Contrast three states: an empty root accepts the first node, a full tree remains unchanged, and a duplicate follows the locked equal-key branch."
+      },
+      "failure_case": {
+        "vi": "Dùng lúc thì equal-left, lúc thì equal-right.",
+        "en": "Sending equal keys left in one comparison and right in another."
+      },
+      "representation_and_convention": [
+        "less and greater-or-equal directions are source-bound",
+        "empty root is a separate commit",
+        "full failure preserves tree and allocation state"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B4"
+    },
+    {
+      "visual_brief_id": "b4.visual.tree-search",
+      "pattern_id": "TREE_SEARCH",
+      "method_step_refs": [
+        "tree-search.step.null-guard",
+        "tree-search.step.compare",
+        "tree-search.step.branch",
+        "tree-search.step.propagate"
+      ],
+      "error_refs": [
+        "b4.tree-search.error.midpoint-confusion",
+        "b4.tree-search.error.missing-return"
+      ],
+      "learning_question": {
+        "vi": "Sau mỗi comparison, subtree nào còn có thể chứa target và return đi qua những frame nào?",
+        "en": "After each comparison, which subtree can still contain the target and through which frames does the return travel?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A current node/index moving along one root-to-child path, with recursive or iterative return state.",
+        "If the target exists, it remains in the subtree named by current; every discarded subtree is excluded by the BST comparison rule.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "GUARD_SEARCH_NODE",
+        "COMPARE_SEARCH_KEY",
+        "CHOOSE_SEARCH_CHILD",
+        "DESCEND_SEARCH_PATH",
+        "RETURN_FOUND",
+        "RETURN_MISSING",
+        "PROPAGATE_SEARCH_RETURN"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Target ở leaf sau hai child edges: mỗi comparison loại một subtree và found return phải đi qua cả hai frame.",
+        "en": "Place the target at a leaf after two child edges: each comparison excludes one subtree and the found return must pass through both frames."
+      },
+      "boundary_case": {
+        "vi": "So found-at-root với missing-null: root case không descend; missing case chạm null trước dereference và trả đúng missing value.",
+        "en": "Compare found-at-root with missing-null: the root case does not descend; the missing case reaches null before dereference and returns the exact missing value."
+      },
+      "failure_case": {
+        "vi": "Dùng low/high/mid như binary search trên sorted array.",
+        "en": "Using low/high/mid as if the backing array were sorted."
+      },
+      "representation_and_convention": [
+        "tree search follows child pointers rather than midpoint array bounds",
+        "null is tested before dereference",
+        "recursive result is returned by every caller"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B4"
+    },
+    {
+      "visual_brief_id": "b4.visual.tree-traverse",
+      "pattern_id": "TREE_TRAVERSE",
+      "method_step_refs": [
+        "tree-traverse.step.order",
+        "tree-traverse.step.null",
+        "tree-traverse.step.expand",
+        "tree-traverse.step.return"
+      ],
+      "error_refs": [
+        "b4.tree-traverse.error.physical-order",
+        "b4.tree-traverse.error.visit-position"
+      ],
+      "learning_question": {
+        "vi": "Visit event xuất hiện trước, giữa hay sau hai child-return để tạo đúng traversal?",
+        "en": "Does the visit event occur before, between or after the two child returns for the required traversal?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A recursive frame with left subtree, current-node visit and right subtree events ordered by the requested traversal grammar.",
+        "Completed visit events equal the requested traversal of completed subtrees, and no null child or node is visited twice.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "ENTER_TRAVERSAL_FRAME",
+        "RETURN_NULL_SUBTREE",
+        "CALL_LEFT_SUBTREE",
+        "VISIT_CURRENT_NODE",
+        "CALL_RIGHT_SUBTREE",
+        "RETURN_TRAVERSAL_FRAME"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Trên cây lệch ba node, hiển thị enter/call/visit/return để LNR và LRN tạo hai sequence khác nhau đúng vị trí N.",
+        "en": "On a three-node skewed tree, show enter/call/visit/return so LNR and LRN produce distinct sequences with N in the correct position."
+      },
+      "boundary_case": {
+        "vi": "Empty tree tạo zero visit; leaf tạo đúng một visit nằm giữa hai null-return cho inorder hoặc sau cả hai null-return cho postorder.",
+        "en": "An empty tree emits zero visits; a leaf emits exactly one visit between two null returns for inorder or after both null returns for postorder."
+      },
+      "failure_case": {
+        "vi": "In các row của array thay vì theo child links.",
+        "en": "Printing backing-array rows instead of following child links."
+      },
+      "representation_and_convention": [
+        "inorder is left-current-right",
+        "postorder is left-right-current",
+        "physical storage order is not traversal order"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B4"
+    },
+    {
+      "visual_brief_id": "B5-VIS-HASH_SETUP",
+      "pattern_id": "HASH_SETUP",
+      "method_step_refs": [
+        "B5-HASH_SETUP-S01",
+        "B5-HASH_SETUP-S02",
+        "B5-HASH_SETUP-S03",
+        "B5-HASH_SETUP-S04",
+        "B5-HASH_SETUP-S05"
+      ],
+      "error_refs": [
+        "B5-ERR-HASH_SETUP-01",
+        "B5-ERR-HASH_SETUP-02",
+        "B5-ERR-HASH_SETUP-03"
+      ],
+      "learning_question": {
+        "vi": "Làm sao biết mọi ô của đúng biểu diễn đã nhận cùng nghĩa rỗng mà không dùng chung object mutable?",
+        "en": "How do we know every slot in the chosen representation has the same empty meaning without sharing one mutable object?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "representation_contract",
+        "storage_regions",
+        "empty_record",
+        "cursor",
+        "initialised_table"
+      ],
+      "proposed_event_types": [
+        "DECLARE_REGION",
+        "MAKE_EMPTY_RECORD",
+        "WRITE_EMPTY_SLOT",
+        "ADVANCE_DIMENSION",
+        "VERIFY_EMPTY_DOMAIN"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán sự kiện HASH_SETUP tiếp theo, address/probe và tập ô sẽ thay đổi.",
+        "en": "Predict the next HASH_SETUP event, address/probe, and changed-slot set."
+      },
+      "normal_case": {
+        "vi": "Khởi tạo đủ Main và Spare hoặc toàn bộ 100×10.",
+        "en": "Initialise complete Main+Spare or the full 100×10 table."
+      },
+      "boundary_case": {
+        "vi": "Theo dõi ô cuối của vùng thứ hai/chiều thứ hai.",
+        "en": "Track the final slot of the second region/dimension."
+      },
+      "failure_case": {
+        "vi": "Bỏ một vùng, sai sentinel hoặc alias mọi ô.",
+        "en": "Skip a region, use the wrong sentinel, or alias all slots."
+      },
+      "representation_and_convention": "Two selectable source panels: Main+Spare and bucket table; never merge their coordinates or capacities.",
+      "static_fallback": {
+        "vi": "Bảng trace từng event với key, modulus, address, probe, sentinel, ô thay đổi và bất biến.",
+        "en": "Event trace table showing key, modulus, address, probe, sentinel, changed slot, and invariant."
+      },
+      "accessibility_notes": [
+        "Do not encode empty/occupied/collision by colour alone.",
+        "Announce region, row, column, address, probe, and changed-slot count.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B5"
+    },
+    {
+      "visual_brief_id": "B5-VIS-HASH_FUNCTION",
+      "pattern_id": "HASH_FUNCTION",
+      "method_step_refs": [
+        "B5-HASH_FUNCTION-S01",
+        "B5-HASH_FUNCTION-S02",
+        "B5-HASH_FUNCTION-S03",
+        "B5-HASH_FUNCTION-S04"
+      ],
+      "error_refs": [
+        "B5-ERR-HASH_FUNCTION-01",
+        "B5-ERR-HASH_FUNCTION-02",
+        "B5-ERR-HASH_FUNCTION-03"
+      ],
+      "learning_question": {
+        "vi": "Vì sao APPLY_MOD với đúng số địa chỉ chính luôn đưa khóa vào miền chỉ số hợp lệ?",
+        "en": "Why does APPLY_MOD with the exact primary-address count always place the key in the valid index domain?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "hash_contract",
+        "key",
+        "address",
+        "returned_address"
+      ],
+      "proposed_event_types": [
+        "READ_KEY",
+        "SELECT_MODULUS",
+        "APPLY_MOD",
+        "CHECK_ADDRESS_DOMAIN",
+        "RETURN_ADDRESS"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán sự kiện HASH_FUNCTION tiếp theo, address/probe và tập ô sẽ thay đổi.",
+        "en": "Predict the next HASH_FUNCTION event, address/probe, and changed-slot set."
+      },
+      "normal_case": {
+        "vi": "Tính địa chỉ cho khóa nằm giữa miền.",
+        "en": "Compute an address for an interior key."
+      },
+      "boundary_case": {
+        "vi": "So sánh khóa 0, modulus−1, modulus và modulus+1.",
+        "en": "Compare keys 0, modulus−1, modulus, and modulus+1."
+      },
+      "failure_case": {
+        "vi": "Dùng tổng capacity hoặc băm sai trường.",
+        "en": "Use total capacity or hash the wrong field."
+      },
+      "representation_and_convention": "Two selectable source panels: Main+Spare and bucket table; never merge their coordinates or capacities.",
+      "static_fallback": {
+        "vi": "Bảng trace từng event với key, modulus, address, probe, sentinel, ô thay đổi và bất biến.",
+        "en": "Event trace table showing key, modulus, address, probe, sentinel, changed slot, and invariant."
+      },
+      "accessibility_notes": [
+        "Do not encode empty/occupied/collision by colour alone.",
+        "Announce region, row, column, address, probe, and changed-slot count.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B5"
+    },
+    {
+      "visual_brief_id": "B5-VIS-HASH_INSERT",
+      "pattern_id": "HASH_INSERT",
+      "method_step_refs": [
+        "B5-HASH_INSERT-S01",
+        "B5-HASH_INSERT-S02",
+        "B5-HASH_INSERT-S03",
+        "B5-HASH_INSERT-S04",
+        "B5-HASH_INSERT-S05",
+        "B5-HASH_INSERT-S06",
+        "B5-HASH_INSERT-S07"
+      ],
+      "error_refs": [
+        "B5-ERR-HASH_INSERT-01",
+        "B5-ERR-HASH_INSERT-02",
+        "B5-ERR-HASH_INSERT-03"
+      ],
+      "learning_question": {
+        "vi": "PROBE_SLOT phải nằm ở vùng nào và sự kiện nào chứng minh record chỉ được STORE_ONCE?",
+        "en": "Which region may PROBE_SLOT visit, and which event proves the record is STORE_ONCE?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "insert_contract",
+        "address",
+        "primary_state",
+        "table",
+        "probe",
+        "collision_region",
+        "outcome"
+      ],
+      "proposed_event_types": [
+        "HASH_ADDRESS",
+        "CHECK_PRIMARY",
+        "COLLISION_BRANCH",
+        "PROBE_SLOT",
+        "STORE_ONCE",
+        "DUPLICATE_OR_FULL"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán sự kiện HASH_INSERT tiếp theo, address/probe và tập ô sẽ thay đổi.",
+        "en": "Predict the next HASH_INSERT event, address/probe, and changed-slot set."
+      },
+      "normal_case": {
+        "vi": "Va chạm rồi lưu ở ô trống đầu tiên đúng chiến lược.",
+        "en": "Collide then store in the first free slot under the chosen strategy."
+      },
+      "boundary_case": {
+        "vi": "Ô trống cuối, duplicate và vùng collision đầy.",
+        "en": "Last free slot, duplicate, and full collision region."
+      },
+      "failure_case": {
+        "vi": "Quét nhầm vùng, probe đứng yên hoặc ghi mọi ô rỗng.",
+        "en": "Scan the wrong region, stall the probe, or write every empty slot."
+      },
+      "representation_and_convention": "Two selectable source panels: Main+Spare and bucket table; never merge their coordinates or capacities.",
+      "static_fallback": {
+        "vi": "Bảng trace từng event với key, modulus, address, probe, sentinel, ô thay đổi và bất biến.",
+        "en": "Event trace table showing key, modulus, address, probe, sentinel, changed slot, and invariant."
+      },
+      "accessibility_notes": [
+        "Do not encode empty/occupied/collision by colour alone.",
+        "Announce region, row, column, address, probe, and changed-slot count.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B5"
+    },
+    {
+      "visual_brief_id": "B5-VIS-HASH_SEARCH",
+      "pattern_id": "HASH_SEARCH",
+      "method_step_refs": [
+        "B5-HASH_SEARCH-S01",
+        "B5-HASH_SEARCH-S02",
+        "B5-HASH_SEARCH-S03",
+        "B5-HASH_SEARCH-S04",
+        "B5-HASH_SEARCH-S05",
+        "B5-HASH_SEARCH-S06"
+      ],
+      "error_refs": [
+        "B5-ERR-HASH_SEARCH-01",
+        "B5-ERR-HASH_SEARCH-02",
+        "B5-ERR-HASH_SEARCH-03"
+      ],
+      "learning_question": {
+        "vi": "Sau mỗi COMPARE_KEY, những cột nào đã bị loại và khi nào EXHAUST_BUCKET mới cho phép Not found?",
+        "en": "After each COMPARE_KEY, which columns are ruled out and when does EXHAUST_BUCKET permit Not found?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "search_contract",
+        "address",
+        "column",
+        "comparison",
+        "result"
+      ],
+      "proposed_event_types": [
+        "HASH_ADDRESS",
+        "ENTER_BUCKET",
+        "COMPARE_KEY",
+        "FOUND_DATA",
+        "EXHAUST_BUCKET",
+        "RETURN_NOT_FOUND"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán sự kiện HASH_SEARCH tiếp theo, address/probe và tập ô sẽ thay đổi.",
+        "en": "Predict the next HASH_SEARCH event, address/probe, and changed-slot set."
+      },
+      "normal_case": {
+        "vi": "Tìm thấy key ở cột giữa và trả đúng data.",
+        "en": "Find a key in an interior column and return its data."
+      },
+      "boundary_case": {
+        "vi": "Tìm ở cột cuối, bucket rỗng và key vắng mặt.",
+        "en": "Search the final column, an empty bucket, and an absent key."
+      },
+      "failure_case": {
+        "vi": "Trả Not found ở lần không khớp đầu hoặc quét toàn bảng.",
+        "en": "Return Not found on the first non-match or scan the whole table."
+      },
+      "representation_and_convention": "Two selectable source panels: Main+Spare and bucket table; never merge their coordinates or capacities.",
+      "static_fallback": {
+        "vi": "Bảng trace từng event với key, modulus, address, probe, sentinel, ô thay đổi và bất biến.",
+        "en": "Event trace table showing key, modulus, address, probe, sentinel, changed slot, and invariant."
+      },
+      "accessibility_notes": [
+        "Do not encode empty/occupied/collision by colour alone.",
+        "Announce region, row, column, address, probe, and changed-slot count.",
+        "Keyboard controls: previous, next, reset, reveal prediction."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B5"
+    },
+    {
+      "visual_brief_id": "b6.visual.oop-class",
+      "pattern_id": "OOP_CLASS",
+      "method_step_refs": [
+        "oop-class.step.contract",
+        "oop-class.step.attributes",
+        "oop-class.step.constructor-signature",
+        "oop-class.step.audit"
+      ],
+      "error_refs": [
+        "b6.oop-class.error.private-name-mismatch",
+        "b6.oop-class.error.parameter-field-swap",
+        "b6.oop-class.error.wrong-signature-default",
+        "b6.oop-class.error.s21-param-sample",
+        "b6.oop-class.error.w22-coordinate-spelling",
+        "b6.oop-class.error.constructor-underscore-source",
+        "b6.oop-class.error.tree-constructor-underscore"
+      ],
+      "learning_question": {
+        "vi": "Mỗi constructor input/default đi vào field nào?",
+        "en": "Where does each constructor input/default go?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "class table",
+        "parameter wires",
+        "private-name labels",
+        "instance field/value cards"
+      ],
+      "proposed_event_types": [
+        "READ_CLASS_TABLE",
+        "DECLARE_ATTRIBUTE",
+        "ENTER_CONSTRUCTOR",
+        "MAP_PARAMETER",
+        "APPLY_DEFAULT",
+        "CREATE_CHILD_SLOT",
+        "AUDIT_INSTANCE"
+      ],
+      "predict_prompt": {
+        "vi": "Kéo từng parameter/default tới field trước reveal.",
+        "en": "Route each parameter/default to a field before reveal."
+      },
+      "normal_case": {
+        "vi": "Mọi parameter có giá trị khác nhau cùng một default field.",
+        "en": "All parameters are distinct plus one default field."
+      },
+      "boundary_case": {
+        "vi": "Default 0/rỗng và slot đầu/cuối của composition.",
+        "en": "Zero/empty default and first/last composed slot."
+      },
+      "failure_case": {
+        "vi": "Đảo parameters hoặc sai mangled/private spelling tạo field lạ.",
+        "en": "Swapped parameters or mangled/private spelling creates a stray field."
+      },
+      "representation_and_convention": [
+        "attribute spelling/case is exact",
+        "double underscore implies Python name mangling",
+        "constructor parameter order follows the QP",
+        "defaults and composed storage are explicit"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot contract→event→object diff kèm identifier/type labels.",
+        "en": "A contract-to-event-to-object-diff strip with identifier/type labels."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone; label owner class, field, argument, branch and success/failure in text.",
+        "Expose object identity, private-name spelling and event sequence to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B6"
+    },
+    {
+      "visual_brief_id": "b6.visual.oop-subclass",
+      "pattern_id": "OOP_SUBCLASS",
+      "method_step_refs": [
+        "oop-subclass.step.split-contract",
+        "oop-subclass.step.inherit",
+        "oop-subclass.step.super",
+        "oop-subclass.step.extra-state",
+        "oop-subclass.step.audit"
+      ],
+      "error_refs": [
+        "b6.oop-subclass.error.missing-or-wrong-parent",
+        "b6.oop-subclass.error.super-argument-map",
+        "b6.oop-subclass.error.territory-identifier-source"
+      ],
+      "learning_question": {
+        "vi": "State nào do parent tạo, state nào do subclass tạo?",
+        "en": "Which state is created by the parent and by the subclass?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "inheritance arrow",
+        "parent/new parameter lanes",
+        "parent and subclass state panels"
+      ],
+      "proposed_event_types": [
+        "DECLARE_INHERITANCE",
+        "SPLIT_PARAMETERS",
+        "CALL_SUPER",
+        "REVEAL_PARENT_STATE",
+        "ASSIGN_NEW_FIELD",
+        "AUDIT_SUBCLASS"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn arguments cho super và remaining assignments.",
+        "en": "Choose super arguments and remaining assignments."
+      },
+      "normal_case": {
+        "vi": "Parent fields xuất hiện sau super, rồi hai fields mới.",
+        "en": "Parent fields appear after super, then two new fields."
+      },
+      "boundary_case": {
+        "vi": "Số parent arguments tối thiểu và một subclass-only field.",
+        "en": "Minimum parent arguments and one subclass-only field."
+      },
+      "failure_case": {
+        "vi": "New argument bị gửi vào super và một parent argument được gán hai lần.",
+        "en": "A new argument is passed to super and a parent argument is assigned twice."
+      },
+      "representation_and_convention": [
+        "parent arguments go through the parent constructor",
+        "subclass-only fields initialise afterward",
+        "super/parent call occurs exactly once"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot contract→event→object diff kèm identifier/type labels.",
+        "en": "A contract-to-event-to-object-diff strip with identifier/type labels."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone; label owner class, field, argument, branch and success/failure in text.",
+        "Expose object identity, private-name spelling and event sequence to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B6"
+    },
+    {
+      "visual_brief_id": "b6.visual.oop-get",
+      "pattern_id": "OOP_GET",
+      "method_step_refs": [
+        "oop-get.step.classify",
+        "oop-get.step.signature",
+        "oop-get.step.read",
+        "oop-get.step.return"
+      ],
+      "error_refs": [
+        "b6.oop-get.error.wrong-member",
+        "b6.oop-get.error.print-not-return",
+        "b6.oop-get.error.mutating-getter"
+      ],
+      "learning_question": {
+        "vi": "Getter chọn member nào và object có đổi không?",
+        "en": "Which member does the getter select, and does the object change?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "object fields",
+        "optional index",
+        "return channel",
+        "before/after diff"
+      ],
+      "proposed_event_types": [
+        "CALL_GETTER",
+        "VALIDATE_INDEX",
+        "READ_MEMBER",
+        "RETURN_VALUE",
+        "COMPARE_OBJECT_SNAPSHOT"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán member, type và mutation count.",
+        "en": "Predict member, type and mutation count."
+      },
+      "normal_case": {
+        "vi": "Scalar/indexed getters trả các stored values phân biệt.",
+        "en": "Scalar and indexed getters return distinct stored values."
+      },
+      "boundary_case": {
+        "vi": "Index đầu/cuối và stored zero/empty string.",
+        "en": "First/last index and stored zero/empty string."
+      },
+      "failure_case": {
+        "vi": "Print thay return hoặc chọn sai field cùng type.",
+        "en": "Prints instead of returns or selects a same-typed wrong field."
+      },
+      "representation_and_convention": [
+        "scalar getter has no business parameter unless stated",
+        "indexed getter uses the exact index convention",
+        "return is distinct from output"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot contract→event→object diff kèm identifier/type labels.",
+        "en": "A contract-to-event-to-object-diff strip with identifier/type labels."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone; label owner class, field, argument, branch and success/failure in text.",
+        "Expose object identity, private-name spelling and event sequence to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B6"
+    },
+    {
+      "visual_brief_id": "b6.visual.oop-set",
+      "pattern_id": "OOP_SET",
+      "method_step_refs": [
+        "oop-set.step.classify",
+        "oop-set.step.signature",
+        "oop-set.step.assign",
+        "oop-set.step.postcheck"
+      ],
+      "error_refs": [
+        "b6.oop-set.error.set-versus-update",
+        "b6.oop-set.error.parameter-order",
+        "b6.oop-set.error.invented-result"
+      ],
+      "learning_question": {
+        "vi": "Replacement khác relative update ở equation nào?",
+        "en": "Which equation separates replacement from relative update?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "old field",
+        "parameter",
+        "new field",
+        "object diff"
+      ],
+      "proposed_event_types": [
+        "CALL_SETTER",
+        "MAP_PARAMETER",
+        "REPLACE_FIELD",
+        "COMPARE_OLD_NEW",
+        "CHECK_UNRELATED_STATE"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn 3 hay 13 khi old=10 và parameter=3.",
+        "en": "Choose 3 or 13 when old=10 and parameter=3."
+      },
+      "normal_case": {
+        "vi": "Old 10 được thay trực tiếp bằng parameter 3; fields khác giữ nguyên.",
+        "en": "Old 10 is replaced by parameter 3 while other fields remain."
+      },
+      "boundary_case": {
+        "vi": "Indexed member đầu/cuối và replacement zero/rỗng.",
+        "en": "First/last indexed member and zero/empty replacement."
+      },
+      "failure_case": {
+        "vi": "Tính 10+3 hoặc đảo value/index parameters.",
+        "en": "Computes 10+3 or swaps value/index parameters."
+      },
+      "representation_and_convention": [
+        "field_after equals parameter",
+        "no relative arithmetic or clamp",
+        "parameter/index order remains source-specific"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot contract→event→object diff kèm identifier/type labels.",
+        "en": "A contract-to-event-to-object-diff strip with identifier/type labels."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone; label owner class, field, argument, branch and success/failure in text.",
+        "Expose object identity, private-name spelling and event sequence to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B6"
+    },
+    {
+      "visual_brief_id": "b6.visual.oop-update",
+      "pattern_id": "OOP_UPDATE",
+      "method_step_refs": [
+        "oop-update.step.equation",
+        "oop-update.step.candidate",
+        "oop-update.step.limit-and-commit",
+        "oop-update.step.return",
+        "oop-update.step.postcheck"
+      ],
+      "error_refs": [
+        "b6.oop-update.error.replacement-instead-of-relative",
+        "b6.oop-update.error.wrong-direction-or-base",
+        "b6.oop-update.error.clamp-skips-related-field",
+        "b6.oop-update.error.territory-name"
+      ],
+      "learning_question": {
+        "vi": "Candidate và clamped-after khác nhau khi nào?",
+        "en": "When do candidate and clamped-after differ?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "before/candidate/after columns",
+        "formula",
+        "bounds",
+        "multiple target fields"
+      ],
+      "proposed_event_types": [
+        "READ_OLD_STATE",
+        "COMPUTE_CANDIDATE",
+        "CHECK_BOUND",
+        "CLAMP_VALUE",
+        "COMMIT_FIELDS",
+        "AUDIT_DIFF"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán mọi after-field khi một candidate vượt bound.",
+        "en": "Predict every after-field when one candidate exceeds a bound."
+      },
+      "normal_case": {
+        "vi": "Old state khác 0 cùng delta/percentage bất đối xứng.",
+        "en": "Non-zero old state plus asymmetric delta/percentage."
+      },
+      "boundary_case": {
+        "vi": "Candidate dưới, đúng, vượt bound trong khi secondary field vẫn update.",
+        "en": "Candidate below, at and above a bound while a secondary field still updates."
+      },
+      "failure_case": {
+        "vi": "Replacement, sai dấu/base hoặc early return bỏ secondary field.",
+        "en": "Replacement, wrong sign/base or early return skips another field."
+      },
+      "representation_and_convention": [
+        "candidate is computed from old state",
+        "clamp applies on every relevant path",
+        "all required fields update even when one reaches a bound"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot contract→event→object diff kèm identifier/type labels.",
+        "en": "A contract-to-event-to-object-diff strip with identifier/type labels."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone; label owner class, field, argument, branch and success/failure in text.",
+        "Expose object identity, private-name spelling and event sequence to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B6"
+    },
+    {
+      "visual_brief_id": "b6.visual.oop-override",
+      "pattern_id": "OOP_OVERRIDE",
+      "method_step_refs": [
+        "oop-override.step.contract",
+        "oop-override.step.parent-strategy",
+        "oop-override.step.specialise",
+        "oop-override.step.result",
+        "oop-override.step.audit"
+      ],
+      "error_refs": [
+        "b6.oop-override.error.signature-drift",
+        "b6.oop-override.error.wrong-super-strategy",
+        "b6.oop-override.error.wrong-branch-result"
+      ],
+      "learning_question": {
+        "vi": "Parent và subclass side effects xảy ra bao nhiêu lần?",
+        "en": "How many times do parent and subclass side effects occur?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "parent/subclass method lanes",
+        "dispatch target",
+        "side-effect counter",
+        "result"
+      ],
+      "proposed_event_types": [
+        "DISPATCH_METHOD",
+        "SELECT_OVERRIDE_BRANCH",
+        "CALL_PARENT",
+        "APPLY_SUBCLASS_RULE",
+        "COMPOSE_RESULT",
+        "RETURN_OR_OUTPUT",
+        "AUDIT_SIDE_EFFECTS"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn strategy và đếm events trước reveal.",
+        "en": "Choose a strategy and count events before reveal."
+      },
+      "normal_case": {
+        "vi": "Dispatch chọn từng subtype branch với exact result.",
+        "en": "Dispatch selects each subtype branch with exact result."
+      },
+      "boundary_case": {
+        "vi": "Values tại/quanh caps và parent result extension rỗng/không rỗng.",
+        "en": "Values at/around caps and empty/nonempty parent result extension."
+      },
+      "failure_case": {
+        "vi": "Signature drift, parent bị gọi hai lần hoặc thiếu discriminator branch.",
+        "en": "Signature drift, parent called twice or one discriminator branch omitted."
+      },
+      "representation_and_convention": [
+        "same callable contract",
+        "parent call only when the source requires/reuses it",
+        "subclass rule preserves unchanged parent postconditions"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot contract→event→object diff kèm identifier/type labels.",
+        "en": "A contract-to-event-to-object-diff strip with identifier/type labels."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone; label owner class, field, argument, branch and success/failure in text.",
+        "Expose object identity, private-name spelling and event sequence to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B6"
+    },
+    {
+      "visual_brief_id": "b6.visual.oop-instantiate",
+      "pattern_id": "OOP_INSTANTIATE",
+      "method_step_refs": [
+        "oop-instantiate.step.constructor-contract",
+        "oop-instantiate.step.acquire-values",
+        "oop-instantiate.step.construct",
+        "oop-instantiate.step.store",
+        "oop-instantiate.step.finish"
+      ],
+      "error_refs": [
+        "b6.oop-instantiate.error.argument-order-type",
+        "b6.oop-instantiate.error.alias-or-overwrite",
+        "b6.oop-instantiate.error.wrong-class-branch",
+        "b6.oop-instantiate.error.s21-capacity-count",
+        "b6.oop-instantiate.error.w21-rubric-arithmetic"
+      ],
+      "learning_question": {
+        "vi": "Một source record trở thành object và slot nào?",
+        "en": "Which object and slot does one source record become?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "record tokens",
+        "constructor slots",
+        "class identity",
+        "object identities",
+        "container indices"
+      ],
+      "proposed_event_types": [
+        "READ_RECORD",
+        "GROUP_VALUES",
+        "CAST_VALUE",
+        "SELECT_CLASS",
+        "MAP_ARGUMENTS",
+        "CONSTRUCT_INSTANCE",
+        "STORE_REFERENCE",
+        "ADVANCE_COUNT"
+      ],
+      "predict_prompt": {
+        "vi": "Map record→class→arguments→slot và phát hiện alias.",
+        "en": "Map record→class→arguments→slot and detect aliasing."
+      },
+      "normal_case": {
+        "vi": "Fixed/input/file records tạo các object riêng đúng type.",
+        "en": "Fixed, input and file records create distinct correctly typed objects."
+      },
+      "boundary_case": {
+        "vi": "Một record, đúng final capacity và các corner cells của nested grid.",
+        "en": "One record, exact final capacity and nested-grid corner cells."
+      },
+      "failure_case": {
+        "vi": "Arguments lệch, sai subclass, slot bị ghi đè hoặc child instances alias nhau.",
+        "en": "Shifted arguments, wrong subclass, overwritten slot or aliased child instances."
+      },
+      "representation_and_convention": [
+        "one complete argument tuple per object",
+        "correct class/subclass selected",
+        "distinct mutable instances per required slot",
+        "record count and storage capacity follow the QP"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot contract→event→object diff kèm identifier/type labels.",
+        "en": "A contract-to-event-to-object-diff strip with identifier/type labels."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone; label owner class, field, argument, branch and success/failure in text.",
+        "Expose object identity, private-name spelling and event sequence to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B6"
+    },
+    {
+      "visual_brief_id": "b6.visual.oop-capacity-add",
+      "pattern_id": "OOP_CAPACITY_ADD",
+      "method_step_refs": [
+        "oop-capacity-add.step.contract",
+        "oop-capacity-add.step.full-guard",
+        "oop-capacity-add.step.store",
+        "oop-capacity-add.step.count-result"
+      ],
+      "error_refs": [
+        "b6.oop-capacity-add.error.off-by-one-full",
+        "b6.oop-capacity-add.error.increment-before-store",
+        "b6.oop-capacity-add.error.wrong-result-or-object"
+      ],
+      "learning_question": {
+        "vi": "Guard, store và count update phải theo thứ tự nào?",
+        "en": "In what order must guard, store and count update occur?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "capacity/count gauge",
+        "child slots",
+        "object identity",
+        "Boolean result"
+      ],
+      "proposed_event_types": [
+        "CHECK_CAPACITY",
+        "REJECT_FULL",
+        "STORE_CHILD_AT_COUNT",
+        "INCREMENT_COUNT",
+        "RETURN_BOOLEAN",
+        "AUDIT_IDENTITY"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn next event cho one-slot-left và full.",
+        "en": "Choose the next event for one-slot-left and full."
+      },
+      "normal_case": {
+        "vi": "Aggregate còn chỗ lưu đúng Train rồi tăng count.",
+        "en": "A partial aggregate stores the exact Train then increments count."
+      },
+      "boundary_case": {
+        "vi": "Capacity 1, còn một slot, rồi full state không mutation.",
+        "en": "Capacity 1, one slot left, then already-full non-mutation."
+      },
+      "failure_case": {
+        "vi": "Tăng count trước store/full guard hoặc sai Boolean/object identity.",
+        "en": "Increments before store/full guard or returns the wrong Boolean/object identity."
+      },
+      "representation_and_convention": [
+        "count is next free slot in the observed part",
+        "full when count equals capacity",
+        "failure is non-mutating",
+        "store precedes increment"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot contract→event→object diff kèm identifier/type labels.",
+        "en": "A contract-to-event-to-object-diff strip with identifier/type labels."
+      },
+      "accessibility_notes": [
+        "Never rely on colour alone; label owner class, field, argument, branch and success/failure in text.",
+        "Expose object identity, private-name spelling and event sequence to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B6"
+    },
+    {
+      "visual_brief_id": "b7.visual.file-read-array",
+      "pattern_id": "FILE_READ_ARRAY",
+      "method_step_refs": [
+        "file-read-array.step.contract",
+        "file-read-array.step.open",
+        "file-read-array.step.read-commit",
+        "file-read-array.step.close-outcome"
+      ],
+      "error_refs": [
+        "b7.file-read-array.error.partial-record",
+        "b7.file-read-array.error.termination-scope"
+      ],
+      "learning_question": {
+        "vi": "Một group line trở thành đúng một destination item ở event nào, và guard nào chặn read/commit tiếp theo?",
+        "en": "At which event does one line group become exactly one destination item, and which guard blocks the next read/commit?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "An input-file lifecycle plus a record buffer, converted fields, destination array/record/ADT and committed-record count.",
+        "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "OPEN_INPUT_FILE",
+        "READ_RECORD_LINE",
+        "COMPLETE_RECORD_BUFFER",
+        "CONVERT_RECORD_FIELD",
+        "CHECK_DESTINATION_CAPACITY",
+        "COMMIT_DESTINATION_ITEM",
+        "CLOSE_INPUT_FILE",
+        "EMIT_READ_ERROR"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "File gồm hai record, mỗi record hai line name/score: mỗi cặp phải tạo READ×2→CONVERT→COMMIT, count đi 0→1→2 rồi CLOSE.",
+        "en": "Use a file with two two-line name/score records: each pair must produce READ×2→CONVERT→COMMIT, count moves 0→1→2, then CLOSE."
+      },
+      "boundary_case": {
+        "vi": "So EOF sau một record rưỡi, capacity đầy trước EOF và open failure; không path nào commit half-record hoặc vượt capacity, và error output đúng contract.",
+        "en": "Compare EOF after one-and-a-half records, capacity full before EOF and open failure; no path commits a half-record or exceeds capacity, and error output follows the contract."
+      },
+      "failure_case": {
+        "vi": "Commit field/array element trước khi đọc đủ mọi line của record.",
+        "en": "Committing a field/array element before all lines of the record have been read."
+      },
+      "representation_and_convention": [
+        "open before the first read and close on every required completion path",
+        "group all lines of one record before conversion/commit",
+        "EOF/fixed count and capacity are independent guards",
+        "exception output remains source-bound"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B7"
+    },
+    {
+      "visual_brief_id": "b7.visual.file-read-objects",
+      "pattern_id": "FILE_READ_OBJECTS",
+      "method_step_refs": [
+        "file-read-objects.step.schema",
+        "file-read-objects.step.open-group",
+        "file-read-objects.step.construct-update",
+        "file-read-objects.step.commit-close"
+      ],
+      "error_refs": [
+        "b7.file-read-objects.error.record-desync",
+        "b7.file-read-objects.error.wrong-object-route"
+      ],
+      "learning_question": {
+        "vi": "Record buffer nào chọn constructor hoặc target object nào, và khi nào object state mới được commit?",
+        "en": "Which constructor or target object does the record buffer select, and when is object state committed?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A complete typed record buffer mapped to one object constructor/subclass or to one located existing object, followed by a single object commit/update.",
+        "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "OPEN_OBJECT_FILE",
+        "BUFFER_OBJECT_RECORD",
+        "CONVERT_OBJECT_FIELDS",
+        "SELECT_OBJECT_ROUTE",
+        "CONSTRUCT_OBJECT_CANDIDATE",
+        "LOOKUP_UPDATE_TARGET",
+        "COMMIT_OBJECT_STATE",
+        "CLOSE_OBJECT_FILE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Một record bốn field description/width/height/colour phải buffer đủ, convert hai số, construct đúng parameter order và commit một object/count.",
+        "en": "A four-field description/width/height/colour record must buffer fully, convert two numbers, construct in exact parameter order and commit one object/count."
+      },
+      "boundary_case": {
+        "vi": "Đối chiếu record subtype khác, lookup key không tồn tại và final record thiếu field; route/lookup phải rõ và không case thất bại nào tạo partial object.",
+        "en": "Contrast a different subtype record, a missing lookup key and a final record missing one field; route/lookup must be explicit and no failure creates a partial object."
+      },
+      "failure_case": {
+        "vi": "Đọc sai số line/record làm field record sau trượt sang record trước.",
+        "en": "Reading the wrong number of lines per record so a later field shifts into the previous record."
+      },
+      "representation_and_convention": [
+        "construct only after complete typed record parsing",
+        "subclass discriminator selects one source-permitted constructor",
+        "create and update paths have distinct postconditions",
+        "count increases only for created/stored objects"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B7"
+    },
+    {
+      "visual_brief_id": "b7.visual.file-write",
+      "pattern_id": "FILE_WRITE",
+      "method_step_refs": [
+        "file-write.step.contract",
+        "file-write.step.open",
+        "file-write.step.format-write",
+        "file-write.step.close-outcome"
+      ],
+      "error_refs": [
+        "b7.file-write.error.wrong-mode",
+        "b7.file-write.error.format-order"
+      ],
+      "learning_question": {
+        "vi": "Open mode biến đổi pre-file state thế nào, và mỗi formatted line được commit theo order nào trước close?",
+        "en": "How does open mode transform pre-file state, and in what order is each formatted line committed before close?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "An output-file lifecycle plus an ordered stream of formatted record lines derived from source state.",
+        "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "SELECT_OUTPUT_MODE",
+        "OPEN_OUTPUT_FILE",
+        "SELECT_OUTPUT_RECORD",
+        "FORMAT_OUTPUT_LINE",
+        "WRITE_OUTPUT_LINE",
+        "CLOSE_OUTPUT_FILE",
+        "EMIT_WRITE_ERROR"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Ghi ba record name/score vào output mới: mỗi record tạo một formatted line theo order, WRITE×3 rồi CLOSE; file cuối chỉ có ba record mới.",
+        "en": "Write three name/score records to a new output: each forms one ordered line, WRITE×3 then CLOSE; the final file contains only the three new records."
+      },
+      "boundary_case": {
+        "vi": "Với pre-file có prefix sentinel, append phải giữ prefix còn overwrite phải bỏ; physical tree rows phải ra triples theo row dù inorder khác.",
+        "en": "With a pre-file sentinel prefix, append must preserve it while overwrite removes it; physical tree rows must emit row triples even when inorder differs."
+      },
+      "failure_case": {
+        "vi": "Dùng overwrite khi phải append hoặc append khi phải tạo output mới.",
+        "en": "Using overwrite when append is required, or append when a new output is required."
+      },
+      "representation_and_convention": [
+        "append preserves existing content; write/overwrite starts the source-required new output",
+        "field and newline grammar is source-bound",
+        "physical storage rows and logical traversal/order are distinct",
+        "close occurs after the final write or on the required handled path"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B7"
+    },
+    {
+      "visual_brief_id": "b8.visual.main-flow",
+      "pattern_id": "MAIN_FLOW",
+      "method_step_refs": [
+        "main-flow.step.contract",
+        "main-flow.step.schedule",
+        "main-flow.step.handoff-branch",
+        "main-flow.step.audit"
+      ],
+      "error_refs": [
+        "b8.main-flow.error.wrong-order-stale-state",
+        "b8.main-flow.error.lost-result-iteration"
+      ],
+      "learning_question": {
+        "vi": "Call nào đang sở hữu state version nào, và return nào mở khóa event kế tiếp?",
+        "en": "Which call owns which state version, and which return unlocks the next event?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A call-and-state graph whose nodes are orchestration steps and whose edges carry parameters, return values, state versions and branch outcomes.",
+        "After each orchestration event, every completed call has received the source-required arguments, its result/state version is owned once, and every pending call still has a satisfiable precondition.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "READ_WORKFLOW_INPUT",
+        "CHECK_CALL_PRECONDITIONS",
+        "INVOKE_DEPENDENCY_CALL",
+        "RECEIVE_CALL_RESULT",
+        "COMMIT_STATE_VERSION",
+        "SELECT_RESULT_BRANCH",
+        "HANDOFF_TO_OUTPUT_OR_EVIDENCE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Pipeline Read→Sort→Output dùng state v0→v1→v2: mỗi call chỉ mở khi producer trước hoàn tất và Output nhận đúng v2.",
+        "en": "A Read→Sort→Output pipeline uses state v0→v1→v2: each call unlocks only after its producer completes, and Output receives v2."
+      },
+      "boundary_case": {
+        "vi": "So zero-iteration, one-iteration và failed-call result: không branch nào dùng stale result, không consumer nào chạy khi precondition chưa thỏa.",
+        "en": "Compare zero-iteration, one-iteration and failed-call results: no branch uses a stale result and no consumer runs with an unsatisfied precondition."
+      },
+      "failure_case": {
+        "vi": "Gọi output/search/transform trước producer hoặc dùng state version cũ.",
+        "en": "Calling output/search/transform before its producer or using a stale state version."
+      },
+      "representation_and_convention": [
+        "a dependency call is referenced rather than reimplemented",
+        "call order follows preconditions and state versions",
+        "each return is stored/used before dependent calls",
+        "loop count and result branch remain source-bound"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B8"
+    },
+    {
+      "visual_brief_id": "b8.visual.output-format",
+      "pattern_id": "OUTPUT_FORMAT",
+      "method_step_refs": [
+        "output-format.step.grammar",
+        "output-format.step.sequence",
+        "output-format.step.render",
+        "output-format.step.audit"
+      ],
+      "error_refs": [
+        "b8.output-format.error.right-data-wrong-shape",
+        "b8.output-format.error.wrong-range-order"
+      ],
+      "learning_question": {
+        "vi": "Iterator chọn item nào tiếp theo, và grammar biến item đó thành exact line/cell/return fragment nào?",
+        "en": "Which item does the iterator select next, and how does the grammar turn it into the exact line/cell/return fragment?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "An output grammar plus an ordered sequence of source values transformed into labelled lines/cells or one returned formatted value.",
+        "After k output events, the rendered prefix exactly matches the first k items of the source-selected sequence under the required labels, separators, line breaks and type contract.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "SELECT_OUTPUT_RANGE",
+        "READ_OUTPUT_ITEM",
+        "BUILD_FORMAT_FRAGMENT",
+        "EMIT_OUTPUT_FRAGMENT",
+        "ADVANCE_OUTPUT_POSITION",
+        "AUDIT_RENDERED_SEQUENCE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Hai record có field phân biệt được render thành hai labelled lines; event sequence phải giữ exact literal, separator, order và source state unchanged.",
+        "en": "Render two records with distinct fields as two labelled lines; events must preserve exact literals, separators and order while leaving source state unchanged."
+      },
+      "boundary_case": {
+        "vi": "Dùng backing rows có physical order khác inorder và một empty/unused slot; chọn đúng physical hoặc logical range phải cho first/last/count khác nhau theo contract.",
+        "en": "Use backing rows whose physical order differs from inorder plus an empty/unused slot; selecting physical or logical range must produce the contract-specific first/last/count."
+      },
+      "failure_case": {
+        "vi": "Có đúng values nhưng thiếu label/separator/newline hoặc ghép sai field order.",
+        "en": "Having correct values but missing a label/separator/newline or concatenating fields in the wrong order."
+      },
+      "representation_and_convention": [
+        "exact source literals and labels are preserved when specified",
+        "physical storage order is distinct from logical traversal/order",
+        "range can include unused physical slots",
+        "formatting does not mutate the underlying data structure"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B8"
+    },
+    {
+      "visual_brief_id": "b8.visual.evidence-run",
+      "pattern_id": "EVIDENCE_RUN",
+      "method_step_refs": [
+        "evidence-run.step.obligation",
+        "evidence-run.step.matrix",
+        "evidence-run.step.capture-plan",
+        "evidence-run.step.review-handoff"
+      ],
+      "error_refs": [
+        "b8.evidence-run.error.unattributed-capture",
+        "b8.evidence-run.error.premature-run-claim"
+      ],
+      "learning_question": {
+        "vi": "Mỗi planned capture phải hiển thị input, observable và attribution nào trước khi Stage 6 có thể review?",
+        "en": "Which input, observable and attribution must each planned capture show before Stage 6 can review it?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "A Stage 5/6 evidence-capture plan linking each prescribed case to setup/reset, visible inputs, required output/file state and a named capture slot; no execution evidence exists yet.",
+        "Every planned capture is attributable to exactly one test case and shows all source-required observable evidence, while no Stage 4 field states that execution, output or screenshot already exists.",
+        "current guard and commit status"
+      ],
+      "proposed_event_types": [
+        "PLAN_CASE_SETUP",
+        "PLAN_RUN_START",
+        "PLAN_INPUT_VISIBLE",
+        "PLAN_OUTPUT_VISIBLE",
+        "PLAN_FILE_AND_FILENAME_VISIBLE",
+        "PLAN_CAPTURE_SLOT",
+        "PLAN_STAGE6_REVIEW"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán event kế tiếp và state nào phải được giữ nguyên.",
+        "en": "Predict the next event and which state must remain unchanged."
+      },
+      "normal_case": {
+        "vi": "Thiết kế hai capture slots cho hai prescribed runs: mỗi slot liệt kê reset, visible input, expected output và case id; cả hai vẫn PENDING Stage 5/6.",
+        "en": "Design two capture slots for two prescribed runs: each lists reset, visible input, expected output and case id; both remain PENDING Stage 5/6."
+      },
+      "boundary_case": {
+        "vi": "File-evidence case yêu cầu filename và contents trong frame; một output-only crop phải bị capture gate từ chối và không được gọi là run/pass.",
+        "en": "A file-evidence case requires filename and contents in frame; an output-only crop must fail the capture gate and must not be described as a run/pass."
+      },
+      "failure_case": {
+        "vi": "Plan chỉ chụp output, thiếu prescribed input, case id, file contents hoặc filename bắt buộc.",
+        "en": "Planning an output-only capture that omits prescribed input, case id, file contents or a required filename."
+      },
+      "representation_and_convention": [
+        "Stage 4 designs evidence obligations but does not claim a run occurred",
+        "official prescribed cases are distinguished from AlgoCore-added coverage",
+        "each capture shows enough input/output/file identity to be attributable",
+        "multiple runs have explicit reset/state lineage"
+      ],
+      "static_fallback": {
+        "vi": "Snapshot trước/sau kèm bảng guard, state và invariant.",
+        "en": "Before/after snapshots with guard, state and invariant table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone.",
+        "Label indices, fields and state changes in text.",
+        "Provide keyboard-step-compatible event descriptions at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD",
+      "source_batch_id": "B8"
+    }
+  ]
+}

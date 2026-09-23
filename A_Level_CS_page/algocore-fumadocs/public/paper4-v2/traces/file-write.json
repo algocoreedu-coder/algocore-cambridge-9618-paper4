@@ -1,0 +1,1042 @@
+{
+  "schema_version": "paper4-v2-trace-chunk-v1",
+  "pattern_id": "FILE_WRITE",
+  "owner": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.text-files",
+    "lesson_slug": "text-files",
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.text-files.production-v1",
+    "artifact_version": "production-v1",
+    "code_sha256": "487434f138c8cedb9bda366fa55f4116e54701049279c9db78728eb10e818c06"
+  },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.text-files.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.text-files",
+    "pattern_ids": [
+      "FILE_READ_ARRAY",
+      "FILE_WRITE"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "text-files.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "text-files.production-v1.L002",
+        "order": 2,
+        "text": "from tempfile import TemporaryDirectory"
+      },
+      {
+        "line_id": "text-files.production-v1.L003",
+        "order": 3,
+        "text": ""
+      },
+      {
+        "line_id": "text-files.production-v1.L004",
+        "order": 4,
+        "text": "def parse_records(text):"
+      },
+      {
+        "line_id": "text-files.production-v1.L005",
+        "order": 5,
+        "text": "    records = []"
+      },
+      {
+        "line_id": "text-files.production-v1.L006",
+        "order": 6,
+        "text": "    for raw in text.splitlines():"
+      },
+      {
+        "line_id": "text-files.production-v1.L007",
+        "order": 7,
+        "text": "        if raw == \"\": continue"
+      },
+      {
+        "line_id": "text-files.production-v1.L008",
+        "order": 8,
+        "text": "        fields = raw.split(\",\")"
+      },
+      {
+        "line_id": "text-files.production-v1.L009",
+        "order": 9,
+        "text": "        if len(fields) != 2: raise ValueError(\"malformed record\")"
+      },
+      {
+        "line_id": "text-files.production-v1.L010",
+        "order": 10,
+        "text": "        records.append({\"name\": fields[0], \"score\": int(fields[1])})"
+      },
+      {
+        "line_id": "text-files.production-v1.L011",
+        "order": 11,
+        "text": "    return records"
+      },
+      {
+        "line_id": "text-files.production-v1.L012",
+        "order": 12,
+        "text": ""
+      },
+      {
+        "line_id": "text-files.production-v1.L013",
+        "order": 13,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "text-files.production-v1.L014",
+        "order": 14,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "text-files.production-v1.L015",
+        "order": 15,
+        "text": "    with TemporaryDirectory() as directory:"
+      },
+      {
+        "line_id": "text-files.production-v1.L016",
+        "order": 16,
+        "text": "        source, output = Path(directory) / \"input.txt\", Path(directory) / \"output.txt\""
+      },
+      {
+        "line_id": "text-files.production-v1.L017",
+        "order": 17,
+        "text": "        source.write_text(fixture[\"content\"], encoding=\"utf-8\", newline=\"\\n\")"
+      },
+      {
+        "line_id": "text-files.production-v1.L018",
+        "order": 18,
+        "text": "        committed = fixture.get(\"committed\", \"SAFE\\n\")"
+      },
+      {
+        "line_id": "text-files.production-v1.L019",
+        "order": 19,
+        "text": "        output.write_text(committed, encoding=\"utf-8\", newline=\"\\n\")"
+      },
+      {
+        "line_id": "text-files.production-v1.L020",
+        "order": 20,
+        "text": "        try:"
+      },
+      {
+        "line_id": "text-files.production-v1.L021",
+        "order": 21,
+        "text": "            records = parse_records(source.read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "text-files.production-v1.L022",
+        "order": 22,
+        "text": "            rendered = \"\".join(f\"{record['name']}:{record['score']}\\n\" for record in records)"
+      },
+      {
+        "line_id": "text-files.production-v1.L023",
+        "order": 23,
+        "text": "            output.write_text(rendered, encoding=\"utf-8\", newline=\"\\n\")"
+      },
+      {
+        "line_id": "text-files.production-v1.L024",
+        "order": 24,
+        "text": "            with output.open(\"a\", encoding=\"utf-8\", newline=\"\\n\") as handle: handle.write(fixture.get(\"append\", \"\"))"
+      },
+      {
+        "line_id": "text-files.production-v1.L025",
+        "order": 25,
+        "text": "            trace += [{\"event\": \"load\", \"records\": len(records)}, {\"event\": \"overwrite\"}, {\"event\": \"append\"}]"
+      },
+      {
+        "line_id": "text-files.production-v1.L026",
+        "order": 26,
+        "text": "            return {\"status\": \"OK\", \"records\": records, \"output\": output.read_text(encoding=\"utf-8\"), \"trace\": trace}"
+      },
+      {
+        "line_id": "text-files.production-v1.L027",
+        "order": 27,
+        "text": "        except (OSError, UnicodeError, ValueError) as error:"
+      },
+      {
+        "line_id": "text-files.production-v1.L028",
+        "order": 28,
+        "text": "            trace.append({\"event\": \"reject\", \"type\": type(error).__name__})"
+      },
+      {
+        "line_id": "text-files.production-v1.L029",
+        "order": 29,
+        "text": "            return {\"status\": \"INVALID_FILE\", \"output\": output.read_text(encoding=\"utf-8\"), \"trace\": trace}"
+      },
+      {
+        "line_id": "text-files.production-v1.L030",
+        "order": 30,
+        "text": ""
+      },
+      {
+        "line_id": "text-files.production-v1.L031",
+        "order": 31,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "text-files.production-v1.L032",
+        "order": 32,
+        "text": "    import json"
+      },
+      {
+        "line_id": "text-files.production-v1.L033",
+        "order": 33,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "text-files.production-v1.L034",
+        "order": 34,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "text-files.production-v1.L035",
+        "order": 35,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "text-files.production-v1.L036",
+        "order": 36,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "text-files.production-v1.L037",
+        "order": 37,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "text-files.production-v1.L038",
+        "order": 38,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "text-files.production-v1.L039",
+        "order": 39,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "487434f138c8cedb9bda366fa55f4116e54701049279c9db78728eb10e818c06",
+    "caption": {
+      "en": "Safe sequential reading, parsing, overwrite and append.",
+      "vi": "Đọc tuần tự, parse, overwrite và append an toàn."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.text-files.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.text-files.production-v1.independent-rerun",
+      "execution_log_sha256": "675cb995d6a70d63e13e52a99814d65c64d2da8e9c865bc7a81c4a4d4b64a948"
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.text-files.file-write.boundary.production-v1",
+      "case_kind": "boundary",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.text-files.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "text-files.boundary",
+        "fixture_input": {
+          "append": "",
+          "content": "Solo,0"
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-002",
+        "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-003"
+      ],
+      "expected_output_ref": "text-files.boundary.expected-output",
+      "fixture_ref": "text-files.boundary"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.text-files.file-write.failure.production-v1",
+      "case_kind": "failure",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.failure.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.text-files.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "text-files.failure",
+        "fixture_input": {
+          "append": "",
+          "committed": "SAFE\n",
+          "content": "Ada,90,EXTRA\n"
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "INVALID_FILE"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.text-files.file-write.failure.production-v1.event-001"
+      ],
+      "expected_output_ref": "text-files.failure.expected-output",
+      "fixture_ref": "text-files.failure"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.text-files.file-write.normal.production-v1",
+      "case_kind": "normal",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.text-files.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "text-files.normal",
+        "fixture_input": {
+          "append": "END:2\n",
+          "content": "Ada,90\nLin,80\n"
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-002",
+        "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-003"
+      ],
+      "expected_output_ref": "text-files.normal.expected-output",
+      "fixture_ref": "text-files.normal"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1",
+      "sequence": 0,
+      "event_type": "read",
+      "active_line_ids": [
+        "text-files.production-v1.L025",
+        "text-files.production-v1.L028",
+        "text-files.production-v1.L034"
+      ],
+      "before": {
+        "fixture_ref": "text-files.boundary",
+        "fixture_input": {
+          "append": "",
+          "content": "Solo,0"
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "load",
+          "records": 1
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "text-files.boundary",
+        "fixture_input": {
+          "append": "",
+          "content": "Solo,0"
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "load",
+            "records": 1
+          }
+        ],
+        "latest_event": "load",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "load",
+          "records": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "FILE_WRITE: sự kiện load phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "FILE_WRITE: event load must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Đọc dữ liệu nào ở bước này? (load)",
+        "en": "Which data is read at this step? (load)"
+      },
+      "feedback": {
+        "vi": "Bước đọc lấy đúng dữ liệu từ fixture đã chạy lại. Sự kiện: load.",
+        "en": "The read takes the exact data from the rerun fixture. Event: load."
+      },
+      "visual_targets": [
+        "visual.file-write.state",
+        "visual.file-write.load"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: load",
+          "en": "Step 1: load"
+        },
+        "action_description": {
+          "vi": "Đọc dữ liệu nào ở bước này? (load)",
+          "en": "Which data is read at this step? (load)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Bước đọc lấy đúng dữ liệu từ fixture đã chạy lại. Sự kiện: load.",
+            "en": "The read takes the exact data from the rerun fixture. Event: load."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1",
+      "sequence": 1,
+      "event_type": "write",
+      "active_line_ids": [
+        "text-files.production-v1.L025",
+        "text-files.production-v1.L028",
+        "text-files.production-v1.L013"
+      ],
+      "before": {
+        "fixture_ref": "text-files.boundary",
+        "fixture_input": {
+          "append": "",
+          "content": "Solo,0"
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "load",
+            "records": 1
+          }
+        ],
+        "latest_event": "load",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "overwrite"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "text-files.boundary",
+        "fixture_input": {
+          "append": "",
+          "content": "Solo,0"
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "event": "load",
+            "records": 1
+          },
+          {
+            "event": "overwrite"
+          }
+        ],
+        "latest_event": "overwrite",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "overwrite"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "FILE_WRITE: sự kiện overwrite phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "FILE_WRITE: event overwrite must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (overwrite)",
+        "en": "Which value will be written or updated? (overwrite)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: overwrite.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: overwrite."
+      },
+      "visual_targets": [
+        "visual.file-write.state",
+        "visual.file-write.overwrite"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: overwrite",
+          "en": "Step 2: overwrite"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (overwrite)",
+          "en": "Which value will be written or updated? (overwrite)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: overwrite.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: overwrite."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1",
+      "sequence": 2,
+      "event_type": "write",
+      "active_line_ids": [
+        "text-files.production-v1.L024",
+        "text-files.production-v1.L025",
+        "text-files.production-v1.L028",
+        "text-files.production-v1.L029"
+      ],
+      "before": {
+        "fixture_ref": "text-files.boundary",
+        "fixture_input": {
+          "append": "",
+          "content": "Solo,0"
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "event": "load",
+            "records": 1
+          },
+          {
+            "event": "overwrite"
+          }
+        ],
+        "latest_event": "overwrite",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "append"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "text-files.boundary",
+        "fixture_input": {
+          "append": "",
+          "content": "Solo,0"
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "event": "load",
+            "records": 1
+          },
+          {
+            "event": "overwrite"
+          },
+          {
+            "event": "append"
+          }
+        ],
+        "latest_event": "append",
+        "execution_status": "OK",
+        "verified_result": {
+          "output": "Solo:0\n",
+          "records": [
+            {
+              "name": "Solo",
+              "score": 0
+            }
+          ],
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "append"
+        },
+        "final_result": {
+          "output": "Solo:0\n",
+          "records": [
+            {
+              "name": "Solo",
+              "score": 0
+            }
+          ],
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "FILE_WRITE: sự kiện append phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "FILE_WRITE: event append must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (append)",
+        "en": "Which value will be written or updated? (append)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: append.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: append."
+      },
+      "visual_targets": [
+        "visual.file-write.state",
+        "visual.file-write.append"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: append",
+          "en": "Step 3: append"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (append)",
+          "en": "Which value will be written or updated? (append)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.text-files.file-write.boundary.production-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: append.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: append."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.text-files.file-write.failure.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.failure.production-v1",
+      "sequence": 0,
+      "event_type": "reject",
+      "active_line_ids": [
+        "text-files.production-v1.L028",
+        "text-files.production-v1.L013",
+        "text-files.production-v1.L029"
+      ],
+      "before": {
+        "fixture_ref": "text-files.failure",
+        "fixture_input": {
+          "append": "",
+          "committed": "SAFE\n",
+          "content": "Ada,90,EXTRA\n"
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "INVALID_FILE"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reject",
+          "type": "ValueError"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "text-files.failure",
+        "fixture_input": {
+          "append": "",
+          "committed": "SAFE\n",
+          "content": "Ada,90,EXTRA\n"
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "reject",
+            "type": "ValueError"
+          }
+        ],
+        "latest_event": "reject",
+        "execution_status": "INVALID_FILE",
+        "verified_result": {
+          "output": "SAFE\n",
+          "status": "INVALID_FILE"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reject",
+          "type": "ValueError"
+        },
+        "final_result": {
+          "output": "SAFE\n",
+          "status": "INVALID_FILE"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "FILE_WRITE: sự kiện reject phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "FILE_WRITE: event reject must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (reject)",
+        "en": "Which condition causes the input to be rejected? (reject)"
+      },
+      "feedback": {
+        "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: reject.",
+        "en": "The failure path stops or protects state at the exact guard. Event: reject."
+      },
+      "visual_targets": [
+        "visual.file-write.state",
+        "visual.file-write.reject"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: reject",
+          "en": "Step 1: reject"
+        },
+        "action_description": {
+          "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (reject)",
+          "en": "Which condition causes the input to be rejected? (reject)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.text-files.file-write.failure.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "assertive",
+          "message": {
+            "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: reject.",
+            "en": "The failure path stops or protects state at the exact guard. Event: reject."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1",
+      "sequence": 0,
+      "event_type": "read",
+      "active_line_ids": [
+        "text-files.production-v1.L025",
+        "text-files.production-v1.L028",
+        "text-files.production-v1.L034"
+      ],
+      "before": {
+        "fixture_ref": "text-files.normal",
+        "fixture_input": {
+          "append": "END:2\n",
+          "content": "Ada,90\nLin,80\n"
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "load",
+          "records": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "text-files.normal",
+        "fixture_input": {
+          "append": "END:2\n",
+          "content": "Ada,90\nLin,80\n"
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "load",
+            "records": 2
+          }
+        ],
+        "latest_event": "load",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "load",
+          "records": 2
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "FILE_WRITE: sự kiện load phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "FILE_WRITE: event load must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Đọc dữ liệu nào ở bước này? (load)",
+        "en": "Which data is read at this step? (load)"
+      },
+      "feedback": {
+        "vi": "Bước đọc lấy đúng dữ liệu từ fixture đã chạy lại. Sự kiện: load.",
+        "en": "The read takes the exact data from the rerun fixture. Event: load."
+      },
+      "visual_targets": [
+        "visual.file-write.state",
+        "visual.file-write.load"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: load",
+          "en": "Step 1: load"
+        },
+        "action_description": {
+          "vi": "Đọc dữ liệu nào ở bước này? (load)",
+          "en": "Which data is read at this step? (load)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Bước đọc lấy đúng dữ liệu từ fixture đã chạy lại. Sự kiện: load.",
+            "en": "The read takes the exact data from the rerun fixture. Event: load."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1",
+      "sequence": 1,
+      "event_type": "write",
+      "active_line_ids": [
+        "text-files.production-v1.L025",
+        "text-files.production-v1.L028",
+        "text-files.production-v1.L013"
+      ],
+      "before": {
+        "fixture_ref": "text-files.normal",
+        "fixture_input": {
+          "append": "END:2\n",
+          "content": "Ada,90\nLin,80\n"
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "load",
+            "records": 2
+          }
+        ],
+        "latest_event": "load",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "overwrite"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "text-files.normal",
+        "fixture_input": {
+          "append": "END:2\n",
+          "content": "Ada,90\nLin,80\n"
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "event": "load",
+            "records": 2
+          },
+          {
+            "event": "overwrite"
+          }
+        ],
+        "latest_event": "overwrite",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "overwrite"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "FILE_WRITE: sự kiện overwrite phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "FILE_WRITE: event overwrite must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (overwrite)",
+        "en": "Which value will be written or updated? (overwrite)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: overwrite.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: overwrite."
+      },
+      "visual_targets": [
+        "visual.file-write.state",
+        "visual.file-write.overwrite"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: overwrite",
+          "en": "Step 2: overwrite"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (overwrite)",
+          "en": "Which value will be written or updated? (overwrite)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: overwrite.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: overwrite."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1",
+      "sequence": 2,
+      "event_type": "write",
+      "active_line_ids": [
+        "text-files.production-v1.L024",
+        "text-files.production-v1.L025",
+        "text-files.production-v1.L028",
+        "text-files.production-v1.L029"
+      ],
+      "before": {
+        "fixture_ref": "text-files.normal",
+        "fixture_input": {
+          "append": "END:2\n",
+          "content": "Ada,90\nLin,80\n"
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "event": "load",
+            "records": 2
+          },
+          {
+            "event": "overwrite"
+          }
+        ],
+        "latest_event": "overwrite",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "append"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "text-files.normal",
+        "fixture_input": {
+          "append": "END:2\n",
+          "content": "Ada,90\nLin,80\n"
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "event": "load",
+            "records": 2
+          },
+          {
+            "event": "overwrite"
+          },
+          {
+            "event": "append"
+          }
+        ],
+        "latest_event": "append",
+        "execution_status": "OK",
+        "verified_result": {
+          "output": "Ada:90\nLin:80\nEND:2\n",
+          "records": [
+            {
+              "name": "Ada",
+              "score": 90
+            },
+            {
+              "name": "Lin",
+              "score": 80
+            }
+          ],
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "append"
+        },
+        "final_result": {
+          "output": "Ada:90\nLin:80\nEND:2\n",
+          "records": [
+            {
+              "name": "Ada",
+              "score": 90
+            },
+            {
+              "name": "Lin",
+              "score": 80
+            }
+          ],
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "FILE_WRITE: sự kiện append phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "FILE_WRITE: event append must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (append)",
+        "en": "Which value will be written or updated? (append)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: append.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: append."
+      },
+      "visual_targets": [
+        "visual.file-write.state",
+        "visual.file-write.append"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: append",
+          "en": "Step 3: append"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (append)",
+          "en": "Which value will be written or updated? (append)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.text-files.file-write.normal.production-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: append.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: append."
+          }
+        }
+      }
+    }
+  ]
+}

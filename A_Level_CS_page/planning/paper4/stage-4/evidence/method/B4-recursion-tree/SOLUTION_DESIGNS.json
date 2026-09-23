@@ -1,0 +1,3060 @@
+{
+  "schema_version": "s4-schema-v1-b4-submission-1",
+  "status": "SUBMITTED",
+  "batch_id": "B4-recursion-tree",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-1/SOURCE_ISSUES.json",
+      "sha256": "7e9a8677b345327847d52a2aa88f293dc6898ef17944a63e6e05bb99daf9f588"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    }
+  ],
+  "solution_designs": [
+    {
+      "solution_design_id": "b4.solution.algorithm-rewrite",
+      "pattern_id": "ALGORITHM_REWRITE",
+      "variant_id": "b4.variant.algorithm-rewrite",
+      "input_contract": {
+        "vi": "Hợp đồng đầu vào phải khóa trước theo quyết định: Chỉ đổi cấu trúc thực hiện sau khi lập ánh xạ state nguồn–đích và chuỗi observable tương đương.",
+        "en": "The supplied algorithm exposes its parameters, base/loop condition, state updates, outputs, side effects and return contract."
+      },
+      "output_contract": {
+        "vi": "Kết quả/trạng thái phải thỏa: Sau mỗi chuyển tiếp đích, state ánh xạ và prefix observable phải bằng chuyển tiếp nguồn tương ứng.",
+        "en": "Result/state satisfies: After each target transition, its mapped state and observable prefix equal those of the corresponding source transition."
+      },
+      "state_model": "A source-to-target state correspondence covering call frames or loop state, accumulator, observable output and returned value.",
+      "representation": [
+        "A source-to-target state correspondence covering call frames or loop state, accumulator, observable output and returned value."
+      ],
+      "preconditions": [
+        "The supplied algorithm exposes its parameters, base/loop condition, state updates, outputs, side effects and return contract."
+      ],
+      "postconditions": [
+        "After each target transition, its mapped state and observable prefix equal those of the corresponding source transition."
+      ],
+      "invariants": [
+        "After each target transition, its mapped state and observable prefix equal those of the corresponding source transition."
+      ],
+      "ordered_method_step_ids": [
+        "algorithm-rewrite.step.contract",
+        "algorithm-rewrite.step.terminal",
+        "algorithm-rewrite.step.progress",
+        "algorithm-rewrite.step.return"
+      ],
+      "mutation_and_preservation_rules": [
+        "Only the commit step may change learner-visible state; rejected/failure paths preserve prior valid state."
+      ],
+      "termination_argument": "Termination follows the explicit role `terminates_rewrite` and its stated guard/check.",
+      "failure_paths": [
+        "Mapping the base case to a loop guard that covers the wrong boundary state.",
+        "Dropping return propagation or changing output/update order."
+      ],
+      "alternative_designs": [
+        "recursive-to-iterative",
+        "iterative-to-recursive",
+        "observable-output"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "replace call frames with loop state while retaining output and return order"
+        ],
+        "boundary": [
+          "preserve intermediate output timing as well as the final result"
+        ],
+        "counterexample": [
+          "Mapping the base case to a loop guard that covers the wrong boundary state.",
+          "Dropping return propagation or changing output/update order."
+        ],
+        "source_fixture": [
+          "9618_w21_41_1(c)",
+          "9618_w21_42_1(c)",
+          "9618_w22_42_3(d)",
+          "9618_s24_42_3(c)(i)",
+          "9618_w23_41_1(b)(i)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s24_42_3(c)(i)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s24_qp_42",
+            "pdf_pages": [
+              12
+            ]
+          },
+          "qp_requirement_paraphrase": "Rewrite RecursiveInsertion as IterativeInsertion using iteration.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S24-42-3-C-I-01",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                43,
+                44,
+                45
+              ],
+              "criterion_paraphrase": "Insertion algorithm written with correct identifier – no recursion",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-3-C-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-3-C-I-02",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                43,
+                44,
+                45
+              ],
+              "criterion_paraphrase": "External loop while there are still elements left (e.g. NumberElements > 0)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-3-C-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-3-C-I-03",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                43,
+                44,
+                45
+              ],
+              "criterion_paraphrase": "Internal loop and selection accurate",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-3-C-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-3-C-I-04",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                43,
+                44,
+                45
+              ],
+              "criterion_paraphrase": "Nothing additional added / logic changed",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-3-C-I",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w21_41_1(c)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w21_qp_41",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Rewrite Unknown() as the iterative function IterativeUnknown().",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w21-41-1-c-01",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for iterative function, taking 2 parameters.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-1-c-02",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for starting with return value (Total) as 1.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-1-c-03",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for looping while X <> Y // might be 1 loop or two separate // returning when X = Y // looping until X==Y.",
+              "award_semantics": "alternative",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-1-c-04",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for within each loop, outputting (X+Y) correctly when X<Y and Y<X.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-1-c-05",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for each time X < Y, Total * 2 and X++.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-1-c-06",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for each time Y < X Total DIV 2 and X--.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-1-c-07",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Continuation criterion: Returning the Total after correct calculations.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w21-41-1-c-06",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w21_42_1(c)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w21_qp_42",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Rewrite Unknown() as the iterative function IterativeUnknown().",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w21-42-1-c-01",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for iterative function, taking 2 parameters.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-1-c-02",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for starting with return value (Total) as 1.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-1-c-03",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for looping while X <> Y // might be 1 loop or two separate // returning when X = Y // looping until X==Y.",
+              "award_semantics": "alternative",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-1-c-04",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for within each loop, outputting (X+Y) correctly when X<Y and Y<X.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-1-c-05",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for each time X < Y, Total * 2 and X++.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-1-c-06",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Credit for each time Y < X Total DIV 2 and X--.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-1-c-07",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                6,
+                7
+              ],
+              "criterion_paraphrase": "Continuation criterion: Returning the Total after correct calculations.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w21-42-1-c-06",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w22_42_3(d)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_42",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Rewrite the supplied iterative queue-total function as a recursive function.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-42-3-d-01",
+              "source_id": "9618_w22_ms_42",
+              "pdf_pages": [
+                23
+              ],
+              "criterion_paraphrase": "Credit for function call (and end where appropriate) taking a parameter.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-42-3-d-02",
+              "source_id": "9618_w22_ms_42",
+              "pdf_pages": [
+                23
+              ],
+              "criterion_paraphrase": "Credit for checking if at start of queue//20.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-42-3-d-03",
+              "source_id": "9618_w22_ms_42",
+              "pdf_pages": [
+                23
+              ],
+              "criterion_paraphrase": "Continuation criterion: returning the last value in the queue.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w22-42-3-d-02",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-42-3-d-04",
+              "source_id": "9618_w22_ms_42",
+              "pdf_pages": [
+                23
+              ],
+              "criterion_paraphrase": "Credit for (otherwise) adding return value to a total // adding value in queue before recursive call and using this in the recursive call.",
+              "award_semantics": "alternative",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-42-3-d-05",
+              "source_id": "9618_w22_ms_42",
+              "pdf_pages": [
+                23
+              ],
+              "criterion_paraphrase": "Credit for recursive call with Start/pointer -1.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-42-3-d-06",
+              "source_id": "9618_w22_ms_42",
+              "pdf_pages": [
+                23
+              ],
+              "criterion_paraphrase": "Continuation criterion: returning the final total.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w22-42-3-d-05",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w23_41_1(b)(i)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_w23_qp_41",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Rewrite IterativeVowels as RecursiveVowels.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-W23-41-1-B-I-01",
+              "source_id": "9618_w23_ms_41",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Recursive call",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-41-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-41-1-B-I-02",
+              "source_id": "9618_w23_ms_41",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Function header (and end where appropriate) taking string parameter (returning integer where given)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-41-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-41-1-B-I-03",
+              "source_id": "9618_w23_ms_41",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Base case checking (length is 0) and returning",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-41-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-41-1-B-I-04",
+              "source_id": "9618_w23_ms_41",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Extracting first character and checking if a vowel …",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-41-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-41-1-B-I-05",
+              "source_id": "9618_w23_ms_41",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "… if it is a vowel, returning 1 + recursive call with 1 less character",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-41-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-41-1-B-I-06",
+              "source_id": "9618_w23_ms_41",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "… if not a vowel, return recursive call with 1 less character",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-41-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S4-S2-W23-41-43-MS-CONTINUATIONS"
+          ],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w23_43_1(b)(i)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_w23_qp_43",
+            "pdf_pages": [
+              3
+            ]
+          },
+          "qp_requirement_paraphrase": "Rewrite IterativeVowels as RecursiveVowels.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-W23-43-1-B-I-01",
+              "source_id": "9618_w23_ms_43",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Recursive call",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-43-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-43-1-B-I-02",
+              "source_id": "9618_w23_ms_43",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Function header (and end where appropriate) taking string parameter (returning integer where given)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-43-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-43-1-B-I-03",
+              "source_id": "9618_w23_ms_43",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Base case checking (length is 0) and returning",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-43-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-43-1-B-I-04",
+              "source_id": "9618_w23_ms_43",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "Extracting first character and checking if a vowel …",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-43-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-43-1-B-I-05",
+              "source_id": "9618_w23_ms_43",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "… if it is a vowel, returning 1 + recursive call with 1 less character",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-43-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            },
+            {
+              "marking_point_id": "MP-9618-W23-43-1-B-I-06",
+              "source_id": "9618_w23_ms_43",
+              "pdf_pages": [
+                6,
+                7,
+                8
+              ],
+              "criterion_paraphrase": "… if not a vowel, return recursive call with 1 less character",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-W23-43-1-B-I",
+              "group_max": null,
+              "source_issue_refs": [
+                "S4-S2-W23-41-43-MS-CONTINUATIONS"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S4-S2-W23-41-43-MS-CONTINUATIONS"
+          ],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "issue_id": "S4-S2-W23-41-43-MS-CONTINUATIONS",
+          "stage4_disposition": "Preserve the located caveat; do not certify extracted/source code.",
+          "stage5_obligation": "Verify the derived implementation/trace against the original facsimile."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "b4.solution.tree-setup",
+      "pattern_id": "TREE_SETUP",
+      "variant_id": "b4.variant.tree-setup",
+      "input_contract": {
+        "vi": "Hợp đồng đầu vào phải khóa trước theo quyết định: Chọn representation trước; sau đó ghi riêng null child, empty root và next-free/count theo đúng hợp đồng nguồn.",
+        "en": "The source fixes array-backed or object-node representation, capacity, null value, root contract and allocation pointer/count."
+      },
+      "output_contract": {
+        "vi": "Kết quả/trạng thái phải thỏa: Mọi root/child reference hoặc là null hoặc trỏ node hợp lệ; allocation state mô tả đúng vùng chưa dùng và không mang nghĩa stack-top.",
+        "en": "Result/state satisfies: Every live root/child reference is null or names a valid node, and allocation state identifies exactly the unused region without inventing a stack-top meaning."
+      },
+      "state_model": "Either indexed node storage with left/data/right fields plus root/free state, or object nodes with child references plus a tree root/count wrapper.",
+      "representation": [
+        "Either indexed node storage with left/data/right fields plus root/free state, or object nodes with child references plus a tree root/count wrapper."
+      ],
+      "preconditions": [
+        "The source fixes array-backed or object-node representation, capacity, null value, root contract and allocation pointer/count."
+      ],
+      "postconditions": [
+        "Every live root/child reference is null or names a valid node, and allocation state identifies exactly the unused region without inventing a stack-top meaning."
+      ],
+      "invariants": [
+        "Every live root/child reference is null or names a valid node, and allocation state identifies exactly the unused region without inventing a stack-top meaning."
+      ],
+      "ordered_method_step_ids": [
+        "tree-setup.step.representation",
+        "tree-setup.step.storage",
+        "tree-setup.step.root-allocation",
+        "tree-setup.step.audit"
+      ],
+      "mutation_and_preservation_rules": [
+        "Only the commit step may change learner-visible state; rejected/failure paths preserve prior valid state."
+      ],
+      "termination_argument": "Termination follows the explicit role `terminates_setup` and its stated guard/check.",
+      "failure_paths": [
+        "A constructor receives a root node but always overwrites root with null.",
+        "Creating the wrong capacity, sharing one Node object or leaving a pointer out of range."
+      ],
+      "alternative_designs": [
+        "array-backed-empty",
+        "object-wrapper-empty",
+        "constructor-root"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "all node rows use the required null sentinel; root/free match source"
+        ],
+        "boundary": [
+          "preserve the supplied first/root Node parameter, including the p35 caveat"
+        ],
+        "counterexample": [
+          "A constructor receives a root node but always overwrites root with null.",
+          "Creating the wrong capacity, sharing one Node object or leaving a pointer out of range."
+        ],
+        "source_fixture": [
+          "9618_w21_41_3(a)",
+          "9618_w21_42_3(a)",
+          "9618_w22_41_3(a)",
+          "9618_w22_41_3(b)",
+          "9618_w22_43_3(a)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s24_42_2(b)(i)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s24_qp_42",
+            "pdf_pages": [
+              7
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare TreeClass and constructor, including array of 20 empty Node objects and tree state.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-I-01",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "Class header (and end)",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-I-02",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "Private array Tree of type Node with 20 elements, private FirstNode and private NumberNodes",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-I-03",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "Constructor assigns –1 to FirstNode and 0 to NumberNodes",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-I-04",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "… initialises all Tree (20) elements to Node object with data value –1",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-I",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_s25_41_3(c)(i)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_s25_qp_41",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare Tree and its constructor, initialising FirstNode to the parameter value.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_s25_41_3(c)(i).mp.01",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                35
+              ],
+              "criterion_paraphrase": "Class Tree header (and end) no inheritance and constructor header (and end) taking 1 node parameter within class …",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": [
+                "S25-41-MS35-INIT"
+              ]
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(c)(i).mp.02",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                35
+              ],
+              "criterion_paraphrase": "… storing parameter in FirstNode declared as a Node data type",
+              "award_semantics": "dependent",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_s25_41_3(c)(i).mp.01",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": [
+                "S25-41-MS35-INIT"
+              ]
+            }
+          ],
+          "source_issue_refs": [
+            "S25-41-MS35-INIT"
+          ],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w21_41_3(a)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w21_qp_41",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare 20-by-3 ArrayNodes, RootPointer=-1 and FreeNode=0; include Python comments.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w21-41-3-a-01",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                17
+              ],
+              "criterion_paraphrase": "Credit for declaring array named ArrayNodes of type integer.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-a-02",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                17
+              ],
+              "criterion_paraphrase": "Continuation criterion: with 20 by 3 elements.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w21-41-3-a-01",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-a-03",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                17
+              ],
+              "criterion_paraphrase": "Credit for rootPointer declared as integer and assigned -1.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-a-04",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                17
+              ],
+              "criterion_paraphrase": "Credit for freeNode declared as integer and assigned 0.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w21_42_3(a)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w21_qp_42",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare 20-by-3 ArrayNodes, RootPointer=-1 and FreeNode=0; include Python comments.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w21-42-3-a-01",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                17
+              ],
+              "criterion_paraphrase": "Credit for declaring array named ArrayNodes of type integer.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-a-02",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                17
+              ],
+              "criterion_paraphrase": "Continuation criterion: with 20 by 3 elements.",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w21-42-3-a-01",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-a-03",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                17
+              ],
+              "criterion_paraphrase": "Credit for rootPointer declared as integer and assigned -1.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-a-04",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                17
+              ],
+              "criterion_paraphrase": "Credit for freeNode declared as integer and assigned 0.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w22_41_3(a)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_41",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare global 20-by-3 ArrayNodes and initialise all cells to -1.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-41-3-a-01",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                16
+              ],
+              "criterion_paraphrase": "Credit for declaring (global) 2D array ArrayNodes.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-a-02",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                16
+              ],
+              "criterion_paraphrase": "Credit for looping through all 20  3 elements of array.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-a-03",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                16
+              ],
+              "criterion_paraphrase": "Credit for storing -1 in each element.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w22_41_3(b)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_41",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Load the supplied binary-tree table and initialise FreeNode=6 and RootPointer=0.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-41-3-b-01",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                17,
+                18
+              ],
+              "criterion_paraphrase": "Credit for initialising each of the first 6 array elements correctly.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-b-02",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                17,
+                18
+              ],
+              "criterion_paraphrase": "Credit for declaring and initialising FreeNode to 6 and RootPointer to 0.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w22_43_3(a)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_43",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Declare global 20-by-3 ArrayNodes and initialise all cells to -1.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-43-3-a-01",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                16
+              ],
+              "criterion_paraphrase": "Credit for declaring (global) 2D array ArrayNodes.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-a-02",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                16
+              ],
+              "criterion_paraphrase": "Credit for looping through all 20  3 elements of array.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-a-03",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                16
+              ],
+              "criterion_paraphrase": "Credit for storing -1 in each element.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w22_43_3(b)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_43",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Load the supplied binary-tree table and initialise FreeNode=6 and RootPointer=0.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-43-3-b-01",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                17,
+                18
+              ],
+              "criterion_paraphrase": "Credit for initialising each of the first 6 array elements correctly.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-b-02",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                17,
+                18
+              ],
+              "criterion_paraphrase": "Credit for declaring and initialising FreeNode to 6 and RootPointer to 0.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w25_42_3(a)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_w25_qp_42",
+            "pdf_pages": [
+              10
+            ]
+          },
+          "qp_requirement_paraphrase": "Initialise the 50 by 3 TreeArray, RootPointer and FreeNode.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_w25_42_3(a).mp.01",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "(global) TreeArray declared as a 2D array with 50  3 elements …",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(a).mp.02",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "… all initialised to –1",
+              "award_semantics": "dependent",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_w25_42_3(a).mp.01",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(a).mp.03",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                27,
+                28
+              ],
+              "criterion_paraphrase": "(global) RootPointer initialised to –1 and FreeNode initialised to 0",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "issue_id": "S25-41-MS35-INIT",
+          "stage4_disposition": "Preserve the located caveat; do not certify extracted/source code.",
+          "stage5_obligation": "Verify the derived implementation/trace against the original facsimile."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "b4.solution.tree-insert",
+      "pattern_id": "TREE_INSERT",
+      "variant_id": "b4.variant.tree-insert",
+      "input_contract": {
+        "vi": "Hợp đồng đầu vào phải khóa trước theo quyết định: Chốt duplicate branch trước; chỉ allocate/attach sau khi capacity và vị trí child trống đã được xác nhận.",
+        "en": "A valid BST representation, root, capacity/allocation state and explicit equal-key branch policy are available."
+      },
+      "output_contract": {
+        "vi": "Kết quả/trạng thái phải thỏa: Cấu trúc reachable vẫn là BST đúng ordering nguồn; link cũ được giữ và allocation chỉ tiến khi một node được gắn.",
+        "en": "Result/state satisfies: The reachable structure is a valid source-ordered BST, every pre-existing link is preserved, and allocation state advances only for one attached node."
+      },
+      "state_model": "A candidate node plus a cursor/parent path over indexed or object child links and one allocation commit.",
+      "representation": [
+        "A candidate node plus a cursor/parent path over indexed or object child links and one allocation commit."
+      ],
+      "preconditions": [
+        "A valid BST representation, root, capacity/allocation state and explicit equal-key branch policy are available."
+      ],
+      "postconditions": [
+        "The reachable structure is a valid source-ordered BST, every pre-existing link is preserved, and allocation state advances only for one attached node."
+      ],
+      "invariants": [
+        "The reachable structure is a valid source-ordered BST, every pre-existing link is preserved, and allocation state advances only for one attached node."
+      ],
+      "ordered_method_step_ids": [
+        "tree-insert.step.guard",
+        "tree-insert.step.empty-root",
+        "tree-insert.step.descend",
+        "tree-insert.step.attach"
+      ],
+      "mutation_and_preservation_rules": [
+        "Only the commit step may change learner-visible state; rejected/failure paths preserve prior valid state."
+      ],
+      "termination_argument": "Termination follows the explicit role `terminates_insert` and its stated guard/check.",
+      "failure_paths": [
+        "Sending equal keys left in one comparison and right in another.",
+        "Advancing count/free or writing the node before the parent-child attachment succeeds."
+      ],
+      "alternative_designs": [
+        "empty-root",
+        "internal-descent",
+        "duplicate-or-full"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "candidate becomes the sole root"
+        ],
+        "boundary": [
+          "apply exact equal-key policy or preserve state on full failure"
+        ],
+        "counterexample": [
+          "Sending equal keys left in one comparison and right in another.",
+          "Advancing count/free or writing the node before the parent-child attachment succeeds."
+        ],
+        "source_fixture": [
+          "9618_w21_41_3(b)",
+          "9618_w21_42_3(b)",
+          "9618_s24_42_2(b)(ii)",
+          "9618_s25_41_3(c)(iii)",
+          "9618_w25_42_3(b)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s24_42_2(b)(ii)",
+          "source_batch": "2023-2024",
+          "qp_locator": {
+            "source_id": "9618_s24_qp_42",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement InsertNode using the supplied empty/nonempty-tree steps and updating the parent pointer.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-II-01",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "Method header and end, taking node as parameter and checking if empty and inserting in first position, updating FirstNode",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-II",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-II-02",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "… otherwise inserting node in tree",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-II",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-II-03",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "Accessing first node and comparing data …",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-II",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-II-04",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "… checking whether to go left or right …",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-II",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-II-05",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "… repeatedly until data found",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-II",
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "MP-9618-S24-42-2-B-II-06",
+              "source_id": "9618_s24_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "Updating left and right pointer for parent node",
+              "award_semantics": "discrete",
+              "condition": "Apply within the complete MS row and QP contract; no independent condition inferred.",
+              "alternatives": null,
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "MPG-9618-S24-42-2-B-II",
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_s25_41_3(c)(iii)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_s25_qp_41",
+            "pdf_pages": [
+              8
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement Insert to place the supplied Node in the binary tree.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_s25_41_3(c)(iii).mp.01",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                37,
+                38,
+                39
+              ],
+              "criterion_paraphrase": "Insert method header (and end) taking 1 node parameter",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_s25_41_3(c)(iii).group.max",
+              "group_max": 6,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(c)(iii).mp.02",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                37,
+                38,
+                39
+              ],
+              "criterion_paraphrase": "If parameter < first node, checking if there is a left node …",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_s25_41_3(c)(iii).group.max",
+              "group_max": 6,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(c)(iii).mp.03",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                37,
+                38,
+                39
+              ],
+              "criterion_paraphrase": "… storing node in left node if it is null",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_s25_41_3(c)(iii).mp.02",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_s25_41_3(c)(iii).group.max",
+              "group_max": 6,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(c)(iii).mp.04",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                37,
+                38,
+                39
+              ],
+              "criterion_paraphrase": "If parameter >= first node, checking if there is a right node …",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_s25_41_3(c)(iii).group.max",
+              "group_max": 6,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(c)(iii).mp.05",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                37,
+                38,
+                39
+              ],
+              "criterion_paraphrase": "… storing node in right node if it is null",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_s25_41_3(c)(iii).mp.04",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_s25_41_3(c)(iii).group.max",
+              "group_max": 6,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(c)(iii).mp.06",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                37,
+                38,
+                39
+              ],
+              "criterion_paraphrase": "Looping until correct position is found // recursive calls",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [
+                "Accept an equivalent route only where the official wording permits it; Lead must preserve the QP contract."
+              ],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_s25_41_3(c)(iii).group.max",
+              "group_max": 6,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w21_41_3(b)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w21_qp_41",
+            "pdf_pages": [
+              8,
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Complete and implement AddNode() using the supplied binary-tree insertion pseudocode and pointer updates.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w21-41-3-b-completed-statements",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                18,
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Complete the 6 source-supplied statements accurately.",
+              "award_semantics": "group_max",
+              "condition": "Apply only to the incomplete statements printed in the question.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": null,
+              "group_id": "grp-9618-w21-41-3-b-completed-statements",
+              "group_max": 6,
+              "source_issue_refs": [
+                "W21-3B-INDENT"
+              ]
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-b-01",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                18,
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Credit for function/procedure declaration either : taking parameters by reference returning the three amended values (Python) using global instead.",
+              "award_semantics": "alternative",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [
+                "The official criterion permits the stated implementation alternatives."
+              ],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": [
+                "W21-3B-INDENT"
+              ]
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-b-02",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                18,
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Credit for remainder of function/procedure matches the pseudocode.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": [
+                "W21-3B-INDENT"
+              ]
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w21_42_3(b)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w21_qp_42",
+            "pdf_pages": [
+              8,
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Complete and implement AddNode() using the supplied binary-tree insertion pseudocode and pointer updates.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w21-42-3-b-completed-statements",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                18,
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Complete the 6 source-supplied statements accurately.",
+              "award_semantics": "group_max",
+              "condition": "Apply only to the incomplete statements printed in the question.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": null,
+              "group_id": "grp-9618-w21-42-3-b-completed-statements",
+              "group_max": 6,
+              "source_issue_refs": [
+                "W21-3B-INDENT"
+              ]
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-b-01",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                18,
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Credit for function/procedure declaration either : taking parameters by reference returning the three amended values (Python) using global instead.",
+              "award_semantics": "alternative",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [
+                "The official criterion permits the stated implementation alternatives."
+              ],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": [
+                "W21-3B-INDENT"
+              ]
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-b-02",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                18,
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Credit for remainder of function/procedure matches the pseudocode.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": [
+                "W21-3B-INDENT"
+              ]
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w25_42_3(b)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_w25_qp_42",
+            "pdf_pages": [
+              10
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement AddNode to insert a value into the array-backed binary tree.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.01",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "Procedure header (and end) taking one (integer) parameter and storing parameter in array in index TreeArray[FreeNode][1]",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.02",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "Checking if tree is full (FreeNode = 50) and outputting \"The tree is full\"",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.03",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "Checking if tree is empty (RootPointer = -1 // FreeNode = 0) and if so, storing 0 in RootPointer",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [
+                "Accept an equivalent route only where the official wording permits it; Lead must preserve the QP contract."
+              ],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.04",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "(if not empty) Comparing parameter to data at index TreeArray[RootPointer][1] …",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.05",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "… if less than, accessing left node …",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_w25_42_3(b).mp.04",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.06",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "… if greater than, accessing right node …",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_w25_42_3(b).mp.05",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.07",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "… until location found …",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_w25_42_3(b).mp.06",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.08",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "… updating parent node's appropriate pointer",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": "9618_w25_42_3(b).mp.07",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_w25_42_3(b).mp.09",
+              "source_id": "9618_w25_ms_42",
+              "pdf_pages": [
+                29,
+                30,
+                31,
+                32
+              ],
+              "criterion_paraphrase": "Incrementing FreeNode",
+              "award_semantics": "group_max",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "9618_w25_42_3(b).group.max",
+              "group_max": 7,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        }
+      ],
+      "source_issue_dispositions": [
+        {
+          "issue_id": "W21-3B-INDENT",
+          "stage4_disposition": "Preserve the located caveat; do not certify extracted/source code.",
+          "stage5_obligation": "Verify the derived implementation/trace against the original facsimile."
+        }
+      ],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "b4.solution.tree-search",
+      "pattern_id": "TREE_SEARCH",
+      "variant_id": "b4.variant.tree-search",
+      "input_contract": {
+        "vi": "Hợp đồng đầu vào phải khóa trước theo quyết định: Mỗi comparison chỉ chọn một child pointer; null trả missing, equality trả đúng found contract.",
+        "en": "The BST ordering/equal policy, root representation, null value and found/missing return contract are known."
+      },
+      "output_contract": {
+        "vi": "Kết quả/trạng thái phải thỏa: Nếu target tồn tại, nó vẫn nằm trong subtree current; mỗi subtree bị bỏ đã được loại bởi quy tắc so sánh BST.",
+        "en": "Result/state satisfies: If the target exists, it remains in the subtree named by current; every discarded subtree is excluded by the BST comparison rule."
+      },
+      "state_model": "A current node/index moving along one root-to-child path, with recursive or iterative return state.",
+      "representation": [
+        "A current node/index moving along one root-to-child path, with recursive or iterative return state."
+      ],
+      "preconditions": [
+        "The BST ordering/equal policy, root representation, null value and found/missing return contract are known."
+      ],
+      "postconditions": [
+        "If the target exists, it remains in the subtree named by current; every discarded subtree is excluded by the BST comparison rule."
+      ],
+      "invariants": [
+        "If the target exists, it remains in the subtree named by current; every discarded subtree is excluded by the BST comparison rule."
+      ],
+      "ordered_method_step_ids": [
+        "tree-search.step.null-guard",
+        "tree-search.step.compare",
+        "tree-search.step.branch",
+        "tree-search.step.propagate"
+      ],
+      "mutation_and_preservation_rules": [
+        "Only the commit step may change learner-visible state; rejected/failure paths preserve prior valid state."
+      ],
+      "termination_argument": "Termination follows the explicit role `terminates_search` and its stated guard/check.",
+      "failure_paths": [
+        "Using low/high/mid as if the backing array were sorted.",
+        "Calling recursive search on a child without returning its result."
+      ],
+      "alternative_designs": [
+        "found-root",
+        "found-deep",
+        "missing-null"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "equality terminates without following a child"
+        ],
+        "boundary": [
+          "null/bounds base case returns the source missing value"
+        ],
+        "counterexample": [
+          "Using low/high/mid as if the backing array were sorted.",
+          "Calling recursive search on a child without returning its result."
+        ],
+        "source_fixture": [
+          "9618_w22_41_3(c)",
+          "9618_w22_43_3(c)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_w22_41_3(c)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_41",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Complete and implement recursive SearchValue(), returning an index or -1.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-41-3-c-completed-statements",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Complete the 4 source-supplied statements accurately.",
+              "award_semantics": "group_max",
+              "condition": "Apply only to the incomplete statements printed in the question.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": null,
+              "group_id": "grp-9618-w22-41-3-c-completed-statements",
+              "group_max": 4,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-c-01",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Credit for remainder of function correct.",
+              "award_semantics": "holistic",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w22_43_3(c)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_43",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Complete and implement recursive SearchValue(), returning an index or -1.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-43-3-c-completed-statements",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Complete the 4 source-supplied statements accurately.",
+              "award_semantics": "group_max",
+              "condition": "Apply only to the incomplete statements printed in the question.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": null,
+              "group_id": "grp-9618-w22-43-3-c-completed-statements",
+              "group_max": 4,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-c-01",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                19,
+                20
+              ],
+              "criterion_paraphrase": "Credit for remainder of function correct.",
+              "award_semantics": "holistic",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        }
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "b4.solution.tree-traverse",
+      "pattern_id": "TREE_TRAVERSE",
+      "variant_id": "b4.variant.tree-traverse",
+      "input_contract": {
+        "vi": "Hợp đồng đầu vào phải khóa trước theo quyết định: Viết traversal thành chuỗi ba token L/N/R trước; đặt visit event đúng vị trí rồi mới mở rộng recursive calls.",
+        "en": "The traversal order, root/node representation, null convention and visit/output action are explicit."
+      },
+      "output_contract": {
+        "vi": "Kết quả/trạng thái phải thỏa: Các visit đã hoàn tất đúng traversal của subtree tương ứng; null không được visit và mỗi node chỉ được visit một lần.",
+        "en": "Result/state satisfies: Completed visit events equal the requested traversal of completed subtrees, and no null child or node is visited twice."
+      },
+      "state_model": "A recursive frame with left subtree, current-node visit and right subtree events ordered by the requested traversal grammar.",
+      "representation": [
+        "A recursive frame with left subtree, current-node visit and right subtree events ordered by the requested traversal grammar."
+      ],
+      "preconditions": [
+        "The traversal order, root/node representation, null convention and visit/output action are explicit."
+      ],
+      "postconditions": [
+        "Completed visit events equal the requested traversal of completed subtrees, and no null child or node is visited twice."
+      ],
+      "invariants": [
+        "Completed visit events equal the requested traversal of completed subtrees, and no null child or node is visited twice."
+      ],
+      "ordered_method_step_ids": [
+        "tree-traverse.step.order",
+        "tree-traverse.step.null",
+        "tree-traverse.step.expand",
+        "tree-traverse.step.return"
+      ],
+      "mutation_and_preservation_rules": [
+        "Only the commit step may change learner-visible state; rejected/failure paths preserve prior valid state."
+      ],
+      "termination_argument": "Termination follows the explicit role `terminates_traversal` and its stated guard/check.",
+      "failure_paths": [
+        "Printing backing-array rows instead of following child links.",
+        "Placing visit around the wrong recursive call or omitting the null guard."
+      ],
+      "alternative_designs": [
+        "inorder",
+        "postorder",
+        "empty-or-leaf"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "left-current-right on an asymmetric tree"
+        ],
+        "boundary": [
+          "null contributes no visit; a leaf contributes exactly one visit"
+        ],
+        "counterexample": [
+          "Printing backing-array rows instead of following child links.",
+          "Placing visit around the wrong recursive call or omitting the null guard."
+        ],
+        "source_fixture": [
+          "9618_w21_41_3(e)(i)",
+          "9618_w21_42_3(e)(i)",
+          "9618_w22_41_3(d)",
+          "9618_w22_43_3(d)",
+          "9618_s25_41_3(d)"
+        ]
+      },
+      "source_constraints": [
+        {
+          "part_id": "9618_s25_41_3(d)",
+          "source_batch": "2025",
+          "qp_locator": {
+            "source_id": "9618_s25_qp_41",
+            "pdf_pages": [
+              9
+            ]
+          },
+          "qp_requirement_paraphrase": "Implement recursive OutputInOrder.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "9618_s25_41_3(d).mp.01",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                40,
+                41
+              ],
+              "criterion_paraphrase": "Procedure header (and end) taking node as parameter, that is recursive",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(d).mp.02",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                40,
+                41
+              ],
+              "criterion_paraphrase": "Checking if left is null and recursive call if not null",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(d).mp.03",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                40,
+                41
+              ],
+              "criterion_paraphrase": "Outputting node's data",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(d).mp.04",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                40,
+                41
+              ],
+              "criterion_paraphrase": "Checking if right is null and recursive call if not null",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "9618_s25_41_3(d).mp.05",
+              "source_id": "9618_s25_ms_41",
+              "pdf_pages": [
+                40,
+                41
+              ],
+              "criterion_paraphrase": "Correct order",
+              "award_semantics": "discrete",
+              "condition": "Apply within the exact data, representation and output contract of the cited part.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w21_41_3(e)(i)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w21_qp_41",
+            "pdf_pages": [
+              11
+            ]
+          },
+          "qp_requirement_paraphrase": "Write recursive InOrder() to traverse the stored binary tree.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w21-41-3-e-i-01",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for procedure name InOrder taking a parameter (for current node being accessed).",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-e-i-02",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for checking if left Node is empty (-1).",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-e-i-03",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for (if not) calling procedure recursively with [Current Node][0] as parameter.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-e-i-04",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Continuation criterion: outputting the [Current Node][1].",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w21-41-3-e-i-03",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-e-i-05",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for checking if right Node is empty (-1).",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-e-i-06",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for (if not) calling procedure recursively with [Current Node][2] as a parameter.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-41-3-e-i-07",
+              "source_id": "9618_w21_ms_41",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for order is correct, left, root, right.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w21_42_3(e)(i)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w21_qp_42",
+            "pdf_pages": [
+              11
+            ]
+          },
+          "qp_requirement_paraphrase": "Write recursive InOrder() to traverse the stored binary tree.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w21-42-3-e-i-01",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for procedure name InOrder taking a parameter (for current node being accessed).",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-e-i-02",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for checking if left Node is empty (-1).",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-e-i-03",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for (if not) calling procedure recursively with [Current Node][0] as parameter.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-e-i-04",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Continuation criterion: outputting the [Current Node][1].",
+              "award_semantics": "dependent",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w21-42-3-e-i-03",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-e-i-05",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for checking if right Node is empty (-1).",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-e-i-06",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for (if not) calling procedure recursively with [Current Node][2] as a parameter.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w21-42-3-e-i-07",
+              "source_id": "9618_w21_ms_42",
+              "pdf_pages": [
+                22
+              ],
+              "criterion_paraphrase": "Credit for order is correct, left, root, right.",
+              "award_semantics": "discrete",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": null,
+              "group_max": null,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w22_41_3(d)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_41",
+            "pdf_pages": [
+              10
+            ]
+          },
+          "qp_requirement_paraphrase": "Write recursive PostOrder() using the specified left-right-root traversal.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-41-3-d-01",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for (procedure) header (and end where appropriate) with one parameter (root node or index of root node) and at least one recursive call.",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-41-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-d-02",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for checking if left node is -1.",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-41-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-d-03",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for if not recursive call with parameter as ArrayNodes[RootNode[0]].",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-41-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-d-04",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for checking if right node is -1.",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-41-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-d-05",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for if not recursive call with parameter as ArrayNodes[RootNode[2]].",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-41-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-d-06",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Continuation criterion: outputting the element at the parameter RootNode[].",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w22-41-3-d-05",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-41-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-41-3-d-07",
+              "source_id": "9618_w22_ms_41",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for all 3 in the correct order.",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-41-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        },
+        {
+          "part_id": "9618_w22_43_3(d)",
+          "source_batch": "2021-2022",
+          "qp_locator": {
+            "source_id": "9618_w22_qp_43",
+            "pdf_pages": [
+              10
+            ]
+          },
+          "qp_requirement_paraphrase": "Write recursive PostOrder() using the specified left-right-root traversal.",
+          "ms_atoms": [
+            {
+              "marking_point_id": "mp-9618-w22-43-3-d-01",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for (procedure) header (and end where appropriate) with one parameter (root node or index of root node) and at least one recursive call.",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-43-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-d-02",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for checking if left node is -1.",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-43-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-d-03",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for if not recursive call with parameter as ArrayNodes[RootNode[0]].",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-43-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-d-04",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for checking if right node is -1.",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-43-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-d-05",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for if not recursive call with parameter as ArrayNodes[RootNode[2]].",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-43-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-d-06",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Continuation criterion: outputting the element at the parameter RootNode[].",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": "mp-9618-w22-43-3-d-05",
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-43-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            },
+            {
+              "marking_point_id": "mp-9618-w22-43-3-d-07",
+              "source_id": "9618_w22_ms_43",
+              "pdf_pages": [
+                21
+              ],
+              "criterion_paraphrase": "Credit for all 3 in the correct order.",
+              "award_semantics": "group_max",
+              "condition": "Within the source part and its stated data/representation contract.",
+              "alternatives": [],
+              "dependency": null,
+              "source_mark_value_if_unambiguous": 1,
+              "group_id": "grp-9618-w22-43-3-d",
+              "group_max": 7,
+              "source_issue_refs": []
+            }
+          ],
+          "source_issue_refs": [],
+          "atom_ownership_note": "Atoms listed here are owned once inside B4; every current assessed relation has exactly one B4 pattern."
+        }
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    }
+  ],
+  "self_checks": {
+    "design_count": 5,
+    "pending_stage5": 5
+  }
+}

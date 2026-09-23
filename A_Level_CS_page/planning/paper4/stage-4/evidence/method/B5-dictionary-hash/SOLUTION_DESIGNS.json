@@ -1,0 +1,401 @@
+{
+  "schema_version": "s4-schema-v1",
+  "status": "SUBMITTED",
+  "batch_id": "B5-dictionary-hash",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-1/SOURCE_ISSUES.json",
+      "sha256": "7e9a8677b345327847d52a2aa88f293dc6898ef17944a63e6e05bb99daf9f588"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    }
+  ],
+  "solution_designs": [
+    {
+      "solution_design_id": "B5-SD-HASH_SETUP",
+      "pattern_id": "HASH_SETUP",
+      "variant_id": "B5-V01-setup-representation",
+      "input_contract": "Fix dimensions, index domains, record fields, and the empty sentinel from the question.",
+      "output_contract": "Assign an independent empty record to each slot, then verify slot count, sentinels, and absence of live keys.",
+      "state_model": [
+        "representation_contract",
+        "storage_regions",
+        "empty_record",
+        "cursor",
+        "initialised_table"
+      ],
+      "representation": [
+        "Explicit examination hash table",
+        "Python-oriented pseudocode",
+        "source-specific record and index domains"
+      ],
+      "preconditions": [
+        "Fix dimensions, index domains, record fields, and the empty sentinel from the question."
+      ],
+      "postconditions": [
+        "VI: Tất cả ô đã thăm là rỗng và không vô tình dùng chung trạng thái mutable. | EN: All visited slots are empty and do not accidentally share mutable state."
+      ],
+      "invariants": [
+        "VI: Một biểu diễn và một định nghĩa rỗng được dùng xuyên suốt. | EN: One representation and one empty definition remain fixed.",
+        "VI: Mỗi chỉ số hợp lệ ánh xạ tới đúng một ô vật lý. | EN: Every valid index maps to exactly one physical slot.",
+        "VI: Cùng một phép kiểm tra rỗng nhận diện mọi ô chưa dùng. | EN: One empty test identifies every unused slot.",
+        "VI: Mọi ô trước cursor đã rỗng; mọi ô sau cursor chưa được giả định. | EN: Every slot before the cursor is empty; later slots are not assumed.",
+        "VI: Tất cả ô đã thăm là rỗng và không vô tình dùng chung trạng thái mutable. | EN: All visited slots are empty and do not accidentally share mutable state."
+      ],
+      "ordered_method_step_ids": [
+        "B5-HASH_SETUP-S01",
+        "B5-HASH_SETUP-S02",
+        "B5-HASH_SETUP-S03",
+        "B5-HASH_SETUP-S04",
+        "B5-HASH_SETUP-S05"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the slot named by the current valid address/probe.",
+        "Preserve complete records and all non-target slots.",
+        "Keep source modulus, sentinel, collision region, and return contract unchanged."
+      ],
+      "termination_argument": "All setup/search/probe domains are finite; every continuing step strictly advances its row/column/probe, while a successful return or declared duplicate/full outcome terminates immediately.",
+      "failure_paths": [
+        "B5-ERR-HASH_SETUP-01",
+        "B5-ERR-HASH_SETUP-02",
+        "B5-ERR-HASH_SETUP-03"
+      ],
+      "alternative_designs": [
+        "B5-V01-setup-representation",
+        "B5-V02-empty-sentinel",
+        "B5-V06-dictionary-vs-explicit-hash"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Capture state before and after every event and check the bilingual invariant."
+        ],
+        "boundary": [
+          "Main200+Spare100 exact coverage",
+          "100x10 exact coverage",
+          "all sentinel fields",
+          "independent mutable records"
+        ],
+        "counterexample": [
+          "Exercise all three linked error triggers and show detection plus repaired trace."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_s25_42_2(b)(i) under its exact 2025 contract.",
+          "Reproduce official part 9618_s25_42_2(b)(ii) under its exact 2025 contract.",
+          "Reproduce official part 9618_w25_41_3(b) under its exact 2025 contract."
+        ]
+      },
+      "source_constraints": [
+        "2025-only observed hash corpus; do not claim universal behavior.",
+        "No current SOURCE_RISK_REGISTER item targets these parts; representation ambiguity is still prohibited by A3C14."
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B5-SD-HASH_FUNCTION",
+      "pattern_id": "HASH_FUNCTION",
+      "variant_id": "B5-V03-hash-domain",
+      "input_contract": "Fix the key type/domain, modulus, and contract returning one primary address.",
+      "output_contract": "Return the integer address and verify it belongs to the main row/slot domain; do not add Spare capacity or bucket columns to the modulus.",
+      "state_model": [
+        "hash_contract",
+        "key",
+        "address",
+        "returned_address"
+      ],
+      "representation": [
+        "Explicit examination hash table",
+        "Python-oriented pseudocode",
+        "source-specific record and index domains"
+      ],
+      "preconditions": [
+        "Fix the key type/domain, modulus, and contract returning one primary address."
+      ],
+      "postconditions": [
+        "VI: Địa chỉ trả về truy cập được đúng vùng chính. | EN: The returned address indexes the correct primary region."
+      ],
+      "invariants": [
+        "VI: Cùng khóa và modulus luôn cho cùng địa chỉ. | EN: The same key and modulus always produce the same address.",
+        "VI: Giá trị được băm là khóa theo hợp đồng. | EN: The hashed value is the contract key.",
+        "VI: 0 ≤ address < modulus theo miền khóa và quy ước MOD đã chốt. | EN: 0 ≤ address < modulus under the fixed key domain and MOD convention.",
+        "VI: Địa chỉ trả về truy cập được đúng vùng chính. | EN: The returned address indexes the correct primary region."
+      ],
+      "ordered_method_step_ids": [
+        "B5-HASH_FUNCTION-S01",
+        "B5-HASH_FUNCTION-S02",
+        "B5-HASH_FUNCTION-S03",
+        "B5-HASH_FUNCTION-S04"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the slot named by the current valid address/probe.",
+        "Preserve complete records and all non-target slots.",
+        "Keep source modulus, sentinel, collision region, and return contract unchanged."
+      ],
+      "termination_argument": "All setup/search/probe domains are finite; every continuing step strictly advances its row/column/probe, while a successful return or declared duplicate/full outcome terminates immediately.",
+      "failure_paths": [
+        "B5-ERR-HASH_FUNCTION-01",
+        "B5-ERR-HASH_FUNCTION-02",
+        "B5-ERR-HASH_FUNCTION-03"
+      ],
+      "alternative_designs": [
+        "B5-V03-hash-domain",
+        "B5-V06-dictionary-vs-explicit-hash"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Capture state before and after every event and check the bilingual invariant."
+        ],
+        "boundary": [
+          "key 0",
+          "key modulus−1",
+          "key modulus",
+          "key modulus+1",
+          "source-domain negative-key policy"
+        ],
+        "counterexample": [
+          "Exercise all three linked error triggers and show detection plus repaired trace."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_s25_42_2(c) under its exact 2025 contract.",
+          "Reproduce official part 9618_w25_41_3(c) under its exact 2025 contract."
+        ]
+      },
+      "source_constraints": [
+        "2025-only observed hash corpus; do not claim universal behavior.",
+        "No current SOURCE_RISK_REGISTER item targets these parts; representation ambiguity is still prohibited by A3C14."
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B5-SD-HASH_INSERT",
+      "pattern_id": "HASH_INSERT",
+      "variant_id": "B5-V04-collision-strategy",
+      "input_contract": "Fix the record/key, sentinel, collision strategy, probe order, duplicate policy, and full behavior before writing.",
+      "output_contract": "If a duplicate key is encountered or probing is exhausted, apply the declared policy; when the source is silent, record the boundary outcome for Stage 5 rather than silently overwriting.",
+      "state_model": [
+        "insert_contract",
+        "address",
+        "primary_state",
+        "table",
+        "probe",
+        "collision_region",
+        "outcome"
+      ],
+      "representation": [
+        "Explicit examination hash table",
+        "Python-oriented pseudocode",
+        "source-specific record and index domains"
+      ],
+      "preconditions": [
+        "Fix the record/key, sentinel, collision strategy, probe order, duplicate policy, and full behavior before writing."
+      ],
+      "postconditions": [
+        "VI: Không overwrite ngoài hợp đồng và bảng đầy không gây truy cập ngoài miền. | EN: No out-of-contract overwrite occurs and a full table never causes an out-of-range access."
+      ],
+      "invariants": [
+        "VI: Chỉ một chiến lược lưu va chạm điều khiển thao tác. | EN: Exactly one collision representation controls the operation.",
+        "VI: Record chỉ có thể vào ô chính đó hoặc vùng va chạm do địa chỉ đó quy định. | EN: The record can enter only that primary slot or its prescribed collision region.",
+        "VI: Chưa có ô nào bị thay đổi trước quyết định rỗng/va chạm. | EN: No slot changes before the empty/collision decision.",
+        "VI: Record được lưu một lần tại địa chỉ hash và các ô khác giữ nguyên. | EN: The record is stored once at its hash address and all other slots remain unchanged.",
+        "VI: Các ô trước probe đã dùng hoặc đã bị loại theo duplicate policy; chưa ghi record. | EN: Slots before the probe are occupied or rejected by duplicate policy; the record is not yet written.",
+        "VI: Tối đa một ô mới chứa record và mọi ô khác giữ nguyên. | EN: At most one new slot contains the record and every other slot is unchanged.",
+        "VI: Không overwrite ngoài hợp đồng và bảng đầy không gây truy cập ngoài miền. | EN: No out-of-contract overwrite occurs and a full table never causes an out-of-range access."
+      ],
+      "ordered_method_step_ids": [
+        "B5-HASH_INSERT-S01",
+        "B5-HASH_INSERT-S02",
+        "B5-HASH_INSERT-S03",
+        "B5-HASH_INSERT-S04",
+        "B5-HASH_INSERT-S05",
+        "B5-HASH_INSERT-S06",
+        "B5-HASH_INSERT-S07"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the slot named by the current valid address/probe.",
+        "Preserve complete records and all non-target slots.",
+        "Keep source modulus, sentinel, collision region, and return contract unchanged."
+      ],
+      "termination_argument": "All setup/search/probe domains are finite; every continuing step strictly advances its row/column/probe, while a successful return or declared duplicate/full outcome terminates immediately.",
+      "failure_paths": [
+        "B5-ERR-HASH_INSERT-01",
+        "B5-ERR-HASH_INSERT-02",
+        "B5-ERR-HASH_INSERT-03"
+      ],
+      "alternative_designs": [
+        "B5-V02-empty-sentinel",
+        "B5-V04-collision-strategy",
+        "B5-V05-boundary-policy",
+        "B5-V06-dictionary-vs-explicit-hash"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Capture state before and after every event and check the bilingual invariant."
+        ],
+        "boundary": [
+          "primary empty",
+          "collision first/last free",
+          "global Spare vs same bucket",
+          "duplicate key",
+          "collision region full"
+        ],
+        "counterexample": [
+          "Exercise all three linked error triggers and show detection plus repaired trace."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_s25_42_2(d) under its exact 2025 contract.",
+          "Reproduce official part 9618_w25_41_3(d) under its exact 2025 contract."
+        ]
+      },
+      "source_constraints": [
+        "2025-only observed hash corpus; do not claim universal behavior.",
+        "No current SOURCE_RISK_REGISTER item targets these parts; representation ambiguity is still prohibited by A3C14."
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    },
+    {
+      "solution_design_id": "B5-SD-HASH_SEARCH",
+      "pattern_id": "HASH_SEARCH",
+      "variant_id": "B5-V05-boundary-policy",
+      "input_contract": "Fix the search key, hash function, collision region, returned data field, and exact Not found string.",
+      "output_contract": "Only after the required region is exhausted, return the exact Not found string.",
+      "state_model": [
+        "search_contract",
+        "address",
+        "column",
+        "comparison",
+        "result"
+      ],
+      "representation": [
+        "Explicit examination hash table",
+        "Python-oriented pseudocode",
+        "source-specific record and index domains"
+      ],
+      "preconditions": [
+        "Fix the search key, hash function, collision region, returned data field, and exact Not found string."
+      ],
+      "postconditions": [
+        "VI: Không ô hợp lệ chưa xét nào có thể chứa khóa. | EN: No unchecked valid slot can contain the key."
+      ],
+      "invariants": [
+        "VI: Mọi đường đi trả cùng kiểu string theo hợp đồng. | EN: Every path returns the contract string type.",
+        "VI: Nếu record tồn tại theo chiến lược bucket, nó nằm trong hàng address. | EN: If the record exists under the bucket strategy, it is in row address.",
+        "VI: Mọi cột trước cursor đã được so và không chứa khóa. | EN: Every earlier column has been compared and does not hold the key.",
+        "VI: Chỉ equality của key quyết định found. | EN: Only key equality determines found.",
+        "VI: Dữ liệu trả về thuộc record có đúng khóa. | EN: Returned data belongs to the record with the exact key.",
+        "VI: Không ô hợp lệ chưa xét nào có thể chứa khóa. | EN: No unchecked valid slot can contain the key."
+      ],
+      "ordered_method_step_ids": [
+        "B5-HASH_SEARCH-S01",
+        "B5-HASH_SEARCH-S02",
+        "B5-HASH_SEARCH-S03",
+        "B5-HASH_SEARCH-S04",
+        "B5-HASH_SEARCH-S05",
+        "B5-HASH_SEARCH-S06"
+      ],
+      "mutation_and_preservation_rules": [
+        "Mutate only the slot named by the current valid address/probe.",
+        "Preserve complete records and all non-target slots.",
+        "Keep source modulus, sentinel, collision region, and return contract unchanged."
+      ],
+      "termination_argument": "All setup/search/probe domains are finite; every continuing step strictly advances its row/column/probe, while a successful return or declared duplicate/full outcome terminates immediately.",
+      "failure_paths": [
+        "B5-ERR-HASH_SEARCH-01",
+        "B5-ERR-HASH_SEARCH-02",
+        "B5-ERR-HASH_SEARCH-03"
+      ],
+      "alternative_designs": [
+        "B5-V02-empty-sentinel",
+        "B5-V05-boundary-policy",
+        "B5-V06-dictionary-vs-explicit-hash"
+      ],
+      "stage5_test_obligations": {
+        "normal": [
+          "Capture state before and after every event and check the bilingual invariant."
+        ],
+        "boundary": [
+          "found column 0",
+          "found interior/last column",
+          "absent full bucket",
+          "empty bucket",
+          "gap only when policy permits"
+        ],
+        "counterexample": [
+          "Exercise all three linked error triggers and show detection plus repaired trace."
+        ],
+        "source_fixture": [
+          "Reproduce official part 9618_w25_41_3(f) under its exact 2025 contract."
+        ]
+      },
+      "source_constraints": [
+        "2025-only observed hash corpus; do not claim universal behavior.",
+        "No current SOURCE_RISK_REGISTER item targets these parts; representation ambiguity is still prohibited by A3C14."
+      ],
+      "source_issue_dispositions": [],
+      "status": "PENDING_STAGE5_EXECUTION_VERIFICATION"
+    }
+  ],
+  "self_checks": {
+    "design_count": 4,
+    "all_pending_stage5": true
+  }
+}

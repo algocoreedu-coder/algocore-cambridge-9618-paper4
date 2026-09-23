@@ -1,0 +1,616 @@
+{
+  "author_run_ref": "p4r3.a3.stack.production-v1.author-run",
+  "caption": {
+    "en": "A fixed-array stack with push, pop and correct operand order.",
+    "vi": "Stack mảng cố định với push, pop và đúng thứ tự toán hạng."
+  },
+  "code_sha256": "c85dcb37f7901eb7342709fe615345a78ea7cf60e53dfd6839ec0667fabfaac0",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "14456629751e6b8e6af6535564eeda689be50673f57697388cc1d0a3186ecd7a",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "stack.normal.expected-output",
+      "fixture_ref": "stack.normal",
+      "value": {
+        "live": [
+          10,
+          30
+        ],
+        "reduced": 5,
+        "results": [
+          true,
+          true,
+          20,
+          true
+        ],
+        "status": "OK",
+        "top": 1,
+        "trace": [
+          {
+            "after": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                10,
+                20
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                10,
+                20
+              ],
+              "top": 1
+            },
+            "event": "pop",
+            "outcome": 20
+          },
+          {
+            "after": {
+              "live": [
+                10,
+                30
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "stack.boundary.expected-output",
+      "fixture_ref": "stack.boundary",
+      "value": {
+        "live": [
+          7
+        ],
+        "reduced": null,
+        "results": [
+          null,
+          true,
+          false
+        ],
+        "status": "OK",
+        "top": 0,
+        "trace": [
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "pop",
+            "outcome": null
+          },
+          {
+            "after": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": false
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "stack.failure.expected-output",
+      "fixture_ref": "stack.failure",
+      "value": {
+        "live": [],
+        "reduced": null,
+        "results": [
+          true,
+          true,
+          false,
+          2,
+          1,
+          null
+        ],
+        "status": "OK",
+        "top": -1,
+        "trace": [
+          {
+            "after": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "event": "push",
+            "outcome": false
+          },
+          {
+            "after": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "event": "pop",
+            "outcome": 2
+          },
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "event": "pop",
+            "outcome": 1
+          },
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "pop",
+            "outcome": null
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/stack/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "stack.normal",
+      "input": {
+        "capacity": 4,
+        "operands": [
+          9,
+          4
+        ],
+        "operations": [
+          [
+            "push",
+            10
+          ],
+          [
+            "push",
+            20
+          ],
+          [
+            "pop"
+          ],
+          [
+            "push",
+            30
+          ]
+        ]
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "stack.boundary",
+      "input": {
+        "capacity": 1,
+        "operands": [],
+        "operations": [
+          [
+            "pop"
+          ],
+          [
+            "push",
+            7
+          ],
+          [
+            "push",
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "stack.failure",
+      "input": {
+        "capacity": 2,
+        "operands": [
+          5
+        ],
+        "operations": [
+          [
+            "push",
+            1
+          ],
+          [
+            "push",
+            2
+          ],
+          [
+            "push",
+            3
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ]
+        ]
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.stack.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.stack",
+  "lines": [
+    {
+      "line_id": "stack.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "stack.production-v1.L002",
+      "order": 2,
+      "text": ""
+    },
+    {
+      "line_id": "stack.production-v1.L003",
+      "order": 3,
+      "text": "class Stack:"
+    },
+    {
+      "line_id": "stack.production-v1.L004",
+      "order": 4,
+      "text": "    def __init__(self, capacity):"
+    },
+    {
+      "line_id": "stack.production-v1.L005",
+      "order": 5,
+      "text": "        self.items = [None] * capacity"
+    },
+    {
+      "line_id": "stack.production-v1.L006",
+      "order": 6,
+      "text": "        self.top = -1"
+    },
+    {
+      "line_id": "stack.production-v1.L007",
+      "order": 7,
+      "text": "    def push(self, value):"
+    },
+    {
+      "line_id": "stack.production-v1.L008",
+      "order": 8,
+      "text": "        if self.top + 1 == len(self.items):"
+    },
+    {
+      "line_id": "stack.production-v1.L009",
+      "order": 9,
+      "text": "            return False"
+    },
+    {
+      "line_id": "stack.production-v1.L010",
+      "order": 10,
+      "text": "        self.top += 1"
+    },
+    {
+      "line_id": "stack.production-v1.L011",
+      "order": 11,
+      "text": "        self.items[self.top] = value"
+    },
+    {
+      "line_id": "stack.production-v1.L012",
+      "order": 12,
+      "text": "        return True"
+    },
+    {
+      "line_id": "stack.production-v1.L013",
+      "order": 13,
+      "text": "    def pop(self):"
+    },
+    {
+      "line_id": "stack.production-v1.L014",
+      "order": 14,
+      "text": "        if self.top == -1:"
+    },
+    {
+      "line_id": "stack.production-v1.L015",
+      "order": 15,
+      "text": "            return None"
+    },
+    {
+      "line_id": "stack.production-v1.L016",
+      "order": 16,
+      "text": "        value = self.items[self.top]"
+    },
+    {
+      "line_id": "stack.production-v1.L017",
+      "order": 17,
+      "text": "        self.items[self.top] = None"
+    },
+    {
+      "line_id": "stack.production-v1.L018",
+      "order": 18,
+      "text": "        self.top -= 1"
+    },
+    {
+      "line_id": "stack.production-v1.L019",
+      "order": 19,
+      "text": "        return value"
+    },
+    {
+      "line_id": "stack.production-v1.L020",
+      "order": 20,
+      "text": "    def live(self):"
+    },
+    {
+      "line_id": "stack.production-v1.L021",
+      "order": 21,
+      "text": "        return self.items[:self.top + 1]"
+    },
+    {
+      "line_id": "stack.production-v1.L022",
+      "order": 22,
+      "text": ""
+    },
+    {
+      "line_id": "stack.production-v1.L023",
+      "order": 23,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "stack.production-v1.L024",
+      "order": 24,
+      "text": "    stack, trace, results = Stack(fixture[\"capacity\"]), [], []"
+    },
+    {
+      "line_id": "stack.production-v1.L025",
+      "order": 25,
+      "text": "    for operation in fixture[\"operations\"]:"
+    },
+    {
+      "line_id": "stack.production-v1.L026",
+      "order": 26,
+      "text": "        before = {\"top\": stack.top, \"live\": stack.live()}"
+    },
+    {
+      "line_id": "stack.production-v1.L027",
+      "order": 27,
+      "text": "        if operation[0] == \"push\":"
+    },
+    {
+      "line_id": "stack.production-v1.L028",
+      "order": 28,
+      "text": "            outcome = stack.push(operation[1])"
+    },
+    {
+      "line_id": "stack.production-v1.L029",
+      "order": 29,
+      "text": "        else:"
+    },
+    {
+      "line_id": "stack.production-v1.L030",
+      "order": 30,
+      "text": "            outcome = stack.pop()"
+    },
+    {
+      "line_id": "stack.production-v1.L031",
+      "order": 31,
+      "text": "        results.append(outcome)"
+    },
+    {
+      "line_id": "stack.production-v1.L032",
+      "order": 32,
+      "text": "        trace.append({\"event\": operation[0], \"before\": before, \"after\": {\"top\": stack.top, \"live\": stack.live()}, \"outcome\": outcome})"
+    },
+    {
+      "line_id": "stack.production-v1.L033",
+      "order": 33,
+      "text": "    reduce_stack = Stack(max(2, len(fixture.get(\"operands\", []))))"
+    },
+    {
+      "line_id": "stack.production-v1.L034",
+      "order": 34,
+      "text": "    for value in fixture.get(\"operands\", []): reduce_stack.push(value)"
+    },
+    {
+      "line_id": "stack.production-v1.L035",
+      "order": 35,
+      "text": "    right, left = reduce_stack.pop(), reduce_stack.pop()"
+    },
+    {
+      "line_id": "stack.production-v1.L036",
+      "order": 36,
+      "text": "    reduced = None if left is None or right is None else left - right"
+    },
+    {
+      "line_id": "stack.production-v1.L037",
+      "order": 37,
+      "text": "    return {\"status\": \"OK\", \"results\": results, \"live\": stack.live(), \"top\": stack.top, \"reduced\": reduced, \"trace\": trace}"
+    },
+    {
+      "line_id": "stack.production-v1.L038",
+      "order": 38,
+      "text": ""
+    },
+    {
+      "line_id": "stack.production-v1.L039",
+      "order": 39,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "stack.production-v1.L040",
+      "order": 40,
+      "text": "    import json"
+    },
+    {
+      "line_id": "stack.production-v1.L041",
+      "order": 41,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "stack.production-v1.L042",
+      "order": 42,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "stack.production-v1.L043",
+      "order": 43,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "stack.production-v1.L044",
+      "order": 44,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "stack.production-v1.L045",
+      "order": 45,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "stack.production-v1.L046",
+      "order": 46,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "stack.production-v1.L047",
+      "order": 47,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "STACK_PAIR",
+    "STACK_POP",
+    "STACK_PUSH",
+    "STACK_REDUCE",
+    "STACK_SETUP"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.stack.production-v1",
+  "stage5_source_refs": [
+    "stage5.p0.pattern-provenance"
+  ],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

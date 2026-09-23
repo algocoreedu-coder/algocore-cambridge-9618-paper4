@@ -1,0 +1,424 @@
+{
+  "author_run_ref": "p4r3.a3.performance.production-v1.author-run",
+  "caption": {
+    "en": "Operation counting, preconditions and algorithm comparison.",
+    "vi": "Đếm phép toán, kiểm tra tiền điều kiện và so sánh thuật toán."
+  },
+  "code_sha256": "3f457dfedb12e5952e4c203d01dd83467f331327a140d33fd30bc9a33a7ec0b9",
+  "entry_point": "run(fixture)",
+  "execution_log_sha256": "db887ad1726d7e5f0c87ab18ee7e27e0bef447beaecc130a0e56a7f3d8fe1f13",
+  "execution_status": "PASS",
+  "expected_outputs": [
+    {
+      "expected_output_id": "performance.normal.expected-output",
+      "fixture_ref": "performance.normal",
+      "value": {
+        "binary": [
+          5,
+          2
+        ],
+        "linear": [
+          5,
+          6
+        ],
+        "result_equivalent": true,
+        "sorted": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "status": "OK",
+        "trace": [
+          {
+            "comparisons": 6,
+            "event": "linear_count"
+          },
+          {
+            "comparisons": 2,
+            "event": "binary_count"
+          },
+          {
+            "comparisons": 6,
+            "event": "insertion_count",
+            "shifts": 0
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "performance.boundary.expected-output",
+      "fixture_ref": "performance.boundary",
+      "value": {
+        "binary": [
+          -1,
+          0
+        ],
+        "linear": [
+          -1,
+          0
+        ],
+        "result_equivalent": true,
+        "sorted": [],
+        "status": "OK",
+        "trace": [
+          {
+            "comparisons": 0,
+            "event": "linear_count"
+          },
+          {
+            "comparisons": 0,
+            "event": "binary_count"
+          },
+          {
+            "comparisons": 0,
+            "event": "insertion_count",
+            "shifts": 0
+          }
+        ]
+      }
+    },
+    {
+      "expected_output_id": "performance.failure.expected-output",
+      "fixture_ref": "performance.failure",
+      "value": {
+        "binary": [
+          -1,
+          0
+        ],
+        "linear": [
+          2,
+          3
+        ],
+        "result_equivalent": true,
+        "sorted": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "status": "UNSORTED",
+        "trace": [
+          {
+            "comparisons": 3,
+            "event": "linear_count"
+          },
+          {
+            "comparisons": 0,
+            "event": "binary_count"
+          },
+          {
+            "comparisons": 6,
+            "event": "insertion_count",
+            "shifts": 4
+          }
+        ]
+      }
+    }
+  ],
+  "filename": "content/paper4/python/production/performance/source.py",
+  "fixtures": [
+    {
+      "case_kind": "normal",
+      "fixture_id": "performance.normal",
+      "input": {
+        "target": 11,
+        "values": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ]
+      }
+    },
+    {
+      "case_kind": "boundary",
+      "fixture_id": "performance.boundary",
+      "input": {
+        "target": 1,
+        "values": []
+      }
+    },
+    {
+      "case_kind": "failure",
+      "fixture_id": "performance.failure",
+      "input": {
+        "target": 4,
+        "values": [
+          5,
+          1,
+          4,
+          2
+        ]
+      }
+    }
+  ],
+  "independent_rerun_ref": "p4r3.a3.performance.production-v1.independent-rerun",
+  "language": "python",
+  "lesson_id": "ac-9618-p4-2026-python.lesson.performance",
+  "lines": [
+    {
+      "line_id": "performance.production-v1.L001",
+      "order": 1,
+      "text": "from pathlib import Path"
+    },
+    {
+      "line_id": "performance.production-v1.L002",
+      "order": 2,
+      "text": ""
+    },
+    {
+      "line_id": "performance.production-v1.L003",
+      "order": 3,
+      "text": "def linear(values, target):"
+    },
+    {
+      "line_id": "performance.production-v1.L004",
+      "order": 4,
+      "text": "    comparisons = 0"
+    },
+    {
+      "line_id": "performance.production-v1.L005",
+      "order": 5,
+      "text": "    for index, value in enumerate(values):"
+    },
+    {
+      "line_id": "performance.production-v1.L006",
+      "order": 6,
+      "text": "        comparisons += 1"
+    },
+    {
+      "line_id": "performance.production-v1.L007",
+      "order": 7,
+      "text": "        if value == target: return index, comparisons"
+    },
+    {
+      "line_id": "performance.production-v1.L008",
+      "order": 8,
+      "text": "    return -1, comparisons"
+    },
+    {
+      "line_id": "performance.production-v1.L009",
+      "order": 9,
+      "text": ""
+    },
+    {
+      "line_id": "performance.production-v1.L010",
+      "order": 10,
+      "text": "def binary(values, target):"
+    },
+    {
+      "line_id": "performance.production-v1.L011",
+      "order": 11,
+      "text": "    if values != sorted(values): raise ValueError(\"binary search requires sorted input\")"
+    },
+    {
+      "line_id": "performance.production-v1.L012",
+      "order": 12,
+      "text": "    low, high, comparisons = 0, len(values) - 1, 0"
+    },
+    {
+      "line_id": "performance.production-v1.L013",
+      "order": 13,
+      "text": "    while low <= high:"
+    },
+    {
+      "line_id": "performance.production-v1.L014",
+      "order": 14,
+      "text": "        middle = (low + high) // 2; comparisons += 1"
+    },
+    {
+      "line_id": "performance.production-v1.L015",
+      "order": 15,
+      "text": "        if values[middle] == target: return middle, comparisons"
+    },
+    {
+      "line_id": "performance.production-v1.L016",
+      "order": 16,
+      "text": "        if values[middle] < target: low = middle + 1"
+    },
+    {
+      "line_id": "performance.production-v1.L017",
+      "order": 17,
+      "text": "        else: high = middle - 1"
+    },
+    {
+      "line_id": "performance.production-v1.L018",
+      "order": 18,
+      "text": "    return -1, comparisons"
+    },
+    {
+      "line_id": "performance.production-v1.L019",
+      "order": 19,
+      "text": ""
+    },
+    {
+      "line_id": "performance.production-v1.L020",
+      "order": 20,
+      "text": "def insertion_cost(values):"
+    },
+    {
+      "line_id": "performance.production-v1.L021",
+      "order": 21,
+      "text": "    output, comparisons, shifts = list(values), 0, 0"
+    },
+    {
+      "line_id": "performance.production-v1.L022",
+      "order": 22,
+      "text": "    for index in range(1, len(output)):"
+    },
+    {
+      "line_id": "performance.production-v1.L023",
+      "order": 23,
+      "text": "        item, position = output[index], index"
+    },
+    {
+      "line_id": "performance.production-v1.L024",
+      "order": 24,
+      "text": "        while position > 0:"
+    },
+    {
+      "line_id": "performance.production-v1.L025",
+      "order": 25,
+      "text": "            comparisons += 1"
+    },
+    {
+      "line_id": "performance.production-v1.L026",
+      "order": 26,
+      "text": "            if output[position - 1] <= item: break"
+    },
+    {
+      "line_id": "performance.production-v1.L027",
+      "order": 27,
+      "text": "            output[position] = output[position - 1]; position -= 1; shifts += 1"
+    },
+    {
+      "line_id": "performance.production-v1.L028",
+      "order": 28,
+      "text": "        output[position] = item"
+    },
+    {
+      "line_id": "performance.production-v1.L029",
+      "order": 29,
+      "text": "    return output, comparisons, shifts"
+    },
+    {
+      "line_id": "performance.production-v1.L030",
+      "order": 30,
+      "text": ""
+    },
+    {
+      "line_id": "performance.production-v1.L031",
+      "order": 31,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "performance.production-v1.L032",
+      "order": 32,
+      "text": "    values = fixture[\"values\"]"
+    },
+    {
+      "line_id": "performance.production-v1.L033",
+      "order": 33,
+      "text": "    linear_result = linear(values, fixture[\"target\"])"
+    },
+    {
+      "line_id": "performance.production-v1.L034",
+      "order": 34,
+      "text": "    try: binary_result, status = binary(values, fixture[\"target\"]), \"OK\""
+    },
+    {
+      "line_id": "performance.production-v1.L035",
+      "order": 35,
+      "text": "    except ValueError: binary_result, status = [-1, 0], \"UNSORTED\""
+    },
+    {
+      "line_id": "performance.production-v1.L036",
+      "order": 36,
+      "text": "    ordered, comparisons, shifts = insertion_cost(values)"
+    },
+    {
+      "line_id": "performance.production-v1.L037",
+      "order": 37,
+      "text": "    trace = [{\"event\": \"linear_count\", \"comparisons\": linear_result[1]}, {\"event\": \"binary_count\", \"comparisons\": binary_result[1]}, {\"event\": \"insertion_count\", \"comparisons\": comparisons, \"shifts\": shifts}]"
+    },
+    {
+      "line_id": "performance.production-v1.L038",
+      "order": 38,
+      "text": "    return {\"status\": status, \"linear\": linear_result, \"binary\": binary_result, \"sorted\": ordered, \"result_equivalent\": ordered == sorted(values), \"trace\": trace}"
+    },
+    {
+      "line_id": "performance.production-v1.L039",
+      "order": 39,
+      "text": ""
+    },
+    {
+      "line_id": "performance.production-v1.L040",
+      "order": 40,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "performance.production-v1.L041",
+      "order": 41,
+      "text": "    import json"
+    },
+    {
+      "line_id": "performance.production-v1.L042",
+      "order": 42,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "performance.production-v1.L043",
+      "order": 43,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "performance.production-v1.L044",
+      "order": 44,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "performance.production-v1.L045",
+      "order": 45,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "performance.production-v1.L046",
+      "order": 46,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "performance.production-v1.L047",
+      "order": 47,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "performance.production-v1.L048",
+      "order": 48,
+      "text": ""
+    }
+  ],
+  "normal_boundary_failure_coverage": {
+    "boundary": true,
+    "failure": true,
+    "normal": true
+  },
+  "pattern_ids": [
+    "LINEAR_SEARCH",
+    "BINARY_SEARCH",
+    "BUBBLE_SORT",
+    "INSERTION_SORT",
+    "EVIDENCE_RUN"
+  ],
+  "python_artifact_id": "ac-9618-p4-2026-python.artifact.performance.production-v1",
+  "stage5_source_refs": [],
+  "status": "independently-rerun",
+  "syntax_status": "PASS",
+  "version": "production-v1"
+}

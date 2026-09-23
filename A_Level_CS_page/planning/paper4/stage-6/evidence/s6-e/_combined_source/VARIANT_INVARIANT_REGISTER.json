@@ -1,0 +1,327 @@
+{
+  "variants": [
+    {
+      "variant_id": "B5-V01-setup-representation",
+      "pattern_ids": [
+        "HASH_SETUP"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "spare-arrays-vs-bucket-table",
+      "decision_rule": {
+        "vi": "Dùng đúng kích thước, số chiều và vùng collision của nguồn; không gộp Main+Spare với bảng 100×10.",
+        "en": "Use the source dimensions and collision region exactly; do not merge Main+Spare with the 100×10 table."
+      },
+      "cases": [
+        "HashTable[200]+Spare[100]",
+        "HashTable[100][10]"
+      ],
+      "invariant": "The complete physical domain uses one empty representation.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B5-V02-empty-sentinel",
+      "pattern_ids": [
+        "HASH_SETUP",
+        "HASH_INSERT",
+        "HASH_SEARCH"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "empty-record-and-sentinel",
+      "decision_rule": {
+        "vi": "Phép khởi tạo, kiểm ô trống, chèn và tìm phải dùng cùng empty record/sentinel; không coi dữ liệu hợp lệ là rỗng.",
+        "en": "Initialisation, empty checks, insertion, and search must share one empty record/sentinel without classifying valid data as empty."
+      },
+      "cases": [
+        "−1 in all specified fields",
+        "empty/null Record object"
+      ],
+      "invariant": "Empty-state recognition is consistent across operations.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B5-V03-hash-domain",
+      "pattern_ids": [
+        "HASH_FUNCTION"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "modulus-and-key-domain",
+      "decision_rule": {
+        "vi": "Chọn MOD 200 cho 200 địa chỉ chính hoặc MOD 100 cho 100 hàng; nêu miền khóa trước khi suy luận về số âm.",
+        "en": "Use MOD 200 for 200 primary addresses or MOD 100 for 100 rows; state the key domain before reasoning about negative keys."
+      },
+      "cases": [
+        "key MOD 200",
+        "key MOD 100"
+      ],
+      "invariant": "Returned address belongs to the primary address domain.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B5-V04-collision-strategy",
+      "pattern_ids": [
+        "HASH_INSERT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C14"
+      ],
+      "axis": "global-spare-vs-same-bucket",
+      "decision_rule": {
+        "vi": "Sau va chạm, quét Spare toàn cục hoặc cột còn lại của đúng bucket theo đề; dừng ở ô trống đầu tiên.",
+        "en": "After collision, scan global Spare or the remaining columns of the exact bucket as prescribed; stop at the first empty slot."
+      },
+      "cases": [
+        "separate Spare[100]",
+        "same-row bucket columns 1..9"
+      ],
+      "invariant": "A successful insertion changes exactly one permitted slot.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B5-V05-boundary-policy",
+      "pattern_ids": [
+        "HASH_INSERT",
+        "HASH_SEARCH"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "duplicate-full-not-found",
+      "decision_rule": {
+        "vi": "Nếu nguồn không định nghĩa duplicate/full, giữ chúng là policy/fixture được công bố; Not found chỉ xuất hiện sau khi hết miền tìm hợp lệ.",
+        "en": "When the source does not define duplicate/full behavior, keep them as declared policy/fixtures; return Not found only after exhausting the valid search region."
+      },
+      "cases": [
+        "duplicate reject/update/allow policy",
+        "full outcome",
+        "not-found result"
+      ],
+      "invariant": "No boundary path overwrites silently or leaves the index domain.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "B5-V06-dictionary-vs-explicit-hash",
+      "pattern_ids": [
+        "HASH_SETUP",
+        "HASH_FUNCTION",
+        "HASH_INSERT",
+        "HASH_SEARCH"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "python-dict-vs-exam-hash-table",
+      "decision_rule": {
+        "vi": "Python dict phù hợp khi đề chỉ cần ánh xạ trực tiếp; các bài B5 yêu cầu bằng chứng về MOD, sentinel, collision và probe nên phải dùng cấu trúc hash tường minh.",
+        "en": "A Python dict suits a direct mapping contract; B5 parts require observable MOD, sentinel, collision, and probe evidence, so use the explicit hash structure."
+      },
+      "cases": [
+        "direct dictionary lookup",
+        "explicit examination hash table"
+      ],
+      "invariant": "The implementation exposes every operation assessed by the chosen contract.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b6.variant.class-constructor",
+      "pattern_ids": [
+        "OOP_CLASS"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "visibility_parameter_mapping_defaults",
+      "decision_rule": {
+        "vi": "Từ class table tạo map field/type/visibility/source-of-value.",
+        "en": "Build a field/type/visibility/value-source map from the class table."
+      },
+      "cases": [
+        {
+          "case_id": "all_parameters",
+          "signature": "every field supplied",
+          "initialisation": "parameter→matching field"
+        },
+        {
+          "case_id": "parameters_plus_defaults",
+          "signature": "some fields omitted",
+          "initialisation": "parameter fields plus stated defaults"
+        },
+        {
+          "case_id": "composition_or_array",
+          "signature": "container field",
+          "initialisation": "distinct child/default element per required slot"
+        }
+      ],
+      "invariant": "Immediately after construction every required field exists once, with exact identifier and source-defined value.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b6.variant.subclass-construction",
+      "pattern_ids": [
+        "OOP_SUBCLASS"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "parent_new_attributes_super_call",
+      "decision_rule": {
+        "vi": "Chia parameters thành parent slice và subclass slice trước super call.",
+        "en": "Partition parameters into parent and subclass slices before the super call."
+      },
+      "cases": [
+        {
+          "case_id": "parent_plus_one_field",
+          "order": "super(parent args), then one subclass assignment"
+        },
+        {
+          "case_id": "parent_plus_multiple_fields",
+          "order": "super(parent args), then each new field exactly once"
+        }
+      ],
+      "invariant": "Parent invariant holds after super; subclass invariant holds after new-field initialisation.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b6.variant.getter-member",
+      "pattern_ids": [
+        "OOP_GET"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "scalar_or_indexed_member",
+      "decision_rule": {
+        "vi": "Chọn stored member và optional index từ method contract.",
+        "en": "Select the stored member and optional index from the method contract."
+      },
+      "cases": [
+        {
+          "case_id": "scalar",
+          "parameters": "none besides instance",
+          "return": "one stored scalar"
+        },
+        {
+          "case_id": "indexed",
+          "parameters": "source index",
+          "return": "stored element at exact index"
+        }
+      ],
+      "invariant": "Getter returns stored value/type and leaves the entire object unchanged.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b6.variant.set-versus-update",
+      "pattern_ids": [
+        "OOP_SET",
+        "OOP_UPDATE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C06"
+      ],
+      "axis": "replacement_or_rule_transition",
+      "decision_rule": {
+        "vi": "Dùng equation: không có field_before là Set; có field_before/formula/bound là Update.",
+        "en": "Use the equation: no field_before means Set; field_before/formula/bound means Update."
+      },
+      "cases": [
+        {
+          "case_id": "direct_set",
+          "equation": "field_after=parameter"
+        },
+        {
+          "case_id": "relative_add",
+          "equation": "field_after=field_before+delta"
+        },
+        {
+          "case_id": "bounded_or_scaled",
+          "equation": "field_after=clamp_or_scale(field_before, parameter)"
+        },
+        {
+          "case_id": "indexed_derived",
+          "equation": "member[index]=formula(parameters, fields)"
+        }
+      ],
+      "invariant": "Only named targets change; after-state satisfies the exact source equation and bounds.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b6.variant.override-strategy",
+      "pattern_ids": [
+        "OOP_OVERRIDE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "parent_call_subclass_rule_result",
+      "decision_rule": {
+        "vi": "Tính parent side effects rồi chọn call/extend/reimplement strategy để mỗi obligation xảy ra đúng một lần.",
+        "en": "Count parent side effects, then choose call/extend/reimplement so every obligation occurs once."
+      },
+      "cases": [
+        {
+          "case_id": "transform_then_super",
+          "example": "bonus-adjusted hours passed to parent SetPay"
+        },
+        {
+          "case_id": "specialised_state_rule",
+          "example": "movement/element rule replaces parent behaviour"
+        },
+        {
+          "case_id": "extend_result",
+          "example": "parent description plus subclass text"
+        }
+      ],
+      "invariant": "Same callable contract dispatches to subclass behaviour without duplicate parent side effects.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b6.variant.instantiate-source",
+      "pattern_ids": [
+        "OOP_INSTANTIATE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "fixed_input_file_single_array_composition",
+      "decision_rule": {
+        "vi": "Map one complete source record/fixed tuple to one constructor call and one storage destination.",
+        "en": "Map one complete source record/fixed tuple to one constructor call and one storage destination."
+      },
+      "cases": [
+        {
+          "case_id": "fixed_single",
+          "source": "literal tuple",
+          "destination": "named object"
+        },
+        {
+          "case_id": "interactive",
+          "source": "validated/input tuple",
+          "destination": "single or array slot"
+        },
+        {
+          "case_id": "file_records",
+          "source": "one complete grouped record",
+          "destination": "next object slot"
+        },
+        {
+          "case_id": "nested_grid",
+          "source": "default child tuple",
+          "destination": "distinct instance per grid cell"
+        }
+      ],
+      "invariant": "After k source tuples exactly k valid, correctly typed object instances are reachable in required positions.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "b6.variant.capacity-add",
+      "pattern_ids": [
+        "OOP_CAPACITY_ADD"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "capacity_count_return",
+      "decision_rule": {
+        "vi": "Dùng count làm next-free slot và capacity làm full boundary trong observed Station contract.",
+        "en": "Use count as next-free slot and capacity as full boundary in the observed Station contract."
+      },
+      "cases": [
+        {
+          "case_id": "space",
+          "guard": "count<capacity",
+          "transition": "storage[count]=object; count+=1; True"
+        },
+        {
+          "case_id": "full",
+          "guard": "count==capacity",
+          "transition": "no mutation; False"
+        }
+      ],
+      "invariant": "0<=count<=capacity; success adds the exact object once and failure preserves all state.",
+      "method_changing": true
+    }
+  ]
+}

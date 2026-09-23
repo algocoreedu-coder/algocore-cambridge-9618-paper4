@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0.0",
+  "wave": "S9-R3",
+  "owner": "A6 Language/UX reviewer",
+  "reviewer": "A0 Lead",
+  "review_mode": "independent static inspection plus TypeScript check",
+  "reviewed_at": "2026-09-22T16:20:00+07:00",
+  "inputs": [
+    "stage-0/LEARNING_PAGE_CONTRACT.md",
+    "stage-9/STAGE9_MASTER_PLAN.md",
+    "stage-9/SCHEMA_CONTRACTS.md",
+    "stage-9/WORK_ORDERS.md",
+    "algocore-fumadocs/app/layout.tsx",
+    "algocore-fumadocs/app/components/paper4-learning/LocaleBoundary.tsx",
+    "algocore-fumadocs/app/components/paper4-learning/LessonLearningPage.tsx",
+    "algocore-fumadocs/app/components/paper4-learning/LessonLearningPage.module.css",
+    "algocore-fumadocs/app/components/paper4-learning/SourceReferences.tsx",
+    "algocore-fumadocs/app/components/paper4-learning/SourceReferences.module.css",
+    "algocore-fumadocs/app/components/paper4-visual/Paper4VisualRuntime.tsx",
+    "algocore-fumadocs/app/components/paper4-visual/Paper4VisualRuntime.module.css",
+    "algocore-fumadocs/app/components/paper4-visual/reducer.ts",
+    "algocore-fumadocs/app/paper-4/sources/page.tsx"
+  ],
+  "checks": [
+    {
+      "id": "S9R-UX-C01",
+      "area": "typecheck",
+      "result": "PASS",
+      "evidence": "npm run typecheck exited 0 on 2026-09-22."
+    },
+    {
+      "id": "S9R-UX-C02",
+      "area": "bilingual labels",
+      "result": "PASS_STATIC",
+      "evidence": "Lesson section labels, page controls, source-card controls, authority descriptions and visual-runtime controls expose VI and EN entries from one shared component tree."
+    },
+    {
+      "id": "S9R-UX-C03",
+      "area": "html language",
+      "result": "REWORK_REQUIRED",
+      "evidence": "LocaleBoundary updates document.documentElement.lang and adds a local lang attribute, but app/layout.tsx fixes both server html lang and RootProvider i18n locale to vi. English provider chrome therefore cannot follow the lesson locale, and the initial EN document remains vi until hydration."
+    },
+    {
+      "id": "S9R-UX-C04",
+      "area": "anchor preservation",
+      "result": "PASS_STATIC",
+      "evidence": "LocaleLink appends window.location.hash to router.push while retaining the same lesson slug; lesson block anchors are stable registry values."
+    },
+    {
+      "id": "S9R-UX-C05",
+      "area": "lesson and action state preservation",
+      "result": "PASS_STATIC_DEFERRED_RUNTIME",
+      "evidence": "Locale switch retains the slug; LocaleBoundary dispatches only SET_LOCALE to the embedded runtime, and the reducer preserves patternId, eventIndex, inputValue and inputRevision on SET_LOCALE. Actual preservation across a Next soft navigation must be verified in-browser after the dynamic route exists."
+    },
+    {
+      "id": "S9R-UX-C06",
+      "area": "keyboard and focus",
+      "result": "PASS_STATIC_DEFERRED_RUNTIME",
+      "evidence": "Semantic links, buttons, fields, details/summary, skip link and focus-visible rules exist. Full tab order, focus retention after locale navigation, sidebar operation and no focus trap remain browser tests."
+    },
+    {
+      "id": "S9R-UX-C07",
+      "area": "heading structure",
+      "result": "REWORK_REQUIRED",
+      "evidence": "Each learning block is introduced by h2, while the embedded Paper4VisualRuntime creates another h2 inside the action-view block. Its panels are h3. The embedded runtime title must be exposed as a child heading of the block, or receive an embedding heading-level option."
+    },
+    {
+      "id": "S9R-UX-C08",
+      "area": "mobile 320 px",
+      "result": "PASS_STATIC_DEFERRED_RUNTIME",
+      "evidence": "Lesson navigation stacks at 640 px, source-card definition rows stack at 420 px, runtime panels collapse at 64 rem, forms collapse at 42 rem, and code/pre regions own overflow. A 320 px rendered overflow and target-size check is still required."
+    },
+    {
+      "id": "S9R-UX-C09",
+      "area": "reduced motion",
+      "result": "PASS_STATIC_DEFERRED_RUNTIME",
+      "evidence": "The runtime suppresses animation and transition duration under prefers-reduced-motion; the learning-page stylesheet does not add essential motion. Browser emulation remains required."
+    },
+    {
+      "id": "S9R-UX-C10",
+      "area": "light and dark theme",
+      "result": "DEFERRED_REQUIRED",
+      "evidence": "Learning-page and source-card shells use Fumadocs color tokens. The embedded runtime uses its own fixed light palette; browser contrast and readability must be checked in both themes before gate closure."
+    },
+    {
+      "id": "S9R-UX-C11",
+      "area": "source cards",
+      "result": "PASS_STATIC_DEFERRED_DATA",
+      "evidence": "Source cards provide localized headings, native keyboard disclosure, visible focus, wrapping for long locators, authority/access-mode labels and a fixed internal conventions route. Live review of actual lesson citations is deferred until the Stage 9 registry exists."
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "S9R-UX-REQ-001",
+      "severity": "P1",
+      "required": true,
+      "owner": "A2 Runtime integration with A6 locale review",
+      "status": "OPEN_REQUIRED",
+      "evidence": "app/layout.tsx hard-codes html lang=vi and RootProvider i18n.locale=vi; LocaleBoundary only changes document.lang after hydration.",
+      "expected_fix": "Provide a route-level locale context accepted by the Fumadocs provider and ensure English lesson navigation/TOC/provider labels follow lang=en. Either make the initial document language correct or document and test an equivalent Next-compatible mechanism without hydration mismatch. A6 must recheck VI and EN."
+    },
+    {
+      "finding_id": "S9R-UX-REQ-002",
+      "severity": "P1",
+      "required": true,
+      "owner": "A2 Runtime integration",
+      "status": "OPEN_REQUIRED",
+      "evidence": "LessonLearningPage renders the action-view block title as h2 and Paper4VisualRuntime renders its embedded title as h2 inside that block.",
+      "expected_fix": "Add an embedding-safe heading-level/title contract so the runtime title is below the action-view h2, then inspect the rendered heading outline and accessible names."
+    },
+    {
+      "finding_id": "S9R-UX-REQ-003",
+      "severity": "P1",
+      "required": true,
+      "owner": "A2 Runtime integration with A6 browser QA",
+      "status": "OPEN_DEPENDENCY",
+      "evidence": "algocore-fumadocs/app/paper-4/lessons/[slug]/page.tsx and app/data/stage9-learning-pages.json were absent at this review checkpoint.",
+      "expected_fix": "After route and registry land, run the deferred locale-state, keyboard, 320 px, light/dark, reduced-motion and source-card tests against representative lessons and record reproducible evidence."
+    }
+  ],
+  "deferred_tests": [
+    "Load a VI lesson and an EN lesson directly; assert document language, provider chrome, title, TOC and ten section labels agree.",
+    "Deep-link to a middle block, switch VI to EN and back, and assert slug and hash are unchanged.",
+    "Within Action View select a non-first pattern, boundary scenario and non-zero event; switch locale and assert pattern, scenario, event index and input revision remain unchanged.",
+    "Reload both locale URLs and verify deterministic default state without hydration warnings.",
+    "Keyboard-only traversal: skip link, locale switch, TOC, source disclosure/cards, visual controls and previous/next navigation; verify visible focus and no trap.",
+    "Inspect heading outline and accessible names for one dynamic and one static action-view lesson.",
+    "At a 320 px viewport check horizontal page overflow, code-local overflow, text wrapping and touch target readability.",
+    "Check light and dark themes, including fixed-palette visual panels and source cards, for legibility and state cues independent of color.",
+    "Emulate prefers-reduced-motion and confirm autoplay/state changes remain understandable without essential animation.",
+    "Inspect actual registry-backed official, coursebook, editorial and internal source cards; confirm local locators are never href values."
+  ],
+  "required_open_findings": 3,
+  "decision": "REWORK_REQUIRED"
+}

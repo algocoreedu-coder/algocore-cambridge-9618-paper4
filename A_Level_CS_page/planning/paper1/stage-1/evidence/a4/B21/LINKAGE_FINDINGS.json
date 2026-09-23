@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "artifact_version": "1.0.0",
+  "task_id": "P1-S1-A4-B21",
+  "reviewer": "A4",
+  "input_artifact": {
+    "task_id": "P1-S1-A2-B21",
+    "artifact_version": "0.1.0",
+    "source_count": 12,
+    "question_count": 48,
+    "part_count": 115,
+    "marking_record_count": 94
+  },
+  "recommendation": "CHANGES_REQUIRED",
+  "findings": [
+    {
+      "id": "A4-B21-F01",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "topic": "Nested QP hierarchy is flattened",
+      "expected": "Represent every visible nested part and preserve its parent_part_id.",
+      "observed": "All 115 part records have null parent_part_id_or_null. The 21 unresolved records use bare label i as a sibling, while source pages show roman labels nested under alphabetic parts; further child labels are absent.",
+      "evidence": [
+        {"source_id": "9618_s21_qp_11", "pdf_page_1_based": 2, "record_ids": ["9618_s21_qp_11-q1-pa", "9618_s21_qp_11-q1-pi"]},
+        {"source_id": "9618_s21_qp_11", "pdf_page_1_based": 11, "record_ids": ["9618_s21_qp_11-q4-pc", "9618_s21_qp_11-q4-pi"]},
+        {"source_id": "9618_s21_qp_11", "pdf_page_1_based": 15, "record_ids": ["9618_s21_qp_11-q7-pb", "9618_s21_qp_11-q7-pi"]},
+        {"source_id": "9618_s21_ms_11", "pdf_page_1_based": 3},
+        {"source_id": "9618_s21_ms_11", "pdf_page_1_based": 7},
+        {"source_id": "9618_s21_ms_11", "pdf_page_1_based": 9}
+      ],
+      "impact": "Part boundaries, MS links, displayed marks, and context dependencies cannot be trusted at child-item level.",
+      "owner": "A2-B21",
+      "retest": "Re-index nested children with exact QP locators and parent IDs; then A4 verifies against the paired originals."
+    },
+    {
+      "id": "A4-B21-F02",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "topic": "Displayed marks and marking conditions are not recorded",
+      "expected": "Copy only marks visibly associated with a QP question/part and identify MS conditions without inferring allocations.",
+      "observed": "48/48 question records and 115/115 part records have null displayed-mark fields. 94/94 marking records have null mark_or_condition_or_null.",
+      "evidence": [
+        {"source_id": "9618_s21_qp_11", "pdf_page_1_based": 2, "observation": "Visible bracketed marks accompany the nested parts."},
+        {"source_id": "9618_s21_ms_11", "pdf_page_1_based": 3, "observation": "MS has distinct subpart criteria beneath the parent label."},
+        {"artifact": "QUESTION_INDEX.jsonl", "record_count": 163, "records_with_marks": 0},
+        {"artifact": "MARKING_INDEX.jsonl", "record_count": 94, "records_with_mark_or_condition": 0}
+      ],
+      "impact": "Displayed marks, totals, and allocation boundaries cannot be reviewed from the corpus records.",
+      "owner": "A2-B21",
+      "retest": "Populate only explicitly visible values at the correct hierarchy level; retain null where association is ambiguous."
+    },
+    {
+      "id": "A4-B21-F03",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "topic": "Parent-context MS locators are presented as part links",
+      "expected": "Distinguish a parent/page context locator from an exact leaf marking-item locator.",
+      "observed": "All 94 locators point to a matching MS source and a page containing the parent label or descendants; 43 cited parent labels expand into multiple roman-numbered MS entries. Example: one Q1(a) link points to 9618_s21_ms_11 page 3, where separate Q1(a)(i) and Q1(a)(ii) entries appear.",
+      "evidence": [
+        {"source_id": "9618_s21_qp_11", "pdf_page_1_based": 2, "record_id": "9618_s21_qp_11-q1-pa"},
+        {"source_id": "9618_s21_ms_11", "pdf_page_1_based": 3},
+        {"artifact": "MARKING_INDEX.jsonl", "linked_record_count": 94, "parent_with_nested_ms_entries": 43}
+      ],
+      "impact": "A downstream reader could incorrectly treat a page-level parent link as an exact marking-row match.",
+      "owner": "A2-B21",
+      "retest": "Use explicit parent-context link type or create child links at the visible MS labels; do not infer marks."
+    },
+    {
+      "id": "A4-B21-F04",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "topic": "Visual and table dependencies are not related to indexed items",
+      "expected": "Connect relevant visual regions, table rows, and answer conditions to the question/marking records they qualify.",
+      "observed": "All 51 visual regions have empty relates_to_ids. All 94 marking records have empty visual_dependency_refs and table_row_ref_or_null.",
+      "evidence": [
+        {"source_id": "9618_w21_ms_12", "pdf_page_1_based": 3, "visual_region_id": "9618_w21_ms_12-p3-whole-page"},
+        {"source_id": "9618_w21_ms_12", "pdf_page_1_based": 4, "visual_region_id": "9618_w21_ms_12-p4-whole-page"},
+        {"source_id": "9618_w21_ms_12", "pdf_page_1_based": 7, "visual_region_id": "9618_w21_ms_12-p7-whole-page"},
+        {"source_id": "9618_w21_ms_13", "pdf_page_1_based": 5, "visual_region_id": "9618_w21_ms_13-p5-whole-page"}
+      ],
+      "impact": "The corpus cannot identify which visual/table structures need to be consulted for an indexed answer.",
+      "owner": "A2-B21",
+      "retest": "Populate item relationships where supported by the page; otherwise keep unresolved and state why."
+    }
+  ],
+  "non_findings": [
+    "All 12 source hashes and page counts independently matched the A2 manifest.",
+    "All 94 marking locators use the corresponding session/component MS source and a page where the referenced label or nested descendants occur.",
+    "No source-pair mismatch or impossible MS page locator was found."
+  ]
+}

@@ -1,0 +1,1889 @@
+{
+  "schema_version": "s4-variant-register-v1",
+  "status": "DESIGN_REVIEWED",
+  "counts": {
+    "variants": 60
+  },
+  "variants": [
+    {
+      "variant_id": "p0.stack.variant.top-pointer",
+      "pattern_ids": [
+        "STACK_SETUP",
+        "STACK_PUSH",
+        "STACK_POP"
+      ],
+      "stage2_contrast_refs": [
+        "A3C16"
+      ],
+      "axis": "top_pointer_meaning",
+      "decision_rule": {
+        "vi": "Đọc định nghĩa/khởi tạo top trong QP rồi dùng đúng một hàng phương trình.",
+        "en": "Read the QP definition/initialisation of top and use exactly one equation row."
+      },
+      "cases": [
+        {
+          "case_id": "next_free",
+          "empty": "top=0",
+          "full": "top=capacity",
+          "live_indices": "0..top-1",
+          "push": "write stack[top], then top+=1",
+          "pop": "save stack[top-1], then top-=1",
+          "observed_parts": [
+            "9618_s22_42_1(a)",
+            "9618_s23_41_3(a)",
+            "9618_s23_43_3(a)",
+            "9618_w23_42_1(a)(ii)"
+          ]
+        },
+        {
+          "case_id": "current_top",
+          "empty": "top=-1",
+          "full": "top=capacity-1",
+          "live_indices": "0..top",
+          "push": "top+=1, then write stack[top]",
+          "pop": "save stack[top], then top-=1",
+          "observed_parts": [
+            "9618_s25_42_1(a)",
+            "9618_w25_41_1(a)"
+          ]
+        }
+      ],
+      "invariant": "Logical size is top for next-free and top+1 for current-top; all live indices are in range.",
+      "method_changing": true,
+      "source_batch_id": "P0"
+    },
+    {
+      "variant_id": "p0.stack.variant.push-result",
+      "pattern_ids": [
+        "STACK_PUSH"
+      ],
+      "axis": "return_and_routing_contract",
+      "decision_rule": {
+        "vi": "Giữ nguyên type/literal và routing của từng QP; không chuẩn hóa sang Boolean.",
+        "en": "Preserve each QP's type/literal and routing; do not normalise to Boolean."
+      },
+      "cases": [
+        {
+          "case_id": "boolean",
+          "observed_parts": [
+            "9618_s22_42_1(c)",
+            "9618_s23_41_3(b)(i)",
+            "9618_s23_43_3(b)(i)",
+            "9618_w25_41_1(b)"
+          ]
+        },
+        {
+          "case_id": "integer_1_minus1",
+          "observed_parts": [
+            "9618_s25_42_1(b)"
+          ]
+        },
+        {
+          "case_id": "route_and_message",
+          "observed_parts": [
+            "9618_w23_42_1(b)(i)"
+          ]
+        }
+      ],
+      "invariant": "On failure state is unchanged; on success logical size increases by exactly one.",
+      "method_changing": true,
+      "source_batch_id": "P0"
+    },
+    {
+      "variant_id": "p0.stack.variant.pop-empty-result",
+      "pattern_ids": [
+        "STACK_POP"
+      ],
+      "axis": "empty_sentinel_and_type",
+      "decision_rule": {
+        "vi": "Sentinel là một phần của giao diện caller; chép đúng literal và type từ QP.",
+        "en": "The sentinel is part of the caller interface; preserve the exact QP literal and type."
+      },
+      "cases": [
+        {
+          "case_id": "numeric_minus1",
+          "observed_parts": [
+            "9618_s22_42_1(e)(i)"
+          ]
+        },
+        {
+          "case_id": "empty_string",
+          "observed_parts": [
+            "9618_s23_41_3(b)(ii)",
+            "9618_s23_43_3(b)(ii)"
+          ]
+        },
+        {
+          "case_id": "no_data_string",
+          "observed_parts": [
+            "9618_w23_42_1(c)"
+          ]
+        },
+        {
+          "case_id": "string_minus1",
+          "observed_parts": [
+            "9618_s25_42_1(c)"
+          ]
+        },
+        {
+          "case_id": "numeric_minus999",
+          "observed_parts": [
+            "9618_w25_41_1(c)"
+          ]
+        }
+      ],
+      "invariant": "Empty Pop returns the exact sentinel without mutating top or live cells.",
+      "method_changing": true,
+      "source_batch_id": "P0"
+    },
+    {
+      "variant_id": "p0.stack.variant.pair-transaction",
+      "pattern_ids": [
+        "STACK_PAIR"
+      ],
+      "axis": "pair_success_and_rollback",
+      "decision_rule": {
+        "vi": "Commit hai Pop khi cả hai thành công; nếu đúng một thành công thì phục hồi item đó.",
+        "en": "Commit both Pops when both succeed; restore the sole successful item otherwise."
+      },
+      "cases": [
+        {
+          "case_id": "both_live",
+          "state_change": "sizeA-1,sizeB-1; output pair"
+        },
+        {
+          "case_id": "a_empty_b_live",
+          "state_change": "restore B; no net mutation"
+        },
+        {
+          "case_id": "a_live_b_empty",
+          "state_change": "restore A; no net mutation"
+        },
+        {
+          "case_id": "both_empty",
+          "state_change": "no restore; no mutation; no sentinel push; any adaptation message is explicitly AlgoCore_inference and is not an official Cambridge literal"
+        }
+      ],
+      "invariant": "A failed pairing leaves both logical stack states equal to their before-state.",
+      "method_changing": true,
+      "corpus_limit": "Only the 2023 mirrored OutputItem task is observed; both-empty is not explicitly specified.",
+      "lead_adjudication": {
+        "decision_id": "P0-STACK-PAIR",
+        "authority": "AlgoCore_inference",
+        "decision": "Use independent typed success/value results. Commit only when both succeed; restore the sole successful item exactly once; when both are empty, perform no restore, no mutation and no sentinel Push. Any adaptation message is explicitly AlgoCore_inference and is not an official Cambridge literal.",
+        "official_boundary": "The official source establishes one-sided restoration but does not explicitly specify both-empty behaviour.",
+        "stage5_obligation": "Execute all four cases and assert no sentinel is ever pushed as data."
+      },
+      "source_batch_id": "P0"
+    },
+    {
+      "variant_id": "p0.stack.variant.reduce-protocol",
+      "pattern_ids": [
+        "STACK_REDUCE"
+      ],
+      "axis": "reduction_kind_operator_order_termination",
+      "decision_rule": {
+        "vi": "Dùng grammar dữ liệu và output contract để chọn invariant trước khi lặp.",
+        "en": "Use the data grammar and output contract to select the invariant before looping."
+      },
+      "cases": [
+        {
+          "case_id": "expression_left_fold",
+          "observed_parts": [
+            "9618_s25_42_1(e)"
+          ],
+          "operator_order": "total_before operator next_number",
+          "termination": "empty after complete pairs"
+        },
+        {
+          "case_id": "extrema",
+          "observed_parts": [
+            "9618_w25_41_1(e)"
+          ],
+          "operator_order": "not applicable",
+          "termination": "Pop until empty"
+        }
+      ],
+      "invariant": "Accumulator summarises exactly the consumed prefix and no sentinel is treated as live data.",
+      "method_changing": true,
+      "source_batch_id": "P0"
+    },
+    {
+      "variant_id": "b1.variant.data-storage",
+      "pattern_ids": [
+        "DATA_STORAGE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C18",
+        "A3C19"
+      ],
+      "axis": "scope;dimensions;initial_values",
+      "decision_rule": {
+        "vi": "Lập bảng tên–kiểu–shape–scope–khởi tạo trước khi khai báo.",
+        "en": "Build an identifier–type–shape–scope–initialisation table before declaring storage."
+      },
+      "cases": [
+        {
+          "case_id": "one-dimensional",
+          "description": "one capacity and one index domain",
+          "observed_parts": []
+        },
+        {
+          "case_id": "multi-dimensional",
+          "description": "one domain per dimension; preserve row/column order",
+          "observed_parts": []
+        },
+        {
+          "case_id": "prefilled",
+          "description": "exact supplied values or sentinel",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Every declared cell belongs to the required shape and accepts only the stated data type.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.data-record",
+      "pattern_ids": [
+        "DATA_RECORD"
+      ],
+      "stage2_contrast_refs": [
+        "A3C03"
+      ],
+      "axis": "field_types;record_or_class_substitute",
+      "decision_rule": {
+        "vi": "Phân loại đây là record dữ liệu hay class có hành vi trước khi thêm method.",
+        "en": "Classify it as a data record or behavioural class before adding methods."
+      },
+      "cases": [
+        {
+          "case_id": "native-record",
+          "description": "direct heterogeneous fields",
+          "observed_parts": []
+        },
+        {
+          "case_id": "class-substitute",
+          "description": "constructor and field access only as permitted",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Each field has exactly one required name, type and role.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.array-append",
+      "pattern_ids": [
+        "ARRAY_APPEND"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "capacity;count_convention;return_contract",
+      "decision_rule": {
+        "vi": "Xác nhận count là số item/ô trống kế tiếp trước khi ghi.",
+        "en": "Confirm count means logical size/next-free index before writing."
+      },
+      "cases": [
+        {
+          "case_id": "space-available",
+          "description": "commit at count then increment",
+          "observed_parts": []
+        },
+        {
+          "case_id": "full",
+          "description": "return failure with identical state",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Live items occupy exactly indices 0..count-1 and 0<=count<=capacity.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.random-array",
+      "pattern_ids": [
+        "RANDOM_ARRAY"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "range_inclusive;dimensions;uniqueness",
+      "decision_rule": {
+        "vi": "Viết miền toán học trước, rồi mới chọn lời gọi random tương ứng.",
+        "en": "Write the mathematical domain first, then choose a matching random call."
+      },
+      "cases": [
+        {
+          "case_id": "duplicates-allowed",
+          "description": "one generation per cell",
+          "observed_parts": []
+        },
+        {
+          "case_id": "unique",
+          "description": "reject duplicates; domain size must cover target",
+          "observed_parts": []
+        },
+        {
+          "case_id": "two-dimensional",
+          "description": "preserve both index domains",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Every filled cell is in range; when uniqueness is required, all live values are distinct.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.rule-compute",
+      "pattern_ids": [
+        "RULE_COMPUTE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C04",
+        "A3C20"
+      ],
+      "axis": "table_lookup;bands;units;rounding;assumptions",
+      "decision_rule": {
+        "vi": "Chuyển rule thành bảng condition→formula→unit trước khi tính.",
+        "en": "Convert the rule into a condition→formula→unit table before calculating."
+      },
+      "cases": [
+        {
+          "case_id": "formula",
+          "description": "single expression with typed operands",
+          "observed_parts": []
+        },
+        {
+          "case_id": "banded-table",
+          "description": "one exclusive branch per input",
+          "observed_parts": []
+        },
+        {
+          "case_id": "source-rounding",
+          "description": "apply only the stated rounding/division",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Exactly one applicable rule is selected and every operand retains its defined unit/type.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.validate-input",
+      "pattern_ids": [
+        "VALIDATE_INPUT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07"
+      ],
+      "axis": "range;length;choice;type;termination",
+      "decision_rule": {
+        "vi": "Viết predicate VALID trước rồi phủ định một lần cho loop.",
+        "en": "Write the VALID predicate first, then negate it once for the loop."
+      },
+      "cases": [
+        {
+          "case_id": "range",
+          "description": "inclusive/exclusive endpoints",
+          "observed_parts": []
+        },
+        {
+          "case_id": "membership",
+          "description": "allowed literals",
+          "observed_parts": []
+        },
+        {
+          "case_id": "type-length",
+          "description": "conversion and exact length",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Before exit, no invalid value is committed; after exit, the retained value satisfies VALID.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.unique-selection",
+      "pattern_ids": [
+        "UNIQUE_SELECTION"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "index_or_answer;tracking_structure;consume_marker",
+      "decision_rule": {
+        "vi": "Tách hợp lệ miền khỏi chưa được chọn; chỉ commit khi cả hai đúng.",
+        "en": "Separate domain validity from availability; commit only when both hold."
+      },
+      "cases": [
+        {
+          "case_id": "boolean-used",
+          "description": "parallel used flags",
+          "observed_parts": []
+        },
+        {
+          "case_id": "sentinel-consume",
+          "description": "replace selected value with an agreed marker",
+          "observed_parts": []
+        },
+        {
+          "case_id": "set-tracker",
+          "description": "membership in a used set",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Every committed selection is valid and appears at most once.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.check-digit",
+      "pattern_ids": [
+        "CHECK_DIGIT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "weights;division_or_modulus;rounding;input_length;payload",
+      "decision_rule": {
+        "vi": "Sao chép công thức nguồn bằng tên bước; không thay bằng modulo quen thuộc.",
+        "en": "Copy the source formula as named steps; do not substitute a familiar modulo rule."
+      },
+      "cases": [
+        {
+          "case_id": "weighted-floor",
+          "description": "weighted sum then source-stated floor/division",
+          "observed_parts": []
+        },
+        {
+          "case_id": "modulo",
+          "description": "only when explicitly specified",
+          "observed_parts": []
+        },
+        {
+          "case_id": "different-weight-order",
+          "description": "preserve left/right mapping",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "After k payload digits, the accumulator equals exactly the weighted sum of those k digits.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.algorithm-translate",
+      "pattern_ids": [
+        "ALGORITHM_TRANSLATE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C11"
+      ],
+      "axis": "recursive_or_iterative;division;parameter_updates;side_effects",
+      "decision_rule": {
+        "vi": "Lập trace của thuật toán nguồn trước khi ánh xạ từng construct.",
+        "en": "Trace the source algorithm before mapping each construct."
+      },
+      "cases": [
+        {
+          "case_id": "iterative",
+          "description": "loop condition and update order",
+          "observed_parts": []
+        },
+        {
+          "case_id": "recursive",
+          "description": "base case, smaller argument and returned value",
+          "observed_parts": []
+        },
+        {
+          "case_id": "side-effecting",
+          "description": "preserve external state writes",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "After every translated step, target state corresponds to the same source state.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.string-compare",
+      "pattern_ids": [
+        "STRING_COMPARE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "prefix_assumption;character_order;built_in_restriction",
+      "decision_rule": {
+        "vi": "Chỉ quyết định tại ký tự khác đầu tiên hoặc khi một chuỗi kết thúc.",
+        "en": "Decide only at the first differing character or when one string ends."
+      },
+      "cases": [
+        {
+          "case_id": "first-difference",
+          "description": "different live characters",
+          "observed_parts": []
+        },
+        {
+          "case_id": "equal",
+          "description": "both end together",
+          "observed_parts": []
+        },
+        {
+          "case_id": "prefix",
+          "description": "one ends while prefix remains equal",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "All character pairs before cursor are equal under the required comparison policy.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.string-split",
+      "pattern_ids": [
+        "STRING_SPLIT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C12"
+      ],
+      "axis": "delimiter;fixed_token_count;built_in_restriction",
+      "decision_rule": {
+        "vi": "Dùng state token hiện tại; delimiter commit token, end commit token cuối.",
+        "en": "Use current-token state; delimiter commits a token and end commits the final token."
+      },
+      "cases": [
+        {
+          "case_id": "ordinary",
+          "description": "tokens separated by one delimiter",
+          "observed_parts": []
+        },
+        {
+          "case_id": "consecutive",
+          "description": "empty-token policy decides output",
+          "observed_parts": []
+        },
+        {
+          "case_id": "fixed-count",
+          "description": "validate exact field count",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Concatenating committed tokens, delimiters and current token reconstructs the consumed prefix.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.string-route",
+      "pattern_ids": [
+        "STRING_ROUTE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C12"
+      ],
+      "axis": "field_layout;category_to_array;value_type;destinations",
+      "decision_rule": {
+        "vi": "Lập bảng field index→type và category→destination trước khi route.",
+        "en": "Build field-index→type and category→destination tables before routing."
+      },
+      "cases": [
+        {
+          "case_id": "two-destination",
+          "description": "category selects exactly one array",
+          "observed_parts": []
+        },
+        {
+          "case_id": "typed-field",
+          "description": "string-to-number conversion before commit",
+          "observed_parts": []
+        },
+        {
+          "case_id": "capacity-failure",
+          "description": "no destination state changes",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Every committed record appears in exactly one permitted destination with correctly typed fields.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "b1.variant.run-length-encode",
+      "pattern_ids": [
+        "RUN_LENGTH_ENCODE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C13"
+      ],
+      "axis": "max_run;nonempty_input;source_queue;final_run",
+      "decision_rule": {
+        "vi": "Giữ một run đang mở; ký tự đổi thì emit run cũ trước khi mở run mới.",
+        "en": "Keep one open run; on symbol change, emit the old run before opening a new one."
+      },
+      "cases": [
+        {
+          "case_id": "single-run",
+          "description": "all symbols equal",
+          "observed_parts": []
+        },
+        {
+          "case_id": "alternating",
+          "description": "every item opens a new run",
+          "observed_parts": []
+        },
+        {
+          "case_id": "source-queue",
+          "description": "consumption order must match queue contract",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Emitted runs plus the open run reconstruct exactly the consumed input prefix.",
+      "method_changing": true,
+      "source_batch_id": "B1"
+    },
+    {
+      "variant_id": "B2-V01-ordered-policy",
+      "pattern_ids": [
+        "ORDERED_INSERT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C10"
+      ],
+      "axis": "qualification-direction-ties-capacity",
+      "decision_rule": {
+        "vi": "Chốt top-N hay không, chiều, vị trí của khóa bằng nhau và cách cắt dung lượng trước khi dịch.",
+        "en": "Fix top-N qualification, direction, equal-key placement, and capacity trimming before shifting."
+      },
+      "cases": [
+        "unbounded insertion",
+        "bounded qualifying insertion",
+        "equal-key before/after policy"
+      ],
+      "invariant": "Existing order and whole-record integrity are preserved.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V02-linear-result",
+      "pattern_ids": [
+        "LINEAR_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07"
+      ],
+      "axis": "result-case-live-range",
+      "decision_rule": {
+        "vi": "Dùng kết quả Boolean, chỉ số, đối tượng hoặc cập nhật đúng như đề; chuẩn hóa chữ chỉ khi đề yêu cầu.",
+        "en": "Use the requested Boolean, index, object, or update result; normalize case only when required."
+      },
+      "cases": [
+        "first-match early exit",
+        "full scan with stored result",
+        "case-normalized accessor comparison"
+      ],
+      "invariant": "Every required live position before termination has been inspected.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V03-count-control",
+      "pattern_ids": [
+        "COUNT_OCCURRENCES"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07",
+        "A3C13"
+      ],
+      "axis": "iterative-recursive",
+      "decision_rule": {
+        "vi": "Chọn vòng lặp với bộ đếm hoặc đệ quy với base case 0 và lời gọi trên bài toán nhỏ hơn.",
+        "en": "Choose a loop with a counter or recursion with a zero base case and a smaller subproblem."
+      },
+      "cases": [
+        "iterative full-range scan",
+        "recursive reduction with returned subtotal"
+      ],
+      "invariant": "The partial result equals matches in exactly the processed portion.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V04-filter-predicate",
+      "pattern_ids": [
+        "FILTER_RECORDS"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07"
+      ],
+      "axis": "compound-predicate-all-matches",
+      "decision_rule": {
+        "vi": "Giữ phép AND và tiếp tục sau mỗi khớp để thu mọi bản ghi.",
+        "en": "Preserve the AND predicate and continue after matches to collect every record."
+      },
+      "cases": [
+        "output matches",
+        "collect matches",
+        "empty-result branch"
+      ],
+      "invariant": "The result contains all and only matching processed records.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V05-group-branch",
+      "pattern_ids": [
+        "GROUP_AGGREGATE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C20"
+      ],
+      "axis": "existing-new-group",
+      "decision_rule": {
+        "vi": "Sau khi quét nhóm sống, cập nhật đúng một nhóm đã có hoặc tạo đúng một nhóm mới.",
+        "en": "After scanning live groups, update one existing group or create exactly one new group."
+      },
+      "cases": [
+        "existing key update",
+        "new key creation"
+      ],
+      "invariant": "One live group exists per processed key.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V06-search-choice",
+      "pattern_ids": [
+        "LINEAR_SEARCH",
+        "BINARY_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C07",
+        "A3C08"
+      ],
+      "axis": "linear-vs-binary",
+      "decision_rule": {
+        "vi": "Chỉ chọn nhị phân khi dữ liệu đã sắp theo cùng bộ so sánh; nếu không, duyệt tuyến tính.",
+        "en": "Choose binary search only for data sorted by the same comparator; otherwise scan linearly."
+      },
+      "cases": [
+        "unsorted linear scan",
+        "sorted interval halving"
+      ],
+      "invariant": "The chosen method's precondition remains true.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V07-insert-vs-sort",
+      "pattern_ids": [
+        "ORDERED_INSERT",
+        "INSERTION_SORT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C10"
+      ],
+      "axis": "one-item-insert-vs-full-sort",
+      "decision_rule": {
+        "vi": "Chèn một mục vào dãy đã sắp khác với lặp thao tác chèn để sắp toàn bộ dãy.",
+        "en": "Inserting one item into an ordered sequence differs from repeated insertion used to sort the full sequence."
+      },
+      "cases": [
+        "single ordered insertion",
+        "growing sorted prefix"
+      ],
+      "invariant": "The requested scope—one item or the whole live range—is preserved.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V08-sort-family",
+      "pattern_ids": [
+        "BUBBLE_SORT",
+        "INSERTION_SORT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "adjacent-passes-vs-sorted-prefix",
+      "decision_rule": {
+        "vi": "Bubble sort tạo hậu tố cố định bằng cặp kề; insertion sort mở rộng tiền tố đã sắp bằng dịch và đặt khóa.",
+        "en": "Bubble sort fixes a suffix through adjacent pairs; insertion sort grows a sorted prefix by shifting and placing a key."
+      },
+      "cases": [
+        "bubble adjacent passes",
+        "insertion sorted prefix"
+      ],
+      "invariant": "Complete records and the requested order are preserved.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V09-bubble-policy",
+      "pattern_ids": [
+        "BUBBLE_SORT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "direction-record-early-exit",
+      "decision_rule": {
+        "vi": "Đổi chiều bộ so sánh nhưng giữ biên hợp lệ; chỉ dừng sớm sau một lượt hoàn chỉnh không hoán đổi.",
+        "en": "Reverse the comparator for direction while retaining valid bounds; stop early only after a complete no-swap pass."
+      },
+      "cases": [
+        "ascending",
+        "descending",
+        "whole-record swap",
+        "optional no-swap exit"
+      ],
+      "invariant": "The fixed suffix is final after every completed pass.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V10-insertion-control",
+      "pattern_ids": [
+        "INSERTION_SORT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "iterative-recursive-rewrite",
+      "decision_rule": {
+        "vi": "Biến thể lặp, đệ quy và viết lại không đệ quy phải giữ cùng comparator, dịch bản ghi và hậu điều kiện.",
+        "en": "Iterative, recursive, and non-recursive rewrite variants retain the same comparator, record shifts, and postcondition."
+      },
+      "cases": [
+        "iterative prefix growth",
+        "recursive prefix sort plus insert",
+        "explicit-loop rewrite"
+      ],
+      "invariant": "The sorted prefix grows and preserves all records.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V11-binary-control",
+      "pattern_ids": [
+        "BINARY_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C08"
+      ],
+      "axis": "iterative-recursive",
+      "decision_rule": {
+        "vi": "Vòng lặp cập nhật biên tại chỗ; đệ quy truyền biên mới và phải return kết quả lời gọi con.",
+        "en": "Iteration updates bounds in place; recursion passes new bounds and must return the child result."
+      },
+      "cases": [
+        "iterative inclusive bounds",
+        "recursive inclusive bounds"
+      ],
+      "invariant": "The target, if present, remains inside a strictly smaller interval.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "B2-V12-binary-bounds",
+      "pattern_ids": [
+        "BINARY_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C08"
+      ],
+      "axis": "inclusive-bounds-midpoint-return",
+      "decision_rule": {
+        "vi": "Với biên bao hàm, dùng midpoint nguyên và loại mid bằng ±1; giữ sentinel nhất quán.",
+        "en": "With inclusive bounds, use an integer midpoint and exclude mid with ±1; preserve the result sentinel."
+      },
+      "cases": [
+        "found at midpoint",
+        "empty interval",
+        "absent target",
+        "ascending/descending comparator"
+      ],
+      "invariant": "low and high delimit exactly the remaining candidate interval.",
+      "method_changing": true,
+      "source_batch_id": "B2"
+    },
+    {
+      "variant_id": "b3.variant.queue-model",
+      "pattern_ids": [
+        "QUEUE_SETUP",
+        "QUEUE_ENQUEUE",
+        "QUEUE_DEQUEUE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C15"
+      ],
+      "axis": "linear_or_circular",
+      "decision_rule": {
+        "vi": "Khóa linear/circular, tail-role và count trước khi chọn equations.",
+        "en": "Lock linear/circular, tail role and count before choosing equations."
+      },
+      "cases": [
+        {
+          "case_id": "linear_next_free",
+          "empty": "head=-1 or source value; tail=0/next free",
+          "full": "tail=capacity",
+          "live_indices": "head..tail-1 when non-empty",
+          "enqueue": "write tail; set first head; tail+=1",
+          "dequeue": "read head; head+=1 or source reset",
+          "observed_parts": [
+            "9618_w22_42_3(a)",
+            "9618_w23_41_2(a)(i)"
+          ]
+        },
+        {
+          "case_id": "linear_last_item",
+          "empty": "head=tail=-1",
+          "full": "tail=capacity-1",
+          "live_indices": "head..tail",
+          "enqueue": "advance/set tail then write",
+          "dequeue": "read head then advance/reset",
+          "observed_parts": [
+            "9618_s24_41_3(a)",
+            "9618_s25_41_1(a)"
+          ]
+        },
+        {
+          "case_id": "circular_count",
+          "empty": "count=0",
+          "full": "count=capacity",
+          "live_indices": "count items from head modulo capacity",
+          "enqueue": "write at next-free tail; wrap; count+=1",
+          "dequeue": "read head; wrap; count-=1",
+          "observed_parts": [
+            "9618_s22_41_3(a)",
+            "9618_s23_42_2(b)"
+          ]
+        }
+      ],
+      "invariant": "Logical size and live order agree with head/tail/count; wrap occurs only in circular case.",
+      "method_changing": true,
+      "source_batch_id": "B3"
+    },
+    {
+      "variant_id": "b3.variant.queue-results",
+      "pattern_ids": [
+        "QUEUE_ENQUEUE",
+        "QUEUE_DEQUEUE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "return_and_empty_contract",
+      "decision_rule": {
+        "vi": "Lấy value, type và output/return từ từng QP; không chuẩn hóa giữa papers.",
+        "en": "Take value, type and output/return from each QP; do not normalise across papers."
+      },
+      "cases": [
+        {
+          "case_id": "boolean_or_string_false",
+          "contract": "Boolean success/failure or source string FALSE",
+          "observed_parts": [
+            "9618_s22_41_3(b)",
+            "9618_s22_41_3(c)"
+          ]
+        },
+        {
+          "case_id": "numeric",
+          "contract": "1/-1 or integer -1 as explicitly stated",
+          "observed_parts": [
+            "9618_s23_42_2(c)",
+            "9618_s25_43_1(c)"
+          ]
+        },
+        {
+          "case_id": "empty_record_or_message",
+          "contract": "empty record, empty string or message plus return",
+          "observed_parts": [
+            "9618_s23_42_2(d)",
+            "9618_w23_41_2(a)(iii)"
+          ]
+        }
+      ],
+      "invariant": "A branch returns/emits the exact source-defined type and literal and preserves failure state.",
+      "method_changing": true,
+      "source_batch_id": "B3"
+    },
+    {
+      "variant_id": "b3.variant.queue-processing",
+      "pattern_ids": [
+        "QUEUE_INSPECT",
+        "QUEUE_REDUCE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "destructive_or_readonly",
+      "decision_rule": {
+        "vi": "Chọn traversal theo hậu trạng thái queue mà QP yêu cầu.",
+        "en": "Choose traversal from the queue post-state required by the QP."
+      },
+      "cases": [
+        {
+          "case_id": "inspect_readonly",
+          "mutation": "none",
+          "termination": "live range end",
+          "observed_parts": [
+            "9618_w24_42_2(d)"
+          ]
+        },
+        {
+          "case_id": "recursive_readonly",
+          "mutation": "none",
+          "termination": "base index",
+          "observed_parts": [
+            "9618_w22_42_3(d)"
+          ]
+        },
+        {
+          "case_id": "dequeue_consume",
+          "mutation": "queue consumed",
+          "termination": "exact empty sentinel",
+          "observed_parts": [
+            "9618_s25_43_1(e)(i)",
+            "9618_w25_43_2(e)"
+          ]
+        }
+      ],
+      "invariant": "Every source item contributes once; readonly variants preserve state and consume variants follow their Dequeue contract.",
+      "method_changing": true,
+      "source_batch_id": "B3"
+    },
+    {
+      "variant_id": "b3.variant.list-representation",
+      "pattern_ids": [
+        "LIST_SETUP",
+        "LIST_TRAVERSE",
+        "LIST_INSERT",
+        "LIST_REMOVE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C17"
+      ],
+      "axis": "array_or_objects",
+      "decision_rule": {
+        "vi": "Giữ riêng index/null/free-list của array và reference/None của object.",
+        "en": "Keep array index/null/free-list rules separate from object reference/None rules."
+      },
+      "cases": [
+        {
+          "case_id": "array_records",
+          "node": "record or two columns",
+          "null": "-1",
+          "allocation": "linked free list",
+          "observed_parts": [
+            "9618_s21_41_1(b)",
+            "9618_w24_41_3(a)"
+          ]
+        },
+        {
+          "case_id": "object_nodes",
+          "node": "object reference",
+          "null": "None/null",
+          "allocation": "construct object; no array free list",
+          "observed_parts": [
+            "9618_s25_43_3(b)(i)"
+          ]
+        }
+      ],
+      "invariant": "Following head/Next visits exactly the live chain; array slots partition into live and free sets.",
+      "method_changing": true,
+      "source_batch_id": "B3"
+    },
+    {
+      "variant_id": "b3.variant.list-insert-position",
+      "pattern_ids": [
+        "LIST_INSERT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "front_or_tail",
+      "decision_rule": {
+        "vi": "Chọn link commit theo vị trí được yêu cầu sau khi node mới đã hợp lệ.",
+        "en": "Choose the link commit from the requested position after the new node is valid."
+      },
+      "cases": [
+        {
+          "case_id": "front",
+          "links": "new.Next=old head; head=new",
+          "observed_parts": [
+            "9618_w24_41_3(b)",
+            "9618_s25_43_3(b)(ii)"
+          ]
+        },
+        {
+          "case_id": "tail",
+          "links": "find tail; tail.Next=new; new.Next=null; empty updates head",
+          "observed_parts": [
+            "9618_s21_41_1(d)(i)"
+          ]
+        }
+      ],
+      "invariant": "Old live order is preserved and new node appears exactly once at the requested end.",
+      "method_changing": true,
+      "source_batch_id": "B3"
+    },
+    {
+      "variant_id": "b3.variant.list-remove-case",
+      "pattern_ids": [
+        "LIST_REMOVE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "head_interior_tail_absent",
+      "decision_rule": {
+        "vi": "Phân nhánh theo current=head, predecessor tồn tại và absence contract.",
+        "en": "Branch on current=head, predecessor existence and the absence contract."
+      },
+      "cases": [
+        {
+          "case_id": "head",
+          "unlink": "head=current.Next"
+        },
+        {
+          "case_id": "interior_or_tail",
+          "unlink": "previous.Next=current.Next"
+        },
+        {
+          "case_id": "absent",
+          "unlink": "none; false only when source permits"
+        }
+      ],
+      "invariant": "Successful removal decreases live reachability by one; failure preserves state; recycling happens only after unlink.",
+      "method_changing": true,
+      "source_batch_id": "B3"
+    },
+    {
+      "variant_id": "b4.variant.algorithm-rewrite",
+      "pattern_ids": [
+        "ALGORITHM_REWRITE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C11"
+      ],
+      "axis": "direction;accumulator;output_order;parameters",
+      "decision_rule": {
+        "vi": "Chỉ đổi cấu trúc thực hiện sau khi lập ánh xạ state nguồn–đích và chuỗi observable tương đương.",
+        "en": "Change execution structure only after mapping source and target states and their equivalent observable sequence."
+      },
+      "cases": [
+        {
+          "case_id": "recursive-to-iterative",
+          "description": "replace call frames with loop state while retaining output and return order",
+          "observed_parts": []
+        },
+        {
+          "case_id": "iterative-to-recursive",
+          "description": "choose a smaller argument and combine the returned value",
+          "observed_parts": []
+        },
+        {
+          "case_id": "observable-output",
+          "description": "preserve intermediate output timing as well as the final result",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "After each target transition, its mapped state and observable prefix equal those of the corresponding source transition.",
+      "invariant_bilingual": {
+        "vi": "Sau mỗi chuyển tiếp đích, state ánh xạ và prefix observable phải bằng chuyển tiếp nguồn tương ứng.",
+        "en": "After each target transition, its mapped state and observable prefix equal those of the corresponding source transition."
+      },
+      "method_changing": true,
+      "source_batch_id": "B4"
+    },
+    {
+      "variant_id": "b4.variant.tree-setup",
+      "pattern_ids": [
+        "TREE_SETUP"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "array_or_objects;root_parameter;empty_value;free_pointer",
+      "decision_rule": {
+        "vi": "Chọn representation trước; sau đó ghi riêng null child, empty root và next-free/count theo đúng hợp đồng nguồn.",
+        "en": "Choose the representation first; then record null child, empty root and next-free/count separately from the source contract."
+      },
+      "cases": [
+        {
+          "case_id": "array-backed-empty",
+          "description": "all node rows use the required null sentinel; root/free match source",
+          "observed_parts": []
+        },
+        {
+          "case_id": "object-wrapper-empty",
+          "description": "independent Node objects plus null root/count contract",
+          "observed_parts": []
+        },
+        {
+          "case_id": "constructor-root",
+          "description": "preserve the supplied first/root Node parameter, including the p35 caveat",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Every live root/child reference is null or names a valid node, and allocation state identifies exactly the unused region without inventing a stack-top meaning.",
+      "invariant_bilingual": {
+        "vi": "Mọi root/child reference hoặc là null hoặc trỏ node hợp lệ; allocation state mô tả đúng vùng chưa dùng và không mang nghĩa stack-top.",
+        "en": "Every live root/child reference is null or names a valid node, and allocation state identifies exactly the unused region without inventing a stack-top meaning."
+      },
+      "method_changing": true,
+      "source_batch_id": "B4"
+    },
+    {
+      "variant_id": "b4.variant.tree-insert",
+      "pattern_ids": [
+        "TREE_INSERT"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "array_or_objects;equal_key_rule;capacity;root_case",
+      "decision_rule": {
+        "vi": "Chốt duplicate branch trước; chỉ allocate/attach sau khi capacity và vị trí child trống đã được xác nhận.",
+        "en": "Fix the duplicate branch first; allocate and attach only after capacity and an empty child position are confirmed."
+      },
+      "cases": [
+        {
+          "case_id": "empty-root",
+          "description": "candidate becomes the sole root",
+          "observed_parts": []
+        },
+        {
+          "case_id": "internal-descent",
+          "description": "follow comparisons until one null child",
+          "observed_parts": []
+        },
+        {
+          "case_id": "duplicate-or-full",
+          "description": "apply exact equal-key policy or preserve state on full failure",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "The reachable structure is a valid source-ordered BST, every pre-existing link is preserved, and allocation state advances only for one attached node.",
+      "invariant_bilingual": {
+        "vi": "Cấu trúc reachable vẫn là BST đúng ordering nguồn; link cũ được giữ và allocation chỉ tiến khi một node được gắn.",
+        "en": "The reachable structure is a valid source-ordered BST, every pre-existing link is preserved, and allocation state advances only for one attached node."
+      },
+      "method_changing": true,
+      "source_batch_id": "B4"
+    },
+    {
+      "variant_id": "b4.variant.tree-search",
+      "pattern_ids": [
+        "TREE_SEARCH"
+      ],
+      "stage2_contrast_refs": [
+        "A3C08"
+      ],
+      "axis": "recursive_or_iterative;missing_case;return_contract",
+      "decision_rule": {
+        "vi": "Mỗi comparison chỉ chọn một child pointer; null trả missing, equality trả đúng found contract.",
+        "en": "Each comparison selects one child pointer; null returns missing and equality returns the exact found contract."
+      },
+      "cases": [
+        {
+          "case_id": "found-root",
+          "description": "equality terminates without following a child",
+          "observed_parts": []
+        },
+        {
+          "case_id": "found-deep",
+          "description": "one comparison-selected path and full return propagation",
+          "observed_parts": []
+        },
+        {
+          "case_id": "missing-null",
+          "description": "null/bounds base case returns the source missing value",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "If the target exists, it remains in the subtree named by current; every discarded subtree is excluded by the BST comparison rule.",
+      "invariant_bilingual": {
+        "vi": "Nếu target tồn tại, nó vẫn nằm trong subtree current; mỗi subtree bị bỏ đã được loại bởi quy tắc so sánh BST.",
+        "en": "If the target exists, it remains in the subtree named by current; every discarded subtree is excluded by the BST comparison rule."
+      },
+      "method_changing": true,
+      "source_batch_id": "B4"
+    },
+    {
+      "variant_id": "b4.variant.tree-traverse",
+      "pattern_ids": [
+        "TREE_TRAVERSE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C09"
+      ],
+      "axis": "inorder_or_postorder;array_or_objects;recursion",
+      "decision_rule": {
+        "vi": "Viết traversal thành chuỗi ba token L/N/R trước; đặt visit event đúng vị trí rồi mới mở rộng recursive calls.",
+        "en": "Write the traversal as a three-token L/N/R sequence first; place the visit event, then expand recursive calls."
+      },
+      "cases": [
+        {
+          "case_id": "inorder",
+          "description": "left-current-right on an asymmetric tree",
+          "observed_parts": []
+        },
+        {
+          "case_id": "postorder",
+          "description": "left-right-current with current emitted after both returns",
+          "observed_parts": []
+        },
+        {
+          "case_id": "empty-or-leaf",
+          "description": "null contributes no visit; a leaf contributes exactly one visit",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Completed visit events equal the requested traversal of completed subtrees, and no null child or node is visited twice.",
+      "invariant_bilingual": {
+        "vi": "Các visit đã hoàn tất đúng traversal của subtree tương ứng; null không được visit và mỗi node chỉ được visit một lần.",
+        "en": "Completed visit events equal the requested traversal of completed subtrees, and no null child or node is visited twice."
+      },
+      "method_changing": true,
+      "source_batch_id": "B4"
+    },
+    {
+      "variant_id": "B5-V01-setup-representation",
+      "pattern_ids": [
+        "HASH_SETUP"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "spare-arrays-vs-bucket-table",
+      "decision_rule": {
+        "vi": "Dùng đúng kích thước, số chiều và vùng collision của nguồn; không gộp Main+Spare với bảng 100×10.",
+        "en": "Use the source dimensions and collision region exactly; do not merge Main+Spare with the 100×10 table."
+      },
+      "cases": [
+        "HashTable[200]+Spare[100]",
+        "HashTable[100][10]"
+      ],
+      "invariant": "The complete physical domain uses one empty representation.",
+      "method_changing": true,
+      "source_batch_id": "B5"
+    },
+    {
+      "variant_id": "B5-V02-empty-sentinel",
+      "pattern_ids": [
+        "HASH_SETUP",
+        "HASH_INSERT",
+        "HASH_SEARCH"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "empty-record-and-sentinel",
+      "decision_rule": {
+        "vi": "Phép khởi tạo, kiểm ô trống, chèn và tìm phải dùng cùng empty record/sentinel; không coi dữ liệu hợp lệ là rỗng.",
+        "en": "Initialisation, empty checks, insertion, and search must share one empty record/sentinel without classifying valid data as empty."
+      },
+      "cases": [
+        "−1 in all specified fields",
+        "empty/null Record object"
+      ],
+      "invariant": "Empty-state recognition is consistent across operations.",
+      "method_changing": true,
+      "source_batch_id": "B5"
+    },
+    {
+      "variant_id": "B5-V03-hash-domain",
+      "pattern_ids": [
+        "HASH_FUNCTION"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "modulus-and-key-domain",
+      "decision_rule": {
+        "vi": "Chọn MOD 200 cho 200 địa chỉ chính hoặc MOD 100 cho 100 hàng; nêu miền khóa trước khi suy luận về số âm.",
+        "en": "Use MOD 200 for 200 primary addresses or MOD 100 for 100 rows; state the key domain before reasoning about negative keys."
+      },
+      "cases": [
+        "key MOD 200",
+        "key MOD 100"
+      ],
+      "invariant": "Returned address belongs to the primary address domain.",
+      "method_changing": true,
+      "source_batch_id": "B5"
+    },
+    {
+      "variant_id": "B5-V04-collision-strategy",
+      "pattern_ids": [
+        "HASH_INSERT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C14"
+      ],
+      "axis": "global-spare-vs-same-bucket",
+      "decision_rule": {
+        "vi": "Sau va chạm, quét Spare toàn cục hoặc cột còn lại của đúng bucket theo đề; dừng ở ô trống đầu tiên.",
+        "en": "After collision, scan global Spare or the remaining columns of the exact bucket as prescribed; stop at the first empty slot."
+      },
+      "cases": [
+        "separate Spare[100]",
+        "same-row bucket columns 1..9"
+      ],
+      "invariant": "A successful insertion changes exactly one permitted slot.",
+      "method_changing": true,
+      "source_batch_id": "B5"
+    },
+    {
+      "variant_id": "B5-V05-boundary-policy",
+      "pattern_ids": [
+        "HASH_INSERT",
+        "HASH_SEARCH"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "duplicate-full-not-found",
+      "decision_rule": {
+        "vi": "Nếu nguồn không định nghĩa duplicate/full, giữ chúng là policy/fixture được công bố; Not found chỉ xuất hiện sau khi hết miền tìm hợp lệ.",
+        "en": "When the source does not define duplicate/full behavior, keep them as declared policy/fixtures; return Not found only after exhausting the valid search region."
+      },
+      "cases": [
+        "duplicate reject/update/allow policy",
+        "full outcome",
+        "not-found result"
+      ],
+      "invariant": "No boundary path overwrites silently or leaves the index domain.",
+      "method_changing": true,
+      "source_batch_id": "B5"
+    },
+    {
+      "variant_id": "B5-V06-dictionary-vs-explicit-hash",
+      "pattern_ids": [
+        "HASH_SETUP",
+        "HASH_FUNCTION",
+        "HASH_INSERT",
+        "HASH_SEARCH"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "python-dict-vs-exam-hash-table",
+      "decision_rule": {
+        "vi": "Python dict phù hợp khi đề chỉ cần ánh xạ trực tiếp; các bài B5 yêu cầu bằng chứng về MOD, sentinel, collision và probe nên phải dùng cấu trúc hash tường minh.",
+        "en": "A Python dict suits a direct mapping contract; B5 parts require observable MOD, sentinel, collision, and probe evidence, so use the explicit hash structure."
+      },
+      "cases": [
+        "direct dictionary lookup",
+        "explicit examination hash table"
+      ],
+      "invariant": "The implementation exposes every operation assessed by the chosen contract.",
+      "method_changing": true,
+      "source_batch_id": "B5"
+    },
+    {
+      "variant_id": "b6.variant.class-constructor",
+      "pattern_ids": [
+        "OOP_CLASS"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "visibility_parameter_mapping_defaults",
+      "decision_rule": {
+        "vi": "Từ class table tạo map field/type/visibility/source-of-value.",
+        "en": "Build a field/type/visibility/value-source map from the class table."
+      },
+      "cases": [
+        {
+          "case_id": "all_parameters",
+          "signature": "every field supplied",
+          "initialisation": "parameter→matching field"
+        },
+        {
+          "case_id": "parameters_plus_defaults",
+          "signature": "some fields omitted",
+          "initialisation": "parameter fields plus stated defaults"
+        },
+        {
+          "case_id": "composition_or_array",
+          "signature": "container field",
+          "initialisation": "distinct child/default element per required slot"
+        }
+      ],
+      "invariant": "Immediately after construction every required field exists once, with exact identifier and source-defined value.",
+      "method_changing": true,
+      "source_batch_id": "B6"
+    },
+    {
+      "variant_id": "b6.variant.subclass-construction",
+      "pattern_ids": [
+        "OOP_SUBCLASS"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "parent_new_attributes_super_call",
+      "decision_rule": {
+        "vi": "Chia parameters thành parent slice và subclass slice trước super call.",
+        "en": "Partition parameters into parent and subclass slices before the super call."
+      },
+      "cases": [
+        {
+          "case_id": "parent_plus_one_field",
+          "order": "super(parent args), then one subclass assignment"
+        },
+        {
+          "case_id": "parent_plus_multiple_fields",
+          "order": "super(parent args), then each new field exactly once"
+        }
+      ],
+      "invariant": "Parent invariant holds after super; subclass invariant holds after new-field initialisation.",
+      "method_changing": true,
+      "source_batch_id": "B6"
+    },
+    {
+      "variant_id": "b6.variant.getter-member",
+      "pattern_ids": [
+        "OOP_GET"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "scalar_or_indexed_member",
+      "decision_rule": {
+        "vi": "Chọn stored member và optional index từ method contract.",
+        "en": "Select the stored member and optional index from the method contract."
+      },
+      "cases": [
+        {
+          "case_id": "scalar",
+          "parameters": "none besides instance",
+          "return": "one stored scalar"
+        },
+        {
+          "case_id": "indexed",
+          "parameters": "source index",
+          "return": "stored element at exact index"
+        }
+      ],
+      "invariant": "Getter returns stored value/type and leaves the entire object unchanged.",
+      "method_changing": true,
+      "source_batch_id": "B6"
+    },
+    {
+      "variant_id": "b6.variant.set-versus-update",
+      "pattern_ids": [
+        "OOP_SET",
+        "OOP_UPDATE"
+      ],
+      "stage2_contrast_refs": [
+        "A3C06"
+      ],
+      "axis": "replacement_or_rule_transition",
+      "decision_rule": {
+        "vi": "Dùng equation: không có field_before là Set; có field_before/formula/bound là Update.",
+        "en": "Use the equation: no field_before means Set; field_before/formula/bound means Update."
+      },
+      "cases": [
+        {
+          "case_id": "direct_set",
+          "equation": "field_after=parameter"
+        },
+        {
+          "case_id": "relative_add",
+          "equation": "field_after=field_before+delta"
+        },
+        {
+          "case_id": "bounded_or_scaled",
+          "equation": "field_after=clamp_or_scale(field_before, parameter)"
+        },
+        {
+          "case_id": "indexed_derived",
+          "equation": "member[index]=formula(parameters, fields)"
+        }
+      ],
+      "invariant": "Only named targets change; after-state satisfies the exact source equation and bounds.",
+      "method_changing": true,
+      "source_batch_id": "B6"
+    },
+    {
+      "variant_id": "b6.variant.override-strategy",
+      "pattern_ids": [
+        "OOP_OVERRIDE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "parent_call_subclass_rule_result",
+      "decision_rule": {
+        "vi": "Tính parent side effects rồi chọn call/extend/reimplement strategy để mỗi obligation xảy ra đúng một lần.",
+        "en": "Count parent side effects, then choose call/extend/reimplement so every obligation occurs once."
+      },
+      "cases": [
+        {
+          "case_id": "transform_then_super",
+          "example": "bonus-adjusted hours passed to parent SetPay"
+        },
+        {
+          "case_id": "specialised_state_rule",
+          "example": "movement/element rule replaces parent behaviour"
+        },
+        {
+          "case_id": "extend_result",
+          "example": "parent description plus subclass text"
+        }
+      ],
+      "invariant": "Same callable contract dispatches to subclass behaviour without duplicate parent side effects.",
+      "method_changing": true,
+      "source_batch_id": "B6"
+    },
+    {
+      "variant_id": "b6.variant.instantiate-source",
+      "pattern_ids": [
+        "OOP_INSTANTIATE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "fixed_input_file_single_array_composition",
+      "decision_rule": {
+        "vi": "Map one complete source record/fixed tuple to one constructor call and one storage destination.",
+        "en": "Map one complete source record/fixed tuple to one constructor call and one storage destination."
+      },
+      "cases": [
+        {
+          "case_id": "fixed_single",
+          "source": "literal tuple",
+          "destination": "named object"
+        },
+        {
+          "case_id": "interactive",
+          "source": "validated/input tuple",
+          "destination": "single or array slot"
+        },
+        {
+          "case_id": "file_records",
+          "source": "one complete grouped record",
+          "destination": "next object slot"
+        },
+        {
+          "case_id": "nested_grid",
+          "source": "default child tuple",
+          "destination": "distinct instance per grid cell"
+        }
+      ],
+      "invariant": "After k source tuples exactly k valid, correctly typed object instances are reachable in required positions.",
+      "method_changing": true,
+      "source_batch_id": "B6"
+    },
+    {
+      "variant_id": "b6.variant.capacity-add",
+      "pattern_ids": [
+        "OOP_CAPACITY_ADD"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "capacity_count_return",
+      "decision_rule": {
+        "vi": "Dùng count làm next-free slot và capacity làm full boundary trong observed Station contract.",
+        "en": "Use count as next-free slot and capacity as full boundary in the observed Station contract."
+      },
+      "cases": [
+        {
+          "case_id": "space",
+          "guard": "count<capacity",
+          "transition": "storage[count]=object; count+=1; True"
+        },
+        {
+          "case_id": "full",
+          "guard": "count==capacity",
+          "transition": "no mutation; False"
+        }
+      ],
+      "invariant": "0<=count<=capacity; success adds the exact object once and failure preserves all state.",
+      "method_changing": true,
+      "source_batch_id": "B6"
+    },
+    {
+      "variant_id": "b7.variant.file-read-array",
+      "pattern_ids": [
+        "FILE_READ_ARRAY"
+      ],
+      "stage2_contrast_refs": [
+        "A3C18"
+      ],
+      "axis": "line_count;record_layout;destination;error_handling",
+      "decision_rule": {
+        "vi": "Chốt record grammar và termination trước khi đọc; chỉ commit sau khi đủ line, convert đúng type và còn capacity.",
+        "en": "Fix record grammar and termination before reading; commit only after all lines exist, conversions succeed and capacity remains."
+      },
+      "cases": [
+        {
+          "case_id": "fixed-record-count",
+          "description": "read exactly the source-stated number of complete records",
+          "observed_parts": []
+        },
+        {
+          "case_id": "eof-driven",
+          "description": "stop at EOF without committing a partial final record",
+          "observed_parts": []
+        },
+        {
+          "case_id": "adt-destination",
+          "description": "call the supplied destination operation once per complete converted record",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval.",
+      "invariant_bilingual": {
+        "vi": "Mỗi destination item đã commit tương ứng đúng một record nguồn hoàn chỉnh theo file order; count không vượt capacity và không read ngoài khoảng file mở.",
+        "en": "Every committed destination element corresponds to one complete source record in file order, committed_count never exceeds capacity, and no read occurs outside the open-file interval."
+      },
+      "method_changing": true,
+      "source_batch_id": "B7"
+    },
+    {
+      "variant_id": "b7.variant.file-read-objects",
+      "pattern_ids": [
+        "FILE_READ_OBJECTS"
+      ],
+      "stage2_contrast_refs": [
+        "A3C18"
+      ],
+      "axis": "fixed_or_variable_record;subclass_dispatch;create_or_update",
+      "decision_rule": {
+        "vi": "Phân loại create, subclass-dispatch hay lookup-update trước; parse đủ typed record rồi mới construct/update và commit.",
+        "en": "Classify create, subclass-dispatch or lookup-update first; parse the complete typed record before constructing/updating and committing."
+      },
+      "cases": [
+        {
+          "case_id": "fixed-object-record",
+          "description": "group fixed lines and construct one object in exact parameter order",
+          "observed_parts": []
+        },
+        {
+          "case_id": "subclass-dispatch",
+          "description": "a discriminator selects one permitted subtype",
+          "observed_parts": []
+        },
+        {
+          "case_id": "lookup-update",
+          "description": "a record key locates one existing object and changes source-stated fields",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state.",
+      "invariant_bilingual": {
+        "vi": "Mỗi record thành công tạo đúng một object hợp lệ hoặc cập nhật đúng một target; partial object không vào destination state.",
+        "en": "Each successful record produces exactly one correctly typed source-permitted object creation or one update to the uniquely matched object; no partial object enters destination state."
+      },
+      "method_changing": true,
+      "source_batch_id": "B7"
+    },
+    {
+      "variant_id": "b7.variant.file-write",
+      "pattern_ids": [
+        "FILE_WRITE"
+      ],
+      "stage2_contrast_refs": [],
+      "axis": "append_or_write;provided_or_created_file;physical_or_logical_order",
+      "decision_rule": {
+        "vi": "Chốt append hay overwrite và physical hay logical order trước khi format bất kỳ dòng nào.",
+        "en": "Fix append versus overwrite and physical versus logical order before formatting any line."
+      },
+      "cases": [
+        {
+          "case_id": "overwrite-new-file",
+          "description": "new target contains only the required formatted records",
+          "observed_parts": []
+        },
+        {
+          "case_id": "append-existing",
+          "description": "existing prefix remains and new records form an exact suffix",
+          "observed_parts": []
+        },
+        {
+          "case_id": "physical-tree-rows",
+          "description": "write backing rows as triples when explicitly required, not traversal order",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract.",
+      "invariant_bilingual": {
+        "vi": "Output suffix chứa đúng records được chọn theo order/format nguồn; append giữ prefix cũ còn overwrite tuân hợp đồng file mới.",
+        "en": "The emitted suffix contains exactly the source-selected records in required order and format; append preserves the prior prefix, while overwrite obeys the new-file contract."
+      },
+      "method_changing": true,
+      "source_batch_id": "B7"
+    },
+    {
+      "variant_id": "b8.variant.main-flow",
+      "pattern_ids": [
+        "MAIN_FLOW"
+      ],
+      "stage2_contrast_refs": [
+        "A3C01",
+        "A3C02"
+      ],
+      "axis": "call_order;repetition;input_plumbing;result_branch",
+      "decision_rule": {
+        "vi": "Dựng dependency/call-state graph trước; chỉ gọi operation khi input và state version mà nó cần đã sẵn sàng.",
+        "en": "Build the dependency/call-state graph first; call an operation only when its required inputs and state version are ready."
+      },
+      "cases": [
+        {
+          "case_id": "linear-pipeline",
+          "description": "setup/read, transform/search and output in dependency order",
+          "observed_parts": []
+        },
+        {
+          "case_id": "repeated-call",
+          "description": "each iteration owns its input, return and branch",
+          "observed_parts": []
+        },
+        {
+          "case_id": "before-after-observation",
+          "description": "output state before and after one mutating call without reimplementing it",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "After each orchestration event, every completed call has received the source-required arguments, its result/state version is owned once, and every pending call still has a satisfiable precondition.",
+      "invariant_bilingual": {
+        "vi": "Sau mỗi event, call đã hoàn tất nhận đúng arguments và state version; result chỉ có một owner và call chờ vẫn còn precondition khả thi.",
+        "en": "After each orchestration event, every completed call has received the source-required arguments, its result/state version is owned once, and every pending call still has a satisfiable precondition."
+      },
+      "method_changing": true,
+      "source_batch_id": "B8"
+    },
+    {
+      "variant_id": "b8.variant.output-format",
+      "pattern_ids": [
+        "OUTPUT_FORMAT"
+      ],
+      "stage2_contrast_refs": [
+        "A3C05",
+        "A3C09"
+      ],
+      "axis": "grid_or_line;physical_or_logical;concatenation;labels",
+      "decision_rule": {
+        "vi": "Viết output grammar và iterator/range trước; mỗi output event phải khớp một record/cell trong đúng order và không đổi dữ liệu gốc.",
+        "en": "Write the output grammar and iterator/range first; each output event must match one record/cell in exact order without mutating source data."
+      },
+      "cases": [
+        {
+          "case_id": "labelled-lines",
+          "description": "one complete labelled record per line in source order",
+          "observed_parts": []
+        },
+        {
+          "case_id": "physical-grid",
+          "description": "all specified rows/cells including unused slots",
+          "observed_parts": []
+        },
+        {
+          "case_id": "returned-string",
+          "description": "concatenate exact fields/literals into the required return type",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "After k output events, the rendered prefix exactly matches the first k items of the source-selected sequence under the required labels, separators, line breaks and type contract.",
+      "invariant_bilingual": {
+        "vi": "Sau k output events, rendered prefix khớp chính xác k items đầu theo labels, separators, line breaks và type contract nguồn.",
+        "en": "After k output events, the rendered prefix exactly matches the first k items of the source-selected sequence under the required labels, separators, line breaks and type contract."
+      },
+      "method_changing": true,
+      "source_batch_id": "B8"
+    },
+    {
+      "variant_id": "b8.variant.evidence-run",
+      "pattern_ids": [
+        "EVIDENCE_RUN"
+      ],
+      "stage2_contrast_refs": [
+        "A3C02"
+      ],
+      "axis": "prescribed_inputs;multiple_runs;file_content;filename_visibility",
+      "decision_rule": {
+        "vi": "Lập evidence matrix case→setup→visible input→expected observable→capture slot; gắn nhãn official hoặc AlgoCore trước Stage 5/6.",
+        "en": "Build an evidence matrix case→setup→visible input→expected observable→capture slot, labelled official or AlgoCore before Stage 5/6."
+      },
+      "cases": [
+        {
+          "case_id": "single-prescribed-run",
+          "description": "one official input/output capture with complete attribution",
+          "observed_parts": []
+        },
+        {
+          "case_id": "multiple-reset-runs",
+          "description": "each official case has its own reset, state lineage and capture slot",
+          "observed_parts": []
+        },
+        {
+          "case_id": "file-evidence",
+          "description": "capture required file contents and visible filename without asserting execution",
+          "observed_parts": []
+        }
+      ],
+      "invariant": "Every planned capture is attributable to exactly one test case and shows all source-required observable evidence, while no Stage 4 field states that execution, output or screenshot already exists.",
+      "invariant_bilingual": {
+        "vi": "Mỗi planned capture gắn đúng một case và đủ observable bắt buộc; không field Stage 4 nào tuyên bố execution/output/screenshot đã tồn tại.",
+        "en": "Every planned capture is attributable to exactly one test case and shows all source-required observable evidence, while no Stage 4 field states that execution, output or screenshot already exists."
+      },
+      "method_changing": true,
+      "source_batch_id": "B8"
+    }
+  ]
+}

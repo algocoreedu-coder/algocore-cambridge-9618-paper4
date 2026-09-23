@@ -1,0 +1,1142 @@
+{
+  "schema_version": "s5-p0-fixtures-v1",
+  "authority": "official_source_adjudication + stage4_invariant + AlgoCore_test_policy",
+  "variant_entry_points": {
+    "p0.stack.variant.top-pointer": {
+      "next_free": "stack_setup/stack_push/stack_pop(mode=next_free)",
+      "current_top": "stack_setup/stack_push/stack_pop(mode=current_top)"
+    },
+    "p0.stack.variant.push-result": {
+      "boolean": "stack_push(result_mode=boolean)",
+      "integer_1_minus1": "stack_push(result_mode=integer_1_minus1)",
+      "route_and_message": "stack_push(result_mode=boolean)+caller_route"
+    },
+    "p0.stack.variant.pop-empty-result": {
+      "numeric_minus1": "stack_pop(empty_value=-1)",
+      "empty_string": "stack_pop(empty_value='')",
+      "no_data_string": "stack_pop(empty_value='No data')",
+      "string_minus1": "stack_pop(empty_value='-1')",
+      "numeric_minus999": "stack_pop(empty_value=-999)"
+    },
+    "p0.stack.variant.pair-transaction": {
+      "both_live": "stack_pair",
+      "a_empty_b_live": "stack_pair",
+      "a_live_b_empty": "stack_pair",
+      "both_empty": "stack_pair"
+    },
+    "p0.stack.variant.reduce-protocol": {
+      "expression_left_fold": "stack_reduce_expression",
+      "extrema": "stack_reduce_extrema"
+    }
+  },
+  "fixtures": [
+    {
+      "fixture_id": "fx.setup.next_free.capacity1",
+      "test_id": "p0.setup.next_free.capacity1",
+      "pattern_id": "STACK_SETUP",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "snapshot": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.setup.current_top.capacity1",
+      "test_id": "p0.setup.current_top.capacity1",
+      "pattern_id": "STACK_SETUP",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "snapshot": {
+          "storage": [
+            null
+          ],
+          "top": -1,
+          "capacity": 1,
+          "mode": "current_top",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.push.next_free.success",
+      "test_id": "p0.push.next_free.success",
+      "pattern_id": "STACK_PUSH",
+      "category": "normal",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "result": true,
+        "snapshot": {
+          "storage": [
+            "A",
+            null
+          ],
+          "top": 1,
+          "capacity": 2,
+          "mode": "next_free",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "A"
+          ],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.push.next_free.full",
+      "test_id": "p0.push.next_free.full_preserve",
+      "pattern_id": "STACK_PUSH",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "result": false,
+        "before": {
+          "storage": [
+            "A"
+          ],
+          "top": 1,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "A"
+          ],
+          "output": null,
+          "return": null
+        },
+        "after": {
+          "storage": [
+            "A"
+          ],
+          "top": 1,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "A"
+          ],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.push.current_top.success",
+      "test_id": "p0.push.current_top.success",
+      "pattern_id": "STACK_PUSH",
+      "category": "normal",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "result": true,
+        "snapshot": {
+          "storage": [
+            "A",
+            null
+          ],
+          "top": 0,
+          "capacity": 2,
+          "mode": "current_top",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "A"
+          ],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.push.current_top.full",
+      "test_id": "p0.push.current_top.full_preserve",
+      "pattern_id": "STACK_PUSH",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "result": false,
+        "before": {
+          "storage": [
+            "A"
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "current_top",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "A"
+          ],
+          "output": null,
+          "return": null
+        },
+        "after": {
+          "storage": [
+            "A"
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "current_top",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "A"
+          ],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.push.result.integer",
+      "test_id": "p0.push.result.integer",
+      "pattern_id": "STACK_PUSH",
+      "category": "variant",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "success_type": "int",
+        "success": 1,
+        "full": -1,
+        "snapshot": {
+          "storage": [
+            "A"
+          ],
+          "top": 1,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "A"
+          ],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.pop.next_free.lifo",
+      "test_id": "p0.pop.next_free.lifo",
+      "pattern_id": "STACK_POP",
+      "category": "normal",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "value": "top",
+        "snapshot": {
+          "storage": [
+            "bottom",
+            "top"
+          ],
+          "top": 1,
+          "capacity": 2,
+          "mode": "next_free",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "bottom"
+          ],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.pop.current_top.lifo",
+      "test_id": "p0.pop.current_top.lifo",
+      "pattern_id": "STACK_POP",
+      "category": "normal",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "value": "top",
+        "snapshot": {
+          "storage": [
+            "bottom",
+            "top"
+          ],
+          "top": 0,
+          "capacity": 2,
+          "mode": "current_top",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            "bottom"
+          ],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.pop.empty.numeric_minus1",
+      "test_id": "p0.pop.empty.numeric_minus1",
+      "pattern_id": "STACK_POP",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "value": -1,
+        "type": "int",
+        "before": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        },
+        "after": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.pop.empty.empty_string",
+      "test_id": "p0.pop.empty.empty_string",
+      "pattern_id": "STACK_POP",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "value": "",
+        "type": "str",
+        "before": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        },
+        "after": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.pop.empty.no_data_string",
+      "test_id": "p0.pop.empty.no_data_string",
+      "pattern_id": "STACK_POP",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "value": "No data",
+        "type": "str",
+        "before": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        },
+        "after": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.pop.empty.string_minus1",
+      "test_id": "p0.pop.empty.string_minus1",
+      "pattern_id": "STACK_POP",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "value": "-1",
+        "type": "str",
+        "before": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        },
+        "after": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.pop.empty.numeric_minus999",
+      "test_id": "p0.pop.empty.numeric_minus999",
+      "pattern_id": "STACK_POP",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "value": -999,
+        "type": "int",
+        "before": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        },
+        "after": {
+          "storage": [
+            null
+          ],
+          "top": 0,
+          "capacity": 1,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.pair.both_live",
+      "test_id": "p0.pair.both_live",
+      "pattern_id": "STACK_PAIR",
+      "category": "normal",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "label": "official_source_contract",
+        "pair": [
+          "L",
+          "R"
+        ],
+        "message": null,
+        "left_ok": true,
+        "right_ok": true,
+        "restores": [],
+        "before": {
+          "left": {
+            "storage": [
+              "L",
+              null
+            ],
+            "top": 1,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 1,
+            "live_range": [
+              0
+            ],
+            "live_values": [
+              "L"
+            ],
+            "output": null,
+            "return": null
+          },
+          "right": {
+            "storage": [
+              "R",
+              null
+            ],
+            "top": 1,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 1,
+            "live_range": [
+              0
+            ],
+            "live_values": [
+              "R"
+            ],
+            "output": null,
+            "return": null
+          }
+        },
+        "after": {
+          "left": {
+            "storage": [
+              "L",
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          },
+          "right": {
+            "storage": [
+              "R",
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          }
+        },
+        "preserved_on_failure": true,
+        "sentinel_push_count": 0,
+        "preservation_fields_checked": [
+          "storage",
+          "top",
+          "capacity",
+          "mode",
+          "logical_size",
+          "live_range",
+          "live_values",
+          "output",
+          "return"
+        ]
+      }
+    },
+    {
+      "fixture_id": "fx.pair.a_empty_b_live",
+      "test_id": "p0.pair.a_empty_b_live",
+      "pattern_id": "STACK_PAIR",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "label": "official_source_contract",
+        "pair": null,
+        "message": "No left item",
+        "left_ok": false,
+        "right_ok": true,
+        "restores": [
+          "right"
+        ],
+        "before": {
+          "left": {
+            "storage": [
+              null,
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          },
+          "right": {
+            "storage": [
+              "R",
+              null
+            ],
+            "top": 1,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 1,
+            "live_range": [
+              0
+            ],
+            "live_values": [
+              "R"
+            ],
+            "output": null,
+            "return": null
+          }
+        },
+        "after": {
+          "left": {
+            "storage": [
+              null,
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          },
+          "right": {
+            "storage": [
+              "R",
+              null
+            ],
+            "top": 1,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 1,
+            "live_range": [
+              0
+            ],
+            "live_values": [
+              "R"
+            ],
+            "output": null,
+            "return": null
+          }
+        },
+        "preserved_on_failure": true,
+        "sentinel_push_count": 0,
+        "preservation_fields_checked": [
+          "storage",
+          "top",
+          "capacity",
+          "mode",
+          "logical_size",
+          "live_range",
+          "live_values",
+          "output",
+          "return"
+        ]
+      }
+    },
+    {
+      "fixture_id": "fx.pair.a_live_b_empty",
+      "test_id": "p0.pair.a_live_b_empty",
+      "pattern_id": "STACK_PAIR",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "label": "official_source_contract",
+        "pair": null,
+        "message": "No right item",
+        "left_ok": true,
+        "right_ok": false,
+        "restores": [
+          "left"
+        ],
+        "before": {
+          "left": {
+            "storage": [
+              "L",
+              null
+            ],
+            "top": 1,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 1,
+            "live_range": [
+              0
+            ],
+            "live_values": [
+              "L"
+            ],
+            "output": null,
+            "return": null
+          },
+          "right": {
+            "storage": [
+              null,
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          }
+        },
+        "after": {
+          "left": {
+            "storage": [
+              "L",
+              null
+            ],
+            "top": 1,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 1,
+            "live_range": [
+              0
+            ],
+            "live_values": [
+              "L"
+            ],
+            "output": null,
+            "return": null
+          },
+          "right": {
+            "storage": [
+              null,
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          }
+        },
+        "preserved_on_failure": true,
+        "sentinel_push_count": 0,
+        "preservation_fields_checked": [
+          "storage",
+          "top",
+          "capacity",
+          "mode",
+          "logical_size",
+          "live_range",
+          "live_values",
+          "output",
+          "return"
+        ]
+      }
+    },
+    {
+      "fixture_id": "fx.pair.both_empty",
+      "test_id": "p0.pair.both_empty",
+      "pattern_id": "STACK_PAIR",
+      "category": "boundary",
+      "authority": "AlgoCore_test_policy",
+      "expected_evidence": {
+        "label": "AlgoCore_inference",
+        "pair": null,
+        "message": "No pair (AlgoCore_inference)",
+        "left_ok": false,
+        "right_ok": false,
+        "restores": [],
+        "before": {
+          "left": {
+            "storage": [
+              null,
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          },
+          "right": {
+            "storage": [
+              null,
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          }
+        },
+        "after": {
+          "left": {
+            "storage": [
+              null,
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          },
+          "right": {
+            "storage": [
+              null,
+              null
+            ],
+            "top": 0,
+            "capacity": 2,
+            "mode": "next_free",
+            "logical_size": 0,
+            "live_range": [],
+            "live_values": [],
+            "output": null,
+            "return": null
+          }
+        },
+        "preserved_on_failure": true,
+        "sentinel_push_count": 0,
+        "preservation_fields_checked": [
+          "storage",
+          "top",
+          "capacity",
+          "mode",
+          "logical_size",
+          "live_range",
+          "live_values",
+          "output",
+          "return"
+        ]
+      }
+    },
+    {
+      "fixture_id": "fx.reduce.expression.left_fold",
+      "test_id": "p0.reduce.expression.left_fold",
+      "pattern_id": "STACK_REDUCE",
+      "category": "normal",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "value": 21,
+        "steps": [
+          {
+            "kind": "first_value",
+            "value": 20
+          },
+          {
+            "kind": "operator_value",
+            "operator": "-",
+            "next": 3,
+            "acc_before": 20,
+            "acc_after": 17
+          },
+          {
+            "kind": "operator_value",
+            "operator": "+",
+            "next": 4,
+            "acc_before": 17,
+            "acc_after": 21
+          }
+        ],
+        "snapshot": {
+          "storage": [
+            4,
+            "+",
+            3,
+            "-",
+            20
+          ],
+          "top": 0,
+          "capacity": 5,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.reduce.extrema.all_negative",
+      "test_id": "p0.reduce.extrema.all_negative",
+      "pattern_id": "STACK_REDUCE",
+      "category": "boundary",
+      "authority": "official_source_adjudication + stage4_invariant",
+      "expected_evidence": {
+        "highest": -1,
+        "lowest": -20,
+        "values": [
+          -20,
+          -1,
+          -10
+        ],
+        "snapshot": {
+          "storage": [
+            -10,
+            -1,
+            -20
+          ],
+          "top": 0,
+          "capacity": 3,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        }
+      }
+    },
+    {
+      "fixture_id": "fx.anchor.stack_setup",
+      "pattern_id": "STACK_SETUP",
+      "source_part_id": "9618_s22_42_1(a)",
+      "authority": "official_source_adjudication",
+      "category": "source_anchor",
+      "run_evidence": {
+        "pattern_id": "STACK_SETUP",
+        "source_contract": "StackData[10], StackPointer=0",
+        "snapshot": {
+          "storage": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "top": 0,
+          "capacity": 10,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        },
+        "result": "PASS"
+      },
+      "run_status": "PASS"
+    },
+    {
+      "fixture_id": "fx.anchor.stack_push",
+      "pattern_id": "STACK_PUSH",
+      "source_part_id": "9618_s22_42_1(c)",
+      "authority": "official_source_adjudication",
+      "category": "source_anchor",
+      "run_evidence": {
+        "pattern_id": "STACK_PUSH",
+        "source_contract": "Push integer when space exists; return success",
+        "result": "PASS",
+        "snapshot": {
+          "storage": [
+            7,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "top": 1,
+          "capacity": 10,
+          "mode": "next_free",
+          "logical_size": 1,
+          "live_range": [
+            0
+          ],
+          "live_values": [
+            7
+          ],
+          "output": null,
+          "return": null
+        }
+      },
+      "run_status": "PASS"
+    },
+    {
+      "fixture_id": "fx.anchor.stack_pop",
+      "pattern_id": "STACK_POP",
+      "source_part_id": "9618_s22_42_1(e)(i)",
+      "authority": "official_source_adjudication",
+      "category": "source_anchor",
+      "run_evidence": {
+        "pattern_id": "STACK_POP",
+        "source_contract": "Pop returns top item and updates pointer",
+        "value": 42,
+        "snapshot": {
+          "storage": [
+            42,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "top": 0,
+          "capacity": 10,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        },
+        "result": "PASS"
+      },
+      "run_status": "PASS"
+    },
+    {
+      "fixture_id": "fx.anchor.stack_pair",
+      "pattern_id": "STACK_PAIR",
+      "source_part_id": "9618_s23_41_3(c)",
+      "authority": "official_source_adjudication",
+      "category": "source_anchor",
+      "run_evidence": {
+        "pattern_id": "STACK_PAIR",
+        "source_contract": "OutputItem commits pair when both Pops succeed",
+        "result": "PASS"
+      },
+      "run_status": "PASS"
+    },
+    {
+      "fixture_id": "fx.anchor.stack_reduce",
+      "pattern_id": "STACK_REDUCE",
+      "source_part_id": "9618_s25_42_1(e)",
+      "authority": "official_source_adjudication",
+      "category": "source_anchor",
+      "run_evidence": {
+        "pattern_id": "STACK_REDUCE",
+        "source_contract": "Calculate consumes expression stack left-to-right",
+        "value": 21,
+        "steps": [
+          {
+            "kind": "first_value",
+            "value": 20
+          },
+          {
+            "kind": "operator_value",
+            "operator": "-",
+            "next": 3,
+            "acc_before": 20,
+            "acc_after": 17
+          },
+          {
+            "kind": "operator_value",
+            "operator": "+",
+            "next": 4,
+            "acc_before": 17,
+            "acc_after": 21
+          }
+        ],
+        "snapshot": {
+          "storage": [
+            4,
+            "+",
+            3,
+            "-",
+            20,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "top": 0,
+          "capacity": 20,
+          "mode": "next_free",
+          "logical_size": 0,
+          "live_range": [],
+          "live_values": [],
+          "output": null,
+          "return": null
+        },
+        "result": "PASS"
+      },
+      "run_status": "PASS"
+    }
+  ]
+}

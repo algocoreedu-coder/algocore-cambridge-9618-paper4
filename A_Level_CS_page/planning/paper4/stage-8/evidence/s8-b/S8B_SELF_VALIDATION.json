@@ -1,0 +1,125 @@
+{
+  "schema_version": "s8-evidence-v1",
+  "stage": 8,
+  "wave": "S8-B",
+  "input_release_id": "paper4-2026-s7-v1",
+  "input_manifest_sha256": "3ed03798f614b22307e07034ec36326af13cda58fd68dc6fd65dd3feb73cb01f",
+  "runtime_registry_sha256": "4a5a9b154d2b1de8197d42c7c900e2cd738238ddaddac9842ccd40246e2ffc34",
+  "owner": "A2_VISUAL_SYSTEM_ENGINEER",
+  "reviewer": "A0_A6_A7_A8_PENDING",
+  "timestamp": "2026-09-22T14:35:59+07:00",
+  "status": "RESUBMITTED_FOR_INDEPENDENT_RECHECK",
+  "self_validation_status": "PASS",
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "result": "PASS"
+    },
+    {
+      "command": "npx tsc app/components/paper4-visual/reducer.ts --target ES2022 --module commonjs --moduleResolution node --skipLibCheck --outDir <temporary-dir>; node reducer assertions",
+      "result": "PASS: 9 actions, 26 assertions"
+    },
+    {
+      "command": "npm run build",
+      "result": "PASS: Next.js production build; /paper-4 prerendered static"
+    },
+    {
+      "command": "rg stable selectors, accessibility media rules, fallback fields and sync cues",
+      "result": "PASS"
+    }
+  ],
+  "counts": {
+    "component_files": 6,
+    "reducer_actions": 9,
+    "reducer_assertions": 26,
+    "runtime_patterns_typechecked": 58,
+    "runtime_scenarios_typechecked": 174,
+    "runtime_unique_events_typechecked": 331,
+    "synchronized_visual_panels": 5,
+    "qa_panel_selectors": 7,
+    "locales": 2
+  },
+  "checks": {
+    "registry_direct_import_contract": "PASS",
+    "deterministic_reducer": "PASS",
+    "locale_preserves_event_identity": "PASS",
+    "reset_clears_prediction_and_input_revision": "PASS",
+    "play_pauses_at_next_prediction_checkpoint": "PASS",
+    "code_state_trace_output_invariant_same_event": "PASS",
+    "keyboard_native_controls": "PASS",
+    "aria_live_announcer": "PASS",
+    "non_colour_current_step_and_sync_cues": "PASS",
+    "reduced_motion": "PASS",
+    "forced_colours": "PASS",
+    "narrow_screen_css": "PASS",
+    "static_fallback_has_code_state_invariant": "PASS",
+    "production_build": "PASS"
+  },
+  "rework_dispositions": [
+    {
+      "finding_id": "S8B-A6-001",
+      "severity": "required",
+      "finding": "Autoplay crossed prediction checkpoints.",
+      "correction": "NEXT now always clears playing; PLAY advances one event after the timer and pauses before the next prediction.",
+      "locator": "app/components/paper4-visual/reducer.ts",
+      "status": "RESUBMITTED"
+    },
+    {
+      "finding_id": "S8B-A7-002",
+      "severity": "required",
+      "finding": "No actionable memory cue.",
+      "correction": "Added bilingual event-specific memory cue at data-testid=memory-cue.",
+      "locator": "app/components/paper4-visual/Paper4VisualRuntime.tsx",
+      "status": "RESUBMITTED"
+    },
+    {
+      "finding_id": "S8B-A6-003",
+      "severity": "required",
+      "finding": "Static fallback was only one line.",
+      "correction": "Noscript fallback now contains code locator, before, delta, after and invariant with data-testid=static-fallback.",
+      "locator": "app/components/paper4-visual/Paper4VisualRuntime.tsx",
+      "status": "RESUBMITTED"
+    },
+    {
+      "finding_id": "S8B-A6-004",
+      "severity": "required",
+      "finding": "Controls appeared before the learning panels in reading order.",
+      "correction": "Control bar moved after code/state/trace/output/invariant and prediction/feedback in DOM order; mobile CSS preserves one-column reading order.",
+      "locator": "app/components/paper4-visual/Paper4VisualRuntime.tsx",
+      "status": "RESUBMITTED"
+    },
+    {
+      "finding_id": "S8B-QA-005",
+      "severity": "required",
+      "finding": "Browser QA selectors and control-bar role were incomplete.",
+      "correction": "Added stable root, pattern, locale, action, panel, progress, announcer and data-role selectors.",
+      "locator": "app/components/paper4-visual/Paper4VisualRuntime.tsx",
+      "status": "RESUBMITTED"
+    },
+    {
+      "finding_id": "S8B-QA-006",
+      "severity": "required",
+      "finding": "Progress did not expose event identity and index.",
+      "correction": "Progress now exposes data-event-id and zero-based data-event-index alongside ARIA values.",
+      "locator": "app/components/paper4-visual/Paper4VisualRuntime.tsx",
+      "status": "RESUBMITTED"
+    },
+    {
+      "finding_id": "S8B-A7-007",
+      "severity": "required",
+      "finding": "Code and state were linked by colour only.",
+      "correction": "Both panels repeat the same localized step number, event name and data-sync-event identity.",
+      "locator": "app/components/paper4-visual/Paper4VisualRuntime.tsx",
+      "status": "RESUBMITTED"
+    }
+  ],
+  "required_findings_pending_independent_recheck": 7,
+  "artifacts": [
+    "algocore-fumadocs/app/components/paper4-visual/Paper4VisualRuntime.tsx",
+    "algocore-fumadocs/app/components/paper4-visual/Paper4VisualRuntime.module.css",
+    "algocore-fumadocs/app/components/paper4-visual/reducer.ts",
+    "algocore-fumadocs/app/components/paper4-visual/types.ts",
+    "algocore-fumadocs/app/components/paper4-visual/registry-contract.typecheck.ts",
+    "algocore-fumadocs/app/components/paper4-visual/index.ts"
+  ]
+}

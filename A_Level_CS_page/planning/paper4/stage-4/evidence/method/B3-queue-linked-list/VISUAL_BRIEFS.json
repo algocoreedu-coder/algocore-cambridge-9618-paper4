@@ -1,0 +1,679 @@
+{
+  "schema_version": "s4-schema-v1-b3-submission-1",
+  "status": "SUBMITTED",
+  "batch_id": "B3-queue-linked-list",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-4/SOURCE_CAVEAT_CARRYOVER.json",
+      "sha256": "ce6679219bc092c2c4054eb8f6f9528edecd3a3f577410f0f41fb614ba7763ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    }
+  ],
+  "visual_briefs": [
+    {
+      "visual_brief_id": "b3.visual.queue-setup",
+      "pattern_id": "QUEUE_SETUP",
+      "method_step_refs": [
+        "queue-setup.step.contract",
+        "queue-setup.step.storage",
+        "queue-setup.step.pointers",
+        "queue-setup.step.consistency"
+      ],
+      "error_refs": [
+        "b3.queue-setup.error.mixed-convention",
+        "b3.queue-setup.error.invented-wrap"
+      ],
+      "learning_question": {
+        "vi": "Head/tail/count đang chỉ điều gì?",
+        "en": "What do head/tail/count denote?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "indexed storage",
+        "head/tail arrows",
+        "count",
+        "live/unused partition"
+      ],
+      "proposed_event_types": [
+        "DECLARE_STORAGE",
+        "SELECT_QUEUE_MODEL",
+        "SET_POINTERS",
+        "MARK_LIVE_RANGE",
+        "CHECK_EMPTY_FULL"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán first read/write và full state.",
+        "en": "Predict the first read/write and full state."
+      },
+      "normal_case": {
+        "vi": "Normal: queue rỗng rồi một item dưới ba conventions.",
+        "en": "Normal: empty then one item under three conventions."
+      },
+      "boundary_case": {
+        "vi": "Boundary: capacity 1 và full state.",
+        "en": "Boundary: capacity 1 and full state."
+      },
+      "failure_case": {
+        "vi": "Failure: trộn circular wrap với linear full.",
+        "en": "Failure: mix circular wrap with linear full."
+      },
+      "representation_and_convention": [
+        "linear queues do not wrap unless stated",
+        "circular queues wrap head/tail at capacity",
+        "tail may be next-free or last-item",
+        "count may be authoritative when present"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-enqueue",
+      "pattern_id": "QUEUE_ENQUEUE",
+      "method_step_refs": [
+        "queue-enqueue.step.contract",
+        "queue-enqueue.step.full-guard",
+        "queue-enqueue.step.write",
+        "queue-enqueue.step.advance",
+        "queue-enqueue.step.result"
+      ],
+      "error_refs": [
+        "b3.queue-enqueue.error.mutate-before-full",
+        "b3.queue-enqueue.error.wrong-tail-update",
+        "b3.queue-enqueue.error.wrong-result-contract",
+        "b3.queue-enqueue.error.scope-sample",
+        "b3.queue-enqueue.error.missing-full-guard"
+      ],
+      "learning_question": {
+        "vi": "Item mới được commit ở event nào?",
+        "en": "At which event is the new item committed?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "before/after metadata",
+        "write index",
+        "new item",
+        "result"
+      ],
+      "proposed_event_types": [
+        "CHECK_FULL",
+        "SELECT_WRITE_INDEX",
+        "WRITE_ITEM",
+        "MOVE_TAIL",
+        "SET_FIRST_HEAD",
+        "INCREMENT_COUNT",
+        "RETURN_RESULT"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn event tiếp theo khi còn một ô.",
+        "en": "Choose the next event with one free slot."
+      },
+      "normal_case": {
+        "vi": "Normal: partial queue commit đúng một item.",
+        "en": "Normal: partial queue commits one item."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one-free-slot success rồi full failure zero-mutation.",
+        "en": "Boundary: one-free-slot success then zero-mutation full failure."
+      },
+      "failure_case": {
+        "vi": "Failure: đảo tail-role update hoặc cập nhật trước guard.",
+        "en": "Failure: reverse tail-role update or mutate before guard."
+      },
+      "representation_and_convention": [
+        "next-free tail writes then advances",
+        "last-item tail advances to a free position before/with write",
+        "wrap only for circular queues",
+        "failure is non-mutating"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-dequeue",
+      "pattern_id": "QUEUE_DEQUEUE",
+      "method_step_refs": [
+        "queue-dequeue.step.contract",
+        "queue-dequeue.step.empty-guard",
+        "queue-dequeue.step.save-item",
+        "queue-dequeue.step.advance",
+        "queue-dequeue.step.return"
+      ],
+      "error_refs": [
+        "b3.queue-dequeue.error.read-after-advance",
+        "b3.queue-dequeue.error.sentinel-or-reset",
+        "b3.queue-dequeue.error.published-example"
+      ],
+      "learning_question": {
+        "vi": "Vì sao phải lưu item trước khi dời head?",
+        "en": "Why must the item be saved before moving head?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "head item",
+        "saved value",
+        "metadata transitions",
+        "result/sentinel"
+      ],
+      "proposed_event_types": [
+        "CHECK_EMPTY",
+        "READ_HEAD",
+        "SAVE_ITEM",
+        "MOVE_HEAD",
+        "DECREMENT_COUNT",
+        "RESET_OR_WRAP",
+        "RETURN_ITEM"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán state sau khi lấy item cuối.",
+        "en": "Predict state after removing the final item."
+      },
+      "normal_case": {
+        "vi": "Normal: hai item, trả item FIFO đầu.",
+        "en": "Normal: two items return the oldest FIFO item."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one item to empty, then empty sentinel.",
+        "en": "Boundary: one item to empty, then empty sentinel."
+      },
+      "failure_case": {
+        "vi": "Failure: move head before read hoặc dùng sai sentinel/reset.",
+        "en": "Failure: move head before read or use wrong sentinel/reset."
+      },
+      "representation_and_convention": [
+        "head identifies the first live item in observed sources",
+        "count or pointer relation detects empty",
+        "wrap/reset and slot clearing are source-specific",
+        "empty failure is non-mutating"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-inspect",
+      "pattern_id": "QUEUE_INSPECT",
+      "method_step_refs": [
+        "queue-inspect.step.contract",
+        "queue-inspect.step.iterate",
+        "queue-inspect.step.format",
+        "queue-inspect.step.preservation"
+      ],
+      "error_refs": [
+        "b3.queue-inspect.error.physical-scan",
+        "b3.queue-inspect.error.destructive-inspect"
+      ],
+      "learning_question": {
+        "vi": "Live range khác storage range thế nào?",
+        "en": "How does the live range differ from storage range?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "live/stale cells",
+        "local cursor",
+        "text",
+        "unchanged metadata"
+      ],
+      "proposed_event_types": [
+        "SET_LOCAL_CURSOR",
+        "READ_LIVE_ITEM",
+        "APPEND_DELIMITER",
+        "ADVANCE_CURSOR",
+        "RETURN_TEXT",
+        "COMPARE_SNAPSHOT"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn các ô sẽ xuất trước khi reveal.",
+        "en": "Choose output cells before reveal."
+      },
+      "normal_case": {
+        "vi": "Normal: nonzero head với nhiều live items.",
+        "en": "Normal: non-zero head with multiple live items."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one live item và exact spacing.",
+        "en": "Boundary: one live item and exact spacing."
+      },
+      "failure_case": {
+        "vi": "Failure: in toàn storage hoặc mutate bằng Dequeue.",
+        "en": "Failure: print all storage or mutate via Dequeue."
+      },
+      "representation_and_convention": [
+        "observed source uses linear next-free tail and half-open [head,tail) range",
+        "no Dequeue or metadata mutation"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b3.visual.queue-reduce",
+      "pattern_id": "QUEUE_REDUCE",
+      "method_step_refs": [
+        "queue-reduce.step.mode",
+        "queue-reduce.step.initialise",
+        "queue-reduce.step.iterate",
+        "queue-reduce.step.terminate",
+        "queue-reduce.step.postcheck"
+      ],
+      "error_refs": [
+        "b3.queue-reduce.error.wrong-mode",
+        "b3.queue-reduce.error.sentinel-as-data",
+        "b3.queue-reduce.error.missing-final-run"
+      ],
+      "learning_question": {
+        "vi": "Accumulator đang tóm tắt prefix nào?",
+        "en": "Which prefix does the accumulator summarise?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "processed/unprocessed items",
+        "accumulator",
+        "sentinel/base",
+        "queue mutation"
+      ],
+      "proposed_event_types": [
+        "SELECT_MODE",
+        "READ_OR_DEQUEUE",
+        "UPDATE_ACCUMULATOR",
+        "ADVANCE_OR_RECURSE",
+        "FLUSH_FINAL_RUN",
+        "CHECK_POST_STATE"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán contribution tiếp theo và hậu trạng thái.",
+        "en": "Predict the next contribution and post-state."
+      },
+      "normal_case": {
+        "vi": "Normal: mỗi variant với prefix invariant rõ ràng.",
+        "en": "Normal: each variant with an explicit prefix invariant."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one item/base case/final run.",
+        "en": "Boundary: one item/base case/final run."
+      },
+      "failure_case": {
+        "vi": "Failure: sentinel thành data hoặc wrong mutation mode.",
+        "en": "Failure: sentinel becomes data or wrong mutation mode."
+      },
+      "representation_and_convention": [
+        "read-only recursion preserves queue",
+        "consume mode stops on exact empty result",
+        "run-length mode flushes final run"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b3.visual.list-setup",
+      "pattern_id": "LIST_SETUP",
+      "method_step_refs": [
+        "list-setup.step.contract",
+        "list-setup.step.storage",
+        "list-setup.step.live-head",
+        "list-setup.step.free-chain",
+        "list-setup.step.consistency"
+      ],
+      "error_refs": [
+        "b3.list-setup.error.physical-order",
+        "b3.list-setup.error.broken-free-partition"
+      ],
+      "learning_question": {
+        "vi": "Mỗi index thuộc live hay free chain?",
+        "en": "Does each index belong to the live or free chain?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "node table",
+        "live arrows",
+        "free arrows",
+        "head/free-head",
+        "null"
+      ],
+      "proposed_event_types": [
+        "CREATE_NODES",
+        "SET_HEAD",
+        "LINK_LIVE_CHAIN",
+        "SET_FREE_HEAD",
+        "LINK_FREE_CHAIN",
+        "CHECK_PARTITION"
+      ],
+      "predict_prompt": {
+        "vi": "Phân loại từng slot L/F trước reveal.",
+        "en": "Classify every slot L/F before reveal."
+      },
+      "normal_case": {
+        "vi": "Normal: live/free partition bao phủ capacity.",
+        "en": "Normal: live/free partition covers capacity."
+      },
+      "boundary_case": {
+        "vi": "Boundary: empty list, one free slot, object HeadNode=None.",
+        "en": "Boundary: empty list, one free slot, object HeadNode=None."
+      },
+      "failure_case": {
+        "vi": "Failure: slot trùng/mất hoặc chain có cycle.",
+        "en": "Failure: duplicated/lost slot or cyclic chain."
+      },
+      "representation_and_convention": [
+        "head is the first logical node",
+        "null terminates chains",
+        "array model may partition live/free nodes",
+        "object model uses references and no invented free list"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b3.visual.list-traverse",
+      "pattern_id": "LIST_TRAVERSE",
+      "method_step_refs": [
+        "list-traverse.step.contract",
+        "list-traverse.step.initialise",
+        "list-traverse.step.visit",
+        "list-traverse.step.advance",
+        "list-traverse.step.finish"
+      ],
+      "error_refs": [
+        "b3.list-traverse.error.cursor-plus-one",
+        "b3.list-traverse.error.wrong-stop"
+      ],
+      "learning_question": {
+        "vi": "Next thay đổi logical order ra sao?",
+        "en": "How does Next determine logical order?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "physical table",
+        "cursor",
+        "logical path",
+        "output prefix"
+      ],
+      "proposed_event_types": [
+        "SET_CURSOR_HEAD",
+        "VISIT_NODE",
+        "EMIT_DATA",
+        "FOLLOW_NEXT",
+        "STOP_AT_NULL"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn node kế tiếp, không dựa vào row kế.",
+        "en": "Choose the next node without using the next row."
+      },
+      "normal_case": {
+        "vi": "Normal: logical links nhảy qua physical rows.",
+        "en": "Normal: logical links jump across physical rows."
+      },
+      "boundary_case": {
+        "vi": "Boundary: empty và one-node tại index 0.",
+        "en": "Boundary: empty and one node at index 0."
+      },
+      "failure_case": {
+        "vi": "Failure: cursor+=1 hoặc wrong null check.",
+        "en": "Failure: cursor+=1 or wrong null check."
+      },
+      "representation_and_convention": [
+        "start at head",
+        "visit before advance",
+        "advance via Next",
+        "stop at exact null"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b3.visual.list-insert",
+      "pattern_id": "LIST_INSERT",
+      "method_step_refs": [
+        "list-insert.step.contract",
+        "list-insert.step.capacity-guard",
+        "list-insert.step.reserve",
+        "list-insert.step.write-node",
+        "list-insert.step.link",
+        "list-insert.step.postcheck"
+      ],
+      "error_refs": [
+        "b3.list-insert.error.overwrite-free-next",
+        "b3.list-insert.error.wrong-position",
+        "b3.list-insert.error.full-mutates"
+      ],
+      "learning_question": {
+        "vi": "Khi nào free node đổi quyền sở hữu?",
+        "en": "When does a free node change ownership?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "live/free chains",
+        "new index/object",
+        "saved free successor",
+        "head/tail"
+      ],
+      "proposed_event_types": [
+        "CHECK_FULL",
+        "SAVE_FREE_NEXT",
+        "RESERVE_NODE",
+        "WRITE_DATA",
+        "SET_NEW_NEXT",
+        "LINK_FRONT_OR_TAIL",
+        "CHECK_PARTITION"
+      ],
+      "predict_prompt": {
+        "vi": "Dự đoán link phải lưu trước write.",
+        "en": "Predict which link must be saved before the write."
+      },
+      "normal_case": {
+        "vi": "Normal: front và tail commit sau reserve.",
+        "en": "Normal: front and tail commit after reservation."
+      },
+      "boundary_case": {
+        "vi": "Boundary: empty, one free node, full.",
+        "en": "Boundary: empty, one free node, full."
+      },
+      "failure_case": {
+        "vi": "Failure: overwrite free Next hoặc link sai vị trí.",
+        "en": "Failure: overwrite free Next or link at wrong position."
+      },
+      "representation_and_convention": [
+        "save free-node successor before overwrite",
+        "front and tail insertion use distinct link commits",
+        "full failure preserves state"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    },
+    {
+      "visual_brief_id": "b3.visual.list-remove",
+      "pattern_id": "LIST_REMOVE",
+      "method_step_refs": [
+        "list-remove.step.contract",
+        "list-remove.step.search",
+        "list-remove.step.handle-miss",
+        "list-remove.step.unlink",
+        "list-remove.step.recycle",
+        "list-remove.step.postcheck"
+      ],
+      "error_refs": [
+        "b3.list-remove.error.head-as-interior",
+        "b3.list-remove.error.recycle-before-unlink",
+        "b3.list-remove.error.invented-absence"
+      ],
+      "learning_question": {
+        "vi": "Unlink và recycle phải theo thứ tự nào?",
+        "en": "In what order must unlink and recycle occur?"
+      },
+      "visual_mode": "event_driven",
+      "state_to_show": [
+        "previous/current",
+        "successor",
+        "live chain",
+        "free chain",
+        "result"
+      ],
+      "proposed_event_types": [
+        "SEARCH_NODE",
+        "CLASSIFY_HEAD_OR_INTERIOR",
+        "SAVE_SUCCESSOR",
+        "UNLINK_LIVE",
+        "RECYCLE_NODE",
+        "RETURN_RESULT",
+        "CHECK_PARTITION"
+      ],
+      "predict_prompt": {
+        "vi": "Chọn field thay đổi cho head/middle/tail.",
+        "en": "Choose changed fields for head/middle/tail."
+      },
+      "normal_case": {
+        "vi": "Normal: first match ở head/middle/tail.",
+        "en": "Normal: first match at head/middle/tail."
+      },
+      "boundary_case": {
+        "vi": "Boundary: one-node và absent object case.",
+        "en": "Boundary: one-node and absent object case."
+      },
+      "failure_case": {
+        "vi": "Failure: recycle trước unlink tạo lost live suffix.",
+        "en": "Failure: recycle before unlink loses the live suffix."
+      },
+      "representation_and_convention": [
+        "head case updates head",
+        "interior/tail case updates previous.Next",
+        "array model recycles after unlink",
+        "object model does not invent free-list state"
+      ],
+      "static_fallback": {
+        "vi": "Chuỗi snapshot before/event/after kèm bảng invariant và contract.",
+        "en": "A before/event/after snapshot strip with invariant and contract table."
+      },
+      "accessibility_notes": [
+        "Do not rely on colour alone; label live/free, success/failure and arrows in text.",
+        "Expose indices/references and event names to screen readers.",
+        "Provide keyboard step controls and a textual event log at Stage 7/8."
+      ],
+      "status": "PENDING_STAGE5_TRACE_AND_STAGE7_STORYBOARD"
+    }
+  ],
+  "self_checks": {
+    "brief_count": 9,
+    "event_driven_count": 9,
+    "one_per_pattern": true
+  }
+}

@@ -1,0 +1,1435 @@
+{
+  "schema_version": "paper4-v2-trace-chunk-v1",
+  "pattern_id": "GROUP_AGGREGATE",
+  "owner": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.search-collections",
+    "lesson_slug": "search-collections",
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.search-collections.production-v1",
+    "artifact_version": "production-v1",
+    "code_sha256": "33fac49f367d200746c1e4f42bcf1cb2b1624e7b04d1070bcabcf40178897f23"
+  },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.search-collections.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.search-collections",
+    "pattern_ids": [
+      "COUNT_OCCURRENCES",
+      "FILTER_RECORDS",
+      "GROUP_AGGREGATE",
+      "LINEAR_SEARCH"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "search-collections.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "search-collections.production-v1.L002",
+        "order": 2,
+        "text": ""
+      },
+      {
+        "line_id": "search-collections.production-v1.L003",
+        "order": 3,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "search-collections.production-v1.L004",
+        "order": 4,
+        "text": "    trace, found = [], -1"
+      },
+      {
+        "line_id": "search-collections.production-v1.L005",
+        "order": 5,
+        "text": "    values = fixture.get(\"values\", [])"
+      },
+      {
+        "line_id": "search-collections.production-v1.L006",
+        "order": 6,
+        "text": "    for index, value in enumerate(values):"
+      },
+      {
+        "line_id": "search-collections.production-v1.L007",
+        "order": 7,
+        "text": "        trace.append({\"event\": \"inspect\", \"index\": index, \"match\": value == fixture[\"target\"]})"
+      },
+      {
+        "line_id": "search-collections.production-v1.L008",
+        "order": 8,
+        "text": "        if found == -1 and value == fixture[\"target\"]:"
+      },
+      {
+        "line_id": "search-collections.production-v1.L009",
+        "order": 9,
+        "text": "            found = index"
+      },
+      {
+        "line_id": "search-collections.production-v1.L010",
+        "order": 10,
+        "text": "    records = fixture.get(\"records\", [])"
+      },
+      {
+        "line_id": "search-collections.production-v1.L011",
+        "order": 11,
+        "text": "    if any(\"group\" not in record or \"amount\" not in record for record in records):"
+      },
+      {
+        "line_id": "search-collections.production-v1.L012",
+        "order": 12,
+        "text": "        return {\"status\": \"MALFORMED_RECORD\", \"found\": found, \"groups\": {}, \"trace\": trace + [{\"event\": \"reject_record\"}]}"
+      },
+      {
+        "line_id": "search-collections.production-v1.L013",
+        "order": 13,
+        "text": "    groups, filtered = {}, []"
+      },
+      {
+        "line_id": "search-collections.production-v1.L014",
+        "order": 14,
+        "text": "    for record in records:"
+      },
+      {
+        "line_id": "search-collections.production-v1.L015",
+        "order": 15,
+        "text": "        groups[record[\"group\"]] = groups.get(record[\"group\"], 0) + record[\"amount\"]"
+      },
+      {
+        "line_id": "search-collections.production-v1.L016",
+        "order": 16,
+        "text": "        if record[\"amount\"] >= fixture[\"threshold\"]:"
+      },
+      {
+        "line_id": "search-collections.production-v1.L017",
+        "order": 17,
+        "text": "            filtered.append(record)"
+      },
+      {
+        "line_id": "search-collections.production-v1.L018",
+        "order": 18,
+        "text": "    return {\"status\": \"OK\", \"found\": found, \"count\": sum(value == fixture[\"target\"] for value in values), \"filtered\": filtered, \"groups\": groups, \"trace\": trace + [{\"event\": \"aggregate\", \"groups\": len(groups)}]}"
+      },
+      {
+        "line_id": "search-collections.production-v1.L019",
+        "order": 19,
+        "text": ""
+      },
+      {
+        "line_id": "search-collections.production-v1.L020",
+        "order": 20,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "search-collections.production-v1.L021",
+        "order": 21,
+        "text": "    import json"
+      },
+      {
+        "line_id": "search-collections.production-v1.L022",
+        "order": 22,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "search-collections.production-v1.L023",
+        "order": 23,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "search-collections.production-v1.L024",
+        "order": 24,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "search-collections.production-v1.L025",
+        "order": 25,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "search-collections.production-v1.L026",
+        "order": 26,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "search-collections.production-v1.L027",
+        "order": 27,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "search-collections.production-v1.L028",
+        "order": 28,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "33fac49f367d200746c1e4f42bcf1cb2b1624e7b04d1070bcabcf40178897f23",
+    "caption": {
+      "en": "Full-scan find, count, filter and group aggregation.",
+      "vi": "Tìm, đếm, lọc và gom nhóm bằng full scan."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.search-collections.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.search-collections.production-v1.independent-rerun",
+      "execution_log_sha256": "5e1b1cb95ef78df93359e9f6460b1a39e45ba4e3e2b270d3f4b073bd76a78644"
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.search-collections.group-aggregate.boundary.production-v1",
+      "case_kind": "boundary",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.boundary.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.search-collections.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "search-collections.boundary",
+        "fixture_input": {
+          "records": [],
+          "target": 9,
+          "threshold": 1,
+          "values": []
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.boundary.production-v1.event-001"
+      ],
+      "expected_output_ref": "search-collections.boundary.expected-output",
+      "fixture_ref": "search-collections.boundary"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.search-collections.group-aggregate.failure.production-v1",
+      "case_kind": "failure",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.search-collections.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "search-collections.failure",
+        "fixture_input": {
+          "records": [
+            {
+              "group": "A"
+            }
+          ],
+          "target": 2,
+          "threshold": 1,
+          "values": [
+            1
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "MALFORMED_RECORD"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1.event-002"
+      ],
+      "expected_output_ref": "search-collections.failure.expected-output",
+      "fixture_ref": "search-collections.failure"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.search-collections.group-aggregate.normal.production-v1",
+      "case_kind": "normal",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.search-collections.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-002",
+        "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-003",
+        "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-004",
+        "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-005"
+      ],
+      "expected_output_ref": "search-collections.normal.expected-output",
+      "fixture_ref": "search-collections.normal"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.boundary.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.boundary.production-v1",
+      "sequence": 0,
+      "event_type": "compare",
+      "active_line_ids": [
+        "search-collections.production-v1.L018",
+        "search-collections.production-v1.L007",
+        "search-collections.production-v1.L003"
+      ],
+      "before": {
+        "fixture_ref": "search-collections.boundary",
+        "fixture_input": {
+          "records": [],
+          "target": 9,
+          "threshold": 1,
+          "values": []
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "aggregate",
+          "groups": 0
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "search-collections.boundary",
+        "fixture_input": {
+          "records": [],
+          "target": 9,
+          "threshold": 1,
+          "values": []
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "aggregate",
+            "groups": 0
+          }
+        ],
+        "latest_event": "aggregate",
+        "execution_status": "OK",
+        "verified_result": {
+          "count": 0,
+          "filtered": [],
+          "found": -1,
+          "groups": {},
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "aggregate",
+          "groups": 0
+        },
+        "final_result": {
+          "count": 0,
+          "filtered": [],
+          "found": -1,
+          "groups": {},
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "GROUP_AGGREGATE: sự kiện aggregate phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "GROUP_AGGREGATE: event aggregate must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (aggregate)",
+        "en": "Which branch will the comparison select? (aggregate)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: aggregate.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: aggregate."
+      },
+      "visual_targets": [
+        "visual.group-aggregate.state",
+        "visual.group-aggregate.aggregate"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: aggregate",
+          "en": "Step 1: aggregate"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (aggregate)",
+          "en": "Which branch will the comparison select? (aggregate)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.boundary.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: aggregate.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: aggregate."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1",
+      "sequence": 0,
+      "event_type": "compare",
+      "active_line_ids": [
+        "search-collections.production-v1.L007",
+        "search-collections.production-v1.L003"
+      ],
+      "before": {
+        "fixture_ref": "search-collections.failure",
+        "fixture_input": {
+          "records": [
+            {
+              "group": "A"
+            }
+          ],
+          "target": 2,
+          "threshold": 1,
+          "values": [
+            1
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "MALFORMED_RECORD"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "inspect",
+          "index": 0,
+          "match": false
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "search-collections.failure",
+        "fixture_input": {
+          "records": [
+            {
+              "group": "A"
+            }
+          ],
+          "target": 2,
+          "threshold": 1,
+          "values": [
+            1
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": false
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "MALFORMED_RECORD"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "inspect",
+          "index": 0,
+          "match": false
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "GROUP_AGGREGATE: sự kiện inspect phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "GROUP_AGGREGATE: event inspect must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+        "en": "Which branch will the comparison select? (inspect)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+      },
+      "visual_targets": [
+        "visual.group-aggregate.state",
+        "visual.group-aggregate.inspect"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: inspect",
+          "en": "Step 1: inspect"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+          "en": "Which branch will the comparison select? (inspect)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1",
+      "sequence": 1,
+      "event_type": "reject",
+      "active_line_ids": [
+        "search-collections.production-v1.L012",
+        "search-collections.production-v1.L007",
+        "search-collections.production-v1.L010",
+        "search-collections.production-v1.L018"
+      ],
+      "before": {
+        "fixture_ref": "search-collections.failure",
+        "fixture_input": {
+          "records": [
+            {
+              "group": "A"
+            }
+          ],
+          "target": 2,
+          "threshold": 1,
+          "values": [
+            1
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": false
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "MALFORMED_RECORD"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reject_record"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "search-collections.failure",
+        "fixture_input": {
+          "records": [
+            {
+              "group": "A"
+            }
+          ],
+          "target": 2,
+          "threshold": 1,
+          "values": [
+            1
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": false
+          },
+          {
+            "event": "reject_record"
+          }
+        ],
+        "latest_event": "reject_record",
+        "execution_status": "MALFORMED_RECORD",
+        "verified_result": {
+          "found": -1,
+          "groups": {},
+          "status": "MALFORMED_RECORD"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reject_record"
+        },
+        "final_result": {
+          "found": -1,
+          "groups": {},
+          "status": "MALFORMED_RECORD"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "GROUP_AGGREGATE: sự kiện reject_record phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "GROUP_AGGREGATE: event reject_record must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (reject record)",
+        "en": "Which condition causes the input to be rejected? (reject record)"
+      },
+      "feedback": {
+        "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: reject record.",
+        "en": "The failure path stops or protects state at the exact guard. Event: reject record."
+      },
+      "visual_targets": [
+        "visual.group-aggregate.state",
+        "visual.group-aggregate.reject-record"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: reject_record",
+          "en": "Step 2: reject_record"
+        },
+        "action_description": {
+          "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (reject record)",
+          "en": "Which condition causes the input to be rejected? (reject record)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.failure.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "assertive",
+          "message": {
+            "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: reject record.",
+            "en": "The failure path stops or protects state at the exact guard. Event: reject record."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1",
+      "sequence": 0,
+      "event_type": "compare",
+      "active_line_ids": [
+        "search-collections.production-v1.L007",
+        "search-collections.production-v1.L003"
+      ],
+      "before": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "inspect",
+          "index": 0,
+          "match": true
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "inspect",
+          "index": 0,
+          "match": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "GROUP_AGGREGATE: sự kiện inspect phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "GROUP_AGGREGATE: event inspect must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+        "en": "Which branch will the comparison select? (inspect)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+      },
+      "visual_targets": [
+        "visual.group-aggregate.state",
+        "visual.group-aggregate.inspect"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: inspect",
+          "en": "Step 1: inspect"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+          "en": "Which branch will the comparison select? (inspect)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1",
+      "sequence": 1,
+      "event_type": "compare",
+      "active_line_ids": [
+        "search-collections.production-v1.L007",
+        "search-collections.production-v1.L003"
+      ],
+      "before": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "inspect",
+          "index": 1,
+          "match": false
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 1,
+            "match": false
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "inspect",
+          "index": 1,
+          "match": false
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "GROUP_AGGREGATE: sự kiện inspect phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "GROUP_AGGREGATE: event inspect must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+        "en": "Which branch will the comparison select? (inspect)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+      },
+      "visual_targets": [
+        "visual.group-aggregate.state",
+        "visual.group-aggregate.inspect"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: inspect",
+          "en": "Step 2: inspect"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+          "en": "Which branch will the comparison select? (inspect)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1",
+      "sequence": 2,
+      "event_type": "compare",
+      "active_line_ids": [
+        "search-collections.production-v1.L007",
+        "search-collections.production-v1.L003"
+      ],
+      "before": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 1,
+            "match": false
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "inspect",
+          "index": 2,
+          "match": true
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 1,
+            "match": false
+          },
+          {
+            "event": "inspect",
+            "index": 2,
+            "match": true
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "inspect",
+          "index": 2,
+          "match": true
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "GROUP_AGGREGATE: sự kiện inspect phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "GROUP_AGGREGATE: event inspect must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+        "en": "Which branch will the comparison select? (inspect)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+      },
+      "visual_targets": [
+        "visual.group-aggregate.state",
+        "visual.group-aggregate.inspect"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: inspect",
+          "en": "Step 3: inspect"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+          "en": "Which branch will the comparison select? (inspect)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-004",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1",
+      "sequence": 3,
+      "event_type": "compare",
+      "active_line_ids": [
+        "search-collections.production-v1.L007",
+        "search-collections.production-v1.L003"
+      ],
+      "before": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 1,
+            "match": false
+          },
+          {
+            "event": "inspect",
+            "index": 2,
+            "match": true
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "inspect",
+          "index": 3,
+          "match": false
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 1,
+            "match": false
+          },
+          {
+            "event": "inspect",
+            "index": 2,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 3,
+            "match": false
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "inspect",
+          "index": 3,
+          "match": false
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "GROUP_AGGREGATE: sự kiện inspect phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "GROUP_AGGREGATE: event inspect must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+        "en": "Which branch will the comparison select? (inspect)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+      },
+      "visual_targets": [
+        "visual.group-aggregate.state",
+        "visual.group-aggregate.inspect"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: inspect",
+          "en": "Step 4: inspect"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (inspect)",
+          "en": "Which branch will the comparison select? (inspect)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: inspect.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: inspect."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1",
+      "sequence": 4,
+      "event_type": "compare",
+      "active_line_ids": [
+        "search-collections.production-v1.L018",
+        "search-collections.production-v1.L007",
+        "search-collections.production-v1.L003"
+      ],
+      "before": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 1,
+            "match": false
+          },
+          {
+            "event": "inspect",
+            "index": 2,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 3,
+            "match": false
+          }
+        ],
+        "latest_event": "inspect",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "aggregate",
+          "groups": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "search-collections.normal",
+        "fixture_input": {
+          "records": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 2,
+              "group": "B"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "target": 4,
+          "threshold": 4,
+          "values": [
+            4,
+            2,
+            4,
+            8
+          ]
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "event": "inspect",
+            "index": 0,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 1,
+            "match": false
+          },
+          {
+            "event": "inspect",
+            "index": 2,
+            "match": true
+          },
+          {
+            "event": "inspect",
+            "index": 3,
+            "match": false
+          },
+          {
+            "event": "aggregate",
+            "groups": 2
+          }
+        ],
+        "latest_event": "aggregate",
+        "execution_status": "OK",
+        "verified_result": {
+          "count": 2,
+          "filtered": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "found": 0,
+          "groups": {
+            "A": 9,
+            "B": 2
+          },
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "aggregate",
+          "groups": 2
+        },
+        "final_result": {
+          "count": 2,
+          "filtered": [
+            {
+              "amount": 5,
+              "group": "A"
+            },
+            {
+              "amount": 4,
+              "group": "A"
+            }
+          ],
+          "found": 0,
+          "groups": {
+            "A": 9,
+            "B": 2
+          },
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "GROUP_AGGREGATE: sự kiện aggregate phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "GROUP_AGGREGATE: event aggregate must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (aggregate)",
+        "en": "Which branch will the comparison select? (aggregate)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: aggregate.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: aggregate."
+      },
+      "visual_targets": [
+        "visual.group-aggregate.state",
+        "visual.group-aggregate.aggregate"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: aggregate",
+          "en": "Step 5: aggregate"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (aggregate)",
+          "en": "Which branch will the comparison select? (aggregate)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.search-collections.group-aggregate.normal.production-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: aggregate.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: aggregate."
+          }
+        }
+      }
+    }
+  ]
+}

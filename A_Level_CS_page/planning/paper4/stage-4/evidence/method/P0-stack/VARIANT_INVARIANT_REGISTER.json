@@ -1,0 +1,282 @@
+{
+  "schema_version": "s4-schema-v1-p0-submission-1",
+  "status": "SUBMITTED",
+  "batch_id": "P0-stack",
+  "input_hashes": [
+    {
+      "path": "stage-2/EXAM_PATTERN_CATALOG.json",
+      "sha256": "eaa7e50e87932b2aa58c5f1d9415d2b8a63ccd6da43c9f2b714d3ee74585dd95"
+    },
+    {
+      "path": "stage-2/QUESTION_PATTERN_MAP.json",
+      "sha256": "2bc7a5fc2cd18eeb01e71c3b782f7c5ff0e6a7d780212f3e715e44a309c9318f"
+    },
+    {
+      "path": "stage-2/CONFUSABLE_PATTERNS.json",
+      "sha256": "74e9c079979c439b09257e9564854682e1cdeabb0193e13338dcf66c8666c244"
+    },
+    {
+      "path": "stage-3/BOOK_KNOWLEDGE_MAP.json",
+      "sha256": "5b81ed6a1b8028eeabbb9e44184dd9bab8864893893a6e0599a7fcf1043dd96a"
+    },
+    {
+      "path": "stage-3/COVERAGE_MATRIX.json",
+      "sha256": "e47f52bc29703f8f0fa03d2777d021cd51935c2e30127759c2dbf6f802345b5f"
+    },
+    {
+      "path": "stage-3/LESSON_PACKAGES.json",
+      "sha256": "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2"
+    },
+    {
+      "path": "stage-1/SOURCE_ISSUES.json",
+      "sha256": "7e9a8677b345327847d52a2aa88f293dc6898ef17944a63e6e05bb99daf9f588"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/MARKING_SUBMISSION.json",
+      "sha256": "431c3d6f520fae30852faa098b11e1f8a9210e8adc679cea99386431c8c321f4"
+    },
+    {
+      "path": "stage-4/evidence/marking/2021-2022/SOURCE_RISK_REGISTER.json",
+      "sha256": "e2065152d043e63e802239b56d13742836552449a126cb67007ea57750abf5cd"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/MARKING_SUBMISSION.json",
+      "sha256": "796e20019b38f0e214f9c8d073caed490aee80b8f916dea9e1ee8c4bec2d51bb"
+    },
+    {
+      "path": "stage-4/evidence/marking/2023-2024/SOURCE_RISK_REGISTER.json",
+      "sha256": "bd408ecb42a723923eb3b0b102b285e6046dfd27e414ae0aa521a3feb36591ef"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/MARKING_SUBMISSION.json",
+      "sha256": "3c460504352ff601d0423c2070b383f7b48e1a5746f2786a05732849a4f99f99"
+    },
+    {
+      "path": "stage-4/evidence/marking/2025/SOURCE_RISK_REGISTER.json",
+      "sha256": "35ab42f032dbcd7420f698c19024cc4d7361a73bf542b4e41263af9795494c18"
+    },
+    {
+      "path": "stage-4/schemas/pattern-card.schema.json",
+      "sha256": "00f88fc719c21a2c0259fdf2275bee108152636dddca0126f4c95f7552410e48"
+    },
+    {
+      "path": "stage-4/schemas/error-prevention.schema.json",
+      "sha256": "282ef2c7964a81cbb541d488ded8bf6439ebb75c8be9469021bc3f61f048294d"
+    },
+    {
+      "path": "stage-4/schemas/design-briefs.schema.json",
+      "sha256": "30748518ea993b1d4da4ae239f69d89bf2d9195fe4601518e45e6dbe1e7703d4"
+    }
+  ],
+  "variants": [
+    {
+      "variant_id": "p0.stack.variant.top-pointer",
+      "pattern_ids": [
+        "STACK_SETUP",
+        "STACK_PUSH",
+        "STACK_POP"
+      ],
+      "stage2_contrast_refs": [
+        "A3C16"
+      ],
+      "axis": "top_pointer_meaning",
+      "decision_rule": {
+        "vi": "Đọc định nghĩa/khởi tạo top trong QP rồi dùng đúng một hàng phương trình.",
+        "en": "Read the QP definition/initialisation of top and use exactly one equation row."
+      },
+      "cases": [
+        {
+          "case_id": "next_free",
+          "empty": "top=0",
+          "full": "top=capacity",
+          "live_indices": "0..top-1",
+          "push": "write stack[top], then top+=1",
+          "pop": "save stack[top-1], then top-=1",
+          "observed_parts": [
+            "9618_s22_42_1(a)",
+            "9618_s23_41_3(a)",
+            "9618_s23_43_3(a)",
+            "9618_w23_42_1(a)(ii)"
+          ]
+        },
+        {
+          "case_id": "current_top",
+          "empty": "top=-1",
+          "full": "top=capacity-1",
+          "live_indices": "0..top",
+          "push": "top+=1, then write stack[top]",
+          "pop": "save stack[top], then top-=1",
+          "observed_parts": [
+            "9618_s25_42_1(a)",
+            "9618_w25_41_1(a)"
+          ]
+        }
+      ],
+      "invariant": "Logical size is top for next-free and top+1 for current-top; all live indices are in range.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "p0.stack.variant.push-result",
+      "pattern_ids": [
+        "STACK_PUSH"
+      ],
+      "axis": "return_and_routing_contract",
+      "decision_rule": {
+        "vi": "Giữ nguyên type/literal và routing của từng QP; không chuẩn hóa sang Boolean.",
+        "en": "Preserve each QP's type/literal and routing; do not normalise to Boolean."
+      },
+      "cases": [
+        {
+          "case_id": "boolean",
+          "observed_parts": [
+            "9618_s22_42_1(c)",
+            "9618_s23_41_3(b)(i)",
+            "9618_s23_43_3(b)(i)",
+            "9618_w25_41_1(b)"
+          ]
+        },
+        {
+          "case_id": "integer_1_minus1",
+          "observed_parts": [
+            "9618_s25_42_1(b)"
+          ]
+        },
+        {
+          "case_id": "route_and_message",
+          "observed_parts": [
+            "9618_w23_42_1(b)(i)"
+          ]
+        }
+      ],
+      "invariant": "On failure state is unchanged; on success logical size increases by exactly one.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "p0.stack.variant.pop-empty-result",
+      "pattern_ids": [
+        "STACK_POP"
+      ],
+      "axis": "empty_sentinel_and_type",
+      "decision_rule": {
+        "vi": "Sentinel là một phần của giao diện caller; chép đúng literal và type từ QP.",
+        "en": "The sentinel is part of the caller interface; preserve the exact QP literal and type."
+      },
+      "cases": [
+        {
+          "case_id": "numeric_minus1",
+          "observed_parts": [
+            "9618_s22_42_1(e)(i)"
+          ]
+        },
+        {
+          "case_id": "empty_string",
+          "observed_parts": [
+            "9618_s23_41_3(b)(ii)",
+            "9618_s23_43_3(b)(ii)"
+          ]
+        },
+        {
+          "case_id": "no_data_string",
+          "observed_parts": [
+            "9618_w23_42_1(c)"
+          ]
+        },
+        {
+          "case_id": "string_minus1",
+          "observed_parts": [
+            "9618_s25_42_1(c)"
+          ]
+        },
+        {
+          "case_id": "numeric_minus999",
+          "observed_parts": [
+            "9618_w25_41_1(c)"
+          ]
+        }
+      ],
+      "invariant": "Empty Pop returns the exact sentinel without mutating top or live cells.",
+      "method_changing": true
+    },
+    {
+      "variant_id": "p0.stack.variant.pair-transaction",
+      "pattern_ids": [
+        "STACK_PAIR"
+      ],
+      "axis": "pair_success_and_rollback",
+      "decision_rule": {
+        "vi": "Commit hai Pop khi cả hai thành công; nếu đúng một thành công thì phục hồi item đó.",
+        "en": "Commit both Pops when both succeed; restore the sole successful item otherwise."
+      },
+      "cases": [
+        {
+          "case_id": "both_live",
+          "state_change": "sizeA-1,sizeB-1; output pair"
+        },
+        {
+          "case_id": "a_empty_b_live",
+          "state_change": "restore B; no net mutation"
+        },
+        {
+          "case_id": "a_live_b_empty",
+          "state_change": "restore A; no net mutation"
+        },
+        {
+          "case_id": "both_empty",
+          "state_change": "no restore; no mutation; no sentinel push; any adaptation message is explicitly AlgoCore_inference and is not an official Cambridge literal"
+        }
+      ],
+      "invariant": "A failed pairing leaves both logical stack states equal to their before-state.",
+      "method_changing": true,
+      "corpus_limit": "Only the 2023 mirrored OutputItem task is observed; both-empty is not explicitly specified.",
+      "lead_adjudication": {
+        "decision_id": "P0-STACK-PAIR",
+        "authority": "AlgoCore_inference",
+        "decision": "Use independent typed success/value results. Commit only when both succeed; restore the sole successful item exactly once; when both are empty, perform no restore, no mutation and no sentinel Push. Any adaptation message is explicitly AlgoCore_inference and is not an official Cambridge literal.",
+        "official_boundary": "The official source establishes one-sided restoration but does not explicitly specify both-empty behaviour.",
+        "stage5_obligation": "Execute all four cases and assert no sentinel is ever pushed as data."
+      }
+    },
+    {
+      "variant_id": "p0.stack.variant.reduce-protocol",
+      "pattern_ids": [
+        "STACK_REDUCE"
+      ],
+      "axis": "reduction_kind_operator_order_termination",
+      "decision_rule": {
+        "vi": "Dùng grammar dữ liệu và output contract để chọn invariant trước khi lặp.",
+        "en": "Use the data grammar and output contract to select the invariant before looping."
+      },
+      "cases": [
+        {
+          "case_id": "expression_left_fold",
+          "observed_parts": [
+            "9618_s25_42_1(e)"
+          ],
+          "operator_order": "total_before operator next_number",
+          "termination": "empty after complete pairs"
+        },
+        {
+          "case_id": "extrema",
+          "observed_parts": [
+            "9618_w25_41_1(e)"
+          ],
+          "operator_order": "not applicable",
+          "termination": "Pop until empty"
+        }
+      ],
+      "invariant": "Accumulator summarises exactly the consumed prefix and no sentinel is treated as live data.",
+      "method_changing": true
+    }
+  ],
+  "self_checks": {
+    "pattern_set": [
+      "STACK_SETUP",
+      "STACK_PUSH",
+      "STACK_POP",
+      "STACK_PAIR",
+      "STACK_REDUCE"
+    ],
+    "variant_count": 5,
+    "method_changing_variants": 5
+  }
+}

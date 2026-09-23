@@ -1,0 +1,952 @@
+{
+  "schema_version": "paper4-v2-trace-chunk-v1",
+  "pattern_id": "RULE_COMPUTE",
+  "owner": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.validation-rules",
+    "lesson_slug": "validation-rules",
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.validation-rules.production-v1",
+    "artifact_version": "production-v1",
+    "code_sha256": "7bc9d023d31808f2f97d0fb5e3d66f2d13d4cc11b05cef4c3ed26aaf066fad8f"
+  },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.validation-rules.production-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.validation-rules",
+    "pattern_ids": [
+      "CHECK_DIGIT",
+      "RULE_COMPUTE",
+      "UNIQUE_SELECTION",
+      "VALIDATE_INPUT"
+    ],
+    "version": "production-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "validation-rules.production-v1.L001",
+        "order": 1,
+        "text": "from pathlib import Path"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L002",
+        "order": 2,
+        "text": ""
+      },
+      {
+        "line_id": "validation-rules.production-v1.L003",
+        "order": 3,
+        "text": "def check_digit(code, weights, modulus):"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L004",
+        "order": 4,
+        "text": "    if not code.isdigit() or len(code) != len(weights) or modulus <= 1:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L005",
+        "order": 5,
+        "text": "        raise ValueError(\"invalid check-digit contract\")"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L006",
+        "order": 6,
+        "text": "    return sum(int(digit) * weight for digit, weight in zip(code, weights)) % modulus"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L007",
+        "order": 7,
+        "text": ""
+      },
+      {
+        "line_id": "validation-rules.production-v1.L008",
+        "order": 8,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L009",
+        "order": 9,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L010",
+        "order": 10,
+        "text": "    accepted = list(fixture.get(\"accepted\", []))"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L011",
+        "order": 11,
+        "text": "    candidate = fixture.get(\"candidate\")"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L012",
+        "order": 12,
+        "text": "    if not isinstance(candidate, int) or not fixture[\"minimum\"] <= candidate <= fixture[\"maximum\"]:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L013",
+        "order": 13,
+        "text": "        return {\"status\": \"INVALID_INPUT\", \"accepted\": accepted, \"trace\": [{\"event\": \"range_reject\", \"value\": candidate}]}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L014",
+        "order": 14,
+        "text": "    if candidate in accepted:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L015",
+        "order": 15,
+        "text": "        return {\"status\": \"DUPLICATE\", \"accepted\": accepted, \"trace\": [{\"event\": \"duplicate_reject\", \"value\": candidate}]}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L016",
+        "order": 16,
+        "text": "    try:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L017",
+        "order": 17,
+        "text": "        calculated = check_digit(fixture[\"code\"], fixture[\"weights\"], fixture[\"modulus\"])"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L018",
+        "order": 18,
+        "text": "    except (KeyError, TypeError, ValueError) as error:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L019",
+        "order": 19,
+        "text": "        return {\"status\": \"INVALID_CODE\", \"accepted\": accepted, \"message\": str(error), \"trace\": [{\"event\": \"code_reject\"}]}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L020",
+        "order": 20,
+        "text": "    trace.append({\"event\": \"check_digit\", \"calculated\": calculated})"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L021",
+        "order": 21,
+        "text": "    if calculated != fixture[\"supplied_digit\"]:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L022",
+        "order": 22,
+        "text": "        return {\"status\": \"CHECK_DIGIT_MISMATCH\", \"accepted\": accepted, \"calculated\": calculated, \"trace\": trace}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L023",
+        "order": 23,
+        "text": "    accepted.append(candidate)"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L024",
+        "order": 24,
+        "text": "    trace.append({\"event\": \"accept_unique\", \"value\": candidate})"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L025",
+        "order": 25,
+        "text": "    return {\"status\": \"ACCEPTED\", \"accepted\": accepted, \"calculated\": calculated, \"trace\": trace}"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L026",
+        "order": 26,
+        "text": ""
+      },
+      {
+        "line_id": "validation-rules.production-v1.L027",
+        "order": 27,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L028",
+        "order": 28,
+        "text": "    import json"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L029",
+        "order": 29,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L030",
+        "order": 30,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L031",
+        "order": 31,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L032",
+        "order": 32,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L033",
+        "order": 33,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L034",
+        "order": 34,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "validation-rules.production-v1.L035",
+        "order": 35,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "7bc9d023d31808f2f97d0fb5e3d66f2d13d4cc11b05cef4c3ed26aaf066fad8f",
+    "caption": {
+      "en": "Validation, unique selection and question-parameterised check digits.",
+      "vi": "Validation, lựa chọn duy nhất và check digit theo tham số đề."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r3.a3.validation-rules.production-v1.author-run",
+      "independent_rerun_ref": "p4r3.a3.validation-rules.production-v1.independent-rerun",
+      "execution_log_sha256": "a1188909e9c5e0fea0190aef9fb56eea86e3304b2332ccb387a9a69bf7b37b5b"
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.validation-rules.rule-compute.boundary.production-v1",
+      "case_kind": "boundary",
+      "trace_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.validation-rules.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "validation-rules.boundary",
+        "fixture_input": {
+          "accepted": [],
+          "candidate": 1,
+          "code": "007",
+          "maximum": 1,
+          "minimum": 1,
+          "modulus": 10,
+          "supplied_digit": 7,
+          "weights": [
+            3,
+            2,
+            1
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "ACCEPTED"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1.event-002"
+      ],
+      "expected_output_ref": "validation-rules.boundary.expected-output",
+      "fixture_ref": "validation-rules.boundary"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.validation-rules.rule-compute.failure.production-v1",
+      "case_kind": "failure",
+      "trace_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.failure.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.validation-rules.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "validation-rules.failure",
+        "fixture_input": {
+          "accepted": [
+            3
+          ],
+          "candidate": 3,
+          "code": "12X",
+          "maximum": 5,
+          "minimum": 1,
+          "modulus": 7,
+          "supplied_digit": 0,
+          "weights": [
+            1,
+            2,
+            3
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "DUPLICATE"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.failure.production-v1.event-001"
+      ],
+      "expected_output_ref": "validation-rules.failure.expected-output",
+      "fixture_ref": "validation-rules.failure"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.validation-rules.rule-compute.normal.production-v1",
+      "case_kind": "normal",
+      "trace_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.validation-rules.production-v1",
+      "artifact_version": "production-v1",
+      "initial_state": {
+        "fixture_ref": "validation-rules.normal",
+        "fixture_input": {
+          "accepted": [
+            2
+          ],
+          "candidate": 4,
+          "code": "123",
+          "maximum": 5,
+          "minimum": 1,
+          "modulus": 7,
+          "supplied_digit": 0,
+          "weights": [
+            1,
+            2,
+            3
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "ACCEPTED"
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1.event-001",
+        "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1.event-002"
+      ],
+      "expected_output_ref": "validation-rules.normal.expected-output",
+      "fixture_ref": "validation-rules.normal"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1",
+      "sequence": 0,
+      "event_type": "compare",
+      "active_line_ids": [
+        "validation-rules.production-v1.L020",
+        "validation-rules.production-v1.L003",
+        "validation-rules.production-v1.L005"
+      ],
+      "before": {
+        "fixture_ref": "validation-rules.boundary",
+        "fixture_input": {
+          "accepted": [],
+          "candidate": 1,
+          "code": "007",
+          "maximum": 1,
+          "minimum": 1,
+          "modulus": 10,
+          "supplied_digit": 7,
+          "weights": [
+            3,
+            2,
+            1
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "ACCEPTED"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "calculated": 7,
+          "event": "check_digit"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "validation-rules.boundary",
+        "fixture_input": {
+          "accepted": [],
+          "candidate": 1,
+          "code": "007",
+          "maximum": 1,
+          "minimum": 1,
+          "modulus": 10,
+          "supplied_digit": 7,
+          "weights": [
+            3,
+            2,
+            1
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "calculated": 7,
+            "event": "check_digit"
+          }
+        ],
+        "latest_event": "check_digit",
+        "execution_status": "ACCEPTED"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "calculated": 7,
+          "event": "check_digit"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "RULE_COMPUTE: sự kiện check_digit phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "RULE_COMPUTE: event check_digit must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (check digit)",
+        "en": "Which branch will the comparison select? (check digit)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: check digit.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: check digit."
+      },
+      "visual_targets": [
+        "visual.rule-compute.state",
+        "visual.rule-compute.check-digit"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: check_digit",
+          "en": "Step 1: check_digit"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (check digit)",
+          "en": "Which branch will the comparison select? (check digit)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: check digit.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: check digit."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1",
+      "sequence": 1,
+      "event_type": "assign",
+      "active_line_ids": [
+        "validation-rules.production-v1.L024",
+        "validation-rules.production-v1.L020",
+        "validation-rules.production-v1.L010",
+        "validation-rules.production-v1.L025"
+      ],
+      "before": {
+        "fixture_ref": "validation-rules.boundary",
+        "fixture_input": {
+          "accepted": [],
+          "candidate": 1,
+          "code": "007",
+          "maximum": 1,
+          "minimum": 1,
+          "modulus": 10,
+          "supplied_digit": 7,
+          "weights": [
+            3,
+            2,
+            1
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "calculated": 7,
+            "event": "check_digit"
+          }
+        ],
+        "latest_event": "check_digit",
+        "execution_status": "ACCEPTED"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "accept_unique",
+          "value": 1
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "validation-rules.boundary",
+        "fixture_input": {
+          "accepted": [],
+          "candidate": 1,
+          "code": "007",
+          "maximum": 1,
+          "minimum": 1,
+          "modulus": 10,
+          "supplied_digit": 7,
+          "weights": [
+            3,
+            2,
+            1
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "calculated": 7,
+            "event": "check_digit"
+          },
+          {
+            "event": "accept_unique",
+            "value": 1
+          }
+        ],
+        "latest_event": "accept_unique",
+        "execution_status": "ACCEPTED",
+        "verified_result": {
+          "accepted": [
+            1
+          ],
+          "calculated": 7,
+          "status": "ACCEPTED"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "accept_unique",
+          "value": 1
+        },
+        "final_result": {
+          "accepted": [
+            1
+          ],
+          "calculated": 7,
+          "status": "ACCEPTED"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "RULE_COMPUTE: sự kiện accept_unique phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "RULE_COMPUTE: event accept_unique must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Trạng thái nào thay đổi sau bước này? (accept unique)",
+        "en": "Which state changes after this step? (accept unique)"
+      },
+      "feedback": {
+        "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: accept unique.",
+        "en": "The new state preserves the event and values from the trace. Event: accept unique."
+      },
+      "visual_targets": [
+        "visual.rule-compute.state",
+        "visual.rule-compute.accept-unique"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: accept_unique",
+          "en": "Step 2: accept_unique"
+        },
+        "action_description": {
+          "vi": "Trạng thái nào thay đổi sau bước này? (accept unique)",
+          "en": "Which state changes after this step? (accept unique)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.boundary.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: accept unique.",
+            "en": "The new state preserves the event and values from the trace. Event: accept unique."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.failure.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.failure.production-v1",
+      "sequence": 0,
+      "event_type": "reject",
+      "active_line_ids": [
+        "validation-rules.production-v1.L015",
+        "validation-rules.production-v1.L020",
+        "validation-rules.production-v1.L024",
+        "validation-rules.production-v1.L025"
+      ],
+      "before": {
+        "fixture_ref": "validation-rules.failure",
+        "fixture_input": {
+          "accepted": [
+            3
+          ],
+          "candidate": 3,
+          "code": "12X",
+          "maximum": 5,
+          "minimum": 1,
+          "modulus": 7,
+          "supplied_digit": 0,
+          "weights": [
+            1,
+            2,
+            3
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "DUPLICATE"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "duplicate_reject",
+          "value": 3
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "validation-rules.failure",
+        "fixture_input": {
+          "accepted": [
+            3
+          ],
+          "candidate": 3,
+          "code": "12X",
+          "maximum": 5,
+          "minimum": 1,
+          "modulus": 7,
+          "supplied_digit": 0,
+          "weights": [
+            1,
+            2,
+            3
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "event": "duplicate_reject",
+            "value": 3
+          }
+        ],
+        "latest_event": "duplicate_reject",
+        "execution_status": "DUPLICATE",
+        "verified_result": {
+          "accepted": [
+            3
+          ],
+          "status": "DUPLICATE"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "duplicate_reject",
+          "value": 3
+        },
+        "final_result": {
+          "accepted": [
+            3
+          ],
+          "status": "DUPLICATE"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "RULE_COMPUTE: sự kiện duplicate_reject phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "RULE_COMPUTE: event duplicate_reject must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (duplicate reject)",
+        "en": "Which condition causes the input to be rejected? (duplicate reject)"
+      },
+      "feedback": {
+        "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: duplicate reject.",
+        "en": "The failure path stops or protects state at the exact guard. Event: duplicate reject."
+      },
+      "visual_targets": [
+        "visual.rule-compute.state",
+        "visual.rule-compute.duplicate-reject"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: duplicate_reject",
+          "en": "Step 1: duplicate_reject"
+        },
+        "action_description": {
+          "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (duplicate reject)",
+          "en": "Which condition causes the input to be rejected? (duplicate reject)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.failure.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "assertive",
+          "message": {
+            "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: duplicate reject.",
+            "en": "The failure path stops or protects state at the exact guard. Event: duplicate reject."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1",
+      "sequence": 0,
+      "event_type": "compare",
+      "active_line_ids": [
+        "validation-rules.production-v1.L020",
+        "validation-rules.production-v1.L003",
+        "validation-rules.production-v1.L005"
+      ],
+      "before": {
+        "fixture_ref": "validation-rules.normal",
+        "fixture_input": {
+          "accepted": [
+            2
+          ],
+          "candidate": 4,
+          "code": "123",
+          "maximum": 5,
+          "minimum": 1,
+          "modulus": 7,
+          "supplied_digit": 0,
+          "weights": [
+            1,
+            2,
+            3
+          ]
+        },
+        "trace_cursor": 0,
+        "history": [],
+        "latest_event": null,
+        "execution_status": "ACCEPTED"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "calculated": 0,
+          "event": "check_digit"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "validation-rules.normal",
+        "fixture_input": {
+          "accepted": [
+            2
+          ],
+          "candidate": 4,
+          "code": "123",
+          "maximum": 5,
+          "minimum": 1,
+          "modulus": 7,
+          "supplied_digit": 0,
+          "weights": [
+            1,
+            2,
+            3
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "calculated": 0,
+            "event": "check_digit"
+          }
+        ],
+        "latest_event": "check_digit",
+        "execution_status": "ACCEPTED"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "calculated": 0,
+          "event": "check_digit"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "RULE_COMPUTE: sự kiện check_digit phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "RULE_COMPUTE: event check_digit must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (check digit)",
+        "en": "Which branch will the comparison select? (check digit)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: check digit.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: check digit."
+      },
+      "visual_targets": [
+        "visual.rule-compute.state",
+        "visual.rule-compute.check-digit"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: check_digit",
+          "en": "Step 1: check_digit"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (check digit)",
+          "en": "Which branch will the comparison select? (check digit)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: check digit.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: check digit."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1",
+      "sequence": 1,
+      "event_type": "assign",
+      "active_line_ids": [
+        "validation-rules.production-v1.L024",
+        "validation-rules.production-v1.L020",
+        "validation-rules.production-v1.L010",
+        "validation-rules.production-v1.L025"
+      ],
+      "before": {
+        "fixture_ref": "validation-rules.normal",
+        "fixture_input": {
+          "accepted": [
+            2
+          ],
+          "candidate": 4,
+          "code": "123",
+          "maximum": 5,
+          "minimum": 1,
+          "modulus": 7,
+          "supplied_digit": 0,
+          "weights": [
+            1,
+            2,
+            3
+          ]
+        },
+        "trace_cursor": 1,
+        "history": [
+          {
+            "calculated": 0,
+            "event": "check_digit"
+          }
+        ],
+        "latest_event": "check_digit",
+        "execution_status": "ACCEPTED"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "accept_unique",
+          "value": 4
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "validation-rules.normal",
+        "fixture_input": {
+          "accepted": [
+            2
+          ],
+          "candidate": 4,
+          "code": "123",
+          "maximum": 5,
+          "minimum": 1,
+          "modulus": 7,
+          "supplied_digit": 0,
+          "weights": [
+            1,
+            2,
+            3
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "calculated": 0,
+            "event": "check_digit"
+          },
+          {
+            "event": "accept_unique",
+            "value": 4
+          }
+        ],
+        "latest_event": "accept_unique",
+        "execution_status": "ACCEPTED",
+        "verified_result": {
+          "accepted": [
+            2,
+            4
+          ],
+          "calculated": 0,
+          "status": "ACCEPTED"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "accept_unique",
+          "value": 4
+        },
+        "final_result": {
+          "accepted": [
+            2,
+            4
+          ],
+          "calculated": 0,
+          "status": "ACCEPTED"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "RULE_COMPUTE: sự kiện accept_unique phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "RULE_COMPUTE: event accept_unique must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Trạng thái nào thay đổi sau bước này? (accept unique)",
+        "en": "Which state changes after this step? (accept unique)"
+      },
+      "feedback": {
+        "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: accept unique.",
+        "en": "The new state preserves the event and values from the trace. Event: accept unique."
+      },
+      "visual_targets": [
+        "visual.rule-compute.state",
+        "visual.rule-compute.accept-unique"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: accept_unique",
+          "en": "Step 2: accept_unique"
+        },
+        "action_description": {
+          "vi": "Trạng thái nào thay đổi sau bước này? (accept unique)",
+          "en": "Which state changes after this step? (accept unique)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.validation-rules.rule-compute.normal.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: accept unique.",
+            "en": "The new state preserves the event and values from the trace. Event: accept unique."
+          }
+        }
+      }
+    }
+  ]
+}

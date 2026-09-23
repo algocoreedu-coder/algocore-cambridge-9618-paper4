@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://algocore.education/schema/paper4/v2.0.0",
+  "title": "AlgoCore A Level 9618 Paper 4 canonical artifact envelope",
+  "description": "Canonical authoring contract for paper4-2026-s9-v2. Every document is a typed envelope; cross-document invariants are enforced by scripts/check-paper4-v2-schema.mjs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "record"],
+  "properties": {
+    "schema_version": { "const": "2.0.0" },
+    "artifact_type": {
+      "enum": [
+        "KnowledgeUnit",
+        "PythonArtifact",
+        "VisualScenarioTrace",
+        "VisualEventBinding",
+        "LessonReleaseRecord",
+        "MarkingChain",
+        "AssessmentItem"
+      ]
+    },
+    "record": { "type": "object" }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/KnowledgeUnitEnvelope" },
+    { "$ref": "#/$defs/PythonArtifactEnvelope" },
+    { "$ref": "#/$defs/VisualScenarioTraceEnvelope" },
+    { "$ref": "#/$defs/VisualEventBindingEnvelope" },
+    { "$ref": "#/$defs/LessonReleaseRecordEnvelope" },
+    { "$ref": "#/$defs/MarkingChainEnvelope" },
+    { "$ref": "#/$defs/AssessmentItemEnvelope" }
+  ],
+  "$defs": {
+    "StableId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "NonEmptyString": { "type": "string", "minLength": 1 },
+    "Sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "StableIdArray": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/StableId" },
+      "uniqueItems": true
+    },
+    "NonEmptyStableIdArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/StableId" },
+      "uniqueItems": true
+    },
+    "Bilingual": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vi", "en"],
+      "properties": {
+        "vi": { "$ref": "#/$defs/NonEmptyString" },
+        "en": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "VisualAccessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accessible_label", "action_description", "interaction_role", "keyboard_instruction", "focus_target", "focus_order", "live_status"],
+      "properties": {
+        "accessible_label": { "$ref": "#/$defs/Bilingual" },
+        "action_description": { "$ref": "#/$defs/Bilingual" },
+        "interaction_role": { "enum": ["status", "step", "control", "code-line", "diagram-node"] },
+        "keyboard_instruction": { "$ref": "#/$defs/Bilingual" },
+        "focus_target": { "$ref": "#/$defs/StableId" },
+        "focus_order": { "type": "integer", "minimum": 0 },
+        "live_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "message"],
+          "properties": {
+            "mode": { "enum": ["off", "polite", "assertive"] },
+            "message": { "$ref": "#/$defs/Bilingual" }
+          }
+        }
+      }
+    },
+    "SourceLocator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id"],
+      "properties": {
+        "source_id": { "$ref": "#/$defs/StableId" },
+        "pdf_page": { "type": "integer", "minimum": 1 },
+        "printed_page": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1 },
+            { "$ref": "#/$defs/NonEmptyString" }
+          ]
+        },
+        "heading": { "$ref": "#/$defs/NonEmptyString" },
+        "bullet_locator": { "$ref": "#/$defs/NonEmptyString" },
+        "anchor_text": { "$ref": "#/$defs/NonEmptyString" }
+      },
+      "anyOf": [
+        { "required": ["pdf_page"] },
+        { "required": ["printed_page"] },
+        { "required": ["heading"] },
+        { "required": ["bullet_locator"] },
+        { "required": ["anchor_text"] }
+      ]
+    },
+    "StableLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["line_id", "order", "text"],
+      "properties": {
+        "line_id": { "$ref": "#/$defs/StableId" },
+        "order": { "type": "integer", "minimum": 1 },
+        "text": { "type": "string" }
+      }
+    },
+    "Fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixture_id", "case_kind", "input"],
+      "properties": {
+        "fixture_id": { "$ref": "#/$defs/StableId" },
+        "case_kind": { "enum": ["normal", "boundary", "failure"] },
+        "input": {}
+      }
+    },
+    "ExpectedOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected_output_id", "fixture_ref", "value"],
+      "properties": {
+        "expected_output_id": { "$ref": "#/$defs/StableId" },
+        "fixture_ref": { "$ref": "#/$defs/StableId" },
+        "value": {}
+      }
+    },
+    "KnowledgeUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "knowledge_unit_id", "lesson_id", "stage3_block_ids", "disposition", "version",
+        "objective_refs", "book_refs", "title", "explanation", "python_connection",
+        "representation", "invariant_or_rule", "misconceptions", "exam_signals",
+        "micro_example", "self_check", "author", "reviewer", "status"
+      ],
+      "properties": {
+        "knowledge_unit_id": { "$ref": "#/$defs/StableId" },
+        "lesson_id": { "$ref": "#/$defs/StableId" },
+        "stage3_block_ids": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "disposition": { "enum": ["publish", "merge", "prerequisite-link", "exclude-with-authority"] },
+        "version": { "$ref": "#/$defs/NonEmptyString" },
+        "objective_refs": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["objective_id", "syllabus_version", "locator"],
+            "properties": {
+              "objective_id": { "$ref": "#/$defs/StableId" },
+              "syllabus_version": { "$ref": "#/$defs/NonEmptyString" },
+              "locator": { "$ref": "#/$defs/SourceLocator" }
+            }
+          }
+        },
+        "book_refs": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["section_id", "chapter", "printed_pages", "pdf_pages", "relationship"],
+            "properties": {
+              "section_id": { "$ref": "#/$defs/StableId" },
+              "chapter": { "type": "integer", "minimum": 1 },
+              "printed_pages": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } },
+              "pdf_pages": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } },
+              "relationship": { "$ref": "#/$defs/NonEmptyString" }
+            }
+          }
+        },
+        "title": { "$ref": "#/$defs/Bilingual" },
+        "explanation": { "$ref": "#/$defs/Bilingual" },
+        "python_connection": { "$ref": "#/$defs/Bilingual" },
+        "representation": { "$ref": "#/$defs/Bilingual" },
+        "invariant_or_rule": { "$ref": "#/$defs/Bilingual" },
+        "misconceptions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/Bilingual" } },
+        "exam_signals": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/Bilingual" } },
+        "micro_example": { "type": "object" },
+        "self_check": { "type": "object" },
+        "author": { "$ref": "#/$defs/NonEmptyString" },
+        "reviewer": { "$ref": "#/$defs/NonEmptyString" },
+        "status": { "enum": ["draft", "source-reviewed", "pedagogy-reviewed", "approved", "excluded"] }
+      }
+    },
+    "PythonArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "python_artifact_id", "lesson_id", "pattern_ids", "version", "filename", "language",
+        "lines", "entry_point", "fixtures", "expected_outputs", "normal_boundary_failure_coverage",
+        "stage5_source_refs", "author_run_ref", "independent_rerun_ref", "execution_log_sha256",
+        "syntax_status", "execution_status", "code_sha256", "caption", "status"
+      ],
+      "properties": {
+        "python_artifact_id": { "$ref": "#/$defs/StableId" },
+        "lesson_id": { "$ref": "#/$defs/StableId" },
+        "pattern_ids": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "version": { "$ref": "#/$defs/NonEmptyString" },
+        "filename": { "type": "string", "pattern": "\\.py$" },
+        "language": { "const": "python" },
+        "lines": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/StableLine" } },
+        "entry_point": { "$ref": "#/$defs/NonEmptyString" },
+        "fixtures": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/Fixture" } },
+        "expected_outputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/ExpectedOutput" } },
+        "normal_boundary_failure_coverage": {
+          "type": "object", "additionalProperties": false,
+          "required": ["normal", "boundary", "failure"],
+          "properties": { "normal": { "type": "boolean" }, "boundary": { "type": "boolean" }, "failure": { "type": "boolean" } }
+        },
+        "stage5_source_refs": { "$ref": "#/$defs/StableIdArray" },
+        "author_run_ref": { "$ref": "#/$defs/StableId" },
+        "independent_rerun_ref": { "$ref": "#/$defs/StableId" },
+        "execution_log_sha256": { "$ref": "#/$defs/Sha256" },
+        "syntax_status": { "const": "PASS" },
+        "execution_status": { "const": "PASS" },
+        "code_sha256": { "$ref": "#/$defs/Sha256" },
+        "caption": { "$ref": "#/$defs/Bilingual" },
+        "status": { "enum": ["draft", "executed", "independently-rerun", "approved"] }
+      }
+    },
+    "VisualScenarioTrace": {
+      "type": "object", "additionalProperties": false,
+      "required": ["pattern_id", "scenario_id", "case_kind", "trace_id", "python_artifact_id", "artifact_version", "initial_state", "event_ids", "expected_output_ref", "fixture_ref", "execution_evidence_ref"],
+      "properties": {
+        "pattern_id": { "$ref": "#/$defs/StableId" },
+        "scenario_id": { "$ref": "#/$defs/StableId" },
+        "case_kind": { "enum": ["normal", "boundary", "failure"] },
+        "trace_id": { "$ref": "#/$defs/StableId" },
+        "python_artifact_id": { "$ref": "#/$defs/StableId" },
+        "artifact_version": { "$ref": "#/$defs/NonEmptyString" },
+        "initial_state": {},
+        "event_ids": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "expected_output_ref": { "$ref": "#/$defs/StableId" },
+        "fixture_ref": { "$ref": "#/$defs/StableId" },
+        "execution_evidence_ref": { "$ref": "#/$defs/StableId" },
+        "equivalence_justification": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "VisualEventBinding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["event_id", "trace_id", "sequence", "event_type", "active_line_ids", "before", "delta", "after", "output_delta", "invariant_or_criterion", "prediction", "feedback", "visual_targets", "accessibility"],
+      "properties": {
+        "event_id": { "$ref": "#/$defs/StableId" },
+        "trace_id": { "$ref": "#/$defs/StableId" },
+        "sequence": { "type": "integer", "minimum": 0 },
+        "event_type": { "$ref": "#/$defs/StableId" },
+        "active_line_ids": { "$ref": "#/$defs/StableIdArray" },
+        "before": {}, "delta": {}, "after": {}, "output_delta": {},
+        "invariant_or_criterion": { "$ref": "#/$defs/Bilingual" },
+        "prediction": { "$ref": "#/$defs/Bilingual" },
+        "feedback": { "$ref": "#/$defs/Bilingual" },
+        "visual_targets": { "$ref": "#/$defs/StableIdArray" },
+        "accessibility": { "$ref": "#/$defs/VisualAccessibility" }
+      }
+    },
+    "SourceRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_id", "authority", "access_mode", "locator"],
+      "properties": {
+        "source_id": { "$ref": "#/$defs/StableId" },
+        "authority": { "enum": ["Cambridge_syllabus", "Cambridge_coursebook", "Cambridge_QP_MS", "AlgoCore_authored"] },
+        "access_mode": { "enum": ["public-citation", "licensed-internal", "internal-authored"] },
+        "locator": { "$ref": "#/$defs/SourceLocator" }
+      }
+    },
+    "LessonReleaseRecord": {
+      "type": "object", "additionalProperties": false,
+      "required": ["lesson_id", "package_id", "slug", "version", "canonical_section_ids", "knowledge_unit_ids", "python_artifact_ids", "pattern_ids", "method_refs", "marking_refs", "error_refs", "practice_refs", "retrieval_refs", "source_refs", "locale_parity", "academic_review", "execution_review", "ux_review", "lead_gate", "release_allowed"],
+      "properties": {
+        "lesson_id": { "$ref": "#/$defs/StableId" },
+        "package_id": { "$ref": "#/$defs/StableId" },
+        "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "version": { "$ref": "#/$defs/NonEmptyString" },
+        "canonical_section_ids": { "type": "array", "minItems": 10, "maxItems": 10, "items": { "$ref": "#/$defs/StableId" }, "uniqueItems": true },
+        "knowledge_unit_ids": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "python_artifact_ids": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "pattern_ids": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "method_refs": { "$ref": "#/$defs/StableIdArray" },
+        "marking_refs": { "$ref": "#/$defs/StableIdArray" },
+        "error_refs": { "$ref": "#/$defs/StableIdArray" },
+        "practice_refs": { "$ref": "#/$defs/StableIdArray" },
+        "retrieval_refs": { "$ref": "#/$defs/StableIdArray" },
+        "source_refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/SourceRef" } },
+        "locale_parity": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "academic_review": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "execution_review": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "ux_review": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "lead_gate": { "enum": ["PASS", "FAIL", "PENDING"] },
+        "release_allowed": { "type": "boolean" }
+      }
+    },
+    "MarkingAtom": {
+      "type": "object", "additionalProperties": false,
+      "required": ["atom_id", "authority", "criterion", "locator"],
+      "properties": {
+        "atom_id": { "$ref": "#/$defs/StableId" },
+        "authority": { "enum": ["Cambridge_QP_MS", "AlgoCore_authored_rubric"] },
+        "criterion": { "$ref": "#/$defs/Bilingual" },
+        "locator": { "$ref": "#/$defs/SourceLocator" }
+      }
+    },
+    "MarkingChain": {
+      "type": "object", "additionalProperties": false,
+      "required": ["marking_chain_id", "pattern_id", "lesson_id", "requirement_ref", "method_step_refs", "error_ref", "detection_check", "repair_check", "marking_atoms", "limited_evidence", "transfer_limit", "reviewer", "status"],
+      "properties": {
+        "marking_chain_id": { "$ref": "#/$defs/StableId" },
+        "pattern_id": { "$ref": "#/$defs/StableId" },
+        "lesson_id": { "$ref": "#/$defs/StableId" },
+        "requirement_ref": { "$ref": "#/$defs/StableId" },
+        "method_step_refs": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "error_ref": { "$ref": "#/$defs/StableId" },
+        "detection_check": { "$ref": "#/$defs/Bilingual" },
+        "repair_check": { "$ref": "#/$defs/Bilingual" },
+        "marking_atoms": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/MarkingAtom" } },
+        "limited_evidence": { "type": "boolean" },
+        "transfer_limit": { "$ref": "#/$defs/Bilingual" },
+        "reviewer": { "$ref": "#/$defs/NonEmptyString" },
+        "status": { "enum": ["draft", "reviewed", "approved"] }
+      }
+    },
+    "AssessmentItem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["assessment_item_id", "lesson_id", "pattern_ids", "assessment_requirement_ids", "destination_id", "level", "prompt", "shared_fixture_code_data_ids", "expected_artifact", "hint", "feedback", "self_rubric", "disclosure_contract"],
+      "properties": {
+        "assessment_item_id": { "$ref": "#/$defs/StableId" },
+        "lesson_id": { "$ref": "#/$defs/StableId" },
+        "pattern_ids": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "assessment_requirement_ids": { "$ref": "#/$defs/NonEmptyStableIdArray" },
+        "destination_id": { "$ref": "#/$defs/StableId" },
+        "level": { "enum": ["guided", "faded", "independent", "retrieval"] },
+        "prompt": { "$ref": "#/$defs/Bilingual" },
+        "shared_fixture_code_data_ids": { "$ref": "#/$defs/StableIdArray" },
+        "expected_artifact": { "$ref": "#/$defs/Bilingual" },
+        "hint": { "$ref": "#/$defs/Bilingual" },
+        "feedback": { "$ref": "#/$defs/Bilingual" },
+        "self_rubric": { "type": "object" },
+        "disclosure_contract": {
+          "type": "object", "additionalProperties": false,
+          "required": ["answer_hidden_initially", "hint_hidden_initially", "feedback_after_attempt"],
+          "properties": {
+            "answer_hidden_initially": { "const": true },
+            "hint_hidden_initially": { "const": true },
+            "feedback_after_attempt": { "const": true }
+          }
+        }
+      }
+    },
+    "KnowledgeUnitEnvelope": {
+      "properties": { "artifact_type": { "const": "KnowledgeUnit" }, "record": { "$ref": "#/$defs/KnowledgeUnit" } }
+    },
+    "PythonArtifactEnvelope": {
+      "properties": { "artifact_type": { "const": "PythonArtifact" }, "record": { "$ref": "#/$defs/PythonArtifact" } }
+    },
+    "VisualScenarioTraceEnvelope": {
+      "properties": { "artifact_type": { "const": "VisualScenarioTrace" }, "record": { "$ref": "#/$defs/VisualScenarioTrace" } }
+    },
+    "VisualEventBindingEnvelope": {
+      "properties": { "artifact_type": { "const": "VisualEventBinding" }, "record": { "$ref": "#/$defs/VisualEventBinding" } }
+    },
+    "LessonReleaseRecordEnvelope": {
+      "properties": { "artifact_type": { "const": "LessonReleaseRecord" }, "record": { "$ref": "#/$defs/LessonReleaseRecord" } }
+    },
+    "MarkingChainEnvelope": {
+      "properties": { "artifact_type": { "const": "MarkingChain" }, "record": { "$ref": "#/$defs/MarkingChain" } }
+    },
+    "AssessmentItemEnvelope": {
+      "properties": { "artifact_type": { "const": "AssessmentItem" }, "record": { "$ref": "#/$defs/AssessmentItem" } }
+    }
+  },
+  "x-algocore-cross-document-invariants": [
+    "All record identities are globally unique inside an artifact type.",
+    "Python line_id and order are unique and order is contiguous from one within one artifact version.",
+    "A trace resolves the exact Python artifact version, fixture, expected output, execution evidence and pattern.",
+    "Every event resolves its trace and every active_line_id resolves in that trace's exact Python artifact version.",
+    "Trace event_ids and event sequence form the same complete ordered set.",
+    "Cambridge authority is only valid with an approved authority enum and a precise source locator.",
+    "Assessment answers, hints and feedback follow the disclosure contract before rendering."
+  ]
+}

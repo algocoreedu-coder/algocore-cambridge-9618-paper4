@@ -1,0 +1,104 @@
+{
+  "schema_version": "s4-a8-marking-method-ownership-qa-v1",
+  "status": "PASS_RECOMMENDED",
+  "recommendation": "Accept the ownership layer. The eight required semantic overrides and the MARKING_MAP authority-boundary correction were independently rechecked on the current canonical hashes.",
+  "canonical_hashes": {
+    "MARKING_METHOD_OWNERSHIP.json": "d39536121a19e97cfc9197f398baa312c0a76e96ef0f62fce4d15c5b4b783256",
+    "MARKING_MAP.json": "f68dabcc50a1990273c4e6e4de3350d9a8bfc6641b99c5be345077a7bfc16a1e",
+    "PATTERN_CARDS.json": "3a15111707a3ec2dfc3e9449422d7472af107b6e8a9d9f10785f54284574a798"
+  },
+  "counts": {
+    "ownership_decisions": 2236,
+    "cross_batch_duplicate_resolutions": 182,
+    "cross_batch_parts": 32,
+    "candidate_owner_families": 22,
+    "part_order_resolutions": 174,
+    "semantic_override_resolutions": 8,
+    "semantically_acceptable_cross_batch_resolutions": 182,
+    "semantic_owner_misjoins": 0,
+    "ms_locators_checked": 2236,
+    "qp_locators_checked": 672,
+    "duplicate_canonical_top_level_ownership": 0,
+    "missing_canonical_top_level_ownership": 0
+  },
+  "passed_checks": [
+    "Exactly 182 decisions have more than one raw batch-card candidate: 174 retain part-pattern order and eight use the reviewed semantic override rule.",
+    "All 2236 marking atoms have exactly one decision and exactly one canonical PATTERN_CARDS.marking_point_refs owner.",
+    "Candidate lists independently rebuilt from P0/B1-B8 submissions match all 2236 recorded candidate lists.",
+    "All current owners are both candidates and Stage 2 assessed patterns; the eight semantic overrides match the directly assessed operations.",
+    "All MARKING_MAP method_owner_pattern_id values match the ownership registry and all method_step_refs exactly equal the selected card's ordered step IDs.",
+    "All 2236 MS source IDs/pages and all 672 QP source IDs/pages match the live marking submissions.",
+    "MARKING_MAP now distinguishes official QP/MS evidence from AlgoCore coordination joins."
+  ],
+  "findings": [
+    {
+      "finding_id": "A8-OWN-REQ-001",
+      "severity": "required",
+      "status": "CLOSED",
+      "title": "Eight cross-batch atoms are joined to a primary-part method that does not teach the directly assessed operation",
+      "cause": "build_method_canonical.py resolves every duplicate by the first assessed pattern in part order. That deterministic part-level rule is too coarse for these atom-level criteria.",
+      "affected_atoms": [
+        {
+          "marking_point_id": "MP-9618-W24-41-2-C-II-01",
+          "previous_owner": "VALIDATE_INPUT",
+          "current_owner": "OOP_INSTANTIATE",
+          "reason": "The criterion is declaration/use of the Fence object container; VALIDATE_INPUT only teaches predicate/read/retry/exit, while OOP_INSTANTIATE teaches the constructor destination and storage container."
+        },
+        {
+          "marking_point_id": "MP-9618-W24-41-2-C-II-03",
+          "previous_owner": "VALIDATE_INPUT",
+          "current_owner": "OOP_INSTANTIATE",
+          "reason": "The criterion explicitly awards constructing each Fence and storing it in the array."
+        },
+        {
+          "marking_point_id": "MP-9618-W24-43-2-C-II-01",
+          "previous_owner": "VALIDATE_INPUT",
+          "current_owner": "OOP_INSTANTIATE",
+          "reason": "Duplicate-paper counterpart of the Fence container criterion."
+        },
+        {
+          "marking_point_id": "MP-9618-W24-43-2-C-II-03",
+          "previous_owner": "VALIDATE_INPUT",
+          "current_owner": "OOP_INSTANTIATE",
+          "reason": "Duplicate-paper counterpart of the Fence construction/storage criterion."
+        },
+        {
+          "marking_point_id": "MP-9618-S24-42-2-B-I-01",
+          "previous_owner": "TREE_SETUP",
+          "current_owner": "OOP_CLASS",
+          "reason": "The complete criterion is the class header/end; only OOP_CLASS has explicit class declaration and constructor structure steps."
+        },
+        {
+          "marking_point_id": "9618_s25_41_3(c)(i).mp.01",
+          "previous_owner": "TREE_SETUP",
+          "current_owner": "OOP_CLASS",
+          "reason": "The atom directly awards the Tree class header and one-parameter constructor header."
+        },
+        {
+          "marking_point_id": "9618_s25_43_3(b)(i).mp.01",
+          "previous_owner": "LIST_SETUP",
+          "current_owner": "OOP_CLASS",
+          "reason": "The atom directly awards the LinkedList class header and zero-parameter constructor header."
+        },
+        {
+          "marking_point_id": "9618_w25_43_1(b)(i).mp.04",
+          "previous_owner": "DATA_STORAGE",
+          "current_owner": "OOP_INSTANTIATE",
+          "reason": "The atom requires a BoardObject constructed and stored in every 2D cell; OOP_INSTANTIATE explicitly requires a distinct nested-array instance per slot and preserves constructor arguments."
+        }
+      ],
+      "required_correction": "Support explicit atom-owner overrides during canonical merge, regenerate MARKING_METHOD_OWNERSHIP.json, PATTERN_CARDS.json and MARKING_MAP.json, and retain the remaining 174 resolutions unchanged.",
+      "resolution": "Closed: the eight reviewed atoms now use cross_batch_duplicate_semantic_override_after_a8_review and all regenerated owner/method joins pass."
+    },
+    {
+      "finding_id": "A8-OWN-REQ-002",
+      "severity": "required",
+      "status": "CLOSED",
+      "title": "MARKING_MAP authority metadata still says method links are empty",
+      "evidence": "MARKING_MAP.authority_boundary ends with: Method links remain empty until pattern-card merge. All 2236 atoms now contain populated method owner and step links.",
+      "required_correction": "Replace the stale pre-merge sentence with the current authority boundary: official QP/MS locators remain authoritative, while method-owner and method-step links are AlgoCore coordination guidance and do not allocate additional marks.",
+      "resolution": "Closed: the current authority boundary makes that distinction explicitly."
+    }
+  ],
+  "supporting_validator": "evidence/qa/final/support/validate_marking_method_ownership.py"
+}

@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "wave": "S9-D",
+  "owner": "A6_LANGUAGE_UX_INDEPENDENT_RECHECK",
+  "reviewed_at": "2026-09-22T18:05:00+07:00",
+  "decision": "PASS",
+  "required_open_findings": 0,
+  "review_mode": "independent source inspection, live HTTP, Chrome headless CDP, TypeScript and reducer verification",
+  "tools": [
+    "PowerShell Invoke-WebRequest",
+    "installed Google Chrome headless with Chrome DevTools Protocol",
+    "stage-9/evidence/s9-d/ux/verify-ux-runtime.mjs",
+    "TypeScript compiler",
+    "Stage 8 reducer verifier"
+  ],
+  "implementation_changes": [
+    {
+      "file": "algocore-fumadocs/app/AppProviders.tsx",
+      "change": "Replaced unqualified provider strings with exact Fumadocs 16 contextual translation keys.",
+      "reason": "Vietnamese provider chrome previously rendered English labels.",
+      "recheck": "PASS_VI_EN_LIVE_RENDER"
+    },
+    {
+      "file": "algocore-fumadocs/app/components/paper4-learning/LocaleBoundary.tsx",
+      "change": "Set the non-semantic locale wrapper to display: contents.",
+      "reason": "The wrapper prevented the nested main element from occupying the Fumadocs named grid area at 320px.",
+      "recheck": "PASS_320PX_GRID_AND_STATE"
+    }
+  ],
+  "checks": [
+    {
+      "id": "S9D-UX-01",
+      "area": "initial VI and EN locale",
+      "result": "PASS",
+      "evidence": "VI: html lang=vi, localized title, Trong bài này, Đổi giao diện sáng tối, Mở điều hướng. EN: html lang=en and matching English chrome. Ten blocks in each locale; zero hydration errors."
+    },
+    {
+      "id": "S9D-UX-02",
+      "area": "responsive 320px",
+      "result": "PASS",
+      "evidence": "innerWidth=320, documentScrollWidth=320, main width=320, lesson/runtime width=288 at x=16..304, no page overflow."
+    },
+    {
+      "id": "S9D-UX-03",
+      "area": "dark theme",
+      "result": "PASS",
+      "evidence": "html dark class active; runtime ink #edf8f4, paper #111c18, computed foreground rgb(237,248,244), background rgb(17,28,24)."
+    },
+    {
+      "id": "S9D-UX-04",
+      "area": "prefers-reduced-motion",
+      "result": "PASS",
+      "evidence": "Emulated reduce media query matched; progress transition and animation computed to 0.01ms."
+    },
+    {
+      "id": "S9D-UX-05",
+      "area": "keyboard and focus",
+      "result": "PASS",
+      "evidence": "Real Tab events reached navigation, sidebar, TOC, skip, locale and source controls; runtime traversal reached select, locale controls, input and next/play/reset. 20 of 20 sampled stops had visible outlines."
+    },
+    {
+      "id": "S9D-UX-06",
+      "area": "heading hierarchy",
+      "result": "PASS",
+      "evidence": "Rendered page has one h1, ten canonical block h2 elements and the embedded runtime title is h3."
+    },
+    {
+      "id": "S9D-UX-07",
+      "area": "locale navigation state",
+      "result": "PASS",
+      "evidence": "VI to EN preserved /paper-4/lessons/binary-tree, #action-view, TREE_SEARCH, boundary scenario, event index 2 and input revision 1; html/runtime locale became en."
+    },
+    {
+      "id": "S9D-UX-08",
+      "area": "zero-pattern static fallback",
+      "result": "PASS",
+      "evidence": "testing lesson mounted zero dynamic runtimes and one localized role=note with the full Visual Lab link."
+    },
+    {
+      "id": "S9D-UX-09",
+      "area": "type and reducer regression",
+      "result": "PASS",
+      "evidence": "npm run typecheck exited 0; npm run stage8:reducer passed 9 actions and 27 assertions."
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "S9R-UX-REQ-001",
+      "severity": "P1",
+      "required": true,
+      "status": "CLOSED_VERIFIED",
+      "verified_by": "A6_LANGUAGE_UX_INDEPENDENT_RECHECK",
+      "evidence": "Initial document locale and Fumadocs provider chrome match VI/EN after contextual-key repair."
+    },
+    {
+      "finding_id": "S9R-UX-REQ-002",
+      "severity": "P1",
+      "required": true,
+      "status": "CLOSED_VERIFIED",
+      "verified_by": "A6_LANGUAGE_UX_INDEPENDENT_RECHECK",
+      "evidence": "The rendered Action View block has an h2 followed by the embedded runtime h3."
+    },
+    {
+      "finding_id": "S9R-UX-REQ-003",
+      "severity": "P1",
+      "required": true,
+      "status": "CLOSED_VERIFIED",
+      "verified_by": "A6_LANGUAGE_UX_INDEPENDENT_RECHECK",
+      "evidence": "Registry route, responsive, theme, motion, keyboard, state and fallback browser matrix passed."
+    },
+    {
+      "finding_id": "S9D-UX-REQ-004",
+      "severity": "P1",
+      "required": true,
+      "status": "CLOSED_VERIFIED",
+      "owner": "A6_LANGUAGE_UX_REPAIR",
+      "evidence": "LocaleBoundary wrapper initially compressed the 320px main track to 90px; display: contents restored the main track to 320px and runtime to 288px without losing locale state."
+    }
+  ]
+}

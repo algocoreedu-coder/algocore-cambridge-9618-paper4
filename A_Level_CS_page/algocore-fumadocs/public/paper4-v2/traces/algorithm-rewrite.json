@@ -1,0 +1,1636 @@
+{
+  "schema_version": "paper4-v2-trace-chunk-v1",
+  "pattern_id": "ALGORITHM_REWRITE",
+  "owner": {
+    "lesson_id": "ac-9618-p4-2026-python.lesson.recursion",
+    "lesson_slug": "recursion",
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.recursion.pilot-v1",
+    "artifact_version": "pilot-v1",
+    "code_sha256": "a0c6beff519ebca4336936749f540d5639dc236eece615ddc56cbf24f04ae05c"
+  },
+  "python_artifact": {
+    "python_artifact_id": "ac-9618-p4-2026-python.artifact.recursion.pilot-v1",
+    "lesson_id": "ac-9618-p4-2026-python.lesson.recursion",
+    "pattern_ids": [
+      "ALGORITHM_REWRITE"
+    ],
+    "version": "pilot-v1",
+    "language": "python",
+    "lines": [
+      {
+        "line_id": "recursion.v1.L001",
+        "order": 1,
+        "text": "import json"
+      },
+      {
+        "line_id": "recursion.v1.L002",
+        "order": 2,
+        "text": "import sys"
+      },
+      {
+        "line_id": "recursion.v1.L003",
+        "order": 3,
+        "text": ""
+      },
+      {
+        "line_id": "recursion.v1.L004",
+        "order": 4,
+        "text": ""
+      },
+      {
+        "line_id": "recursion.v1.L005",
+        "order": 5,
+        "text": "def recursive_sum(values, index, trace):"
+      },
+      {
+        "line_id": "recursion.v1.L006",
+        "order": 6,
+        "text": "    trace.append({\"event\": \"call\", \"index\": index})"
+      },
+      {
+        "line_id": "recursion.v1.L007",
+        "order": 7,
+        "text": "    if index == len(values):"
+      },
+      {
+        "line_id": "recursion.v1.L008",
+        "order": 8,
+        "text": "        trace.append({\"event\": \"base_case\", \"index\": index, \"result\": 0})"
+      },
+      {
+        "line_id": "recursion.v1.L009",
+        "order": 9,
+        "text": "        return 0"
+      },
+      {
+        "line_id": "recursion.v1.L010",
+        "order": 10,
+        "text": "    subtotal = recursive_sum(values, index + 1, trace)"
+      },
+      {
+        "line_id": "recursion.v1.L011",
+        "order": 11,
+        "text": "    result = values[index] + subtotal"
+      },
+      {
+        "line_id": "recursion.v1.L012",
+        "order": 12,
+        "text": "    trace.append({\"event\": \"return\", \"index\": index, \"value\": values[index], \"result\": result})"
+      },
+      {
+        "line_id": "recursion.v1.L013",
+        "order": 13,
+        "text": "    return result"
+      },
+      {
+        "line_id": "recursion.v1.L014",
+        "order": 14,
+        "text": ""
+      },
+      {
+        "line_id": "recursion.v1.L015",
+        "order": 15,
+        "text": ""
+      },
+      {
+        "line_id": "recursion.v1.L016",
+        "order": 16,
+        "text": "def iterative_sum(values):"
+      },
+      {
+        "line_id": "recursion.v1.L017",
+        "order": 17,
+        "text": "    total = 0"
+      },
+      {
+        "line_id": "recursion.v1.L018",
+        "order": 18,
+        "text": "    for value in values:"
+      },
+      {
+        "line_id": "recursion.v1.L019",
+        "order": 19,
+        "text": "        total += value"
+      },
+      {
+        "line_id": "recursion.v1.L020",
+        "order": 20,
+        "text": "    return total"
+      },
+      {
+        "line_id": "recursion.v1.L021",
+        "order": 21,
+        "text": ""
+      },
+      {
+        "line_id": "recursion.v1.L022",
+        "order": 22,
+        "text": ""
+      },
+      {
+        "line_id": "recursion.v1.L023",
+        "order": 23,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "recursion.v1.L024",
+        "order": 24,
+        "text": "    values = fixture[\"values\"]"
+      },
+      {
+        "line_id": "recursion.v1.L025",
+        "order": 25,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "recursion.v1.L026",
+        "order": 26,
+        "text": "    if not all(isinstance(value, int) for value in values):"
+      },
+      {
+        "line_id": "recursion.v1.L027",
+        "order": 27,
+        "text": "        trace.append({\"event\": \"reject_non_integer\"})"
+      },
+      {
+        "line_id": "recursion.v1.L028",
+        "order": 28,
+        "text": "        return {\"status\": \"INVALID_VALUE\", \"trace\": trace}"
+      },
+      {
+        "line_id": "recursion.v1.L029",
+        "order": 29,
+        "text": "    recursive_result = recursive_sum(values, 0, trace)"
+      },
+      {
+        "line_id": "recursion.v1.L030",
+        "order": 30,
+        "text": "    iterative_result = iterative_sum(values)"
+      },
+      {
+        "line_id": "recursion.v1.L031",
+        "order": 31,
+        "text": "    return {"
+      },
+      {
+        "line_id": "recursion.v1.L032",
+        "order": 32,
+        "text": "        \"status\": \"OK\" if recursive_result == iterative_result else \"MISMATCH\","
+      },
+      {
+        "line_id": "recursion.v1.L033",
+        "order": 33,
+        "text": "        \"recursive_result\": recursive_result,"
+      },
+      {
+        "line_id": "recursion.v1.L034",
+        "order": 34,
+        "text": "        \"iterative_result\": iterative_result,"
+      },
+      {
+        "line_id": "recursion.v1.L035",
+        "order": 35,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "recursion.v1.L036",
+        "order": 36,
+        "text": "    }"
+      },
+      {
+        "line_id": "recursion.v1.L037",
+        "order": 37,
+        "text": ""
+      },
+      {
+        "line_id": "recursion.v1.L038",
+        "order": 38,
+        "text": ""
+      },
+      {
+        "line_id": "recursion.v1.L039",
+        "order": 39,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "recursion.v1.L040",
+        "order": 40,
+        "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
+      },
+      {
+        "line_id": "recursion.v1.L041",
+        "order": 41,
+        "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
+      },
+      {
+        "line_id": "recursion.v1.L042",
+        "order": 42,
+        "text": ""
+      }
+    ],
+    "entry_point": "run(fixture)",
+    "code_sha256": "a0c6beff519ebca4336936749f540d5639dc236eece615ddc56cbf24f04ae05c",
+    "caption": {
+      "vi": "Tổng đệ quy có base case, quá trình unwind và phép đối chiếu với phiên bản lặp.",
+      "en": "A recursive sum with a base case, unwind trace and iterative equivalence check."
+    },
+    "execution": {
+      "syntax_status": "PASS",
+      "execution_status": "PASS",
+      "author_run_ref": "p4r2.a3.recursion.pilot-v1.author-run",
+      "independent_rerun_ref": "p4r2.a3.recursion.pilot-v1.independent-rerun",
+      "execution_log_sha256": "f85f850d89810281d472521dddc8c11650cb2e6721e2f403e727d0addbc74ea0"
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.recursion.algorithm-rewrite.boundary.pilot-v1",
+      "case_kind": "boundary",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.recursion.pilot-v1",
+      "artifact_version": "pilot-v1",
+      "initial_state": {
+        "fixture_ref": "recursion.boundary",
+        "fixture_input": {
+          "values": []
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "values": [],
+          "call_stack": [],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1.event-001",
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1.event-002"
+      ],
+      "expected_output_ref": "recursion.boundary.expected-output",
+      "fixture_ref": "recursion.boundary"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.recursion.algorithm-rewrite.failure.pilot-v1",
+      "case_kind": "failure",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.failure.pilot-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.recursion.pilot-v1",
+      "artifact_version": "pilot-v1",
+      "initial_state": {
+        "fixture_ref": "recursion.failure",
+        "fixture_input": {
+          "values": [
+            4,
+            "seven",
+            2
+          ]
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "values": [
+            4,
+            "seven",
+            2
+          ],
+          "call_stack": [],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.failure.pilot-v1.event-001"
+      ],
+      "expected_output_ref": "recursion.failure.expected-output",
+      "fixture_ref": "recursion.failure"
+    },
+    {
+      "scenario_id": "ac-9618-p4-2026-python.scenario.recursion.algorithm-rewrite.normal.pilot-v1",
+      "case_kind": "normal",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "python_artifact_id": "ac-9618-p4-2026-python.artifact.recursion.pilot-v1",
+      "artifact_version": "pilot-v1",
+      "initial_state": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "event_ids": [
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-001",
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-002",
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-003",
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-004",
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-005",
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-006",
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-007",
+        "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-008"
+      ],
+      "expected_output_ref": "recursion.normal.expected-output",
+      "fixture_ref": "recursion.normal"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1",
+      "sequence": 0,
+      "event_type": "call",
+      "active_line_ids": [
+        "recursion.v1.L005",
+        "recursion.v1.L006",
+        "recursion.v1.L007"
+      ],
+      "before": {
+        "fixture_ref": "recursion.boundary",
+        "fixture_input": {
+          "values": []
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "values": [],
+          "call_stack": [],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "call",
+          "index": 0
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.boundary",
+        "fixture_input": {
+          "values": []
+        },
+        "trace_cursor": 1,
+        "last_event": "call",
+        "domain": {
+          "values": [],
+          "call_stack": [
+            0
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "call",
+          "index": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện call phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event call must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Frame đệ quy mới mang chỉ số nào?",
+        "en": "Which index belongs to the new recursive frame?"
+      },
+      "feedback": {
+        "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+        "en": "A new frame is pushed with the current index."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.call"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: call",
+          "en": "Step 1: call"
+        },
+        "action_description": {
+          "vi": "Frame đệ quy mới mang chỉ số nào?",
+          "en": "Which index belongs to the new recursive frame?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+            "en": "A new frame is pushed with the current index."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1",
+      "sequence": 1,
+      "event_type": "branch",
+      "active_line_ids": [
+        "recursion.v1.L007",
+        "recursion.v1.L008",
+        "recursion.v1.L009",
+        "recursion.v1.L016",
+        "recursion.v1.L017",
+        "recursion.v1.L018",
+        "recursion.v1.L019",
+        "recursion.v1.L020",
+        "recursion.v1.L029",
+        "recursion.v1.L030",
+        "recursion.v1.L031",
+        "recursion.v1.L032",
+        "recursion.v1.L033",
+        "recursion.v1.L034",
+        "recursion.v1.L035"
+      ],
+      "before": {
+        "fixture_ref": "recursion.boundary",
+        "fixture_input": {
+          "values": []
+        },
+        "trace_cursor": 1,
+        "last_event": "call",
+        "domain": {
+          "values": [],
+          "call_stack": [
+            0
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "base_case",
+          "index": 0,
+          "result": 0
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.boundary",
+        "fixture_input": {
+          "values": []
+        },
+        "trace_cursor": 2,
+        "last_event": "base_case",
+        "domain": {
+          "values": [],
+          "call_stack": [],
+          "returned": {
+            "0": 0
+          },
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "base_case",
+          "index": 0,
+          "result": 0
+        },
+        "final_result": {
+          "iterative_result": 0,
+          "recursive_result": 0,
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện base_case phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event base_case must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Điều kiện dừng đã đạt chưa?",
+        "en": "Has the stopping condition been reached?"
+      },
+      "feedback": {
+        "vi": "index bằng độ dài tạo giá trị cơ sở 0.",
+        "en": "An index equal to the length produces the base value 0."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.base_case"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: base_case",
+          "en": "Step 2: base_case"
+        },
+        "action_description": {
+          "vi": "Điều kiện dừng đã đạt chưa?",
+          "en": "Has the stopping condition been reached?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.boundary.pilot-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "index bằng độ dài tạo giá trị cơ sở 0.",
+            "en": "An index equal to the length produces the base value 0."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.failure.pilot-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.failure.pilot-v1",
+      "sequence": 0,
+      "event_type": "reject",
+      "active_line_ids": [
+        "recursion.v1.L026",
+        "recursion.v1.L027",
+        "recursion.v1.L028"
+      ],
+      "before": {
+        "fixture_ref": "recursion.failure",
+        "fixture_input": {
+          "values": [
+            4,
+            "seven",
+            2
+          ]
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "values": [
+            4,
+            "seven",
+            2
+          ],
+          "call_stack": [],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reject_non_integer"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.failure",
+        "fixture_input": {
+          "values": [
+            4,
+            "seven",
+            2
+          ]
+        },
+        "trace_cursor": 1,
+        "last_event": "reject_non_integer",
+        "domain": {
+          "values": [
+            4,
+            "seven",
+            2
+          ],
+          "call_stack": [],
+          "returned": {},
+          "status": "INVALID_VALUE"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reject_non_integer"
+        },
+        "final_result": {
+          "status": "INVALID_VALUE"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện reject_non_integer phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event reject_non_integer must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Dữ liệu có giữ invariant số nguyên không?",
+        "en": "Does the data preserve the integer invariant?"
+      },
+      "feedback": {
+        "vi": "Giá trị không phải số nguyên bị chặn trước lời gọi đệ quy.",
+        "en": "A non-integer is blocked before the recursive call."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.reject_non_integer"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: reject_non_integer",
+          "en": "Step 1: reject_non_integer"
+        },
+        "action_description": {
+          "vi": "Dữ liệu có giữ invariant số nguyên không?",
+          "en": "Does the data preserve the integer invariant?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.failure.pilot-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "assertive",
+          "message": {
+            "vi": "Giá trị không phải số nguyên bị chặn trước lời gọi đệ quy.",
+            "en": "A non-integer is blocked before the recursive call."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-001",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "sequence": 0,
+      "event_type": "call",
+      "active_line_ids": [
+        "recursion.v1.L005",
+        "recursion.v1.L006",
+        "recursion.v1.L007"
+      ],
+      "before": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 0,
+        "last_event": null,
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "call",
+          "index": 0
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 1,
+        "last_event": "call",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "call",
+          "index": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện call phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event call must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Frame đệ quy mới mang chỉ số nào?",
+        "en": "Which index belongs to the new recursive frame?"
+      },
+      "feedback": {
+        "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+        "en": "A new frame is pushed with the current index."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.call"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 1: call",
+          "en": "Step 1: call"
+        },
+        "action_description": {
+          "vi": "Frame đệ quy mới mang chỉ số nào?",
+          "en": "Which index belongs to the new recursive frame?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-001.focus",
+        "focus_order": 0,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+            "en": "A new frame is pushed with the current index."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-002",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "sequence": 1,
+      "event_type": "call",
+      "active_line_ids": [
+        "recursion.v1.L005",
+        "recursion.v1.L006",
+        "recursion.v1.L007"
+      ],
+      "before": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 1,
+        "last_event": "call",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "call",
+          "index": 1
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 2,
+        "last_event": "call",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "call",
+          "index": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện call phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event call must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Frame đệ quy mới mang chỉ số nào?",
+        "en": "Which index belongs to the new recursive frame?"
+      },
+      "feedback": {
+        "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+        "en": "A new frame is pushed with the current index."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.call"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: call",
+          "en": "Step 2: call"
+        },
+        "action_description": {
+          "vi": "Frame đệ quy mới mang chỉ số nào?",
+          "en": "Which index belongs to the new recursive frame?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+            "en": "A new frame is pushed with the current index."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "sequence": 2,
+      "event_type": "call",
+      "active_line_ids": [
+        "recursion.v1.L005",
+        "recursion.v1.L006",
+        "recursion.v1.L007"
+      ],
+      "before": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 2,
+        "last_event": "call",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "call",
+          "index": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 3,
+        "last_event": "call",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1,
+            2
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "call",
+          "index": 2
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện call phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event call must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Frame đệ quy mới mang chỉ số nào?",
+        "en": "Which index belongs to the new recursive frame?"
+      },
+      "feedback": {
+        "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+        "en": "A new frame is pushed with the current index."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.call"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: call",
+          "en": "Step 3: call"
+        },
+        "action_description": {
+          "vi": "Frame đệ quy mới mang chỉ số nào?",
+          "en": "Which index belongs to the new recursive frame?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+            "en": "A new frame is pushed with the current index."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-004",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "sequence": 3,
+      "event_type": "call",
+      "active_line_ids": [
+        "recursion.v1.L005",
+        "recursion.v1.L006",
+        "recursion.v1.L007"
+      ],
+      "before": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 3,
+        "last_event": "call",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1,
+            2
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "call",
+          "index": 3
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 4,
+        "last_event": "call",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "call",
+          "index": 3
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện call phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event call must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Frame đệ quy mới mang chỉ số nào?",
+        "en": "Which index belongs to the new recursive frame?"
+      },
+      "feedback": {
+        "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+        "en": "A new frame is pushed with the current index."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.call"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: call",
+          "en": "Step 4: call"
+        },
+        "action_description": {
+          "vi": "Frame đệ quy mới mang chỉ số nào?",
+          "en": "Which index belongs to the new recursive frame?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Một frame mới được đẩy với chỉ số hiện tại.",
+            "en": "A new frame is pushed with the current index."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "sequence": 4,
+      "event_type": "branch",
+      "active_line_ids": [
+        "recursion.v1.L007",
+        "recursion.v1.L008",
+        "recursion.v1.L009"
+      ],
+      "before": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 4,
+        "last_event": "call",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "returned": {},
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "base_case",
+          "index": 3,
+          "result": 0
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 5,
+        "last_event": "base_case",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1,
+            2
+          ],
+          "returned": {
+            "3": 0
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "base_case",
+          "index": 3,
+          "result": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện base_case phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event base_case must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Điều kiện dừng đã đạt chưa?",
+        "en": "Has the stopping condition been reached?"
+      },
+      "feedback": {
+        "vi": "index bằng độ dài tạo giá trị cơ sở 0.",
+        "en": "An index equal to the length produces the base value 0."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.base_case"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: base_case",
+          "en": "Step 5: base_case"
+        },
+        "action_description": {
+          "vi": "Điều kiện dừng đã đạt chưa?",
+          "en": "Has the stopping condition been reached?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "index bằng độ dài tạo giá trị cơ sở 0.",
+            "en": "An index equal to the length produces the base value 0."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-006",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "sequence": 5,
+      "event_type": "return",
+      "active_line_ids": [
+        "recursion.v1.L010",
+        "recursion.v1.L011",
+        "recursion.v1.L012",
+        "recursion.v1.L013"
+      ],
+      "before": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 5,
+        "last_event": "base_case",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1,
+            2
+          ],
+          "returned": {
+            "3": 0
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "return",
+          "index": 2,
+          "result": 2,
+          "value": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 6,
+        "last_event": "return",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1
+          ],
+          "returned": {
+            "2": 2,
+            "3": 0
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "return",
+          "index": 2,
+          "result": 2,
+          "value": 2
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện return phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event return must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Frame này trả tổng từng phần nào?",
+        "en": "Which subtotal does this frame return?"
+      },
+      "feedback": {
+        "vi": "Frame hiện tại cộng giá trị của nó rồi trả kết quả lên frame gọi.",
+        "en": "The current frame adds its value and returns the result to its caller."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.return"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 6: return",
+          "en": "Step 6: return"
+        },
+        "action_description": {
+          "vi": "Frame này trả tổng từng phần nào?",
+          "en": "Which subtotal does this frame return?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-006.focus",
+        "focus_order": 5,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Frame hiện tại cộng giá trị của nó rồi trả kết quả lên frame gọi.",
+            "en": "The current frame adds its value and returns the result to its caller."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-007",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "sequence": 6,
+      "event_type": "return",
+      "active_line_ids": [
+        "recursion.v1.L010",
+        "recursion.v1.L011",
+        "recursion.v1.L012",
+        "recursion.v1.L013"
+      ],
+      "before": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 6,
+        "last_event": "return",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0,
+            1
+          ],
+          "returned": {
+            "2": 2,
+            "3": 0
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "return",
+          "index": 1,
+          "result": 9,
+          "value": 7
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 7,
+        "last_event": "return",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0
+          ],
+          "returned": {
+            "1": 9,
+            "2": 2,
+            "3": 0
+          },
+          "status": "READY"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "return",
+          "index": 1,
+          "result": 9,
+          "value": 7
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện return phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event return must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Frame này trả tổng từng phần nào?",
+        "en": "Which subtotal does this frame return?"
+      },
+      "feedback": {
+        "vi": "Frame hiện tại cộng giá trị của nó rồi trả kết quả lên frame gọi.",
+        "en": "The current frame adds its value and returns the result to its caller."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.return"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 7: return",
+          "en": "Step 7: return"
+        },
+        "action_description": {
+          "vi": "Frame này trả tổng từng phần nào?",
+          "en": "Which subtotal does this frame return?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-007.focus",
+        "focus_order": 6,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Frame hiện tại cộng giá trị của nó rồi trả kết quả lên frame gọi.",
+            "en": "The current frame adds its value and returns the result to its caller."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-008",
+      "trace_id": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1",
+      "sequence": 7,
+      "event_type": "return",
+      "active_line_ids": [
+        "recursion.v1.L010",
+        "recursion.v1.L011",
+        "recursion.v1.L012",
+        "recursion.v1.L013",
+        "recursion.v1.L016",
+        "recursion.v1.L017",
+        "recursion.v1.L018",
+        "recursion.v1.L019",
+        "recursion.v1.L020",
+        "recursion.v1.L029",
+        "recursion.v1.L030",
+        "recursion.v1.L031",
+        "recursion.v1.L032",
+        "recursion.v1.L033",
+        "recursion.v1.L034",
+        "recursion.v1.L035"
+      ],
+      "before": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 7,
+        "last_event": "return",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [
+            0
+          ],
+          "returned": {
+            "1": 9,
+            "2": 2,
+            "3": 0
+          },
+          "status": "READY"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "return",
+          "index": 0,
+          "result": 13,
+          "value": 4
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "recursion.normal",
+        "fixture_input": {
+          "values": [
+            4,
+            7,
+            2
+          ]
+        },
+        "trace_cursor": 8,
+        "last_event": "return",
+        "domain": {
+          "values": [
+            4,
+            7,
+            2
+          ],
+          "call_stack": [],
+          "returned": {
+            "0": 13,
+            "1": 9,
+            "2": 2,
+            "3": 0
+          },
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "return",
+          "index": 0,
+          "result": 13,
+          "value": 4
+        },
+        "final_result": {
+          "iterative_result": 13,
+          "recursive_result": 13,
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "ALGORITHM_REWRITE: sự kiện return phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "ALGORITHM_REWRITE: event return must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Frame này trả tổng từng phần nào?",
+        "en": "Which subtotal does this frame return?"
+      },
+      "feedback": {
+        "vi": "Frame hiện tại cộng giá trị của nó rồi trả kết quả lên frame gọi.",
+        "en": "The current frame adds its value and returns the result to its caller."
+      },
+      "visual_targets": [
+        "visual.recursion.state",
+        "visual.recursion.return"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 8: return",
+          "en": "Step 8: return"
+        },
+        "action_description": {
+          "vi": "Frame này trả tổng từng phần nào?",
+          "en": "Which subtotal does this frame return?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.recursion.algorithm-rewrite.normal.pilot-v1.event-008.focus",
+        "focus_order": 7,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Frame hiện tại cộng giá trị của nó rồi trả kết quả lên frame gọi.",
+            "en": "The current frame adds its value and returns the result to its caller."
+          }
+        }
+      }
+    }
+  ]
+}
