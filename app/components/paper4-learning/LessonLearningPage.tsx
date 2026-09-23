@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Paper4VisualRuntime } from "@/app/components/paper4-visual";
 import { PythonArtifact } from "./PythonArtifact";
+import { PracticeInteractions, RetrievalInteractions } from "./LearningInteractions";
 import { LocaleBoundary, LocaleLink } from "./LocaleBoundary";
 import { SourceReferences } from "./SourceReferences";
 import type { LearningBlockKind, LearningLocale, LessonDto, Localized, SourceLocator } from "./types";
@@ -107,15 +108,11 @@ function MarkingAndErrors({ lesson, locale }: { readonly lesson: LessonDto; read
 }
 
 function Practice({ lesson, locale }: { readonly lesson: LessonDto; readonly locale: LearningLocale }) {
-  const t = copy[locale];
-  const order = new Map([["guided", 0], ["faded", 1], ["independent", 2]]);
-  const items = [...lesson.practice.items].sort((left, right) => (order.get(left.level) ?? 9) - (order.get(right.level) ?? 9));
-  return <div className={styles.practiceGrid}>{items.map((item) => <article className={styles.practiceCard} key={item.assessment_item_id}><header><strong>{item.level}</strong><code>{item.assessment_item_id}</code></header><p>{item.prompt[locale]}</p><p><strong>{t.expectedArtifact}: </strong>{item.expected_artifact[locale]}</p><p><strong>{t.practiceAuthority}: </strong>{item.self_rubric.authority}{item.self_rubric.official_marks === null ? " · official_marks: null" : ` · ${item.self_rubric.official_marks}`}</p><details><summary>{t.hint}</summary><p>{item.hint[locale]}</p></details><details><summary>{t.feedback}</summary><p>{item.feedback[locale]}</p></details><details><summary>{t.rubric}</summary><ul>{item.self_rubric.criteria.map((criterion) => <li key={criterion.criterion_id}><p>{criterion.description[locale]}</p><small>{criterion.evidence_required}</small></li>)}</ul><p>{item.self_rubric.pass_rule[locale]}</p><p>{item.self_rubric.retry_rule[locale]}</p><JsonBlock label="Disclosure contract" value={item.disclosure_contract} /></details></article>)}</div>;
+  return <PracticeInteractions items={lesson.practice.items} locale={locale} />;
 }
 
 function Retrieval({ lesson, locale }: { readonly lesson: LessonDto; readonly locale: LearningLocale }) {
-  const t = copy[locale];
-  return <div className={styles.retrieval}>{lesson.retrieval.items.map((item) => <article key={item.knowledge_unit_id}><h3>{item.prompt[locale]}</h3><details><summary>{t.answer}</summary><p>{item.answer[locale]}</p><p><strong>{t.rationale}: </strong>{item.rationale[locale]}</p></details></article>)}</div>;
+  return <RetrievalInteractions items={lesson.retrieval.items} locale={locale} />;
 }
 
 function LessonLink({ direction, item, locale }: { readonly direction: "previous" | "next"; readonly item: LessonNavigationItem | null; readonly locale: LearningLocale }) {

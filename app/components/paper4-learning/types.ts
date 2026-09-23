@@ -106,6 +106,34 @@ export type AssessmentItem = Readonly<{
   disclosure_contract: Readonly<Record<string, JsonValue>>;
 }>;
 
+export type RetrievalItem = Readonly<{
+  knowledge_unit_id: string;
+  prompt: Localized;
+  answer: Localized;
+  rationale: Localized;
+  answer_hidden_initially: boolean;
+  authority: string;
+  response_contract: Readonly<{
+    mode: "recall_then_trace" | "recall_then_explain";
+    prompt: Localized;
+    evidence_refs: readonly string[];
+    submit_before_answer: true;
+  }>;
+  diagnosis: Readonly<{
+    prompt: Localized;
+    misconception_to_check: Localized;
+  }>;
+  repair: Readonly<{
+    action: Localized;
+    retry_rule: Localized;
+  }>;
+  self_rubric: Readonly<{
+    authority: "AlgoCore_authored_self_rubric";
+    official_marks: null;
+    criteria: readonly Readonly<{ criterion_id: string; description: Localized }>[];
+  }>;
+}>;
+
 export type LessonDto = Readonly<{
   schema_version: "paper4-v2-lesson-dto-v1";
   identity: Readonly<{
@@ -144,10 +172,7 @@ export type LessonDto = Readonly<{
   practice: Readonly<{ items: readonly AssessmentItem[] }>;
   retrieval: Readonly<{
     release_refs: readonly string[];
-    items: readonly Readonly<{
-      knowledge_unit_id: string; prompt: Localized; answer: Localized; rationale: Localized;
-      answer_hidden_initially: boolean; authority: string;
-    }>[];
+    items: readonly RetrievalItem[];
   }>;
   navigation: Readonly<{ previous_slug: string | null; next_slug: string | null }>;
   sources: readonly LearningSourceReference[];

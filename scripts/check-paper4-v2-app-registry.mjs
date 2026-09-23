@@ -107,6 +107,7 @@ const lessonSlugs = new Set();
 const artifactIds = new Set();
 const codeLinesByArtifact = new Map();
 const gapLessons = new Set();
+let retrievalLoopCount = 0;
 for (const lessonMeta of manifest.lessons) {
   const lesson = await readJson(`app/data/paper4-v2/lessons/${lessonMeta.slug}.json`);
   assert(lesson.schema_version === "paper4-v2-lesson-dto-v1", `${lessonMeta.slug}: schema mismatch`);
@@ -136,7 +137,17 @@ for (const lessonMeta of manifest.lessons) {
   assert(new Set(lesson.tests.fixtures.map((fixture) => fixture.case_kind)).size === 3, `${lessonMeta.slug}: fixture case coverage mismatch`);
   assert(lesson.tests.expected_outputs.length === 3, `${lessonMeta.slug}: expected three outputs`);
   assert(lesson.practice.items.length === 3, `${lessonMeta.slug}: expected three practice levels`);
+  for (const item of lesson.practice.items) assert(item.disclosure_contract.feedback_after_attempt === true, `${item.assessment_item_id}: feedback must be attempt-gated`);
   assert(lesson.retrieval.items.length === lesson.theory.knowledge_units.length, `${lessonMeta.slug}: retrieval/theory mismatch`);
+  for (const item of lesson.retrieval.items) {
+    assert(item.response_contract?.submit_before_answer === true, `${item.knowledge_unit_id}: retrieval response is not required before answer`);
+    assert(["recall_then_trace", "recall_then_explain"].includes(item.response_contract?.mode), `${item.knowledge_unit_id}: invalid retrieval response mode`);
+    assert(item.diagnosis?.prompt?.vi && item.diagnosis?.prompt?.en && item.diagnosis?.misconception_to_check?.vi && item.diagnosis?.misconception_to_check?.en, `${item.knowledge_unit_id}: missing bilingual diagnosis`);
+    assert(item.repair?.action?.vi && item.repair?.action?.en && item.repair?.retry_rule?.vi && item.repair?.retry_rule?.en, `${item.knowledge_unit_id}: missing bilingual repair/retry`);
+    assert(item.self_rubric?.authority === "AlgoCore_authored_self_rubric" && item.self_rubric?.official_marks === null, `${item.knowledge_unit_id}: invalid retrieval rubric authority`);
+    assert(item.self_rubric.criteria.length === 3 && item.self_rubric.criteria.every((criterion) => criterion.description?.vi && criterion.description?.en), `${item.knowledge_unit_id}: incomplete bilingual retrieval rubric`);
+    retrievalLoopCount += 1;
+  }
   assert(Array.isArray(lesson.sources) && lesson.sources.length > 0, `${lessonMeta.slug}: missing source citations`);
   assert(Array.isArray(lesson.errors.misconceptions), `${lessonMeta.slug}: missing error prevention content`);
 
@@ -165,6 +176,7 @@ for (const lessonMeta of manifest.lessons) {
   checkPublicSafety(lesson, `${lessonMeta.slug}.json`);
 }
 assert(lessonIds.size === 26 && lessonSlugs.size === 26 && artifactIds.size === 26, "Lesson/Python exact set mismatch");
+assert(retrievalLoopCount === 108, `Expected 108 retrieval diagnosis-repair loops, received ${retrievalLoopCount}`);
 assert(JSON.stringify([...gapLessons].sort()) === JSON.stringify([...EXPECTED_GAP_LESSONS].sort()), "Association-only lesson exact set mismatch");
 
 let scenarioCount = 0;

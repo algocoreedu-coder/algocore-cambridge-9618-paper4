@@ -224,6 +224,68 @@ function publicAssessmentItem(item) {
   };
 }
 
+function publicRetrievalItem(unit) {
+  const evidenceRefs = unit.micro_example?.active_line_ids ?? [];
+  const misconception = unit.misconceptions?.[0] ?? {
+    vi: "Câu trả lời chưa nêu đúng quy tắc hoặc chưa nối quy tắc với trạng thái/chương trình.",
+    en: "The response does not yet state the rule or connect it to program state or code.",
+  };
+  return {
+    knowledge_unit_id: unit.knowledge_unit_id,
+    ...unit.self_check,
+    response_contract: {
+      mode: evidenceRefs.length > 0 ? "recall_then_trace" : "recall_then_explain",
+      prompt: {
+        vi: evidenceRefs.length > 0
+          ? `Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: ${evidenceRefs.join(", ")}.`
+          : "Trả lời từ trí nhớ và giải thích quy tắc hoặc trạng thái quyết định kết quả.",
+        en: evidenceRefs.length > 0
+          ? `Answer from memory, state the rule, and trace at least one line: ${evidenceRefs.join(", ")}.`
+          : "Answer from memory and explain the rule or state that determines the result.",
+      },
+      evidence_refs: evidenceRefs,
+      submit_before_answer: true,
+    },
+    diagnosis: {
+      prompt: {
+        vi: "So sánh câu trả lời đã ghi nhận với đáp án và rationale. Xác định ý còn thiếu hoặc bước trace đầu tiên bị sai.",
+        en: "Compare the recorded response with the answer and rationale. Identify the missing idea or the first incorrect trace step.",
+      },
+      misconception_to_check: misconception,
+    },
+    repair: {
+      action: {
+        vi: `Viết lại câu trả lời bằng quy tắc này rồi kiểm tra lại với code/trace: ${unit.invariant_or_rule.vi}`,
+        en: `Rewrite the answer using this rule, then check it against the code or trace: ${unit.invariant_or_rule.en}`,
+      },
+      retry_rule: {
+        vi: "Chọn Thử lại, trả lời không nhìn đáp án, rồi chỉ đạt khi đủ ý chính, lý do và bằng chứng dòng/trace hoặc quy tắc.",
+        en: "Choose Try again, answer without viewing the model answer, and pass only when the key idea, reason, and line/trace or rule evidence are present.",
+      },
+    },
+    self_rubric: {
+      authority: "AlgoCore_authored_self_rubric",
+      official_marks: null,
+      criteria: [
+        {
+          criterion_id: `${unit.knowledge_unit_id}.retrieval.key-idea`,
+          description: { vi: "Nêu đúng ý cốt lõi của đáp án.", en: "States the answer's key idea accurately." },
+        },
+        {
+          criterion_id: `${unit.knowledge_unit_id}.retrieval.reason`,
+          description: { vi: "Giải thích vì sao quy tắc tạo ra kết quả.", en: "Explains why the rule produces the result." },
+        },
+        {
+          criterion_id: `${unit.knowledge_unit_id}.retrieval.evidence`,
+          description: evidenceRefs.length > 0
+            ? { vi: "Đối chiếu đúng ít nhất một line ID hoặc bước trace.", en: "Checks at least one correct line ID or trace step." }
+            : { vi: "Nêu đúng invariant hoặc quy tắc kiểm tra.", en: "States the correct invariant or checking rule." },
+        },
+      ],
+    },
+  };
+}
+
 function publicEvent(event) {
   return {
     event_id: event.event_id,
@@ -433,7 +495,7 @@ export async function createPaper4V2Outputs() {
       practice: { items: assessments.map(publicAssessmentItem) },
       retrieval: {
         release_refs: release.retrieval_refs,
-        items: units.map((unit) => ({ knowledge_unit_id: unit.knowledge_unit_id, ...unit.self_check })),
+        items: units.map(publicRetrievalItem),
       },
       navigation: {
         previous_slug: index === 0 ? null : releases[index - 1].slug,
