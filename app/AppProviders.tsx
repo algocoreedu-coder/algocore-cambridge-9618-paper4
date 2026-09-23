@@ -1,11 +1,16 @@
 "use client";
 
 import { RootProvider } from "fumadocs-ui/provider/next";
-import { type ReactNode, useEffect, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 
 import type { LearningLocale } from "@/app/components/paper4-learning";
 
 export const localeChangeEvent = "algocore:locale-change";
+const LearningLocaleContext = createContext<LearningLocale>("en");
+
+export function useLearningLocale(): LearningLocale {
+  return useContext(LearningLocaleContext);
+}
 
 const viTranslations = {
   "On this page(table of contents)": "Trong bài này",
@@ -17,7 +22,7 @@ const viTranslations = {
 
 function localeFromLocation(fallback: LearningLocale): LearningLocale {
   if (typeof window === "undefined") return fallback;
-  return new URLSearchParams(window.location.search).get("lang") === "en" ? "en" : "vi";
+  return new URLSearchParams(window.location.search).get("lang") === "vi" ? "vi" : "en";
 }
 
 export function AppProviders({
@@ -40,7 +45,6 @@ export function AppProviders({
       if (!(target instanceof Element)) return;
       const anchor = target.closest<HTMLAnchorElement>("a[href]");
       if (!anchor || anchor.target || anchor.hasAttribute("download") || anchor.hasAttribute("data-locale-switch")) return;
-      if (!anchor.closest("#nd-sidebar, [data-sidebar-panel]")) return;
       const url = new URL(anchor.href, window.location.href);
       if (url.origin !== window.location.origin || !url.pathname.startsWith("/paper-4")) return;
       if (url.searchParams.get("lang") === locale) return;
@@ -55,7 +59,7 @@ export function AppProviders({
     const updateFromHistory = () => setLocale(localeFromLocation(initialLocale));
     const updateFromLesson = (event: Event) => {
       const requested = (event as CustomEvent<LearningLocale>).detail;
-      setLocale(requested === "en" ? "en" : "vi");
+      setLocale(requested === "vi" ? "vi" : "en");
     };
     window.addEventListener("popstate", updateFromHistory);
     window.addEventListener(localeChangeEvent, updateFromLesson);
@@ -65,16 +69,13 @@ export function AppProviders({
     };
   }, [initialLocale]);
 
-  return (
+  return <LearningLocaleContext.Provider value={locale}>
     <RootProvider
       search={{ enabled: false }}
       theme={{ defaultTheme: "light" }}
-      i18n={{
-        locale,
-        translations: locale === "vi" ? viTranslations : {},
-      }}
+      i18n={{ locale, translations: locale === "vi" ? viTranslations : {} }}
     >
       {children}
     </RootProvider>
-  );
+  </LearningLocaleContext.Provider>;
 }

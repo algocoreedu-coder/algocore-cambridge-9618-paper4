@@ -10,22 +10,30 @@ import manifestData from "@/app/data/paper4-v2/course-manifest.json";
 const manifest = manifestData as unknown as CourseManifest;
 const lessonBySlug = new Map(manifest.lessons.map((lesson) => [lesson.slug, lesson]));
 
-const toc = [
-  { title: "Cách dùng / How to use", url: "#how-to-use", depth: 2 },
-  { title: "Lộ trình 26 bài / 26 lessons", url: "#course-map", depth: 2 },
-  { title: "Visual Lab", url: "#visual-lab", depth: 2 },
-  { title: "Quy trình luyện / Practice loop", url: "#practice-loop", depth: 2 },
-];
+const tocByLocale = {
+  vi: [
+    { title: "Cách dùng", url: "#how-to-use", depth: 2 },
+    { title: "Lộ trình 26 bài", url: "#course-map", depth: 2 },
+    { title: "Visual Lab", url: "#visual-lab", depth: 2 },
+    { title: "Quy trình luyện", url: "#practice-loop", depth: 2 },
+  ],
+  en: [
+    { title: "How to use", url: "#how-to-use", depth: 2 },
+    { title: "26-lesson pathway", url: "#course-map", depth: 2 },
+    { title: "Visual Lab", url: "#visual-lab", depth: 2 },
+    { title: "Practice loop", url: "#practice-loop", depth: 2 },
+  ],
+} satisfies Record<LearningLocale, Array<{ title: string; url: string; depth: number }>>;
 
 function resolveLocale(value: string | string[] | undefined): LearningLocale {
-  return value === "en" ? "en" : "vi";
+  return value === "vi" ? "vi" : "en";
 }
 
 export default async function Paper4Page({ searchParams }: { readonly searchParams: Promise<{ lang?: string | string[] }> }) {
   const locale = resolveLocale((await searchParams).lang);
   return <>
     <LocaleBoundary locale={locale} />
-    <DocsPage toc={toc} tableOfContent={{ style: "normal", single: false }} footer={{ enabled: false }}>
+    <DocsPage full toc={tocByLocale[locale]} tableOfContent={{ enabled: true, style: "normal", single: false }} footer={{ enabled: false }}>
       <div className="lesson-eyebrow"><span className="unit-label">PAPER 4 · 2026</span><span>ADVANCED PRACTICAL SKILLS</span></div>
       <DocsTitle>{manifest.editorial_registry.course_title[locale]}</DocsTitle>
       <DocsDescription>{locale === "vi" ? "26 bài nối lý thuyết, Python đã chạy, trace động, tiêu chí chấm và luyện tập tăng dần." : "Twenty-six lessons connect theory, executed Python, dynamic traces, marking evidence, and progressive practice."}</DocsDescription>

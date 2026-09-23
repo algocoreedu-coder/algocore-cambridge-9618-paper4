@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { JSDOM } from "jsdom";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baseUrl = (process.env.PAPER4_BASE_URL ?? "http://127.0.0.1:3018").replace(/\/$/, "");
@@ -47,6 +48,31 @@ for (const lesson of manifest.lessons) {
   }
 }
 
+async function checkLocaleShell(route, expectedLocale, expectedTitle) {
+  const url = `${baseUrl}${route}`;
+  const response = await fetch(url, { redirect: "manual" });
+  const html = await response.text();
+  assert(response.status === 200, `${url} returned ${response.status}`);
+  const document = new JSDOM(html).window.document;
+  const sidebar = document.querySelector("#nd-sidebar");
+  assert(document.documentElement.lang === expectedLocale, `${url} rendered html[lang=${document.documentElement.lang}], expected ${expectedLocale}`);
+  assert(document.querySelector("h1")?.textContent?.includes(expectedTitle), `${url} is missing default ${expectedLocale} title ${expectedTitle}`);
+  assert(sidebar?.textContent?.includes(manifest.packages[0].title[expectedLocale]), `${url} sidebar is missing the ${expectedLocale} package title`);
+  const sidebarLinks = [...(sidebar?.querySelectorAll("a[href*='/paper-4']") ?? [])];
+  assert(sidebarLinks.length > 0, `${url} rendered no Paper 4 sidebar links`);
+  for (const link of sidebarLinks) {
+    const linkedUrl = new URL(link.getAttribute("href"), baseUrl);
+    assert(linkedUrl.searchParams.get("lang") === expectedLocale, `${url} sidebar link lost ${expectedLocale}: ${linkedUrl.pathname}${linkedUrl.search}`);
+  }
+  return { route, locale: expectedLocale, sidebar_links: sidebarLinks.length };
+}
+
+const localeShells = [
+  await checkLocaleShell("/paper-4", "en", manifest.editorial_registry.course_title.en),
+  await checkLocaleShell(`/paper-4/lessons/${manifest.lessons[0].slug}`, "en", manifest.lessons[0].title.en),
+  await checkLocaleShell(`/paper-4/lessons/${manifest.lessons[0].slug}?lang=vi`, "vi", manifest.lessons[0].title.vi),
+];
+
 const invalidResponse = await fetch(`${baseUrl}/paper-4/lessons/__invalid-paper4-slug__?lang=vi`, { redirect: "manual" });
 assert(invalidResponse.status === 404, `Invalid slug returned ${invalidResponse.status}, expected 404`);
 
@@ -56,5 +82,7 @@ console.log(JSON.stringify({
   route_variants: results.length,
   passed: results.filter((result) => result.status === 200 && result.sections === 10).length,
   invalid_slug_status: invalidResponse.status,
+  default_locale: "en",
+  localized_sidebar_shells: localeShells.length,
   legacy_imports: 0,
 }, null, 2));

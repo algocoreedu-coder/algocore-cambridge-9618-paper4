@@ -24,7 +24,7 @@ export function generateStaticParams() {
 }
 
 function resolveLocale(value: string | string[] | undefined): LearningLocale {
-  return value === "en" ? "en" : "vi";
+  return value === "vi" ? "vi" : "en";
 }
 
 async function loadLesson(slug: string): Promise<LessonDto> {

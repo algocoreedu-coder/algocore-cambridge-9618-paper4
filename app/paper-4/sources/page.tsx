@@ -39,13 +39,13 @@ export default async function SourceConventionsPage({
   readonly searchParams: Promise<{ lang?: string | string[] }>;
 }) {
   const query = await searchParams;
-  const locale = query.lang === "en" ? "en" : "vi";
+  const locale = query.lang === "vi" ? "vi" : "en";
   const text = copy[locale];
   const otherLocale = locale === "vi" ? "en" : "vi";
 
   return (
     <LocaleBoundary locale={locale}>
-    <DocsPage toc={[]} tableOfContent={{ enabled: false }} footer={{ enabled: false }}>
+    <DocsPage full toc={[]} tableOfContent={{ enabled: false }} footer={{ enabled: false }}>
       <header lang={locale}>
         <DocsTitle>{text.title}</DocsTitle>
         <DocsDescription>{text.description}</DocsDescription>
@@ -68,7 +68,7 @@ export default async function SourceConventionsPage({
         <p>
           <Link href={`/paper-4?lang=${locale}`}>{text.back}</Link>
           {" · "}
-          <Link href={`/paper-4/sources?lang=${otherLocale}`}>{text.language}</Link>
+          <Link href={`/paper-4/sources?lang=${otherLocale}`} data-locale-switch>{text.language}</Link>
         </p>
       </DocsBody>
     </DocsPage>
