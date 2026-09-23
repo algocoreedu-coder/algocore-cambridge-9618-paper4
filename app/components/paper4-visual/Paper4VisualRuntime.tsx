@@ -12,7 +12,8 @@ const copy = {
   vi: {
     eyebrow: "Phòng luyện Paper 4", pattern: "Dạng bài", previous: "Bước trước", next: "Bước tiếp", play: "Chạy", pause: "Tạm dừng", reset: "Làm lại",
     step: "Bước", of: "trên", code: "Mã Python", state: "Trạng thái", trace: "Luồng thực thi", output: "Kết quả", invariant: "Điều phải luôn đúng",
-    before: "Trước", change: "Thay đổi", after: "Sau", noOutput: "Chưa có output ở bước này.", current: "Đang xét", prediction: "Dừng và dự đoán",
+    before: "Trước bước này", change: "Điều vừa thay đổi", after: "Sau bước này", noOutput: "Chưa có output ở bước này.", current: "Đang xét", prediction: "Dừng và dự đoán",
+    stateTransition: "So sánh trạng thái", rawJson: "Xem JSON đầy đủ", fields: "trường", items: "mục", noChange: "Không có thay đổi dữ liệu ở bước này.",
     yourPrediction: "Dự đoán của bạn", checkPrediction: "Kiểm tra dự đoán", correct: "Đúng. Hãy tiếp tục và đối chiếu trạng thái.", incorrect: "Chưa đúng. Event kế tiếp là",
     traceComplete: "Bạn đã đến cuối trace. Dùng Làm lại để luyện lại.", scenarioInput: "Đổi tình huống đầu vào", inputHint: "Chọn trace normal, boundary hoặc failure.",
     applyInput: "Áp dụng tình huống", loading: "Đang tải trace đã kiểm chứng…", loadError: "Không thể tải trace đã kiểm chứng.", retry: "Thử tải lại", migration: "Visual v2 đang chờ route truyền pattern metadata và Python artifact.",
@@ -20,7 +21,8 @@ const copy = {
   en: {
     eyebrow: "Paper 4 practice lab", pattern: "Question pattern", previous: "Previous", next: "Next", play: "Play", pause: "Pause", reset: "Reset",
     step: "Step", of: "of", code: "Python source", state: "State", trace: "Execution trace", output: "Output", invariant: "Invariant to protect",
-    before: "Before", change: "Change", after: "After", noOutput: "No output is produced at this step.", current: "Current", prediction: "Pause and predict",
+    before: "Before this step", change: "What changed", after: "After this step", noOutput: "No output is produced at this step.", current: "Current", prediction: "Pause and predict",
+    stateTransition: "Compare state", rawJson: "View raw JSON", fields: "fields", items: "items", noChange: "No data changes at this step.",
     yourPrediction: "Your prediction", checkPrediction: "Check prediction", correct: "Correct. Continue and compare the resulting state.", incorrect: "Not yet. The next event is",
     traceComplete: "You reached the end of the trace. Reset to practise again.", scenarioInput: "Change input scenario", inputHint: "Choose the normal, boundary, or failure trace.",
     applyInput: "Apply scenario", loading: "Loading the verified trace…", loadError: "The verified trace could not be loaded.", retry: "Try again", migration: "The v2 visual is waiting for pattern metadata and a Python artifact from the route.",
@@ -56,6 +58,53 @@ function patternLabel(pattern: PatternMetadata, locale: Locale) {
 function DataBlock({ value }: { readonly value: JsonValue | undefined }) {
   if (value === undefined || value === null) return <span aria-hidden="true">—</span>;
   return <pre>{JSON.stringify(value, null, 2)}</pre>;
+}
+
+function compactValue(value: JsonValue, locale: Locale): string {
+  if (value === null) return "null";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value);
+  if (Array.isArray(value)) {
+    const allPrimitive = value.every((item) => item === null || typeof item !== "object");
+    if (allPrimitive && value.length <= 4) return `[${value.map((item) => String(item)).join(", ")}]`;
+    return `${value.length} ${copy[locale].items}`;
+  }
+  const record = value as { readonly [key: string]: JsonValue };
+  if (record[locale] !== undefined) return localText(record[locale], locale);
+  const entries = Object.entries(record);
+  const shortEntries = entries.filter(([, item]) => item === null || typeof item !== "object");
+  if (shortEntries.length > 0 && shortEntries.length === entries.length && entries.length <= 3) {
+    return shortEntries.map(([key, item]) => `${key}: ${String(item)}`).join(" · ");
+  }
+  return `${entries.length} ${copy[locale].fields}`;
+}
+
+function StateSummary({ value, locale, rawLabel, emptyLabel }: Readonly<{ value: JsonValue | undefined; locale: Locale; rawLabel: string; emptyLabel: string }>) {
+  if (isRecord(value) && value[locale] !== undefined && structuredValue(value) === undefined) {
+    return <p className={styles.stateLead}>{localText(value, locale)}</p>;
+  }
+  const displayValue = structuredValue(value) ?? value;
+  if (displayValue === undefined || displayValue === null) return <p className={styles.emptyState}>{emptyLabel}</p>;
+  if (!isRecord(displayValue)) return <p className={styles.stateLead}>{compactValue(displayValue, locale)}</p>;
+
+  const entries = Object.entries(displayValue);
+  if (entries.length === 0) return <p className={styles.emptyState}>{emptyLabel}</p>;
+
+  return (
+    <>
+      <dl className={styles.stateFacts}>
+        {entries.map(([key, item]) => (
+          <div className={styles.stateFact} key={key}>
+            <dt>{key.replaceAll("_", " ")}</dt>
+            <dd title={typeof item === "object" ? JSON.stringify(item) : undefined}>{compactValue(item, locale)}</dd>
+          </div>
+        ))}
+      </dl>
+      <details className={styles.rawDetails}>
+        <summary>{rawLabel}</summary>
+        <DataBlock value={displayValue} />
+      </details>
+    </>
+  );
 }
 
 type V2Props = Extract<Paper4VisualRuntimeProps, { patterns: readonly PatternMetadata[] }>;
@@ -161,10 +210,14 @@ function V2Runtime(props: V2Props) {
       <p className={styles.runContext} data-testid="run-context"><strong>{activeScenario?.case_kind}</strong> · {activeScenario?.fixture_ref} · {state.inputRevision}</p>
 
       <div className={styles.panelGrid}>
+        <article className={`${styles.panel} ${styles.changePanel}`} data-panel="change" aria-labelledby={`${componentId}-change`}>
+          <div className={styles.changeHeading}><span>{t.step} {eventIndex + 1}</span><h3 id={`${componentId}-change`}>{t.change}</h3><p>{eventName}</p></div>
+          <StateSummary value={event.delta} locale={state.locale} rawLabel={t.rawJson} emptyLabel={t.noChange} />
+        </article>
         <article className={`${styles.panel} ${styles.codePanel}`} data-panel="code" aria-labelledby={`${componentId}-code`}><h3 id={`${componentId}-code`}>{t.code}</h3><PythonArtifact artifact={pythonArtifact} activeLineIds={event.active_line_ids} locale={state.locale} headingLevel={4} /></article>
-        <article className={`${styles.panel} ${styles.statePanel}`} data-panel="state" aria-labelledby={`${componentId}-state`}><h3 id={`${componentId}-state`}>{t.state}</h3><div className={styles.stateSequence}>{([[t.before,event.before],[t.change,event.delta],[t.after,event.after]] as const).map(([label,value]) => <section key={label}><h4>{label}</h4><p>{localText(value,state.locale)}</p><DataBlock value={structuredValue(value)} /></section>)}</div></article>
+        <article className={`${styles.panel} ${styles.statePanel}`} data-panel="state" aria-labelledby={`${componentId}-state`}><h3 id={`${componentId}-state`}>{t.stateTransition}</h3><div className={styles.stateSequence}>{([[t.before,event.before],[t.after,event.after]] as const).map(([label,value]) => <section key={label}><h4>{label}</h4><StateSummary value={value} locale={state.locale} rawLabel={t.rawJson} emptyLabel={t.noChange} /></section>)}</div></article>
         <article className={`${styles.panel} ${styles.tracePanel}`} data-panel="trace" aria-labelledby={`${componentId}-trace`}><h3 id={`${componentId}-trace`}>{t.trace}</h3><p className={styles.keyboardHelp}>{event.accessibility.keyboard_instruction[state.locale]}</p><ol className={styles.traceList} onKeyDown={traceKeyboard}>{scenarioEvents.map((traceEvent,index) => { const current=index===eventIndex; return <li key={traceEvent.event_id} id={traceEvent.accessibility.focus_target} tabIndex={current ? 0 : -1} aria-current={current ? "step" : undefined} data-complete={index<eventIndex||undefined}><span className={styles.traceNumber}>{index+1}</span><span>{traceEvent.accessibility.accessible_label[state.locale]}</span>{current && <strong>{t.current}</strong>}</li>; })}</ol></article>
-        <article className={`${styles.panel} ${styles.outputPanel}`} data-panel="output" aria-labelledby={`${componentId}-output`}><h3 id={`${componentId}-output`}>{t.output}</h3>{event.output_delta == null ? <p>{t.noOutput}</p> : <><p>{localText(event.output_delta,state.locale)}</p><DataBlock value={structuredValue(event.output_delta)} /></>}</article>
+        <article className={`${styles.panel} ${styles.outputPanel}`} data-panel="output" aria-labelledby={`${componentId}-output`}><h3 id={`${componentId}-output`}>{t.output}</h3><StateSummary value={event.output_delta} locale={state.locale} rawLabel={t.rawJson} emptyLabel={t.noOutput} /></article>
         <article className={`${styles.panel} ${styles.invariantPanel}`} data-panel="invariant" aria-labelledby={`${componentId}-invariant`}><h3 id={`${componentId}-invariant`}>{t.invariant}</h3><p>{localText(event.invariant_or_criterion,state.locale)}</p></article>
       </div>
 
