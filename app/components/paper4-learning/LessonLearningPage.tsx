@@ -89,10 +89,10 @@ function Tests({ lesson, locale }: { readonly lesson: LessonDto; readonly locale
 
 function ActionView({ lesson, locale }: { readonly lesson: LessonDto; readonly locale: LearningLocale }) {
   return <div className={styles.stack}>
-    <PythonArtifact artifact={lesson.python} locale={locale} />
+    {lesson.visual.owned_patterns.length === 0 && <PythonArtifact artifact={lesson.python} locale={locale} />}
     <Tests lesson={lesson} locale={locale} />
     {lesson.visual.owned_patterns.length > 0
-      ? <Paper4VisualRuntime patterns={lesson.visual.owned_patterns} initialPatternId={lesson.visual.owned_patterns[0]?.pattern_id} initialLocale={locale} autoplayDelayMs={1800} headingLevel={3} />
+      ? <Paper4VisualRuntime patterns={lesson.visual.owned_patterns} pythonArtifact={lesson.python} initialPatternId={lesson.visual.owned_patterns[0]?.pattern_id} initialLocale={locale} autoplayDelayMs={1800} headingLevel={3} />
       : <aside className={styles.fallback} role="note"><strong>{copy[locale].support}</strong><p>{copy[locale].noOfficial}</p><Tags values={lesson.visual.approved_static_or_representational_support.map((item) => item.pattern_id)} /></aside>}
   </div>;
 }

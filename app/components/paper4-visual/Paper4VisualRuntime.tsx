@@ -117,7 +117,7 @@ function V2Runtime(props: V2Props) {
   }, [event, state.inputRevision]);
 
   if (!pattern) return <section className={`${styles.empty} ${className ?? ""}`} role="status">{t.loadError}</section>;
-  if (loadState.status === "loading") return <section className={`${styles.empty} ${className ?? ""}`} role="status" aria-live="polite">{t.loading}</section>;
+  if (loadState.status === "loading") return <section className={`${styles.runtime} ${className ?? ""}`} data-runtime-version="paper4-v2-loading" data-testid="paper4-visual-lab" role="status" aria-live="polite"><p className={styles.empty}>{t.loading}</p>{preloadArtifact && <article className={`${styles.panel} ${styles.codePanel}`} data-panel="code"><PythonArtifact artifact={preloadArtifact} locale={state.locale} headingLevel={4} /></article>}</section>;
   if (loadState.status === "error" || !loadState.chunk || !event) {
     return <section className={`${styles.empty} ${className ?? ""}`} role="alert"><p>{t.loadError}</p><p className={styles.errorDetail}>{loadState.message}</p><button type="button" onClick={() => setLoadRevision((value) => value + 1)}>{t.retry}</button></section>;
   }
