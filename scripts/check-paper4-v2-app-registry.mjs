@@ -155,6 +155,12 @@ for (const lessonMeta of manifest.lessons) {
   } else {
     assert(lesson.authority.official_pattern_ids.length > 0, `${lessonMeta.slug}: official owner has no patterns`);
     assert(lesson.marking.chains.length === lesson.authority.official_pattern_ids.length, `${lessonMeta.slug}: marking/owned pattern mismatch`);
+    for (const chain of lesson.marking.chains) {
+      assert(chain.marking_atom_selection === "representative_public_sample", `${chain.marking_chain_id}: public marking selection is not explicit`);
+      assert(Number.isInteger(chain.marking_atom_count) && chain.marking_atom_count >= chain.marking_atoms.length, `${chain.marking_chain_id}: invalid full atom count`);
+      assert(chain.marking_atoms.length > 0 && chain.marking_atoms.length <= 3, `${chain.marking_chain_id}: representative atom sample must contain 1-3 atoms`);
+      assert(new Set(chain.marking_atoms.map((atom) => atom.atom_id)).size === chain.marking_atoms.length, `${chain.marking_chain_id}: duplicate representative atom`);
+    }
   }
   checkPublicSafety(lesson, `${lessonMeta.slug}.json`);
 }

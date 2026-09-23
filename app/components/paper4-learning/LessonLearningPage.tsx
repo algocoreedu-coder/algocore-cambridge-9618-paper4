@@ -26,7 +26,7 @@ const copy = {
     skip: "Bỏ qua đến nội dung bài học", course: "Cambridge 9618 · Paper 4 · Python · 2026", language: "Ngôn ngữ bài học",
     owned: "Dạng bài chính thức thuộc bài", support: "Liên kết biểu diễn hỗ trợ", noOfficial: "Các liên kết này là workflow/biểu diễn do AlgoCore biên soạn; không chuyển quyền sở hữu dạng bài hoặc điểm Cambridge.",
     pythonEvidence: "Bằng chứng chạy Python", fixtures: "Ca kiểm thử canonical", input: "Input", expected: "Expected output", sourceHash: "Mã băm source",
-    marking: "Chuỗi chấm điểm", markAtoms: "Tiêu chí nguồn", detection: "Cách phát hiện lỗi", repair: "Cách sửa", misconception: "Lỗi dễ mất điểm",
+    marking: "Chuỗi chấm điểm", markAtoms: "Tiêu chí nguồn đại diện", detection: "Cách phát hiện lỗi", repair: "Cách sửa", misconception: "Lỗi dễ mất điểm",
     practiceAuthority: "Thẩm quyền rubric", expectedArtifact: "Sản phẩm cần nộp", hint: "Mở gợi ý", feedback: "Mở phản hồi và cách sửa", rubric: "Tiêu chí tự chấm",
     answer: "Mở đáp án", rationale: "Lý do", previous: "Bài trước", next: "Bài tiếp theo", noPrevious: "Đây là bài đầu tiên", noNext: "Đây là bài cuối cùng",
   },
@@ -34,7 +34,7 @@ const copy = {
     skip: "Skip to lesson content", course: "Cambridge 9618 · Paper 4 · Python · 2026", language: "Lesson language",
     owned: "Official patterns owned by this lesson", support: "Approved representational support", noOfficial: "These links are AlgoCore-authored workflow or representation support; they do not transfer official pattern ownership or Cambridge marks.",
     pythonEvidence: "Python execution evidence", fixtures: "Canonical test cases", input: "Input", expected: "Expected output", sourceHash: "Source hash",
-    marking: "Marking chain", markAtoms: "Source criteria", detection: "Error detection", repair: "Repair check", misconception: "Mark-losing pitfall",
+    marking: "Marking chain", markAtoms: "Representative source criteria", detection: "Error detection", repair: "Repair check", misconception: "Mark-losing pitfall",
     practiceAuthority: "Rubric authority", expectedArtifact: "Expected submission", hint: "Reveal hint", feedback: "Reveal feedback and repair", rubric: "Self-assessment criteria",
     answer: "Reveal answer", rationale: "Why", previous: "Previous lesson", next: "Next lesson", noPrevious: "This is the first lesson", noNext: "This is the final lesson",
   },
@@ -101,7 +101,7 @@ function MarkingAndErrors({ lesson, locale }: { readonly lesson: LessonDto; read
   const t = copy[locale];
   return <div className={styles.stack}>
     {lesson.marking.chains.length === 0 && <aside className={styles.fallback} role="note"><strong>{t.support}</strong><p>{t.noOfficial}</p></aside>}
-    {lesson.marking.chains.map((chain) => <article className={styles.markingChain} key={chain.marking_chain_id}><header><h3>{t.marking}: {chain.pattern_id}</h3><code>{chain.requirement_ref}</code></header><Tags values={chain.method_step_refs} /><dl><div><dt>{t.detection}</dt><dd>{chain.detection_check[locale]}</dd></div><div><dt>{t.repair}</dt><dd>{chain.repair_check[locale]}</dd></div></dl><details><summary>{t.markAtoms} · {chain.marking_atoms.length}</summary><ol>{chain.marking_atoms.map((atom) => <li key={atom.atom_id}><p>{atom.criterion[locale]}</p><small>{atom.authority} · {locatorText(atom.locator)}</small></li>)}</ol></details></article>)}
+    {lesson.marking.chains.map((chain) => <article className={styles.markingChain} key={chain.marking_chain_id}><header><h3>{t.marking}: {chain.pattern_id}</h3><code>{chain.requirement_ref}</code></header><Tags values={chain.method_step_refs} /><dl><div><dt>{t.detection}</dt><dd>{chain.detection_check[locale]}</dd></div><div><dt>{t.repair}</dt><dd>{chain.repair_check[locale]}</dd></div></dl><details><summary>{t.markAtoms} · {chain.marking_atoms.length}/{chain.marking_atom_count}</summary><ol>{chain.marking_atoms.map((atom) => <li key={atom.atom_id}><p>{atom.criterion[locale]}</p><small>{atom.authority} · {locatorText(atom.locator)}</small></li>)}</ol></details></article>)}
     <section><h3>{t.misconception}</h3><Tags values={lesson.errors.error_refs} /><ul className={styles.pitfalls}>{lesson.errors.misconceptions.map((item, index) => <li key={`${item.knowledge_unit_id}-${index}`}>{item[locale]}</li>)}</ul></section>
   </div>;
 }

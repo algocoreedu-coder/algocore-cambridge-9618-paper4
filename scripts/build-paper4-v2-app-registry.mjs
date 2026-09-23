@@ -183,6 +183,14 @@ function publicPythonArtifact(artifact) {
 }
 
 function publicMarkingChain(chain) {
+  const caveated = chain.marking_atoms.find((atom) => JSON.stringify(atom.criterion).includes("RETAIN_WITH_SOURCE_CAVEAT"));
+  const candidates = [
+    chain.marking_atoms[0],
+    caveated,
+    chain.marking_atoms[Math.floor(chain.marking_atoms.length / 2)],
+    chain.marking_atoms.at(-1),
+  ].filter(Boolean);
+  const representativeAtoms = [...new Map(candidates.map((atom) => [atom.atom_id, atom])).values()].slice(0, 3);
   return {
     marking_chain_id: chain.marking_chain_id,
     pattern_id: chain.pattern_id,
@@ -191,7 +199,9 @@ function publicMarkingChain(chain) {
     error_ref: chain.error_ref,
     detection_check: chain.detection_check,
     repair_check: chain.repair_check,
-    marking_atoms: chain.marking_atoms,
+    marking_atom_count: chain.marking_atoms.length,
+    marking_atom_selection: "representative_public_sample",
+    marking_atoms: representativeAtoms,
     limited_evidence: chain.limited_evidence,
     transfer_limit: chain.transfer_limit,
   };

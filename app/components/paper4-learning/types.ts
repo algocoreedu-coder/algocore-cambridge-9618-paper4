@@ -77,6 +77,8 @@ export type MarkingChain = Readonly<{
   error_ref: string;
   detection_check: Localized;
   repair_check: Localized;
+  marking_atom_count: number;
+  marking_atom_selection: "representative_public_sample";
   marking_atoms: readonly MarkingAtom[];
   limited_evidence?: boolean;
   transfer_limit?: Localized | string;
