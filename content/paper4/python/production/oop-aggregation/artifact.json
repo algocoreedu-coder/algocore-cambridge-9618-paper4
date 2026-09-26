@@ -1,12 +1,12 @@
 {
   "author_run_ref": "p4r3.a3.oop-aggregation.production-v1.author-run",
   "caption": {
-    "en": "A has-a relationship and bounded object references.",
-    "vi": "Quan hệ has-a và bounded object references."
+    "en": "A has-a relationship, object graph, and bounded component references.",
+    "vi": "Quan hệ has-a, object graph và bounded component references."
   },
-  "code_sha256": "3c4eb116b80309a684b4f1d4deff4c813eb296bcb948c0f252e909085e6cec1e",
+  "code_sha256": "a3253eca8a3fd37124dd9fec5dad58ad9219df3450d1d98e40de0a3dcf2e392d",
   "entry_point": "run(fixture)",
-  "execution_log_sha256": "e819cc36ec97f40ccb0429b2a492f4baa934a0bf099f6cbc8d444cc6edae5f26",
+  "execution_log_sha256": "940c7e0fcba10957c0d97bcd7ec2c24b44a56fedcadae465f427020658332e8f",
   "execution_status": "PASS",
   "expected_outputs": [
     {
@@ -24,12 +24,14 @@
           {
             "count": 1,
             "event": "bounded_add",
+            "relationship": "has-a",
             "success": true,
             "unchanged_on_reject": true
           },
           {
             "count": 2,
             "event": "bounded_add",
+            "relationship": "has-a",
             "success": true,
             "unchanged_on_reject": true
           }
@@ -50,6 +52,7 @@
           {
             "count": 1,
             "event": "bounded_add",
+            "relationship": "has-a",
             "success": true,
             "unchanged_on_reject": true
           }
@@ -70,18 +73,21 @@
           {
             "count": 1,
             "event": "bounded_add",
+            "relationship": "has-a",
             "success": true,
             "unchanged_on_reject": true
           },
           {
             "count": 1,
             "event": "bounded_add",
+            "relationship": "has-a",
             "success": false,
             "unchanged_on_reject": true
           },
           {
             "count": 1,
             "event": "bounded_add",
+            "relationship": "has-a",
             "success": false,
             "unchanged_on_reject": true
           }
@@ -147,131 +153,266 @@
     {
       "line_id": "oop-aggregation.production-v1.L004",
       "order": 4,
-      "text": "    def __init__(self, title): self.title = title"
+      "text": "    def __init__(self, title):"
     },
     {
       "line_id": "oop-aggregation.production-v1.L005",
       "order": 5,
-      "text": "    def label(self): return self.title.upper()"
+      "text": "        self.title = title"
     },
     {
       "line_id": "oop-aggregation.production-v1.L006",
       "order": 6,
-      "text": "class Shelf:"
+      "text": ""
     },
     {
       "line_id": "oop-aggregation.production-v1.L007",
       "order": 7,
-      "text": "    def __init__(self, capacity): self.capacity, self.books = capacity, []"
+      "text": "    def label(self):"
     },
     {
       "line_id": "oop-aggregation.production-v1.L008",
       "order": 8,
-      "text": "    def add(self, book):"
+      "text": "        return self.title.upper()"
     },
     {
       "line_id": "oop-aggregation.production-v1.L009",
       "order": 9,
-      "text": "        if not isinstance(book, Book) or len(self.books) == self.capacity: return False"
+      "text": ""
     },
     {
       "line_id": "oop-aggregation.production-v1.L010",
       "order": 10,
-      "text": "        self.books.append(book); return True"
+      "text": "class Shelf:"
     },
     {
       "line_id": "oop-aggregation.production-v1.L011",
       "order": 11,
-      "text": "    def labels(self): return [book.label() for book in self.books]"
+      "text": "    def __init__(self, capacity):"
     },
     {
       "line_id": "oop-aggregation.production-v1.L012",
       "order": 12,
-      "text": ""
+      "text": "        self.capacity = capacity"
     },
     {
       "line_id": "oop-aggregation.production-v1.L013",
       "order": 13,
-      "text": "def run(fixture):"
+      "text": "        self.books = []"
     },
     {
       "line_id": "oop-aggregation.production-v1.L014",
       "order": 14,
-      "text": "    shelf, trace = Shelf(fixture[\"capacity\"]), []"
+      "text": ""
     },
     {
       "line_id": "oop-aggregation.production-v1.L015",
       "order": 15,
-      "text": "    for value in fixture.get(\"items\", []):"
+      "text": "    def add(self, book):"
     },
     {
       "line_id": "oop-aggregation.production-v1.L016",
       "order": 16,
-      "text": "        item = Book(value) if isinstance(value, str) else value"
+      "text": "        valid_book = isinstance(book, Book)"
     },
     {
       "line_id": "oop-aggregation.production-v1.L017",
       "order": 17,
-      "text": "        before = len(shelf.books); success = shelf.add(item)"
+      "text": "        has_space = len(self.books) < self.capacity"
     },
     {
       "line_id": "oop-aggregation.production-v1.L018",
       "order": 18,
-      "text": "        trace.append({\"event\": \"bounded_add\", \"success\": success, \"count\": len(shelf.books), \"unchanged_on_reject\": success or before == len(shelf.books)})"
+      "text": "        if not valid_book or not has_space:"
     },
     {
       "line_id": "oop-aggregation.production-v1.L019",
       "order": 19,
-      "text": "    return {\"status\": \"OK\", \"count\": len(shelf.books), \"labels\": shelf.labels(), \"capacity\": shelf.capacity, \"trace\": trace}"
+      "text": "            return False"
     },
     {
       "line_id": "oop-aggregation.production-v1.L020",
       "order": 20,
-      "text": ""
+      "text": "        self.books.append(book)"
     },
     {
       "line_id": "oop-aggregation.production-v1.L021",
       "order": 21,
-      "text": "if __name__ == \"__main__\":"
+      "text": "        return True"
     },
     {
       "line_id": "oop-aggregation.production-v1.L022",
       "order": 22,
-      "text": "    import json"
+      "text": ""
     },
     {
       "line_id": "oop-aggregation.production-v1.L023",
       "order": 23,
-      "text": "    import sys"
+      "text": "    def labels(self):"
     },
     {
       "line_id": "oop-aggregation.production-v1.L024",
       "order": 24,
-      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      "text": "        return [book.label() for book in self.books]"
     },
     {
       "line_id": "oop-aggregation.production-v1.L025",
       "order": 25,
-      "text": "    result = run(fixture)"
+      "text": ""
     },
     {
       "line_id": "oop-aggregation.production-v1.L026",
       "order": 26,
-      "text": "    if not result[\"trace\"]:"
+      "text": "def run(fixture):"
     },
     {
       "line_id": "oop-aggregation.production-v1.L027",
       "order": 27,
-      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      "text": "    shelf = Shelf(fixture[\"capacity\"])"
     },
     {
       "line_id": "oop-aggregation.production-v1.L028",
       "order": 28,
-      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      "text": "    trace = []"
     },
     {
       "line_id": "oop-aggregation.production-v1.L029",
       "order": 29,
+      "text": "    for value in fixture.get(\"items\", []):"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L030",
+      "order": 30,
+      "text": "        item = Book(value) if isinstance(value, str) else value"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L031",
+      "order": 31,
+      "text": "        before = len(shelf.books)"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L032",
+      "order": 32,
+      "text": "        success = shelf.add(item)"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L033",
+      "order": 33,
+      "text": "        trace.append({"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L034",
+      "order": 34,
+      "text": "            \"event\": \"bounded_add\","
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L035",
+      "order": 35,
+      "text": "            \"success\": success,"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L036",
+      "order": 36,
+      "text": "            \"count\": len(shelf.books),"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L037",
+      "order": 37,
+      "text": "            \"unchanged_on_reject\": success or before == len(shelf.books),"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L038",
+      "order": 38,
+      "text": "            \"relationship\": \"has-a\","
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L039",
+      "order": 39,
+      "text": "        })"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L040",
+      "order": 40,
+      "text": "    return {"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L041",
+      "order": 41,
+      "text": "        \"status\": \"OK\","
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L042",
+      "order": 42,
+      "text": "        \"count\": len(shelf.books),"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L043",
+      "order": 43,
+      "text": "        \"labels\": shelf.labels(),"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L044",
+      "order": 44,
+      "text": "        \"capacity\": shelf.capacity,"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L045",
+      "order": 45,
+      "text": "        \"trace\": trace,"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L046",
+      "order": 46,
+      "text": "    }"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L047",
+      "order": 47,
+      "text": ""
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L048",
+      "order": 48,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L049",
+      "order": 49,
+      "text": "    import json"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L050",
+      "order": 50,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L051",
+      "order": 51,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L052",
+      "order": 52,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L053",
+      "order": 53,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L054",
+      "order": 54,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L055",
+      "order": 55,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "oop-aggregation.production-v1.L056",
+      "order": 56,
       "text": ""
     }
   ],

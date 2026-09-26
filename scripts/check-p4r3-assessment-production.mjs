@@ -168,7 +168,7 @@ if (await exists(visualRoot)) {
   const visualPatterns = new Set(traces.map((trace) => trace.pattern_id));
   if (visualFiles.length !== 14) fail(errors, "VISUAL_BUNDLE_SCOPE", `Expected exact 14 official pattern-owner bundles, found ${visualFiles.length}.`);
   if (traces.length !== 126) fail(errors, "VISUAL_TRACE_COUNT", `Expected 126 traces, found ${traces.length}.`);
-  if (events.length !== 351) fail(errors, "VISUAL_EVENT_COUNT", `Expected 351 events, found ${events.length}.`);
+  if (events.length !== 361) fail(errors, "VISUAL_EVENT_COUNT", `Expected 361 events after the P4R-8 OOP trace migration, found ${events.length}.`);
   if (visualPatterns.size !== 42 || [...officialPatterns].some((pattern) => !visualPatterns.has(pattern)) || [...visualPatterns].some((pattern) => !officialPatterns.has(pattern))) fail(errors, "VISUAL_PATTERN_SCOPE", "Visual pattern set must equal the exact 42 official production chains.");
   for (const chain of marking.map((entry) => entry.record)) {
     const artifact = artifactByLesson.get(chain.lesson_id);

@@ -77,7 +77,7 @@ const stage3Editorial = JSON.parse(await readFile(STAGE3_EDITORIAL_PATH, "utf8")
 const stage3LessonById = new Map(stage3Editorial.lessons.map((lesson) => [lesson.lesson_id, lesson]));
 const stage3PackageById = new Map(stage3Editorial.packages.map((item) => [item.package_id, item]));
 assert(manifest.schema_version === "paper4-v2-course-manifest-v1", "Manifest schema mismatch");
-assert(manifest.canonical_registry_sha256 === "e9fe687c79e23d3a6d0ec844c5e8ca83fca473fbc800623836be61b5a439f827", "Canonical registry aggregate authority mismatch");
+assert(manifest.canonical_registry_sha256 === "1ad3244f6ec6c8d33f9141bfc2458fffb92acb0980678c39be5e050cccf3527e", "Canonical registry aggregate authority mismatch");
 assert(manifest.editorial_registry.sha256 === "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2", "Stage 3 editorial hash mismatch");
 assert(JSON.stringify(manifest.editorial_registry.course_title) === JSON.stringify(stage3Editorial.titles), "Course title does not match Stage 3" );
 assert(manifest.counts.packages === 13, "Expected 13 packages");
@@ -87,7 +87,7 @@ assert(manifest.counts.sections_per_lesson === 10, "Expected ten sections per le
 assert(manifest.counts.knowledge_units === 108, "Expected 108 KnowledgeUnits");
 assert(manifest.counts.python_artifacts === 26, "Expected 26 PythonArtifacts");
 assert(manifest.counts.visual_scenario_traces === 174, "Expected 174 VisualScenarioTraces");
-assert(manifest.counts.visual_event_bindings === 589, "Expected 589 VisualEventBindings");
+assert(manifest.counts.visual_event_bindings === 599, "Expected 599 VisualEventBindings");
 assert(manifest.counts.marking_chains === 58, "Expected 58 MarkingChains");
 assert(manifest.counts.assessment_items === 78, "Expected 78 AssessmentItems");
 assert(manifest.counts.lesson_release_records === 26, "Expected 26 LessonReleaseRecords");
@@ -187,7 +187,7 @@ const eventIds = new Set();
 for (const patternMeta of manifest.patterns) {
   assert(!patternIds.has(patternMeta.pattern_id), `Duplicate pattern ${patternMeta.pattern_id}`);
   patternIds.add(patternMeta.pattern_id);
-  const relativePath = patternMeta.trace_url.replace(/^\//, "public/");
+  const relativePath = patternMeta.trace_url.split("?", 1)[0].replace(/^\//, "public/");
   const chunk = await readJson(relativePath);
   assert(chunk.pattern_id === patternMeta.pattern_id, `${patternMeta.pattern_id}: chunk identity mismatch`);
   assert(chunk.python_artifact.python_artifact_id === chunk.owner.python_artifact_id, `${patternMeta.pattern_id}: embedded PythonArtifact identity mismatch`);
@@ -226,7 +226,7 @@ for (const patternMeta of manifest.patterns) {
 }
 assert(patternIds.size === 58, "Pattern exact set mismatch");
 assert(scenarioCount === 174 && traceIds.size === 174, "Scenario exact set mismatch");
-assert(eventCount === 589 && eventIds.size === 589, "Event exact set mismatch");
+assert(eventCount === 599 && eventIds.size === 599, "Event exact set mismatch");
 
 const loaderSource = await readFile(path.join(ROOT, "app", "data", "paper4-v2", "lesson-loaders.generated.ts"), "utf8");
 for (const slug of lessonSlugs) assert(loaderSource.includes(`\"${slug}\": () => import(\"./lessons/${slug}.json\")`), `${slug}: static loader is missing`);

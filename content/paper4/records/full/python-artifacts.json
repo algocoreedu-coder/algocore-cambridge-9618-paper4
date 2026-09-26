@@ -4530,12 +4530,12 @@
     "record": {
       "author_run_ref": "p4r3.a3.oop-aggregation.production-v1.author-run",
       "caption": {
-        "en": "A has-a relationship and bounded object references.",
-        "vi": "Quan hệ has-a và bounded object references."
+        "en": "A has-a relationship, object graph, and bounded component references.",
+        "vi": "Quan hệ has-a, object graph và bounded component references."
       },
-      "code_sha256": "3c4eb116b80309a684b4f1d4deff4c813eb296bcb948c0f252e909085e6cec1e",
+      "code_sha256": "a3253eca8a3fd37124dd9fec5dad58ad9219df3450d1d98e40de0a3dcf2e392d",
       "entry_point": "run(fixture)",
-      "execution_log_sha256": "e819cc36ec97f40ccb0429b2a492f4baa934a0bf099f6cbc8d444cc6edae5f26",
+      "execution_log_sha256": "940c7e0fcba10957c0d97bcd7ec2c24b44a56fedcadae465f427020658332e8f",
       "execution_status": "PASS",
       "expected_outputs": [
         {
@@ -4553,12 +4553,14 @@
               {
                 "count": 1,
                 "event": "bounded_add",
+                "relationship": "has-a",
                 "success": true,
                 "unchanged_on_reject": true
               },
               {
                 "count": 2,
                 "event": "bounded_add",
+                "relationship": "has-a",
                 "success": true,
                 "unchanged_on_reject": true
               }
@@ -4579,6 +4581,7 @@
               {
                 "count": 1,
                 "event": "bounded_add",
+                "relationship": "has-a",
                 "success": true,
                 "unchanged_on_reject": true
               }
@@ -4599,18 +4602,21 @@
               {
                 "count": 1,
                 "event": "bounded_add",
+                "relationship": "has-a",
                 "success": true,
                 "unchanged_on_reject": true
               },
               {
                 "count": 1,
                 "event": "bounded_add",
+                "relationship": "has-a",
                 "success": false,
                 "unchanged_on_reject": true
               },
               {
                 "count": 1,
                 "event": "bounded_add",
+                "relationship": "has-a",
                 "success": false,
                 "unchanged_on_reject": true
               }
@@ -4676,131 +4682,266 @@
         {
           "line_id": "oop-aggregation.production-v1.L004",
           "order": 4,
-          "text": "    def __init__(self, title): self.title = title"
+          "text": "    def __init__(self, title):"
         },
         {
           "line_id": "oop-aggregation.production-v1.L005",
           "order": 5,
-          "text": "    def label(self): return self.title.upper()"
+          "text": "        self.title = title"
         },
         {
           "line_id": "oop-aggregation.production-v1.L006",
           "order": 6,
-          "text": "class Shelf:"
+          "text": ""
         },
         {
           "line_id": "oop-aggregation.production-v1.L007",
           "order": 7,
-          "text": "    def __init__(self, capacity): self.capacity, self.books = capacity, []"
+          "text": "    def label(self):"
         },
         {
           "line_id": "oop-aggregation.production-v1.L008",
           "order": 8,
-          "text": "    def add(self, book):"
+          "text": "        return self.title.upper()"
         },
         {
           "line_id": "oop-aggregation.production-v1.L009",
           "order": 9,
-          "text": "        if not isinstance(book, Book) or len(self.books) == self.capacity: return False"
+          "text": ""
         },
         {
           "line_id": "oop-aggregation.production-v1.L010",
           "order": 10,
-          "text": "        self.books.append(book); return True"
+          "text": "class Shelf:"
         },
         {
           "line_id": "oop-aggregation.production-v1.L011",
           "order": 11,
-          "text": "    def labels(self): return [book.label() for book in self.books]"
+          "text": "    def __init__(self, capacity):"
         },
         {
           "line_id": "oop-aggregation.production-v1.L012",
           "order": 12,
-          "text": ""
+          "text": "        self.capacity = capacity"
         },
         {
           "line_id": "oop-aggregation.production-v1.L013",
           "order": 13,
-          "text": "def run(fixture):"
+          "text": "        self.books = []"
         },
         {
           "line_id": "oop-aggregation.production-v1.L014",
           "order": 14,
-          "text": "    shelf, trace = Shelf(fixture[\"capacity\"]), []"
+          "text": ""
         },
         {
           "line_id": "oop-aggregation.production-v1.L015",
           "order": 15,
-          "text": "    for value in fixture.get(\"items\", []):"
+          "text": "    def add(self, book):"
         },
         {
           "line_id": "oop-aggregation.production-v1.L016",
           "order": 16,
-          "text": "        item = Book(value) if isinstance(value, str) else value"
+          "text": "        valid_book = isinstance(book, Book)"
         },
         {
           "line_id": "oop-aggregation.production-v1.L017",
           "order": 17,
-          "text": "        before = len(shelf.books); success = shelf.add(item)"
+          "text": "        has_space = len(self.books) < self.capacity"
         },
         {
           "line_id": "oop-aggregation.production-v1.L018",
           "order": 18,
-          "text": "        trace.append({\"event\": \"bounded_add\", \"success\": success, \"count\": len(shelf.books), \"unchanged_on_reject\": success or before == len(shelf.books)})"
+          "text": "        if not valid_book or not has_space:"
         },
         {
           "line_id": "oop-aggregation.production-v1.L019",
           "order": 19,
-          "text": "    return {\"status\": \"OK\", \"count\": len(shelf.books), \"labels\": shelf.labels(), \"capacity\": shelf.capacity, \"trace\": trace}"
+          "text": "            return False"
         },
         {
           "line_id": "oop-aggregation.production-v1.L020",
           "order": 20,
-          "text": ""
+          "text": "        self.books.append(book)"
         },
         {
           "line_id": "oop-aggregation.production-v1.L021",
           "order": 21,
-          "text": "if __name__ == \"__main__\":"
+          "text": "        return True"
         },
         {
           "line_id": "oop-aggregation.production-v1.L022",
           "order": 22,
-          "text": "    import json"
+          "text": ""
         },
         {
           "line_id": "oop-aggregation.production-v1.L023",
           "order": 23,
-          "text": "    import sys"
+          "text": "    def labels(self):"
         },
         {
           "line_id": "oop-aggregation.production-v1.L024",
           "order": 24,
-          "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+          "text": "        return [book.label() for book in self.books]"
         },
         {
           "line_id": "oop-aggregation.production-v1.L025",
           "order": 25,
-          "text": "    result = run(fixture)"
+          "text": ""
         },
         {
           "line_id": "oop-aggregation.production-v1.L026",
           "order": 26,
-          "text": "    if not result[\"trace\"]:"
+          "text": "def run(fixture):"
         },
         {
           "line_id": "oop-aggregation.production-v1.L027",
           "order": 27,
-          "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+          "text": "    shelf = Shelf(fixture[\"capacity\"])"
         },
         {
           "line_id": "oop-aggregation.production-v1.L028",
           "order": 28,
-          "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+          "text": "    trace = []"
         },
         {
           "line_id": "oop-aggregation.production-v1.L029",
           "order": 29,
+          "text": "    for value in fixture.get(\"items\", []):"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L030",
+          "order": 30,
+          "text": "        item = Book(value) if isinstance(value, str) else value"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L031",
+          "order": 31,
+          "text": "        before = len(shelf.books)"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L032",
+          "order": 32,
+          "text": "        success = shelf.add(item)"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L033",
+          "order": 33,
+          "text": "        trace.append({"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L034",
+          "order": 34,
+          "text": "            \"event\": \"bounded_add\","
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L035",
+          "order": 35,
+          "text": "            \"success\": success,"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L036",
+          "order": 36,
+          "text": "            \"count\": len(shelf.books),"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L037",
+          "order": 37,
+          "text": "            \"unchanged_on_reject\": success or before == len(shelf.books),"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L038",
+          "order": 38,
+          "text": "            \"relationship\": \"has-a\","
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L039",
+          "order": 39,
+          "text": "        })"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L040",
+          "order": 40,
+          "text": "    return {"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L041",
+          "order": 41,
+          "text": "        \"status\": \"OK\","
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L042",
+          "order": 42,
+          "text": "        \"count\": len(shelf.books),"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L043",
+          "order": 43,
+          "text": "        \"labels\": shelf.labels(),"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L044",
+          "order": 44,
+          "text": "        \"capacity\": shelf.capacity,"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L045",
+          "order": 45,
+          "text": "        \"trace\": trace,"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L046",
+          "order": 46,
+          "text": "    }"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L047",
+          "order": 47,
+          "text": ""
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L048",
+          "order": 48,
+          "text": "if __name__ == \"__main__\":"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L049",
+          "order": 49,
+          "text": "    import json"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L050",
+          "order": 50,
+          "text": "    import sys"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L051",
+          "order": 51,
+          "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L052",
+          "order": 52,
+          "text": "    result = run(fixture)"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L053",
+          "order": 53,
+          "text": "    if not result[\"trace\"]:"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L054",
+          "order": 54,
+          "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L055",
+          "order": 55,
+          "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+        },
+        {
+          "line_id": "oop-aggregation.production-v1.L056",
+          "order": 56,
           "text": ""
         }
       ],
@@ -4827,12 +4968,12 @@
     "record": {
       "author_run_ref": "p4r3.a3.oop-inheritance.production-v1.author-run",
       "caption": {
-        "en": "Inheritance, overriding and dynamic dispatch.",
-        "vi": "Kế thừa, override và dynamic dispatch."
+        "en": "An is-a relationship, super(), overriding, and dynamic dispatch.",
+        "vi": "Quan hệ is-a, super(), override và dynamic dispatch."
       },
-      "code_sha256": "ab6c449e327fe607c48c5f508a37aaad7b4fda82e7e64e991a01cbac4a2ad528",
+      "code_sha256": "6f8712de5f2a1ef533e5c1a817e425789865655a48927f52bd804ee6aa22ad7d",
       "entry_point": "run(fixture)",
-      "execution_log_sha256": "16b37d516f6d9aa8afc20b8e178445d4e79fcb775438860d23a1db298417d78c",
+      "execution_log_sha256": "6d15657c73c5a5244b961b8855057dd8370b2e452065b0aabce3c2a9e6dd064e",
       "execution_status": "PASS",
       "expected_outputs": [
         {
@@ -4840,10 +4981,6 @@
           "fixture_ref": "oop-inheritance.normal",
           "value": {
             "outputs": [
-              {
-                "area": 0,
-                "name": "base"
-              },
               {
                 "area": 12,
                 "name": "rectangle"
@@ -4857,15 +4994,23 @@
             "status": "OK",
             "trace": [
               {
-                "event": "dynamic_dispatch",
-                "runtime_type": "Shape"
+                "event": "constructor_chain",
+                "runtime_type": "Rectangle"
+              },
+              {
+                "event": "constructor_chain",
+                "runtime_type": "Circle"
               },
               {
                 "event": "dynamic_dispatch",
+                "method": "area",
+                "result": 12,
                 "runtime_type": "Rectangle"
               },
               {
                 "event": "dynamic_dispatch",
+                "method": "area",
+                "result": 12.56,
                 "runtime_type": "Circle"
               }
             ]
@@ -4878,10 +5023,6 @@
             "outputs": [
               {
                 "area": 0,
-                "name": "base"
-              },
-              {
-                "area": 0,
                 "name": "rectangle"
               }
             ],
@@ -4889,11 +5030,13 @@
             "status": "OK",
             "trace": [
               {
-                "event": "dynamic_dispatch",
-                "runtime_type": "Shape"
+                "event": "constructor_chain",
+                "runtime_type": "Rectangle"
               },
               {
                 "event": "dynamic_dispatch",
+                "method": "area",
+                "result": 0,
                 "runtime_type": "Rectangle"
               }
             ]
@@ -4903,18 +5046,12 @@
           "expected_output_id": "oop-inheritance.failure.expected-output",
           "fixture_ref": "oop-inheritance.failure",
           "value": {
-            "outputs": [
-              {
-                "area": 0,
-                "name": "base"
-              }
-            ],
+            "outputs": [],
             "rejected": 1,
             "status": "REJECTED_INVALID_SUBCLASS",
             "trace": [
               {
-                "event": "dynamic_dispatch",
-                "runtime_type": "Shape"
+                "event": "reject_subclass"
               }
             ]
           }
@@ -4988,161 +5125,326 @@
         {
           "line_id": "oop-inheritance.production-v1.L004",
           "order": 4,
-          "text": "    def __init__(self, name): self.name = name"
+          "text": "    def __init__(self, name):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L005",
           "order": 5,
-          "text": "    def area(self): return 0"
+          "text": "        self.name = name"
         },
         {
           "line_id": "oop-inheritance.production-v1.L006",
           "order": 6,
-          "text": "class Rectangle(Shape):"
+          "text": ""
         },
         {
           "line_id": "oop-inheritance.production-v1.L007",
           "order": 7,
-          "text": "    def __init__(self, width, height):"
+          "text": "    def area(self):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L008",
           "order": 8,
-          "text": "        if width < 0 or height < 0: raise ValueError(\"negative size\")"
+          "text": "        raise NotImplementedError(\"subclass must implement area\")"
         },
         {
           "line_id": "oop-inheritance.production-v1.L009",
           "order": 9,
-          "text": "        super().__init__(\"rectangle\"); self.width, self.height = width, height"
+          "text": ""
         },
         {
           "line_id": "oop-inheritance.production-v1.L010",
           "order": 10,
-          "text": "    def area(self): return self.width * self.height"
+          "text": "class Rectangle(Shape):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L011",
           "order": 11,
-          "text": "class Circle(Shape):"
+          "text": "    def __init__(self, width, height):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L012",
           "order": 12,
-          "text": "    def __init__(self, radius):"
+          "text": "        if width < 0 or height < 0:"
         },
         {
           "line_id": "oop-inheritance.production-v1.L013",
           "order": 13,
-          "text": "        if radius < 0: raise ValueError(\"negative size\")"
+          "text": "            raise ValueError(\"negative size\")"
         },
         {
           "line_id": "oop-inheritance.production-v1.L014",
           "order": 14,
-          "text": "        super().__init__(\"circle\"); self.radius = radius"
+          "text": "        super().__init__(\"rectangle\")"
         },
         {
           "line_id": "oop-inheritance.production-v1.L015",
           "order": 15,
-          "text": "    def area(self): return round(3.14 * self.radius * self.radius, 2)"
+          "text": "        self.width = width"
         },
         {
           "line_id": "oop-inheritance.production-v1.L016",
           "order": 16,
-          "text": ""
+          "text": "        self.height = height"
         },
         {
           "line_id": "oop-inheritance.production-v1.L017",
           "order": 17,
-          "text": "def run(fixture):"
+          "text": ""
         },
         {
           "line_id": "oop-inheritance.production-v1.L018",
           "order": 18,
-          "text": "    shapes, rejected, trace = [Shape(\"base\")], 0, []"
+          "text": "    def area(self):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L019",
           "order": 19,
-          "text": "    for record in fixture.get(\"shapes\", []):"
+          "text": "        return self.width * self.height"
         },
         {
           "line_id": "oop-inheritance.production-v1.L020",
           "order": 20,
-          "text": "        try: shapes.append(Rectangle(record[\"width\"], record[\"height\"]) if record[\"type\"] == \"rectangle\" else Circle(record[\"radius\"]))"
+          "text": ""
         },
         {
           "line_id": "oop-inheritance.production-v1.L021",
           "order": 21,
-          "text": "        except (KeyError, ValueError): rejected += 1"
+          "text": "class Circle(Shape):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L022",
           "order": 22,
-          "text": "    outputs = []"
+          "text": "    def __init__(self, radius):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L023",
           "order": 23,
-          "text": "    for shape in shapes:"
+          "text": "        if radius < 0:"
         },
         {
           "line_id": "oop-inheritance.production-v1.L024",
           "order": 24,
-          "text": "        outputs.append({\"name\": shape.name, \"area\": shape.area()}); trace.append({\"event\": \"dynamic_dispatch\", \"runtime_type\": type(shape).__name__})"
+          "text": "            raise ValueError(\"negative size\")"
         },
         {
           "line_id": "oop-inheritance.production-v1.L025",
           "order": 25,
-          "text": "    return {\"status\": \"OK\" if rejected == 0 else \"REJECTED_INVALID_SUBCLASS\", \"outputs\": outputs, \"rejected\": rejected, \"trace\": trace}"
+          "text": "        super().__init__(\"circle\")"
         },
         {
           "line_id": "oop-inheritance.production-v1.L026",
           "order": 26,
-          "text": ""
+          "text": "        self.radius = radius"
         },
         {
           "line_id": "oop-inheritance.production-v1.L027",
           "order": 27,
-          "text": "if __name__ == \"__main__\":"
+          "text": ""
         },
         {
           "line_id": "oop-inheritance.production-v1.L028",
           "order": 28,
-          "text": "    import json"
+          "text": "    def area(self):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L029",
           "order": 29,
-          "text": "    import sys"
+          "text": "        return round(3.14 * self.radius * self.radius, 2)"
         },
         {
           "line_id": "oop-inheritance.production-v1.L030",
           "order": 30,
-          "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+          "text": ""
         },
         {
           "line_id": "oop-inheritance.production-v1.L031",
           "order": 31,
-          "text": "    result = run(fixture)"
+          "text": "def run(fixture):"
         },
         {
           "line_id": "oop-inheritance.production-v1.L032",
           "order": 32,
-          "text": "    if not result[\"trace\"]:"
+          "text": "    shapes = []"
         },
         {
           "line_id": "oop-inheritance.production-v1.L033",
           "order": 33,
-          "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+          "text": "    rejected = 0"
         },
         {
           "line_id": "oop-inheritance.production-v1.L034",
           "order": 34,
-          "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+          "text": "    trace = []"
         },
         {
           "line_id": "oop-inheritance.production-v1.L035",
           "order": 35,
+          "text": "    for record in fixture.get(\"shapes\", []):"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L036",
+          "order": 36,
+          "text": "        try:"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L037",
+          "order": 37,
+          "text": "            if record[\"type\"] == \"rectangle\":"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L038",
+          "order": 38,
+          "text": "                shape = Rectangle(record[\"width\"], record[\"height\"])"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L039",
+          "order": 39,
+          "text": "            elif record[\"type\"] == \"circle\":"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L040",
+          "order": 40,
+          "text": "                shape = Circle(record[\"radius\"])"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L041",
+          "order": 41,
+          "text": "            else:"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L042",
+          "order": 42,
+          "text": "                raise ValueError(\"unknown shape\")"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L043",
+          "order": 43,
+          "text": "            shapes.append(shape)"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L044",
+          "order": 44,
+          "text": "            trace.append({\"event\": \"constructor_chain\", \"runtime_type\": type(shape).__name__})"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L045",
+          "order": 45,
+          "text": "        except (KeyError, ValueError):"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L046",
+          "order": 46,
+          "text": "            rejected += 1"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L047",
+          "order": 47,
+          "text": "            trace.append({\"event\": \"reject_subclass\"})"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L048",
+          "order": 48,
+          "text": "    outputs = []"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L049",
+          "order": 49,
+          "text": "    for shape in shapes:"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L050",
+          "order": 50,
+          "text": "        area = shape.area()"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L051",
+          "order": 51,
+          "text": "        outputs.append({\"name\": shape.name, \"area\": area})"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L052",
+          "order": 52,
+          "text": "        trace.append({\"event\": \"dynamic_dispatch\", \"runtime_type\": type(shape).__name__, \"method\": \"area\", \"result\": area})"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L053",
+          "order": 53,
+          "text": "    return {"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L054",
+          "order": 54,
+          "text": "        \"status\": \"OK\" if rejected == 0 else \"REJECTED_INVALID_SUBCLASS\","
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L055",
+          "order": 55,
+          "text": "        \"outputs\": outputs,"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L056",
+          "order": 56,
+          "text": "        \"rejected\": rejected,"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L057",
+          "order": 57,
+          "text": "        \"trace\": trace,"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L058",
+          "order": 58,
+          "text": "    }"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L059",
+          "order": 59,
+          "text": ""
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L060",
+          "order": 60,
+          "text": "if __name__ == \"__main__\":"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L061",
+          "order": 61,
+          "text": "    import json"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L062",
+          "order": 62,
+          "text": "    import sys"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L063",
+          "order": 63,
+          "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L064",
+          "order": 64,
+          "text": "    result = run(fixture)"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L065",
+          "order": 65,
+          "text": "    if not result[\"trace\"]:"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L066",
+          "order": 66,
+          "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L067",
+          "order": 67,
+          "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+        },
+        {
+          "line_id": "oop-inheritance.production-v1.L068",
+          "order": 68,
           "text": ""
         }
       ],
@@ -5170,12 +5472,12 @@
     "record": {
       "author_run_ref": "p4r3.a3.oop-model.production-v1.author-run",
       "caption": {
-        "en": "A class, constructor and independent instances.",
-        "vi": "Class, constructor và các instance độc lập."
+        "en": "A class blueprint, self, constructor, and independent instances.",
+        "vi": "Class blueprint, self, constructor và các instance độc lập."
       },
-      "code_sha256": "31a57737365a3de3982e414e754691f12726e28da9fb27af40ee4fa985b304df",
+      "code_sha256": "b6ee26c0e3fdf7870f2b0fbb5acdf03bc4779707c2bdde6e8163f722a1c8ee72",
       "entry_point": "run(fixture)",
-      "execution_log_sha256": "a1c120658a9cfb927d3295cd73f3bdce0e1f29ff5891814502ecff9df1433ee2",
+      "execution_log_sha256": "46f6f63cbaef2a4b0918fd75dfd9608f52058735ab2f25ca152d7aaac4fa1763",
       "execution_status": "PASS",
       "expected_outputs": [
         {
@@ -5199,8 +5501,16 @@
             "status": "OK",
             "trace": [
               {
+                "event": "bind_instance",
+                "student_id": 1
+              },
+              {
                 "event": "instantiate",
                 "student_id": 1
+              },
+              {
+                "event": "bind_instance",
+                "student_id": 2
               },
               {
                 "event": "instantiate",
@@ -5225,6 +5535,10 @@
             "status": "OK",
             "trace": [
               {
+                "event": "bind_instance",
+                "student_id": 1
+              },
+              {
                 "event": "instantiate",
                 "student_id": 1
               }
@@ -5247,7 +5561,12 @@
             "status": "PARTIAL_REJECT",
             "trace": [
               {
-                "event": "reject_constructor"
+                "event": "reject_constructor",
+                "object_created": false
+              },
+              {
+                "event": "bind_instance",
+                "student_id": 3
               },
               {
                 "event": "instantiate",
@@ -5336,126 +5655,236 @@
         {
           "line_id": "oop-model.production-v1.L005",
           "order": 5,
-          "text": "        if not isinstance(student_id, int) or student_id < 1 or not isinstance(score, int) or not 0 <= score <= 100:"
+          "text": "        valid_id = isinstance(student_id, int) and student_id >= 1"
         },
         {
           "line_id": "oop-model.production-v1.L006",
           "order": 6,
-          "text": "            raise ValueError(\"invalid student\")"
+          "text": "        valid_score = isinstance(score, int) and 0 <= score <= 100"
         },
         {
           "line_id": "oop-model.production-v1.L007",
           "order": 7,
-          "text": "        self.student_id, self.name, self.score = student_id, name, score"
+          "text": "        if not valid_id or not valid_score:"
         },
         {
           "line_id": "oop-model.production-v1.L008",
           "order": 8,
-          "text": "    def state(self): return {\"student_id\": self.student_id, \"name\": self.name, \"score\": self.score}"
+          "text": "            raise ValueError(\"invalid student\")"
         },
         {
           "line_id": "oop-model.production-v1.L009",
           "order": 9,
-          "text": ""
+          "text": "        self.student_id = student_id"
         },
         {
           "line_id": "oop-model.production-v1.L010",
           "order": 10,
-          "text": "def run(fixture):"
+          "text": "        self.name = name"
         },
         {
           "line_id": "oop-model.production-v1.L011",
           "order": 11,
-          "text": "    objects, rejected, trace = [], 0, []"
+          "text": "        self.score = score"
         },
         {
           "line_id": "oop-model.production-v1.L012",
           "order": 12,
-          "text": "    for record in fixture.get(\"records\", []):"
+          "text": ""
         },
         {
           "line_id": "oop-model.production-v1.L013",
           "order": 13,
-          "text": "        try:"
+          "text": "    def state(self):"
         },
         {
           "line_id": "oop-model.production-v1.L014",
           "order": 14,
-          "text": "            student = Student(record.get(\"student_id\"), record.get(\"name\", \"\"), record.get(\"score\", 0))"
+          "text": "        return {"
         },
         {
           "line_id": "oop-model.production-v1.L015",
           "order": 15,
-          "text": "            objects.append(student); trace.append({\"event\": \"instantiate\", \"student_id\": student.student_id})"
+          "text": "            \"student_id\": self.student_id,"
         },
         {
           "line_id": "oop-model.production-v1.L016",
           "order": 16,
-          "text": "        except (TypeError, ValueError):"
+          "text": "            \"name\": self.name,"
         },
         {
           "line_id": "oop-model.production-v1.L017",
           "order": 17,
-          "text": "            rejected += 1; trace.append({\"event\": \"reject_constructor\"})"
+          "text": "            \"score\": self.score,"
         },
         {
           "line_id": "oop-model.production-v1.L018",
           "order": 18,
-          "text": "    states = [student.state() for student in objects]"
+          "text": "        }"
         },
         {
           "line_id": "oop-model.production-v1.L019",
           "order": 19,
-          "text": "    return {\"status\": \"OK\" if rejected == 0 else \"PARTIAL_REJECT\", \"objects\": states, \"rejected\": rejected, \"independent_instances\": len({id(student) for student in objects}) == len(objects), \"trace\": trace}"
+          "text": ""
         },
         {
           "line_id": "oop-model.production-v1.L020",
           "order": 20,
-          "text": ""
+          "text": "def run(fixture):"
         },
         {
           "line_id": "oop-model.production-v1.L021",
           "order": 21,
-          "text": "if __name__ == \"__main__\":"
+          "text": "    objects = []"
         },
         {
           "line_id": "oop-model.production-v1.L022",
           "order": 22,
-          "text": "    import json"
+          "text": "    rejected = 0"
         },
         {
           "line_id": "oop-model.production-v1.L023",
           "order": 23,
-          "text": "    import sys"
+          "text": "    trace = []"
         },
         {
           "line_id": "oop-model.production-v1.L024",
           "order": 24,
-          "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+          "text": "    for record in fixture.get(\"records\", []):"
         },
         {
           "line_id": "oop-model.production-v1.L025",
           "order": 25,
-          "text": "    result = run(fixture)"
+          "text": "        try:"
         },
         {
           "line_id": "oop-model.production-v1.L026",
           "order": 26,
-          "text": "    if not result[\"trace\"]:"
+          "text": "            student = Student(record.get(\"student_id\"), record.get(\"name\", \"\"), record.get(\"score\", 0))"
         },
         {
           "line_id": "oop-model.production-v1.L027",
           "order": 27,
-          "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+          "text": "            trace.append({\"event\": \"bind_instance\", \"student_id\": student.student_id})"
         },
         {
           "line_id": "oop-model.production-v1.L028",
           "order": 28,
-          "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+          "text": "            objects.append(student)"
         },
         {
           "line_id": "oop-model.production-v1.L029",
           "order": 29,
+          "text": "            trace.append({\"event\": \"instantiate\", \"student_id\": student.student_id})"
+        },
+        {
+          "line_id": "oop-model.production-v1.L030",
+          "order": 30,
+          "text": "        except (TypeError, ValueError):"
+        },
+        {
+          "line_id": "oop-model.production-v1.L031",
+          "order": 31,
+          "text": "            rejected += 1"
+        },
+        {
+          "line_id": "oop-model.production-v1.L032",
+          "order": 32,
+          "text": "            trace.append({\"event\": \"reject_constructor\", \"object_created\": False})"
+        },
+        {
+          "line_id": "oop-model.production-v1.L033",
+          "order": 33,
+          "text": "    states = [student.state() for student in objects]"
+        },
+        {
+          "line_id": "oop-model.production-v1.L034",
+          "order": 34,
+          "text": "    independent_instances = len({id(student) for student in objects}) == len(objects)"
+        },
+        {
+          "line_id": "oop-model.production-v1.L035",
+          "order": 35,
+          "text": "    return {"
+        },
+        {
+          "line_id": "oop-model.production-v1.L036",
+          "order": 36,
+          "text": "        \"status\": \"OK\" if rejected == 0 else \"PARTIAL_REJECT\","
+        },
+        {
+          "line_id": "oop-model.production-v1.L037",
+          "order": 37,
+          "text": "        \"objects\": states,"
+        },
+        {
+          "line_id": "oop-model.production-v1.L038",
+          "order": 38,
+          "text": "        \"rejected\": rejected,"
+        },
+        {
+          "line_id": "oop-model.production-v1.L039",
+          "order": 39,
+          "text": "        \"independent_instances\": independent_instances,"
+        },
+        {
+          "line_id": "oop-model.production-v1.L040",
+          "order": 40,
+          "text": "        \"trace\": trace,"
+        },
+        {
+          "line_id": "oop-model.production-v1.L041",
+          "order": 41,
+          "text": "    }"
+        },
+        {
+          "line_id": "oop-model.production-v1.L042",
+          "order": 42,
+          "text": ""
+        },
+        {
+          "line_id": "oop-model.production-v1.L043",
+          "order": 43,
+          "text": "if __name__ == \"__main__\":"
+        },
+        {
+          "line_id": "oop-model.production-v1.L044",
+          "order": 44,
+          "text": "    import json"
+        },
+        {
+          "line_id": "oop-model.production-v1.L045",
+          "order": 45,
+          "text": "    import sys"
+        },
+        {
+          "line_id": "oop-model.production-v1.L046",
+          "order": 46,
+          "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+        },
+        {
+          "line_id": "oop-model.production-v1.L047",
+          "order": 47,
+          "text": "    result = run(fixture)"
+        },
+        {
+          "line_id": "oop-model.production-v1.L048",
+          "order": 48,
+          "text": "    if not result[\"trace\"]:"
+        },
+        {
+          "line_id": "oop-model.production-v1.L049",
+          "order": 49,
+          "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+        },
+        {
+          "line_id": "oop-model.production-v1.L050",
+          "order": 50,
+          "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+        },
+        {
+          "line_id": "oop-model.production-v1.L051",
+          "order": 51,
           "text": ""
         }
       ],
@@ -5483,10 +5912,10 @@
     "record": {
       "author_run_ref": "p4r3.a3.oop-state.production-v1.author-run",
       "caption": {
-        "en": "Encapsulation through getters, setters and rule updates.",
-        "vi": "Encapsulation bằng getter, setter và rule update."
+        "en": "Encapsulation with getters, setters, guard-before-write, and state preservation.",
+        "vi": "Encapsulation với getter, setter, guard-before-write và state preservation."
       },
-      "code_sha256": "d40ba5a86768a1fb1345c71ae13a8d6cb8d4650eb30a85edbf6005052e9f919b",
+      "code_sha256": "2f63820f6c4b1764bea1092eef134b45e5f6dbf3165e097a4f1ab49769730f5a",
       "entry_point": "run(fixture)",
       "execution_log_sha256": "2e56133a61aae6a729a1a68837d5a7be1a691d93284548db3080ee1c85c1bc7b",
       "execution_status": "PASS",
@@ -5619,32 +6048,32 @@
         {
           "line_id": "oop-state.production-v1.L004",
           "order": 4,
-          "text": "    def __init__(self, balance, limit): self.__balance, self.__limit = balance, limit"
+          "text": "    def __init__(self, balance, limit):"
         },
         {
           "line_id": "oop-state.production-v1.L005",
           "order": 5,
-          "text": "    def get_balance(self): return self.__balance"
+          "text": "        self.__balance = balance"
         },
         {
           "line_id": "oop-state.production-v1.L006",
           "order": 6,
-          "text": "    def set_balance(self, value):"
+          "text": "        self.__limit = limit"
         },
         {
           "line_id": "oop-state.production-v1.L007",
           "order": 7,
-          "text": "        if not 0 <= value <= self.__limit: return False"
+          "text": ""
         },
         {
           "line_id": "oop-state.production-v1.L008",
           "order": 8,
-          "text": "        self.__balance = value; return True"
+          "text": "    def get_balance(self):"
         },
         {
           "line_id": "oop-state.production-v1.L009",
           "order": 9,
-          "text": "    def apply_change(self, delta): return self.set_balance(self.__balance + delta)"
+          "text": "        return self.__balance"
         },
         {
           "line_id": "oop-state.production-v1.L010",
@@ -5654,47 +6083,47 @@
         {
           "line_id": "oop-state.production-v1.L011",
           "order": 11,
-          "text": "def run(fixture):"
+          "text": "    def set_balance(self, value):"
         },
         {
           "line_id": "oop-state.production-v1.L012",
           "order": 12,
-          "text": "    account, trace = Account(fixture[\"start\"], fixture[\"limit\"]), []"
+          "text": "        if not 0 <= value <= self.__limit:"
         },
         {
           "line_id": "oop-state.production-v1.L013",
           "order": 13,
-          "text": "    old = account.get_balance()"
+          "text": "            return False"
         },
         {
           "line_id": "oop-state.production-v1.L014",
           "order": 14,
-          "text": "    setter_ok = account.set_balance(fixture[\"replacement\"])"
+          "text": "        self.__balance = value"
         },
         {
           "line_id": "oop-state.production-v1.L015",
           "order": 15,
-          "text": "    trace.append({\"event\": \"setter\", \"success\": setter_ok, \"balance\": account.get_balance()})"
+          "text": "        return True"
         },
         {
           "line_id": "oop-state.production-v1.L016",
           "order": 16,
-          "text": "    before_update = account.get_balance()"
+          "text": ""
         },
         {
           "line_id": "oop-state.production-v1.L017",
           "order": 17,
-          "text": "    update_ok = account.apply_change(fixture[\"delta\"])"
+          "text": "    def apply_change(self, delta):"
         },
         {
           "line_id": "oop-state.production-v1.L018",
           "order": 18,
-          "text": "    trace.append({\"event\": \"rule_update\", \"success\": update_ok, \"balance\": account.get_balance()})"
+          "text": "        candidate = self.__balance + delta"
         },
         {
           "line_id": "oop-state.production-v1.L019",
           "order": 19,
-          "text": "    return {\"status\": \"OK\", \"old\": old, \"balance\": account.get_balance(), \"setter_ok\": setter_ok, \"update_ok\": update_ok, \"preserved_after_failed_update\": update_ok or account.get_balance() == before_update, \"trace\": trace}"
+          "text": "        return self.set_balance(candidate)"
         },
         {
           "line_id": "oop-state.production-v1.L020",
@@ -5704,46 +6133,146 @@
         {
           "line_id": "oop-state.production-v1.L021",
           "order": 21,
-          "text": "if __name__ == \"__main__\":"
+          "text": "def run(fixture):"
         },
         {
           "line_id": "oop-state.production-v1.L022",
           "order": 22,
-          "text": "    import json"
+          "text": "    account = Account(fixture[\"start\"], fixture[\"limit\"])"
         },
         {
           "line_id": "oop-state.production-v1.L023",
           "order": 23,
-          "text": "    import sys"
+          "text": "    trace = []"
         },
         {
           "line_id": "oop-state.production-v1.L024",
           "order": 24,
-          "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+          "text": "    old = account.get_balance()"
         },
         {
           "line_id": "oop-state.production-v1.L025",
           "order": 25,
-          "text": "    result = run(fixture)"
+          "text": "    setter_ok = account.set_balance(fixture[\"replacement\"])"
         },
         {
           "line_id": "oop-state.production-v1.L026",
           "order": 26,
-          "text": "    if not result[\"trace\"]:"
+          "text": "    trace.append({\"event\": \"setter\", \"success\": setter_ok, \"balance\": account.get_balance()})"
         },
         {
           "line_id": "oop-state.production-v1.L027",
           "order": 27,
-          "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+          "text": "    before_update = account.get_balance()"
         },
         {
           "line_id": "oop-state.production-v1.L028",
           "order": 28,
-          "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+          "text": "    update_ok = account.apply_change(fixture[\"delta\"])"
         },
         {
           "line_id": "oop-state.production-v1.L029",
           "order": 29,
+          "text": "    trace.append({\"event\": \"rule_update\", \"success\": update_ok, \"balance\": account.get_balance()})"
+        },
+        {
+          "line_id": "oop-state.production-v1.L030",
+          "order": 30,
+          "text": "    preserved = update_ok or account.get_balance() == before_update"
+        },
+        {
+          "line_id": "oop-state.production-v1.L031",
+          "order": 31,
+          "text": "    return {"
+        },
+        {
+          "line_id": "oop-state.production-v1.L032",
+          "order": 32,
+          "text": "        \"status\": \"OK\","
+        },
+        {
+          "line_id": "oop-state.production-v1.L033",
+          "order": 33,
+          "text": "        \"old\": old,"
+        },
+        {
+          "line_id": "oop-state.production-v1.L034",
+          "order": 34,
+          "text": "        \"balance\": account.get_balance(),"
+        },
+        {
+          "line_id": "oop-state.production-v1.L035",
+          "order": 35,
+          "text": "        \"setter_ok\": setter_ok,"
+        },
+        {
+          "line_id": "oop-state.production-v1.L036",
+          "order": 36,
+          "text": "        \"update_ok\": update_ok,"
+        },
+        {
+          "line_id": "oop-state.production-v1.L037",
+          "order": 37,
+          "text": "        \"preserved_after_failed_update\": preserved,"
+        },
+        {
+          "line_id": "oop-state.production-v1.L038",
+          "order": 38,
+          "text": "        \"trace\": trace,"
+        },
+        {
+          "line_id": "oop-state.production-v1.L039",
+          "order": 39,
+          "text": "    }"
+        },
+        {
+          "line_id": "oop-state.production-v1.L040",
+          "order": 40,
+          "text": ""
+        },
+        {
+          "line_id": "oop-state.production-v1.L041",
+          "order": 41,
+          "text": "if __name__ == \"__main__\":"
+        },
+        {
+          "line_id": "oop-state.production-v1.L042",
+          "order": 42,
+          "text": "    import json"
+        },
+        {
+          "line_id": "oop-state.production-v1.L043",
+          "order": 43,
+          "text": "    import sys"
+        },
+        {
+          "line_id": "oop-state.production-v1.L044",
+          "order": 44,
+          "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+        },
+        {
+          "line_id": "oop-state.production-v1.L045",
+          "order": 45,
+          "text": "    result = run(fixture)"
+        },
+        {
+          "line_id": "oop-state.production-v1.L046",
+          "order": 46,
+          "text": "    if not result[\"trace\"]:"
+        },
+        {
+          "line_id": "oop-state.production-v1.L047",
+          "order": 47,
+          "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+        },
+        {
+          "line_id": "oop-state.production-v1.L048",
+          "order": 48,
+          "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+        },
+        {
+          "line_id": "oop-state.production-v1.L049",
+          "order": 49,
           "text": ""
         }
       ],

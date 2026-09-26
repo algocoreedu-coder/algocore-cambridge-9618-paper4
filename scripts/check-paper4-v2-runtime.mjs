@@ -35,7 +35,7 @@ for (const metadata of manifest.patterns) {
   const lesson = lessonBySlug.get(metadata.owner_lesson_slug);
   if (!lesson) { fail("LESSON_MISSING", metadata.pattern_id); continue; }
   const artifact = lesson.python;
-  const traceFile = path.join(appRoot, "public", metadata.trace_url.replace(/^\//, ""));
+  const traceFile = path.join(appRoot, "public", metadata.trace_url.split("?", 1)[0].replace(/^\//, ""));
   const chunkValue = await json(traceFile);
   let chunk;
   try { chunk = traceApi.validateTraceChunk(chunkValue, metadata, artifact); }
@@ -73,7 +73,7 @@ for (const metadata of manifest.patterns) {
 
 const sampleMeta = manifest.patterns[0];
 const sampleLesson = lessonBySlug.get(sampleMeta.owner_lesson_slug);
-const sampleChunk = await json(path.join(appRoot, "public", sampleMeta.trace_url.replace(/^\//, "")));
+const sampleChunk = await json(path.join(appRoot, "public", sampleMeta.trace_url.split("?", 1)[0].replace(/^\//, "")));
 traceApi.clearTraceCacheForTests();
 let fetchCount = 0;
 const mockFetch = async () => ({ ok: true, status: 200, json: async () => structuredClone(sampleChunk) });

@@ -13,6 +13,16 @@ const SCOPE_PATH = path.join(WORKSPACE_ROOT, "A_Level_CS_page/planning/paper4/ne
 const MIGRATION_PATH = path.join(ROOT, "content/paper4/mappings/visual-migration-inventory.json");
 const CASES = ["normal", "boundary", "failure"];
 const EVENT_TYPES = new Set(["read", "write", "assign", "compare", "advance", "swap", "link", "unlink", "call", "return", "branch", "reject", "emit"]);
+const OOP_VISUAL_PROFILE = {
+  OOP_CLASS: { id: "class-instance-memory", vi: "Thuộc tính nào thuộc instance nào, và self đang trỏ tới object nào?", en: "Which attributes belong to which instance, and which object does self reference?" },
+  OOP_INSTANTIATE: { id: "class-instance-memory", vi: "Hai lần gọi constructor tạo hai identity và state độc lập như thế nào?", en: "How do two constructor calls create separate identities and state?" },
+  OOP_GET: { id: "encapsulation-gate", vi: "Getter đọc field nào mà không làm đổi state?", en: "Which field does the getter read without changing state?" },
+  OOP_SET: { id: "encapsulation-gate", vi: "Guard nào chạy trước write và state nào được giữ khi reject?", en: "Which guard runs before the write, and which state is preserved after rejection?" },
+  OOP_UPDATE: { id: "encapsulation-gate", vi: "Candidate được tính, kiểm tra và commit theo thứ tự nào?", en: "In what order is the candidate derived, checked, and committed?" },
+  OOP_SUBCLASS: { id: "constructor-chain", vi: "super() khởi tạo base state trước subclass state theo thứ tự nào?", en: "In what order does super() initialise base state before subclass state?" },
+  OOP_OVERRIDE: { id: "dynamic-dispatch", vi: "Runtime type nào quyết định implementation của area() được gọi?", en: "Which runtime type selects the area() implementation?" },
+  OOP_CAPACITY_ADD: { id: "object-graph", vi: "Shelf giữ reference tới Book nào, và reject có giữ nguyên object graph không?", en: "Which Book references does Shelf hold, and does rejection preserve the object graph?" },
+};
 
 function clone(value) { return structuredClone(value); }
 function slugId(value) { return value.toLowerCase().replaceAll("_", "-"); }
@@ -111,6 +121,7 @@ function makeEvent({ artifact, pattern, caseKind, traceId, sequence, step, befor
   };
   if (sequence === result.trace.length - 1) after.verified_result = withoutTrace(result);
   const copy = wording(eventName, eventType);
+  const oopVisual = OOP_VISUAL_PROFILE[pattern];
   return {
     envelope: {
       schema_version: "2.0.0",
@@ -129,12 +140,14 @@ function makeEvent({ artifact, pattern, caseKind, traceId, sequence, step, befor
           ...(sequence === result.trace.length - 1 ? { final_result: withoutTrace(result) } : {}),
         },
         invariant_or_criterion: {
-          vi: `${pattern}: sự kiện ${eventName} phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.`,
-          en: `${pattern}: event ${eventName} must match the independent rerun trace, production-v1 Python lines, and displayed state transition.`,
+          vi: oopVisual ? `${oopVisual.vi} Sự kiện ${eventName} phải khớp trace chạy lại độc lập và line Python production-v1.` : `${pattern}: sự kiện ${eventName} phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.`,
+          en: oopVisual ? `${oopVisual.en} Event ${eventName} must match the independent rerun trace and production-v1 Python lines.` : `${pattern}: event ${eventName} must match the independent rerun trace, production-v1 Python lines, and displayed state transition.`,
         },
         prediction: copy.prediction,
         feedback: copy.feedback,
-        visual_targets: [`visual.${slugId(pattern)}.state`, `visual.${slugId(pattern)}.${slugId(eventName)}`],
+        visual_targets: oopVisual
+          ? [`visual.oop.${oopVisual.id}`, `visual.${slugId(pattern)}.${slugId(eventName)}`]
+          : [`visual.${slugId(pattern)}.state`, `visual.${slugId(pattern)}.${slugId(eventName)}`],
         accessibility: {
           accessible_label: { vi: `Bước ${sequence + 1}: ${eventName}`, en: `Step ${sequence + 1}: ${eventName}` },
           action_description: copy.prediction,

@@ -6,7 +6,7 @@
     "lesson_slug": "oop-state",
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-state.production-v1",
     "artifact_version": "production-v1",
-    "code_sha256": "d40ba5a86768a1fb1345c71ae13a8d6cb8d4650eb30a85edbf6005052e9f919b"
+    "code_sha256": "2f63820f6c4b1764bea1092eef134b45e5f6dbf3165e097a4f1ab49769730f5a"
   },
   "python_artifact": {
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.oop-state.production-v1",
@@ -37,32 +37,32 @@
       {
         "line_id": "oop-state.production-v1.L004",
         "order": 4,
-        "text": "    def __init__(self, balance, limit): self.__balance, self.__limit = balance, limit"
+        "text": "    def __init__(self, balance, limit):"
       },
       {
         "line_id": "oop-state.production-v1.L005",
         "order": 5,
-        "text": "    def get_balance(self): return self.__balance"
+        "text": "        self.__balance = balance"
       },
       {
         "line_id": "oop-state.production-v1.L006",
         "order": 6,
-        "text": "    def set_balance(self, value):"
+        "text": "        self.__limit = limit"
       },
       {
         "line_id": "oop-state.production-v1.L007",
         "order": 7,
-        "text": "        if not 0 <= value <= self.__limit: return False"
+        "text": ""
       },
       {
         "line_id": "oop-state.production-v1.L008",
         "order": 8,
-        "text": "        self.__balance = value; return True"
+        "text": "    def get_balance(self):"
       },
       {
         "line_id": "oop-state.production-v1.L009",
         "order": 9,
-        "text": "    def apply_change(self, delta): return self.set_balance(self.__balance + delta)"
+        "text": "        return self.__balance"
       },
       {
         "line_id": "oop-state.production-v1.L010",
@@ -72,47 +72,47 @@
       {
         "line_id": "oop-state.production-v1.L011",
         "order": 11,
-        "text": "def run(fixture):"
+        "text": "    def set_balance(self, value):"
       },
       {
         "line_id": "oop-state.production-v1.L012",
         "order": 12,
-        "text": "    account, trace = Account(fixture[\"start\"], fixture[\"limit\"]), []"
+        "text": "        if not 0 <= value <= self.__limit:"
       },
       {
         "line_id": "oop-state.production-v1.L013",
         "order": 13,
-        "text": "    old = account.get_balance()"
+        "text": "            return False"
       },
       {
         "line_id": "oop-state.production-v1.L014",
         "order": 14,
-        "text": "    setter_ok = account.set_balance(fixture[\"replacement\"])"
+        "text": "        self.__balance = value"
       },
       {
         "line_id": "oop-state.production-v1.L015",
         "order": 15,
-        "text": "    trace.append({\"event\": \"setter\", \"success\": setter_ok, \"balance\": account.get_balance()})"
+        "text": "        return True"
       },
       {
         "line_id": "oop-state.production-v1.L016",
         "order": 16,
-        "text": "    before_update = account.get_balance()"
+        "text": ""
       },
       {
         "line_id": "oop-state.production-v1.L017",
         "order": 17,
-        "text": "    update_ok = account.apply_change(fixture[\"delta\"])"
+        "text": "    def apply_change(self, delta):"
       },
       {
         "line_id": "oop-state.production-v1.L018",
         "order": 18,
-        "text": "    trace.append({\"event\": \"rule_update\", \"success\": update_ok, \"balance\": account.get_balance()})"
+        "text": "        candidate = self.__balance + delta"
       },
       {
         "line_id": "oop-state.production-v1.L019",
         "order": 19,
-        "text": "    return {\"status\": \"OK\", \"old\": old, \"balance\": account.get_balance(), \"setter_ok\": setter_ok, \"update_ok\": update_ok, \"preserved_after_failed_update\": update_ok or account.get_balance() == before_update, \"trace\": trace}"
+        "text": "        return self.set_balance(candidate)"
       },
       {
         "line_id": "oop-state.production-v1.L020",
@@ -122,54 +122,154 @@
       {
         "line_id": "oop-state.production-v1.L021",
         "order": 21,
-        "text": "if __name__ == \"__main__\":"
+        "text": "def run(fixture):"
       },
       {
         "line_id": "oop-state.production-v1.L022",
         "order": 22,
-        "text": "    import json"
+        "text": "    account = Account(fixture[\"start\"], fixture[\"limit\"])"
       },
       {
         "line_id": "oop-state.production-v1.L023",
         "order": 23,
-        "text": "    import sys"
+        "text": "    trace = []"
       },
       {
         "line_id": "oop-state.production-v1.L024",
         "order": 24,
-        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+        "text": "    old = account.get_balance()"
       },
       {
         "line_id": "oop-state.production-v1.L025",
         "order": 25,
-        "text": "    result = run(fixture)"
+        "text": "    setter_ok = account.set_balance(fixture[\"replacement\"])"
       },
       {
         "line_id": "oop-state.production-v1.L026",
         "order": 26,
-        "text": "    if not result[\"trace\"]:"
+        "text": "    trace.append({\"event\": \"setter\", \"success\": setter_ok, \"balance\": account.get_balance()})"
       },
       {
         "line_id": "oop-state.production-v1.L027",
         "order": 27,
-        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+        "text": "    before_update = account.get_balance()"
       },
       {
         "line_id": "oop-state.production-v1.L028",
         "order": 28,
-        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+        "text": "    update_ok = account.apply_change(fixture[\"delta\"])"
       },
       {
         "line_id": "oop-state.production-v1.L029",
         "order": 29,
+        "text": "    trace.append({\"event\": \"rule_update\", \"success\": update_ok, \"balance\": account.get_balance()})"
+      },
+      {
+        "line_id": "oop-state.production-v1.L030",
+        "order": 30,
+        "text": "    preserved = update_ok or account.get_balance() == before_update"
+      },
+      {
+        "line_id": "oop-state.production-v1.L031",
+        "order": 31,
+        "text": "    return {"
+      },
+      {
+        "line_id": "oop-state.production-v1.L032",
+        "order": 32,
+        "text": "        \"status\": \"OK\","
+      },
+      {
+        "line_id": "oop-state.production-v1.L033",
+        "order": 33,
+        "text": "        \"old\": old,"
+      },
+      {
+        "line_id": "oop-state.production-v1.L034",
+        "order": 34,
+        "text": "        \"balance\": account.get_balance(),"
+      },
+      {
+        "line_id": "oop-state.production-v1.L035",
+        "order": 35,
+        "text": "        \"setter_ok\": setter_ok,"
+      },
+      {
+        "line_id": "oop-state.production-v1.L036",
+        "order": 36,
+        "text": "        \"update_ok\": update_ok,"
+      },
+      {
+        "line_id": "oop-state.production-v1.L037",
+        "order": 37,
+        "text": "        \"preserved_after_failed_update\": preserved,"
+      },
+      {
+        "line_id": "oop-state.production-v1.L038",
+        "order": 38,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "oop-state.production-v1.L039",
+        "order": 39,
+        "text": "    }"
+      },
+      {
+        "line_id": "oop-state.production-v1.L040",
+        "order": 40,
+        "text": ""
+      },
+      {
+        "line_id": "oop-state.production-v1.L041",
+        "order": 41,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "oop-state.production-v1.L042",
+        "order": 42,
+        "text": "    import json"
+      },
+      {
+        "line_id": "oop-state.production-v1.L043",
+        "order": 43,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "oop-state.production-v1.L044",
+        "order": 44,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "oop-state.production-v1.L045",
+        "order": 45,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "oop-state.production-v1.L046",
+        "order": 46,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "oop-state.production-v1.L047",
+        "order": 47,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "oop-state.production-v1.L048",
+        "order": 48,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "oop-state.production-v1.L049",
+        "order": 49,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "d40ba5a86768a1fb1345c71ae13a8d6cb8d4650eb30a85edbf6005052e9f919b",
+    "code_sha256": "2f63820f6c4b1764bea1092eef134b45e5f6dbf3165e097a4f1ab49769730f5a",
     "caption": {
-      "en": "Encapsulation through getters, setters and rule updates.",
-      "vi": "Encapsulation bằng getter, setter và rule update."
+      "en": "Encapsulation with getters, setters, guard-before-write, and state preservation.",
+      "vi": "Encapsulation với getter, setter, guard-before-write và state preservation."
     },
     "execution": {
       "syntax_status": "PASS",
@@ -266,9 +366,9 @@
       "sequence": 0,
       "event_type": "write",
       "active_line_ids": [
-        "oop-state.production-v1.L015",
-        "oop-state.production-v1.L018",
-        "oop-state.production-v1.L014"
+        "oop-state.production-v1.L026",
+        "oop-state.production-v1.L029",
+        "oop-state.production-v1.L025"
       ],
       "before": {
         "fixture_ref": "oop-state.boundary",
@@ -318,8 +418,8 @@
         }
       },
       "invariant_or_criterion": {
-        "vi": "OOP_SET: sự kiện setter phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "OOP_SET: event setter must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Guard nào chạy trước write và state nào được giữ khi reject? Sự kiện setter phải khớp trace chạy lại độc lập và line Python production-v1.",
+        "en": "Which guard runs before the write, and which state is preserved after rejection? Event setter must match the independent rerun trace and production-v1 Python lines."
       },
       "prediction": {
         "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
@@ -330,7 +430,7 @@
         "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
       },
       "visual_targets": [
-        "visual.oop-set.state",
+        "visual.oop.encapsulation-gate",
         "visual.oop-set.setter"
       ],
       "accessibility": {
@@ -364,10 +464,10 @@
       "sequence": 1,
       "event_type": "write",
       "active_line_ids": [
-        "oop-state.production-v1.L018",
-        "oop-state.production-v1.L015",
-        "oop-state.production-v1.L016",
-        "oop-state.production-v1.L019"
+        "oop-state.production-v1.L029",
+        "oop-state.production-v1.L026",
+        "oop-state.production-v1.L027",
+        "oop-state.production-v1.L031"
       ],
       "before": {
         "fixture_ref": "oop-state.boundary",
@@ -444,8 +544,8 @@
         }
       },
       "invariant_or_criterion": {
-        "vi": "OOP_SET: sự kiện rule_update phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "OOP_SET: event rule_update must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Guard nào chạy trước write và state nào được giữ khi reject? Sự kiện rule_update phải khớp trace chạy lại độc lập và line Python production-v1.",
+        "en": "Which guard runs before the write, and which state is preserved after rejection? Event rule_update must match the independent rerun trace and production-v1 Python lines."
       },
       "prediction": {
         "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
@@ -456,7 +556,7 @@
         "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
       },
       "visual_targets": [
-        "visual.oop-set.state",
+        "visual.oop.encapsulation-gate",
         "visual.oop-set.rule-update"
       ],
       "accessibility": {
@@ -490,9 +590,9 @@
       "sequence": 0,
       "event_type": "write",
       "active_line_ids": [
-        "oop-state.production-v1.L015",
-        "oop-state.production-v1.L018",
-        "oop-state.production-v1.L014"
+        "oop-state.production-v1.L026",
+        "oop-state.production-v1.L029",
+        "oop-state.production-v1.L025"
       ],
       "before": {
         "fixture_ref": "oop-state.failure",
@@ -542,8 +642,8 @@
         }
       },
       "invariant_or_criterion": {
-        "vi": "OOP_SET: sự kiện setter phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "OOP_SET: event setter must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Guard nào chạy trước write và state nào được giữ khi reject? Sự kiện setter phải khớp trace chạy lại độc lập và line Python production-v1.",
+        "en": "Which guard runs before the write, and which state is preserved after rejection? Event setter must match the independent rerun trace and production-v1 Python lines."
       },
       "prediction": {
         "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
@@ -554,7 +654,7 @@
         "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
       },
       "visual_targets": [
-        "visual.oop-set.state",
+        "visual.oop.encapsulation-gate",
         "visual.oop-set.setter"
       ],
       "accessibility": {
@@ -588,10 +688,10 @@
       "sequence": 1,
       "event_type": "write",
       "active_line_ids": [
-        "oop-state.production-v1.L018",
-        "oop-state.production-v1.L015",
-        "oop-state.production-v1.L016",
-        "oop-state.production-v1.L019"
+        "oop-state.production-v1.L029",
+        "oop-state.production-v1.L026",
+        "oop-state.production-v1.L027",
+        "oop-state.production-v1.L031"
       ],
       "before": {
         "fixture_ref": "oop-state.failure",
@@ -668,8 +768,8 @@
         }
       },
       "invariant_or_criterion": {
-        "vi": "OOP_SET: sự kiện rule_update phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "OOP_SET: event rule_update must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Guard nào chạy trước write và state nào được giữ khi reject? Sự kiện rule_update phải khớp trace chạy lại độc lập và line Python production-v1.",
+        "en": "Which guard runs before the write, and which state is preserved after rejection? Event rule_update must match the independent rerun trace and production-v1 Python lines."
       },
       "prediction": {
         "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
@@ -680,7 +780,7 @@
         "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
       },
       "visual_targets": [
-        "visual.oop-set.state",
+        "visual.oop.encapsulation-gate",
         "visual.oop-set.rule-update"
       ],
       "accessibility": {
@@ -714,9 +814,9 @@
       "sequence": 0,
       "event_type": "write",
       "active_line_ids": [
-        "oop-state.production-v1.L015",
-        "oop-state.production-v1.L018",
-        "oop-state.production-v1.L014"
+        "oop-state.production-v1.L026",
+        "oop-state.production-v1.L029",
+        "oop-state.production-v1.L025"
       ],
       "before": {
         "fixture_ref": "oop-state.normal",
@@ -766,8 +866,8 @@
         }
       },
       "invariant_or_criterion": {
-        "vi": "OOP_SET: sự kiện setter phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "OOP_SET: event setter must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Guard nào chạy trước write và state nào được giữ khi reject? Sự kiện setter phải khớp trace chạy lại độc lập và line Python production-v1.",
+        "en": "Which guard runs before the write, and which state is preserved after rejection? Event setter must match the independent rerun trace and production-v1 Python lines."
       },
       "prediction": {
         "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (setter)",
@@ -778,7 +878,7 @@
         "en": "The write preserves prior data and applies the exact change in the trace. Event: setter."
       },
       "visual_targets": [
-        "visual.oop-set.state",
+        "visual.oop.encapsulation-gate",
         "visual.oop-set.setter"
       ],
       "accessibility": {
@@ -812,10 +912,10 @@
       "sequence": 1,
       "event_type": "write",
       "active_line_ids": [
-        "oop-state.production-v1.L018",
-        "oop-state.production-v1.L015",
-        "oop-state.production-v1.L016",
-        "oop-state.production-v1.L019"
+        "oop-state.production-v1.L029",
+        "oop-state.production-v1.L026",
+        "oop-state.production-v1.L027",
+        "oop-state.production-v1.L031"
       ],
       "before": {
         "fixture_ref": "oop-state.normal",
@@ -892,8 +992,8 @@
         }
       },
       "invariant_or_criterion": {
-        "vi": "OOP_SET: sự kiện rule_update phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "OOP_SET: event rule_update must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Guard nào chạy trước write và state nào được giữ khi reject? Sự kiện rule_update phải khớp trace chạy lại độc lập và line Python production-v1.",
+        "en": "Which guard runs before the write, and which state is preserved after rejection? Event rule_update must match the independent rerun trace and production-v1 Python lines."
       },
       "prediction": {
         "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (rule update)",
@@ -904,7 +1004,7 @@
         "en": "The write preserves prior data and applies the exact change in the trace. Event: rule update."
       },
       "visual_targets": [
-        "visual.oop-set.state",
+        "visual.oop.encapsulation-gate",
         "visual.oop-set.rule-update"
       ],
       "accessibility": {

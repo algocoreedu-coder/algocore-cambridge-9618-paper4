@@ -44,6 +44,53 @@ const profiles = {
   "validation-rules": ["input validation, unique selection, rule outcome và check digit", "input validation, unique selection, rule outcomes, and check digits", "tính rule từ dữ liệu gốc, phân biệt invalid với duplicate và không mutate khi reject", "compute the rule from source data, distinguish invalid from duplicate, and do not mutate on rejection"],
 };
 
+const oopPrompts = {
+  "oop-model": {
+    guided: bilingual(
+      "Từ yêu cầu quản lý Student gồm student_id, name và score, hãy lập class-design checklist: entity, state, responsibility, constructor, public method và invariant. Sau đó dự đoán trace khi tạo hai instance độc lập.",
+      "From a requirement to manage a Student with student_id, name, and score, produce a class-design checklist: entity, state, responsibility, constructor, public method, and invariant. Then predict the trace for two independent instances."),
+    faded: bilingual(
+      "Sửa class Student có method thiếu self và constructor gán field trước validation. Nộp code chạy được và chứng minh invalid input không tạo object nửa hợp lệ.",
+      "Repair a Student class whose method omits self and whose constructor assigns fields before validation. Submit runnable code and prove that invalid input creates no partially valid object."),
+    independent: bilingual(
+      "Thiết kế một class mới từ prompt, tạo hai instance, thay đổi một instance và chứng minh instance còn lại không đổi bằng normal, boundary và failure evidence.",
+      "Design a new class from a prompt, create two instances, change one instance, and prove the other remains unchanged with normal, boundary, and failure evidence."),
+  },
+  "oop-state": {
+    guided: bilingual(
+      "Trace Account qua getter, setter và rule-based update. Đánh dấu guard chạy trước write và state được giữ khi update bị từ chối.",
+      "Trace Account through a getter, setter, and rule-based update. Mark the guard before the write and the state preserved after a rejected update."),
+    faded: bilingual(
+      "Sửa code client đang ghi trực tiếp __balance và setter đang mutate trước validation. Giữ explicit getter/setter là đường ôn thi; ghi @property là Python nuance bổ sung.",
+      "Repair client code that writes __balance directly and a setter that mutates before validation. Keep explicit getters/setters as the exam path; label @property as supplementary Python nuance."),
+    independent: bilingual(
+      "Cài đặt class có private-by-convention state, getter, validated setter và relative update; chứng minh mỗi rejected operation không mutate state.",
+      "Implement a class with private-by-convention state, a getter, a validated setter, and a relative update; prove every rejected operation leaves state unchanged."),
+  },
+  "oop-inheritance": {
+    guided: bilingual(
+      "Trace constructor chain Rectangle.__init__ → super().__init__, rồi xác định runtime type, selected area() method và output cho từng object.",
+      "Trace the Rectangle.__init__ → super().__init__ constructor chain, then identify each object's runtime type, selected area() method, and output."),
+    faded: bilingual(
+      "Sửa subclass bỏ super() và override sai tên hoặc signature. Giải thích vì sao overload không thay thế override trong lời giải này.",
+      "Repair a subclass that omits super() and misnames or changes the signature of an override. Explain why overloading does not replace overriding in this solution."),
+    independent: bilingual(
+      "Thiết kế base contract và hai subclass is-a; xử lý collection qua cùng area() call mà không dùng chuỗi isinstance, rồi kiểm chứng dynamic dispatch.",
+      "Design a base contract and two is-a subclasses; process a collection through the same area() call without an isinstance chain, then verify dynamic dispatch."),
+  },
+  "oop-aggregation": {
+    guided: bilingual(
+      "Vẽ object graph Shelf has-a Book, chỉ ra owner, component references và state của từng object; giải thích vì sao đây không phải is-a.",
+      "Draw the Shelf has-a Book object graph, identifying the owner, component references, and each object's state; explain why this is not an is-a relationship."),
+    faded: bilingual(
+      "Sửa add() đang append trước khi kiểm tra capacity và type. Dùng fixture full-capacity và wrong-object-type để chứng minh collection không đổi khi reject.",
+      "Repair add() when it appends before checking capacity and type. Use full-capacity and wrong-object-type fixtures to prove the collection remains unchanged after rejection."),
+    independent: bilingual(
+      "Cài đặt aggregate mới có component method delegation, capacity guard và object graph; kiểm chứng normal, boundary và failure mà không dùng inheritance cho quan hệ has-a.",
+      "Implement a new aggregate with component-method delegation, a capacity guard, and an object graph; verify normal, boundary, and failure cases without using inheritance for the has-a relationship."),
+  },
+};
+
 function atomCriterion(atom) {
   const details = [
     `disposition=${atom.disposition}`, `award_semantics=${atom.award_semantics}`,
@@ -70,8 +117,14 @@ function atomLocator(atom) {
 }
 
 function prompts(slug) {
+  if (oopPrompts[slug]) {
+    return Object.fromEntries(Object.entries(oopPrompts[slug]).map(([level, prompt]) => [level, bilingual(
+      `${prompt.vi} Dùng fixture và output canonical của mức này làm bằng chứng thực thi.`,
+      `${prompt.en} Use this level's fixture and canonical output as execution evidence.`
+    )]));
+  }
   const [focusVi, focusEn, invariantVi, invariantEn] = profiles[slug];
-  return {
+  const generated = {
     guided: bilingual(
       `Chạy fixture normal cho ${focusVi}. Trước khi chạy, dự đoán event và state chính; sau đó lập trace trước/event/sau, đối chiếu output canonical và giải thích invariant: ${invariantVi}.`,
       `Run the normal fixture for ${focusEn}. Predict the key events and state before execution, then submit a before/event/after trace, compare it with canonical output, and explain this invariant: ${invariantEn}.`,
@@ -85,6 +138,12 @@ function prompts(slug) {
       `Independently implement and verify ${focusEn} with all three fixtures: normal, boundary, and failure. Submit code, three actual outputs, assertions, a first-divergence trace, and explain why the solution preserves this rule: ${invariantEn}.`,
     ),
   };
+  if (slug === "exam-workflow") {
+    generated.independent = bilingual(
+      "Capstone OOP: từ prompt hãy thiết kế class, tạo aggregate has-a chứa các object thuộc base/subclass, xử lý bằng polymorphic call, rồi bàn giao output qua main workflow. Nộp code, ba fixture và output normal/boundary/failure, object graph, constructor/dynamic-dispatch trace và evidence matrix; đây là bài AlgoCore tích hợp, không tạo official pattern mới.",
+      "OOP capstone: design a class from the prompt, create a has-a aggregate containing base/subclass objects, process them through a polymorphic call, and hand the output to the main workflow. Submit code, three normal/boundary/failure fixture outputs, an object graph, constructor/dynamic-dispatch trace, and an evidence matrix; this is an AlgoCore integration task and creates no new official pattern.");
+  }
+  return generated;
 }
 
 function assessmentRubric(slug, level, patterns, requirements, refs, representational) {

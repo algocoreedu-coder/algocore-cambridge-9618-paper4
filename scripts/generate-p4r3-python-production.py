@@ -406,87 +406,189 @@ def run(fixture):
 
 class Student:
     def __init__(self, student_id, name, score=0):
-        if not isinstance(student_id, int) or student_id < 1 or not isinstance(score, int) or not 0 <= score <= 100:
+        valid_id = isinstance(student_id, int) and student_id >= 1
+        valid_score = isinstance(score, int) and 0 <= score <= 100
+        if not valid_id or not valid_score:
             raise ValueError("invalid student")
-        self.student_id, self.name, self.score = student_id, name, score
-    def state(self): return {"student_id": self.student_id, "name": self.name, "score": self.score}
+        self.student_id = student_id
+        self.name = name
+        self.score = score
+
+    def state(self):
+        return {
+            "student_id": self.student_id,
+            "name": self.name,
+            "score": self.score,
+        }
 
 def run(fixture):
-    objects, rejected, trace = [], 0, []
+    objects = []
+    rejected = 0
+    trace = []
     for record in fixture.get("records", []):
         try:
             student = Student(record.get("student_id"), record.get("name", ""), record.get("score", 0))
-            objects.append(student); trace.append({"event": "instantiate", "student_id": student.student_id})
+            trace.append({"event": "bind_instance", "student_id": student.student_id})
+            objects.append(student)
+            trace.append({"event": "instantiate", "student_id": student.student_id})
         except (TypeError, ValueError):
-            rejected += 1; trace.append({"event": "reject_constructor"})
+            rejected += 1
+            trace.append({"event": "reject_constructor", "object_created": False})
     states = [student.state() for student in objects]
-    return {"status": "OK" if rejected == 0 else "PARTIAL_REJECT", "objects": states, "rejected": rejected, "independent_instances": len({id(student) for student in objects}) == len(objects), "trace": trace}
+    independent_instances = len({id(student) for student in objects}) == len(objects)
+    return {
+        "status": "OK" if rejected == 0 else "PARTIAL_REJECT",
+        "objects": states,
+        "rejected": rejected,
+        "independent_instances": independent_instances,
+        "trace": trace,
+    }
 ''',
 "oop-state": '''from pathlib import Path
 
 class Account:
-    def __init__(self, balance, limit): self.__balance, self.__limit = balance, limit
-    def get_balance(self): return self.__balance
+    def __init__(self, balance, limit):
+        self.__balance = balance
+        self.__limit = limit
+
+    def get_balance(self):
+        return self.__balance
+
     def set_balance(self, value):
-        if not 0 <= value <= self.__limit: return False
-        self.__balance = value; return True
-    def apply_change(self, delta): return self.set_balance(self.__balance + delta)
+        if not 0 <= value <= self.__limit:
+            return False
+        self.__balance = value
+        return True
+
+    def apply_change(self, delta):
+        candidate = self.__balance + delta
+        return self.set_balance(candidate)
 
 def run(fixture):
-    account, trace = Account(fixture["start"], fixture["limit"]), []
+    account = Account(fixture["start"], fixture["limit"])
+    trace = []
     old = account.get_balance()
     setter_ok = account.set_balance(fixture["replacement"])
     trace.append({"event": "setter", "success": setter_ok, "balance": account.get_balance()})
     before_update = account.get_balance()
     update_ok = account.apply_change(fixture["delta"])
     trace.append({"event": "rule_update", "success": update_ok, "balance": account.get_balance()})
-    return {"status": "OK", "old": old, "balance": account.get_balance(), "setter_ok": setter_ok, "update_ok": update_ok, "preserved_after_failed_update": update_ok or account.get_balance() == before_update, "trace": trace}
+    preserved = update_ok or account.get_balance() == before_update
+    return {
+        "status": "OK",
+        "old": old,
+        "balance": account.get_balance(),
+        "setter_ok": setter_ok,
+        "update_ok": update_ok,
+        "preserved_after_failed_update": preserved,
+        "trace": trace,
+    }
 ''',
 "oop-inheritance": '''from pathlib import Path
 
 class Shape:
-    def __init__(self, name): self.name = name
-    def area(self): return 0
+    def __init__(self, name):
+        self.name = name
+
+    def area(self):
+        raise NotImplementedError("subclass must implement area")
+
 class Rectangle(Shape):
     def __init__(self, width, height):
-        if width < 0 or height < 0: raise ValueError("negative size")
-        super().__init__("rectangle"); self.width, self.height = width, height
-    def area(self): return self.width * self.height
+        if width < 0 or height < 0:
+            raise ValueError("negative size")
+        super().__init__("rectangle")
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
 class Circle(Shape):
     def __init__(self, radius):
-        if radius < 0: raise ValueError("negative size")
-        super().__init__("circle"); self.radius = radius
-    def area(self): return round(3.14 * self.radius * self.radius, 2)
+        if radius < 0:
+            raise ValueError("negative size")
+        super().__init__("circle")
+        self.radius = radius
+
+    def area(self):
+        return round(3.14 * self.radius * self.radius, 2)
 
 def run(fixture):
-    shapes, rejected, trace = [Shape("base")], 0, []
+    shapes = []
+    rejected = 0
+    trace = []
     for record in fixture.get("shapes", []):
-        try: shapes.append(Rectangle(record["width"], record["height"]) if record["type"] == "rectangle" else Circle(record["radius"]))
-        except (KeyError, ValueError): rejected += 1
+        try:
+            if record["type"] == "rectangle":
+                shape = Rectangle(record["width"], record["height"])
+            elif record["type"] == "circle":
+                shape = Circle(record["radius"])
+            else:
+                raise ValueError("unknown shape")
+            shapes.append(shape)
+            trace.append({"event": "constructor_chain", "runtime_type": type(shape).__name__})
+        except (KeyError, ValueError):
+            rejected += 1
+            trace.append({"event": "reject_subclass"})
     outputs = []
     for shape in shapes:
-        outputs.append({"name": shape.name, "area": shape.area()}); trace.append({"event": "dynamic_dispatch", "runtime_type": type(shape).__name__})
-    return {"status": "OK" if rejected == 0 else "REJECTED_INVALID_SUBCLASS", "outputs": outputs, "rejected": rejected, "trace": trace}
+        area = shape.area()
+        outputs.append({"name": shape.name, "area": area})
+        trace.append({"event": "dynamic_dispatch", "runtime_type": type(shape).__name__, "method": "area", "result": area})
+    return {
+        "status": "OK" if rejected == 0 else "REJECTED_INVALID_SUBCLASS",
+        "outputs": outputs,
+        "rejected": rejected,
+        "trace": trace,
+    }
 ''',
 "oop-aggregation": '''from pathlib import Path
 
 class Book:
-    def __init__(self, title): self.title = title
-    def label(self): return self.title.upper()
+    def __init__(self, title):
+        self.title = title
+
+    def label(self):
+        return self.title.upper()
+
 class Shelf:
-    def __init__(self, capacity): self.capacity, self.books = capacity, []
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.books = []
+
     def add(self, book):
-        if not isinstance(book, Book) or len(self.books) == self.capacity: return False
-        self.books.append(book); return True
-    def labels(self): return [book.label() for book in self.books]
+        valid_book = isinstance(book, Book)
+        has_space = len(self.books) < self.capacity
+        if not valid_book or not has_space:
+            return False
+        self.books.append(book)
+        return True
+
+    def labels(self):
+        return [book.label() for book in self.books]
 
 def run(fixture):
-    shelf, trace = Shelf(fixture["capacity"]), []
+    shelf = Shelf(fixture["capacity"])
+    trace = []
     for value in fixture.get("items", []):
         item = Book(value) if isinstance(value, str) else value
-        before = len(shelf.books); success = shelf.add(item)
-        trace.append({"event": "bounded_add", "success": success, "count": len(shelf.books), "unchanged_on_reject": success or before == len(shelf.books)})
-    return {"status": "OK", "count": len(shelf.books), "labels": shelf.labels(), "capacity": shelf.capacity, "trace": trace}
+        before = len(shelf.books)
+        success = shelf.add(item)
+        trace.append({
+            "event": "bounded_add",
+            "success": success,
+            "count": len(shelf.books),
+            "unchanged_on_reject": success or before == len(shelf.books),
+            "relationship": "has-a",
+        })
+    return {
+        "status": "OK",
+        "count": len(shelf.books),
+        "labels": shelf.labels(),
+        "capacity": shelf.capacity,
+        "trace": trace,
+    }
 ''',
 "text-files": r'''from pathlib import Path
 from tempfile import TemporaryDirectory

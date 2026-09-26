@@ -110,6 +110,68 @@ const RULES = new Map([
   ["exam-workflow/source-and-rubric", bi("Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore.", "Only QP/MS receive official authority; authored explanations, examples, and rubrics always carry an AlgoCore label.")],
 ]);
 
+const OOP_ENRICHMENT = new Map([
+  ["oop-model/class-object", bi(
+    "Trong Python, self là reference tới instance hiện tại: cùng một method definition nhưng mỗi lần gọi đọc và ghi state của object nhận lời gọi.",
+    "In Python, self references the current instance: one method definition reads and writes the state of whichever object receives the call.")],
+  ["oop-model/constructor", bi(
+    "Constructor phải kiểm tra dữ liệu trước khi gán; nếu validation thất bại thì không được để lại object nửa hợp lệ.",
+    "A constructor validates before assignment; failed validation must not leave a partially valid object.")],
+  ["oop-model/instantiate", bi(
+    "Dùng class blueprint để tạo ít nhất hai instance rồi trace riêng identity và state của từng instance.",
+    "Use the class blueprint to create at least two instances, then trace each instance identity and state separately.")],
+  ["oop-model/class-design", bi(
+    "Checklist thiết kế: xác định entity, persistent state, responsibility, constructor parameters, public methods và invariant trước khi viết code.",
+    "Design checklist: identify the entity, persistent state, responsibilities, constructor parameters, public methods, and invariant before writing code.")],
+  ["oop-state/encapsulation", bi(
+    "Tên _name là convention; __name kích hoạt name mangling nhưng không phải hàng rào bảo mật. Encapsulation nằm ở hợp đồng public interface và invariant.",
+    "A _name is a convention; __name triggers name mangling but is not a security barrier. Encapsulation comes from the public-interface contract and invariant.")],
+  ["oop-state/getters", bi(
+    "Đường ôn thi canonical dùng getter tường minh. @property chỉ là Python nuance bổ sung và không thay đổi mục tiêu syllabus về getter.",
+    "The canonical exam path uses an explicit getter. @property is supplementary Python nuance and does not change the syllabus getter objective.")],
+  ["oop-state/setters", bi(
+    "Guard phải chạy trước write; setter bị từ chối trả outcome rõ và giữ nguyên state cũ.",
+    "The guard runs before the write; a rejected setter returns a clear outcome and preserves the previous state.")],
+  ["oop-state/rule-updates", bi(
+    "Tính candidate từ state hiện tại, kiểm tra candidate, rồi mới commit đúng một lần; không cập nhật trước rồi hoàn tác.",
+    "Derive a candidate from current state, validate it, and commit exactly once; do not mutate first and then undo.")],
+  ["oop-inheritance/base-derived", bi(
+    "Chọn inheritance chỉ khi quan hệ là is-a; subclass gọi super() để khởi tạo phần base trước khi thêm state riêng.",
+    "Choose inheritance only for an is-a relationship; the subclass calls super() to initialise the base portion before adding its own state.")],
+  ["oop-inheritance/override-dispatch", bi(
+    "Override giữ cùng method name và contract. Overload theo signature không phải cơ chế trọng tâm ở đây; runtime type quyết định implementation được gọi.",
+    "An override keeps the method name and contract. Signature overloading is not the focus here; runtime type selects the implementation.")],
+  ["oop-inheritance/substitutability", bi(
+    "Một collection kiểu base có thể chứa nhiều subclass; cùng lời gọi area() tạo kết quả khác nhau mà không cần type-switch thủ công.",
+    "A base-typed collection can hold several subclasses; the same area() call produces class-specific results without a manual type switch.")],
+  ["oop-aggregation/has-a", bi(
+    "Dùng aggregation khi quan hệ là has-a: owner giữ reference tới component; không biến component thành subclass của owner.",
+    "Use aggregation for a has-a relationship: the owner stores a component reference; the component is not a subclass of the owner.")],
+  ["oop-aggregation/bounded-add", bi(
+    "Kiểm tra đúng type và còn capacity trước append; ca full và wrong-object-type đều phải chứng minh collection không đổi.",
+    "Check the component type and remaining capacity before append; both full and wrong-object-type cases must prove the collection is unchanged.")],
+  ["oop-aggregation/nested-access", bi(
+    "Object graph phải cho thấy owner, component references và state riêng của từng object; owner gọi method của component thay vì sao chép field.",
+    "The object graph shows the owner, component references, and each object's state; the owner calls component methods instead of copying fields.")],
+]);
+
+const OOP_MISCONCEPTION = new Map([
+  ["oop-model/class-object", bi("Cho rằng self là một biến toàn cục hoặc class chỉ có một state dùng chung.", "Treating self as a global variable or assuming a class has one shared state.")],
+  ["oop-model/constructor", bi("Gán một số attribute trước validation, tạo object nửa hợp lệ khi constructor thất bại.", "Assigning some attributes before validation and leaving a partially valid object after constructor failure.")],
+  ["oop-model/instantiate", bi("Dùng lại cùng object reference khi đề yêu cầu hai instance độc lập.", "Reusing one object reference when the task requires two independent instances.")],
+  ["oop-model/class-design", bi("Biến mọi noun thành class mà không kiểm tra state, responsibility và invariant.", "Turning every noun into a class without checking its state, responsibility, and invariant.")],
+  ["oop-state/encapsulation", bi("Cho rằng __name làm dữ liệu hoàn toàn private và không cần public interface rõ.", "Assuming __name makes data completely private and removes the need for a clear public interface.")],
+  ["oop-state/getters", bi("Getter làm thay đổi state hoặc trả nhầm attribute.", "A getter mutates state or returns the wrong attribute.")],
+  ["oop-state/setters", bi("Ghi field trước khi validation hoặc nhầm setter với phép tăng tương đối.", "Writing the field before validation or confusing a setter with a relative update.")],
+  ["oop-state/rule-updates", bi("Cộng delta hai lần hoặc thay thế bằng delta thay vì tính candidate từ state cũ.", "Applying the delta twice or replacing the value with the delta instead of deriving a candidate from old state.")],
+  ["oop-inheritance/base-derived", bi("Bỏ super() nên base state chưa được khởi tạo đúng.", "Omitting super() so the base state is not initialised correctly.")],
+  ["oop-inheritance/override-dispatch", bi("Đổi tên hoặc signature nên method không override contract của base class.", "Changing the name or signature so the method no longer overrides the base-class contract.")],
+  ["oop-inheritance/substitutability", bi("Dùng chuỗi isinstance thay cho polymorphic call qua interface chung.", "Using an isinstance chain instead of a polymorphic call through the shared interface.")],
+  ["oop-aggregation/has-a", bi("Dùng inheritance cho quan hệ has-a, ví dụ Shelf kế thừa Book.", "Using inheritance for a has-a relationship, such as making Shelf inherit from Book.")],
+  ["oop-aggregation/bounded-add", bi("Kiểm tra full sau append khiến collection vượt capacity.", "Checking for full capacity after append, allowing the collection to overflow.")],
+  ["oop-aggregation/nested-access", bi("Sao chép field component vào owner làm hai state có thể lệch nhau.", "Copying a component field into the owner so the two states can drift apart.")],
+]);
+
 function cleanLocatorObjective(ref) {
   const source = ref.source;
   return { objective_id: ref.objective_id, syllabus_version: "2026", locator: {
@@ -167,9 +229,10 @@ for (const lesson of inventory.lessons) {
     const viDomain = domain ? ` trong ${domain.vi}` : "";
     const enDomain = domain ? ` in the ${domain.en}` : "";
     const boundLines = lineRole.active_line_ids.join(", ");
+    const enrichment = OOP_ENRICHMENT.get(key);
     const explanation = aligned(
-      `${focusVi}${viDomain} tập trung vào một quy tắc có thể kiểm tra: ${rule.vi} Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.`,
-      `${disposition.titles.en}${enDomain} centres on one checkable rule: ${rule.en} In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation.`);
+      `${focusVi}${viDomain} tập trung vào một quy tắc có thể kiểm tra: ${rule.vi} Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.${enrichment ? ` ${enrichment.vi}` : ""}`,
+      `${disposition.titles.en}${enDomain} centres on one checkable rule: ${rule.en} In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation.${enrichment ? ` ${enrichment.en}` : ""}`);
     const pythonConnection = aligned(
       `Trong artifact ${artifactId}, các dòng ${boundLines} chứa đoạn mã “${lineRole.matched_text}” và minh họa trực tiếp ${focusVi}${viDomain}: ${rule.vi} Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.`,
       `In artifact ${artifactId}, lines ${boundLines} contain “${lineRole.matched_text}” and directly demonstrate ${disposition.titles.en}${enDomain}: ${rule.en} This is the A3-frozen and independently rerun production-v1 source.`);
@@ -189,7 +252,7 @@ for (const lesson of inventory.lessons) {
       invariant_or_rule: rule,
       misconceptions: [
         bi(`Áp dụng cú pháp hoặc shortcut Python trước khi xác định hợp đồng của “${focusVi}”.`, `Applying Python syntax or a shortcut before establishing the contract for “${disposition.titles.en}”.`),
-        bi(`Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.`, "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."),
+        OOP_MISCONCEPTION.get(key) ?? bi(`Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.`, "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."),
       ],
       exam_signals: [
         bi(`Đề yêu cầu triển khai, hoàn thiện, trace hoặc giải thích ${focusVi.toLowerCase()}.`, `The task asks the candidate to implement, complete, trace, or explain ${disposition.titles.en.toLowerCase()}.`),

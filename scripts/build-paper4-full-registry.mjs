@@ -21,7 +21,7 @@ export const EXPECTED_COUNTS = {
   KnowledgeUnit: 108,
   PythonArtifact: 26,
   VisualScenarioTrace: 174,
-  VisualEventBinding: 589,
+  VisualEventBinding: 599,
   MarkingChain: 58,
   AssessmentItem: 78,
   LessonReleaseRecord: 26,
@@ -63,6 +63,13 @@ const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const readJson = async (filename) => JSON.parse(await readFile(filename, "utf8"));
 const envelope = (artifact_type, record) => ({ schema_version: "2.0.0", artifact_type, record });
 
+const OOP_VIDEO_CHAPTERS = {
+  "oop-model": { start: 256, end: 1606, heading: "Creating classes and objects; class, object, attribute, method and self" },
+  "oop-state": { start: 2082, end: 7510, heading: "Object data, access conventions, getters, setters and encapsulation" },
+  "oop-inheritance": { start: 7510, end: 9335, heading: "Inheritance, overriding and polymorphism" },
+  "oop-aggregation": { start: 915, end: 1303, heading: "Combining objects and has-a relationships" },
+};
+
 async function filesBelow(directory, suffix) {
   const output = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -99,7 +106,19 @@ function sourceRefsForLesson(lesson) {
       anchor_text: ref.section_id,
     },
   }));
-  return [...syllabus, ...coursebook].sort((a, b) => {
+  const videoChapter = OOP_VIDEO_CHAPTERS[lesson.slug];
+  const supplementary = videoChapter ? [{
+    source_id: "video_freecodecamp_python_oop_2025",
+    authority: "Supplementary_education_source",
+    access_mode: "public-citation",
+    locator: {
+      source_id: "video_freecodecamp_python_oop_2025",
+      heading: videoChapter.heading,
+      bullet_locator: `youtube_seconds_${videoChapter.start}_${videoChapter.end}`,
+      anchor_text: `T2 supplementary concept source only; YouTube iLRZi0Gu8Go at ${videoChapter.start} seconds`,
+    },
+  }] : [];
+  return [...syllabus, ...coursebook, ...supplementary].sort((a, b) => {
     const left = `${a.authority}|${a.locator.anchor_text}|${a.locator.pdf_page}`;
     const right = `${b.authority}|${b.locator.anchor_text}|${b.locator.pdf_page}`;
     return left.localeCompare(right);

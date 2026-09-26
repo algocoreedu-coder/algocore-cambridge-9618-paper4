@@ -251,7 +251,7 @@ function validateLessonRelease(record, errors) {
     validateIdArray(record[key], `/record/${key}`, errors, { nonEmpty: true });
   for (const [index, source] of (record.source_refs ?? []).entries()) {
     const authority = source?.authority;
-    const allowed = ["Cambridge_syllabus", "Cambridge_coursebook", "Cambridge_QP_MS", "AlgoCore_authored"];
+    const allowed = ["Cambridge_syllabus", "Cambridge_coursebook", "Cambridge_QP_MS", "AlgoCore_authored", "Supplementary_education_source"];
     if (!allowed.includes(authority)) {
       const code = String(authority ?? "").toLowerCase().includes("cambridge") ? "FORGED_CAMBRIDGE_AUTHORITY" : "SOURCE_AUTHORITY_INVALID";
       errors.push(issue(code, `/record/source_refs/${index}/authority`, `Unsupported source authority ${authority}.`));

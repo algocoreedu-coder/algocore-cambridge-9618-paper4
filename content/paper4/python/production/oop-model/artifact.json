@@ -1,12 +1,12 @@
 {
   "author_run_ref": "p4r3.a3.oop-model.production-v1.author-run",
   "caption": {
-    "en": "A class, constructor and independent instances.",
-    "vi": "Class, constructor và các instance độc lập."
+    "en": "A class blueprint, self, constructor, and independent instances.",
+    "vi": "Class blueprint, self, constructor và các instance độc lập."
   },
-  "code_sha256": "31a57737365a3de3982e414e754691f12726e28da9fb27af40ee4fa985b304df",
+  "code_sha256": "b6ee26c0e3fdf7870f2b0fbb5acdf03bc4779707c2bdde6e8163f722a1c8ee72",
   "entry_point": "run(fixture)",
-  "execution_log_sha256": "a1c120658a9cfb927d3295cd73f3bdce0e1f29ff5891814502ecff9df1433ee2",
+  "execution_log_sha256": "46f6f63cbaef2a4b0918fd75dfd9608f52058735ab2f25ca152d7aaac4fa1763",
   "execution_status": "PASS",
   "expected_outputs": [
     {
@@ -30,8 +30,16 @@
         "status": "OK",
         "trace": [
           {
+            "event": "bind_instance",
+            "student_id": 1
+          },
+          {
             "event": "instantiate",
             "student_id": 1
+          },
+          {
+            "event": "bind_instance",
+            "student_id": 2
           },
           {
             "event": "instantiate",
@@ -56,6 +64,10 @@
         "status": "OK",
         "trace": [
           {
+            "event": "bind_instance",
+            "student_id": 1
+          },
+          {
             "event": "instantiate",
             "student_id": 1
           }
@@ -78,7 +90,12 @@
         "status": "PARTIAL_REJECT",
         "trace": [
           {
-            "event": "reject_constructor"
+            "event": "reject_constructor",
+            "object_created": false
+          },
+          {
+            "event": "bind_instance",
+            "student_id": 3
           },
           {
             "event": "instantiate",
@@ -167,126 +184,236 @@
     {
       "line_id": "oop-model.production-v1.L005",
       "order": 5,
-      "text": "        if not isinstance(student_id, int) or student_id < 1 or not isinstance(score, int) or not 0 <= score <= 100:"
+      "text": "        valid_id = isinstance(student_id, int) and student_id >= 1"
     },
     {
       "line_id": "oop-model.production-v1.L006",
       "order": 6,
-      "text": "            raise ValueError(\"invalid student\")"
+      "text": "        valid_score = isinstance(score, int) and 0 <= score <= 100"
     },
     {
       "line_id": "oop-model.production-v1.L007",
       "order": 7,
-      "text": "        self.student_id, self.name, self.score = student_id, name, score"
+      "text": "        if not valid_id or not valid_score:"
     },
     {
       "line_id": "oop-model.production-v1.L008",
       "order": 8,
-      "text": "    def state(self): return {\"student_id\": self.student_id, \"name\": self.name, \"score\": self.score}"
+      "text": "            raise ValueError(\"invalid student\")"
     },
     {
       "line_id": "oop-model.production-v1.L009",
       "order": 9,
-      "text": ""
+      "text": "        self.student_id = student_id"
     },
     {
       "line_id": "oop-model.production-v1.L010",
       "order": 10,
-      "text": "def run(fixture):"
+      "text": "        self.name = name"
     },
     {
       "line_id": "oop-model.production-v1.L011",
       "order": 11,
-      "text": "    objects, rejected, trace = [], 0, []"
+      "text": "        self.score = score"
     },
     {
       "line_id": "oop-model.production-v1.L012",
       "order": 12,
-      "text": "    for record in fixture.get(\"records\", []):"
+      "text": ""
     },
     {
       "line_id": "oop-model.production-v1.L013",
       "order": 13,
-      "text": "        try:"
+      "text": "    def state(self):"
     },
     {
       "line_id": "oop-model.production-v1.L014",
       "order": 14,
-      "text": "            student = Student(record.get(\"student_id\"), record.get(\"name\", \"\"), record.get(\"score\", 0))"
+      "text": "        return {"
     },
     {
       "line_id": "oop-model.production-v1.L015",
       "order": 15,
-      "text": "            objects.append(student); trace.append({\"event\": \"instantiate\", \"student_id\": student.student_id})"
+      "text": "            \"student_id\": self.student_id,"
     },
     {
       "line_id": "oop-model.production-v1.L016",
       "order": 16,
-      "text": "        except (TypeError, ValueError):"
+      "text": "            \"name\": self.name,"
     },
     {
       "line_id": "oop-model.production-v1.L017",
       "order": 17,
-      "text": "            rejected += 1; trace.append({\"event\": \"reject_constructor\"})"
+      "text": "            \"score\": self.score,"
     },
     {
       "line_id": "oop-model.production-v1.L018",
       "order": 18,
-      "text": "    states = [student.state() for student in objects]"
+      "text": "        }"
     },
     {
       "line_id": "oop-model.production-v1.L019",
       "order": 19,
-      "text": "    return {\"status\": \"OK\" if rejected == 0 else \"PARTIAL_REJECT\", \"objects\": states, \"rejected\": rejected, \"independent_instances\": len({id(student) for student in objects}) == len(objects), \"trace\": trace}"
+      "text": ""
     },
     {
       "line_id": "oop-model.production-v1.L020",
       "order": 20,
-      "text": ""
+      "text": "def run(fixture):"
     },
     {
       "line_id": "oop-model.production-v1.L021",
       "order": 21,
-      "text": "if __name__ == \"__main__\":"
+      "text": "    objects = []"
     },
     {
       "line_id": "oop-model.production-v1.L022",
       "order": 22,
-      "text": "    import json"
+      "text": "    rejected = 0"
     },
     {
       "line_id": "oop-model.production-v1.L023",
       "order": 23,
-      "text": "    import sys"
+      "text": "    trace = []"
     },
     {
       "line_id": "oop-model.production-v1.L024",
       "order": 24,
-      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      "text": "    for record in fixture.get(\"records\", []):"
     },
     {
       "line_id": "oop-model.production-v1.L025",
       "order": 25,
-      "text": "    result = run(fixture)"
+      "text": "        try:"
     },
     {
       "line_id": "oop-model.production-v1.L026",
       "order": 26,
-      "text": "    if not result[\"trace\"]:"
+      "text": "            student = Student(record.get(\"student_id\"), record.get(\"name\", \"\"), record.get(\"score\", 0))"
     },
     {
       "line_id": "oop-model.production-v1.L027",
       "order": 27,
-      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      "text": "            trace.append({\"event\": \"bind_instance\", \"student_id\": student.student_id})"
     },
     {
       "line_id": "oop-model.production-v1.L028",
       "order": 28,
-      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      "text": "            objects.append(student)"
     },
     {
       "line_id": "oop-model.production-v1.L029",
       "order": 29,
+      "text": "            trace.append({\"event\": \"instantiate\", \"student_id\": student.student_id})"
+    },
+    {
+      "line_id": "oop-model.production-v1.L030",
+      "order": 30,
+      "text": "        except (TypeError, ValueError):"
+    },
+    {
+      "line_id": "oop-model.production-v1.L031",
+      "order": 31,
+      "text": "            rejected += 1"
+    },
+    {
+      "line_id": "oop-model.production-v1.L032",
+      "order": 32,
+      "text": "            trace.append({\"event\": \"reject_constructor\", \"object_created\": False})"
+    },
+    {
+      "line_id": "oop-model.production-v1.L033",
+      "order": 33,
+      "text": "    states = [student.state() for student in objects]"
+    },
+    {
+      "line_id": "oop-model.production-v1.L034",
+      "order": 34,
+      "text": "    independent_instances = len({id(student) for student in objects}) == len(objects)"
+    },
+    {
+      "line_id": "oop-model.production-v1.L035",
+      "order": 35,
+      "text": "    return {"
+    },
+    {
+      "line_id": "oop-model.production-v1.L036",
+      "order": 36,
+      "text": "        \"status\": \"OK\" if rejected == 0 else \"PARTIAL_REJECT\","
+    },
+    {
+      "line_id": "oop-model.production-v1.L037",
+      "order": 37,
+      "text": "        \"objects\": states,"
+    },
+    {
+      "line_id": "oop-model.production-v1.L038",
+      "order": 38,
+      "text": "        \"rejected\": rejected,"
+    },
+    {
+      "line_id": "oop-model.production-v1.L039",
+      "order": 39,
+      "text": "        \"independent_instances\": independent_instances,"
+    },
+    {
+      "line_id": "oop-model.production-v1.L040",
+      "order": 40,
+      "text": "        \"trace\": trace,"
+    },
+    {
+      "line_id": "oop-model.production-v1.L041",
+      "order": 41,
+      "text": "    }"
+    },
+    {
+      "line_id": "oop-model.production-v1.L042",
+      "order": 42,
+      "text": ""
+    },
+    {
+      "line_id": "oop-model.production-v1.L043",
+      "order": 43,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "oop-model.production-v1.L044",
+      "order": 44,
+      "text": "    import json"
+    },
+    {
+      "line_id": "oop-model.production-v1.L045",
+      "order": 45,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "oop-model.production-v1.L046",
+      "order": 46,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "oop-model.production-v1.L047",
+      "order": 47,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "oop-model.production-v1.L048",
+      "order": 48,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "oop-model.production-v1.L049",
+      "order": 49,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "oop-model.production-v1.L050",
+      "order": 50,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "oop-model.production-v1.L051",
+      "order": 51,
       "text": ""
     }
   ],

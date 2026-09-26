@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, "..");
 const RECORDS_DIR = path.join(ROOT, "content", "paper4", "records", "full");
-const CANONICAL_REGISTRY_AGGREGATE = "e9fe687c79e23d3a6d0ec844c5e8ca83fca473fbc800623836be61b5a439f827";
+const CANONICAL_REGISTRY_AGGREGATE = "1ad3244f6ec6c8d33f9141bfc2458fffb92acb0980678c39be5e050cccf3527e";
 const EDITORIAL_REGISTRY_PATH = path.resolve(ROOT, "..", "planning", "paper4", "stage-3", "LESSON_PACKAGES.json");
 const EDITORIAL_REGISTRY_SHA256 = "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2";
 
@@ -29,7 +29,7 @@ const EXPECTED_COUNTS = Object.freeze({
   knowledgeUnits: 108,
   pythonArtifacts: 26,
   visualScenarioTraces: 174,
-  visualEventBindings: 589,
+  visualEventBindings: 599,
   markingChains: 58,
   assessmentItems: 78,
   lessonReleaseRecords: 26,
@@ -375,7 +375,7 @@ export async function createPaper4V2Outputs() {
       for (const lineId of event.active_line_ids) assert(validLineIds.has(lineId), `${event.event_id} has invalid active line ${lineId}`);
     }
     const filename = patternFileName(patternId);
-    const traceUrl = `/paper4-v2/traces/${filename}`;
+    const traceUrl = `/paper4-v2/traces/${filename}?v=${ownerArtifact.code_sha256.slice(0, 16)}`;
     const chunk = {
       schema_version: "paper4-v2-trace-chunk-v1",
       pattern_id: patternId,
