@@ -40,7 +40,7 @@ const oopAssessments = assessments.filter((item) => oopLessons.has(item.lesson_i
 
 assert(manifest.counts.lessons === 26, "Expected 26 lessons.");
 assert(manifest.counts.patterns === 58, "Official pattern count must remain 58.");
-assert(manifest.counts.visual_event_bindings === 599, "Expected the P4R-8 event migration count of 599.");
+assert(manifest.counts.visual_event_bindings === 870, "Expected the P4R-9 preserved/enriched event count of 870.");
 assert(oopKnowledge.length === 14, `Expected 14 OOP knowledge units, received ${oopKnowledge.length}.`);
 assert(oopArtifacts.length === 4, `Expected four OOP Python artifacts, received ${oopArtifacts.length}.`);
 assert(oopPatterns.size === 8, `Expected eight OOP patterns, received ${oopPatterns.size}.`);

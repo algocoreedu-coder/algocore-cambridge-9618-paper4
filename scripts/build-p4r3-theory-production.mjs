@@ -172,6 +172,56 @@ const OOP_MISCONCEPTION = new Map([
   ["oop-aggregation/nested-access", bi("Sao chép field component vào owner làm hai state có thể lệch nhau.", "Copying a component field into the owner so the two states can drift apart.")],
 ]);
 
+const DSA_ENRICHMENT = new Map([
+  ["performance/asymptotic-cost", bi("Bài giải complexity phải nêu bốn phần: định nghĩa n, operation được đếm, case đang phân tích, rồi time và auxiliary space riêng biệt.", "A complexity justification states four parts: define n, name the counted operation, identify the analysed case, then give time and auxiliary space separately.")],
+  ["performance/algorithm-choice", bi("So sánh theo cùng input contract; Python container tiện dụng không tự chứng minh rằng representation hoặc algorithm đáp ứng yêu cầu đề.", "Compare algorithms under the same input contract; a convenient Python container does not prove that the required representation or algorithm has been implemented.")],
+  ["performance/trace-cost", bi("Dùng counter gắn với comparison, swap, shift hoặc visited node; không dùng wall-clock timing làm thay thế cho growth reasoning.", "Use a counter tied to comparisons, swaps, shifts, or visited nodes; wall-clock timing is not a substitute for growth reasoning.")],
+  ["text-processing/character-comparison", bi("Python string là immutable: index walk đọc ký tự theo thứ tự, còn mọi thay đổi phải tạo string/result mới theo contract.", "Python strings are immutable: an index walk reads characters in order, while any change creates a new string or result under the contract.")],
+  ["text-processing/delimiter-tokenisation", bi("Khi đề yêu cầu thuật toán, trace current index, token start và delimiter; không thay thế bằng `split` nếu shortcut không được phép.", "When the task requires the algorithm, trace the current index, token start, and delimiter; do not replace it with `split` unless the shortcut is allowed.")],
+  ["text-processing/typed-routing", bi("Parse theo index/boundary trước, rồi convert và route; string gốc không bị mutate trong quá trình này.", "Parse by index and boundary first, then convert and route; the source string is not mutated during this process.")],
+  ["text-processing/run-length", bi("Index walk phải flush run cuối sau loop; việc nối output tạo giá trị mới vì string không mutable.", "The index walk must flush the final run after the loop; output concatenation creates a new value because strings are immutable.")],
+  ["linked-list/representation-free-list", bi("Video object-node chỉ hỗ trợ trực giác liên kết; lời giải Cambridge ở đây giữ array/index/free-list với head, null sentinel và free pointer tách biệt.", "The object-node video supplies linkage intuition only; the Cambridge solution here retains the array/index/free-list model with separate head, null sentinel, and free pointer.")],
+  ["linked-list/traversal", bi("Logical order đến từ next links, không từ thứ tự index vật lý; lưu current trước khi theo link tiếp theo.", "Logical order comes from next links rather than physical index order; preserve the current node before following the next link.")],
+  ["linked-list/search", bi("Mỗi bước kiểm tra data rồi mới đi theo saved next link; not-found chỉ khi chain thật sự kết thúc.", "Each step checks the data before following the saved next link; not found occurs only when the chain really ends.")],
+  ["linked-list/insert", bi("Lưu next-free link trước khi ghi node mới; sau đó nối node vào head hoặc predecessor mà không làm mất successor chain.", "Save the next-free link before writing the new node; then attach the node at the head or predecessor without losing the successor chain.")],
+  ["linked-list/remove-recycle", bi("Lưu successor, nối predecessor hoặc head qua node bị xóa, rồi mới đưa node về đầu free list; trace phải cho thấy live/free chains vẫn rời nhau.", "Save the successor, link the predecessor or head around the removed node, then return the node to the free-list head; the trace must show that live and free chains remain disjoint.")],
+  ["dictionary/adt-interface", bi("Client thấy find/insert/delete và postcondition; nó không cần biết representation là array, linked list, tree hay hash table.", "The client sees find/insert/delete and their postconditions; it need not know whether the representation is an array, linked list, tree, or hash table.")],
+  ["dictionary/find-insert", bi("Tách duplicate-key policy khỏi lookup mechanism; Python dict chỉ là implementation option khi đề cho phép.", "Separate duplicate-key policy from the lookup mechanism; Python dict is only an implementation option when the task allows it.")],
+  ["dictionary/delete", bi("Delete missing key phải giữ state; exception của Python dict không tự định nghĩa ADT contract của đề.", "Deleting a missing key must preserve state; a Python-dict exception does not define the task's ADT contract.")],
+  ["dictionary/representation-choice", bi("Giải thích interface trước, rồi chọn representation từ size, required operations và representation được chỉ định; không đồng nhất dictionary ADT với hashing.", "Explain the interface first, then choose a representation from size, required operations, and any prescribed model; do not equate the dictionary ADT with hashing.")],
+  ["dictionary/other-adt-implementation", bi("Dù dùng linked list hoặc tree, uniqueness, missing-key result và operation postconditions phải giữ nguyên.", "Whether a linked list or tree is used, uniqueness, missing-key results, and operation postconditions remain unchanged.")],
+  ["stack/representation-conventions", bi("LIFO là semantics; implementation vẫn phải khai báo top-used/next-free, live region và capacity.", "LIFO is the semantics; the implementation must still declare top-used or next-free, the live region, and capacity.")],
+  ["stack/push", bi("Capacity guard chạy trước write; list.append chỉ được nêu trong contrast box, không thay manual pointer update được yêu cầu.", "The capacity guard runs before the write; list.append belongs only in a contrast box and cannot replace a required manual pointer update.")],
+  ["stack/pop", bi("Underflow guard chạy trước read; rejected pop giữ array và top không đổi.", "The underflow guard runs before the read; a rejected pop preserves both the array and top.")],
+  ["stack/paired-restoration", bi("Trace cả temporary pops và push-back order để chứng minh failure phục hồi đúng live region.", "Trace temporary pops and the push-back order to prove that failure restores the live region exactly.")],
+  ["stack/reduce-operands", bi("Gắn operand order vào từng pop; không suy ra thứ tự chỉ từ LIFO khi operator không giao hoán.", "Attach operand order to each pop; do not infer it from LIFO alone when the operator is non-commutative.")],
+  ["binary-tree/representation", bi("Nêu rõ node/reference hoặc array/index representation trước trace; không trộn hai mô hình trong một operation.", "Declare the node/reference or array/index representation before tracing; do not mix the two models within one operation.")],
+  ["binary-tree/ordered-insert", bi("Ghi branch choice ở mỗi comparison, path đã đi và null link nơi node mới được gắn; duplicate đi theo policy đã khóa.", "Record the branch choice at each comparison, the path taken, and the null link where the new node is attached; duplicates follow the locked policy.")],
+  ["binary-tree/search", bi("Search path là chuỗi comparison và branch choice; failed search kết thúc tại đúng null branch.", "A search path is a sequence of comparisons and branch choices; a failed search ends at the required null branch.")],
+  ["binary-tree/traversals", bi("Pre/in/post-order phải xuất đúng visit order. BFS và iterative DFS chỉ là supplementary enrichment, không mở objective bắt buộc.", "Preorder, inorder, and postorder must emit the exact visit order. BFS and iterative DFS remain supplementary enrichment and do not create required objectives.")],
+  ["sorting/bubble-passes", bi("Trace mỗi comparison, swap và pass completion; swap flag chỉ cho early exit sau một pass đầy đủ không swap.", "Trace every comparison, swap, and pass completion; the swap flag permits early exit only after a complete pass with no swap.")],
+  ["sorting/insertion-shifts", bi("Trace key selection, từng shift và final insertion; prefix trước key phải sorted sau mọi bước.", "Trace key selection, every shift, and final insertion; the prefix before the key remains sorted after every step.")],
+  ["sorting/ordered-insert", bi("Phân biệt chèn một record vào collection đã sorted với chạy toàn bộ insertion sort; capacity guard vẫn xảy ra trước shifts.", "Distinguish inserting one record into an already sorted collection from running a complete insertion sort; the capacity guard still precedes all shifts.")],
+  ["sorting/comparator-variants", bi("Complexity claim phải nêu n và counted operation; selection, merge, quick và counting sort không trở thành required objective.", "A complexity claim defines n and the counted operation; selection, merge, quick, and counting sort do not become required objectives.")],
+  ["exam-workflow/compose-main", bi("DSA integration bắt đầu bằng chọn representation và algorithm từ contract, rồi main truyền state qua validate/process/output theo dependency rõ.", "DSA integration starts by selecting a representation and algorithm from the contract, then main passes state through validate/process/output in explicit dependency order.")],
+  ["exam-workflow/format-output", bi("Output phải làm rõ logical order, physical state và operation count khi chúng khác nhau.", "Output must distinguish logical order, physical state, and operation count when they differ.")],
+  ["exam-workflow/evidence-document", bi("Evidence matrix cho DSA có hàng normal, boundary và failure, nối requirement → code owner → fixture → actual output → invariant check.", "A DSA evidence matrix has normal, boundary, and failure rows joining requirement → code owner → fixture → actual output → invariant check.")],
+  ["exam-workflow/source-and-rubric", bi("Nguồn video chỉ hỗ trợ cách giải thích; syllabus/coursebook/QP/MS tiếp tục quyết định scope, representation và official marking claims.", "The videos support explanation only; the syllabus, coursebook, QP, and MS continue to govern scope, representation, and official marking claims.")],
+]);
+
+const DSA_MISCONCEPTION = new Map([
+  ["performance/asymptotic-cost", bi("Nêu O(n) mà không định nghĩa n, operation, case hoặc auxiliary space.", "Stating O(n) without defining n, the operation, the case, or auxiliary space.")],
+  ["text-processing/character-comparison", bi("Cố gán trực tiếp vào một vị trí của Python string.", "Trying to assign directly to a position in a Python string.")],
+  ["linked-list/representation-free-list", bi("Thay array/index/free-list bằng object-node implementation dù đề đã chỉ định representation.", "Replacing a prescribed array/index/free-list model with an object-node implementation.")],
+  ["linked-list/remove-recycle", bi("Ghi đè next link trước khi lưu successor hoặc nối predecessor.", "Overwriting the next link before saving the successor or rewiring the predecessor.")],
+  ["dictionary/adt-interface", bi("Cho rằng dictionary luôn là hash table hoặc Python dict.", "Assuming a dictionary is always a hash table or Python dict.")],
+  ["stack/representation-conventions", bi("Dùng list append/pop mà không giải thích top convention, capacity và guards.", "Using list append/pop without explaining the top convention, capacity, and guards.")],
+  ["binary-tree/ordered-insert", bi("Chỉ đưa cây cuối mà không ghi comparison path và branch choices.", "Showing only the final tree without the comparison path and branch choices.")],
+  ["sorting/bubble-passes", bi("Chỉ chụp array sau pass mà không ghi comparison/swap events.", "Showing only the array after a pass without comparison and swap events.")],
+  ["sorting/insertion-shifts", bi("Swap key qua từng phần tử thay vì giữ key, shift prefix rồi insert một lần.", "Swapping the key through each item instead of saving it, shifting the prefix, and inserting once.")],
+  ["exam-workflow/source-and-rubric", bi("Dùng T2 video làm marking authority hoặc mở rộng official pattern set.", "Using a T2 video as marking authority or expanding the official pattern set.")],
+]);
+
 function cleanLocatorObjective(ref) {
   const source = ref.source;
   return { objective_id: ref.objective_id, syllabus_version: "2026", locator: {
@@ -229,7 +279,7 @@ for (const lesson of inventory.lessons) {
     const viDomain = domain ? ` trong ${domain.vi}` : "";
     const enDomain = domain ? ` in the ${domain.en}` : "";
     const boundLines = lineRole.active_line_ids.join(", ");
-    const enrichment = OOP_ENRICHMENT.get(key);
+    const enrichment = OOP_ENRICHMENT.get(key) ?? DSA_ENRICHMENT.get(key);
     const explanation = aligned(
       `${focusVi}${viDomain} tập trung vào một quy tắc có thể kiểm tra: ${rule.vi} Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.${enrichment ? ` ${enrichment.vi}` : ""}`,
       `${disposition.titles.en}${enDomain} centres on one checkable rule: ${rule.en} In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation.${enrichment ? ` ${enrichment.en}` : ""}`);
@@ -252,7 +302,7 @@ for (const lesson of inventory.lessons) {
       invariant_or_rule: rule,
       misconceptions: [
         bi(`Áp dụng cú pháp hoặc shortcut Python trước khi xác định hợp đồng của “${focusVi}”.`, `Applying Python syntax or a shortcut before establishing the contract for “${disposition.titles.en}”.`),
-        OOP_MISCONCEPTION.get(key) ?? bi(`Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.`, "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."),
+        OOP_MISCONCEPTION.get(key) ?? DSA_MISCONCEPTION.get(key) ?? bi(`Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.`, "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."),
       ],
       exam_signals: [
         bi(`Đề yêu cầu triển khai, hoàn thiện, trace hoặc giải thích ${focusVi.toLowerCase()}.`, `The task asks the candidate to implement, complete, trace, or explain ${disposition.titles.en.toLowerCase()}.`),

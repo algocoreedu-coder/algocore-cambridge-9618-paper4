@@ -22,7 +22,7 @@ export const EXPECTED_COUNTS = {
   KnowledgeUnit: 26,
   PythonArtifact: 6,
   VisualScenarioTrace: 48,
-  VisualEventBinding: 238,
+  VisualEventBinding: 274,
   MarkingChain: 16,
   AssessmentItem: 18,
   LessonReleaseRecord: 6,

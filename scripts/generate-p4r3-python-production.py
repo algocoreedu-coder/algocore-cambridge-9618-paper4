@@ -164,45 +164,150 @@ def run(fixture):
 ''',
 "sorting": '''from pathlib import Path
 
-def bubble(values, reverse=False):
-    output, comparisons, swaps = list(values), 0, 0
+def bubble(values, trace, reverse=False):
+    output = list(values)
+    comparisons = 0
+    swaps = 0
     for end in range(len(output) - 1, 0, -1):
         changed = False
+        pass_number = len(output) - end
         for index in range(end):
             comparisons += 1
-            wrong = output[index] < output[index + 1] if reverse else output[index] > output[index + 1]
+            left = output[index]
+            right = output[index + 1]
+            wrong = left < right if reverse else left > right
+            trace.append({
+                "event": "bubble_compare",
+                "pass": pass_number,
+                "left_index": index,
+                "right_index": index + 1,
+                "left": left,
+                "right": right,
+                "swap_required": wrong,
+            })
             if wrong:
-                output[index], output[index + 1] = output[index + 1], output[index]
-                swaps, changed = swaps + 1, True
+                before = list(output)
+                output[index] = right
+                output[index + 1] = left
+                swaps += 1
+                changed = True
+                trace.append({
+                    "event": "bubble_swap",
+                    "pass": pass_number,
+                    "indices": [index, index + 1],
+                    "before": before,
+                    "after": list(output),
+                })
+        trace.append({
+            "event": "bubble_pass_complete",
+            "pass": pass_number,
+            "changed": changed,
+            "sorted_suffix_start": end,
+            "values": list(output),
+        })
         if not changed:
             break
+    trace.append({"event": "bubble_complete", "values": list(output)})
     return output, comparisons, swaps
 
-def insertion(values):
+def insertion(values, trace):
     output = list(values)
     for index in range(1, len(output)):
-        item, position = output[index], index
+        item = output[index]
+        position = index
+        trace.append({
+            "event": "insertion_select_key",
+            "index": index,
+            "key": item,
+            "sorted_prefix": list(output[:index]),
+        })
         while position > 0 and output[position - 1] > item:
+            before = list(output)
             output[position] = output[position - 1]
+            trace.append({
+                "event": "insertion_shift",
+                "from_index": position - 1,
+                "to_index": position,
+                "value": output[position],
+                "before": before,
+                "after": list(output),
+            })
             position -= 1
+        before = list(output)
         output[position] = item
+        trace.append({
+            "event": "insertion_place_key",
+            "from_index": index,
+            "to_index": position,
+            "key": item,
+            "before": before,
+            "after": list(output),
+        })
+    trace.append({"event": "insertion_complete", "values": list(output)})
     return output
 
 def run(fixture):
     values = fixture.get("values", [])
+    trace = []
     if not all(isinstance(value, int) for value in values):
-        return {"status": "INVALID_KEY", "values": values, "trace": [{"event": "reject_key"}]}
-    ordered, comparisons, swaps = bubble(values, fixture.get("reverse", False))
-    insertion_ordered = insertion(values)
+        trace.append({
+            "event": "reject_key",
+            "before": list(values),
+            "after": list(values),
+        })
+        return {"status": "INVALID_KEY", "values": values, "trace": trace}
+    ordered, comparisons, swaps = bubble(values, trace, fixture.get("reverse", False))
+    insertion_ordered = insertion(values, trace)
     bounded = list(fixture.get("bounded", []))
     if len(bounded) >= fixture["capacity"]:
-        return {"status": "FULL", "values": bounded, "bubble": ordered, "insertion": insertion_ordered, "trace": [{"event": "capacity_reject"}]}
+        before = list(bounded)
+        trace.append({
+            "event": "capacity_reject",
+            "capacity": fixture["capacity"],
+            "before": before,
+            "after": list(bounded),
+        })
+        return {
+            "status": "FULL",
+            "values": bounded,
+            "bubble": ordered,
+            "insertion": insertion_ordered,
+            "trace": trace,
+        }
     item = fixture["insert"]
     position = 0
-    while position < len(bounded) and bounded[position] <= item:
+    while position < len(bounded):
+        current = bounded[position]
+        moves_right = current <= item
+        trace.append({
+            "event": "ordered_insert_compare",
+            "index": position,
+            "current": current,
+            "item": item,
+            "moves_right": moves_right,
+        })
+        if not moves_right:
+            break
         position += 1
+    before = list(bounded)
     bounded.insert(position, item)
-    return {"status": "OK", "bubble": ordered, "insertion": insertion_ordered, "bounded": bounded, "comparisons": comparisons, "swaps": swaps, "trace": [{"event": "bubble_complete"}, {"event": "ordered_insert", "position": position}]}
+    trace.append({
+        "event": "ordered_insert",
+        "position": position,
+        "item": item,
+        "before": before,
+        "after": list(bounded),
+    })
+    return {
+        "status": "OK",
+        "bubble": ordered,
+        "insertion": insertion_ordered,
+        "bounded": bounded,
+        "comparisons": comparisons,
+        "swaps": swaps,
+        "trace": trace,
+    }
+
 ''',
 "stack": '''from pathlib import Path
 
@@ -248,72 +353,233 @@ class ArrayList:
     def __init__(self, capacity):
         self.data = [None] * capacity
         self.next = list(range(1, capacity)) + [-1]
-        self.head, self.free = -1, 0 if capacity else -1
-    def insert_head(self, value):
-        if self.free == -1: return False
-        node, self.free = self.free, self.next[self.free]
-        self.data[node], self.next[node], self.head = value, self.head, node
+        self.head = -1
+        self.free = 0 if capacity else -1
+
+    def state(self):
+        return {
+            "head": self.head,
+            "free": self.free,
+            "data": list(self.data),
+            "next": list(self.next),
+        }
+
+    def insert_head(self, value, trace):
+        before = self.state()
+        if self.free == -1:
+            trace.append({
+                "event": "insert_reject_full",
+                "value": value,
+                "before": before,
+                "change": {"reason": "free_list_empty"},
+                "after": self.state(),
+            })
+            return False
+        node = self.free
+        next_free = self.next[node]
+        saved_head = self.head
+        self.free = next_free
+        self.data[node] = value
+        self.next[node] = saved_head
+        self.head = node
+        trace.append({
+            "event": "insert_head",
+            "value": value,
+            "before": before,
+            "change": {
+                "allocated_node": node,
+                "saved_head": saved_head,
+                "next_free": next_free,
+            },
+            "after": self.state(),
+        })
         return True
+
     def traverse(self):
-        output, node, seen = [], self.head, set()
+        output = []
+        node = self.head
+        seen = set()
         while node != -1:
-            if node in seen or node < 0 or node >= len(self.data): raise ValueError("corrupt link")
-            seen.add(node); output.append(self.data[node]); node = self.next[node]
+            if node in seen or node < 0 or node >= len(self.data):
+                raise ValueError("corrupt link")
+            seen.add(node)
+            output.append(self.data[node])
+            node = self.next[node]
         return output
-    def remove(self, target):
-        previous, node = -1, self.head
-        while node != -1 and self.data[node] != target: previous, node = node, self.next[node]
-        if node == -1: return False
-        if previous == -1: self.head = self.next[node]
-        else: self.next[previous] = self.next[node]
-        self.data[node], self.next[node], self.free = None, self.free, node
+
+    def remove(self, target, trace):
+        previous = -1
+        node = self.head
+        while node != -1:
+            trace.append({
+                "event": "remove_compare",
+                "target": target,
+                "previous": previous,
+                "node": node,
+                "value": self.data[node],
+                "next_node": self.next[node],
+            })
+            if self.data[node] == target:
+                break
+            previous = node
+            node = self.next[node]
+        before = self.state()
+        if node == -1:
+            trace.append({
+                "event": "remove_reject_missing",
+                "target": target,
+                "before": before,
+                "change": {"reason": "target_not_found"},
+                "after": self.state(),
+            })
+            return False
+        successor = self.next[node]
+        previous_free = self.free
+        if previous == -1:
+            self.head = successor
+        else:
+            self.next[previous] = successor
+        self.data[node] = None
+        self.next[node] = previous_free
+        self.free = node
+        trace.append({
+            "event": "remove_recycle",
+            "target": target,
+            "before": before,
+            "change": {
+                "previous": previous,
+                "removed_node": node,
+                "saved_successor": successor,
+                "previous_free": previous_free,
+            },
+            "after": self.state(),
+        })
         return True
 
 def run(fixture):
-    linked, trace = ArrayList(fixture["capacity"]), []
+    linked = ArrayList(fixture["capacity"])
+    trace = []
     for value in reversed(fixture.get("initial", [])):
-        trace.append({"event": "insert", "value": value, "success": linked.insert_head(value)})
+        linked.insert_head(value, trace)
     before = linked.traverse()
-    inserted = linked.insert_head(fixture["insert"])
-    removed = linked.remove(fixture["remove"])
-    try: after, status = linked.traverse(), "OK"
-    except ValueError: after, status = before, "CORRUPT"
-    trace += [{"event": "insert_requested", "success": inserted}, {"event": "remove_requested", "success": removed}]
-    return {"status": status, "before": before, "after": after, "inserted": inserted, "removed": removed, "head": linked.head, "free": linked.free, "trace": trace}
+    inserted = linked.insert_head(fixture["insert"], trace)
+    removed = linked.remove(fixture["remove"], trace)
+    try:
+        after = linked.traverse()
+        status = "OK"
+    except ValueError:
+        after = before
+        status = "CORRUPT"
+    return {
+        "status": status,
+        "before": before,
+        "after": after,
+        "inserted": inserted,
+        "removed": removed,
+        "head": linked.head,
+        "free": linked.free,
+        "trace": trace,
+    }
+
 ''',
 "binary-tree": '''from pathlib import Path
 
 class Node:
-    def __init__(self, value): self.value, self.left, self.right = value, None, None
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
 
-def insert(root, value):
-    if root is None: return Node(value), True
+def insert(root, value, trace, phase):
+    if root is None:
+        trace.append({
+            "event": "tree_attach_root",
+            "phase": phase,
+            "value": value,
+        })
+        return Node(value), True
     current = root
     while True:
-        if value == current.value: return root, False
+        if value == current.value:
+            trace.append({
+                "event": "tree_reject_duplicate",
+                "phase": phase,
+                "node": current.value,
+                "value": value,
+            })
+            return root, False
         side = "left" if value < current.value else "right"
         child = getattr(current, side)
-        if child is None: setattr(current, side, Node(value)); return root, True
+        trace.append({
+            "event": "tree_compare_insert",
+            "phase": phase,
+            "node": current.value,
+            "value": value,
+            "direction": side,
+            "child": None if child is None else child.value,
+        })
+        if child is None:
+            setattr(current, side, Node(value))
+            trace.append({
+                "event": "tree_attach_child",
+                "phase": phase,
+                "parent": current.value,
+                "direction": side,
+                "value": value,
+            })
+            return root, True
         current = child
 
 def traverse(node, order):
-    if node is None: return []
-    if order == "pre": return [node.value] + traverse(node.left, order) + traverse(node.right, order)
-    if order == "post": return traverse(node.left, order) + traverse(node.right, order) + [node.value]
+    if node is None:
+        return []
+    if order == "pre":
+        return [node.value] + traverse(node.left, order) + traverse(node.right, order)
+    if order == "post":
+        return traverse(node.left, order) + traverse(node.right, order) + [node.value]
     return traverse(node.left, order) + [node.value] + traverse(node.right, order)
 
 def run(fixture):
-    root, trace = None, []
+    root = None
+    trace = []
     for value in fixture.get("values", []):
-        root, added = insert(root, value); trace.append({"event": "insert", "value": value, "added": added})
+        root, added = insert(root, value, trace, "setup")
     before = traverse(root, "in")
-    root, added = insert(root, fixture["insert"])
-    current, found = root, False
+    root, added = insert(root, fixture["insert"], trace, "requested")
+    current = root
+    found = False
     while current is not None:
-        trace.append({"event": "search", "node": current.value})
-        if fixture["target"] == current.value: found = True; break
-        current = current.left if fixture["target"] < current.value else current.right
-    return {"status": "FOUND" if found else "NOT_FOUND", "inserted": added, "unchanged_on_duplicate": added or before == traverse(root, "in"), "inorder": traverse(root, "in"), "preorder": traverse(root, "pre"), "postorder": traverse(root, "post"), "trace": trace}
+        if fixture["target"] == current.value:
+            direction = "found"
+        elif fixture["target"] < current.value:
+            direction = "left"
+        else:
+            direction = "right"
+        trace.append({
+            "event": "tree_search_visit",
+            "node": current.value,
+            "target": fixture["target"],
+            "direction": direction,
+        })
+        if direction == "found":
+            found = True
+            break
+        current = getattr(current, direction)
+    if not found:
+        trace.append({
+            "event": "tree_search_exhausted",
+            "target": fixture["target"],
+        })
+    return {
+        "status": "FOUND" if found else "NOT_FOUND",
+        "inserted": added,
+        "unchanged_on_duplicate": added or before == traverse(root, "in"),
+        "inorder": traverse(root, "in"),
+        "preorder": traverse(root, "pre"),
+        "postorder": traverse(root, "post"),
+        "trace": trace,
+    }
+
 ''',
 "dictionary": '''from pathlib import Path
 

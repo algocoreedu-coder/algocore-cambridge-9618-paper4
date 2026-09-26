@@ -274,6 +274,91 @@ const CONTENT = {
   }
 };
 
+const P4R9_ENRICHMENT = new Map([
+  ["data-models/scalars-types-scope", bi(
+    "Trong mô hình mảng của đề, capacity và logical count là hai biến có vai trò khác nhau; cả hai phải được khai báo và khởi tạo trước khi tính valid-index interval.",
+    "In the task's array model, capacity and logical count are different variables; both must be declared and initialised before deriving the valid-index interval.")],
+  ["data-models/array-representation", bi(
+    "Phân biệt physical capacity với logical count: các index sống là 0..logical_count-1, còn 0..capacity-1 chỉ là miền ô được cấp. Với 2D, luôn đọc chỉ số theo row-column order của đề.",
+    "Separate physical capacity from logical count: live indices are 0..logical_count-1, while 0..capacity-1 is only the allocated-cell range. For 2D data, follow the task's row-column index order.")],
+  ["data-models/record-fields", bi(
+    "Một record chiếm một logical slot; thêm field vào record không làm tăng logical count của mảng chứa record đó.",
+    "One record occupies one logical slot; adding a field to a record does not increase the logical count of the containing array.")],
+  ["data-models/bounded-append", bi(
+    "Quy trình phòng thi là check `logical_count < capacity`, ghi tại index `logical_count`, rồi tăng count đúng một lần; Python `append` chỉ mô phỏng bước ghi khi contract cho phép.",
+    "The exam sequence is: check `logical_count < capacity`, write at index `logical_count`, then increment the count exactly once; Python `append` only simulates the write when the contract allows it.")],
+  ["data-models/random-data", bi(
+    "Mọi phép thống kê chỉ duyệt logical region; các ô chưa dùng trong physical capacity không được tính như dữ liệu đã sinh.",
+    "Every summary scans only the logical region; unused cells in the physical capacity are not generated data.")],
+  ["data-models/identifier-contract", bi(
+    "Data dictionary nên nêu riêng `capacity`, `logical_count`, row, column và current index để tránh dùng một tên cho nhiều vai trò.",
+    "The data dictionary should name `capacity`, `logical_count`, row, column, and current index separately so one identifier is not reused for several roles.")],
+  ["binary-search/preconditions-interval", bi(
+    "Khai báo rõ closed interval `[low, high]`; sau mỗi comparison, tô phần bị loại và chứng minh mọi vị trí còn có thể vẫn nằm trong interval mới.",
+    "Declare the closed interval `[low, high]`; after each comparison, mark the discarded region and prove that every remaining candidate position is still inside the new interval.")],
+  ["binary-search/midpoint-update", bi(
+    "Đếm một comparison với middle mỗi vòng; cập nhật `middle-1` hoặc `middle+1` để interval giảm nghiêm ngặt và không kiểm tra lại middle.",
+    "Count one comparison with the middle item per iteration; update to `middle-1` or `middle+1` so the interval strictly shrinks and the middle is not tested again.")],
+  ["binary-search/recursive-variant", bi(
+    "Biến thể condition-based là enrichment tùy chọn. Lời giải bắt buộc vẫn bám precondition sorted, base case empty interval và cùng closed-interval contract.",
+    "Condition-based binary search is optional enrichment. The required solution still follows the sorted precondition, the empty-interval base case, and the same closed-interval contract.")],
+  ["queue/representation-conventions", bi(
+    "FIFO chỉ mô tả thứ tự logic; implementation trong đề còn cần front, rear, count, capacity và quy ước rear là ô đang dùng hay next-free.",
+    "FIFO describes logical order only; an exam implementation also needs front, rear, count, capacity, and a declaration of whether rear is used or next-free.")],
+  ["queue/enqueue", bi(
+    "Kiểm tra `count == capacity` trước write; nếu chấp nhận thì ghi tại rear, wrap bằng modulo và tăng count đúng một lần.",
+    "Check `count == capacity` before the write; on acceptance, write at rear, wrap with modulo, and increment count exactly once.")],
+  ["queue/dequeue", bi(
+    "Kiểm tra `count == 0` trước read; nếu chấp nhận thì lưu item front, clear khi contract yêu cầu, wrap front và giảm count đúng một lần.",
+    "Check `count == 0` before the read; on acceptance, save the front item, clear it when required, wrap front, and decrement count exactly once.")],
+  ["queue/inspect-live-items", bi(
+    "Live-window trace bắt đầu tại front và đi đúng count bước; physical array order không nhất thiết là FIFO order sau wrap-around.",
+    "A live-window trace starts at front and takes exactly count steps; physical array order need not equal FIFO order after wrap-around.")],
+  ["queue/reduce-consume", bi(
+    "Ghi rõ operation có phá hủy queue hay chỉ đọc; nếu dùng dequeue để reduce thì postcondition phải cho biết queue đã đổi ra sao.",
+    "State whether the operation consumes the queue or only reads it; if reduction uses dequeue, the postcondition must describe the changed queue.")],
+  ["recursion/recursive-contract", bi(
+    "Trước code, viết ba dòng contract: base case, smaller subproblem và progress measure giảm sau mỗi call.",
+    "Before coding, write a three-line contract: base case, smaller subproblem, and the progress measure that decreases on every call.")],
+  ["recursion/call-stack-unwind", bi(
+    "Trace tách hai pha: frame creation khi call đi xuống và return-value propagation khi unwind đi lên.",
+    "Separate the trace into frame creation while calls descend and return-value propagation while frames unwind.")],
+  ["recursion/design-benefits", bi(
+    "Chỉ chọn recursion khi cấu trúc bài toán hỗ trợ nó; luôn nêu depth và auxiliary stack space thay vì chỉ nói code ngắn hơn.",
+    "Choose recursion only when it fits the problem structure; always state depth and auxiliary stack space rather than merely saying the code is shorter.")],
+  ["recursion/translate-recursive", bi(
+    "Giữ nguyên terminal value, progress và combine order khi dịch pseudocode sang Python; return của child call phải được truyền về caller.",
+    "Preserve the terminal value, progress, and combination order when translating pseudocode to Python; the child call's return must propagate to its caller.")],
+  ["recursion/iteration-conversion", bi(
+    "Bản lặp phải lưu mọi state mà call stack từng giữ; accumulator đơn chỉ đủ khi không có pending work phức tạp.",
+    "The iterative form must preserve every state formerly held by the call stack; one accumulator is sufficient only when there is no complex pending work.")],
+  ["hashing/table-storage", bi(
+    "Phân biệt interface set/map với hash-table representation; câu hỏi hashing yêu cầu thao tác trên slot, empty marker, capacity và collision policy tường minh.",
+    "Separate the set/map interface from the hash-table representation; a hashing task requires explicit slots, empty markers, capacity, and collision policy.")],
+  ["hashing/hash-address", bi(
+    "Nêu `n` là capacity của table khi dùng modulo và kiểm tra address luôn nằm trong 0..capacity-1.",
+    "When using modulo, define `n` as table capacity and verify that every address lies in 0..capacity-1.")],
+  ["hashing/insert-collisions", bi(
+    "Probe tối đa capacity ô; nếu không còn slot, trả full và chứng minh table trước/sau giống hệt nhau.",
+    "Probe at most capacity slots; if none is free, return full and prove that the table is identical before and after.")],
+  ["hashing/find-collisions", bi(
+    "Failed search dừng theo empty-marker policy hoặc sau capacity probes; không được phụ thuộc vòng lặp vô hạn hay hành vi của Python dict.",
+    "A failed search stops under the empty-marker policy or after capacity probes; it must not rely on an infinite loop or Python-dict behaviour.")],
+]);
+
+const P4R9_MISCONCEPTION = new Map([
+  ["data-models/array-representation", bi("Dùng `len(list)` đồng thời làm physical capacity và logical count.", "Using `len(list)` as both physical capacity and logical count.")],
+  ["data-models/bounded-append", bi("Append trước capacity guard rồi cố hoàn tác khi đầy.", "Appending before the capacity guard and then trying to undo a full-state write.")],
+  ["binary-search/preconditions-interval", bi("Chạy binary search trên input chưa sắp xếp hoặc đổi interval convention giữa chừng.", "Running binary search on unsorted input or changing interval convention mid-trace.")],
+  ["binary-search/midpoint-update", bi("Giữ lại middle trong interval mới nên có thể lặp vô hạn.", "Keeping middle inside the new interval and risking a non-terminating loop.")],
+  ["queue/representation-conventions", bi("Cho rằng biết FIFO là đủ mà không khai báo front/rear/count convention.", "Assuming FIFO alone is enough without declaring front/rear/count conventions.")],
+  ["queue/enqueue", bi("Dùng `deque.append` thay cho implementation thủ công mà đề yêu cầu.", "Using `deque.append` instead of the manual implementation required by the task.")],
+  ["recursion/recursive-contract", bi("Có base case nhưng recursive call không tiến gần nó.", "Having a base case while the recursive call makes no progress toward it.")],
+  ["recursion/call-stack-unwind", bi("Gộp call và return vào một bước nên mất pending operation của từng frame.", "Collapsing call and return into one step and losing each frame's pending operation.")],
+  ["hashing/table-storage", bi("Dùng Python dict làm bằng chứng rằng collision algorithm đã đúng.", "Using a Python dict as proof that the collision algorithm is correct.")],
+  ["hashing/insert-collisions", bi("Probe quá capacity hoặc mutate table trước khi biết insert có thành công.", "Probing beyond capacity or mutating the table before insertion is known to succeed.")],
+]);
+
 function locatorFromObjective(objective) {
   const source = objective.source;
   return {
@@ -337,11 +422,15 @@ async function main() {
           };
         }),
         title: block.titles,
-        explanation: authored.ex,
+        explanation: P4R9_ENRICHMENT.has(block.block_key)
+          ? bi(`${authored.ex.vi} ${P4R9_ENRICHMENT.get(block.block_key).vi}`, `${authored.ex.en} ${P4R9_ENRICHMENT.get(block.block_key).en}`)
+          : authored.ex,
         python_connection: authored.py,
         representation: authored.rep,
         invariant_or_rule: authored.rule,
-        misconceptions: authored.mis,
+        misconceptions: P4R9_MISCONCEPTION.has(block.block_key)
+          ? [...authored.mis, P4R9_MISCONCEPTION.get(block.block_key)]
+          : authored.mis,
         exam_signals: authored.sig,
         micro_example: {
           scenario: authored.micro[0],

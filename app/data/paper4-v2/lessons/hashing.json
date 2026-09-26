@@ -178,8 +178,8 @@
           "vi": "Tìm khóa qua bảng và vùng va chạm"
         },
         "explanation": {
-          "vi": "Search phải theo cùng hash function và collision sequence đã dùng khi insert. Với linear probing không xóa tombstone, gặp ô chưa dùng chứng minh key không thể nằm xa hơn; nếu không gặp, dừng sau một vòng.",
-          "en": "Search must follow the same hash function and collision sequence used by insertion. With linear probing and no deletion tombstones, an unused cell proves the key cannot lie farther along; otherwise stop after one full cycle."
+          "vi": "Search phải theo cùng hash function và collision sequence đã dùng khi insert. Với linear probing không xóa tombstone, gặp ô chưa dùng chứng minh key không thể nằm xa hơn; nếu không gặp, dừng sau một vòng. Failed search dừng theo empty-marker policy hoặc sau capacity probes; không được phụ thuộc vòng lặp vô hạn hay hành vi của Python dict.",
+          "en": "Search must follow the same hash function and collision sequence used by insertion. With linear probing and no deletion tombstones, an unused cell proves the key cannot lie farther along; otherwise stop after one full cycle. A failed search stops under the empty-marker policy or after capacity probes; it must not rely on an infinite loop or Python-dict behaviour."
         },
         "python_connection": {
           "vi": "L028 lấy start; L029–L031 tạo cùng probe sequence với insert; L032–L033 dừng ở ô trống; L034–L035 trả index khi bằng; L036 là not-found sau một vòng.",
@@ -310,8 +310,8 @@
           "vi": "Tính địa chỉ băm theo công thức đề"
         },
         "explanation": {
-          "vi": "Hash function biến key thành địa chỉ hợp lệ. Với công thức modulo, địa chỉ là `key % table_size`; cần table_size dương và key thuộc kiểu mà công thức định nghĩa.",
-          "en": "A hash function maps a key to a valid address. For a modulo rule, the address is `key % table_size`; table_size must be positive and the key must have the type required by the rule."
+          "vi": "Hash function biến key thành địa chỉ hợp lệ. Với công thức modulo, địa chỉ là `key % table_size`; cần table_size dương và key thuộc kiểu mà công thức định nghĩa. Nêu `n` là capacity của table khi dùng modulo và kiểm tra address luôn nằm trong 0..capacity-1.",
+          "en": "A hash function maps a key to a valid address. For a modulo rule, the address is `key % table_size`; table_size must be positive and the key must have the type required by the rule. When using modulo, define `n` as table capacity and verify that every address lies in 0..capacity-1."
         },
         "python_connection": {
           "vi": "L012–L013 triển khai `key % len(self.slots)`; L007–L009 đảm bảo size dương trước khi dùng. L041 từ chối key không phải integer cho contract của pilot.",
@@ -437,8 +437,8 @@
           "vi": "Chèn và xử lý va chạm theo cấu trúc đề"
         },
         "explanation": {
-          "vi": "Insert tính địa chỉ ban đầu rồi theo collision sequence đến ô trống hoặc key đã có. Thuật toán phải dừng sau số vị trí hữu hạn và báo thất bại khi không còn ô phù hợp.",
-          "en": "Insertion computes the initial address and follows the collision sequence to an empty cell or the existing key. It must stop after finitely many positions and report failure when no suitable cell remains."
+          "vi": "Insert tính địa chỉ ban đầu rồi theo collision sequence đến ô trống hoặc key đã có. Thuật toán phải dừng sau số vị trí hữu hạn và báo thất bại khi không còn ô phù hợp. Probe tối đa capacity ô; nếu không còn slot, trả full và chứng minh table trước/sau giống hệt nhau.",
+          "en": "Insertion computes the initial address and follows the collision sequence to an empty cell or the existing key. It must stop after finitely many positions and report failure when no suitable cell remains. Probe at most capacity slots; if none is free, return full and prove that the table is identical before and after."
         },
         "python_connection": {
           "vi": "L016 tính start; L017 giới hạn tối đa size bước; L018 wrap index; L020–L022 ghi vào ô trống; L023–L024 xử lý duplicate; L025 trả -1 khi đầy.",
@@ -460,6 +460,10 @@
           {
             "vi": "Probe vô hạn khi bảng không còn ô trống.",
             "en": "Probing forever when no empty slot remains."
+          },
+          {
+            "vi": "Probe quá capacity hoặc mutate table trước khi biết insert có thành công.",
+            "en": "Probing beyond capacity or mutating the table before insertion is known to succeed."
           }
         ],
         "exam_signals": [
@@ -578,8 +582,8 @@
           "vi": "Bảng băm và vùng va chạm được chỉ định"
         },
         "explanation": {
-          "vi": "Hash table có capacity cố định và quy ước ô rỗng; collision xảy ra khi hai key có cùng địa chỉ ban đầu. Cách lưu collision phải theo đúng cấu trúc được giao, như probing, bucket hoặc vùng spare, vì các cách này có invariants khác nhau.",
-          "en": "A hash table has fixed capacity and an empty-slot convention; a collision occurs when keys share an initial address. Collision storage must follow the supplied structure, such as probing, buckets, or a spare area, because their invariants differ."
+          "vi": "Hash table có capacity cố định và quy ước ô rỗng; collision xảy ra khi hai key có cùng địa chỉ ban đầu. Cách lưu collision phải theo đúng cấu trúc được giao, như probing, bucket hoặc vùng spare, vì các cách này có invariants khác nhau. Phân biệt interface set/map với hash-table representation; câu hỏi hashing yêu cầu thao tác trên slot, empty marker, capacity và collision policy tường minh.",
+          "en": "A hash table has fixed capacity and an empty-slot convention; a collision occurs when keys share an initial address. Collision storage must follow the supplied structure, such as probing, buckets, or a spare area, because their invariants differ. Separate the set/map interface from the hash-table representation; a hashing task requires explicit slots, empty markers, capacity, and collision policy."
         },
         "python_connection": {
           "vi": "Pilot tạo `slots=[None]*size` ở L009 và dùng linear probing trong cùng array ở L017–L024. Nó không triển khai `Spare` array/bucket riêng; bài yêu cầu cấu trúc đó cần artifact khác hoặc mở rộng đã kiểm chứng.",
@@ -601,6 +605,10 @@
           {
             "vi": "Không giới hạn số lần probe khi bảng đầy.",
             "en": "Failing to bound probes when the table is full."
+          },
+          {
+            "vi": "Dùng Python dict làm bằng chứng rằng collision algorithm đã đúng.",
+            "en": "Using a Python dict as proof that the collision algorithm is correct."
           }
         ],
         "exam_signals": [
@@ -737,258 +745,563 @@
         "text": ""
       },
       {
-        "line_id": "hashing.v1.L015",
+        "line_id": "hashing.v1.L065",
         "order": 15,
+        "text": "    def state(self):"
+      },
+      {
+        "line_id": "hashing.v1.L066",
+        "order": 16,
+        "text": "        return list(self.slots)"
+      },
+      {
+        "line_id": "hashing.v1.L067",
+        "order": 17,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L015",
+        "order": 18,
         "text": "    def insert(self, key):"
       },
       {
         "line_id": "hashing.v1.L016",
-        "order": 16,
+        "order": 19,
         "text": "        start = self.address(key)"
       },
       {
         "line_id": "hashing.v1.L017",
-        "order": 17,
+        "order": 20,
         "text": "        for step in range(len(self.slots)):"
       },
       {
         "line_id": "hashing.v1.L018",
-        "order": 18,
+        "order": 21,
         "text": "            index = (start + step) % len(self.slots)"
       },
       {
-        "line_id": "hashing.v1.L019",
-        "order": 19,
-        "text": "            self.trace.append({\"event\": \"probe_insert\", \"key\": key, \"index\": index, \"step\": step})"
+        "line_id": "hashing.v1.L068",
+        "order": 22,
+        "text": "            self.trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L069",
+        "order": 23,
+        "text": "                \"event\": \"probe_insert\","
+      },
+      {
+        "line_id": "hashing.v1.L070",
+        "order": 24,
+        "text": "                \"key\": key,"
+      },
+      {
+        "line_id": "hashing.v1.L071",
+        "order": 25,
+        "text": "                \"start\": start,"
+      },
+      {
+        "line_id": "hashing.v1.L072",
+        "order": 26,
+        "text": "                \"index\": index,"
+      },
+      {
+        "line_id": "hashing.v1.L073",
+        "order": 27,
+        "text": "                \"step\": step,"
+      },
+      {
+        "line_id": "hashing.v1.L074",
+        "order": 28,
+        "text": "                \"slot\": self.slots[index],"
+      },
+      {
+        "line_id": "hashing.v1.L075",
+        "order": 29,
+        "text": "            })"
       },
       {
         "line_id": "hashing.v1.L020",
-        "order": 20,
+        "order": 30,
         "text": "            if self.slots[index] is None:"
       },
       {
+        "line_id": "hashing.v1.L076",
+        "order": 31,
+        "text": "                before = self.state()"
+      },
+      {
         "line_id": "hashing.v1.L021",
-        "order": 21,
+        "order": 32,
         "text": "                self.slots[index] = key"
       },
       {
+        "line_id": "hashing.v1.L077",
+        "order": 33,
+        "text": "                self.trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L078",
+        "order": 34,
+        "text": "                    \"event\": \"insert_commit\","
+      },
+      {
+        "line_id": "hashing.v1.L079",
+        "order": 35,
+        "text": "                    \"key\": key,"
+      },
+      {
+        "line_id": "hashing.v1.L080",
+        "order": 36,
+        "text": "                    \"index\": index,"
+      },
+      {
+        "line_id": "hashing.v1.L081",
+        "order": 37,
+        "text": "                    \"before\": before,"
+      },
+      {
+        "line_id": "hashing.v1.L082",
+        "order": 38,
+        "text": "                    \"after\": self.state(),"
+      },
+      {
+        "line_id": "hashing.v1.L083",
+        "order": 39,
+        "text": "                })"
+      },
+      {
         "line_id": "hashing.v1.L022",
-        "order": 22,
+        "order": 40,
         "text": "                return index"
       },
       {
         "line_id": "hashing.v1.L023",
-        "order": 23,
+        "order": 41,
         "text": "            if self.slots[index] == key:"
       },
       {
+        "line_id": "hashing.v1.L084",
+        "order": 42,
+        "text": "                self.trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L085",
+        "order": 43,
+        "text": "                    \"event\": \"insert_existing\","
+      },
+      {
+        "line_id": "hashing.v1.L086",
+        "order": 44,
+        "text": "                    \"key\": key,"
+      },
+      {
+        "line_id": "hashing.v1.L087",
+        "order": 45,
+        "text": "                    \"index\": index,"
+      },
+      {
+        "line_id": "hashing.v1.L088",
+        "order": 46,
+        "text": "                    \"before\": self.state(),"
+      },
+      {
+        "line_id": "hashing.v1.L089",
+        "order": 47,
+        "text": "                    \"after\": self.state(),"
+      },
+      {
+        "line_id": "hashing.v1.L090",
+        "order": 48,
+        "text": "                })"
+      },
+      {
         "line_id": "hashing.v1.L024",
-        "order": 24,
+        "order": 49,
         "text": "                return index"
       },
       {
+        "line_id": "hashing.v1.L091",
+        "order": 50,
+        "text": "        before = self.state()"
+      },
+      {
+        "line_id": "hashing.v1.L092",
+        "order": 51,
+        "text": "        self.trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L093",
+        "order": 52,
+        "text": "            \"event\": \"insert_reject_full\","
+      },
+      {
+        "line_id": "hashing.v1.L094",
+        "order": 53,
+        "text": "            \"key\": key,"
+      },
+      {
+        "line_id": "hashing.v1.L095",
+        "order": 54,
+        "text": "            \"probes\": len(self.slots),"
+      },
+      {
+        "line_id": "hashing.v1.L096",
+        "order": 55,
+        "text": "            \"before\": before,"
+      },
+      {
+        "line_id": "hashing.v1.L097",
+        "order": 56,
+        "text": "            \"after\": self.state(),"
+      },
+      {
+        "line_id": "hashing.v1.L098",
+        "order": 57,
+        "text": "        })"
+      },
+      {
         "line_id": "hashing.v1.L025",
-        "order": 25,
+        "order": 58,
         "text": "        return -1"
       },
       {
         "line_id": "hashing.v1.L026",
-        "order": 26,
-        "text": ""
-      },
-      {
-        "line_id": "hashing.v1.L027",
-        "order": 27,
-        "text": "    def search(self, key):"
-      },
-      {
-        "line_id": "hashing.v1.L028",
-        "order": 28,
-        "text": "        start = self.address(key)"
-      },
-      {
-        "line_id": "hashing.v1.L029",
-        "order": 29,
-        "text": "        for step in range(len(self.slots)):"
-      },
-      {
-        "line_id": "hashing.v1.L030",
-        "order": 30,
-        "text": "            index = (start + step) % len(self.slots)"
-      },
-      {
-        "line_id": "hashing.v1.L031",
-        "order": 31,
-        "text": "            self.trace.append({\"event\": \"probe_search\", \"key\": key, \"index\": index, \"step\": step})"
-      },
-      {
-        "line_id": "hashing.v1.L032",
-        "order": 32,
-        "text": "            if self.slots[index] is None:"
-      },
-      {
-        "line_id": "hashing.v1.L033",
-        "order": 33,
-        "text": "                return -1"
-      },
-      {
-        "line_id": "hashing.v1.L034",
-        "order": 34,
-        "text": "            if self.slots[index] == key:"
-      },
-      {
-        "line_id": "hashing.v1.L035",
-        "order": 35,
-        "text": "                return index"
-      },
-      {
-        "line_id": "hashing.v1.L036",
-        "order": 36,
-        "text": "        return -1"
-      },
-      {
-        "line_id": "hashing.v1.L037",
-        "order": 37,
-        "text": ""
-      },
-      {
-        "line_id": "hashing.v1.L038",
-        "order": 38,
-        "text": ""
-      },
-      {
-        "line_id": "hashing.v1.L039",
-        "order": 39,
-        "text": "def run(fixture):"
-      },
-      {
-        "line_id": "hashing.v1.L040",
-        "order": 40,
-        "text": "    trace = []"
-      },
-      {
-        "line_id": "hashing.v1.L041",
-        "order": 41,
-        "text": "    if not all(isinstance(key, int) for key in fixture[\"insert_keys\"] + [fixture[\"search_key\"]]):"
-      },
-      {
-        "line_id": "hashing.v1.L042",
-        "order": 42,
-        "text": "        trace.append({\"event\": \"reject_non_integer_key\"})"
-      },
-      {
-        "line_id": "hashing.v1.L043",
-        "order": 43,
-        "text": "        return {\"status\": \"INVALID_KEY\", \"trace\": trace}"
-      },
-      {
-        "line_id": "hashing.v1.L044",
-        "order": 44,
-        "text": "    try:"
-      },
-      {
-        "line_id": "hashing.v1.L045",
-        "order": 45,
-        "text": "        table = HashTable(fixture[\"size\"], trace)"
-      },
-      {
-        "line_id": "hashing.v1.L046",
-        "order": 46,
-        "text": "    except ValueError as error:"
-      },
-      {
-        "line_id": "hashing.v1.L047",
-        "order": 47,
-        "text": "        return {\"status\": \"INVALID_SIZE\", \"message\": str(error), \"trace\": trace}"
-      },
-      {
-        "line_id": "hashing.v1.L048",
-        "order": 48,
-        "text": "    inserted_at = []"
-      },
-      {
-        "line_id": "hashing.v1.L049",
-        "order": 49,
-        "text": "    for key in fixture[\"insert_keys\"]:"
-      },
-      {
-        "line_id": "hashing.v1.L050",
-        "order": 50,
-        "text": "        inserted_at.append(table.insert(key))"
-      },
-      {
-        "line_id": "hashing.v1.L051",
-        "order": 51,
-        "text": "    found_at = table.search(fixture[\"search_key\"])"
-      },
-      {
-        "line_id": "hashing.v1.L052",
-        "order": 52,
-        "text": "    return {"
-      },
-      {
-        "line_id": "hashing.v1.L053",
-        "order": 53,
-        "text": "        \"status\": \"OK\","
-      },
-      {
-        "line_id": "hashing.v1.L054",
-        "order": 54,
-        "text": "        \"inserted_at\": inserted_at,"
-      },
-      {
-        "line_id": "hashing.v1.L055",
-        "order": 55,
-        "text": "        \"found_at\": found_at,"
-      },
-      {
-        "line_id": "hashing.v1.L056",
-        "order": 56,
-        "text": "        \"slots\": table.slots,"
-      },
-      {
-        "line_id": "hashing.v1.L057",
-        "order": 57,
-        "text": "        \"trace\": trace,"
-      },
-      {
-        "line_id": "hashing.v1.L058",
-        "order": 58,
-        "text": "    }"
-      },
-      {
-        "line_id": "hashing.v1.L059",
         "order": 59,
         "text": ""
       },
       {
-        "line_id": "hashing.v1.L060",
+        "line_id": "hashing.v1.L027",
         "order": 60,
+        "text": "    def search(self, key):"
+      },
+      {
+        "line_id": "hashing.v1.L028",
+        "order": 61,
+        "text": "        start = self.address(key)"
+      },
+      {
+        "line_id": "hashing.v1.L029",
+        "order": 62,
+        "text": "        for step in range(len(self.slots)):"
+      },
+      {
+        "line_id": "hashing.v1.L030",
+        "order": 63,
+        "text": "            index = (start + step) % len(self.slots)"
+      },
+      {
+        "line_id": "hashing.v1.L099",
+        "order": 64,
+        "text": "            self.trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L100",
+        "order": 65,
+        "text": "                \"event\": \"probe_search\","
+      },
+      {
+        "line_id": "hashing.v1.L101",
+        "order": 66,
+        "text": "                \"key\": key,"
+      },
+      {
+        "line_id": "hashing.v1.L102",
+        "order": 67,
+        "text": "                \"start\": start,"
+      },
+      {
+        "line_id": "hashing.v1.L103",
+        "order": 68,
+        "text": "                \"index\": index,"
+      },
+      {
+        "line_id": "hashing.v1.L104",
+        "order": 69,
+        "text": "                \"step\": step,"
+      },
+      {
+        "line_id": "hashing.v1.L105",
+        "order": 70,
+        "text": "                \"slot\": self.slots[index],"
+      },
+      {
+        "line_id": "hashing.v1.L106",
+        "order": 71,
+        "text": "            })"
+      },
+      {
+        "line_id": "hashing.v1.L032",
+        "order": 72,
+        "text": "            if self.slots[index] is None:"
+      },
+      {
+        "line_id": "hashing.v1.L107",
+        "order": 73,
+        "text": "                self.trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L108",
+        "order": 74,
+        "text": "                    \"event\": \"search_stop_empty\","
+      },
+      {
+        "line_id": "hashing.v1.L109",
+        "order": 75,
+        "text": "                    \"key\": key,"
+      },
+      {
+        "line_id": "hashing.v1.L110",
+        "order": 76,
+        "text": "                    \"index\": index,"
+      },
+      {
+        "line_id": "hashing.v1.L111",
+        "order": 77,
+        "text": "                    \"probes\": step + 1,"
+      },
+      {
+        "line_id": "hashing.v1.L112",
+        "order": 78,
+        "text": "                })"
+      },
+      {
+        "line_id": "hashing.v1.L033",
+        "order": 79,
+        "text": "                return -1"
+      },
+      {
+        "line_id": "hashing.v1.L034",
+        "order": 80,
+        "text": "            if self.slots[index] == key:"
+      },
+      {
+        "line_id": "hashing.v1.L113",
+        "order": 81,
+        "text": "                self.trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L114",
+        "order": 82,
+        "text": "                    \"event\": \"search_found\","
+      },
+      {
+        "line_id": "hashing.v1.L115",
+        "order": 83,
+        "text": "                    \"key\": key,"
+      },
+      {
+        "line_id": "hashing.v1.L116",
+        "order": 84,
+        "text": "                    \"index\": index,"
+      },
+      {
+        "line_id": "hashing.v1.L117",
+        "order": 85,
+        "text": "                    \"probes\": step + 1,"
+      },
+      {
+        "line_id": "hashing.v1.L118",
+        "order": 86,
+        "text": "                })"
+      },
+      {
+        "line_id": "hashing.v1.L035",
+        "order": 87,
+        "text": "                return index"
+      },
+      {
+        "line_id": "hashing.v1.L119",
+        "order": 88,
+        "text": "        self.trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L120",
+        "order": 89,
+        "text": "            \"event\": \"search_exhausted\","
+      },
+      {
+        "line_id": "hashing.v1.L121",
+        "order": 90,
+        "text": "            \"key\": key,"
+      },
+      {
+        "line_id": "hashing.v1.L122",
+        "order": 91,
+        "text": "            \"probes\": len(self.slots),"
+      },
+      {
+        "line_id": "hashing.v1.L123",
+        "order": 92,
+        "text": "        })"
+      },
+      {
+        "line_id": "hashing.v1.L036",
+        "order": 93,
+        "text": "        return -1"
+      },
+      {
+        "line_id": "hashing.v1.L037",
+        "order": 94,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L038",
+        "order": 95,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L039",
+        "order": 96,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "hashing.v1.L040",
+        "order": 97,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "hashing.v1.L041",
+        "order": 98,
+        "text": "    if not all(isinstance(key, int) for key in fixture[\"insert_keys\"] + [fixture[\"search_key\"]]):"
+      },
+      {
+        "line_id": "hashing.v1.L124",
+        "order": 99,
+        "text": "        trace.append({"
+      },
+      {
+        "line_id": "hashing.v1.L125",
+        "order": 100,
+        "text": "            \"event\": \"reject_non_integer_key\","
+      },
+      {
+        "line_id": "hashing.v1.L126",
+        "order": 101,
+        "text": "            \"before\": [],"
+      },
+      {
+        "line_id": "hashing.v1.L127",
+        "order": 102,
+        "text": "            \"after\": [],"
+      },
+      {
+        "line_id": "hashing.v1.L128",
+        "order": 103,
+        "text": "        })"
+      },
+      {
+        "line_id": "hashing.v1.L043",
+        "order": 104,
+        "text": "        return {\"status\": \"INVALID_KEY\", \"trace\": trace}"
+      },
+      {
+        "line_id": "hashing.v1.L044",
+        "order": 105,
+        "text": "    try:"
+      },
+      {
+        "line_id": "hashing.v1.L045",
+        "order": 106,
+        "text": "        table = HashTable(fixture[\"size\"], trace)"
+      },
+      {
+        "line_id": "hashing.v1.L046",
+        "order": 107,
+        "text": "    except ValueError as error:"
+      },
+      {
+        "line_id": "hashing.v1.L047",
+        "order": 108,
+        "text": "        return {\"status\": \"INVALID_SIZE\", \"message\": str(error), \"trace\": trace}"
+      },
+      {
+        "line_id": "hashing.v1.L048",
+        "order": 109,
+        "text": "    inserted_at = []"
+      },
+      {
+        "line_id": "hashing.v1.L049",
+        "order": 110,
+        "text": "    for key in fixture[\"insert_keys\"]:"
+      },
+      {
+        "line_id": "hashing.v1.L050",
+        "order": 111,
+        "text": "        inserted_at.append(table.insert(key))"
+      },
+      {
+        "line_id": "hashing.v1.L051",
+        "order": 112,
+        "text": "    found_at = table.search(fixture[\"search_key\"])"
+      },
+      {
+        "line_id": "hashing.v1.L052",
+        "order": 113,
+        "text": "    return {"
+      },
+      {
+        "line_id": "hashing.v1.L053",
+        "order": 114,
+        "text": "        \"status\": \"OK\","
+      },
+      {
+        "line_id": "hashing.v1.L054",
+        "order": 115,
+        "text": "        \"inserted_at\": inserted_at,"
+      },
+      {
+        "line_id": "hashing.v1.L055",
+        "order": 116,
+        "text": "        \"found_at\": found_at,"
+      },
+      {
+        "line_id": "hashing.v1.L056",
+        "order": 117,
+        "text": "        \"slots\": table.slots,"
+      },
+      {
+        "line_id": "hashing.v1.L057",
+        "order": 118,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "hashing.v1.L058",
+        "order": 119,
+        "text": "    }"
+      },
+      {
+        "line_id": "hashing.v1.L059",
+        "order": 120,
+        "text": ""
+      },
+      {
+        "line_id": "hashing.v1.L060",
+        "order": 121,
         "text": ""
       },
       {
         "line_id": "hashing.v1.L061",
-        "order": 61,
+        "order": 122,
         "text": "if __name__ == \"__main__\":"
       },
       {
         "line_id": "hashing.v1.L062",
-        "order": 62,
+        "order": 123,
         "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
       },
       {
         "line_id": "hashing.v1.L063",
-        "order": 63,
+        "order": 124,
         "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
       },
       {
         "line_id": "hashing.v1.L064",
-        "order": 64,
+        "order": 125,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "00acfb5f4c6320ceb5714cba3060f8ec6777ec6a386dc08b6bb3a3d3ead38707",
+    "code_sha256": "455ff53df0f45330e1d7b6d35ce6debfb60d93fd41e214c053d69bdc2620a509",
     "caption": {
       "vi": "Bảng băm dùng phép chia dư, dò tuyến tính, chèn và tìm kiếm có giới hạn.",
       "en": "A hash table using remainder addressing and bounded linear probing for insert and search."
@@ -998,7 +1311,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r2.a3.hashing.pilot-v1.author-run",
       "independent_rerun_ref": "p4r2.a3.hashing.pilot-v1.independent-rerun",
-      "execution_log_sha256": "1de2ed8b3ec907eed9c74ae8b6bf8deaeee0fe4c32480f0924a1091d4b613cab"
+      "execution_log_sha256": "32a34bda0ed7153c34a4aa284ba8c29f01381706666c07bf0b260a954b535df8"
     }
   },
   "tests": {
@@ -1069,49 +1382,140 @@
               "event": "probe_insert",
               "index": 3,
               "key": 10,
+              "slot": null,
+              "start": 3,
               "step": 0
+            },
+            {
+              "after": [
+                null,
+                null,
+                null,
+                10,
+                null,
+                null,
+                null
+              ],
+              "before": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "event": "insert_commit",
+              "index": 3,
+              "key": 10
             },
             {
               "event": "probe_insert",
               "index": 3,
               "key": 17,
+              "slot": 10,
+              "start": 3,
               "step": 0
             },
             {
               "event": "probe_insert",
               "index": 4,
               "key": 17,
+              "slot": null,
+              "start": 3,
               "step": 1
             },
             {
+              "after": [
+                null,
+                null,
+                null,
+                10,
+                17,
+                null,
+                null
+              ],
+              "before": [
+                null,
+                null,
+                null,
+                10,
+                null,
+                null,
+                null
+              ],
+              "event": "insert_commit",
+              "index": 4,
+              "key": 17
+            },
+            {
               "event": "probe_insert",
               "index": 3,
               "key": 24,
+              "slot": 10,
+              "start": 3,
               "step": 0
             },
             {
               "event": "probe_insert",
               "index": 4,
               "key": 24,
+              "slot": 17,
+              "start": 3,
               "step": 1
             },
             {
               "event": "probe_insert",
               "index": 5,
               "key": 24,
+              "slot": null,
+              "start": 3,
               "step": 2
+            },
+            {
+              "after": [
+                null,
+                null,
+                null,
+                10,
+                17,
+                24,
+                null
+              ],
+              "before": [
+                null,
+                null,
+                null,
+                10,
+                17,
+                null,
+                null
+              ],
+              "event": "insert_commit",
+              "index": 5,
+              "key": 24
             },
             {
               "event": "probe_search",
               "index": 3,
               "key": 17,
+              "slot": 10,
+              "start": 3,
               "step": 0
             },
             {
               "event": "probe_search",
               "index": 4,
               "key": 17,
+              "slot": 17,
+              "start": 3,
               "step": 1
+            },
+            {
+              "event": "search_found",
+              "index": 4,
+              "key": 17,
+              "probes": 2
             }
           ]
         }
@@ -1138,55 +1542,138 @@
               "event": "probe_insert",
               "index": 0,
               "key": 0,
+              "slot": null,
+              "start": 0,
               "step": 0
+            },
+            {
+              "after": [
+                0,
+                null,
+                null
+              ],
+              "before": [
+                null,
+                null,
+                null
+              ],
+              "event": "insert_commit",
+              "index": 0,
+              "key": 0
             },
             {
               "event": "probe_insert",
               "index": 1,
               "key": 1,
+              "slot": null,
+              "start": 1,
               "step": 0
+            },
+            {
+              "after": [
+                0,
+                1,
+                null
+              ],
+              "before": [
+                0,
+                null,
+                null
+              ],
+              "event": "insert_commit",
+              "index": 1,
+              "key": 1
             },
             {
               "event": "probe_insert",
               "index": 2,
               "key": 2,
+              "slot": null,
+              "start": 2,
               "step": 0
+            },
+            {
+              "after": [
+                0,
+                1,
+                2
+              ],
+              "before": [
+                0,
+                1,
+                null
+              ],
+              "event": "insert_commit",
+              "index": 2,
+              "key": 2
             },
             {
               "event": "probe_insert",
               "index": 0,
               "key": 3,
+              "slot": 0,
+              "start": 0,
               "step": 0
             },
             {
               "event": "probe_insert",
               "index": 1,
               "key": 3,
+              "slot": 1,
+              "start": 0,
               "step": 1
             },
             {
               "event": "probe_insert",
               "index": 2,
               "key": 3,
+              "slot": 2,
+              "start": 0,
               "step": 2
+            },
+            {
+              "after": [
+                0,
+                1,
+                2
+              ],
+              "before": [
+                0,
+                1,
+                2
+              ],
+              "event": "insert_reject_full",
+              "key": 3,
+              "probes": 3
             },
             {
               "event": "probe_search",
               "index": 0,
               "key": 9,
+              "slot": 0,
+              "start": 0,
               "step": 0
             },
             {
               "event": "probe_search",
               "index": 1,
               "key": 9,
+              "slot": 1,
+              "start": 0,
               "step": 1
             },
             {
               "event": "probe_search",
               "index": 2,
               "key": 9,
+              "slot": 2,
+              "start": 0,
               "step": 2
+            },
+            {
+              "event": "search_exhausted",
+              "key": 9,
+              "probes": 3
             }
           ]
         }
@@ -1198,6 +1685,8 @@
           "status": "INVALID_KEY",
           "trace": [
             {
+              "after": [],
+              "before": [],
               "event": "reject_non_integer_key"
             }
           ]
@@ -1211,7 +1700,7 @@
     },
     "author_run_ref": "p4r2.a3.hashing.pilot-v1.author-run",
     "independent_rerun_ref": "p4r2.a3.hashing.pilot-v1.independent-rerun",
-    "execution_log_sha256": "1de2ed8b3ec907eed9c74ae8b6bf8deaeee0fe4c32480f0924a1091d4b613cab"
+    "execution_log_sha256": "32a34bda0ed7153c34a4aa284ba8c29f01381706666c07bf0b260a954b535df8"
   },
   "visual": {
     "owned_patterns": [
@@ -1220,38 +1709,39 @@
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
         "owner_lesson_slug": "hashing",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
-        "trace_url": "/paper4-v2/traces/hash-function.json?v=00acfb5f4c6320ce",
+        "trace_url": "/paper4-v2/traces/hash-function.json?v=455ff53df0f45330",
         "scenario_count": 3,
-        "event_count": 18
+        "event_count": 27
       },
       {
         "pattern_id": "HASH_INSERT",
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
         "owner_lesson_slug": "hashing",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
-        "trace_url": "/paper4-v2/traces/hash-insert.json?v=00acfb5f4c6320ce",
+        "trace_url": "/paper4-v2/traces/hash-insert.json?v=455ff53df0f45330",
         "scenario_count": 3,
-        "event_count": 18
+        "event_count": 27
       },
       {
         "pattern_id": "HASH_SEARCH",
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
         "owner_lesson_slug": "hashing",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
-        "trace_url": "/paper4-v2/traces/hash-search.json?v=00acfb5f4c6320ce",
+        "trace_url": "/paper4-v2/traces/hash-search.json?v=455ff53df0f45330",
         "scenario_count": 3,
-        "event_count": 18
+        "event_count": 27
       },
       {
         "pattern_id": "HASH_SETUP",
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.hashing",
         "owner_lesson_slug": "hashing",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
-        "trace_url": "/paper4-v2/traces/hash-setup.json?v=00acfb5f4c6320ce",
+        "trace_url": "/paper4-v2/traces/hash-setup.json?v=455ff53df0f45330",
         "scenario_count": 3,
-        "event_count": 18
+        "event_count": 27
       }
     ],
+    "trace_backed_association_patterns": [],
     "approved_static_or_representational_support": []
   },
   "marking": {
@@ -1599,6 +2089,11 @@
         "en": "Probing forever when no empty slot remains."
       },
       {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.insert-collisions",
+        "vi": "Probe quá capacity hoặc mutate table trước khi biết insert có thành công.",
+        "en": "Probing beyond capacity or mutating the table before insertion is known to succeed."
+      },
+      {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.table-storage",
         "vi": "Trộn linear probing với spare-array layout trong cùng lời giải.",
         "en": "Mixing linear probing with a spare-array layout in one solution."
@@ -1607,6 +2102,11 @@
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.table-storage",
         "vi": "Không giới hạn số lần probe khi bảng đầy.",
         "en": "Failing to bound probes when the table is full."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.hashing.knowledge.table-storage",
+        "vi": "Dùng Python dict làm bằng chứng rằng collision algorithm đã đúng.",
+        "en": "Using a Python dict as proof that the collision algorithm is correct."
       }
     ],
     "checks": [
@@ -1671,8 +2171,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.hashing.assessment.progression",
         "level": "faded",
         "prompt": {
-          "vi": "Hoàn thiện linear probing có wrap-around và giới hạn tối đa `size` probe. Với fixture boundary, chỉ ra insert nào trả -1 và vì sao search 9 kết thúc; nộp Python, bảng probe và kiểm tra không lặp vô hạn.",
-          "en": "Complete linear probing with wrap-around and a maximum of `size` probes. For the boundary fixture, identify which insert returns -1 and why searching for 9 terminates; submit Python, a probe table, and a no-infinite-loop check."
+          "vi": "Hoàn thiện linear probing có wrap-around và tối đa `size` probe. Với full-table insert và failed search, nộp table trước/sau để chứng minh reject không mutate, cùng lý do termination; không dùng Python dict/set thay collision policy.",
+          "en": "Complete linear probing with wrap-around and at most `size` probes. For full-table insertion and failed search, submit before/after tables proving rejection does not mutate state, plus the termination reason; do not replace the collision policy with Python dict/set."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
@@ -1749,8 +2249,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.hashing.assessment.progression",
         "level": "guided",
         "prompt": {
-          "vi": "Với fixture normal, tính địa chỉ ban đầu của 10, 17 và 24, rồi trace từng probe khi insert và search 17. Ghi trạng thái bảng sau mỗi insert và giải thích vì sao các khóa va chạm.",
-          "en": "For the normal fixture, calculate the initial addresses of 10, 17, and 24, then trace every probe while inserting and searching for 17. Record the table after each insert and explain why the keys collide."
+          "vi": "Với fixture normal, tách ADT operation khỏi hash-table implementation, tính địa chỉ của 10, 17, 24 rồi trace probe khi insert/search. Ghi address, slot, collision và table state; không dùng Python dict/set làm bằng chứng implementation.",
+          "en": "For the normal fixture, separate the ADT operation from the hash-table implementation, calculate addresses for 10, 17, and 24, then trace insertion/search probes. Record address, slot, collision, and table state; do not use Python dict/set as implementation evidence."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.hashing.pilot-v1",
@@ -2298,6 +2798,16 @@
         "heading": "File organisation and access",
         "bullet_locator": "Hashing objective",
         "anchor_text": "Show understanding of hashing algorithms"
+      }
+    },
+    {
+      "source_id": "video_greg_hogg_dsa_lecture_04",
+      "authority": "Supplementary_education_source",
+      "locator": {
+        "source_id": "video_greg_hogg_dsa_lecture_04",
+        "heading": "Hash functions, collisions, probing and failed lookup",
+        "bullet_locator": "youtube_seconds_0_843",
+        "anchor_text": "T2 supplementary concept source only; YouTube iZyxNEBpqFY at 0 seconds"
       }
     }
   ]

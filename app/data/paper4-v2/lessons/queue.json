@@ -167,8 +167,8 @@
           "vi": "Dequeue, rỗng và giá trị trả về"
         },
         "explanation": {
-          "vi": "Dequeue kiểm tra rỗng trước, đọc item tại front, tùy representation có thể xóa dấu vết ô, rồi dịch front và giảm count. Giá trị được đọc trước khi xóa phải được trả về cho caller.",
-          "en": "Dequeue checks for empty first, reads the item at front, may clear the cell according to the representation, then advances front and decreases count. The value read before clearing must be returned to the caller."
+          "vi": "Dequeue kiểm tra rỗng trước, đọc item tại front, tùy representation có thể xóa dấu vết ô, rồi dịch front và giảm count. Giá trị được đọc trước khi xóa phải được trả về cho caller. Kiểm tra `count == 0` trước read; nếu chấp nhận thì lưu item front, clear khi contract yêu cầu, wrap front và giảm count đúng một lần.",
+          "en": "Dequeue checks for empty first, reads the item at front, may clear the cell according to the representation, then advances front and decreases count. The value read before clearing must be returned to the caller. Check `count == 0` before the read; on acceptance, save the front item, clear it when required, wrap front, and decrement count exactly once."
         },
         "python_connection": {
           "vi": "L028–L030 xử lý underflow bằng `None`; L031–L033 lưu item rồi xóa ô; L034–L035 cập nhật front/count; L037 trả item.",
@@ -284,8 +284,8 @@
           "vi": "Enqueue, đầy và vòng chỉ số"
         },
         "explanation": {
-          "vi": "Enqueue kiểm tra đầy trước khi ghi, đặt item vào `rear`, dịch rear theo vòng và tăng count. Thứ tự cập nhật cần giữ để trace chỉ ra đúng ô vừa thay đổi.",
-          "en": "Enqueue checks for full before writing, places the item at `rear`, advances rear circularly, and increments count. The update order must remain clear so a trace identifies the changed cell."
+          "vi": "Enqueue kiểm tra đầy trước khi ghi, đặt item vào `rear`, dịch rear theo vòng và tăng count. Thứ tự cập nhật cần giữ để trace chỉ ra đúng ô vừa thay đổi. Kiểm tra `count == capacity` trước write; nếu chấp nhận thì ghi tại rear, wrap bằng modulo và tăng count đúng một lần.",
+          "en": "Enqueue checks for full before writing, places the item at `rear`, advances rear circularly, and increments count. The update order must remain clear so a trace identifies the changed cell. Check `count == capacity` before the write; on acceptance, write at rear, wrap with modulo, and increment count exactly once."
         },
         "python_connection": {
           "vi": "L017–L019 bảo vệ overflow; L020 giữ insert index; L021 ghi item; L022 wrap rear; L023 tăng count. L024 ghi trace bằng index trước khi rear đổi.",
@@ -307,6 +307,10 @@
           {
             "vi": "Tăng rear không modulo nên vượt chỉ số cuối.",
             "en": "Incrementing rear without modulo and moving past the last index."
+          },
+          {
+            "vi": "Dùng `deque.append` thay cho implementation thủ công mà đề yêu cầu.",
+            "en": "Using `deque.append` instead of the manual implementation required by the task."
           }
         ],
         "exam_signals": [
@@ -419,8 +423,8 @@
           "vi": "Đọc các phần tử đang dùng mà không xóa"
         },
         "explanation": {
-          "vi": "Duyệt queue không phá hủy phải đọc đúng `count` phần tử theo logical order từ front và không thay đổi front/rear/count. Với circular array, index vật lý của offset là `(front + offset) % capacity`.",
-          "en": "A non-destructive queue traversal reads exactly `count` items in logical order from front without changing front/rear/count. In a circular array, the physical index for an offset is `(front + offset) % capacity`."
+          "vi": "Duyệt queue không phá hủy phải đọc đúng `count` phần tử theo logical order từ front và không thay đổi front/rear/count. Với circular array, index vật lý của offset là `(front + offset) % capacity`. Live-window trace bắt đầu tại front và đi đúng count bước; physical array order không nhất thiết là FIFO order sau wrap-around.",
+          "en": "A non-destructive queue traversal reads exactly `count` items in logical order from front without changing front/rear/count. In a circular array, the physical index for an offset is `(front + offset) % capacity`. A live-window trace starts at front and takes exactly count steps; physical array order need not equal FIFO order after wrap-around."
         },
         "python_connection": {
           "vi": "L039–L044 tạo list mới; L041 lặp đúng count lần và L042 ánh xạ offset qua modulo. Không line nào gán lại front, rear hoặc count.",
@@ -566,8 +570,8 @@
           "vi": "Tổng hợp queue bằng đọc hoặc tiêu thụ dữ liệu"
         },
         "explanation": {
-          "vi": "Reduce gộp nhiều item thành một kết quả, ví dụ tổng; trước tiên phải quyết định thao tác chỉ đọc hay tiêu thụ queue. Nếu tiêu thụ, termination dựa vào trạng thái rỗng; nếu giữ nguyên, duyệt đúng live items mà không gọi dequeue.",
-          "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing."
+          "vi": "Reduce gộp nhiều item thành một kết quả, ví dụ tổng; trước tiên phải quyết định thao tác chỉ đọc hay tiêu thụ queue. Nếu tiêu thụ, termination dựa vào trạng thái rỗng; nếu giữ nguyên, duyệt đúng live items mà không gọi dequeue. Ghi rõ operation có phá hủy queue hay chỉ đọc; nếu dùng dequeue để reduce thì postcondition phải cho biết queue đã đổi ra sao.",
+          "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing. State whether the operation consumes the queue or only reads it; if reduction uses dequeue, the postcondition must describe the changed queue."
         },
         "python_connection": {
           "vi": "Pilot chọn preserve: L062 gọi `live_items`, rồi L063 tính tổng số từ bản sao logical. Không dequeue trong bước reduce, nên queue vẫn giữ dữ liệu; artifact chưa triển khai biến thể recursive consuming.",
@@ -718,8 +722,8 @@
           "vi": "Head, tail, count và quy ước rỗng"
         },
         "explanation": {
-          "vi": "Queue là FIFO: phần tử vào trước ra trước. Với circular array, `front` chỉ phần tử sẽ lấy, `rear` chỉ ô sẽ chèn kế tiếp và `count` phân biệt rỗng với đầy khi hai chỉ số bằng nhau.",
-          "en": "A queue is FIFO: the first item inserted is the first removed. In a circular array, `front` points to the next item to remove, `rear` to the next insertion cell, and `count` distinguishes empty from full when the indices coincide."
+          "vi": "Queue là FIFO: phần tử vào trước ra trước. Với circular array, `front` chỉ phần tử sẽ lấy, `rear` chỉ ô sẽ chèn kế tiếp và `count` phân biệt rỗng với đầy khi hai chỉ số bằng nhau. FIFO chỉ mô tả thứ tự logic; implementation trong đề còn cần front, rear, count, capacity và quy ước rear là ô đang dùng hay next-free.",
+          "en": "A queue is FIFO: the first item inserted is the first removed. In a circular array, `front` points to the next item to remove, `rear` to the next insertion cell, and `count` distinguishes empty from full when the indices coincide. FIFO describes logical order only; an exam implementation also needs front, rear, count, capacity, and a declaration of whether rear is used or next-free."
         },
         "python_connection": {
           "vi": "L010–L013 khởi tạo array, front, rear, count; L022/L034 dùng modulo để quay vòng. Representation của pilot chọn `rear` là next insertion index và `count` là logical size.",
@@ -741,6 +745,10 @@
           {
             "vi": "Đọc queue theo index 0..count-1 khi front đã wrap.",
             "en": "Reading the queue at indices 0..count-1 after front has wrapped."
+          },
+          {
+            "vi": "Cho rằng biết FIFO là đủ mà không khai báo front/rear/count convention.",
+            "en": "Assuming FIFO alone is enough without declaring front/rear/count conventions."
           }
         ],
         "exam_signals": [
@@ -1503,6 +1511,7 @@
         "event_count": 19
       }
     ],
+    "trace_backed_association_patterns": [],
     "approved_static_or_representational_support": []
   },
   "marking": {
@@ -1912,6 +1921,11 @@
         "en": "Incrementing rear without modulo and moving past the last index."
       },
       {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.enqueue",
+        "vi": "Dùng `deque.append` thay cho implementation thủ công mà đề yêu cầu.",
+        "en": "Using `deque.append` instead of the manual implementation required by the task."
+      },
+      {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.inspect-live-items",
         "vi": "Duyệt toàn bộ array rồi loại `None`, sai nếu `None` là dữ liệu hợp lệ hoặc thứ tự đã wrap.",
         "en": "Scanning the whole array and filtering `None`, which fails if `None` is valid data or order has wrapped."
@@ -1940,6 +1954,11 @@
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions",
         "vi": "Đọc queue theo index 0..count-1 khi front đã wrap.",
         "en": "Reading the queue at indices 0..count-1 after front has wrapped."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.queue.knowledge.representation-conventions",
+        "vi": "Cho rằng biết FIFO là đủ mà không khai báo front/rear/count convention.",
+        "en": "Assuming FIFO alone is enough without declaring front/rear/count conventions."
       }
     ],
     "checks": [
@@ -2179,8 +2198,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.queue.assessment.progression",
         "level": "independent",
         "prompt": {
-          "vi": "Tự cài đặt circular queue hoàn chỉnh gồm setup, enqueue, dequeue, inspect và reduce; chạy normal/boundary/failure. Nộp code, output thực tế, trace wrap-around, assertions FIFO và bằng chứng mọi thao tác bị từ chối đều giữ nguyên trạng thái.",
-          "en": "Implement a complete circular queue with setup, enqueue, dequeue, inspect, and reduce; run normal/boundary/failure. Submit code, actual outputs, a wrap-around trace, FIFO assertions, and evidence that every rejected operation leaves state unchanged."
+          "vi": "Tự cài đặt circular queue với front/rear/count/capacity, setup, enqueue, dequeue, inspect và reduce; chạy normal/boundary/failure. Nộp wrap-around trace, FIFO assertions và non-mutation evidence. Chỉ nêu `deque` trong contrast box và giải thích vì sao nó không thay implementation thủ công.",
+          "en": "Implement a circular queue with front/rear/count/capacity, setup, enqueue, dequeue, inspect, and reduce; run normal/boundary/failure. Submit a wrap-around trace, FIFO assertions, and non-mutation evidence. Mention `deque` only in a contrast box and explain why it does not replace the manual implementation."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
@@ -2786,6 +2805,16 @@
         "heading": "Algorithms",
         "bullet_locator": "ADT insert list, queue facet",
         "anchor_text": "Write algorithms to insert an item into each of the following: stack, queue, linked list, binary tree"
+      }
+    },
+    {
+      "source_id": "video_greg_hogg_dsa_lecture_05",
+      "authority": "Supplementary_education_source",
+      "locator": {
+        "source_id": "video_greg_hogg_dsa_lecture_05",
+        "heading": "Queue FIFO operations and representation context",
+        "bullet_locator": "youtube_seconds_325_569",
+        "anchor_text": "T2 supplementary concept source only; YouTube vOx3vY1w4tM at 325 seconds"
       }
     }
   ]

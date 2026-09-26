@@ -159,8 +159,8 @@
           "vi": "Phần tử giữa, thu hẹp khoảng và thất bại"
         },
         "explanation": {
-          "vi": "Middle dùng chia nguyên để chọn một index trong khoảng. Sau khi so sánh, phải loại luôn middle bằng `middle-1` hoặc `middle+1`; nếu không, khoảng có thể không nhỏ đi và vòng lặp không kết thúc.",
-          "en": "Middle uses integer division to choose an index in the interval. After comparison, exclude middle with `middle-1` or `middle+1`; otherwise the interval may fail to shrink and the loop may not terminate."
+          "vi": "Middle dùng chia nguyên để chọn một index trong khoảng. Sau khi so sánh, phải loại luôn middle bằng `middle-1` hoặc `middle+1`; nếu không, khoảng có thể không nhỏ đi và vòng lặp không kết thúc. Đếm một comparison với middle mỗi vòng; cập nhật `middle-1` hoặc `middle+1` để interval giảm nghiêm ngặt và không kiểm tra lại middle.",
+          "en": "Middle uses integer division to choose an index in the interval. After comparison, exclude middle with `middle-1` or `middle+1`; otherwise the interval may fail to shrink and the loop may not terminate. Count one comparison with the middle item per iteration; update to `middle-1` or `middle+1` so the interval strictly shrinks and the middle is not tested again."
         },
         "python_connection": {
           "vi": "L016 tính middle; L024–L029 xử lý bằng/nhỏ hơn/lớn hơn. L030–L031 định nghĩa thất bại khi `low > high` bằng sentinel `-1`.",
@@ -182,6 +182,10 @@
           {
             "vi": "Dùng `/` tạo float làm index.",
             "en": "Using `/`, producing a float index."
+          },
+          {
+            "vi": "Giữ lại middle trong interval mới nên có thể lặp vô hạn.",
+            "en": "Keeping middle inside the new interval and risking a non-terminating loop."
           }
         ],
         "exam_signals": [
@@ -275,8 +279,8 @@
           "vi": "Tiền điều kiện và khoảng tìm kiếm"
         },
         "explanation": {
-          "vi": "Tìm kiếm nhị phân chỉ loại bỏ nửa khoảng an toàn khi dữ liệu đã sắp theo cùng comparator dùng để so sánh target. Khoảng tìm kiếm đóng `[low, high]` chứa mọi vị trí còn có thể là đáp án.",
-          "en": "Binary search can safely discard half an interval only when data is sorted under the same comparator used against the target. The closed search interval `[low, high]` contains every position that can still be the answer."
+          "vi": "Tìm kiếm nhị phân chỉ loại bỏ nửa khoảng an toàn khi dữ liệu đã sắp theo cùng comparator dùng để so sánh target. Khoảng tìm kiếm đóng `[low, high]` chứa mọi vị trí còn có thể là đáp án. Khai báo rõ closed interval `[low, high]`; sau mỗi comparison, tô phần bị loại và chứng minh mọi vị trí còn có thể vẫn nằm trong interval mới.",
+          "en": "Binary search can safely discard half an interval only when data is sorted under the same comparator used against the target. The closed search interval `[low, high]` contains every position that can still be the answer. Declare the closed interval `[low, high]`; after each comparison, mark the discarded region and prove that every remaining candidate position is still inside the new interval."
         },
         "python_connection": {
           "vi": "L005–L009 kiểm tra thứ tự tăng; L037–L039 từ chối input không sắp. L013–L015 khởi tạo khoảng đóng từ 0 đến `len(values)-1` và chỉ lặp khi khoảng chưa rỗng.",
@@ -298,6 +302,10 @@
           {
             "vi": "Trộn khoảng đóng `[low, high]` với điều kiện của khoảng nửa mở.",
             "en": "Mixing a closed `[low, high]` interval with half-open interval conditions."
+          },
+          {
+            "vi": "Chạy binary search trên input chưa sắp xếp hoặc đổi interval convention giữa chừng.",
+            "en": "Running binary search on unsorted input or changing interval convention mid-trace."
           }
         ],
         "exam_signals": [
@@ -407,8 +415,8 @@
           "vi": "Biến thể tìm nhị phân đệ quy"
         },
         "explanation": {
-          "vi": "Biến thể đệ quy mang `low` và `high` trong từng lời gọi. Base case là khoảng rỗng; recursive case tính middle rồi gọi lại đúng nửa còn khả năng chứa target, đồng thời trả kết quả của lời gọi con lên trên.",
-          "en": "The recursive variant carries `low` and `high` in each call. Its base case is an empty interval; the recursive case computes middle, calls the only half that can contain the target, and propagates the child result upward."
+          "vi": "Biến thể đệ quy mang `low` và `high` trong từng lời gọi. Base case là khoảng rỗng; recursive case tính middle rồi gọi lại đúng nửa còn khả năng chứa target, đồng thời trả kết quả của lời gọi con lên trên. Biến thể condition-based là enrichment tùy chọn. Lời giải bắt buộc vẫn bám precondition sorted, base case empty interval và cùng closed-interval contract.",
+          "en": "The recursive variant carries `low` and `high` in each call. Its base case is an empty interval; the recursive case computes middle, calls the only half that can contain the target, and propagates the child result upward. Condition-based binary search is optional enrichment. The required solution still follows the sorted precondition, the empty-interval base case, and the same closed-interval contract."
         },
         "python_connection": {
           "vi": "Artifact binary-search thực thi biến thể đệ quy ở L048–L061: L050–L052 xử lý khoảng rỗng, L053 tính middle, L059/L061 trả kết quả từ lời gọi trên khoảng nhỏ hơn. L064–L067 chạy cả hai phiên bản và phát hiện nếu index không khớp.",
@@ -1040,6 +1048,7 @@
         "event_count": 15
       }
     ],
+    "trace_backed_association_patterns": [],
     "approved_static_or_representational_support": []
   },
   "marking": {
@@ -1138,6 +1147,11 @@
         "en": "Using `/`, producing a float index."
       },
       {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.midpoint-update",
+        "vi": "Giữ lại middle trong interval mới nên có thể lặp vô hạn.",
+        "en": "Keeping middle inside the new interval and risking a non-terminating loop."
+      },
+      {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.preconditions-interval",
         "vi": "Chạy tìm nhị phân trên list chưa sắp.",
         "en": "Running binary search on an unsorted list."
@@ -1146,6 +1160,11 @@
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.preconditions-interval",
         "vi": "Trộn khoảng đóng `[low, high]` với điều kiện của khoảng nửa mở.",
         "en": "Mixing a closed `[low, high]` interval with half-open interval conditions."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.preconditions-interval",
+        "vi": "Chạy binary search trên input chưa sắp xếp hoặc đổi interval convention giữa chừng.",
+        "en": "Running binary search on unsorted input or changing interval convention mid-trace."
       },
       {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.binary-search.knowledge.recursive-variant",
@@ -1335,8 +1354,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.binary-search.assessment.progression",
         "level": "independent",
         "prompt": {
-          "vi": "Cài đặt tìm kiếm nhị phân theo hợp đồng danh sách tăng dần, bao gồm biến thể lặp và biến thể đệ quy có cùng kết quả. Chạy ba fixture, nộp output thực tế, trace khoảng tìm kiếm và assertions về found/not-found/unsorted.",
-          "en": "Implement binary search for an ascending-list contract, including iterative and recursive variants that return the same result. Run all three fixtures and submit actual outputs, interval traces, and assertions for found/not-found/unsorted cases."
+          "vi": "Cài đặt binary search theo closed interval `[low, high]`, gồm bản lặp và đệ quy có cùng kết quả. Chạy ba fixture, tô vùng bị loại sau mỗi comparison và nộp assertions found/not-found/unsorted. Gắn condition-based search là optional enrichment, không phải yêu cầu chính thức.",
+          "en": "Implement binary search using the closed interval `[low, high]`, with iterative and recursive variants returning the same result. Run all three fixtures, mark the discarded region after every comparison, and submit found/not-found/unsorted assertions. Label condition-based search as optional enrichment, not an official requirement."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.binary-search.pilot-v1",
@@ -1707,6 +1726,16 @@
         "heading": "Algorithms",
         "bullet_locator": "Search note 2",
         "anchor_text": "Write an algorithm to implement a binary search"
+      }
+    },
+    {
+      "source_id": "video_greg_hogg_dsa_lecture_07",
+      "authority": "Supplementary_education_source",
+      "locator": {
+        "source_id": "video_greg_hogg_dsa_lecture_07",
+        "heading": "Traditional binary search and search cost",
+        "bullet_locator": "youtube_seconds_0_808",
+        "anchor_text": "T2 supplementary concept source only; YouTube 9nmrkG6QtpQ at 0 seconds"
       }
     }
   ]

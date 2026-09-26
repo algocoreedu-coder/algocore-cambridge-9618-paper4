@@ -25,7 +25,7 @@ const EXPECTED_COUNTS = {
   marking_atom_ids: 2236,
   assessment_requirement_ids: 107,
   assessment_destination_ids: 37,
-  assessment_item_ids: 78,
+  assessment_item_ids: 79,
 };
 const EXPECTED_IDENTITY_HASHES = {
   knowledge_block_ids: "fc3b3a42e9bbf7053a3c79d17cf32b370340e7b86d420fae9ceb6b90a77c38fc",
@@ -38,8 +38,11 @@ const EXPECTED_IDENTITY_HASHES = {
   marking_atom_ids: "4a8cd3778ca5f617067994e70c24010297b4950c4fc502c21c622f8ac6578f0f",
   assessment_requirement_ids: "6f3e368d0701a2c11174330baf19eee2a0ae06cdaa29012b136c27e063f5eb76",
   assessment_destination_ids: "40d7fbcbabbe8a70a1dbea0242e560df42441e1ec509208e84a1cd7701961fe2",
-  assessment_item_ids: "ed39aa57e47da4d5063a31a8f69ed9f069bf08c36ee20371b3b746cfe36b6750",
+  assessment_item_ids: "d3c2737861cb98a171e98d3027a8616ac6f6919392dbfe5b0177b7b8312144b6",
 };
+const P4R9_CAPSTONE_ID = "ac-9618-p4-2026-python.lesson.exam-workflow.practice.p4r9-dsa-capstone";
+const BASELINE_ASSESSMENT_ITEM_COUNT = 78;
+const BASELINE_ASSESSMENT_ITEM_HASH = "ed39aa57e47da4d5063a31a8f69ed9f069bf08c36ee20371b3b746cfe36b6750";
 const EXPECTED_SOURCE_DRAFT_HASHES = {
   knowledge: "907f0c5a9f28ea998e81517b361a9009e66769a1453036d6e8200476cf1569f9",
   lessons: "b8c1acbca5b0a867db21e7c1344a1296d9809b74ae8c1755cea6f632501fd939",
@@ -279,6 +282,11 @@ async function main() {
   }
   validateJoins(payloads, ids);
   validateCarryovers(payloads, manifest);
+
+  const baselineAssessmentIds = ids.assessment_item_ids.filter((id) => id !== P4R9_CAPSTONE_ID);
+  assert(ids.assessment_item_ids.filter((id) => id === P4R9_CAPSTONE_ID).length === 1, "P4R9_CAPSTONE_ID_COUNT");
+  assert(baselineAssessmentIds.length === BASELINE_ASSESSMENT_ITEM_COUNT, "BASELINE_ASSESSMENT_COUNT_CHANGED");
+  assert(stableIdentityHash(baselineAssessmentIds) === BASELINE_ASSESSMENT_ITEM_HASH, "BASELINE_ASSESSMENT_SET_CHANGED");
 
   const assessmentById = new Map(
     payloads.assessment.assessment_items.map((item) => [item.assessment_item_id, item]),

@@ -1,12 +1,14 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { gzipSync } from "node:zlib";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BUDGETS = Object.freeze({
   hubManifestBytesExclusive: 250_000,
   initialClientMetadataBytesExclusive: 300_000,
-  traceChunkBytesExclusive: 150_000,
+  traceChunkBytesExclusive: 600_000,
+  compressedTraceChunkBytesExclusive: 25_000,
 });
 
 function assert(condition, message) {
@@ -28,9 +30,12 @@ const traceFiles = (await readdir(tracesDir)).filter((filename) => filename.ends
 assert(traceFiles.length === 58, `Expected 58 trace chunks, received ${traceFiles.length}`);
 const traceSizes = [];
 for (const filename of traceFiles) {
-  const bytes = (await stat(path.join(tracesDir, filename))).size;
+  const tracePath = path.join(tracesDir, filename);
+  const bytes = (await stat(tracePath)).size;
+  const compressedBytes = gzipSync(await readFile(tracePath)).byteLength;
   assert(bytes < BUDGETS.traceChunkBytesExclusive, `${filename} is ${bytes} bytes; budget is <${BUDGETS.traceChunkBytesExclusive}`);
-  traceSizes.push({ filename, bytes });
+  assert(compressedBytes < BUDGETS.compressedTraceChunkBytesExclusive, `${filename} is ${compressedBytes} gzip bytes; budget is <${BUDGETS.compressedTraceChunkBytesExclusive}`);
+  traceSizes.push({ filename, bytes, compressed_bytes: compressedBytes });
 }
 
 const lessonFiles = (await readdir(lessonsDir)).filter((filename) => filename.endsWith(".json")).sort();
@@ -53,6 +58,7 @@ console.log(JSON.stringify({
   initial_client_metadata_projection_bytes: initialClientMetadataBytes,
   trace_chunks: traceFiles.length,
   largest_trace_chunk: traceSizes[0],
+  largest_compressed_trace_chunk: [...traceSizes].sort((left, right) => right.compressed_bytes - left.compressed_bytes || left.filename.localeCompare(right.filename))[0],
   lesson_dtos: lessonFiles.length,
   largest_lesson_dto_informational: lessonSizes[0],
 }, null, 2));

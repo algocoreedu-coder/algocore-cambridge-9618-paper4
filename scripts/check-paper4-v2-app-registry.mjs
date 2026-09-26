@@ -77,7 +77,7 @@ const stage3Editorial = JSON.parse(await readFile(STAGE3_EDITORIAL_PATH, "utf8")
 const stage3LessonById = new Map(stage3Editorial.lessons.map((lesson) => [lesson.lesson_id, lesson]));
 const stage3PackageById = new Map(stage3Editorial.packages.map((item) => [item.package_id, item]));
 assert(manifest.schema_version === "paper4-v2-course-manifest-v1", "Manifest schema mismatch");
-assert(manifest.canonical_registry_sha256 === "1ad3244f6ec6c8d33f9141bfc2458fffb92acb0980678c39be5e050cccf3527e", "Canonical registry aggregate authority mismatch");
+assert(manifest.canonical_registry_sha256 === "2c99660563e8b7c974941d488f3b11ed0ae4efb6f710249456625019fbfef7b4", "Canonical registry aggregate authority mismatch");
 assert(manifest.editorial_registry.sha256 === "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2", "Stage 3 editorial hash mismatch");
 assert(JSON.stringify(manifest.editorial_registry.course_title) === JSON.stringify(stage3Editorial.titles), "Course title does not match Stage 3" );
 assert(manifest.counts.packages === 13, "Expected 13 packages");
@@ -87,9 +87,9 @@ assert(manifest.counts.sections_per_lesson === 10, "Expected ten sections per le
 assert(manifest.counts.knowledge_units === 108, "Expected 108 KnowledgeUnits");
 assert(manifest.counts.python_artifacts === 26, "Expected 26 PythonArtifacts");
 assert(manifest.counts.visual_scenario_traces === 174, "Expected 174 VisualScenarioTraces");
-assert(manifest.counts.visual_event_bindings === 599, "Expected 599 VisualEventBindings");
+assert(manifest.counts.visual_event_bindings === 870, "Expected 870 VisualEventBindings");
 assert(manifest.counts.marking_chains === 58, "Expected 58 MarkingChains");
-assert(manifest.counts.assessment_items === 78, "Expected 78 AssessmentItems");
+assert(manifest.counts.assessment_items === 79, "Expected 79 AssessmentItems");
 assert(manifest.counts.lesson_release_records === 26, "Expected 26 LessonReleaseRecords");
 assert(JSON.stringify(manifest.canonical_sections.map((section) => section.section_id)) === JSON.stringify(EXPECTED_SECTION_IDS), "Canonical section order mismatch");
 for (const forbiddenKey of ["theory", "python", "tests", "marking", "events", "scenarios"]) {
@@ -136,7 +136,11 @@ for (const lessonMeta of manifest.lessons) {
   assert(lesson.tests.fixtures.length === 3, `${lessonMeta.slug}: expected three fixtures`);
   assert(new Set(lesson.tests.fixtures.map((fixture) => fixture.case_kind)).size === 3, `${lessonMeta.slug}: fixture case coverage mismatch`);
   assert(lesson.tests.expected_outputs.length === 3, `${lessonMeta.slug}: expected three outputs`);
-  assert(lesson.practice.items.length === 3, `${lessonMeta.slug}: expected three practice levels`);
+  const expectedPracticeCount = lessonMeta.slug === "exam-workflow" ? 4 : 3;
+  assert(lesson.practice.items.length === expectedPracticeCount, `${lessonMeta.slug}: expected ${expectedPracticeCount} practice items`);
+  if (lessonMeta.slug === "exam-workflow") {
+    assert(lesson.practice.items.filter((item) => item.assessment_item_id === "ac-9618-p4-2026-python.lesson.exam-workflow.practice.p4r9-dsa-capstone").length === 1, "exam-workflow: expected one protected P4R-9 DSA capstone");
+  }
   for (const item of lesson.practice.items) assert(item.disclosure_contract.feedback_after_attempt === true, `${item.assessment_item_id}: feedback must be attempt-gated`);
   assert(lesson.retrieval.items.length === lesson.theory.knowledge_units.length, `${lessonMeta.slug}: retrieval/theory mismatch`);
   for (const item of lesson.retrieval.items) {
@@ -226,7 +230,7 @@ for (const patternMeta of manifest.patterns) {
 }
 assert(patternIds.size === 58, "Pattern exact set mismatch");
 assert(scenarioCount === 174 && traceIds.size === 174, "Scenario exact set mismatch");
-assert(eventCount === 599 && eventIds.size === 599, "Event exact set mismatch");
+assert(eventCount === 870 && eventIds.size === 870, "Event exact set mismatch");
 
 const loaderSource = await readFile(path.join(ROOT, "app", "data", "paper4-v2", "lesson-loaders.generated.ts"), "utf8");
 for (const slug of lessonSlugs) assert(loaderSource.includes(`\"${slug}\": () => import(\"./lessons/${slug}.json\")`), `${slug}: static loader is missing`);

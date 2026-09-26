@@ -206,8 +206,8 @@
           "vi": "Frame riêng, call stack và trả ngược"
         },
         "explanation": {
-          "vi": "Mỗi lời gọi tạo một frame riêng chứa tham số, biến cục bộ và vị trí chờ trả về. Khi gặp base case, các frame được tháo theo LIFO; công việc nằm sau recursive call chỉ chạy khi frame con trả về.",
-          "en": "Each call creates a separate frame containing parameters, local variables, and a return point. At the base case, frames unwind in LIFO order; work after the recursive call runs only when the child frame returns."
+          "vi": "Mỗi lời gọi tạo một frame riêng chứa tham số, biến cục bộ và vị trí chờ trả về. Khi gặp base case, các frame được tháo theo LIFO; công việc nằm sau recursive call chỉ chạy khi frame con trả về. Trace tách hai pha: frame creation khi call đi xuống và return-value propagation khi unwind đi lên.",
+          "en": "Each call creates a separate frame containing parameters, local variables, and a return point. At the base case, frames unwind in LIFO order; work after the recursive call runs only when the child frame returns. Separate the trace into frame creation while calls descend and return-value propagation while frames unwind."
         },
         "python_connection": {
           "vi": "L006 ghi sự kiện call; L010 tạm dừng frame hiện tại để chờ subtotal. L011–L012 chạy theo thứ tự ngược khi unwind và ghi result của từng index.",
@@ -229,6 +229,10 @@
           {
             "vi": "Cho rằng mọi frame dùng chung biến `index`.",
             "en": "Assuming every frame shares one `index` variable."
+          },
+          {
+            "vi": "Gộp call và return vào một bước nên mất pending operation của từng frame.",
+            "en": "Collapsing call and return into one step and losing each frame's pending operation."
           }
         ],
         "exam_signals": [
@@ -344,8 +348,8 @@
           "vi": "Nhận bài toán đệ quy và cân nhắc lợi ích"
         },
         "explanation": {
-          "vi": "Recursion phù hợp khi bài toán có định nghĩa tự giống nhau hoặc cấu trúc phân nhánh; code có thể bám sát định nghĩa. Đổi lại, mỗi call dùng stack frame và recursion sâu có thể tốn bộ nhớ hoặc chạm giới hạn recursion.",
-          "en": "Recursion suits self-similar definitions or branching structures and can mirror the problem definition closely. The trade-off is one stack frame per call, so deep recursion can use substantial memory or reach a recursion limit."
+          "vi": "Recursion phù hợp khi bài toán có định nghĩa tự giống nhau hoặc cấu trúc phân nhánh; code có thể bám sát định nghĩa. Đổi lại, mỗi call dùng stack frame và recursion sâu có thể tốn bộ nhớ hoặc chạm giới hạn recursion. Chỉ chọn recursion khi cấu trúc bài toán hỗ trợ nó; luôn nêu depth và auxiliary stack space thay vì chỉ nói code ngắn hơn.",
+          "en": "Recursion suits self-similar definitions or branching structures and can mirror the problem definition closely. The trade-off is one stack frame per call, so deep recursion can use substantial memory or reach a recursion limit. Choose recursion only when it fits the problem structure; always state depth and auxiliary stack space rather than merely saying the code is shorter."
         },
         "python_connection": {
           "vi": "L029 và L030 chạy hai cách tương đương; L032 so sánh kết quả. `recursive_sum` tạo event cho từng call trong khi `iterative_sum` L016–L020 dùng một accumulator, giúp quan sát trade-off.",
@@ -479,8 +483,8 @@
           "vi": "Đổi đệ quy và vòng lặp, giữ đúng hành vi"
         },
         "explanation": {
-          "vi": "Chuyển recursion sang iteration cần lưu mọi trạng thái mà call stack từng giữ. Với tail-like linear accumulation, một loop và accumulator có thể đủ; với pending work phức tạp, cần stack tường minh.",
-          "en": "Converting recursion to iteration requires preserving all state previously held by the call stack. For a tail-like linear accumulation, a loop and accumulator may suffice; complex pending work needs an explicit stack."
+          "vi": "Chuyển recursion sang iteration cần lưu mọi trạng thái mà call stack từng giữ. Với tail-like linear accumulation, một loop và accumulator có thể đủ; với pending work phức tạp, cần stack tường minh. Bản lặp phải lưu mọi state mà call stack từng giữ; accumulator đơn chỉ đủ khi không có pending work phức tạp.",
+          "en": "Converting recursion to iteration requires preserving all state previously held by the call stack. For a tail-like linear accumulation, a loop and accumulator may suffice; complex pending work needs an explicit stack. The iterative form must preserve every state formerly held by the call stack; one accumulator is sufficient only when there is no complex pending work."
         },
         "python_connection": {
           "vi": "L005–L013 và L016–L020 tính cùng tổng bằng hai cơ chế. L029–L032 chạy cả hai và kiểm tra equality, tạo oracle tương đương cho fixture pilot.",
@@ -607,8 +611,8 @@
           "vi": "Base case, recursive case và tiến triển"
         },
         "explanation": {
-          "vi": "Một hàm đệ quy cần base case trả kết quả trực tiếp và recursive case chuyển sang bài toán nhỏ hơn. Thước đo tiến triển phải tiến gần base case ở mỗi lời gọi để bảo đảm kết thúc.",
-          "en": "A recursive function needs a base case that returns directly and a recursive case that moves to a smaller problem. A progress measure must approach the base case on every call to guarantee termination."
+          "vi": "Một hàm đệ quy cần base case trả kết quả trực tiếp và recursive case chuyển sang bài toán nhỏ hơn. Thước đo tiến triển phải tiến gần base case ở mỗi lời gọi để bảo đảm kết thúc. Trước code, viết ba dòng contract: base case, smaller subproblem và progress measure giảm sau mỗi call.",
+          "en": "A recursive function needs a base case that returns directly and a recursive case that moves to a smaller problem. A progress measure must approach the base case on every call to guarantee termination. Before coding, write a three-line contract: base case, smaller subproblem, and the progress measure that decreases on every call."
         },
         "python_connection": {
           "vi": "L007–L009 là base case khi index bằng độ dài list; L010 gọi với `index+1`, nên số phần tử chưa xử lý giảm một. L011–L013 kết hợp và trả kết quả.",
@@ -630,6 +634,10 @@
           {
             "vi": "Base value sai identity, làm toàn bộ kết quả sai khi unwind.",
             "en": "Using the wrong identity as the base value, corrupting the result during unwinding."
+          },
+          {
+            "vi": "Có base case nhưng recursive call không tiến gần nó.",
+            "en": "Having a base case while the recursive call makes no progress toward it."
           }
         ],
         "exam_signals": [
@@ -743,8 +751,8 @@
           "vi": "Triển khai đệ quy đã cho và giữ kết quả trả về"
         },
         "explanation": {
-          "vi": "Khi dịch một thuật toán đệ quy sang Python, giữ nguyên base condition, thứ tự đánh giá và giá trị trả về. Toán tử chia nguyên, slicing và mutation cần được chọn theo đúng ý nghĩa của pseudocode nguồn.",
-          "en": "When translating a recursive algorithm into Python, preserve its base condition, evaluation order, and return value. Integer division, slicing, and mutation must match the source pseudocode semantics."
+          "vi": "Khi dịch một thuật toán đệ quy sang Python, giữ nguyên base condition, thứ tự đánh giá và giá trị trả về. Toán tử chia nguyên, slicing và mutation cần được chọn theo đúng ý nghĩa của pseudocode nguồn. Giữ nguyên terminal value, progress và combine order khi dịch pseudocode sang Python; return của child call phải được truyền về caller.",
+          "en": "When translating a recursive algorithm into Python, preserve its base condition, evaluation order, and return value. Integer division, slicing, and mutation must match the source pseudocode semantics. Preserve the terminal value, progress, and combination order when translating pseudocode to Python; the child call's return must propagate to its caller."
         },
         "python_connection": {
           "vi": "L005 giữ signature rõ; L007 dịch base condition; L010 lưu kết quả lời gọi con; L011 kết hợp; L013 return. Chuỗi này cho thấy giá trị phải được truyền qua từng frame.",
@@ -1190,6 +1198,7 @@
         "event_count": 11
       }
     ],
+    "trace_backed_association_patterns": [],
     "approved_static_or_representational_support": []
   },
   "marking": {
@@ -1286,6 +1295,11 @@
         "en": "Assuming every frame shares one `index` variable."
       },
       {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.recursion.knowledge.call-stack-unwind",
+        "vi": "Gộp call và return vào một bước nên mất pending operation của từng frame.",
+        "en": "Collapsing call and return into one step and losing each frame's pending operation."
+      },
+      {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.recursion.knowledge.design-benefits",
         "vi": "Khẳng định recursion luôn nhanh hoặc luôn ngắn hơn.",
         "en": "Claiming recursion is always faster or always shorter."
@@ -1314,6 +1328,11 @@
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.recursion.knowledge.recursive-contract",
         "vi": "Base value sai identity, làm toàn bộ kết quả sai khi unwind.",
         "en": "Using the wrong identity as the base value, corrupting the result during unwinding."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.recursion.knowledge.recursive-contract",
+        "vi": "Có base case nhưng recursive call không tiến gần nó.",
+        "en": "Having a base case while the recursive call makes no progress toward it."
       },
       {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.recursion.knowledge.translate-recursive",
@@ -1428,8 +1447,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.recursion.assessment.progression",
         "level": "guided",
         "prompt": {
-          "vi": "Với fixture normal, vẽ call stack của `recursive_sum`: ghi index khi gọi, xác định base case và điền kết quả theo thứ tự unwind. So sánh tổng cuối với phiên bản lặp.",
-          "en": "For the normal fixture, draw the `recursive_sum` call stack: record each call index, identify the base case, and fill results in unwind order. Compare the final total with the iterative version."
+          "vi": "Với fixture normal, viết contract base-case-progress trước rồi vẽ `recursive_sum` thành hai pha frame creation và unwind: ghi index/pending work của từng call, sau đó điền return values. So sánh với bản lặp.",
+          "en": "For the normal fixture, state the base-case-progress contract first, then draw `recursive_sum` in two phases: frame creation with each call's index/pending work, followed by unwind return values. Compare it with the iterative form."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.recursion.pilot-v1",
@@ -2122,6 +2141,16 @@
         "heading": "Recursion",
         "bullet_locator": "Recursion note 3, tracing facet",
         "anchor_text": "Write and trace recursive algorithms"
+      }
+    },
+    {
+      "source_id": "video_greg_hogg_dsa_lecture_06",
+      "authority": "Supplementary_education_source",
+      "locator": {
+        "source_id": "video_greg_hogg_dsa_lecture_06",
+        "heading": "Recursion contract, call stack, unwind and cost",
+        "bullet_locator": "youtube_seconds_0_832",
+        "anchor_text": "T2 supplementary concept source only; YouTube TGT79h7e7tE at 0 seconds"
       }
     }
   ]

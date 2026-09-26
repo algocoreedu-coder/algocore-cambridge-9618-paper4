@@ -28,7 +28,7 @@ ROLE_MARKERS = {
     "search-collections": {"linear-find":"if found == -1", "count-all":"sum(value ==", "filter-all":"filtered.append", "group-totals":"groups[record"},
     "sorting": {"bubble-passes":"def bubble", "insertion-shifts":"def insertion", "ordered-insert":"bounded.insert", "comparator-variants":"wrong ="},
     "stack": {"representation-conventions":"self.top = -1", "push":"def push", "pop":"def pop", "paired-restoration":"before =", "reduce-operands":"right, left"},
-    "linked-list": {"representation-free-list":"self.head, self.free", "traversal":"def traverse", "search":"while node != -1 and", "insert":"def insert_head", "remove-recycle":"def remove"},
+    "linked-list": {"representation-free-list":"self.head = -1", "traversal":"def traverse", "search":"while node != -1:", "insert":"def insert_head", "remove-recycle":"def remove"},
     "binary-tree": {"representation":"class Node", "ordered-insert":"def insert", "search":"while current is not None", "traversals":"def traverse"},
     "dictionary": {"adt-interface":"class DictionaryADT", "find-insert":"def find", "delete":"def delete", "representation-choice":"self.entries = []", "other-adt-implementation":"frequency[token]"},
     "performance": {"asymptotic-cost":"def insertion_cost", "algorithm-choice":"binary search requires", "trace-cost":"linear_count"},
@@ -124,6 +124,36 @@ def freeze_lines(slug: str, source_bytes: bytes) -> list[dict]:
     return [{"line_id": f"{slug}.production-v1.L{index:03d}", "order": index, "text": line} for index, line in enumerate(text.split("\n"), 1)]
 
 
+def assert_p4r9_trace_contract(slug: str, case: dict) -> None:
+    if slug not in {"linked-list", "binary-tree", "sorting"}:
+        return
+    case_kind = case["case_kind"]
+    trace = case["result"]["trace"]
+    event_names = {step.get("event") for step in trace}
+    required = {
+        "linked-list": {"insert_head", "remove_compare"},
+        "binary-tree": {"tree_search_visit"},
+        "sorting": {"bubble_complete", "insertion_complete"},
+    }[slug]
+    if slug == "linked-list":
+        required.add("remove_recycle" if case_kind != "failure" else "insert_reject_full")
+    if slug == "binary-tree":
+        required.add("tree_attach_root" if case_kind == "boundary" else "tree_compare_insert")
+        if case_kind == "failure":
+            required.update({"tree_reject_duplicate", "tree_search_exhausted"})
+    if slug == "sorting":
+        required.add("capacity_reject" if case_kind == "failure" else "ordered_insert")
+        if case_kind == "normal":
+            required.update({"bubble_compare", "bubble_swap", "insertion_shift", "insertion_place_key"})
+    missing = required - event_names
+    if missing:
+        raise AssertionError(f"{slug}/{case_kind}: missing P4R-9 trace events {sorted(missing)}")
+    for step in trace:
+        if step.get("event") in {"insert_reject_full", "remove_reject_missing", "capacity_reject"}:
+            if step.get("before") != step.get("after"):
+                raise AssertionError(f"{slug}/{case_kind}: rejected operation mutated valid state")
+
+
 def build_role_map(lesson: dict, lines: list[dict]) -> dict:
     slug = lesson["lesson_slug"]
     roles = []
@@ -178,6 +208,8 @@ def execute(mode: str) -> None:
         lines = freeze_lines(slug, source_bytes)
         role_maps.append(build_role_map(lesson, lines))
         cases = [run_case(source, source.parent / "fixtures" / f"{kind}.json") for kind in CASES]
+        for case in cases:
+            assert_p4r9_trace_contract(slug, case)
         artifact = artifact_for(lesson, source, source_bytes, lines, cases, "executed" if mode == "author" else "independently-rerun")
         artifact_path = source.parent / "artifact.json"
         if mode == "author":

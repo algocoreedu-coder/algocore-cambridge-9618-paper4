@@ -64,8 +64,8 @@
       "vi": "Vị trí kế tiếp và chèn vào mảng có giới hạn"
     },
     "explanation": {
-      "vi": "Chèn vào cấu trúc có giới hạn cần kiểm tra chỗ trống trước khi ghi. Live count chỉ số phần tử hợp lệ; capacity là số ô tối đa, nên trạng thái đầy xảy ra khi `live_count >= capacity`.",
-      "en": "Appending to a bounded structure requires a free-space check before writing. The live count is the number of valid items; capacity is the maximum cell count, so full means `live_count >= capacity`."
+      "vi": "Chèn vào cấu trúc có giới hạn cần kiểm tra chỗ trống trước khi ghi. Live count chỉ số phần tử hợp lệ; capacity là số ô tối đa, nên trạng thái đầy xảy ra khi `live_count >= capacity`. Quy trình phòng thi là check `logical_count < capacity`, ghi tại index `logical_count`, rồi tăng count đúng một lần; Python `append` chỉ mô phỏng bước ghi khi contract cho phép.",
+      "en": "Appending to a bounded structure requires a free-space check before writing. The live count is the number of valid items; capacity is the maximum cell count, so full means `live_count >= capacity`. The exam sequence is: check `logical_count < capacity`, write at index `logical_count`, then increment the count exactly once; Python `append` only simulates the write when the contract allows it."
     },
     "python_connection": {
       "vi": "L018 ghi nhận count/capacity, L019 chặn trạng thái đầy và L021 chỉ append sau khi kiểm tra. L022 tính index mới bằng `len(records)-1`, tức sau thao tác chèn thành công.",
@@ -87,6 +87,10 @@
       {
         "vi": "Dùng `>` thay vì `>=`, cho phép ghi khi count đã bằng capacity.",
         "en": "Using `>` instead of `>=`, allowing a write when count already equals capacity."
+      },
+      {
+        "vi": "Append trước capacity guard rồi cố hoàn tác khi đầy.",
+        "en": "Appending before the capacity guard and then trying to undo a full-state write."
       }
     ],
     "exam_signals": [

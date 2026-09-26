@@ -23,6 +23,32 @@ const OOP_VISUAL_PROFILE = {
   OOP_OVERRIDE: { id: "dynamic-dispatch", vi: "Runtime type nào quyết định implementation của area() được gọi?", en: "Which runtime type selects the area() implementation?" },
   OOP_CAPACITY_ADD: { id: "object-graph", vi: "Shelf giữ reference tới Book nào, và reject có giữ nguyên object graph không?", en: "Which Book references does Shelf hold, and does rejection preserve the object graph?" },
 };
+const DSA_VISUAL_QUESTIONS = {
+  "growth-counter": { vi: "Số thao tác được đếm tăng như thế nào khi kích thước đầu vào n tăng?", en: "How does the counted operation grow as input size n increases?" },
+  "link-rewire": { vi: "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list?", en: "Which link must be saved before insert/remove changes the predecessor, successor, or free list?" },
+  "stack-pointer": { vi: "top và vùng dữ liệu sống thay đổi theo thứ tự nào trước và sau push/pop?", en: "In what order do top and the live data region change before and after push/pop?" },
+  "sort-tree-state": { vi: "Pass, shift hoặc tree path nào thay đổi trong khi invariant vẫn được bảo toàn?", en: "Which pass, shift, or tree path changes while the invariant remains true?" },
+};
+const PRODUCTION_DSA_VISUAL_IDS_BY_PATTERN = {
+  LINEAR_SEARCH: ["growth-counter"],
+  BUBBLE_SORT: ["sort-tree-state", "growth-counter"],
+  INSERTION_SORT: ["sort-tree-state", "growth-counter"],
+  EVIDENCE_RUN: ["growth-counter"],
+  LIST_INSERT: ["link-rewire"],
+  LIST_REMOVE: ["link-rewire"],
+  LIST_SETUP: ["link-rewire"],
+  LIST_TRAVERSE: ["link-rewire"],
+  STACK_PAIR: ["stack-pointer"],
+  STACK_POP: ["stack-pointer"],
+  STACK_PUSH: ["stack-pointer"],
+  STACK_REDUCE: ["stack-pointer"],
+  STACK_SETUP: ["stack-pointer"],
+  TREE_INSERT: ["sort-tree-state"],
+  TREE_SEARCH: ["sort-tree-state"],
+  TREE_SETUP: ["sort-tree-state"],
+  TREE_TRAVERSE: ["sort-tree-state"],
+  ORDERED_INSERT: ["sort-tree-state"],
+};
 
 function clone(value) { return structuredClone(value); }
 function slugId(value) { return value.toLowerCase().replaceAll("_", "-"); }
@@ -122,6 +148,11 @@ function makeEvent({ artifact, pattern, caseKind, traceId, sequence, step, befor
   if (sequence === result.trace.length - 1) after.verified_result = withoutTrace(result);
   const copy = wording(eventName, eventType);
   const oopVisual = OOP_VISUAL_PROFILE[pattern];
+  const dsaVisuals = (PRODUCTION_DSA_VISUAL_IDS_BY_PATTERN[pattern] ?? []).map((id) => ({ id, ...DSA_VISUAL_QUESTIONS[id] }));
+  const dsaQuestion = {
+    vi: dsaVisuals.map((item) => item.vi).join(" "),
+    en: dsaVisuals.map((item) => item.en).join(" "),
+  };
   return {
     envelope: {
       schema_version: "2.0.0",
@@ -140,14 +171,18 @@ function makeEvent({ artifact, pattern, caseKind, traceId, sequence, step, befor
           ...(sequence === result.trace.length - 1 ? { final_result: withoutTrace(result) } : {}),
         },
         invariant_or_criterion: {
-          vi: oopVisual ? `${oopVisual.vi} Sự kiện ${eventName} phải khớp trace chạy lại độc lập và line Python production-v1.` : `${pattern}: sự kiện ${eventName} phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.`,
-          en: oopVisual ? `${oopVisual.en} Event ${eventName} must match the independent rerun trace and production-v1 Python lines.` : `${pattern}: event ${eventName} must match the independent rerun trace, production-v1 Python lines, and displayed state transition.`,
+          vi: oopVisual ? `${oopVisual.vi} Sự kiện ${eventName} phải khớp trace chạy lại độc lập và line Python production-v1.` : `${dsaQuestion.vi ? `${dsaQuestion.vi} ` : ""}${pattern}: sự kiện ${eventName} phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.`,
+          en: oopVisual ? `${oopVisual.en} Event ${eventName} must match the independent rerun trace and production-v1 Python lines.` : `${dsaQuestion.en ? `${dsaQuestion.en} ` : ""}${pattern}: event ${eventName} must match the independent rerun trace, production-v1 Python lines, and displayed state transition.`,
         },
         prediction: copy.prediction,
         feedback: copy.feedback,
         visual_targets: oopVisual
           ? [`visual.oop.${oopVisual.id}`, `visual.${slugId(pattern)}.${slugId(eventName)}`]
-          : [`visual.${slugId(pattern)}.state`, `visual.${slugId(pattern)}.${slugId(eventName)}`],
+          : [
+              ...dsaVisuals.map((item) => `visual.dsa.${item.id}`),
+              `visual.${slugId(pattern)}.state`,
+              `visual.${slugId(pattern)}.${slugId(eventName)}`,
+            ],
         accessibility: {
           accessible_label: { vi: `Bước ${sequence + 1}: ${eventName}`, en: `Step ${sequence + 1}: ${eventName}` },
           action_description: copy.prediction,

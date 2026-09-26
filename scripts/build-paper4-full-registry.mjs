@@ -21,9 +21,9 @@ export const EXPECTED_COUNTS = {
   KnowledgeUnit: 108,
   PythonArtifact: 26,
   VisualScenarioTrace: 174,
-  VisualEventBinding: 599,
+  VisualEventBinding: 870,
   MarkingChain: 58,
-  AssessmentItem: 78,
+  AssessmentItem: 79,
   LessonReleaseRecord: 26,
 };
 export const SECTION_IDS = [
@@ -68,6 +68,25 @@ const OOP_VIDEO_CHAPTERS = {
   "oop-state": { start: 2082, end: 7510, heading: "Object data, access conventions, getters, setters and encapsulation" },
   "oop-inheritance": { start: 7510, end: 9335, heading: "Inheritance, overriding and polymorphism" },
   "oop-aggregation": { start: 915, end: 1303, heading: "Combining objects and has-a relationships" },
+};
+const DSA_VIDEO_CHAPTERS_BY_LESSON = {
+  "performance": [
+    { source_id: "video_greg_hogg_dsa_lecture_01", video_id: "aWKEBEg55ps", start: 0, end: 957, heading: "Time-complexity cost model, Big O growth and space complexity" },
+    { source_id: "video_greg_hogg_dsa_lecture_07", video_id: "9nmrkG6QtpQ", start: 0, end: 808, heading: "Traditional binary search and search cost" },
+    { source_id: "video_greg_hogg_dsa_lecture_10", video_id: "gcRUIO-8r3U", start: 0, end: 513, heading: "Bubble and insertion sort cost context" },
+  ],
+  "data-models": [{ source_id: "video_greg_hogg_dsa_lecture_02", video_id: "TQMvBTKn2p0", start: 10, end: 675, heading: "Static and dynamic array models" }],
+  "text-processing": [{ source_id: "video_greg_hogg_dsa_lecture_02", video_id: "TQMvBTKn2p0", start: 675, end: 810, heading: "String indexing and immutability context" }],
+  "linked-list": [{ source_id: "video_greg_hogg_dsa_lecture_03", video_id: "dqLHTK7RuIo", start: 0, end: 526, heading: "Linked-node model, traversal and reference rewiring" }],
+  "dictionary": [{ source_id: "video_greg_hogg_dsa_lecture_04", video_id: "iZyxNEBpqFY", start: 216, end: 592, heading: "Set and map interface distinction" }],
+  "hashing": [{ source_id: "video_greg_hogg_dsa_lecture_04", video_id: "iZyxNEBpqFY", start: 0, end: 843, heading: "Hash functions, collisions, probing and failed lookup" }],
+  "stack": [{ source_id: "video_greg_hogg_dsa_lecture_05", video_id: "vOx3vY1w4tM", start: 0, end: 325, heading: "Stack LIFO operations and cost context" }],
+  "queue": [{ source_id: "video_greg_hogg_dsa_lecture_05", video_id: "vOx3vY1w4tM", start: 325, end: 569, heading: "Queue FIFO operations and representation context" }],
+  "recursion": [{ source_id: "video_greg_hogg_dsa_lecture_06", video_id: "TGT79h7e7tE", start: 0, end: 832, heading: "Recursion contract, call stack, unwind and cost" }],
+  "binary-search": [{ source_id: "video_greg_hogg_dsa_lecture_07", video_id: "9nmrkG6QtpQ", start: 0, end: 808, heading: "Traditional binary search and search cost" }],
+  "binary-tree": [{ source_id: "video_greg_hogg_dsa_lecture_08", video_id: "EPwWrs8OtfI", start: 0, end: 1772, heading: "Binary-tree model, representation, traversal and ordered paths" }],
+  "sorting": [{ source_id: "video_greg_hogg_dsa_lecture_10", video_id: "gcRUIO-8r3U", start: 0, end: 513, heading: "Bubble and insertion sort" }],
+  "exam-workflow": [{ source_id: "video_greg_hogg_dsa_lecture_01", video_id: "aWKEBEg55ps", start: 0, end: 957, heading: "Time-complexity cost model, Big O growth and space complexity" }],
 };
 
 async function filesBelow(directory, suffix) {
@@ -118,7 +137,18 @@ function sourceRefsForLesson(lesson) {
       anchor_text: `T2 supplementary concept source only; YouTube iLRZi0Gu8Go at ${videoChapter.start} seconds`,
     },
   }] : [];
-  return [...syllabus, ...coursebook, ...supplementary].sort((a, b) => {
+  const dsaSupplementary = (DSA_VIDEO_CHAPTERS_BY_LESSON[lesson.slug] ?? []).map((chapter) => ({
+    source_id: chapter.source_id,
+    authority: "Supplementary_education_source",
+    access_mode: "public-citation",
+    locator: {
+      source_id: chapter.source_id,
+      heading: chapter.heading,
+      bullet_locator: `youtube_seconds_${chapter.start}_${chapter.end}`,
+      anchor_text: `T2 supplementary concept source only; YouTube ${chapter.video_id} at ${chapter.start} seconds`,
+    },
+  }));
+  return [...syllabus, ...coursebook, ...supplementary, ...dsaSupplementary].sort((a, b) => {
     const left = `${a.authority}|${a.locator.anchor_text}|${a.locator.pdf_page}`;
     const right = `${b.authority}|${b.locator.anchor_text}|${b.locator.pdf_page}`;
     return left.localeCompare(right);

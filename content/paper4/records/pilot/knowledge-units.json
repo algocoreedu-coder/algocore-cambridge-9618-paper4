@@ -48,8 +48,8 @@
         "vi": "Phần tử giữa, thu hẹp khoảng và thất bại"
       },
       "explanation": {
-        "vi": "Middle dùng chia nguyên để chọn một index trong khoảng. Sau khi so sánh, phải loại luôn middle bằng `middle-1` hoặc `middle+1`; nếu không, khoảng có thể không nhỏ đi và vòng lặp không kết thúc.",
-        "en": "Middle uses integer division to choose an index in the interval. After comparison, exclude middle with `middle-1` or `middle+1`; otherwise the interval may fail to shrink and the loop may not terminate."
+        "vi": "Middle dùng chia nguyên để chọn một index trong khoảng. Sau khi so sánh, phải loại luôn middle bằng `middle-1` hoặc `middle+1`; nếu không, khoảng có thể không nhỏ đi và vòng lặp không kết thúc. Đếm một comparison với middle mỗi vòng; cập nhật `middle-1` hoặc `middle+1` để interval giảm nghiêm ngặt và không kiểm tra lại middle.",
+        "en": "Middle uses integer division to choose an index in the interval. After comparison, exclude middle with `middle-1` or `middle+1`; otherwise the interval may fail to shrink and the loop may not terminate. Count one comparison with the middle item per iteration; update to `middle-1` or `middle+1` so the interval strictly shrinks and the middle is not tested again."
       },
       "python_connection": {
         "vi": "L016 tính middle; L024–L029 xử lý bằng/nhỏ hơn/lớn hơn. L030–L031 định nghĩa thất bại khi `low > high` bằng sentinel `-1`.",
@@ -71,6 +71,10 @@
         {
           "vi": "Dùng `/` tạo float làm index.",
           "en": "Using `/`, producing a float index."
+        },
+        {
+          "vi": "Giữ lại middle trong interval mới nên có thể lặp vô hạn.",
+          "en": "Keeping middle inside the new interval and risking a non-terminating loop."
         }
       ],
       "exam_signals": [
@@ -175,8 +179,8 @@
         "vi": "Tiền điều kiện và khoảng tìm kiếm"
       },
       "explanation": {
-        "vi": "Tìm kiếm nhị phân chỉ loại bỏ nửa khoảng an toàn khi dữ liệu đã sắp theo cùng comparator dùng để so sánh target. Khoảng tìm kiếm đóng `[low, high]` chứa mọi vị trí còn có thể là đáp án.",
-        "en": "Binary search can safely discard half an interval only when data is sorted under the same comparator used against the target. The closed search interval `[low, high]` contains every position that can still be the answer."
+        "vi": "Tìm kiếm nhị phân chỉ loại bỏ nửa khoảng an toàn khi dữ liệu đã sắp theo cùng comparator dùng để so sánh target. Khoảng tìm kiếm đóng `[low, high]` chứa mọi vị trí còn có thể là đáp án. Khai báo rõ closed interval `[low, high]`; sau mỗi comparison, tô phần bị loại và chứng minh mọi vị trí còn có thể vẫn nằm trong interval mới.",
+        "en": "Binary search can safely discard half an interval only when data is sorted under the same comparator used against the target. The closed search interval `[low, high]` contains every position that can still be the answer. Declare the closed interval `[low, high]`; after each comparison, mark the discarded region and prove that every remaining candidate position is still inside the new interval."
       },
       "python_connection": {
         "vi": "L005–L009 kiểm tra thứ tự tăng; L037–L039 từ chối input không sắp. L013–L015 khởi tạo khoảng đóng từ 0 đến `len(values)-1` và chỉ lặp khi khoảng chưa rỗng.",
@@ -198,6 +202,10 @@
         {
           "vi": "Trộn khoảng đóng `[low, high]` với điều kiện của khoảng nửa mở.",
           "en": "Mixing a closed `[low, high]` interval with half-open interval conditions."
+        },
+        {
+          "vi": "Chạy binary search trên input chưa sắp xếp hoặc đổi interval convention giữa chừng.",
+          "en": "Running binary search on unsorted input or changing interval convention mid-trace."
         }
       ],
       "exam_signals": [
@@ -318,8 +326,8 @@
         "vi": "Biến thể tìm nhị phân đệ quy"
       },
       "explanation": {
-        "vi": "Biến thể đệ quy mang `low` và `high` trong từng lời gọi. Base case là khoảng rỗng; recursive case tính middle rồi gọi lại đúng nửa còn khả năng chứa target, đồng thời trả kết quả của lời gọi con lên trên.",
-        "en": "The recursive variant carries `low` and `high` in each call. Its base case is an empty interval; the recursive case computes middle, calls the only half that can contain the target, and propagates the child result upward."
+        "vi": "Biến thể đệ quy mang `low` và `high` trong từng lời gọi. Base case là khoảng rỗng; recursive case tính middle rồi gọi lại đúng nửa còn khả năng chứa target, đồng thời trả kết quả của lời gọi con lên trên. Biến thể condition-based là enrichment tùy chọn. Lời giải bắt buộc vẫn bám precondition sorted, base case empty interval và cùng closed-interval contract.",
+        "en": "The recursive variant carries `low` and `high` in each call. Its base case is an empty interval; the recursive case computes middle, calls the only half that can contain the target, and propagates the child result upward. Condition-based binary search is optional enrichment. The required solution still follows the sorted precondition, the empty-interval base case, and the same closed-interval contract."
       },
       "python_connection": {
         "vi": "Artifact binary-search thực thi biến thể đệ quy ở L048–L061: L050–L052 xử lý khoảng rỗng, L053 tính middle, L059/L061 trả kết quả từ lời gọi trên khoảng nhỏ hơn. L064–L067 chạy cả hai phiên bản và phát hiện nếu index không khớp.",
@@ -471,8 +479,8 @@
         "vi": "Mảng một chiều, hai chiều và giới hạn chỉ số"
       },
       "explanation": {
-        "vi": "Mảng một chiều dùng một chỉ số; mảng hai chiều dùng cặp chỉ số hàng–cột. Khi mô phỏng mảng cố định bằng list Python, cần giữ riêng capacity và không coi độ dài vật lý là số phần tử đang dùng trong mọi bài.",
-        "en": "A one-dimensional array uses one index; a two-dimensional array uses a row-column pair. When a Python list models a fixed array, keep capacity explicit and do not always treat physical length as the number of live elements."
+        "vi": "Mảng một chiều dùng một chỉ số; mảng hai chiều dùng cặp chỉ số hàng–cột. Khi mô phỏng mảng cố định bằng list Python, cần giữ riêng capacity và không coi độ dài vật lý là số phần tử đang dùng trong mọi bài. Phân biệt physical capacity với logical count: các index sống là 0..logical_count-1, còn 0..capacity-1 chỉ là miền ô được cấp. Với 2D, luôn đọc chỉ số theo row-column order của đề.",
+        "en": "A one-dimensional array uses one index; a two-dimensional array uses a row-column pair. When a Python list models a fixed array, keep capacity explicit and do not always treat physical length as the number of live elements. Separate physical capacity from logical count: live indices are 0..logical_count-1, while 0..capacity-1 is only the allocated-cell range. For 2D data, follow the task's row-column index order."
       },
       "python_connection": {
         "vi": "Artifact tạo bản sao list record ở L027 và so sánh `len(records)` với `capacity` ở L018–L020. Đây là mô hình mảng 1D đang chứa các record; Python list không tự áp đặt capacity của đề.",
@@ -494,6 +502,10 @@
         {
           "vi": "Dùng `[[0] * c] * r`, khiến các hàng cùng trỏ tới một list.",
           "en": "Using `[[0] * c] * r`, causing rows to reference the same list."
+        },
+        {
+          "vi": "Dùng `len(list)` đồng thời làm physical capacity và logical count.",
+          "en": "Using `len(list)` as both physical capacity and logical count."
         }
       ],
       "exam_signals": [
@@ -613,8 +625,8 @@
         "vi": "Vị trí kế tiếp và chèn vào mảng có giới hạn"
       },
       "explanation": {
-        "vi": "Chèn vào cấu trúc có giới hạn cần kiểm tra chỗ trống trước khi ghi. Live count chỉ số phần tử hợp lệ; capacity là số ô tối đa, nên trạng thái đầy xảy ra khi `live_count >= capacity`.",
-        "en": "Appending to a bounded structure requires a free-space check before writing. The live count is the number of valid items; capacity is the maximum cell count, so full means `live_count >= capacity`."
+        "vi": "Chèn vào cấu trúc có giới hạn cần kiểm tra chỗ trống trước khi ghi. Live count chỉ số phần tử hợp lệ; capacity là số ô tối đa, nên trạng thái đầy xảy ra khi `live_count >= capacity`. Quy trình phòng thi là check `logical_count < capacity`, ghi tại index `logical_count`, rồi tăng count đúng một lần; Python `append` chỉ mô phỏng bước ghi khi contract cho phép.",
+        "en": "Appending to a bounded structure requires a free-space check before writing. The live count is the number of valid items; capacity is the maximum cell count, so full means `live_count >= capacity`. The exam sequence is: check `logical_count < capacity`, write at index `logical_count`, then increment the count exactly once; Python `append` only simulates the write when the contract allows it."
       },
       "python_connection": {
         "vi": "L018 ghi nhận count/capacity, L019 chặn trạng thái đầy và L021 chỉ append sau khi kiểm tra. L022 tính index mới bằng `len(records)-1`, tức sau thao tác chèn thành công.",
@@ -636,6 +648,10 @@
         {
           "vi": "Dùng `>` thay vì `>=`, cho phép ghi khi count đã bằng capacity.",
           "en": "Using `>` instead of `>=`, allowing a write when count already equals capacity."
+        },
+        {
+          "vi": "Append trước capacity guard rồi cố hoàn tác khi đầy.",
+          "en": "Appending before the capacity guard and then trying to undo a full-state write."
         }
       ],
       "exam_signals": [
@@ -774,8 +790,8 @@
         "vi": "Tên, vai trò dữ liệu và biểu thức"
       },
       "explanation": {
-        "vi": "Identifier tốt cho biết vai trò của dữ liệu và giữ nhất quán giữa đặc tả, code và output. Biểu thức gán phải có một đích hợp lệ; biểu thức số học tạo giá trị số, còn biểu thức logic tạo Boolean dùng cho nhánh hoặc vòng lặp.",
-        "en": "A good identifier communicates a data role and remains consistent across specification, code, and output. Assignment needs a valid target; arithmetic expressions produce numeric values, while logical expressions produce Booleans for branches or loops."
+        "vi": "Identifier tốt cho biết vai trò của dữ liệu và giữ nhất quán giữa đặc tả, code và output. Biểu thức gán phải có một đích hợp lệ; biểu thức số học tạo giá trị số, còn biểu thức logic tạo Boolean dùng cho nhánh hoặc vòng lặp. Data dictionary nên nêu riêng `capacity`, `logical_count`, row, column và current index để tránh dùng một tên cho nhiều vai trò.",
+        "en": "A good identifier communicates a data role and remains consistent across specification, code, and output. Assignment needs a valid target; arithmetic expressions produce numeric values, while logical expressions produce Booleans for branches or loops. The data dictionary should name `capacity`, `logical_count`, row, column, and current index separately so one identifier is not reused for several roles."
       },
       "python_connection": {
         "vi": "Các tên `capacity`, `records`, `added` và `message` tại L014/L029 thể hiện vai trò rõ. Điều kiện L019 là biểu thức logic; phép `sum(...)/len(...)` ở L033 là biểu thức số học được gán cho `average`.",
@@ -909,8 +925,8 @@
         "vi": "Dữ liệu ngẫu nhiên và miền giá trị"
       },
       "explanation": {
-        "vi": "Khi tạo dữ liệu ngẫu nhiên, miền giá trị phải được xác định rõ và kiểm tra quy ước hai đầu có bao gồm hay không. Dữ liệu ngẫu nhiên phù hợp để tạo bộ thử, nhưng kết quả học tập cần có seed hoặc fixture cố định để tái lập.",
-        "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility."
+        "vi": "Khi tạo dữ liệu ngẫu nhiên, miền giá trị phải được xác định rõ và kiểm tra quy ước hai đầu có bao gồm hay không. Dữ liệu ngẫu nhiên phù hợp để tạo bộ thử, nhưng kết quả học tập cần có seed hoặc fixture cố định để tái lập. Mọi phép thống kê chỉ duyệt logical region; các ô chưa dùng trong physical capacity không được tính như dữ liệu đã sinh.",
+        "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility. Every summary scans only the logical region; unused cells in the physical capacity are not generated data."
       },
       "python_connection": {
         "vi": "Pilot không gọi bộ sinh ngẫu nhiên; nó nhận `random_values` đã cố định ở L030 rồi tính trung bình tại L032–L034. Vì vậy các line chứng minh bước xử lý dữ liệu, không chứng minh API/range sinh số.",
@@ -1043,8 +1059,8 @@
         "vi": "Trường bản ghi và lớp thay thế record"
       },
       "explanation": {
-        "vi": "Record gom các trường khác kiểu nhưng cùng mô tả một thực thể. Trong Python, dictionary hoặc một lớp đơn giản có thể biểu diễn record khi yêu cầu cho phép; lớp record thay thế không đồng nghĩa với thiết kế OOP đầy đủ có kế thừa và đa hình.",
-        "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism."
+        "vi": "Record gom các trường khác kiểu nhưng cùng mô tả một thực thể. Trong Python, dictionary hoặc một lớp đơn giản có thể biểu diễn record khi yêu cầu cho phép; lớp record thay thế không đồng nghĩa với thiết kế OOP đầy đủ có kế thừa và đa hình. Một record chiếm một logical slot; thêm field vào record không làm tăng logical count của mảng chứa record đó.",
+        "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism. One record occupies one logical slot; adding a field to a record does not increase the logical count of the containing array."
       },
       "python_connection": {
         "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng và `score: int`; L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
@@ -1226,8 +1242,8 @@
         "vi": "Kiểu, hằng, biến và phạm vi"
       },
       "explanation": {
-        "vi": "Kiểu dữ liệu xác định miền giá trị và phép toán hợp lệ; hằng biểu diễn giá trị không đổi còn biến lưu trạng thái có thể đổi. Phạm vi quyết định nơi một tên được truy cập, vì vậy dữ liệu cục bộ của hàm không tự động thay đổi dữ liệu bên ngoài.",
-        "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data."
+        "vi": "Kiểu dữ liệu xác định miền giá trị và phép toán hợp lệ; hằng biểu diễn giá trị không đổi còn biến lưu trạng thái có thể đổi. Phạm vi quyết định nơi một tên được truy cập, vì vậy dữ liệu cục bộ của hàm không tự động thay đổi dữ liệu bên ngoài. Trong mô hình mảng của đề, capacity và logical count là hai biến có vai trò khác nhau; cả hai phải được khai báo và khởi tạo trước khi tính valid-index interval.",
+        "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data. In the task's array model, capacity and logical count are different variables; both must be declared and initialised before deriving the valid-index interval."
       },
       "python_connection": {
         "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L010 kiểm tra `score` thật sự là `int` trước khi dùng.",
@@ -1364,8 +1380,8 @@
         "vi": "Tìm khóa qua bảng và vùng va chạm"
       },
       "explanation": {
-        "vi": "Search phải theo cùng hash function và collision sequence đã dùng khi insert. Với linear probing không xóa tombstone, gặp ô chưa dùng chứng minh key không thể nằm xa hơn; nếu không gặp, dừng sau một vòng.",
-        "en": "Search must follow the same hash function and collision sequence used by insertion. With linear probing and no deletion tombstones, an unused cell proves the key cannot lie farther along; otherwise stop after one full cycle."
+        "vi": "Search phải theo cùng hash function và collision sequence đã dùng khi insert. Với linear probing không xóa tombstone, gặp ô chưa dùng chứng minh key không thể nằm xa hơn; nếu không gặp, dừng sau một vòng. Failed search dừng theo empty-marker policy hoặc sau capacity probes; không được phụ thuộc vòng lặp vô hạn hay hành vi của Python dict.",
+        "en": "Search must follow the same hash function and collision sequence used by insertion. With linear probing and no deletion tombstones, an unused cell proves the key cannot lie farther along; otherwise stop after one full cycle. A failed search stops under the empty-marker policy or after capacity probes; it must not rely on an infinite loop or Python-dict behaviour."
       },
       "python_connection": {
         "vi": "L028 lấy start; L029–L031 tạo cùng probe sequence với insert; L032–L033 dừng ở ô trống; L034–L035 trả index khi bằng; L036 là not-found sau một vòng.",
@@ -1507,8 +1523,8 @@
         "vi": "Tính địa chỉ băm theo công thức đề"
       },
       "explanation": {
-        "vi": "Hash function biến key thành địa chỉ hợp lệ. Với công thức modulo, địa chỉ là `key % table_size`; cần table_size dương và key thuộc kiểu mà công thức định nghĩa.",
-        "en": "A hash function maps a key to a valid address. For a modulo rule, the address is `key % table_size`; table_size must be positive and the key must have the type required by the rule."
+        "vi": "Hash function biến key thành địa chỉ hợp lệ. Với công thức modulo, địa chỉ là `key % table_size`; cần table_size dương và key thuộc kiểu mà công thức định nghĩa. Nêu `n` là capacity của table khi dùng modulo và kiểm tra address luôn nằm trong 0..capacity-1.",
+        "en": "A hash function maps a key to a valid address. For a modulo rule, the address is `key % table_size`; table_size must be positive and the key must have the type required by the rule. When using modulo, define `n` as table capacity and verify that every address lies in 0..capacity-1."
       },
       "python_connection": {
         "vi": "L012–L013 triển khai `key % len(self.slots)`; L007–L009 đảm bảo size dương trước khi dùng. L041 từ chối key không phải integer cho contract của pilot.",
@@ -1645,8 +1661,8 @@
         "vi": "Chèn và xử lý va chạm theo cấu trúc đề"
       },
       "explanation": {
-        "vi": "Insert tính địa chỉ ban đầu rồi theo collision sequence đến ô trống hoặc key đã có. Thuật toán phải dừng sau số vị trí hữu hạn và báo thất bại khi không còn ô phù hợp.",
-        "en": "Insertion computes the initial address and follows the collision sequence to an empty cell or the existing key. It must stop after finitely many positions and report failure when no suitable cell remains."
+        "vi": "Insert tính địa chỉ ban đầu rồi theo collision sequence đến ô trống hoặc key đã có. Thuật toán phải dừng sau số vị trí hữu hạn và báo thất bại khi không còn ô phù hợp. Probe tối đa capacity ô; nếu không còn slot, trả full và chứng minh table trước/sau giống hệt nhau.",
+        "en": "Insertion computes the initial address and follows the collision sequence to an empty cell or the existing key. It must stop after finitely many positions and report failure when no suitable cell remains. Probe at most capacity slots; if none is free, return full and prove that the table is identical before and after."
       },
       "python_connection": {
         "vi": "L016 tính start; L017 giới hạn tối đa size bước; L018 wrap index; L020–L022 ghi vào ô trống; L023–L024 xử lý duplicate; L025 trả -1 khi đầy.",
@@ -1668,6 +1684,10 @@
         {
           "vi": "Probe vô hạn khi bảng không còn ô trống.",
           "en": "Probing forever when no empty slot remains."
+        },
+        {
+          "vi": "Probe quá capacity hoặc mutate table trước khi biết insert có thành công.",
+          "en": "Probing beyond capacity or mutating the table before insertion is known to succeed."
         }
       ],
       "exam_signals": [
@@ -1797,8 +1817,8 @@
         "vi": "Bảng băm và vùng va chạm được chỉ định"
       },
       "explanation": {
-        "vi": "Hash table có capacity cố định và quy ước ô rỗng; collision xảy ra khi hai key có cùng địa chỉ ban đầu. Cách lưu collision phải theo đúng cấu trúc được giao, như probing, bucket hoặc vùng spare, vì các cách này có invariants khác nhau.",
-        "en": "A hash table has fixed capacity and an empty-slot convention; a collision occurs when keys share an initial address. Collision storage must follow the supplied structure, such as probing, buckets, or a spare area, because their invariants differ."
+        "vi": "Hash table có capacity cố định và quy ước ô rỗng; collision xảy ra khi hai key có cùng địa chỉ ban đầu. Cách lưu collision phải theo đúng cấu trúc được giao, như probing, bucket hoặc vùng spare, vì các cách này có invariants khác nhau. Phân biệt interface set/map với hash-table representation; câu hỏi hashing yêu cầu thao tác trên slot, empty marker, capacity và collision policy tường minh.",
+        "en": "A hash table has fixed capacity and an empty-slot convention; a collision occurs when keys share an initial address. Collision storage must follow the supplied structure, such as probing, buckets, or a spare area, because their invariants differ. Separate the set/map interface from the hash-table representation; a hashing task requires explicit slots, empty markers, capacity, and collision policy."
       },
       "python_connection": {
         "vi": "Pilot tạo `slots=[None]*size` ở L009 và dùng linear probing trong cùng array ở L017–L024. Nó không triển khai `Spare` array/bucket riêng; bài yêu cầu cấu trúc đó cần artifact khác hoặc mở rộng đã kiểm chứng.",
@@ -1820,6 +1840,10 @@
         {
           "vi": "Không giới hạn số lần probe khi bảng đầy.",
           "en": "Failing to bound probes when the table is full."
+        },
+        {
+          "vi": "Dùng Python dict làm bằng chứng rằng collision algorithm đã đúng.",
+          "en": "Using a Python dict as proof that the collision algorithm is correct."
         }
       ],
       "exam_signals": [
@@ -2392,8 +2416,8 @@
         "vi": "Dequeue, rỗng và giá trị trả về"
       },
       "explanation": {
-        "vi": "Dequeue kiểm tra rỗng trước, đọc item tại front, tùy representation có thể xóa dấu vết ô, rồi dịch front và giảm count. Giá trị được đọc trước khi xóa phải được trả về cho caller.",
-        "en": "Dequeue checks for empty first, reads the item at front, may clear the cell according to the representation, then advances front and decreases count. The value read before clearing must be returned to the caller."
+        "vi": "Dequeue kiểm tra rỗng trước, đọc item tại front, tùy representation có thể xóa dấu vết ô, rồi dịch front và giảm count. Giá trị được đọc trước khi xóa phải được trả về cho caller. Kiểm tra `count == 0` trước read; nếu chấp nhận thì lưu item front, clear khi contract yêu cầu, wrap front và giảm count đúng một lần.",
+        "en": "Dequeue checks for empty first, reads the item at front, may clear the cell according to the representation, then advances front and decreases count. The value read before clearing must be returned to the caller. Check `count == 0` before the read; on acceptance, save the front item, clear it when required, wrap front, and decrement count exactly once."
       },
       "python_connection": {
         "vi": "L028–L030 xử lý underflow bằng `None`; L031–L033 lưu item rồi xóa ô; L034–L035 cập nhật front/count; L037 trả item.",
@@ -2520,8 +2544,8 @@
         "vi": "Enqueue, đầy và vòng chỉ số"
       },
       "explanation": {
-        "vi": "Enqueue kiểm tra đầy trước khi ghi, đặt item vào `rear`, dịch rear theo vòng và tăng count. Thứ tự cập nhật cần giữ để trace chỉ ra đúng ô vừa thay đổi.",
-        "en": "Enqueue checks for full before writing, places the item at `rear`, advances rear circularly, and increments count. The update order must remain clear so a trace identifies the changed cell."
+        "vi": "Enqueue kiểm tra đầy trước khi ghi, đặt item vào `rear`, dịch rear theo vòng và tăng count. Thứ tự cập nhật cần giữ để trace chỉ ra đúng ô vừa thay đổi. Kiểm tra `count == capacity` trước write; nếu chấp nhận thì ghi tại rear, wrap bằng modulo và tăng count đúng một lần.",
+        "en": "Enqueue checks for full before writing, places the item at `rear`, advances rear circularly, and increments count. The update order must remain clear so a trace identifies the changed cell. Check `count == capacity` before the write; on acceptance, write at rear, wrap with modulo, and increment count exactly once."
       },
       "python_connection": {
         "vi": "L017–L019 bảo vệ overflow; L020 giữ insert index; L021 ghi item; L022 wrap rear; L023 tăng count. L024 ghi trace bằng index trước khi rear đổi.",
@@ -2543,6 +2567,10 @@
         {
           "vi": "Tăng rear không modulo nên vượt chỉ số cuối.",
           "en": "Incrementing rear without modulo and moving past the last index."
+        },
+        {
+          "vi": "Dùng `deque.append` thay cho implementation thủ công mà đề yêu cầu.",
+          "en": "Using `deque.append` instead of the manual implementation required by the task."
         }
       ],
       "exam_signals": [
@@ -2666,8 +2694,8 @@
         "vi": "Đọc các phần tử đang dùng mà không xóa"
       },
       "explanation": {
-        "vi": "Duyệt queue không phá hủy phải đọc đúng `count` phần tử theo logical order từ front và không thay đổi front/rear/count. Với circular array, index vật lý của offset là `(front + offset) % capacity`.",
-        "en": "A non-destructive queue traversal reads exactly `count` items in logical order from front without changing front/rear/count. In a circular array, the physical index for an offset is `(front + offset) % capacity`."
+        "vi": "Duyệt queue không phá hủy phải đọc đúng `count` phần tử theo logical order từ front và không thay đổi front/rear/count. Với circular array, index vật lý của offset là `(front + offset) % capacity`. Live-window trace bắt đầu tại front và đi đúng count bước; physical array order không nhất thiết là FIFO order sau wrap-around.",
+        "en": "A non-destructive queue traversal reads exactly `count` items in logical order from front without changing front/rear/count. In a circular array, the physical index for an offset is `(front + offset) % capacity`. A live-window trace starts at front and takes exactly count steps; physical array order need not equal FIFO order after wrap-around."
       },
       "python_connection": {
         "vi": "L039–L044 tạo list mới; L041 lặp đúng count lần và L042 ánh xạ offset qua modulo. Không line nào gán lại front, rear hoặc count.",
@@ -2824,8 +2852,8 @@
         "vi": "Tổng hợp queue bằng đọc hoặc tiêu thụ dữ liệu"
       },
       "explanation": {
-        "vi": "Reduce gộp nhiều item thành một kết quả, ví dụ tổng; trước tiên phải quyết định thao tác chỉ đọc hay tiêu thụ queue. Nếu tiêu thụ, termination dựa vào trạng thái rỗng; nếu giữ nguyên, duyệt đúng live items mà không gọi dequeue.",
-        "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing."
+        "vi": "Reduce gộp nhiều item thành một kết quả, ví dụ tổng; trước tiên phải quyết định thao tác chỉ đọc hay tiêu thụ queue. Nếu tiêu thụ, termination dựa vào trạng thái rỗng; nếu giữ nguyên, duyệt đúng live items mà không gọi dequeue. Ghi rõ operation có phá hủy queue hay chỉ đọc; nếu dùng dequeue để reduce thì postcondition phải cho biết queue đã đổi ra sao.",
+        "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing. State whether the operation consumes the queue or only reads it; if reduction uses dequeue, the postcondition must describe the changed queue."
       },
       "python_connection": {
         "vi": "Pilot chọn preserve: L062 gọi `live_items`, rồi L063 tính tổng số từ bản sao logical. Không dequeue trong bước reduce, nên queue vẫn giữ dữ liệu; artifact chưa triển khai biến thể recursive consuming.",
@@ -2987,8 +3015,8 @@
         "vi": "Head, tail, count và quy ước rỗng"
       },
       "explanation": {
-        "vi": "Queue là FIFO: phần tử vào trước ra trước. Với circular array, `front` chỉ phần tử sẽ lấy, `rear` chỉ ô sẽ chèn kế tiếp và `count` phân biệt rỗng với đầy khi hai chỉ số bằng nhau.",
-        "en": "A queue is FIFO: the first item inserted is the first removed. In a circular array, `front` points to the next item to remove, `rear` to the next insertion cell, and `count` distinguishes empty from full when the indices coincide."
+        "vi": "Queue là FIFO: phần tử vào trước ra trước. Với circular array, `front` chỉ phần tử sẽ lấy, `rear` chỉ ô sẽ chèn kế tiếp và `count` phân biệt rỗng với đầy khi hai chỉ số bằng nhau. FIFO chỉ mô tả thứ tự logic; implementation trong đề còn cần front, rear, count, capacity và quy ước rear là ô đang dùng hay next-free.",
+        "en": "A queue is FIFO: the first item inserted is the first removed. In a circular array, `front` points to the next item to remove, `rear` to the next insertion cell, and `count` distinguishes empty from full when the indices coincide. FIFO describes logical order only; an exam implementation also needs front, rear, count, capacity, and a declaration of whether rear is used or next-free."
       },
       "python_connection": {
         "vi": "L010–L013 khởi tạo array, front, rear, count; L022/L034 dùng modulo để quay vòng. Representation của pilot chọn `rear` là next insertion index và `count` là logical size.",
@@ -3010,6 +3038,10 @@
         {
           "vi": "Đọc queue theo index 0..count-1 khi front đã wrap.",
           "en": "Reading the queue at indices 0..count-1 after front has wrapped."
+        },
+        {
+          "vi": "Cho rằng biết FIFO là đủ mà không khai báo front/rear/count convention.",
+          "en": "Assuming FIFO alone is enough without declaring front/rear/count conventions."
         }
       ],
       "exam_signals": [
@@ -3161,8 +3193,8 @@
         "vi": "Frame riêng, call stack và trả ngược"
       },
       "explanation": {
-        "vi": "Mỗi lời gọi tạo một frame riêng chứa tham số, biến cục bộ và vị trí chờ trả về. Khi gặp base case, các frame được tháo theo LIFO; công việc nằm sau recursive call chỉ chạy khi frame con trả về.",
-        "en": "Each call creates a separate frame containing parameters, local variables, and a return point. At the base case, frames unwind in LIFO order; work after the recursive call runs only when the child frame returns."
+        "vi": "Mỗi lời gọi tạo một frame riêng chứa tham số, biến cục bộ và vị trí chờ trả về. Khi gặp base case, các frame được tháo theo LIFO; công việc nằm sau recursive call chỉ chạy khi frame con trả về. Trace tách hai pha: frame creation khi call đi xuống và return-value propagation khi unwind đi lên.",
+        "en": "Each call creates a separate frame containing parameters, local variables, and a return point. At the base case, frames unwind in LIFO order; work after the recursive call runs only when the child frame returns. Separate the trace into frame creation while calls descend and return-value propagation while frames unwind."
       },
       "python_connection": {
         "vi": "L006 ghi sự kiện call; L010 tạm dừng frame hiện tại để chờ subtotal. L011–L012 chạy theo thứ tự ngược khi unwind và ghi result của từng index.",
@@ -3184,6 +3216,10 @@
         {
           "vi": "Cho rằng mọi frame dùng chung biến `index`.",
           "en": "Assuming every frame shares one `index` variable."
+        },
+        {
+          "vi": "Gộp call và return vào một bước nên mất pending operation của từng frame.",
+          "en": "Collapsing call and return into one step and losing each frame's pending operation."
         }
       ],
       "exam_signals": [
@@ -3310,8 +3346,8 @@
         "vi": "Nhận bài toán đệ quy và cân nhắc lợi ích"
       },
       "explanation": {
-        "vi": "Recursion phù hợp khi bài toán có định nghĩa tự giống nhau hoặc cấu trúc phân nhánh; code có thể bám sát định nghĩa. Đổi lại, mỗi call dùng stack frame và recursion sâu có thể tốn bộ nhớ hoặc chạm giới hạn recursion.",
-        "en": "Recursion suits self-similar definitions or branching structures and can mirror the problem definition closely. The trade-off is one stack frame per call, so deep recursion can use substantial memory or reach a recursion limit."
+        "vi": "Recursion phù hợp khi bài toán có định nghĩa tự giống nhau hoặc cấu trúc phân nhánh; code có thể bám sát định nghĩa. Đổi lại, mỗi call dùng stack frame và recursion sâu có thể tốn bộ nhớ hoặc chạm giới hạn recursion. Chỉ chọn recursion khi cấu trúc bài toán hỗ trợ nó; luôn nêu depth và auxiliary stack space thay vì chỉ nói code ngắn hơn.",
+        "en": "Recursion suits self-similar definitions or branching structures and can mirror the problem definition closely. The trade-off is one stack frame per call, so deep recursion can use substantial memory or reach a recursion limit. Choose recursion only when it fits the problem structure; always state depth and auxiliary stack space rather than merely saying the code is shorter."
       },
       "python_connection": {
         "vi": "L029 và L030 chạy hai cách tương đương; L032 so sánh kết quả. `recursive_sum` tạo event cho từng call trong khi `iterative_sum` L016–L020 dùng một accumulator, giúp quan sát trade-off.",
@@ -3456,8 +3492,8 @@
         "vi": "Đổi đệ quy và vòng lặp, giữ đúng hành vi"
       },
       "explanation": {
-        "vi": "Chuyển recursion sang iteration cần lưu mọi trạng thái mà call stack từng giữ. Với tail-like linear accumulation, một loop và accumulator có thể đủ; với pending work phức tạp, cần stack tường minh.",
-        "en": "Converting recursion to iteration requires preserving all state previously held by the call stack. For a tail-like linear accumulation, a loop and accumulator may suffice; complex pending work needs an explicit stack."
+        "vi": "Chuyển recursion sang iteration cần lưu mọi trạng thái mà call stack từng giữ. Với tail-like linear accumulation, một loop và accumulator có thể đủ; với pending work phức tạp, cần stack tường minh. Bản lặp phải lưu mọi state mà call stack từng giữ; accumulator đơn chỉ đủ khi không có pending work phức tạp.",
+        "en": "Converting recursion to iteration requires preserving all state previously held by the call stack. For a tail-like linear accumulation, a loop and accumulator may suffice; complex pending work needs an explicit stack. The iterative form must preserve every state formerly held by the call stack; one accumulator is sufficient only when there is no complex pending work."
       },
       "python_connection": {
         "vi": "L005–L013 và L016–L020 tính cùng tổng bằng hai cơ chế. L029–L032 chạy cả hai và kiểm tra equality, tạo oracle tương đương cho fixture pilot.",
@@ -3595,8 +3631,8 @@
         "vi": "Base case, recursive case và tiến triển"
       },
       "explanation": {
-        "vi": "Một hàm đệ quy cần base case trả kết quả trực tiếp và recursive case chuyển sang bài toán nhỏ hơn. Thước đo tiến triển phải tiến gần base case ở mỗi lời gọi để bảo đảm kết thúc.",
-        "en": "A recursive function needs a base case that returns directly and a recursive case that moves to a smaller problem. A progress measure must approach the base case on every call to guarantee termination."
+        "vi": "Một hàm đệ quy cần base case trả kết quả trực tiếp và recursive case chuyển sang bài toán nhỏ hơn. Thước đo tiến triển phải tiến gần base case ở mỗi lời gọi để bảo đảm kết thúc. Trước code, viết ba dòng contract: base case, smaller subproblem và progress measure giảm sau mỗi call.",
+        "en": "A recursive function needs a base case that returns directly and a recursive case that moves to a smaller problem. A progress measure must approach the base case on every call to guarantee termination. Before coding, write a three-line contract: base case, smaller subproblem, and the progress measure that decreases on every call."
       },
       "python_connection": {
         "vi": "L007–L009 là base case khi index bằng độ dài list; L010 gọi với `index+1`, nên số phần tử chưa xử lý giảm một. L011–L013 kết hợp và trả kết quả.",
@@ -3618,6 +3654,10 @@
         {
           "vi": "Base value sai identity, làm toàn bộ kết quả sai khi unwind.",
           "en": "Using the wrong identity as the base value, corrupting the result during unwinding."
+        },
+        {
+          "vi": "Có base case nhưng recursive call không tiến gần nó.",
+          "en": "Having a base case while the recursive call makes no progress toward it."
         }
       ],
       "exam_signals": [
@@ -3742,8 +3782,8 @@
         "vi": "Triển khai đệ quy đã cho và giữ kết quả trả về"
       },
       "explanation": {
-        "vi": "Khi dịch một thuật toán đệ quy sang Python, giữ nguyên base condition, thứ tự đánh giá và giá trị trả về. Toán tử chia nguyên, slicing và mutation cần được chọn theo đúng ý nghĩa của pseudocode nguồn.",
-        "en": "When translating a recursive algorithm into Python, preserve its base condition, evaluation order, and return value. Integer division, slicing, and mutation must match the source pseudocode semantics."
+        "vi": "Khi dịch một thuật toán đệ quy sang Python, giữ nguyên base condition, thứ tự đánh giá và giá trị trả về. Toán tử chia nguyên, slicing và mutation cần được chọn theo đúng ý nghĩa của pseudocode nguồn. Giữ nguyên terminal value, progress và combine order khi dịch pseudocode sang Python; return của child call phải được truyền về caller.",
+        "en": "When translating a recursive algorithm into Python, preserve its base condition, evaluation order, and return value. Integer division, slicing, and mutation must match the source pseudocode semantics. Preserve the terminal value, progress, and combination order when translating pseudocode to Python; the child call's return must propagate to its caller."
       },
       "python_connection": {
         "vi": "L005 giữ signature rõ; L007 dịch base condition; L010 lưu kết quả lời gọi con; L011 kết hợp; L013 return. Chuỗi này cho thấy giá trị phải được truyền qua từng frame.",

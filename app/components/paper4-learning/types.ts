@@ -3,6 +3,18 @@ import type { JsonValue, PatternMetadata, PythonArtifactDto } from "@/app/compon
 export type LearningLocale = "vi" | "en";
 export type Localized<T = string> = Readonly<Record<LearningLocale, T>>;
 
+export type TraceBackedAssociationPattern = PatternMetadata & Readonly<{
+  required_visual_target: "visual.dsa.growth-counter";
+  association_authority: "AlgoCore_representational_workflow_only";
+  official_marks: null;
+  reuse_notice: Localized;
+  source_owner: Readonly<{
+    lesson_id: string;
+    lesson_slug: string;
+    python_artifact_id: string;
+  }>;
+}>;
+
 export type LearningBlockKind =
   | "recognition" | "exam-cues" | "knowledge" | "method" | "worked-example"
   | "action-view" | "marking-pitfalls" | "practice" | "retrieval" | "next-and-sources";
@@ -159,6 +171,7 @@ export type LessonDto = Readonly<{
   }>;
   visual: Readonly<{
     owned_patterns: readonly PatternMetadata[];
+    trace_backed_association_patterns?: readonly TraceBackedAssociationPattern[];
     approved_static_or_representational_support: readonly Readonly<{
       pattern_id: string; authority: "AlgoCore_representational_workflow_only"; official_marks: null;
     }>[];
@@ -186,7 +199,7 @@ export type CourseManifest = Readonly<{
   counts: Readonly<{
     packages: 13; lessons: 26; patterns: 58; sections_per_lesson: 10;
     knowledge_units: 108; python_artifacts: 26; visual_scenario_traces: 174;
-    visual_event_bindings: 589; marking_chains: 58; assessment_items: 78; lesson_release_records: 26;
+    visual_event_bindings: 870; marking_chains: 58; assessment_items: 79; lesson_release_records: 26;
   }>;
   canonical_sections: readonly Readonly<{ section_id: string; kind: LearningBlockKind; order: number }>[];
   packages: readonly Readonly<{ package_id: string; label: string; title: Localized; lesson_slugs: readonly string[] }>[];

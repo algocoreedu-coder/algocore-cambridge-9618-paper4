@@ -48,8 +48,8 @@
         "vi": "Phần tử giữa, thu hẹp khoảng và thất bại"
       },
       "explanation": {
-        "vi": "Middle dùng chia nguyên để chọn một index trong khoảng. Sau khi so sánh, phải loại luôn middle bằng `middle-1` hoặc `middle+1`; nếu không, khoảng có thể không nhỏ đi và vòng lặp không kết thúc.",
-        "en": "Middle uses integer division to choose an index in the interval. After comparison, exclude middle with `middle-1` or `middle+1`; otherwise the interval may fail to shrink and the loop may not terminate."
+        "vi": "Middle dùng chia nguyên để chọn một index trong khoảng. Sau khi so sánh, phải loại luôn middle bằng `middle-1` hoặc `middle+1`; nếu không, khoảng có thể không nhỏ đi và vòng lặp không kết thúc. Đếm một comparison với middle mỗi vòng; cập nhật `middle-1` hoặc `middle+1` để interval giảm nghiêm ngặt và không kiểm tra lại middle.",
+        "en": "Middle uses integer division to choose an index in the interval. After comparison, exclude middle with `middle-1` or `middle+1`; otherwise the interval may fail to shrink and the loop may not terminate. Count one comparison with the middle item per iteration; update to `middle-1` or `middle+1` so the interval strictly shrinks and the middle is not tested again."
       },
       "python_connection": {
         "vi": "L016 tính middle; L024–L029 xử lý bằng/nhỏ hơn/lớn hơn. L030–L031 định nghĩa thất bại khi `low > high` bằng sentinel `-1`.",
@@ -71,6 +71,10 @@
         {
           "vi": "Dùng `/` tạo float làm index.",
           "en": "Using `/`, producing a float index."
+        },
+        {
+          "vi": "Giữ lại middle trong interval mới nên có thể lặp vô hạn.",
+          "en": "Keeping middle inside the new interval and risking a non-terminating loop."
         }
       ],
       "exam_signals": [
@@ -175,8 +179,8 @@
         "vi": "Tiền điều kiện và khoảng tìm kiếm"
       },
       "explanation": {
-        "vi": "Tìm kiếm nhị phân chỉ loại bỏ nửa khoảng an toàn khi dữ liệu đã sắp theo cùng comparator dùng để so sánh target. Khoảng tìm kiếm đóng `[low, high]` chứa mọi vị trí còn có thể là đáp án.",
-        "en": "Binary search can safely discard half an interval only when data is sorted under the same comparator used against the target. The closed search interval `[low, high]` contains every position that can still be the answer."
+        "vi": "Tìm kiếm nhị phân chỉ loại bỏ nửa khoảng an toàn khi dữ liệu đã sắp theo cùng comparator dùng để so sánh target. Khoảng tìm kiếm đóng `[low, high]` chứa mọi vị trí còn có thể là đáp án. Khai báo rõ closed interval `[low, high]`; sau mỗi comparison, tô phần bị loại và chứng minh mọi vị trí còn có thể vẫn nằm trong interval mới.",
+        "en": "Binary search can safely discard half an interval only when data is sorted under the same comparator used against the target. The closed search interval `[low, high]` contains every position that can still be the answer. Declare the closed interval `[low, high]`; after each comparison, mark the discarded region and prove that every remaining candidate position is still inside the new interval."
       },
       "python_connection": {
         "vi": "L005–L009 kiểm tra thứ tự tăng; L037–L039 từ chối input không sắp. L013–L015 khởi tạo khoảng đóng từ 0 đến `len(values)-1` và chỉ lặp khi khoảng chưa rỗng.",
@@ -198,6 +202,10 @@
         {
           "vi": "Trộn khoảng đóng `[low, high]` với điều kiện của khoảng nửa mở.",
           "en": "Mixing a closed `[low, high]` interval with half-open interval conditions."
+        },
+        {
+          "vi": "Chạy binary search trên input chưa sắp xếp hoặc đổi interval convention giữa chừng.",
+          "en": "Running binary search on unsorted input or changing interval convention mid-trace."
         }
       ],
       "exam_signals": [
@@ -318,8 +326,8 @@
         "vi": "Biến thể tìm nhị phân đệ quy"
       },
       "explanation": {
-        "vi": "Biến thể đệ quy mang `low` và `high` trong từng lời gọi. Base case là khoảng rỗng; recursive case tính middle rồi gọi lại đúng nửa còn khả năng chứa target, đồng thời trả kết quả của lời gọi con lên trên.",
-        "en": "The recursive variant carries `low` and `high` in each call. Its base case is an empty interval; the recursive case computes middle, calls the only half that can contain the target, and propagates the child result upward."
+        "vi": "Biến thể đệ quy mang `low` và `high` trong từng lời gọi. Base case là khoảng rỗng; recursive case tính middle rồi gọi lại đúng nửa còn khả năng chứa target, đồng thời trả kết quả của lời gọi con lên trên. Biến thể condition-based là enrichment tùy chọn. Lời giải bắt buộc vẫn bám precondition sorted, base case empty interval và cùng closed-interval contract.",
+        "en": "The recursive variant carries `low` and `high` in each call. Its base case is an empty interval; the recursive case computes middle, calls the only half that can contain the target, and propagates the child result upward. Condition-based binary search is optional enrichment. The required solution still follows the sorted precondition, the empty-interval base case, and the same closed-interval contract."
       },
       "python_connection": {
         "vi": "Artifact binary-search thực thi biến thể đệ quy ở L048–L061: L050–L052 xử lý khoảng rỗng, L053 tính middle, L059/L061 trả kết quả từ lời gọi trên khoảng nhỏ hơn. L064–L067 chạy cả hai phiên bản và phát hiện nếu index không khớp.",
@@ -468,16 +476,16 @@
         "vi": "So sánh và gắn node mới trong BST"
       },
       "explanation": {
-        "vi": "So sánh và gắn node mới trong BST trong cây nhị phân tập trung vào một quy tắc có thể kiểm tra: Mỗi so sánh chọn đúng một nhánh; node mới chỉ gắn tại null link và duplicate tuân theo policy đã cho. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Comparing and attaching a new BST node in the binary tree centres on one checkable rule: Each comparison chooses exactly one branch; a new node is attached only at a null link, and duplicates follow the supplied policy. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "So sánh và gắn node mới trong BST trong cây nhị phân tập trung vào một quy tắc có thể kiểm tra: Mỗi so sánh chọn đúng một nhánh; node mới chỉ gắn tại null link và duplicate tuân theo policy đã cho. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Ghi branch choice ở mỗi comparison, path đã đi và null link nơi node mới được gắn; duplicate đi theo policy đã khóa.",
+        "en": "Comparing and attaching a new BST node in the binary tree centres on one checkable rule: Each comparison chooses exactly one branch; a new node is attached only at a null link, and duplicates follow the supplied policy. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Record the branch choice at each comparison, the path taken, and the null link where the new node is attached; duplicates follow the locked policy."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, các dòng binary-tree.production-v1.L006 chứa đoạn mã “def insert(root, value):” và minh họa trực tiếp So sánh và gắn node mới trong BST trong cây nhị phân: Mỗi so sánh chọn đúng một nhánh; node mới chỉ gắn tại null link và duplicate tuân theo policy đã cho. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, lines binary-tree.production-v1.L006 contain “def insert(root, value):” and directly demonstrate Comparing and attaching a new BST node in the binary tree: Each comparison chooses exactly one branch; a new node is attached only at a null link, and duplicates follow the supplied policy. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, các dòng binary-tree.production-v1.L009 chứa đoạn mã “def insert(root, value, trace, phase):” và minh họa trực tiếp So sánh và gắn node mới trong BST trong cây nhị phân: Mỗi so sánh chọn đúng một nhánh; node mới chỉ gắn tại null link và duplicate tuân theo policy đã cho. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, lines binary-tree.production-v1.L009 contain “def insert(root, value, trace, phase):” and directly demonstrate Comparing and attaching a new BST node in the binary tree: Each comparison chooses exactly one branch; a new node is attached only at a null link, and duplicates follow the supplied policy. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn So sánh và gắn node mới trong BST trong cây nhị phân bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại binary-tree.production-v1.L006, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Mỗi so sánh chọn đúng một nhánh; node mới chỉ gắn tại null link và duplicate tuân theo policy đã cho.",
-        "en": "Represent Comparing and attaching a new BST node in the binary tree with a four-column trace: before-state, condition or decision at binary-tree.production-v1.L006, applied change, and after-state. The trace must show that this rule still holds: Each comparison chooses exactly one branch; a new node is attached only at a null link, and duplicates follow the supplied policy."
+        "vi": "Biểu diễn So sánh và gắn node mới trong BST trong cây nhị phân bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại binary-tree.production-v1.L009, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Mỗi so sánh chọn đúng một nhánh; node mới chỉ gắn tại null link và duplicate tuân theo policy đã cho.",
+        "en": "Represent Comparing and attaching a new BST node in the binary tree with a four-column trace: before-state, condition or decision at binary-tree.production-v1.L009, applied change, and after-state. The trace must show that this rule still holds: Each comparison chooses exactly one branch; a new node is attached only at a null link, and duplicates follow the supplied policy."
       },
       "invariant_or_rule": {
         "vi": "Mỗi so sánh chọn đúng một nhánh; node mới chỉ gắn tại null link và duplicate tuân theo policy đã cho.",
@@ -489,8 +497,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Comparing and attaching a new BST node”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Chỉ đưa cây cuối mà không ghi comparison path và branch choices.",
+          "en": "Showing only the final tree without the comparison path and branch choices."
         }
       ],
       "exam_signals": [
@@ -517,16 +525,16 @@
           "ac-9618-p4-2026-python.artifact.binary-tree.production-v1"
         ],
         "active_line_ids": [
-          "binary-tree.production-v1.L006"
+          "binary-tree.production-v1.L009"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "binary-tree",
           "semantic_role": "ordered-insert",
           "artifact_version": "production-v1",
-          "matched_text": "def insert(root, value):",
+          "matched_text": "def insert(root, value, trace, phase):",
           "resolved_line_ids": [
-            "binary-tree.production-v1.L006"
+            "binary-tree.production-v1.L009"
           ]
         },
         "fixture_kind": "boundary",
@@ -617,8 +625,8 @@
         "vi": "Root, con trái/phải và vùng chưa dùng"
       },
       "explanation": {
-        "vi": "Root, con trái/phải và vùng chưa dùng trong cây nhị phân tập trung vào một quy tắc có thể kiểm tra: Root và mỗi child link là node index/reference hoặc null sentinel; node chưa dùng không được reachable từ root. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Root, left/right children and unused storage in the binary tree centres on one checkable rule: Root and each child link are a node index/reference or null sentinel; unused nodes must not be reachable from root. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Root, con trái/phải và vùng chưa dùng trong cây nhị phân tập trung vào một quy tắc có thể kiểm tra: Root và mỗi child link là node index/reference hoặc null sentinel; node chưa dùng không được reachable từ root. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Nêu rõ node/reference hoặc array/index representation trước trace; không trộn hai mô hình trong một operation.",
+        "en": "Root, left/right children and unused storage in the binary tree centres on one checkable rule: Root and each child link are a node index/reference or null sentinel; unused nodes must not be reachable from root. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Declare the node/reference or array/index representation before tracing; do not mix the two models within one operation."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, các dòng binary-tree.production-v1.L003 chứa đoạn mã “class Node:” và minh họa trực tiếp Root, con trái/phải và vùng chưa dùng trong cây nhị phân: Root và mỗi child link là node index/reference hoặc null sentinel; node chưa dùng không được reachable từ root. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -768,16 +776,16 @@
         "vi": "Chọn nhánh khi tìm trong BST"
       },
       "explanation": {
-        "vi": "Chọn nhánh khi tìm trong BST trong cây nhị phân tập trung vào một quy tắc có thể kiểm tra: Nếu target nhỏ hơn đi trái, lớn hơn đi phải; không tìm thấy chỉ khi nhánh cần đi là null. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Choosing a branch when searching a BST in the binary tree centres on one checkable rule: Go left when the target is smaller and right when larger; not found occurs only when the required branch is null. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Chọn nhánh khi tìm trong BST trong cây nhị phân tập trung vào một quy tắc có thể kiểm tra: Nếu target nhỏ hơn đi trái, lớn hơn đi phải; không tìm thấy chỉ khi nhánh cần đi là null. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Search path là chuỗi comparison và branch choice; failed search kết thúc tại đúng null branch.",
+        "en": "Choosing a branch when searching a BST in the binary tree centres on one checkable rule: Go left when the target is smaller and right when larger; not found occurs only when the required branch is null. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. A search path is a sequence of comparisons and branch choices; a failed search ends at the required null branch."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, các dòng binary-tree.production-v1.L029 chứa đoạn mã “while current is not None:” và minh họa trực tiếp Chọn nhánh khi tìm trong BST trong cây nhị phân: Nếu target nhỏ hơn đi trái, lớn hơn đi phải; không tìm thấy chỉ khi nhánh cần đi là null. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, lines binary-tree.production-v1.L029 contain “while current is not None:” and directly demonstrate Choosing a branch when searching a BST in the binary tree: Go left when the target is smaller and right when larger; not found occurs only when the required branch is null. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, các dòng binary-tree.production-v1.L067 chứa đoạn mã “while current is not None:” và minh họa trực tiếp Chọn nhánh khi tìm trong BST trong cây nhị phân: Nếu target nhỏ hơn đi trái, lớn hơn đi phải; không tìm thấy chỉ khi nhánh cần đi là null. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, lines binary-tree.production-v1.L067 contain “while current is not None:” and directly demonstrate Choosing a branch when searching a BST in the binary tree: Go left when the target is smaller and right when larger; not found occurs only when the required branch is null. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Chọn nhánh khi tìm trong BST trong cây nhị phân bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại binary-tree.production-v1.L029, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Nếu target nhỏ hơn đi trái, lớn hơn đi phải; không tìm thấy chỉ khi nhánh cần đi là null.",
-        "en": "Represent Choosing a branch when searching a BST in the binary tree with a four-column trace: before-state, condition or decision at binary-tree.production-v1.L029, applied change, and after-state. The trace must show that this rule still holds: Go left when the target is smaller and right when larger; not found occurs only when the required branch is null."
+        "vi": "Biểu diễn Chọn nhánh khi tìm trong BST trong cây nhị phân bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại binary-tree.production-v1.L067, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Nếu target nhỏ hơn đi trái, lớn hơn đi phải; không tìm thấy chỉ khi nhánh cần đi là null.",
+        "en": "Represent Choosing a branch when searching a BST in the binary tree with a four-column trace: before-state, condition or decision at binary-tree.production-v1.L067, applied change, and after-state. The trace must show that this rule still holds: Go left when the target is smaller and right when larger; not found occurs only when the required branch is null."
       },
       "invariant_or_rule": {
         "vi": "Nếu target nhỏ hơn đi trái, lớn hơn đi phải; không tìm thấy chỉ khi nhánh cần đi là null.",
@@ -817,7 +825,7 @@
           "ac-9618-p4-2026-python.artifact.binary-tree.production-v1"
         ],
         "active_line_ids": [
-          "binary-tree.production-v1.L029"
+          "binary-tree.production-v1.L067"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
@@ -826,7 +834,7 @@
           "artifact_version": "production-v1",
           "matched_text": "while current is not None:",
           "resolved_line_ids": [
-            "binary-tree.production-v1.L029"
+            "binary-tree.production-v1.L067"
           ]
         },
         "fixture_kind": "failure",
@@ -928,16 +936,16 @@
         "vi": "Duyệt inorder và postorder theo yêu cầu đề"
       },
       "explanation": {
-        "vi": "Duyệt inorder và postorder theo yêu cầu đề trong cây nhị phân tập trung vào một quy tắc có thể kiểm tra: Inorder là left-root-right; postorder là left-right-root; output phụ thuộc thứ tự visit chứ không phụ thuộc index lưu node. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Inorder and postorder traversal as required by the task in the binary tree centres on one checkable rule: Inorder is left-root-right; postorder is left-right-root; output follows visit order, not node storage index. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Duyệt inorder và postorder theo yêu cầu đề trong cây nhị phân tập trung vào một quy tắc có thể kiểm tra: Inorder là left-root-right; postorder là left-right-root; output phụ thuộc thứ tự visit chứ không phụ thuộc index lưu node. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Pre/in/post-order phải xuất đúng visit order. BFS và iterative DFS chỉ là supplementary enrichment, không mở objective bắt buộc.",
+        "en": "Inorder and postorder traversal as required by the task in the binary tree centres on one checkable rule: Inorder is left-root-right; postorder is left-right-root; output follows visit order, not node storage index. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Preorder, inorder, and postorder must emit the exact visit order. BFS and iterative DFS remain supplementary enrichment and do not create required objectives."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, các dòng binary-tree.production-v1.L016 chứa đoạn mã “def traverse(node, order):” và minh họa trực tiếp Duyệt inorder và postorder theo yêu cầu đề trong cây nhị phân: Inorder là left-root-right; postorder là left-right-root; output phụ thuộc thứ tự visit chứ không phụ thuộc index lưu node. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, lines binary-tree.production-v1.L016 contain “def traverse(node, order):” and directly demonstrate Inorder and postorder traversal as required by the task in the binary tree: Inorder is left-root-right; postorder is left-right-root; output follows visit order, not node storage index. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, các dòng binary-tree.production-v1.L049 chứa đoạn mã “def traverse(node, order):” và minh họa trực tiếp Duyệt inorder và postorder theo yêu cầu đề trong cây nhị phân: Inorder là left-root-right; postorder là left-right-root; output phụ thuộc thứ tự visit chứ không phụ thuộc index lưu node. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.binary-tree.production-v1, lines binary-tree.production-v1.L049 contain “def traverse(node, order):” and directly demonstrate Inorder and postorder traversal as required by the task in the binary tree: Inorder is left-root-right; postorder is left-right-root; output follows visit order, not node storage index. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Duyệt inorder và postorder theo yêu cầu đề trong cây nhị phân bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại binary-tree.production-v1.L016, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Inorder là left-root-right; postorder là left-right-root; output phụ thuộc thứ tự visit chứ không phụ thuộc index lưu node.",
-        "en": "Represent Inorder and postorder traversal as required by the task in the binary tree with a four-column trace: before-state, condition or decision at binary-tree.production-v1.L016, applied change, and after-state. The trace must show that this rule still holds: Inorder is left-root-right; postorder is left-right-root; output follows visit order, not node storage index."
+        "vi": "Biểu diễn Duyệt inorder và postorder theo yêu cầu đề trong cây nhị phân bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại binary-tree.production-v1.L049, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Inorder là left-root-right; postorder là left-right-root; output phụ thuộc thứ tự visit chứ không phụ thuộc index lưu node.",
+        "en": "Represent Inorder and postorder traversal as required by the task in the binary tree with a four-column trace: before-state, condition or decision at binary-tree.production-v1.L049, applied change, and after-state. The trace must show that this rule still holds: Inorder is left-root-right; postorder is left-right-root; output follows visit order, not node storage index."
       },
       "invariant_or_rule": {
         "vi": "Inorder là left-root-right; postorder là left-right-root; output phụ thuộc thứ tự visit chứ không phụ thuộc index lưu node.",
@@ -977,7 +985,7 @@
           "ac-9618-p4-2026-python.artifact.binary-tree.production-v1"
         ],
         "active_line_ids": [
-          "binary-tree.production-v1.L016"
+          "binary-tree.production-v1.L049"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
@@ -986,7 +994,7 @@
           "artifact_version": "production-v1",
           "matched_text": "def traverse(node, order):",
           "resolved_line_ids": [
-            "binary-tree.production-v1.L016"
+            "binary-tree.production-v1.L049"
           ]
         },
         "fixture_kind": "normal",
@@ -1084,8 +1092,8 @@
         "vi": "Mảng một chiều, hai chiều và giới hạn chỉ số"
       },
       "explanation": {
-        "vi": "Mảng một chiều dùng một chỉ số; mảng hai chiều dùng cặp chỉ số hàng–cột. Khi mô phỏng mảng cố định bằng list Python, cần giữ riêng capacity và không coi độ dài vật lý là số phần tử đang dùng trong mọi bài.",
-        "en": "A one-dimensional array uses one index; a two-dimensional array uses a row-column pair. When a Python list models a fixed array, keep capacity explicit and do not always treat physical length as the number of live elements."
+        "vi": "Mảng một chiều dùng một chỉ số; mảng hai chiều dùng cặp chỉ số hàng–cột. Khi mô phỏng mảng cố định bằng list Python, cần giữ riêng capacity và không coi độ dài vật lý là số phần tử đang dùng trong mọi bài. Phân biệt physical capacity với logical count: các index sống là 0..logical_count-1, còn 0..capacity-1 chỉ là miền ô được cấp. Với 2D, luôn đọc chỉ số theo row-column order của đề.",
+        "en": "A one-dimensional array uses one index; a two-dimensional array uses a row-column pair. When a Python list models a fixed array, keep capacity explicit and do not always treat physical length as the number of live elements. Separate physical capacity from logical count: live indices are 0..logical_count-1, while 0..capacity-1 is only the allocated-cell range. For 2D data, follow the task's row-column index order."
       },
       "python_connection": {
         "vi": "Artifact tạo bản sao list record ở L027 và so sánh `len(records)` với `capacity` ở L018–L020. Đây là mô hình mảng 1D đang chứa các record; Python list không tự áp đặt capacity của đề.",
@@ -1107,6 +1115,10 @@
         {
           "vi": "Dùng `[[0] * c] * r`, khiến các hàng cùng trỏ tới một list.",
           "en": "Using `[[0] * c] * r`, causing rows to reference the same list."
+        },
+        {
+          "vi": "Dùng `len(list)` đồng thời làm physical capacity và logical count.",
+          "en": "Using `len(list)` as both physical capacity and logical count."
         }
       ],
       "exam_signals": [
@@ -1226,8 +1238,8 @@
         "vi": "Vị trí kế tiếp và chèn vào mảng có giới hạn"
       },
       "explanation": {
-        "vi": "Chèn vào cấu trúc có giới hạn cần kiểm tra chỗ trống trước khi ghi. Live count chỉ số phần tử hợp lệ; capacity là số ô tối đa, nên trạng thái đầy xảy ra khi `live_count >= capacity`.",
-        "en": "Appending to a bounded structure requires a free-space check before writing. The live count is the number of valid items; capacity is the maximum cell count, so full means `live_count >= capacity`."
+        "vi": "Chèn vào cấu trúc có giới hạn cần kiểm tra chỗ trống trước khi ghi. Live count chỉ số phần tử hợp lệ; capacity là số ô tối đa, nên trạng thái đầy xảy ra khi `live_count >= capacity`. Quy trình phòng thi là check `logical_count < capacity`, ghi tại index `logical_count`, rồi tăng count đúng một lần; Python `append` chỉ mô phỏng bước ghi khi contract cho phép.",
+        "en": "Appending to a bounded structure requires a free-space check before writing. The live count is the number of valid items; capacity is the maximum cell count, so full means `live_count >= capacity`. The exam sequence is: check `logical_count < capacity`, write at index `logical_count`, then increment the count exactly once; Python `append` only simulates the write when the contract allows it."
       },
       "python_connection": {
         "vi": "L018 ghi nhận count/capacity, L019 chặn trạng thái đầy và L021 chỉ append sau khi kiểm tra. L022 tính index mới bằng `len(records)-1`, tức sau thao tác chèn thành công.",
@@ -1249,6 +1261,10 @@
         {
           "vi": "Dùng `>` thay vì `>=`, cho phép ghi khi count đã bằng capacity.",
           "en": "Using `>` instead of `>=`, allowing a write when count already equals capacity."
+        },
+        {
+          "vi": "Append trước capacity guard rồi cố hoàn tác khi đầy.",
+          "en": "Appending before the capacity guard and then trying to undo a full-state write."
         }
       ],
       "exam_signals": [
@@ -1387,8 +1403,8 @@
         "vi": "Tên, vai trò dữ liệu và biểu thức"
       },
       "explanation": {
-        "vi": "Identifier tốt cho biết vai trò của dữ liệu và giữ nhất quán giữa đặc tả, code và output. Biểu thức gán phải có một đích hợp lệ; biểu thức số học tạo giá trị số, còn biểu thức logic tạo Boolean dùng cho nhánh hoặc vòng lặp.",
-        "en": "A good identifier communicates a data role and remains consistent across specification, code, and output. Assignment needs a valid target; arithmetic expressions produce numeric values, while logical expressions produce Booleans for branches or loops."
+        "vi": "Identifier tốt cho biết vai trò của dữ liệu và giữ nhất quán giữa đặc tả, code và output. Biểu thức gán phải có một đích hợp lệ; biểu thức số học tạo giá trị số, còn biểu thức logic tạo Boolean dùng cho nhánh hoặc vòng lặp. Data dictionary nên nêu riêng `capacity`, `logical_count`, row, column và current index để tránh dùng một tên cho nhiều vai trò.",
+        "en": "A good identifier communicates a data role and remains consistent across specification, code, and output. Assignment needs a valid target; arithmetic expressions produce numeric values, while logical expressions produce Booleans for branches or loops. The data dictionary should name `capacity`, `logical_count`, row, column, and current index separately so one identifier is not reused for several roles."
       },
       "python_connection": {
         "vi": "Các tên `capacity`, `records`, `added` và `message` tại L014/L029 thể hiện vai trò rõ. Điều kiện L019 là biểu thức logic; phép `sum(...)/len(...)` ở L033 là biểu thức số học được gán cho `average`.",
@@ -1522,8 +1538,8 @@
         "vi": "Dữ liệu ngẫu nhiên và miền giá trị"
       },
       "explanation": {
-        "vi": "Khi tạo dữ liệu ngẫu nhiên, miền giá trị phải được xác định rõ và kiểm tra quy ước hai đầu có bao gồm hay không. Dữ liệu ngẫu nhiên phù hợp để tạo bộ thử, nhưng kết quả học tập cần có seed hoặc fixture cố định để tái lập.",
-        "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility."
+        "vi": "Khi tạo dữ liệu ngẫu nhiên, miền giá trị phải được xác định rõ và kiểm tra quy ước hai đầu có bao gồm hay không. Dữ liệu ngẫu nhiên phù hợp để tạo bộ thử, nhưng kết quả học tập cần có seed hoặc fixture cố định để tái lập. Mọi phép thống kê chỉ duyệt logical region; các ô chưa dùng trong physical capacity không được tính như dữ liệu đã sinh.",
+        "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility. Every summary scans only the logical region; unused cells in the physical capacity are not generated data."
       },
       "python_connection": {
         "vi": "Pilot không gọi bộ sinh ngẫu nhiên; nó nhận `random_values` đã cố định ở L030 rồi tính trung bình tại L032–L034. Vì vậy các line chứng minh bước xử lý dữ liệu, không chứng minh API/range sinh số.",
@@ -1656,8 +1672,8 @@
         "vi": "Trường bản ghi và lớp thay thế record"
       },
       "explanation": {
-        "vi": "Record gom các trường khác kiểu nhưng cùng mô tả một thực thể. Trong Python, dictionary hoặc một lớp đơn giản có thể biểu diễn record khi yêu cầu cho phép; lớp record thay thế không đồng nghĩa với thiết kế OOP đầy đủ có kế thừa và đa hình.",
-        "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism."
+        "vi": "Record gom các trường khác kiểu nhưng cùng mô tả một thực thể. Trong Python, dictionary hoặc một lớp đơn giản có thể biểu diễn record khi yêu cầu cho phép; lớp record thay thế không đồng nghĩa với thiết kế OOP đầy đủ có kế thừa và đa hình. Một record chiếm một logical slot; thêm field vào record không làm tăng logical count của mảng chứa record đó.",
+        "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism. One record occupies one logical slot; adding a field to a record does not increase the logical count of the containing array."
       },
       "python_connection": {
         "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng và `score: int`; L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
@@ -1839,8 +1855,8 @@
         "vi": "Kiểu, hằng, biến và phạm vi"
       },
       "explanation": {
-        "vi": "Kiểu dữ liệu xác định miền giá trị và phép toán hợp lệ; hằng biểu diễn giá trị không đổi còn biến lưu trạng thái có thể đổi. Phạm vi quyết định nơi một tên được truy cập, vì vậy dữ liệu cục bộ của hàm không tự động thay đổi dữ liệu bên ngoài.",
-        "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data."
+        "vi": "Kiểu dữ liệu xác định miền giá trị và phép toán hợp lệ; hằng biểu diễn giá trị không đổi còn biến lưu trạng thái có thể đổi. Phạm vi quyết định nơi một tên được truy cập, vì vậy dữ liệu cục bộ của hàm không tự động thay đổi dữ liệu bên ngoài. Trong mô hình mảng của đề, capacity và logical count là hai biến có vai trò khác nhau; cả hai phải được khai báo và khởi tạo trước khi tính valid-index interval.",
+        "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data. In the task's array model, capacity and logical count are different variables; both must be declared and initialised before deriving the valid-index interval."
       },
       "python_connection": {
         "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L010 kiểm tra `score` thật sự là `int` trước khi dùng.",
@@ -1974,8 +1990,8 @@
         "vi": "Khóa duy nhất, giá trị và giao diện ADT"
       },
       "explanation": {
-        "vi": "Khóa duy nhất, giá trị và giao diện ADT tập trung vào một quy tắc có thể kiểm tra: Key là duy nhất và client dùng find/insert/delete qua interface, không phụ thuộc representation bên dưới. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Unique keys, values and the ADT interface centres on one checkable rule: Keys are unique and clients use find/insert/delete through the interface without depending on the underlying representation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Khóa duy nhất, giá trị và giao diện ADT tập trung vào một quy tắc có thể kiểm tra: Key là duy nhất và client dùng find/insert/delete qua interface, không phụ thuộc representation bên dưới. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Client thấy find/insert/delete và postcondition; nó không cần biết representation là array, linked list, tree hay hash table.",
+        "en": "Unique keys, values and the ADT interface centres on one checkable rule: Keys are unique and clients use find/insert/delete through the interface without depending on the underlying representation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. The client sees find/insert/delete and their postconditions; it need not know whether the representation is an array, linked list, tree, or hash table."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.dictionary.production-v1, các dòng dictionary.production-v1.L003 chứa đoạn mã “class DictionaryADT:” và minh họa trực tiếp Khóa duy nhất, giá trị và giao diện ADT: Key là duy nhất và client dùng find/insert/delete qua interface, không phụ thuộc representation bên dưới. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -1995,8 +2011,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Unique keys, values and the ADT interface”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Cho rằng dictionary luôn là hash table hoặc Python dict.",
+          "en": "Assuming a dictionary is always a hash table or Python dict."
         }
       ],
       "exam_signals": [
@@ -2106,8 +2122,8 @@
         "vi": "Xóa khóa và xử lý khóa không tồn tại"
       },
       "explanation": {
-        "vi": "Xóa khóa và xử lý khóa không tồn tại tập trung vào một quy tắc có thể kiểm tra: Delete key tồn tại làm key không còn tìm thấy; delete key thiếu không được làm đổi dictionary. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Deleting a key and handling missing keys centres on one checkable rule: Deleting an existing key makes it unfindable; deleting a missing key must leave the dictionary unchanged. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Xóa khóa và xử lý khóa không tồn tại tập trung vào một quy tắc có thể kiểm tra: Delete key tồn tại làm key không còn tìm thấy; delete key thiếu không được làm đổi dictionary. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Delete missing key phải giữ state; exception của Python dict không tự định nghĩa ADT contract của đề.",
+        "en": "Deleting a key and handling missing keys centres on one checkable rule: Deleting an existing key makes it unfindable; deleting a missing key must leave the dictionary unchanged. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Deleting a missing key must preserve state; a Python-dict exception does not define the task's ADT contract."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.dictionary.production-v1, các dòng dictionary.production-v1.L010 chứa đoạn mã “def delete(self, key):” và minh họa trực tiếp Xóa khóa và xử lý khóa không tồn tại: Delete key tồn tại làm key không còn tìm thấy; delete key thiếu không được làm đổi dictionary. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -2238,8 +2254,8 @@
         "vi": "Tìm khóa, chèn và cập nhật giá trị"
       },
       "explanation": {
-        "vi": "Tìm khóa, chèn và cập nhật giá trị tập trung vào một quy tắc có thể kiểm tra: Find phân biệt missing với giá trị hợp lệ; insert với duplicate key phải update hoặc reject đúng contract. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Finding keys, inserting and updating values centres on one checkable rule: Find distinguishes a missing key from a valid value; duplicate-key insertion updates or rejects exactly as contracted. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Tìm khóa, chèn và cập nhật giá trị tập trung vào một quy tắc có thể kiểm tra: Find phân biệt missing với giá trị hợp lệ; insert với duplicate key phải update hoặc reject đúng contract. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Tách duplicate-key policy khỏi lookup mechanism; Python dict chỉ là implementation option khi đề cho phép.",
+        "en": "Finding keys, inserting and updating values centres on one checkable rule: Find distinguishes a missing key from a valid value; duplicate-key insertion updates or rejects exactly as contracted. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Separate duplicate-key policy from the lookup mechanism; Python dict is only an implementation option when the task allows it."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.dictionary.production-v1, các dòng dictionary.production-v1.L005 chứa đoạn mã “def find(self, key):” và minh họa trực tiếp Tìm khóa, chèn và cập nhật giá trị: Find phân biệt missing với giá trị hợp lệ; insert với duplicate key phải update hoặc reject đúng contract. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -2383,8 +2399,8 @@
         "vi": "Dùng ADT khác để cài đặt dictionary"
       },
       "explanation": {
-        "vi": "Dùng ADT khác để cài đặt dictionary tập trung vào một quy tắc có thể kiểm tra: ADT thành phần phải bảo toàn uniqueness, missing-key result và postcondition của dictionary ở mọi operation. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Implementing a dictionary using another ADT centres on one checkable rule: The component ADT must preserve key uniqueness, missing-key results, and dictionary postconditions for every operation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Dùng ADT khác để cài đặt dictionary tập trung vào một quy tắc có thể kiểm tra: ADT thành phần phải bảo toàn uniqueness, missing-key result và postcondition của dictionary ở mọi operation. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Dù dùng linked list hoặc tree, uniqueness, missing-key result và operation postconditions phải giữ nguyên.",
+        "en": "Implementing a dictionary using another ADT centres on one checkable rule: The component ADT must preserve key uniqueness, missing-key results, and dictionary postconditions for every operation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Whether a linked list or tree is used, uniqueness, missing-key results, and operation postconditions remain unchanged."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.dictionary.production-v1, các dòng dictionary.production-v1.L022 chứa đoạn mã “for token in fixture.get(\"tokens\", []): frequency[token] = frequency.get(token, 0) + 1” và minh họa trực tiếp Dùng ADT khác để cài đặt dictionary: ADT thành phần phải bảo toàn uniqueness, missing-key result và postcondition của dictionary ở mọi operation. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -2528,8 +2544,8 @@
         "vi": "Giao diện logic và cách biểu diễn"
       },
       "explanation": {
-        "vi": "Giao diện logic và cách biểu diễn tập trung vào một quy tắc có thể kiểm tra: Python dict chỉ dùng khi đề cho phép; nếu đề yêu cầu array/linked list/tree thì vẫn phải cài interface bằng representation đó. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Logical interface and representation choices centres on one checkable rule: Use Python dict only when allowed; if the task prescribes an array, linked list, or tree, implement the interface with that representation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Giao diện logic và cách biểu diễn tập trung vào một quy tắc có thể kiểm tra: Python dict chỉ dùng khi đề cho phép; nếu đề yêu cầu array/linked list/tree thì vẫn phải cài interface bằng representation đó. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Giải thích interface trước, rồi chọn representation từ size, required operations và representation được chỉ định; không đồng nhất dictionary ADT với hashing.",
+        "en": "Logical interface and representation choices centres on one checkable rule: Use Python dict only when allowed; if the task prescribes an array, linked list, or tree, implement the interface with that representation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Explain the interface first, then choose a representation from size, required operations, and any prescribed model; do not equate the dictionary ADT with hashing."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.dictionary.production-v1, các dòng dictionary.production-v1.L004 chứa đoạn mã “def __init__(self): self.entries = []” và minh họa trực tiếp Giao diện logic và cách biểu diễn: Python dict chỉ dùng khi đề cho phép; nếu đề yêu cầu array/linked list/tree thì vẫn phải cài interface bằng representation đó. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -2679,8 +2695,8 @@
         "vi": "Ghép hàm đã có và giữ quan hệ phụ thuộc"
       },
       "explanation": {
-        "vi": "Ghép hàm đã có và giữ quan hệ phụ thuộc tập trung vào một quy tắc có thể kiểm tra: Main truyền đúng output của bước trước vào bước sau và chặn downstream mutation khi validation/load thất bại. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Composing existing routines and preserving dependencies centres on one checkable rule: Main passes each stage's output to the next stage and blocks downstream mutation when loading or validation fails. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Ghép hàm đã có và giữ quan hệ phụ thuộc tập trung vào một quy tắc có thể kiểm tra: Main truyền đúng output của bước trước vào bước sau và chặn downstream mutation khi validation/load thất bại. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. DSA integration bắt đầu bằng chọn representation và algorithm từ contract, rồi main truyền state qua validate/process/output theo dependency rõ.",
+        "en": "Composing existing routines and preserving dependencies centres on one checkable rule: Main passes each stage's output to the next stage and blocks downstream mutation when loading or validation fails. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. DSA integration starts by selecting a representation and algorithm from the contract, then main passes state through validate/process/output in explicit dependency order."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L015 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Ghép hàm đã có và giữ quan hệ phụ thuộc: Main truyền đúng output của bước trước vào bước sau và chặn downstream mutation khi validation/load thất bại. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -2853,8 +2869,8 @@
         "vi": "Tên file, code, output và bằng chứng theo ý đề"
       },
       "explanation": {
-        "vi": "Tên file, code, output và bằng chứng theo ý đề tập trung vào một quy tắc có thể kiểm tra: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "File names, code, output and evidence by exam part centres on one checkable rule: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Tên file, code, output và bằng chứng theo ý đề tập trung vào một quy tắc có thể kiểm tra: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Evidence matrix cho DSA có hàng normal, boundary và failure, nối requirement → code owner → fixture → actual output → invariant check.",
+        "en": "File names, code, output and evidence by exam part centres on one checkable rule: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. A DSA evidence matrix has normal, boundary, and failure rows joining requirement → code owner → fixture → actual output → invariant check."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L015 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Tên file, code, output và bằng chứng theo ý đề: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -3043,8 +3059,8 @@
         "vi": "Định dạng kết quả, bảng và giá trị trả về"
       },
       "explanation": {
-        "vi": "Định dạng kết quả, bảng và giá trị trả về tập trung vào một quy tắc có thể kiểm tra: Nhãn, thứ tự, spacing và logical order phải khớp yêu cầu; return value và printed output là hai hợp đồng khác nhau. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Formatting results, tables and return values centres on one checkable rule: Labels, order, spacing, and logical order must match the requirement; a return value and printed output are separate contracts. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Định dạng kết quả, bảng và giá trị trả về tập trung vào một quy tắc có thể kiểm tra: Nhãn, thứ tự, spacing và logical order phải khớp yêu cầu; return value và printed output là hai hợp đồng khác nhau. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Output phải làm rõ logical order, physical state và operation count khi chúng khác nhau.",
+        "en": "Formatting results, tables and return values centres on one checkable rule: Labels, order, spacing, and logical order must match the requirement; a return value and printed output are separate contracts. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Output must distinguish logical order, physical state, and operation count when they differ."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L010 chứa đoạn mã “def format_output(rows): return \"\\n\".join(f\"{index + 1}. {row['name']}: {row['score']}\" for index, row in enumerate(rows)) or \"NO RESULTS\"” và minh họa trực tiếp Định dạng kết quả, bảng và giá trị trả về: Nhãn, thứ tự, spacing và logical order phải khớp yêu cầu; return value và printed output là hai hợp đồng khác nhau. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -3217,8 +3233,8 @@
         "vi": "Phân biệt nguồn chính thức và hướng dẫn học"
       },
       "explanation": {
-        "vi": "Phân biệt nguồn chính thức và hướng dẫn học tập trung vào một quy tắc có thể kiểm tra: Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Distinguishing official sources from learning guidance centres on one checkable rule: Only QP/MS receive official authority; authored explanations, examples, and rubrics always carry an AlgoCore label. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Phân biệt nguồn chính thức và hướng dẫn học tập trung vào một quy tắc có thể kiểm tra: Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Nguồn video chỉ hỗ trợ cách giải thích; syllabus/coursebook/QP/MS tiếp tục quyết định scope, representation và official marking claims.",
+        "en": "Distinguishing official sources from learning guidance centres on one checkable rule: Only QP/MS receive official authority; authored explanations, examples, and rubrics always carry an AlgoCore label. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. The videos support explanation only; the syllabus, coursebook, QP, and MS continue to govern scope, representation, and official marking claims."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L015 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Phân biệt nguồn chính thức và hướng dẫn học: Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -3238,8 +3254,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Distinguishing official sources from learning guidance”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Dùng T2 video làm marking authority hoặc mở rộng official pattern set.",
+          "en": "Using a T2 video as marking authority or expanding the official pattern set."
         }
       ],
       "exam_signals": [
@@ -4074,8 +4090,8 @@
         "vi": "Tìm khóa qua bảng và vùng va chạm"
       },
       "explanation": {
-        "vi": "Search phải theo cùng hash function và collision sequence đã dùng khi insert. Với linear probing không xóa tombstone, gặp ô chưa dùng chứng minh key không thể nằm xa hơn; nếu không gặp, dừng sau một vòng.",
-        "en": "Search must follow the same hash function and collision sequence used by insertion. With linear probing and no deletion tombstones, an unused cell proves the key cannot lie farther along; otherwise stop after one full cycle."
+        "vi": "Search phải theo cùng hash function và collision sequence đã dùng khi insert. Với linear probing không xóa tombstone, gặp ô chưa dùng chứng minh key không thể nằm xa hơn; nếu không gặp, dừng sau một vòng. Failed search dừng theo empty-marker policy hoặc sau capacity probes; không được phụ thuộc vòng lặp vô hạn hay hành vi của Python dict.",
+        "en": "Search must follow the same hash function and collision sequence used by insertion. With linear probing and no deletion tombstones, an unused cell proves the key cannot lie farther along; otherwise stop after one full cycle. A failed search stops under the empty-marker policy or after capacity probes; it must not rely on an infinite loop or Python-dict behaviour."
       },
       "python_connection": {
         "vi": "L028 lấy start; L029–L031 tạo cùng probe sequence với insert; L032–L033 dừng ở ô trống; L034–L035 trả index khi bằng; L036 là not-found sau một vòng.",
@@ -4217,8 +4233,8 @@
         "vi": "Tính địa chỉ băm theo công thức đề"
       },
       "explanation": {
-        "vi": "Hash function biến key thành địa chỉ hợp lệ. Với công thức modulo, địa chỉ là `key % table_size`; cần table_size dương và key thuộc kiểu mà công thức định nghĩa.",
-        "en": "A hash function maps a key to a valid address. For a modulo rule, the address is `key % table_size`; table_size must be positive and the key must have the type required by the rule."
+        "vi": "Hash function biến key thành địa chỉ hợp lệ. Với công thức modulo, địa chỉ là `key % table_size`; cần table_size dương và key thuộc kiểu mà công thức định nghĩa. Nêu `n` là capacity của table khi dùng modulo và kiểm tra address luôn nằm trong 0..capacity-1.",
+        "en": "A hash function maps a key to a valid address. For a modulo rule, the address is `key % table_size`; table_size must be positive and the key must have the type required by the rule. When using modulo, define `n` as table capacity and verify that every address lies in 0..capacity-1."
       },
       "python_connection": {
         "vi": "L012–L013 triển khai `key % len(self.slots)`; L007–L009 đảm bảo size dương trước khi dùng. L041 từ chối key không phải integer cho contract của pilot.",
@@ -4355,8 +4371,8 @@
         "vi": "Chèn và xử lý va chạm theo cấu trúc đề"
       },
       "explanation": {
-        "vi": "Insert tính địa chỉ ban đầu rồi theo collision sequence đến ô trống hoặc key đã có. Thuật toán phải dừng sau số vị trí hữu hạn và báo thất bại khi không còn ô phù hợp.",
-        "en": "Insertion computes the initial address and follows the collision sequence to an empty cell or the existing key. It must stop after finitely many positions and report failure when no suitable cell remains."
+        "vi": "Insert tính địa chỉ ban đầu rồi theo collision sequence đến ô trống hoặc key đã có. Thuật toán phải dừng sau số vị trí hữu hạn và báo thất bại khi không còn ô phù hợp. Probe tối đa capacity ô; nếu không còn slot, trả full và chứng minh table trước/sau giống hệt nhau.",
+        "en": "Insertion computes the initial address and follows the collision sequence to an empty cell or the existing key. It must stop after finitely many positions and report failure when no suitable cell remains. Probe at most capacity slots; if none is free, return full and prove that the table is identical before and after."
       },
       "python_connection": {
         "vi": "L016 tính start; L017 giới hạn tối đa size bước; L018 wrap index; L020–L022 ghi vào ô trống; L023–L024 xử lý duplicate; L025 trả -1 khi đầy.",
@@ -4378,6 +4394,10 @@
         {
           "vi": "Probe vô hạn khi bảng không còn ô trống.",
           "en": "Probing forever when no empty slot remains."
+        },
+        {
+          "vi": "Probe quá capacity hoặc mutate table trước khi biết insert có thành công.",
+          "en": "Probing beyond capacity or mutating the table before insertion is known to succeed."
         }
       ],
       "exam_signals": [
@@ -4507,8 +4527,8 @@
         "vi": "Bảng băm và vùng va chạm được chỉ định"
       },
       "explanation": {
-        "vi": "Hash table có capacity cố định và quy ước ô rỗng; collision xảy ra khi hai key có cùng địa chỉ ban đầu. Cách lưu collision phải theo đúng cấu trúc được giao, như probing, bucket hoặc vùng spare, vì các cách này có invariants khác nhau.",
-        "en": "A hash table has fixed capacity and an empty-slot convention; a collision occurs when keys share an initial address. Collision storage must follow the supplied structure, such as probing, buckets, or a spare area, because their invariants differ."
+        "vi": "Hash table có capacity cố định và quy ước ô rỗng; collision xảy ra khi hai key có cùng địa chỉ ban đầu. Cách lưu collision phải theo đúng cấu trúc được giao, như probing, bucket hoặc vùng spare, vì các cách này có invariants khác nhau. Phân biệt interface set/map với hash-table representation; câu hỏi hashing yêu cầu thao tác trên slot, empty marker, capacity và collision policy tường minh.",
+        "en": "A hash table has fixed capacity and an empty-slot convention; a collision occurs when keys share an initial address. Collision storage must follow the supplied structure, such as probing, buckets, or a spare area, because their invariants differ. Separate the set/map interface from the hash-table representation; a hashing task requires explicit slots, empty markers, capacity, and collision policy."
       },
       "python_connection": {
         "vi": "Pilot tạo `slots=[None]*size` ở L009 và dùng linear probing trong cùng array ở L017–L024. Nó không triển khai `Spare` array/bucket riêng; bài yêu cầu cấu trúc đó cần artifact khác hoặc mở rộng đã kiểm chứng.",
@@ -4530,6 +4550,10 @@
         {
           "vi": "Không giới hạn số lần probe khi bảng đầy.",
           "en": "Failing to bound probes when the table is full."
+        },
+        {
+          "vi": "Dùng Python dict làm bằng chứng rằng collision algorithm đã đúng.",
+          "en": "Using a Python dict as proof that the collision algorithm is correct."
         }
       ],
       "exam_signals": [
@@ -4647,16 +4671,16 @@
         "vi": "Lấy node trống và nối link khi chèn"
       },
       "explanation": {
-        "vi": "Lấy node trống và nối link khi chèn trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: Lấy node từ free list trước, gắn data/link, rồi cập nhật head hoặc predecessor mà không mất phần còn lại của chain. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Allocating a free node and linking an insertion in the linked list centres on one checkable rule: Take a node from the free list first, set data/link, then update head or predecessor without losing the rest of the chain. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Lấy node trống và nối link khi chèn trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: Lấy node từ free list trước, gắn data/link, rồi cập nhật head hoặc predecessor mà không mất phần còn lại của chain. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Lưu next-free link trước khi ghi node mới; sau đó nối node vào head hoặc predecessor mà không làm mất successor chain.",
+        "en": "Allocating a free node and linking an insertion in the linked list centres on one checkable rule: Take a node from the free list first, set data/link, then update head or predecessor without losing the rest of the chain. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Save the next-free link before writing the new node; then attach the node at the head or predecessor without losing the successor chain."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L008 chứa đoạn mã “def insert_head(self, value):” và minh họa trực tiếp Lấy node trống và nối link khi chèn trong danh sách liên kết: Lấy node từ free list trước, gắn data/link, rồi cập nhật head hoặc predecessor mà không mất phần còn lại của chain. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L008 contain “def insert_head(self, value):” and directly demonstrate Allocating a free node and linking an insertion in the linked list: Take a node from the free list first, set data/link, then update head or predecessor without losing the rest of the chain. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L018 chứa đoạn mã “def insert_head(self, value, trace):” và minh họa trực tiếp Lấy node trống và nối link khi chèn trong danh sách liên kết: Lấy node từ free list trước, gắn data/link, rồi cập nhật head hoặc predecessor mà không mất phần còn lại của chain. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L018 contain “def insert_head(self, value, trace):” and directly demonstrate Allocating a free node and linking an insertion in the linked list: Take a node from the free list first, set data/link, then update head or predecessor without losing the rest of the chain. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Lấy node trống và nối link khi chèn trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L008, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Lấy node từ free list trước, gắn data/link, rồi cập nhật head hoặc predecessor mà không mất phần còn lại của chain.",
-        "en": "Represent Allocating a free node and linking an insertion in the linked list with a four-column trace: before-state, condition or decision at linked-list.production-v1.L008, applied change, and after-state. The trace must show that this rule still holds: Take a node from the free list first, set data/link, then update head or predecessor without losing the rest of the chain."
+        "vi": "Biểu diễn Lấy node trống và nối link khi chèn trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L018, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Lấy node từ free list trước, gắn data/link, rồi cập nhật head hoặc predecessor mà không mất phần còn lại của chain.",
+        "en": "Represent Allocating a free node and linking an insertion in the linked list with a four-column trace: before-state, condition or decision at linked-list.production-v1.L018, applied change, and after-state. The trace must show that this rule still holds: Take a node from the free list first, set data/link, then update head or predecessor without losing the rest of the chain."
       },
       "invariant_or_rule": {
         "vi": "Lấy node từ free list trước, gắn data/link, rồi cập nhật head hoặc predecessor mà không mất phần còn lại của chain.",
@@ -4696,16 +4720,16 @@
           "ac-9618-p4-2026-python.artifact.linked-list.production-v1"
         ],
         "active_line_ids": [
-          "linked-list.production-v1.L008"
+          "linked-list.production-v1.L018"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "linked-list",
           "semantic_role": "insert",
           "artifact_version": "production-v1",
-          "matched_text": "def insert_head(self, value):",
+          "matched_text": "def insert_head(self, value, trace):",
           "resolved_line_ids": [
-            "linked-list.production-v1.L008"
+            "linked-list.production-v1.L018"
           ]
         },
         "fixture_kind": "normal",
@@ -4783,16 +4807,16 @@
         "vi": "Bỏ node, nối lại và trả về vùng trống"
       },
       "explanation": {
-        "vi": "Bỏ node, nối lại và trả về vùng trống trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: Nối predecessor qua node bị xóa rồi đưa node đó về free list; xóa head dùng cùng postcondition nhưng khác pointer cập nhật. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Unlinking a node and returning it to free storage in the linked list centres on one checkable rule: Link the predecessor around the removed node, then return it to the free list; head removal has the same postcondition but a different pointer update. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Bỏ node, nối lại và trả về vùng trống trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: Nối predecessor qua node bị xóa rồi đưa node đó về free list; xóa head dùng cùng postcondition nhưng khác pointer cập nhật. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Lưu successor, nối predecessor hoặc head qua node bị xóa, rồi mới đưa node về đầu free list; trace phải cho thấy live/free chains vẫn rời nhau.",
+        "en": "Unlinking a node and returning it to free storage in the linked list centres on one checkable rule: Link the predecessor around the removed node, then return it to the free list; head removal has the same postcondition but a different pointer update. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Save the successor, link the predecessor or head around the removed node, then return the node to the free-list head; the trace must show that live and free chains remain disjoint."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L019 chứa đoạn mã “def remove(self, target):” và minh họa trực tiếp Bỏ node, nối lại và trả về vùng trống trong danh sách liên kết: Nối predecessor qua node bị xóa rồi đưa node đó về free list; xóa head dùng cùng postcondition nhưng khác pointer cập nhật. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L019 contain “def remove(self, target):” and directly demonstrate Unlinking a node and returning it to free storage in the linked list: Link the predecessor around the removed node, then return it to the free list; head removal has the same postcondition but a different pointer update. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L061 chứa đoạn mã “def remove(self, target, trace):” và minh họa trực tiếp Bỏ node, nối lại và trả về vùng trống trong danh sách liên kết: Nối predecessor qua node bị xóa rồi đưa node đó về free list; xóa head dùng cùng postcondition nhưng khác pointer cập nhật. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L061 contain “def remove(self, target, trace):” and directly demonstrate Unlinking a node and returning it to free storage in the linked list: Link the predecessor around the removed node, then return it to the free list; head removal has the same postcondition but a different pointer update. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Bỏ node, nối lại và trả về vùng trống trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L019, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Nối predecessor qua node bị xóa rồi đưa node đó về free list; xóa head dùng cùng postcondition nhưng khác pointer cập nhật.",
-        "en": "Represent Unlinking a node and returning it to free storage in the linked list with a four-column trace: before-state, condition or decision at linked-list.production-v1.L019, applied change, and after-state. The trace must show that this rule still holds: Link the predecessor around the removed node, then return it to the free list; head removal has the same postcondition but a different pointer update."
+        "vi": "Biểu diễn Bỏ node, nối lại và trả về vùng trống trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L061, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Nối predecessor qua node bị xóa rồi đưa node đó về free list; xóa head dùng cùng postcondition nhưng khác pointer cập nhật.",
+        "en": "Represent Unlinking a node and returning it to free storage in the linked list with a four-column trace: before-state, condition or decision at linked-list.production-v1.L061, applied change, and after-state. The trace must show that this rule still holds: Link the predecessor around the removed node, then return it to the free list; head removal has the same postcondition but a different pointer update."
       },
       "invariant_or_rule": {
         "vi": "Nối predecessor qua node bị xóa rồi đưa node đó về free list; xóa head dùng cùng postcondition nhưng khác pointer cập nhật.",
@@ -4804,8 +4828,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Unlinking a node and returning it to free storage”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Ghi đè next link trước khi lưu successor hoặc nối predecessor.",
+          "en": "Overwriting the next link before saving the successor or rewiring the predecessor."
         }
       ],
       "exam_signals": [
@@ -4832,16 +4856,16 @@
           "ac-9618-p4-2026-python.artifact.linked-list.production-v1"
         ],
         "active_line_ids": [
-          "linked-list.production-v1.L019"
+          "linked-list.production-v1.L061"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "linked-list",
           "semantic_role": "remove-recycle",
           "artifact_version": "production-v1",
-          "matched_text": "def remove(self, target):",
+          "matched_text": "def remove(self, target, trace):",
           "resolved_line_ids": [
-            "linked-list.production-v1.L019"
+            "linked-list.production-v1.L061"
           ]
         },
         "fixture_kind": "boundary",
@@ -4937,12 +4961,12 @@
         "vi": "Node, head và chuỗi vùng trống"
       },
       "explanation": {
-        "vi": "Node, head và chuỗi vùng trống trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: Mỗi node sống thuộc đúng một chain từ head; mỗi node trống thuộc free list; hai chain không giao nhau. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Nodes, head and free-list chain in the linked list centres on one checkable rule: Each live node belongs to exactly one chain from head; each unused node belongs to the free list; the chains are disjoint. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Node, head và chuỗi vùng trống trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: Mỗi node sống thuộc đúng một chain từ head; mỗi node trống thuộc free list; hai chain không giao nhau. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Video object-node chỉ hỗ trợ trực giác liên kết; lời giải Cambridge ở đây giữ array/index/free-list với head, null sentinel và free pointer tách biệt.",
+        "en": "Nodes, head and free-list chain in the linked list centres on one checkable rule: Each live node belongs to exactly one chain from head; each unused node belongs to the free list; the chains are disjoint. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. The object-node video supplies linkage intuition only; the Cambridge solution here retains the array/index/free-list model with separate head, null sentinel, and free pointer."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L007 chứa đoạn mã “self.head, self.free = -1, 0 if capacity else -1” và minh họa trực tiếp Node, head và chuỗi vùng trống trong danh sách liên kết: Mỗi node sống thuộc đúng một chain từ head; mỗi node trống thuộc free list; hai chain không giao nhau. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L007 contain “self.head, self.free = -1, 0 if capacity else -1” and directly demonstrate Nodes, head and free-list chain in the linked list: Each live node belongs to exactly one chain from head; each unused node belongs to the free list; the chains are disjoint. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L007 chứa đoạn mã “self.head = -1” và minh họa trực tiếp Node, head và chuỗi vùng trống trong danh sách liên kết: Mỗi node sống thuộc đúng một chain từ head; mỗi node trống thuộc free list; hai chain không giao nhau. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L007 contain “self.head = -1” and directly demonstrate Nodes, head and free-list chain in the linked list: Each live node belongs to exactly one chain from head; each unused node belongs to the free list; the chains are disjoint. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
         "vi": "Biểu diễn Node, head và chuỗi vùng trống trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L007, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Mỗi node sống thuộc đúng một chain từ head; mỗi node trống thuộc free list; hai chain không giao nhau.",
@@ -4958,8 +4982,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Nodes, head and free-list chain”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Thay array/index/free-list bằng object-node implementation dù đề đã chỉ định representation.",
+          "en": "Replacing a prescribed array/index/free-list model with an object-node implementation."
         }
       ],
       "exam_signals": [
@@ -4993,7 +5017,7 @@
           "lesson_slug": "linked-list",
           "semantic_role": "representation-free-list",
           "artifact_version": "production-v1",
-          "matched_text": "self.head, self.free = -1, 0 if capacity else -1",
+          "matched_text": "self.head = -1",
           "resolved_line_ids": [
             "linked-list.production-v1.L007"
           ]
@@ -5073,16 +5097,16 @@
         "vi": "Tìm dữ liệu trong danh sách liên kết"
       },
       "explanation": {
-        "vi": "Tìm dữ liệu trong danh sách liên kết trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: So sánh data ở node hiện tại trước khi theo link; chỉ not-found khi link tiếp theo là null. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Searching data in a linked list in the linked list centres on one checkable rule: Compare data at the current node before following its link; report not found only when the next link is null. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Tìm dữ liệu trong danh sách liên kết trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: So sánh data ở node hiện tại trước khi theo link; chỉ not-found khi link tiếp theo là null. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Mỗi bước kiểm tra data rồi mới đi theo saved next link; not-found chỉ khi chain thật sự kết thúc.",
+        "en": "Searching data in a linked list in the linked list centres on one checkable rule: Compare data at the current node before following its link; report not found only when the next link is null. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Each step checks the data before following the saved next link; not found occurs only when the chain really ends."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L021 chứa đoạn mã “while node != -1 and self.data[node] != target: previous, node = node, self.next[node]” và minh họa trực tiếp Tìm dữ liệu trong danh sách liên kết trong danh sách liên kết: So sánh data ở node hiện tại trước khi theo link; chỉ not-found khi link tiếp theo là null. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L021 contain “while node != -1 and self.data[node] != target: previous, node = node, self.next[node]” and directly demonstrate Searching data in a linked list in the linked list: Compare data at the current node before following its link; report not found only when the next link is null. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L053 chứa đoạn mã “while node != -1:” và minh họa trực tiếp Tìm dữ liệu trong danh sách liên kết trong danh sách liên kết: So sánh data ở node hiện tại trước khi theo link; chỉ not-found khi link tiếp theo là null. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L053 contain “while node != -1:” and directly demonstrate Searching data in a linked list in the linked list: Compare data at the current node before following its link; report not found only when the next link is null. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Tìm dữ liệu trong danh sách liên kết trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L021, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: So sánh data ở node hiện tại trước khi theo link; chỉ not-found khi link tiếp theo là null.",
-        "en": "Represent Searching data in a linked list in the linked list with a four-column trace: before-state, condition or decision at linked-list.production-v1.L021, applied change, and after-state. The trace must show that this rule still holds: Compare data at the current node before following its link; report not found only when the next link is null."
+        "vi": "Biểu diễn Tìm dữ liệu trong danh sách liên kết trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L053, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: So sánh data ở node hiện tại trước khi theo link; chỉ not-found khi link tiếp theo là null.",
+        "en": "Represent Searching data in a linked list in the linked list with a four-column trace: before-state, condition or decision at linked-list.production-v1.L053, applied change, and after-state. The trace must show that this rule still holds: Compare data at the current node before following its link; report not found only when the next link is null."
       },
       "invariant_or_rule": {
         "vi": "So sánh data ở node hiện tại trước khi theo link; chỉ not-found khi link tiếp theo là null.",
@@ -5122,16 +5146,16 @@
           "ac-9618-p4-2026-python.artifact.linked-list.production-v1"
         ],
         "active_line_ids": [
-          "linked-list.production-v1.L021"
+          "linked-list.production-v1.L053"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "linked-list",
           "semantic_role": "search",
           "artifact_version": "production-v1",
-          "matched_text": "while node != -1 and self.data[node] != target: previous, node = node, self.next[node]",
+          "matched_text": "while node != -1:",
           "resolved_line_ids": [
-            "linked-list.production-v1.L021"
+            "linked-list.production-v1.L053"
           ]
         },
         "fixture_kind": "failure",
@@ -5209,16 +5233,16 @@
         "vi": "Duyệt theo link, không theo ô mảng"
       },
       "explanation": {
-        "vi": "Duyệt theo link, không theo ô mảng trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: Duyệt bằng next link cho tới null sentinel, không tăng index vật lý như mảng. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Following links rather than physical slots in the linked list centres on one checkable rule: Traverse by following next links to the null sentinel, not by incrementing a physical array index. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Duyệt theo link, không theo ô mảng trong danh sách liên kết tập trung vào một quy tắc có thể kiểm tra: Duyệt bằng next link cho tới null sentinel, không tăng index vật lý như mảng. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Logical order đến từ next links, không từ thứ tự index vật lý; lưu current trước khi theo link tiếp theo.",
+        "en": "Following links rather than physical slots in the linked list centres on one checkable rule: Traverse by following next links to the null sentinel, not by incrementing a physical array index. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Logical order comes from next links rather than physical index order; preserve the current node before following the next link."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L013 chứa đoạn mã “def traverse(self):” và minh họa trực tiếp Duyệt theo link, không theo ô mảng trong danh sách liên kết: Duyệt bằng next link cho tới null sentinel, không tăng index vật lý như mảng. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L013 contain “def traverse(self):” and directly demonstrate Following links rather than physical slots in the linked list: Traverse by following next links to the null sentinel, not by incrementing a physical array index. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, các dòng linked-list.production-v1.L049 chứa đoạn mã “def traverse(self):” và minh họa trực tiếp Duyệt theo link, không theo ô mảng trong danh sách liên kết: Duyệt bằng next link cho tới null sentinel, không tăng index vật lý như mảng. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.linked-list.production-v1, lines linked-list.production-v1.L049 contain “def traverse(self):” and directly demonstrate Following links rather than physical slots in the linked list: Traverse by following next links to the null sentinel, not by incrementing a physical array index. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Duyệt theo link, không theo ô mảng trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L013, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Duyệt bằng next link cho tới null sentinel, không tăng index vật lý như mảng.",
-        "en": "Represent Following links rather than physical slots in the linked list with a four-column trace: before-state, condition or decision at linked-list.production-v1.L013, applied change, and after-state. The trace must show that this rule still holds: Traverse by following next links to the null sentinel, not by incrementing a physical array index."
+        "vi": "Biểu diễn Duyệt theo link, không theo ô mảng trong danh sách liên kết bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại linked-list.production-v1.L049, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Duyệt bằng next link cho tới null sentinel, không tăng index vật lý như mảng.",
+        "en": "Represent Following links rather than physical slots in the linked list with a four-column trace: before-state, condition or decision at linked-list.production-v1.L049, applied change, and after-state. The trace must show that this rule still holds: Traverse by following next links to the null sentinel, not by incrementing a physical array index."
       },
       "invariant_or_rule": {
         "vi": "Duyệt bằng next link cho tới null sentinel, không tăng index vật lý như mảng.",
@@ -5258,7 +5282,7 @@
           "ac-9618-p4-2026-python.artifact.linked-list.production-v1"
         ],
         "active_line_ids": [
-          "linked-list.production-v1.L013"
+          "linked-list.production-v1.L049"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
@@ -5267,7 +5291,7 @@
           "artifact_version": "production-v1",
           "matched_text": "def traverse(self):",
           "resolved_line_ids": [
-            "linked-list.production-v1.L013"
+            "linked-list.production-v1.L049"
           ]
         },
         "fixture_kind": "boundary",
@@ -7946,8 +7970,8 @@
         "vi": "Chọn thuật toán theo điều kiện dữ liệu"
       },
       "explanation": {
-        "vi": "Chọn thuật toán theo điều kiện dữ liệu tập trung vào một quy tắc có thể kiểm tra: Lựa chọn phải dựa vào dữ liệu đã sorted chưa, kích thước, update frequency và yêu cầu time/space. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Selecting algorithms using data conditions centres on one checkable rule: The choice must use whether data is sorted, its size, update frequency, and time/space requirements. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Chọn thuật toán theo điều kiện dữ liệu tập trung vào một quy tắc có thể kiểm tra: Lựa chọn phải dựa vào dữ liệu đã sorted chưa, kích thước, update frequency và yêu cầu time/space. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. So sánh theo cùng input contract; Python container tiện dụng không tự chứng minh rằng representation hoặc algorithm đáp ứng yêu cầu đề.",
+        "en": "Selecting algorithms using data conditions centres on one checkable rule: The choice must use whether data is sorted, its size, update frequency, and time/space requirements. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Compare algorithms under the same input contract; a convenient Python container does not prove that the required representation or algorithm has been implemented."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.performance.production-v1, các dòng performance.production-v1.L011 chứa đoạn mã “if values != sorted(values): raise ValueError(\"binary search requires sorted input\")” và minh họa trực tiếp Chọn thuật toán theo điều kiện dữ liệu: Lựa chọn phải dựa vào dữ liệu đã sorted chưa, kích thước, update frequency và yêu cầu time/space. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -8124,8 +8148,8 @@
         "vi": "So sánh Big O thời gian và không gian"
       },
       "explanation": {
-        "vi": "So sánh Big O thời gian và không gian tập trung vào một quy tắc có thể kiểm tra: Nêu biến n, operation được đếm và worst-case; tách time growth khỏi auxiliary space growth. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Comparing time and space Big O centres on one checkable rule: State the input size n, counted operation, and worst case; separate time growth from auxiliary-space growth. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "So sánh Big O thời gian và không gian tập trung vào một quy tắc có thể kiểm tra: Nêu biến n, operation được đếm và worst-case; tách time growth khỏi auxiliary space growth. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Bài giải complexity phải nêu bốn phần: định nghĩa n, operation được đếm, case đang phân tích, rồi time và auxiliary space riêng biệt.",
+        "en": "Comparing time and space Big O centres on one checkable rule: State the input size n, counted operation, and worst case; separate time growth from auxiliary-space growth. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. A complexity justification states four parts: define n, name the counted operation, identify the analysed case, then give time and auxiliary space separately."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.performance.production-v1, các dòng performance.production-v1.L020 chứa đoạn mã “def insertion_cost(values):” và minh họa trực tiếp So sánh Big O thời gian và không gian: Nêu biến n, operation được đếm và worst-case; tách time growth khỏi auxiliary space growth. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -8145,8 +8169,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Comparing time and space Big O”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Nêu O(n) mà không định nghĩa n, operation, case hoặc auxiliary space.",
+          "en": "Stating O(n) without defining n, the operation, the case, or auxiliary space."
         }
       ],
       "exam_signals": [
@@ -8329,8 +8353,8 @@
         "vi": "Đếm bước để giải thích hiệu năng"
       },
       "explanation": {
-        "vi": "Đếm bước để giải thích hiệu năng tập trung vào một quy tắc có thể kiểm tra: Đếm cùng loại operation trên cùng fixture; timing máy chỉ là quan sát, không thay thế mô hình tăng trưởng. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Counting operations to explain performance centres on one checkable rule: Count the same operation on the same fixture; machine timing is an observation, not a replacement for the growth model. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Đếm bước để giải thích hiệu năng tập trung vào một quy tắc có thể kiểm tra: Đếm cùng loại operation trên cùng fixture; timing máy chỉ là quan sát, không thay thế mô hình tăng trưởng. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Dùng counter gắn với comparison, swap, shift hoặc visited node; không dùng wall-clock timing làm thay thế cho growth reasoning.",
+        "en": "Counting operations to explain performance centres on one checkable rule: Count the same operation on the same fixture; machine timing is an observation, not a replacement for the growth model. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Use a counter tied to comparisons, swaps, shifts, or visited nodes; wall-clock timing is not a substitute for growth reasoning."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.performance.production-v1, các dòng performance.production-v1.L037 chứa đoạn mã “trace = [{\"event\": \"linear_count\", \"comparisons\": linear_result[1]}, {\"event\": \"binary_count\", \"comparisons\": binary_result[1]}, {\"event\": \"insertion_count\", \"comparisons\": comparisons, \"shifts\": shifts}]” và minh họa trực tiếp Đếm bước để giải thích hiệu năng: Đếm cùng loại operation trên cùng fixture; timing máy chỉ là quan sát, không thay thế mô hình tăng trưởng. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -9846,8 +9870,8 @@
         "vi": "Dequeue, rỗng và giá trị trả về"
       },
       "explanation": {
-        "vi": "Dequeue kiểm tra rỗng trước, đọc item tại front, tùy representation có thể xóa dấu vết ô, rồi dịch front và giảm count. Giá trị được đọc trước khi xóa phải được trả về cho caller.",
-        "en": "Dequeue checks for empty first, reads the item at front, may clear the cell according to the representation, then advances front and decreases count. The value read before clearing must be returned to the caller."
+        "vi": "Dequeue kiểm tra rỗng trước, đọc item tại front, tùy representation có thể xóa dấu vết ô, rồi dịch front và giảm count. Giá trị được đọc trước khi xóa phải được trả về cho caller. Kiểm tra `count == 0` trước read; nếu chấp nhận thì lưu item front, clear khi contract yêu cầu, wrap front và giảm count đúng một lần.",
+        "en": "Dequeue checks for empty first, reads the item at front, may clear the cell according to the representation, then advances front and decreases count. The value read before clearing must be returned to the caller. Check `count == 0` before the read; on acceptance, save the front item, clear it when required, wrap front, and decrement count exactly once."
       },
       "python_connection": {
         "vi": "L028–L030 xử lý underflow bằng `None`; L031–L033 lưu item rồi xóa ô; L034–L035 cập nhật front/count; L037 trả item.",
@@ -9974,8 +9998,8 @@
         "vi": "Enqueue, đầy và vòng chỉ số"
       },
       "explanation": {
-        "vi": "Enqueue kiểm tra đầy trước khi ghi, đặt item vào `rear`, dịch rear theo vòng và tăng count. Thứ tự cập nhật cần giữ để trace chỉ ra đúng ô vừa thay đổi.",
-        "en": "Enqueue checks for full before writing, places the item at `rear`, advances rear circularly, and increments count. The update order must remain clear so a trace identifies the changed cell."
+        "vi": "Enqueue kiểm tra đầy trước khi ghi, đặt item vào `rear`, dịch rear theo vòng và tăng count. Thứ tự cập nhật cần giữ để trace chỉ ra đúng ô vừa thay đổi. Kiểm tra `count == capacity` trước write; nếu chấp nhận thì ghi tại rear, wrap bằng modulo và tăng count đúng một lần.",
+        "en": "Enqueue checks for full before writing, places the item at `rear`, advances rear circularly, and increments count. The update order must remain clear so a trace identifies the changed cell. Check `count == capacity` before the write; on acceptance, write at rear, wrap with modulo, and increment count exactly once."
       },
       "python_connection": {
         "vi": "L017–L019 bảo vệ overflow; L020 giữ insert index; L021 ghi item; L022 wrap rear; L023 tăng count. L024 ghi trace bằng index trước khi rear đổi.",
@@ -9997,6 +10021,10 @@
         {
           "vi": "Tăng rear không modulo nên vượt chỉ số cuối.",
           "en": "Incrementing rear without modulo and moving past the last index."
+        },
+        {
+          "vi": "Dùng `deque.append` thay cho implementation thủ công mà đề yêu cầu.",
+          "en": "Using `deque.append` instead of the manual implementation required by the task."
         }
       ],
       "exam_signals": [
@@ -10120,8 +10148,8 @@
         "vi": "Đọc các phần tử đang dùng mà không xóa"
       },
       "explanation": {
-        "vi": "Duyệt queue không phá hủy phải đọc đúng `count` phần tử theo logical order từ front và không thay đổi front/rear/count. Với circular array, index vật lý của offset là `(front + offset) % capacity`.",
-        "en": "A non-destructive queue traversal reads exactly `count` items in logical order from front without changing front/rear/count. In a circular array, the physical index for an offset is `(front + offset) % capacity`."
+        "vi": "Duyệt queue không phá hủy phải đọc đúng `count` phần tử theo logical order từ front và không thay đổi front/rear/count. Với circular array, index vật lý của offset là `(front + offset) % capacity`. Live-window trace bắt đầu tại front và đi đúng count bước; physical array order không nhất thiết là FIFO order sau wrap-around.",
+        "en": "A non-destructive queue traversal reads exactly `count` items in logical order from front without changing front/rear/count. In a circular array, the physical index for an offset is `(front + offset) % capacity`. A live-window trace starts at front and takes exactly count steps; physical array order need not equal FIFO order after wrap-around."
       },
       "python_connection": {
         "vi": "L039–L044 tạo list mới; L041 lặp đúng count lần và L042 ánh xạ offset qua modulo. Không line nào gán lại front, rear hoặc count.",
@@ -10278,8 +10306,8 @@
         "vi": "Tổng hợp queue bằng đọc hoặc tiêu thụ dữ liệu"
       },
       "explanation": {
-        "vi": "Reduce gộp nhiều item thành một kết quả, ví dụ tổng; trước tiên phải quyết định thao tác chỉ đọc hay tiêu thụ queue. Nếu tiêu thụ, termination dựa vào trạng thái rỗng; nếu giữ nguyên, duyệt đúng live items mà không gọi dequeue.",
-        "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing."
+        "vi": "Reduce gộp nhiều item thành một kết quả, ví dụ tổng; trước tiên phải quyết định thao tác chỉ đọc hay tiêu thụ queue. Nếu tiêu thụ, termination dựa vào trạng thái rỗng; nếu giữ nguyên, duyệt đúng live items mà không gọi dequeue. Ghi rõ operation có phá hủy queue hay chỉ đọc; nếu dùng dequeue để reduce thì postcondition phải cho biết queue đã đổi ra sao.",
+        "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing. State whether the operation consumes the queue or only reads it; if reduction uses dequeue, the postcondition must describe the changed queue."
       },
       "python_connection": {
         "vi": "Pilot chọn preserve: L062 gọi `live_items`, rồi L063 tính tổng số từ bản sao logical. Không dequeue trong bước reduce, nên queue vẫn giữ dữ liệu; artifact chưa triển khai biến thể recursive consuming.",
@@ -10441,8 +10469,8 @@
         "vi": "Head, tail, count và quy ước rỗng"
       },
       "explanation": {
-        "vi": "Queue là FIFO: phần tử vào trước ra trước. Với circular array, `front` chỉ phần tử sẽ lấy, `rear` chỉ ô sẽ chèn kế tiếp và `count` phân biệt rỗng với đầy khi hai chỉ số bằng nhau.",
-        "en": "A queue is FIFO: the first item inserted is the first removed. In a circular array, `front` points to the next item to remove, `rear` to the next insertion cell, and `count` distinguishes empty from full when the indices coincide."
+        "vi": "Queue là FIFO: phần tử vào trước ra trước. Với circular array, `front` chỉ phần tử sẽ lấy, `rear` chỉ ô sẽ chèn kế tiếp và `count` phân biệt rỗng với đầy khi hai chỉ số bằng nhau. FIFO chỉ mô tả thứ tự logic; implementation trong đề còn cần front, rear, count, capacity và quy ước rear là ô đang dùng hay next-free.",
+        "en": "A queue is FIFO: the first item inserted is the first removed. In a circular array, `front` points to the next item to remove, `rear` to the next insertion cell, and `count` distinguishes empty from full when the indices coincide. FIFO describes logical order only; an exam implementation also needs front, rear, count, capacity, and a declaration of whether rear is used or next-free."
       },
       "python_connection": {
         "vi": "L010–L013 khởi tạo array, front, rear, count; L022/L034 dùng modulo để quay vòng. Representation của pilot chọn `rear` là next insertion index và `count` là logical size.",
@@ -10464,6 +10492,10 @@
         {
           "vi": "Đọc queue theo index 0..count-1 khi front đã wrap.",
           "en": "Reading the queue at indices 0..count-1 after front has wrapped."
+        },
+        {
+          "vi": "Cho rằng biết FIFO là đủ mà không khai báo front/rear/count convention.",
+          "en": "Assuming FIFO alone is enough without declaring front/rear/count conventions."
         }
       ],
       "exam_signals": [
@@ -11087,8 +11119,8 @@
         "vi": "Frame riêng, call stack và trả ngược"
       },
       "explanation": {
-        "vi": "Mỗi lời gọi tạo một frame riêng chứa tham số, biến cục bộ và vị trí chờ trả về. Khi gặp base case, các frame được tháo theo LIFO; công việc nằm sau recursive call chỉ chạy khi frame con trả về.",
-        "en": "Each call creates a separate frame containing parameters, local variables, and a return point. At the base case, frames unwind in LIFO order; work after the recursive call runs only when the child frame returns."
+        "vi": "Mỗi lời gọi tạo một frame riêng chứa tham số, biến cục bộ và vị trí chờ trả về. Khi gặp base case, các frame được tháo theo LIFO; công việc nằm sau recursive call chỉ chạy khi frame con trả về. Trace tách hai pha: frame creation khi call đi xuống và return-value propagation khi unwind đi lên.",
+        "en": "Each call creates a separate frame containing parameters, local variables, and a return point. At the base case, frames unwind in LIFO order; work after the recursive call runs only when the child frame returns. Separate the trace into frame creation while calls descend and return-value propagation while frames unwind."
       },
       "python_connection": {
         "vi": "L006 ghi sự kiện call; L010 tạm dừng frame hiện tại để chờ subtotal. L011–L012 chạy theo thứ tự ngược khi unwind và ghi result của từng index.",
@@ -11110,6 +11142,10 @@
         {
           "vi": "Cho rằng mọi frame dùng chung biến `index`.",
           "en": "Assuming every frame shares one `index` variable."
+        },
+        {
+          "vi": "Gộp call và return vào một bước nên mất pending operation của từng frame.",
+          "en": "Collapsing call and return into one step and losing each frame's pending operation."
         }
       ],
       "exam_signals": [
@@ -11236,8 +11272,8 @@
         "vi": "Nhận bài toán đệ quy và cân nhắc lợi ích"
       },
       "explanation": {
-        "vi": "Recursion phù hợp khi bài toán có định nghĩa tự giống nhau hoặc cấu trúc phân nhánh; code có thể bám sát định nghĩa. Đổi lại, mỗi call dùng stack frame và recursion sâu có thể tốn bộ nhớ hoặc chạm giới hạn recursion.",
-        "en": "Recursion suits self-similar definitions or branching structures and can mirror the problem definition closely. The trade-off is one stack frame per call, so deep recursion can use substantial memory or reach a recursion limit."
+        "vi": "Recursion phù hợp khi bài toán có định nghĩa tự giống nhau hoặc cấu trúc phân nhánh; code có thể bám sát định nghĩa. Đổi lại, mỗi call dùng stack frame và recursion sâu có thể tốn bộ nhớ hoặc chạm giới hạn recursion. Chỉ chọn recursion khi cấu trúc bài toán hỗ trợ nó; luôn nêu depth và auxiliary stack space thay vì chỉ nói code ngắn hơn.",
+        "en": "Recursion suits self-similar definitions or branching structures and can mirror the problem definition closely. The trade-off is one stack frame per call, so deep recursion can use substantial memory or reach a recursion limit. Choose recursion only when it fits the problem structure; always state depth and auxiliary stack space rather than merely saying the code is shorter."
       },
       "python_connection": {
         "vi": "L029 và L030 chạy hai cách tương đương; L032 so sánh kết quả. `recursive_sum` tạo event cho từng call trong khi `iterative_sum` L016–L020 dùng một accumulator, giúp quan sát trade-off.",
@@ -11382,8 +11418,8 @@
         "vi": "Đổi đệ quy và vòng lặp, giữ đúng hành vi"
       },
       "explanation": {
-        "vi": "Chuyển recursion sang iteration cần lưu mọi trạng thái mà call stack từng giữ. Với tail-like linear accumulation, một loop và accumulator có thể đủ; với pending work phức tạp, cần stack tường minh.",
-        "en": "Converting recursion to iteration requires preserving all state previously held by the call stack. For a tail-like linear accumulation, a loop and accumulator may suffice; complex pending work needs an explicit stack."
+        "vi": "Chuyển recursion sang iteration cần lưu mọi trạng thái mà call stack từng giữ. Với tail-like linear accumulation, một loop và accumulator có thể đủ; với pending work phức tạp, cần stack tường minh. Bản lặp phải lưu mọi state mà call stack từng giữ; accumulator đơn chỉ đủ khi không có pending work phức tạp.",
+        "en": "Converting recursion to iteration requires preserving all state previously held by the call stack. For a tail-like linear accumulation, a loop and accumulator may suffice; complex pending work needs an explicit stack. The iterative form must preserve every state formerly held by the call stack; one accumulator is sufficient only when there is no complex pending work."
       },
       "python_connection": {
         "vi": "L005–L013 và L016–L020 tính cùng tổng bằng hai cơ chế. L029–L032 chạy cả hai và kiểm tra equality, tạo oracle tương đương cho fixture pilot.",
@@ -11521,8 +11557,8 @@
         "vi": "Base case, recursive case và tiến triển"
       },
       "explanation": {
-        "vi": "Một hàm đệ quy cần base case trả kết quả trực tiếp và recursive case chuyển sang bài toán nhỏ hơn. Thước đo tiến triển phải tiến gần base case ở mỗi lời gọi để bảo đảm kết thúc.",
-        "en": "A recursive function needs a base case that returns directly and a recursive case that moves to a smaller problem. A progress measure must approach the base case on every call to guarantee termination."
+        "vi": "Một hàm đệ quy cần base case trả kết quả trực tiếp và recursive case chuyển sang bài toán nhỏ hơn. Thước đo tiến triển phải tiến gần base case ở mỗi lời gọi để bảo đảm kết thúc. Trước code, viết ba dòng contract: base case, smaller subproblem và progress measure giảm sau mỗi call.",
+        "en": "A recursive function needs a base case that returns directly and a recursive case that moves to a smaller problem. A progress measure must approach the base case on every call to guarantee termination. Before coding, write a three-line contract: base case, smaller subproblem, and the progress measure that decreases on every call."
       },
       "python_connection": {
         "vi": "L007–L009 là base case khi index bằng độ dài list; L010 gọi với `index+1`, nên số phần tử chưa xử lý giảm một. L011–L013 kết hợp và trả kết quả.",
@@ -11544,6 +11580,10 @@
         {
           "vi": "Base value sai identity, làm toàn bộ kết quả sai khi unwind.",
           "en": "Using the wrong identity as the base value, corrupting the result during unwinding."
+        },
+        {
+          "vi": "Có base case nhưng recursive call không tiến gần nó.",
+          "en": "Having a base case while the recursive call makes no progress toward it."
         }
       ],
       "exam_signals": [
@@ -11668,8 +11708,8 @@
         "vi": "Triển khai đệ quy đã cho và giữ kết quả trả về"
       },
       "explanation": {
-        "vi": "Khi dịch một thuật toán đệ quy sang Python, giữ nguyên base condition, thứ tự đánh giá và giá trị trả về. Toán tử chia nguyên, slicing và mutation cần được chọn theo đúng ý nghĩa của pseudocode nguồn.",
-        "en": "When translating a recursive algorithm into Python, preserve its base condition, evaluation order, and return value. Integer division, slicing, and mutation must match the source pseudocode semantics."
+        "vi": "Khi dịch một thuật toán đệ quy sang Python, giữ nguyên base condition, thứ tự đánh giá và giá trị trả về. Toán tử chia nguyên, slicing và mutation cần được chọn theo đúng ý nghĩa của pseudocode nguồn. Giữ nguyên terminal value, progress và combine order khi dịch pseudocode sang Python; return của child call phải được truyền về caller.",
+        "en": "When translating a recursive algorithm into Python, preserve its base condition, evaluation order, and return value. Integer division, slicing, and mutation must match the source pseudocode semantics. Preserve the terminal value, progress, and combination order when translating pseudocode to Python; the child call's return must propagate to its caller."
       },
       "python_connection": {
         "vi": "L005 giữ signature rõ; L007 dịch base condition; L010 lưu kết quả lời gọi con; L011 kết hợp; L013 return. Chuỗi này cho thấy giá trị phải được truyền qua từng frame.",
@@ -12402,12 +12442,12 @@
         "vi": "Bubble sort: lượt so sánh, đổi chỗ và dừng"
       },
       "explanation": {
-        "vi": "Bubble sort: lượt so sánh, đổi chỗ và dừng tập trung vào một quy tắc có thể kiểm tra: Sau mỗi pass, ít nhất một phần tử đã về cuối miền chưa sắp; swap flag chỉ cho dừng khi cả pass không đổi chỗ. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Bubble sort: passes, swaps and stopping centres on one checkable rule: After each pass, at least one item reaches the end of the unsorted region; stop only when a full pass makes no swap. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Bubble sort: lượt so sánh, đổi chỗ và dừng tập trung vào một quy tắc có thể kiểm tra: Sau mỗi pass, ít nhất một phần tử đã về cuối miền chưa sắp; swap flag chỉ cho dừng khi cả pass không đổi chỗ. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Trace mỗi comparison, swap và pass completion; swap flag chỉ cho early exit sau một pass đầy đủ không swap.",
+        "en": "Bubble sort: passes, swaps and stopping centres on one checkable rule: After each pass, at least one item reaches the end of the unsorted region; stop only when a full pass makes no swap. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Trace every comparison, swap, and pass completion; the swap flag permits early exit only after a complete pass with no swap."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L003 chứa đoạn mã “def bubble(values, reverse=False):” và minh họa trực tiếp Bubble sort: lượt so sánh, đổi chỗ và dừng: Sau mỗi pass, ít nhất một phần tử đã về cuối miền chưa sắp; swap flag chỉ cho dừng khi cả pass không đổi chỗ. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L003 contain “def bubble(values, reverse=False):” and directly demonstrate Bubble sort: passes, swaps and stopping: After each pass, at least one item reaches the end of the unsorted region; stop only when a full pass makes no swap. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L003 chứa đoạn mã “def bubble(values, trace, reverse=False):” và minh họa trực tiếp Bubble sort: lượt so sánh, đổi chỗ và dừng: Sau mỗi pass, ít nhất một phần tử đã về cuối miền chưa sắp; swap flag chỉ cho dừng khi cả pass không đổi chỗ. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L003 contain “def bubble(values, trace, reverse=False):” and directly demonstrate Bubble sort: passes, swaps and stopping: After each pass, at least one item reaches the end of the unsorted region; stop only when a full pass makes no swap. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
         "vi": "Biểu diễn Bubble sort: lượt so sánh, đổi chỗ và dừng bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L003, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Sau mỗi pass, ít nhất một phần tử đã về cuối miền chưa sắp; swap flag chỉ cho dừng khi cả pass không đổi chỗ.",
@@ -12423,8 +12463,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Bubble sort: passes, swaps and stopping”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Chỉ chụp array sau pass mà không ghi comparison/swap events.",
+          "en": "Showing only the array after a pass without comparison and swap events."
         }
       ],
       "exam_signals": [
@@ -12458,7 +12498,7 @@
           "lesson_slug": "sorting",
           "semantic_role": "bubble-passes",
           "artifact_version": "production-v1",
-          "matched_text": "def bubble(values, reverse=False):",
+          "matched_text": "def bubble(values, trace, reverse=False):",
           "resolved_line_ids": [
             "sorting.production-v1.L003"
           ]
@@ -12578,16 +12618,16 @@
         "vi": "Khóa sắp xếp, chiều sắp và nhiều tiêu chí"
       },
       "explanation": {
-        "vi": "Khóa sắp xếp, chiều sắp và nhiều tiêu chí tập trung vào một quy tắc có thể kiểm tra: Comparator phải nhất quán về chiều, key phụ và equality; khi swap phải di chuyển toàn bộ record. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Sort keys, direction and multiple criteria centres on one checkable rule: The comparator must be consistent about direction, secondary key, and equality; a swap moves the whole record. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Khóa sắp xếp, chiều sắp và nhiều tiêu chí tập trung vào một quy tắc có thể kiểm tra: Comparator phải nhất quán về chiều, key phụ và equality; khi swap phải di chuyển toàn bộ record. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Complexity claim phải nêu n và counted operation; selection, merge, quick và counting sort không trở thành required objective.",
+        "en": "Sort keys, direction and multiple criteria centres on one checkable rule: The comparator must be consistent about direction, secondary key, and equality; a swap moves the whole record. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. A complexity claim defines n and the counted operation; selection, merge, quick, and counting sort do not become required objectives."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L009 chứa đoạn mã “wrong = output[index] < output[index + 1] if reverse else output[index] > output[index + 1]” và minh họa trực tiếp Khóa sắp xếp, chiều sắp và nhiều tiêu chí: Comparator phải nhất quán về chiều, key phụ và equality; khi swap phải di chuyển toàn bộ record. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L009 contain “wrong = output[index] < output[index + 1] if reverse else output[index] > output[index + 1]” and directly demonstrate Sort keys, direction and multiple criteria: The comparator must be consistent about direction, secondary key, and equality; a swap moves the whole record. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L014 chứa đoạn mã “wrong = left < right if reverse else left > right” và minh họa trực tiếp Khóa sắp xếp, chiều sắp và nhiều tiêu chí: Comparator phải nhất quán về chiều, key phụ và equality; khi swap phải di chuyển toàn bộ record. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L014 contain “wrong = left < right if reverse else left > right” and directly demonstrate Sort keys, direction and multiple criteria: The comparator must be consistent about direction, secondary key, and equality; a swap moves the whole record. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Khóa sắp xếp, chiều sắp và nhiều tiêu chí bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L009, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Comparator phải nhất quán về chiều, key phụ và equality; khi swap phải di chuyển toàn bộ record.",
-        "en": "Represent Sort keys, direction and multiple criteria with a four-column trace: before-state, condition or decision at sorting.production-v1.L009, applied change, and after-state. The trace must show that this rule still holds: The comparator must be consistent about direction, secondary key, and equality; a swap moves the whole record."
+        "vi": "Biểu diễn Khóa sắp xếp, chiều sắp và nhiều tiêu chí bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L014, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Comparator phải nhất quán về chiều, key phụ và equality; khi swap phải di chuyển toàn bộ record.",
+        "en": "Represent Sort keys, direction and multiple criteria with a four-column trace: before-state, condition or decision at sorting.production-v1.L014, applied change, and after-state. The trace must show that this rule still holds: The comparator must be consistent about direction, secondary key, and equality; a swap moves the whole record."
       },
       "invariant_or_rule": {
         "vi": "Comparator phải nhất quán về chiều, key phụ và equality; khi swap phải di chuyển toàn bộ record.",
@@ -12627,16 +12667,16 @@
           "ac-9618-p4-2026-python.artifact.sorting.production-v1"
         ],
         "active_line_ids": [
-          "sorting.production-v1.L009"
+          "sorting.production-v1.L014"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "sorting",
           "semantic_role": "comparator-variants",
           "artifact_version": "production-v1",
-          "matched_text": "wrong = output[index] < output[index + 1] if reverse else output[index] > output[index + 1]",
+          "matched_text": "wrong = left < right if reverse else left > right",
           "resolved_line_ids": [
-            "sorting.production-v1.L009"
+            "sorting.production-v1.L014"
           ]
         },
         "fixture_kind": "normal",
@@ -12712,16 +12752,16 @@
         "vi": "Insertion sort: phần đã sắp và dịch phần tử"
       },
       "explanation": {
-        "vi": "Insertion sort: phần đã sắp và dịch phần tử tập trung vào một quy tắc có thể kiểm tra: Prefix trước key luôn có thứ tự; dịch mọi phần tử lớn hơn key rồi chèn key vào lỗ trống còn lại. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Insertion sort: sorted prefix and shifts centres on one checkable rule: The prefix before the key remains sorted; shift every larger item and insert the key into the remaining gap. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Insertion sort: phần đã sắp và dịch phần tử tập trung vào một quy tắc có thể kiểm tra: Prefix trước key luôn có thứ tự; dịch mọi phần tử lớn hơn key rồi chèn key vào lỗ trống còn lại. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Trace key selection, từng shift và final insertion; prefix trước key phải sorted sau mọi bước.",
+        "en": "Insertion sort: sorted prefix and shifts centres on one checkable rule: The prefix before the key remains sorted; shift every larger item and insert the key into the remaining gap. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Trace key selection, every shift, and final insertion; the prefix before the key remains sorted after every step."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L017 chứa đoạn mã “def insertion(values):” và minh họa trực tiếp Insertion sort: phần đã sắp và dịch phần tử: Prefix trước key luôn có thứ tự; dịch mọi phần tử lớn hơn key rồi chèn key vào lỗ trống còn lại. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L017 contain “def insertion(values):” and directly demonstrate Insertion sort: sorted prefix and shifts: The prefix before the key remains sorted; shift every larger item and insert the key into the remaining gap. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L049 chứa đoạn mã “def insertion(values, trace):” và minh họa trực tiếp Insertion sort: phần đã sắp và dịch phần tử: Prefix trước key luôn có thứ tự; dịch mọi phần tử lớn hơn key rồi chèn key vào lỗ trống còn lại. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L049 contain “def insertion(values, trace):” and directly demonstrate Insertion sort: sorted prefix and shifts: The prefix before the key remains sorted; shift every larger item and insert the key into the remaining gap. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Insertion sort: phần đã sắp và dịch phần tử bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L017, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Prefix trước key luôn có thứ tự; dịch mọi phần tử lớn hơn key rồi chèn key vào lỗ trống còn lại.",
-        "en": "Represent Insertion sort: sorted prefix and shifts with a four-column trace: before-state, condition or decision at sorting.production-v1.L017, applied change, and after-state. The trace must show that this rule still holds: The prefix before the key remains sorted; shift every larger item and insert the key into the remaining gap."
+        "vi": "Biểu diễn Insertion sort: phần đã sắp và dịch phần tử bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L049, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Prefix trước key luôn có thứ tự; dịch mọi phần tử lớn hơn key rồi chèn key vào lỗ trống còn lại.",
+        "en": "Represent Insertion sort: sorted prefix and shifts with a four-column trace: before-state, condition or decision at sorting.production-v1.L049, applied change, and after-state. The trace must show that this rule still holds: The prefix before the key remains sorted; shift every larger item and insert the key into the remaining gap."
       },
       "invariant_or_rule": {
         "vi": "Prefix trước key luôn có thứ tự; dịch mọi phần tử lớn hơn key rồi chèn key vào lỗ trống còn lại.",
@@ -12733,8 +12773,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Insertion sort: sorted prefix and shifts”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Swap key qua từng phần tử thay vì giữ key, shift prefix rồi insert một lần.",
+          "en": "Swapping the key through each item instead of saving it, shifting the prefix, and inserting once."
         }
       ],
       "exam_signals": [
@@ -12761,16 +12801,16 @@
           "ac-9618-p4-2026-python.artifact.sorting.production-v1"
         ],
         "active_line_ids": [
-          "sorting.production-v1.L017"
+          "sorting.production-v1.L049"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "sorting",
           "semantic_role": "insertion-shifts",
           "artifact_version": "production-v1",
-          "matched_text": "def insertion(values):",
+          "matched_text": "def insertion(values, trace):",
           "resolved_line_ids": [
-            "sorting.production-v1.L017"
+            "sorting.production-v1.L049"
           ]
         },
         "fixture_kind": "boundary",
@@ -12861,16 +12901,16 @@
         "vi": "Chèn một phần tử vào bảng đã có thứ tự"
       },
       "explanation": {
-        "vi": "Chèn một phần tử vào bảng đã có thứ tự tập trung vào một quy tắc có thể kiểm tra: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Inserting one item into an ordered table centres on one checkable rule: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Chèn một phần tử vào bảng đã có thứ tự tập trung vào một quy tắc có thể kiểm tra: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Phân biệt chèn một record vào collection đã sorted với chạy toàn bộ insertion sort; capacity guard vẫn xảy ra trước shifts.",
+        "en": "Inserting one item into an ordered table centres on one checkable rule: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Distinguish inserting one record into an already sorted collection from running a complete insertion sort; the capacity guard still precedes all shifts."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L040 chứa đoạn mã “bounded.insert(position, item)” và minh họa trực tiếp Chèn một phần tử vào bảng đã có thứ tự: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L040 contain “bounded.insert(position, item)” and directly demonstrate Inserting one item into an ordered table: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L129 chứa đoạn mã “bounded.insert(position, item)” và minh họa trực tiếp Chèn một phần tử vào bảng đã có thứ tự: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L129 contain “bounded.insert(position, item)” and directly demonstrate Inserting one item into an ordered table: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Chèn một phần tử vào bảng đã có thứ tự bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L040, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
-        "en": "Represent Inserting one item into an ordered table with a four-column trace: before-state, condition or decision at sorting.production-v1.L040, applied change, and after-state. The trace must show that this rule still holds: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record."
+        "vi": "Biểu diễn Chèn một phần tử vào bảng đã có thứ tự bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L129, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
+        "en": "Represent Inserting one item into an ordered table with a four-column trace: before-state, condition or decision at sorting.production-v1.L129, applied change, and after-state. The trace must show that this rule still holds: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record."
       },
       "invariant_or_rule": {
         "vi": "Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
@@ -12910,7 +12950,7 @@
           "ac-9618-p4-2026-python.artifact.sorting.production-v1"
         ],
         "active_line_ids": [
-          "sorting.production-v1.L040"
+          "sorting.production-v1.L129"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
@@ -12919,7 +12959,7 @@
           "artifact_version": "production-v1",
           "matched_text": "bounded.insert(position, item)",
           "resolved_line_ids": [
-            "sorting.production-v1.L040"
+            "sorting.production-v1.L129"
           ]
         },
         "fixture_kind": "failure",
@@ -13012,8 +13052,8 @@
         "vi": "Hai stack và phục hồi khi không ghép được"
       },
       "explanation": {
-        "vi": "Hai stack và phục hồi khi không ghép được tập trung vào một quy tắc có thể kiểm tra: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Paired stacks and restoration on failure centres on one checkable rule: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Hai stack và phục hồi khi không ghép được tập trung vào một quy tắc có thể kiểm tra: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Trace cả temporary pops và push-back order để chứng minh failure phục hồi đúng live region.",
+        "en": "Paired stacks and restoration on failure centres on one checkable rule: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Trace temporary pops and the push-back order to prove that failure restores the live region exactly."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L026 chứa đoạn mã “before = {\"top\": stack.top, \"live\": stack.live()}” và minh họa trực tiếp Hai stack và phục hồi khi không ghép được: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -13144,8 +13184,8 @@
         "vi": "Pop và tình huống rỗng"
       },
       "explanation": {
-        "vi": "Pop và tình huống rỗng tập trung vào một quy tắc có thể kiểm tra: Kiểm tra underflow trước khi đọc; trả đúng phần tử trên cùng rồi cập nhật pointer đúng một bước. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Pop and the empty condition centres on one checkable rule: Check underflow before reading; return the top item and update the pointer by exactly one step. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Pop và tình huống rỗng tập trung vào một quy tắc có thể kiểm tra: Kiểm tra underflow trước khi đọc; trả đúng phần tử trên cùng rồi cập nhật pointer đúng một bước. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Underflow guard chạy trước read; rejected pop giữ array và top không đổi.",
+        "en": "Pop and the empty condition centres on one checkable rule: Check underflow before reading; return the top item and update the pointer by exactly one step. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. The underflow guard runs before the read; a rejected pop preserves both the array and top."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L013 chứa đoạn mã “def pop(self):” và minh họa trực tiếp Pop và tình huống rỗng: Kiểm tra underflow trước khi đọc; trả đúng phần tử trên cùng rồi cập nhật pointer đúng một bước. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -13276,8 +13316,8 @@
         "vi": "Push và tình huống đầy"
       },
       "explanation": {
-        "vi": "Push và tình huống đầy tập trung vào một quy tắc có thể kiểm tra: Kiểm tra overflow trước khi ghi; thứ tự tăng pointer và ghi phụ thuộc quy ước top đã công bố. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Push and the full condition centres on one checkable rule: Check overflow before writing; pointer update and write order depend on the declared top convention. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Push và tình huống đầy tập trung vào một quy tắc có thể kiểm tra: Kiểm tra overflow trước khi ghi; thứ tự tăng pointer và ghi phụ thuộc quy ước top đã công bố. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Capacity guard chạy trước write; list.append chỉ được nêu trong contrast box, không thay manual pointer update được yêu cầu.",
+        "en": "Push and the full condition centres on one checkable rule: Check overflow before writing; pointer update and write order depend on the declared top convention. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. The capacity guard runs before the write; list.append belongs only in a contrast box and cannot replace a required manual pointer update."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L007 chứa đoạn mã “def push(self, value):” và minh họa trực tiếp Push và tình huống đầy: Kiểm tra overflow trước khi ghi; thứ tự tăng pointer và ghi phụ thuộc quy ước top đã công bố. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -13423,8 +13463,8 @@
         "vi": "Lấy toán hạng và tính kết quả"
       },
       "explanation": {
-        "vi": "Lấy toán hạng và tính kết quả tập trung vào một quy tắc có thể kiểm tra: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Popping operands and reducing to a result centres on one checkable rule: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Lấy toán hạng và tính kết quả tập trung vào một quy tắc có thể kiểm tra: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Gắn operand order vào từng pop; không suy ra thứ tự chỉ từ LIFO khi operator không giao hoán.",
+        "en": "Popping operands and reducing to a result centres on one checkable rule: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Attach operand order to each pop; do not infer it from LIFO alone when the operator is non-commutative."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L035 chứa đoạn mã “right, left = reduce_stack.pop(), reduce_stack.pop()” và minh họa trực tiếp Lấy toán hạng và tính kết quả: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -13592,8 +13632,8 @@
         "vi": "Mảng, con trỏ đỉnh và quy ước rỗng"
       },
       "explanation": {
-        "vi": "Mảng, con trỏ đỉnh và quy ước rỗng tập trung vào một quy tắc có thể kiểm tra: Chọn một quy ước top-used hoặc next-free và suy ra empty/full từ cùng quy ước trong mọi operation. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Array, top pointer and empty conventions centres on one checkable rule: Choose either top-used or next-free and derive empty/full consistently from that convention in every operation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Mảng, con trỏ đỉnh và quy ước rỗng tập trung vào một quy tắc có thể kiểm tra: Chọn một quy ước top-used hoặc next-free và suy ra empty/full từ cùng quy ước trong mọi operation. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. LIFO là semantics; implementation vẫn phải khai báo top-used/next-free, live region và capacity.",
+        "en": "Array, top pointer and empty conventions centres on one checkable rule: Choose either top-used or next-free and derive empty/full consistently from that convention in every operation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. LIFO is the semantics; the implementation must still declare top-used or next-free, the live region, and capacity."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L006 chứa đoạn mã “self.top = -1” và minh họa trực tiếp Mảng, con trỏ đỉnh và quy ước rỗng: Chọn một quy ước top-used hoặc next-free và suy ra empty/full từ cùng quy ước trong mọi operation. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -13613,8 +13653,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Array, top pointer and empty conventions”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Dùng list append/pop mà không giải thích top convention, capacity và guards.",
+          "en": "Using list append/pop without explaining the top convention, capacity, and guards."
         }
       ],
       "exam_signals": [
@@ -15535,8 +15575,8 @@
         "vi": "So sánh chuỗi theo ký tự"
       },
       "explanation": {
-        "vi": "So sánh chuỗi theo ký tự tập trung vào một quy tắc có thể kiểm tra: So sánh từ trái sang phải; ký tự khác đầu tiên quyết định thứ tự, còn nếu một chuỗi là prefix thì chuỗi ngắn hơn đứng trước. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Character-by-character comparison centres on one checkable rule: Compare left to right; the first differing character decides order, and if one string is a prefix, the shorter string comes first. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "So sánh chuỗi theo ký tự tập trung vào một quy tắc có thể kiểm tra: So sánh từ trái sang phải; ký tự khác đầu tiên quyết định thứ tự, còn nếu một chuỗi là prefix thì chuỗi ngắn hơn đứng trước. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Python string là immutable: index walk đọc ký tự theo thứ tự, còn mọi thay đổi phải tạo string/result mới theo contract.",
+        "en": "Character-by-character comparison centres on one checkable rule: Compare left to right; the first differing character decides order, and if one string is a prefix, the shorter string comes first. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Python strings are immutable: an index walk reads characters in order, while any change creates a new string or result under the contract."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.text-processing.production-v1, các dòng text-processing.production-v1.L003 chứa đoạn mã “def compare_text(left, right):” và minh họa trực tiếp So sánh chuỗi theo ký tự: So sánh từ trái sang phải; ký tự khác đầu tiên quyết định thứ tự, còn nếu một chuỗi là prefix thì chuỗi ngắn hơn đứng trước. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -15556,8 +15596,8 @@
           "en": "Applying Python syntax or a shortcut before establishing the contract for “Character-by-character comparison”."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "vi": "Cố gán trực tiếp vào một vị trí của Python string.",
+          "en": "Trying to assign directly to a position in a Python string."
         }
       ],
       "exam_signals": [
@@ -15686,8 +15726,8 @@
         "vi": "Tách chuỗi thành token theo dấu phân cách"
       },
       "explanation": {
-        "vi": "Tách chuỗi thành token theo dấu phân cách tập trung vào một quy tắc có thể kiểm tra: Mỗi delimiter kết thúc một token; chính sách token rỗng và token cuối phải được thực hiện tường minh. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Splitting delimited strings into tokens centres on one checkable rule: Each delimiter ends a token; the empty-token policy and final token must be handled explicitly. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Tách chuỗi thành token theo dấu phân cách tập trung vào một quy tắc có thể kiểm tra: Mỗi delimiter kết thúc một token; chính sách token rỗng và token cuối phải được thực hiện tường minh. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Khi đề yêu cầu thuật toán, trace current index, token start và delimiter; không thay thế bằng `split` nếu shortcut không được phép.",
+        "en": "Splitting delimited strings into tokens centres on one checkable rule: Each delimiter ends a token; the empty-token policy and final token must be handled explicitly. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. When the task requires the algorithm, trace the current index, token start, and delimiter; do not replace it with `split` unless the shortcut is allowed."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.text-processing.production-v1, các dòng text-processing.production-v1.L024 chứa đoạn mã “fields = fixture[\"record\"].split(fixture[\"delimiter\"])” và minh họa trực tiếp Tách chuỗi thành token theo dấu phân cách: Mỗi delimiter kết thúc một token; chính sách token rỗng và token cuối phải được thực hiện tường minh. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -15837,8 +15877,8 @@
         "vi": "Đếm các dãy ký tự liên tiếp"
       },
       "explanation": {
-        "vi": "Đếm các dãy ký tự liên tiếp tập trung vào một quy tắc có thể kiểm tra: Count thuộc về một dãy liên tiếp; khi symbol đổi phải xuất run cũ, reset count và nhớ flush run cuối. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Counting consecutive character runs centres on one checkable rule: The count belongs to one consecutive run; on a symbol change, emit the old run, reset the count, and flush the final run. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Đếm các dãy ký tự liên tiếp tập trung vào một quy tắc có thể kiểm tra: Count thuộc về một dãy liên tiếp; khi symbol đổi phải xuất run cũ, reset count và nhớ flush run cuối. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Index walk phải flush run cuối sau loop; việc nối output tạo giá trị mới vì string không mutable.",
+        "en": "Counting consecutive character runs centres on one checkable rule: The count belongs to one consecutive run; on a symbol change, emit the old run, reset the count, and flush the final run. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. The index walk must flush the final run after the loop; output concatenation creates a new value because strings are immutable."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.text-processing.production-v1, các dòng text-processing.production-v1.L009 chứa đoạn mã “def run_length_encode(text):” và minh họa trực tiếp Đếm các dãy ký tự liên tiếp: Count thuộc về một dãy liên tiếp; khi symbol đổi phải xuất run cũ, reset count và nhớ flush run cuối. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
@@ -16014,8 +16054,8 @@
         "vi": "Đổi kiểu trường và đưa vào nhóm đích"
       },
       "explanation": {
-        "vi": "Đổi kiểu trường và đưa vào nhóm đích tập trung vào một quy tắc có thể kiểm tra: Chỉ route record sau khi đủ trường, chuyển kiểu thành công và destination còn sức chứa. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Converting fields and routing to a destination centres on one checkable rule: Route a record only after all fields exist, conversion succeeds, and the destination has capacity. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "vi": "Đổi kiểu trường và đưa vào nhóm đích tập trung vào một quy tắc có thể kiểm tra: Chỉ route record sau khi đủ trường, chuyển kiểu thành công và destination còn sức chứa. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác. Parse theo index/boundary trước, rồi convert và route; string gốc không bị mutate trong quá trình này.",
+        "en": "Converting fields and routing to a destination centres on one checkable rule: Route a record only after all fields exist, conversion succeeds, and the destination has capacity. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Parse by index and boundary first, then convert and route; the source string is not mutated during this process."
       },
       "python_connection": {
         "vi": "Trong artifact ac-9618-p4-2026-python.artifact.text-processing.production-v1, các dòng text-processing.production-v1.L028 chứa đoạn mã “value = int(fields[2]) if fields[0] == \"INT\" else fields[2]” và minh họa trực tiếp Đổi kiểu trường và đưa vào nhóm đích: Chỉ route record sau khi đủ trường, chuyển kiểu thành công và destination còn sức chứa. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",

@@ -6,7 +6,7 @@
     "lesson_slug": "linked-list",
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.linked-list.production-v1",
     "artifact_version": "production-v1",
-    "code_sha256": "8aafd850d1dd34f5515286eaa9057765a95a7f8a3e59b491df5e51db0be2aaa9"
+    "code_sha256": "fa4f9febb2bd951aa6b8e35f0f02d78b3e7101a09151a7a4326b2a651f5bdcbc"
   },
   "python_artifact": {
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.linked-list.production-v1",
@@ -53,216 +53,691 @@
       {
         "line_id": "linked-list.production-v1.L007",
         "order": 7,
-        "text": "        self.head, self.free = -1, 0 if capacity else -1"
+        "text": "        self.head = -1"
       },
       {
         "line_id": "linked-list.production-v1.L008",
         "order": 8,
-        "text": "    def insert_head(self, value):"
+        "text": "        self.free = 0 if capacity else -1"
       },
       {
         "line_id": "linked-list.production-v1.L009",
         "order": 9,
-        "text": "        if self.free == -1: return False"
+        "text": ""
       },
       {
         "line_id": "linked-list.production-v1.L010",
         "order": 10,
-        "text": "        node, self.free = self.free, self.next[self.free]"
+        "text": "    def state(self):"
       },
       {
         "line_id": "linked-list.production-v1.L011",
         "order": 11,
-        "text": "        self.data[node], self.next[node], self.head = value, self.head, node"
+        "text": "        return {"
       },
       {
         "line_id": "linked-list.production-v1.L012",
         "order": 12,
-        "text": "        return True"
+        "text": "            \"head\": self.head,"
       },
       {
         "line_id": "linked-list.production-v1.L013",
         "order": 13,
-        "text": "    def traverse(self):"
+        "text": "            \"free\": self.free,"
       },
       {
         "line_id": "linked-list.production-v1.L014",
         "order": 14,
-        "text": "        output, node, seen = [], self.head, set()"
+        "text": "            \"data\": list(self.data),"
       },
       {
         "line_id": "linked-list.production-v1.L015",
         "order": 15,
-        "text": "        while node != -1:"
+        "text": "            \"next\": list(self.next),"
       },
       {
         "line_id": "linked-list.production-v1.L016",
         "order": 16,
-        "text": "            if node in seen or node < 0 or node >= len(self.data): raise ValueError(\"corrupt link\")"
+        "text": "        }"
       },
       {
         "line_id": "linked-list.production-v1.L017",
         "order": 17,
-        "text": "            seen.add(node); output.append(self.data[node]); node = self.next[node]"
+        "text": ""
       },
       {
         "line_id": "linked-list.production-v1.L018",
         "order": 18,
-        "text": "        return output"
+        "text": "    def insert_head(self, value, trace):"
       },
       {
         "line_id": "linked-list.production-v1.L019",
         "order": 19,
-        "text": "    def remove(self, target):"
+        "text": "        before = self.state()"
       },
       {
         "line_id": "linked-list.production-v1.L020",
         "order": 20,
-        "text": "        previous, node = -1, self.head"
+        "text": "        if self.free == -1:"
       },
       {
         "line_id": "linked-list.production-v1.L021",
         "order": 21,
-        "text": "        while node != -1 and self.data[node] != target: previous, node = node, self.next[node]"
+        "text": "            trace.append({"
       },
       {
         "line_id": "linked-list.production-v1.L022",
         "order": 22,
-        "text": "        if node == -1: return False"
+        "text": "                \"event\": \"insert_reject_full\","
       },
       {
         "line_id": "linked-list.production-v1.L023",
         "order": 23,
-        "text": "        if previous == -1: self.head = self.next[node]"
+        "text": "                \"value\": value,"
       },
       {
         "line_id": "linked-list.production-v1.L024",
         "order": 24,
-        "text": "        else: self.next[previous] = self.next[node]"
+        "text": "                \"before\": before,"
       },
       {
         "line_id": "linked-list.production-v1.L025",
         "order": 25,
-        "text": "        self.data[node], self.next[node], self.free = None, self.free, node"
+        "text": "                \"change\": {\"reason\": \"free_list_empty\"},"
       },
       {
         "line_id": "linked-list.production-v1.L026",
         "order": 26,
-        "text": "        return True"
+        "text": "                \"after\": self.state(),"
       },
       {
         "line_id": "linked-list.production-v1.L027",
         "order": 27,
-        "text": ""
+        "text": "            })"
       },
       {
         "line_id": "linked-list.production-v1.L028",
         "order": 28,
-        "text": "def run(fixture):"
+        "text": "            return False"
       },
       {
         "line_id": "linked-list.production-v1.L029",
         "order": 29,
-        "text": "    linked, trace = ArrayList(fixture[\"capacity\"]), []"
+        "text": "        node = self.free"
       },
       {
         "line_id": "linked-list.production-v1.L030",
         "order": 30,
-        "text": "    for value in reversed(fixture.get(\"initial\", [])):"
+        "text": "        next_free = self.next[node]"
       },
       {
         "line_id": "linked-list.production-v1.L031",
         "order": 31,
-        "text": "        trace.append({\"event\": \"insert\", \"value\": value, \"success\": linked.insert_head(value)})"
+        "text": "        saved_head = self.head"
       },
       {
         "line_id": "linked-list.production-v1.L032",
         "order": 32,
-        "text": "    before = linked.traverse()"
+        "text": "        self.free = next_free"
       },
       {
         "line_id": "linked-list.production-v1.L033",
         "order": 33,
-        "text": "    inserted = linked.insert_head(fixture[\"insert\"])"
+        "text": "        self.data[node] = value"
       },
       {
         "line_id": "linked-list.production-v1.L034",
         "order": 34,
-        "text": "    removed = linked.remove(fixture[\"remove\"])"
+        "text": "        self.next[node] = saved_head"
       },
       {
         "line_id": "linked-list.production-v1.L035",
         "order": 35,
-        "text": "    try: after, status = linked.traverse(), \"OK\""
+        "text": "        self.head = node"
       },
       {
         "line_id": "linked-list.production-v1.L036",
         "order": 36,
-        "text": "    except ValueError: after, status = before, \"CORRUPT\""
+        "text": "        trace.append({"
       },
       {
         "line_id": "linked-list.production-v1.L037",
         "order": 37,
-        "text": "    trace += [{\"event\": \"insert_requested\", \"success\": inserted}, {\"event\": \"remove_requested\", \"success\": removed}]"
+        "text": "            \"event\": \"insert_head\","
       },
       {
         "line_id": "linked-list.production-v1.L038",
         "order": 38,
-        "text": "    return {\"status\": status, \"before\": before, \"after\": after, \"inserted\": inserted, \"removed\": removed, \"head\": linked.head, \"free\": linked.free, \"trace\": trace}"
+        "text": "            \"value\": value,"
       },
       {
         "line_id": "linked-list.production-v1.L039",
         "order": 39,
-        "text": ""
+        "text": "            \"before\": before,"
       },
       {
         "line_id": "linked-list.production-v1.L040",
         "order": 40,
-        "text": "if __name__ == \"__main__\":"
+        "text": "            \"change\": {"
       },
       {
         "line_id": "linked-list.production-v1.L041",
         "order": 41,
-        "text": "    import json"
+        "text": "                \"allocated_node\": node,"
       },
       {
         "line_id": "linked-list.production-v1.L042",
         "order": 42,
-        "text": "    import sys"
+        "text": "                \"saved_head\": saved_head,"
       },
       {
         "line_id": "linked-list.production-v1.L043",
         "order": 43,
-        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+        "text": "                \"next_free\": next_free,"
       },
       {
         "line_id": "linked-list.production-v1.L044",
         "order": 44,
-        "text": "    result = run(fixture)"
+        "text": "            },"
       },
       {
         "line_id": "linked-list.production-v1.L045",
         "order": 45,
-        "text": "    if not result[\"trace\"]:"
+        "text": "            \"after\": self.state(),"
       },
       {
         "line_id": "linked-list.production-v1.L046",
         "order": 46,
-        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+        "text": "        })"
       },
       {
         "line_id": "linked-list.production-v1.L047",
         "order": 47,
-        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+        "text": "        return True"
       },
       {
         "line_id": "linked-list.production-v1.L048",
         "order": 48,
         "text": ""
+      },
+      {
+        "line_id": "linked-list.production-v1.L049",
+        "order": 49,
+        "text": "    def traverse(self):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L050",
+        "order": 50,
+        "text": "        output = []"
+      },
+      {
+        "line_id": "linked-list.production-v1.L051",
+        "order": 51,
+        "text": "        node = self.head"
+      },
+      {
+        "line_id": "linked-list.production-v1.L052",
+        "order": 52,
+        "text": "        seen = set()"
+      },
+      {
+        "line_id": "linked-list.production-v1.L053",
+        "order": 53,
+        "text": "        while node != -1:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L054",
+        "order": 54,
+        "text": "            if node in seen or node < 0 or node >= len(self.data):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L055",
+        "order": 55,
+        "text": "                raise ValueError(\"corrupt link\")"
+      },
+      {
+        "line_id": "linked-list.production-v1.L056",
+        "order": 56,
+        "text": "            seen.add(node)"
+      },
+      {
+        "line_id": "linked-list.production-v1.L057",
+        "order": 57,
+        "text": "            output.append(self.data[node])"
+      },
+      {
+        "line_id": "linked-list.production-v1.L058",
+        "order": 58,
+        "text": "            node = self.next[node]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L059",
+        "order": 59,
+        "text": "        return output"
+      },
+      {
+        "line_id": "linked-list.production-v1.L060",
+        "order": 60,
+        "text": ""
+      },
+      {
+        "line_id": "linked-list.production-v1.L061",
+        "order": 61,
+        "text": "    def remove(self, target, trace):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L062",
+        "order": 62,
+        "text": "        previous = -1"
+      },
+      {
+        "line_id": "linked-list.production-v1.L063",
+        "order": 63,
+        "text": "        node = self.head"
+      },
+      {
+        "line_id": "linked-list.production-v1.L064",
+        "order": 64,
+        "text": "        while node != -1:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L065",
+        "order": 65,
+        "text": "            trace.append({"
+      },
+      {
+        "line_id": "linked-list.production-v1.L066",
+        "order": 66,
+        "text": "                \"event\": \"remove_compare\","
+      },
+      {
+        "line_id": "linked-list.production-v1.L067",
+        "order": 67,
+        "text": "                \"target\": target,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L068",
+        "order": 68,
+        "text": "                \"previous\": previous,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L069",
+        "order": 69,
+        "text": "                \"node\": node,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L070",
+        "order": 70,
+        "text": "                \"value\": self.data[node],"
+      },
+      {
+        "line_id": "linked-list.production-v1.L071",
+        "order": 71,
+        "text": "                \"next_node\": self.next[node],"
+      },
+      {
+        "line_id": "linked-list.production-v1.L072",
+        "order": 72,
+        "text": "            })"
+      },
+      {
+        "line_id": "linked-list.production-v1.L073",
+        "order": 73,
+        "text": "            if self.data[node] == target:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L074",
+        "order": 74,
+        "text": "                break"
+      },
+      {
+        "line_id": "linked-list.production-v1.L075",
+        "order": 75,
+        "text": "            previous = node"
+      },
+      {
+        "line_id": "linked-list.production-v1.L076",
+        "order": 76,
+        "text": "            node = self.next[node]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L077",
+        "order": 77,
+        "text": "        before = self.state()"
+      },
+      {
+        "line_id": "linked-list.production-v1.L078",
+        "order": 78,
+        "text": "        if node == -1:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L079",
+        "order": 79,
+        "text": "            trace.append({"
+      },
+      {
+        "line_id": "linked-list.production-v1.L080",
+        "order": 80,
+        "text": "                \"event\": \"remove_reject_missing\","
+      },
+      {
+        "line_id": "linked-list.production-v1.L081",
+        "order": 81,
+        "text": "                \"target\": target,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L082",
+        "order": 82,
+        "text": "                \"before\": before,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L083",
+        "order": 83,
+        "text": "                \"change\": {\"reason\": \"target_not_found\"},"
+      },
+      {
+        "line_id": "linked-list.production-v1.L084",
+        "order": 84,
+        "text": "                \"after\": self.state(),"
+      },
+      {
+        "line_id": "linked-list.production-v1.L085",
+        "order": 85,
+        "text": "            })"
+      },
+      {
+        "line_id": "linked-list.production-v1.L086",
+        "order": 86,
+        "text": "            return False"
+      },
+      {
+        "line_id": "linked-list.production-v1.L087",
+        "order": 87,
+        "text": "        successor = self.next[node]"
+      },
+      {
+        "line_id": "linked-list.production-v1.L088",
+        "order": 88,
+        "text": "        previous_free = self.free"
+      },
+      {
+        "line_id": "linked-list.production-v1.L089",
+        "order": 89,
+        "text": "        if previous == -1:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L090",
+        "order": 90,
+        "text": "            self.head = successor"
+      },
+      {
+        "line_id": "linked-list.production-v1.L091",
+        "order": 91,
+        "text": "        else:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L092",
+        "order": 92,
+        "text": "            self.next[previous] = successor"
+      },
+      {
+        "line_id": "linked-list.production-v1.L093",
+        "order": 93,
+        "text": "        self.data[node] = None"
+      },
+      {
+        "line_id": "linked-list.production-v1.L094",
+        "order": 94,
+        "text": "        self.next[node] = previous_free"
+      },
+      {
+        "line_id": "linked-list.production-v1.L095",
+        "order": 95,
+        "text": "        self.free = node"
+      },
+      {
+        "line_id": "linked-list.production-v1.L096",
+        "order": 96,
+        "text": "        trace.append({"
+      },
+      {
+        "line_id": "linked-list.production-v1.L097",
+        "order": 97,
+        "text": "            \"event\": \"remove_recycle\","
+      },
+      {
+        "line_id": "linked-list.production-v1.L098",
+        "order": 98,
+        "text": "            \"target\": target,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L099",
+        "order": 99,
+        "text": "            \"before\": before,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L100",
+        "order": 100,
+        "text": "            \"change\": {"
+      },
+      {
+        "line_id": "linked-list.production-v1.L101",
+        "order": 101,
+        "text": "                \"previous\": previous,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L102",
+        "order": 102,
+        "text": "                \"removed_node\": node,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L103",
+        "order": 103,
+        "text": "                \"saved_successor\": successor,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L104",
+        "order": 104,
+        "text": "                \"previous_free\": previous_free,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L105",
+        "order": 105,
+        "text": "            },"
+      },
+      {
+        "line_id": "linked-list.production-v1.L106",
+        "order": 106,
+        "text": "            \"after\": self.state(),"
+      },
+      {
+        "line_id": "linked-list.production-v1.L107",
+        "order": 107,
+        "text": "        })"
+      },
+      {
+        "line_id": "linked-list.production-v1.L108",
+        "order": 108,
+        "text": "        return True"
+      },
+      {
+        "line_id": "linked-list.production-v1.L109",
+        "order": 109,
+        "text": ""
+      },
+      {
+        "line_id": "linked-list.production-v1.L110",
+        "order": 110,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L111",
+        "order": 111,
+        "text": "    linked = ArrayList(fixture[\"capacity\"])"
+      },
+      {
+        "line_id": "linked-list.production-v1.L112",
+        "order": 112,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "linked-list.production-v1.L113",
+        "order": 113,
+        "text": "    for value in reversed(fixture.get(\"initial\", [])):"
+      },
+      {
+        "line_id": "linked-list.production-v1.L114",
+        "order": 114,
+        "text": "        linked.insert_head(value, trace)"
+      },
+      {
+        "line_id": "linked-list.production-v1.L115",
+        "order": 115,
+        "text": "    before = linked.traverse()"
+      },
+      {
+        "line_id": "linked-list.production-v1.L116",
+        "order": 116,
+        "text": "    inserted = linked.insert_head(fixture[\"insert\"], trace)"
+      },
+      {
+        "line_id": "linked-list.production-v1.L117",
+        "order": 117,
+        "text": "    removed = linked.remove(fixture[\"remove\"], trace)"
+      },
+      {
+        "line_id": "linked-list.production-v1.L118",
+        "order": 118,
+        "text": "    try:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L119",
+        "order": 119,
+        "text": "        after = linked.traverse()"
+      },
+      {
+        "line_id": "linked-list.production-v1.L120",
+        "order": 120,
+        "text": "        status = \"OK\""
+      },
+      {
+        "line_id": "linked-list.production-v1.L121",
+        "order": 121,
+        "text": "    except ValueError:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L122",
+        "order": 122,
+        "text": "        after = before"
+      },
+      {
+        "line_id": "linked-list.production-v1.L123",
+        "order": 123,
+        "text": "        status = \"CORRUPT\""
+      },
+      {
+        "line_id": "linked-list.production-v1.L124",
+        "order": 124,
+        "text": "    return {"
+      },
+      {
+        "line_id": "linked-list.production-v1.L125",
+        "order": 125,
+        "text": "        \"status\": status,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L126",
+        "order": 126,
+        "text": "        \"before\": before,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L127",
+        "order": 127,
+        "text": "        \"after\": after,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L128",
+        "order": 128,
+        "text": "        \"inserted\": inserted,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L129",
+        "order": 129,
+        "text": "        \"removed\": removed,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L130",
+        "order": 130,
+        "text": "        \"head\": linked.head,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L131",
+        "order": 131,
+        "text": "        \"free\": linked.free,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L132",
+        "order": 132,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "linked-list.production-v1.L133",
+        "order": 133,
+        "text": "    }"
+      },
+      {
+        "line_id": "linked-list.production-v1.L134",
+        "order": 134,
+        "text": ""
+      },
+      {
+        "line_id": "linked-list.production-v1.L135",
+        "order": 135,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "linked-list.production-v1.L136",
+        "order": 136,
+        "text": "    import json"
+      },
+      {
+        "line_id": "linked-list.production-v1.L137",
+        "order": 137,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "linked-list.production-v1.L138",
+        "order": 138,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "linked-list.production-v1.L139",
+        "order": 139,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "linked-list.production-v1.L140",
+        "order": 140,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "linked-list.production-v1.L141",
+        "order": 141,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "linked-list.production-v1.L142",
+        "order": 142,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "linked-list.production-v1.L143",
+        "order": 143,
+        "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "8aafd850d1dd34f5515286eaa9057765a95a7f8a3e59b491df5e51db0be2aaa9",
+    "code_sha256": "fa4f9febb2bd951aa6b8e35f0f02d78b3e7101a09151a7a4326b2a651f5bdcbc",
     "caption": {
       "en": "An array linked list with a recyclable free list.",
       "vi": "Linked list trên mảng và free list có tái sử dụng node."
@@ -272,7 +747,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r3.a3.linked-list.production-v1.author-run",
       "independent_rerun_ref": "p4r3.a3.linked-list.production-v1.independent-rerun",
-      "execution_log_sha256": "95007303fd8aec4c7405d502f912df1b9486432e6d798aeccc31eff3156ca5f3"
+      "execution_log_sha256": "7ee7d766e0c70360938e98ec1b96b57c3d41549f3d529bc299f709f8fd0f37dd"
     }
   },
   "scenarios": [
@@ -297,7 +772,8 @@
       },
       "event_ids": [
         "ac-9618-p4-2026-python.trace.linked-list.list-traverse.boundary.production-v1.event-001",
-        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.boundary.production-v1.event-002"
+        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.boundary.production-v1.event-002",
+        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.boundary.production-v1.event-003"
       ],
       "expected_output_ref": "linked-list.boundary.expected-output",
       "fixture_ref": "linked-list.boundary"
@@ -328,7 +804,9 @@
         "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-001",
         "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-002",
         "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-003",
-        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-004"
+        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-004",
+        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-005",
+        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-006"
       ],
       "expected_output_ref": "linked-list.failure.expected-output",
       "fixture_ref": "linked-list.failure"
@@ -359,7 +837,9 @@
         "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-001",
         "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-002",
         "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-003",
-        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-004"
+        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-004",
+        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-005",
+        "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-006"
       ],
       "expected_output_ref": "linked-list.normal.expected-output",
       "fixture_ref": "linked-list.normal"
@@ -373,8 +853,8 @@
       "event_type": "write",
       "active_line_ids": [
         "linked-list.production-v1.L037",
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L008"
+        "linked-list.production-v1.L018",
+        "linked-list.production-v1.L114"
       ],
       "before": {
         "fixture_ref": "linked-list.boundary",
@@ -391,8 +871,33 @@
       },
       "delta": {
         "execution_trace_event": {
-          "event": "insert_requested",
-          "success": true
+          "after": {
+            "data": [
+              9
+            ],
+            "free": -1,
+            "head": 0,
+            "next": [
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              null
+            ],
+            "free": 0,
+            "head": -1,
+            "next": [
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 0,
+            "next_free": -1,
+            "saved_head": -1
+          },
+          "event": "insert_head",
+          "value": 9
         },
         "pattern_focus": true
       },
@@ -407,43 +912,94 @@
         "trace_cursor": 1,
         "history": [
           {
-            "event": "insert_requested",
-            "success": true
+            "after": {
+              "data": [
+                9
+              ],
+              "free": -1,
+              "head": 0,
+              "next": [
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": -1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 9
           }
         ],
-        "latest_event": "insert_requested",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "insert_requested",
-          "success": true
+          "after": {
+            "data": [
+              9
+            ],
+            "free": -1,
+            "head": 0,
+            "next": [
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              null
+            ],
+            "free": 0,
+            "head": -1,
+            "next": [
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 0,
+            "next_free": -1,
+            "saved_head": -1
+          },
+          "event": "insert_head",
+          "value": 9
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện insert_requested phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event insert_requested must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện insert_head phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event insert_head must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert requested)",
-        "en": "Which value will be written or updated? (insert requested)"
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+        "en": "Which value will be written or updated? (insert head)"
       },
       "feedback": {
-        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert requested.",
-        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert requested."
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.insert-requested"
+        "visual.list-traverse.insert-head"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 1: insert_requested",
-          "en": "Step 1: insert_requested"
+          "vi": "Bước 1: insert_head",
+          "en": "Step 1: insert_head"
         },
         "action_description": {
-          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert requested)",
-          "en": "Which value will be written or updated? (insert requested)"
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+          "en": "Which value will be written or updated? (insert head)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
@@ -455,8 +1011,8 @@
         "live_status": {
           "mode": "polite",
           "message": {
-            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert requested.",
-            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert requested."
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
           }
         }
       }
@@ -467,10 +1023,9 @@
       "sequence": 1,
       "event_type": "unlink",
       "active_line_ids": [
-        "linked-list.production-v1.L037",
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L019",
-        "linked-list.production-v1.L038"
+        "linked-list.production-v1.L066",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036"
       ],
       "before": {
         "fixture_ref": "linked-list.boundary",
@@ -483,17 +1038,46 @@
         "trace_cursor": 1,
         "history": [
           {
-            "event": "insert_requested",
-            "success": true
+            "after": {
+              "data": [
+                9
+              ],
+              "free": -1,
+              "head": 0,
+              "next": [
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": -1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 9
           }
         ],
-        "latest_event": "insert_requested",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "delta": {
         "execution_trace_event": {
-          "event": "remove_requested",
-          "success": true
+          "event": "remove_compare",
+          "next_node": -1,
+          "node": 0,
+          "previous": -1,
+          "target": 9,
+          "value": 9
         },
         "pattern_focus": true
       },
@@ -508,65 +1092,81 @@
         "trace_cursor": 2,
         "history": [
           {
-            "event": "insert_requested",
-            "success": true
+            "after": {
+              "data": [
+                9
+              ],
+              "free": -1,
+              "head": 0,
+              "next": [
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": -1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 9
           },
           {
-            "event": "remove_requested",
-            "success": true
+            "event": "remove_compare",
+            "next_node": -1,
+            "node": 0,
+            "previous": -1,
+            "target": 9,
+            "value": 9
           }
         ],
-        "latest_event": "remove_requested",
-        "execution_status": "OK",
-        "verified_result": {
-          "after": [],
-          "before": [],
-          "free": 0,
-          "head": -1,
-          "inserted": true,
-          "removed": true,
-          "status": "OK"
-        }
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "remove_requested",
-          "success": true
-        },
-        "final_result": {
-          "after": [],
-          "before": [],
-          "free": 0,
-          "head": -1,
-          "inserted": true,
-          "removed": true,
-          "status": "OK"
+          "event": "remove_compare",
+          "next_node": -1,
+          "node": 0,
+          "previous": -1,
+          "target": 9,
+          "value": 9
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện remove_requested phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event remove_requested must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện remove_compare phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event remove_compare must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove requested)",
-        "en": "Which item will be removed from the structure? (remove requested)"
+        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+        "en": "Which item will be removed from the structure? (remove compare)"
       },
       "feedback": {
-        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove requested.",
-        "en": "The link or item is removed from the trace's prior state. Event: remove requested."
+        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+        "en": "The link or item is removed from the trace's prior state. Event: remove compare."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.remove-requested"
+        "visual.list-traverse.remove-compare"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 2: remove_requested",
-          "en": "Step 2: remove_requested"
+          "vi": "Bước 2: remove_compare",
+          "en": "Step 2: remove_compare"
         },
         "action_description": {
-          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove requested)",
-          "en": "Which item will be removed from the structure? (remove requested)"
+          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+          "en": "Which item will be removed from the structure? (remove compare)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
@@ -578,8 +1178,276 @@
         "live_status": {
           "mode": "polite",
           "message": {
-            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove requested.",
-            "en": "The link or item is removed from the trace's prior state. Event: remove requested."
+            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+            "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.boundary.production-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.boundary.production-v1",
+      "sequence": 2,
+      "event_type": "unlink",
+      "active_line_ids": [
+        "linked-list.production-v1.L097",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036",
+        "linked-list.production-v1.L124"
+      ],
+      "before": {
+        "fixture_ref": "linked-list.boundary",
+        "fixture_input": {
+          "capacity": 1,
+          "initial": [],
+          "insert": 9,
+          "remove": 9
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "after": {
+              "data": [
+                9
+              ],
+              "free": -1,
+              "head": 0,
+              "next": [
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": -1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 9
+          },
+          {
+            "event": "remove_compare",
+            "next_node": -1,
+            "node": 0,
+            "previous": -1,
+            "target": 9,
+            "value": 9
+          }
+        ],
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "after": {
+            "data": [
+              null
+            ],
+            "free": 0,
+            "head": -1,
+            "next": [
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              9
+            ],
+            "free": -1,
+            "head": 0,
+            "next": [
+              -1
+            ]
+          },
+          "change": {
+            "previous": -1,
+            "previous_free": -1,
+            "removed_node": 0,
+            "saved_successor": -1
+          },
+          "event": "remove_recycle",
+          "target": 9
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "linked-list.boundary",
+        "fixture_input": {
+          "capacity": 1,
+          "initial": [],
+          "insert": 9,
+          "remove": 9
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "after": {
+              "data": [
+                9
+              ],
+              "free": -1,
+              "head": 0,
+              "next": [
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": -1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 9
+          },
+          {
+            "event": "remove_compare",
+            "next_node": -1,
+            "node": 0,
+            "previous": -1,
+            "target": 9,
+            "value": 9
+          },
+          {
+            "after": {
+              "data": [
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                9
+              ],
+              "free": -1,
+              "head": 0,
+              "next": [
+                -1
+              ]
+            },
+            "change": {
+              "previous": -1,
+              "previous_free": -1,
+              "removed_node": 0,
+              "saved_successor": -1
+            },
+            "event": "remove_recycle",
+            "target": 9
+          }
+        ],
+        "latest_event": "remove_recycle",
+        "execution_status": "OK",
+        "verified_result": {
+          "after": [],
+          "before": [],
+          "free": 0,
+          "head": -1,
+          "inserted": true,
+          "removed": true,
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "after": {
+            "data": [
+              null
+            ],
+            "free": 0,
+            "head": -1,
+            "next": [
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              9
+            ],
+            "free": -1,
+            "head": 0,
+            "next": [
+              -1
+            ]
+          },
+          "change": {
+            "previous": -1,
+            "previous_free": -1,
+            "removed_node": 0,
+            "saved_successor": -1
+          },
+          "event": "remove_recycle",
+          "target": 9
+        },
+        "final_result": {
+          "after": [],
+          "before": [],
+          "free": 0,
+          "head": -1,
+          "inserted": true,
+          "removed": true,
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện remove_recycle phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event remove_recycle must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove recycle)",
+        "en": "Which item will be removed from the structure? (remove recycle)"
+      },
+      "feedback": {
+        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove recycle.",
+        "en": "The link or item is removed from the trace's prior state. Event: remove recycle."
+      },
+      "visual_targets": [
+        "visual.dsa.link-rewire",
+        "visual.list-traverse.state",
+        "visual.list-traverse.remove-recycle"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 3: remove_recycle",
+          "en": "Step 3: remove_recycle"
+        },
+        "action_description": {
+          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove recycle)",
+          "en": "Which item will be removed from the structure? (remove recycle)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.boundary.production-v1.event-003.focus",
+        "focus_order": 2,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove recycle.",
+            "en": "The link or item is removed from the trace's prior state. Event: remove recycle."
           }
         }
       }
@@ -590,9 +1458,9 @@
       "sequence": 0,
       "event_type": "write",
       "active_line_ids": [
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L033",
-        "linked-list.production-v1.L008"
+        "linked-list.production-v1.L037",
+        "linked-list.production-v1.L018",
+        "linked-list.production-v1.L114"
       ],
       "before": {
         "fixture_ref": "linked-list.failure",
@@ -612,8 +1480,36 @@
       },
       "delta": {
         "execution_trace_event": {
-          "event": "insert",
-          "success": true,
+          "after": {
+            "data": [
+              2,
+              null
+            ],
+            "free": 1,
+            "head": 0,
+            "next": [
+              -1,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              null,
+              null
+            ],
+            "free": 0,
+            "head": -1,
+            "next": [
+              1,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 0,
+            "next_free": 1,
+            "saved_head": -1
+          },
+          "event": "insert_head",
           "value": 2
         },
         "pattern_focus": true
@@ -632,45 +1528,102 @@
         "trace_cursor": 1,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 2
           }
         ],
-        "latest_event": "insert",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "insert",
-          "success": true,
+          "after": {
+            "data": [
+              2,
+              null
+            ],
+            "free": 1,
+            "head": 0,
+            "next": [
+              -1,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              null,
+              null
+            ],
+            "free": 0,
+            "head": -1,
+            "next": [
+              1,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 0,
+            "next_free": 1,
+            "saved_head": -1
+          },
+          "event": "insert_head",
           "value": 2
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện insert_head phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event insert_head must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
-        "en": "Which value will be written or updated? (insert)"
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+        "en": "Which value will be written or updated? (insert head)"
       },
       "feedback": {
-        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
-        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.insert"
+        "visual.list-traverse.insert-head"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 1: insert",
-          "en": "Step 1: insert"
+          "vi": "Bước 1: insert_head",
+          "en": "Step 1: insert_head"
         },
         "action_description": {
-          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
-          "en": "Which value will be written or updated? (insert)"
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+          "en": "Which value will be written or updated? (insert head)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
@@ -682,8 +1635,8 @@
         "live_status": {
           "mode": "polite",
           "message": {
-            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
-            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
           }
         }
       }
@@ -694,9 +1647,9 @@
       "sequence": 1,
       "event_type": "write",
       "active_line_ids": [
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L033",
-        "linked-list.production-v1.L008"
+        "linked-list.production-v1.L037",
+        "linked-list.production-v1.L018",
+        "linked-list.production-v1.L114"
       ],
       "before": {
         "fixture_ref": "linked-list.failure",
@@ -712,18 +1665,74 @@
         "trace_cursor": 1,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 2
           }
         ],
-        "latest_event": "insert",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "delta": {
         "execution_trace_event": {
-          "event": "insert",
-          "success": true,
+          "after": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "data": [
+              2,
+              null
+            ],
+            "free": 1,
+            "head": 0,
+            "next": [
+              -1,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 1,
+            "next_free": -1,
+            "saved_head": 0
+          },
+          "event": "insert_head",
           "value": 1
         },
         "pattern_focus": true
@@ -742,50 +1751,135 @@
         "trace_cursor": 2,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 2
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 1
           }
         ],
-        "latest_event": "insert",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "insert",
-          "success": true,
+          "after": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "data": [
+              2,
+              null
+            ],
+            "free": 1,
+            "head": 0,
+            "next": [
+              -1,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 1,
+            "next_free": -1,
+            "saved_head": 0
+          },
+          "event": "insert_head",
           "value": 1
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện insert_head phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event insert_head must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
-        "en": "Which value will be written or updated? (insert)"
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+        "en": "Which value will be written or updated? (insert head)"
       },
       "feedback": {
-        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
-        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.insert"
+        "visual.list-traverse.insert-head"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 2: insert",
-          "en": "Step 2: insert"
+          "vi": "Bước 2: insert_head",
+          "en": "Step 2: insert_head"
         },
         "action_description": {
-          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
-          "en": "Which value will be written or updated? (insert)"
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+          "en": "Which value will be written or updated? (insert head)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
@@ -797,8 +1891,8 @@
         "live_status": {
           "mode": "polite",
           "message": {
-            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
-            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
           }
         }
       }
@@ -807,11 +1901,11 @@
       "event_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-003",
       "trace_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1",
       "sequence": 2,
-      "event_type": "write",
+      "event_type": "reject",
       "active_line_ids": [
-        "linked-list.production-v1.L037",
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L008"
+        "linked-list.production-v1.L022",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036"
       ],
       "before": {
         "fixture_ref": "linked-list.failure",
@@ -827,23 +1921,106 @@
         "trace_cursor": 2,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 2
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 1
           }
         ],
-        "latest_event": "insert",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "delta": {
         "execution_trace_event": {
-          "event": "insert_requested",
-          "success": false
+          "after": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "change": {
+            "reason": "free_list_empty"
+          },
+          "event": "insert_reject_full",
+          "value": 3
         },
         "pattern_focus": true
       },
@@ -861,53 +2038,164 @@
         "trace_cursor": 3,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 2
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 1
           },
           {
-            "event": "insert_requested",
-            "success": false
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "change": {
+              "reason": "free_list_empty"
+            },
+            "event": "insert_reject_full",
+            "value": 3
           }
         ],
-        "latest_event": "insert_requested",
+        "latest_event": "insert_reject_full",
         "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "insert_requested",
-          "success": false
+          "after": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "change": {
+            "reason": "free_list_empty"
+          },
+          "event": "insert_reject_full",
+          "value": 3
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện insert_requested phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event insert_requested must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện insert_reject_full phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event insert_reject_full must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert requested)",
-        "en": "Which value will be written or updated? (insert requested)"
+        "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (insert reject full)",
+        "en": "Which condition causes the input to be rejected? (insert reject full)"
       },
       "feedback": {
-        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert requested.",
-        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert requested."
+        "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: insert reject full.",
+        "en": "The failure path stops or protects state at the exact guard. Event: insert reject full."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.insert-requested"
+        "visual.list-traverse.insert-reject-full"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 3: insert_requested",
-          "en": "Step 3: insert_requested"
+          "vi": "Bước 3: insert_reject_full",
+          "en": "Step 3: insert_reject_full"
         },
         "action_description": {
-          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert requested)",
-          "en": "Which value will be written or updated? (insert requested)"
+          "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (insert reject full)",
+          "en": "Which condition causes the input to be rejected? (insert reject full)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
@@ -917,10 +2205,10 @@
         "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-003.focus",
         "focus_order": 2,
         "live_status": {
-          "mode": "polite",
+          "mode": "assertive",
           "message": {
-            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert requested.",
-            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert requested."
+            "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: insert reject full.",
+            "en": "The failure path stops or protects state at the exact guard. Event: insert reject full."
           }
         }
       }
@@ -931,10 +2219,9 @@
       "sequence": 3,
       "event_type": "unlink",
       "active_line_ids": [
-        "linked-list.production-v1.L037",
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L019",
-        "linked-list.production-v1.L038"
+        "linked-list.production-v1.L066",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036"
       ],
       "before": {
         "fixture_ref": "linked-list.failure",
@@ -950,27 +2237,114 @@
         "trace_cursor": 3,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 2
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 1
           },
           {
-            "event": "insert_requested",
-            "success": false
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "change": {
+              "reason": "free_list_empty"
+            },
+            "event": "insert_reject_full",
+            "value": 3
           }
         ],
-        "latest_event": "insert_requested",
+        "latest_event": "insert_reject_full",
         "execution_status": "OK"
       },
       "delta": {
         "execution_trace_event": {
-          "event": "remove_requested",
-          "success": false
+          "event": "remove_compare",
+          "next_node": 0,
+          "node": 1,
+          "previous": -1,
+          "target": 8,
+          "value": 1
         },
         "pattern_focus": true
       },
@@ -988,25 +2362,825 @@
         "trace_cursor": 4,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 2
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 1
           },
           {
-            "event": "insert_requested",
-            "success": false
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "change": {
+              "reason": "free_list_empty"
+            },
+            "event": "insert_reject_full",
+            "value": 3
           },
           {
-            "event": "remove_requested",
-            "success": false
+            "event": "remove_compare",
+            "next_node": 0,
+            "node": 1,
+            "previous": -1,
+            "target": 8,
+            "value": 1
           }
         ],
-        "latest_event": "remove_requested",
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "remove_compare",
+          "next_node": 0,
+          "node": 1,
+          "previous": -1,
+          "target": 8,
+          "value": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện remove_compare phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event remove_compare must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+        "en": "Which item will be removed from the structure? (remove compare)"
+      },
+      "feedback": {
+        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+        "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+      },
+      "visual_targets": [
+        "visual.dsa.link-rewire",
+        "visual.list-traverse.state",
+        "visual.list-traverse.remove-compare"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: remove_compare",
+          "en": "Step 4: remove_compare"
+        },
+        "action_description": {
+          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+          "en": "Which item will be removed from the structure? (remove compare)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+            "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1",
+      "sequence": 4,
+      "event_type": "unlink",
+      "active_line_ids": [
+        "linked-list.production-v1.L066",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036"
+      ],
+      "before": {
+        "fixture_ref": "linked-list.failure",
+        "fixture_input": {
+          "capacity": 2,
+          "initial": [
+            1,
+            2
+          ],
+          "insert": 3,
+          "remove": 8
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
+            "value": 1
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "change": {
+              "reason": "free_list_empty"
+            },
+            "event": "insert_reject_full",
+            "value": 3
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 0,
+            "node": 1,
+            "previous": -1,
+            "target": 8,
+            "value": 1
+          }
+        ],
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "remove_compare",
+          "next_node": -1,
+          "node": 0,
+          "previous": 1,
+          "target": 8,
+          "value": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "linked-list.failure",
+        "fixture_input": {
+          "capacity": 2,
+          "initial": [
+            1,
+            2
+          ],
+          "insert": 3,
+          "remove": 8
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
+            "value": 1
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "change": {
+              "reason": "free_list_empty"
+            },
+            "event": "insert_reject_full",
+            "value": 3
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 0,
+            "node": 1,
+            "previous": -1,
+            "target": 8,
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": -1,
+            "node": 0,
+            "previous": 1,
+            "target": 8,
+            "value": 2
+          }
+        ],
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "remove_compare",
+          "next_node": -1,
+          "node": 0,
+          "previous": 1,
+          "target": 8,
+          "value": 2
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện remove_compare phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event remove_compare must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+        "en": "Which item will be removed from the structure? (remove compare)"
+      },
+      "feedback": {
+        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+        "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+      },
+      "visual_targets": [
+        "visual.dsa.link-rewire",
+        "visual.list-traverse.state",
+        "visual.list-traverse.remove-compare"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: remove_compare",
+          "en": "Step 5: remove_compare"
+        },
+        "action_description": {
+          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+          "en": "Which item will be removed from the structure? (remove compare)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+            "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-006",
+      "trace_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1",
+      "sequence": 5,
+      "event_type": "reject",
+      "active_line_ids": [
+        "linked-list.production-v1.L080",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036",
+        "linked-list.production-v1.L124"
+      ],
+      "before": {
+        "fixture_ref": "linked-list.failure",
+        "fixture_input": {
+          "capacity": 2,
+          "initial": [
+            1,
+            2
+          ],
+          "insert": 3,
+          "remove": 8
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
+            "value": 1
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "change": {
+              "reason": "free_list_empty"
+            },
+            "event": "insert_reject_full",
+            "value": 3
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 0,
+            "node": 1,
+            "previous": -1,
+            "target": 8,
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": -1,
+            "node": 0,
+            "previous": 1,
+            "target": 8,
+            "value": 2
+          }
+        ],
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "after": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "change": {
+            "reason": "target_not_found"
+          },
+          "event": "remove_reject_missing",
+          "target": 8
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "linked-list.failure",
+        "fixture_input": {
+          "capacity": 2,
+          "initial": [
+            1,
+            2
+          ],
+          "insert": 3,
+          "remove": 8
+        },
+        "trace_cursor": 6,
+        "history": [
+          {
+            "after": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": -1,
+              "saved_head": 0
+            },
+            "event": "insert_head",
+            "value": 1
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "change": {
+              "reason": "free_list_empty"
+            },
+            "event": "insert_reject_full",
+            "value": 3
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 0,
+            "node": 1,
+            "previous": -1,
+            "target": 8,
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": -1,
+            "node": 0,
+            "previous": 1,
+            "target": 8,
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "before": {
+              "data": [
+                2,
+                1
+              ],
+              "free": -1,
+              "head": 1,
+              "next": [
+                -1,
+                0
+              ]
+            },
+            "change": {
+              "reason": "target_not_found"
+            },
+            "event": "remove_reject_missing",
+            "target": 8
+          }
+        ],
+        "latest_event": "remove_reject_missing",
         "execution_status": "OK",
         "verified_result": {
           "after": [
@@ -1026,8 +3200,35 @@
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "remove_requested",
-          "success": false
+          "after": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "data": [
+              2,
+              1
+            ],
+            "free": -1,
+            "head": 1,
+            "next": [
+              -1,
+              0
+            ]
+          },
+          "change": {
+            "reason": "target_not_found"
+          },
+          "event": "remove_reject_missing",
+          "target": 8
         },
         "final_result": {
           "after": [
@@ -1046,42 +3247,43 @@
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện remove_requested phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event remove_requested must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện remove_reject_missing phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event remove_reject_missing must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove requested)",
-        "en": "Which item will be removed from the structure? (remove requested)"
+        "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (remove reject missing)",
+        "en": "Which condition causes the input to be rejected? (remove reject missing)"
       },
       "feedback": {
-        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove requested.",
-        "en": "The link or item is removed from the trace's prior state. Event: remove requested."
+        "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: remove reject missing.",
+        "en": "The failure path stops or protects state at the exact guard. Event: remove reject missing."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.remove-requested"
+        "visual.list-traverse.remove-reject-missing"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 4: remove_requested",
-          "en": "Step 4: remove_requested"
+          "vi": "Bước 6: remove_reject_missing",
+          "en": "Step 6: remove_reject_missing"
         },
         "action_description": {
-          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove requested)",
-          "en": "Which item will be removed from the structure? (remove requested)"
+          "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (remove reject missing)",
+          "en": "Which condition causes the input to be rejected? (remove reject missing)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
           "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
           "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
         },
-        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-004.focus",
-        "focus_order": 3,
+        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.failure.production-v1.event-006.focus",
+        "focus_order": 5,
         "live_status": {
-          "mode": "polite",
+          "mode": "assertive",
           "message": {
-            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove requested.",
-            "en": "The link or item is removed from the trace's prior state. Event: remove requested."
+            "vi": "Đường lỗi dừng hoặc bảo vệ trạng thái tại đúng điểm kiểm tra. Sự kiện: remove reject missing.",
+            "en": "The failure path stops or protects state at the exact guard. Event: remove reject missing."
           }
         }
       }
@@ -1092,9 +3294,9 @@
       "sequence": 0,
       "event_type": "write",
       "active_line_ids": [
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L033",
-        "linked-list.production-v1.L008"
+        "linked-list.production-v1.L037",
+        "linked-list.production-v1.L018",
+        "linked-list.production-v1.L114"
       ],
       "before": {
         "fixture_ref": "linked-list.normal",
@@ -1114,8 +3316,48 @@
       },
       "delta": {
         "execution_trace_event": {
-          "event": "insert",
-          "success": true,
+          "after": {
+            "data": [
+              4,
+              null,
+              null,
+              null,
+              null
+            ],
+            "free": 1,
+            "head": 0,
+            "next": [
+              -1,
+              2,
+              3,
+              4,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "free": 0,
+            "head": -1,
+            "next": [
+              1,
+              2,
+              3,
+              4,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 0,
+            "next_free": 1,
+            "saved_head": -1
+          },
+          "event": "insert_head",
           "value": 4
         },
         "pattern_focus": true
@@ -1134,45 +3376,126 @@
         "trace_cursor": 1,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 4
           }
         ],
-        "latest_event": "insert",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "insert",
-          "success": true,
+          "after": {
+            "data": [
+              4,
+              null,
+              null,
+              null,
+              null
+            ],
+            "free": 1,
+            "head": 0,
+            "next": [
+              -1,
+              2,
+              3,
+              4,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "free": 0,
+            "head": -1,
+            "next": [
+              1,
+              2,
+              3,
+              4,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 0,
+            "next_free": 1,
+            "saved_head": -1
+          },
+          "event": "insert_head",
           "value": 4
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện insert_head phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event insert_head must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
-        "en": "Which value will be written or updated? (insert)"
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+        "en": "Which value will be written or updated? (insert head)"
       },
       "feedback": {
-        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
-        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.insert"
+        "visual.list-traverse.insert-head"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 1: insert",
-          "en": "Step 1: insert"
+          "vi": "Bước 1: insert_head",
+          "en": "Step 1: insert_head"
         },
         "action_description": {
-          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
-          "en": "Which value will be written or updated? (insert)"
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+          "en": "Which value will be written or updated? (insert head)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
@@ -1184,8 +3507,8 @@
         "live_status": {
           "mode": "polite",
           "message": {
-            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
-            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
           }
         }
       }
@@ -1196,9 +3519,9 @@
       "sequence": 1,
       "event_type": "write",
       "active_line_ids": [
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L033",
-        "linked-list.production-v1.L008"
+        "linked-list.production-v1.L037",
+        "linked-list.production-v1.L018",
+        "linked-list.production-v1.L114"
       ],
       "before": {
         "fixture_ref": "linked-list.normal",
@@ -1214,18 +3537,98 @@
         "trace_cursor": 1,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 4
           }
         ],
-        "latest_event": "insert",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "delta": {
         "execution_trace_event": {
-          "event": "insert",
-          "success": true,
+          "after": {
+            "data": [
+              4,
+              2,
+              null,
+              null,
+              null
+            ],
+            "free": 2,
+            "head": 1,
+            "next": [
+              -1,
+              0,
+              3,
+              4,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              4,
+              null,
+              null,
+              null,
+              null
+            ],
+            "free": 1,
+            "head": 0,
+            "next": [
+              -1,
+              2,
+              3,
+              4,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 1,
+            "next_free": 2,
+            "saved_head": 0
+          },
+          "event": "insert_head",
           "value": 2
         },
         "pattern_focus": true
@@ -1244,50 +3647,171 @@
         "trace_cursor": 2,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 4
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 2
           }
         ],
-        "latest_event": "insert",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "insert",
-          "success": true,
+          "after": {
+            "data": [
+              4,
+              2,
+              null,
+              null,
+              null
+            ],
+            "free": 2,
+            "head": 1,
+            "next": [
+              -1,
+              0,
+              3,
+              4,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              4,
+              null,
+              null,
+              null,
+              null
+            ],
+            "free": 1,
+            "head": 0,
+            "next": [
+              -1,
+              2,
+              3,
+              4,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 1,
+            "next_free": 2,
+            "saved_head": 0
+          },
+          "event": "insert_head",
           "value": 2
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện insert phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event insert must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện insert_head phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event insert_head must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
-        "en": "Which value will be written or updated? (insert)"
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+        "en": "Which value will be written or updated? (insert head)"
       },
       "feedback": {
-        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
-        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.insert"
+        "visual.list-traverse.insert-head"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 2: insert",
-          "en": "Step 2: insert"
+          "vi": "Bước 2: insert_head",
+          "en": "Step 2: insert_head"
         },
         "action_description": {
-          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert)",
-          "en": "Which value will be written or updated? (insert)"
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+          "en": "Which value will be written or updated? (insert head)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
@@ -1299,8 +3823,8 @@
         "live_status": {
           "mode": "polite",
           "message": {
-            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert.",
-            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert."
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
           }
         }
       }
@@ -1312,8 +3836,8 @@
       "event_type": "write",
       "active_line_ids": [
         "linked-list.production-v1.L037",
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L008"
+        "linked-list.production-v1.L018",
+        "linked-list.production-v1.L114"
       ],
       "before": {
         "fixture_ref": "linked-list.normal",
@@ -1329,23 +3853,144 @@
         "trace_cursor": 2,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 4
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 2
           }
         ],
-        "latest_event": "insert",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "delta": {
         "execution_trace_event": {
-          "event": "insert_requested",
-          "success": true
+          "after": {
+            "data": [
+              4,
+              2,
+              1,
+              null,
+              null
+            ],
+            "free": 3,
+            "head": 2,
+            "next": [
+              -1,
+              0,
+              1,
+              4,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              4,
+              2,
+              null,
+              null,
+              null
+            ],
+            "free": 2,
+            "head": 1,
+            "next": [
+              -1,
+              0,
+              3,
+              4,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 2,
+            "next_free": 3,
+            "saved_head": 1
+          },
+          "event": "insert_head",
+          "value": 1
         },
         "pattern_focus": true
       },
@@ -1363,53 +4008,216 @@
         "trace_cursor": 3,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 4
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 2
           },
           {
-            "event": "insert_requested",
-            "success": true
+            "after": {
+              "data": [
+                4,
+                2,
+                1,
+                null,
+                null
+              ],
+              "free": 3,
+              "head": 2,
+              "next": [
+                -1,
+                0,
+                1,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 2,
+              "next_free": 3,
+              "saved_head": 1
+            },
+            "event": "insert_head",
+            "value": 1
           }
         ],
-        "latest_event": "insert_requested",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "insert_requested",
-          "success": true
+          "after": {
+            "data": [
+              4,
+              2,
+              1,
+              null,
+              null
+            ],
+            "free": 3,
+            "head": 2,
+            "next": [
+              -1,
+              0,
+              1,
+              4,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              4,
+              2,
+              null,
+              null,
+              null
+            ],
+            "free": 2,
+            "head": 1,
+            "next": [
+              -1,
+              0,
+              3,
+              4,
+              -1
+            ]
+          },
+          "change": {
+            "allocated_node": 2,
+            "next_free": 3,
+            "saved_head": 1
+          },
+          "event": "insert_head",
+          "value": 1
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện insert_requested phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event insert_requested must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện insert_head phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event insert_head must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert requested)",
-        "en": "Which value will be written or updated? (insert requested)"
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+        "en": "Which value will be written or updated? (insert head)"
       },
       "feedback": {
-        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert requested.",
-        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert requested."
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.insert-requested"
+        "visual.list-traverse.insert-head"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 3: insert_requested",
-          "en": "Step 3: insert_requested"
+          "vi": "Bước 3: insert_head",
+          "en": "Step 3: insert_head"
         },
         "action_description": {
-          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert requested)",
-          "en": "Which value will be written or updated? (insert requested)"
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (insert head)",
+          "en": "Which value will be written or updated? (insert head)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
@@ -1421,8 +4229,8 @@
         "live_status": {
           "mode": "polite",
           "message": {
-            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert requested.",
-            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert requested."
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: insert head.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: insert head."
           }
         }
       }
@@ -1433,10 +4241,9 @@
       "sequence": 3,
       "event_type": "unlink",
       "active_line_ids": [
-        "linked-list.production-v1.L037",
-        "linked-list.production-v1.L031",
-        "linked-list.production-v1.L019",
-        "linked-list.production-v1.L038"
+        "linked-list.production-v1.L066",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036"
       ],
       "before": {
         "fixture_ref": "linked-list.normal",
@@ -1452,27 +4259,152 @@
         "trace_cursor": 3,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 4
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 2
           },
           {
-            "event": "insert_requested",
-            "success": true
+            "after": {
+              "data": [
+                4,
+                2,
+                1,
+                null,
+                null
+              ],
+              "free": 3,
+              "head": 2,
+              "next": [
+                -1,
+                0,
+                1,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 2,
+              "next_free": 3,
+              "saved_head": 1
+            },
+            "event": "insert_head",
+            "value": 1
           }
         ],
-        "latest_event": "insert_requested",
+        "latest_event": "insert_head",
         "execution_status": "OK"
       },
       "delta": {
         "execution_trace_event": {
-          "event": "remove_requested",
-          "success": true
+          "event": "remove_compare",
+          "next_node": 1,
+          "node": 2,
+          "previous": -1,
+          "target": 2,
+          "value": 1
         },
         "pattern_focus": true
       },
@@ -1490,25 +4422,1045 @@
         "trace_cursor": 4,
         "history": [
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
             "value": 4
           },
           {
-            "event": "insert",
-            "success": true,
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
             "value": 2
           },
           {
-            "event": "insert_requested",
-            "success": true
+            "after": {
+              "data": [
+                4,
+                2,
+                1,
+                null,
+                null
+              ],
+              "free": 3,
+              "head": 2,
+              "next": [
+                -1,
+                0,
+                1,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 2,
+              "next_free": 3,
+              "saved_head": 1
+            },
+            "event": "insert_head",
+            "value": 1
           },
           {
-            "event": "remove_requested",
-            "success": true
+            "event": "remove_compare",
+            "next_node": 1,
+            "node": 2,
+            "previous": -1,
+            "target": 2,
+            "value": 1
           }
         ],
-        "latest_event": "remove_requested",
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "remove_compare",
+          "next_node": 1,
+          "node": 2,
+          "previous": -1,
+          "target": 2,
+          "value": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện remove_compare phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event remove_compare must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+        "en": "Which item will be removed from the structure? (remove compare)"
+      },
+      "feedback": {
+        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+        "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+      },
+      "visual_targets": [
+        "visual.dsa.link-rewire",
+        "visual.list-traverse.state",
+        "visual.list-traverse.remove-compare"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: remove_compare",
+          "en": "Step 4: remove_compare"
+        },
+        "action_description": {
+          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+          "en": "Which item will be removed from the structure? (remove compare)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+            "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1",
+      "sequence": 4,
+      "event_type": "unlink",
+      "active_line_ids": [
+        "linked-list.production-v1.L066",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036"
+      ],
+      "before": {
+        "fixture_ref": "linked-list.normal",
+        "fixture_input": {
+          "capacity": 5,
+          "initial": [
+            2,
+            4
+          ],
+          "insert": 1,
+          "remove": 2
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 4
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                2,
+                1,
+                null,
+                null
+              ],
+              "free": 3,
+              "head": 2,
+              "next": [
+                -1,
+                0,
+                1,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 2,
+              "next_free": 3,
+              "saved_head": 1
+            },
+            "event": "insert_head",
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 1,
+            "node": 2,
+            "previous": -1,
+            "target": 2,
+            "value": 1
+          }
+        ],
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "remove_compare",
+          "next_node": 0,
+          "node": 1,
+          "previous": 2,
+          "target": 2,
+          "value": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "linked-list.normal",
+        "fixture_input": {
+          "capacity": 5,
+          "initial": [
+            2,
+            4
+          ],
+          "insert": 1,
+          "remove": 2
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 4
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                2,
+                1,
+                null,
+                null
+              ],
+              "free": 3,
+              "head": 2,
+              "next": [
+                -1,
+                0,
+                1,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 2,
+              "next_free": 3,
+              "saved_head": 1
+            },
+            "event": "insert_head",
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 1,
+            "node": 2,
+            "previous": -1,
+            "target": 2,
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 0,
+            "node": 1,
+            "previous": 2,
+            "target": 2,
+            "value": 2
+          }
+        ],
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "remove_compare",
+          "next_node": 0,
+          "node": 1,
+          "previous": 2,
+          "target": 2,
+          "value": 2
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện remove_compare phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event remove_compare must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+        "en": "Which item will be removed from the structure? (remove compare)"
+      },
+      "feedback": {
+        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+        "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+      },
+      "visual_targets": [
+        "visual.dsa.link-rewire",
+        "visual.list-traverse.state",
+        "visual.list-traverse.remove-compare"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: remove_compare",
+          "en": "Step 5: remove_compare"
+        },
+        "action_description": {
+          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove compare)",
+          "en": "Which item will be removed from the structure? (remove compare)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove compare.",
+            "en": "The link or item is removed from the trace's prior state. Event: remove compare."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-006",
+      "trace_id": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1",
+      "sequence": 5,
+      "event_type": "unlink",
+      "active_line_ids": [
+        "linked-list.production-v1.L097",
+        "linked-list.production-v1.L021",
+        "linked-list.production-v1.L036",
+        "linked-list.production-v1.L124"
+      ],
+      "before": {
+        "fixture_ref": "linked-list.normal",
+        "fixture_input": {
+          "capacity": 5,
+          "initial": [
+            2,
+            4
+          ],
+          "insert": 1,
+          "remove": 2
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 4
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                2,
+                1,
+                null,
+                null
+              ],
+              "free": 3,
+              "head": 2,
+              "next": [
+                -1,
+                0,
+                1,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 2,
+              "next_free": 3,
+              "saved_head": 1
+            },
+            "event": "insert_head",
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 1,
+            "node": 2,
+            "previous": -1,
+            "target": 2,
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 0,
+            "node": 1,
+            "previous": 2,
+            "target": 2,
+            "value": 2
+          }
+        ],
+        "latest_event": "remove_compare",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "after": {
+            "data": [
+              4,
+              null,
+              1,
+              null,
+              null
+            ],
+            "free": 1,
+            "head": 2,
+            "next": [
+              -1,
+              3,
+              0,
+              4,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              4,
+              2,
+              1,
+              null,
+              null
+            ],
+            "free": 3,
+            "head": 2,
+            "next": [
+              -1,
+              0,
+              1,
+              4,
+              -1
+            ]
+          },
+          "change": {
+            "previous": 2,
+            "previous_free": 3,
+            "removed_node": 1,
+            "saved_successor": 0
+          },
+          "event": "remove_recycle",
+          "target": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "linked-list.normal",
+        "fixture_input": {
+          "capacity": 5,
+          "initial": [
+            2,
+            4
+          ],
+          "insert": 1,
+          "remove": 2
+        },
+        "trace_cursor": 6,
+        "history": [
+          {
+            "after": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 0,
+              "head": -1,
+              "next": [
+                1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 0,
+              "next_free": 1,
+              "saved_head": -1
+            },
+            "event": "insert_head",
+            "value": 4
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                null,
+                null,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 0,
+              "next": [
+                -1,
+                2,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 1,
+              "next_free": 2,
+              "saved_head": 0
+            },
+            "event": "insert_head",
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                2,
+                1,
+                null,
+                null
+              ],
+              "free": 3,
+              "head": 2,
+              "next": [
+                -1,
+                0,
+                1,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                2,
+                null,
+                null,
+                null
+              ],
+              "free": 2,
+              "head": 1,
+              "next": [
+                -1,
+                0,
+                3,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "allocated_node": 2,
+              "next_free": 3,
+              "saved_head": 1
+            },
+            "event": "insert_head",
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 1,
+            "node": 2,
+            "previous": -1,
+            "target": 2,
+            "value": 1
+          },
+          {
+            "event": "remove_compare",
+            "next_node": 0,
+            "node": 1,
+            "previous": 2,
+            "target": 2,
+            "value": 2
+          },
+          {
+            "after": {
+              "data": [
+                4,
+                null,
+                1,
+                null,
+                null
+              ],
+              "free": 1,
+              "head": 2,
+              "next": [
+                -1,
+                3,
+                0,
+                4,
+                -1
+              ]
+            },
+            "before": {
+              "data": [
+                4,
+                2,
+                1,
+                null,
+                null
+              ],
+              "free": 3,
+              "head": 2,
+              "next": [
+                -1,
+                0,
+                1,
+                4,
+                -1
+              ]
+            },
+            "change": {
+              "previous": 2,
+              "previous_free": 3,
+              "removed_node": 1,
+              "saved_successor": 0
+            },
+            "event": "remove_recycle",
+            "target": 2
+          }
+        ],
+        "latest_event": "remove_recycle",
         "execution_status": "OK",
         "verified_result": {
           "after": [
@@ -1528,8 +5480,50 @@
       },
       "output_delta": {
         "emitted_trace_event": {
-          "event": "remove_requested",
-          "success": true
+          "after": {
+            "data": [
+              4,
+              null,
+              1,
+              null,
+              null
+            ],
+            "free": 1,
+            "head": 2,
+            "next": [
+              -1,
+              3,
+              0,
+              4,
+              -1
+            ]
+          },
+          "before": {
+            "data": [
+              4,
+              2,
+              1,
+              null,
+              null
+            ],
+            "free": 3,
+            "head": 2,
+            "next": [
+              -1,
+              0,
+              1,
+              4,
+              -1
+            ]
+          },
+          "change": {
+            "previous": 2,
+            "previous_free": 3,
+            "removed_node": 1,
+            "saved_successor": 0
+          },
+          "event": "remove_recycle",
+          "target": 2
         },
         "final_result": {
           "after": [
@@ -1548,42 +5542,43 @@
         }
       },
       "invariant_or_criterion": {
-        "vi": "LIST_TRAVERSE: sự kiện remove_requested phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
-        "en": "LIST_TRAVERSE: event remove_requested must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+        "vi": "Link nào phải được lưu trước khi insert/remove thay đổi predecessor, successor hoặc free list? LIST_TRAVERSE: sự kiện remove_recycle phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which link must be saved before insert/remove changes the predecessor, successor, or free list? LIST_TRAVERSE: event remove_recycle must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
       },
       "prediction": {
-        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove requested)",
-        "en": "Which item will be removed from the structure? (remove requested)"
+        "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove recycle)",
+        "en": "Which item will be removed from the structure? (remove recycle)"
       },
       "feedback": {
-        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove requested.",
-        "en": "The link or item is removed from the trace's prior state. Event: remove requested."
+        "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove recycle.",
+        "en": "The link or item is removed from the trace's prior state. Event: remove recycle."
       },
       "visual_targets": [
+        "visual.dsa.link-rewire",
         "visual.list-traverse.state",
-        "visual.list-traverse.remove-requested"
+        "visual.list-traverse.remove-recycle"
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 4: remove_requested",
-          "en": "Step 4: remove_requested"
+          "vi": "Bước 6: remove_recycle",
+          "en": "Step 6: remove_recycle"
         },
         "action_description": {
-          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove requested)",
-          "en": "Which item will be removed from the structure? (remove requested)"
+          "vi": "Phần tử nào sẽ bị gỡ khỏi cấu trúc? (remove recycle)",
+          "en": "Which item will be removed from the structure? (remove recycle)"
         },
         "interaction_role": "step",
         "keyboard_instruction": {
           "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
           "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
         },
-        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-004.focus",
-        "focus_order": 3,
+        "focus_target": "ac-9618-p4-2026-python.trace.linked-list.list-traverse.normal.production-v1.event-006.focus",
+        "focus_order": 5,
         "live_status": {
           "mode": "polite",
           "message": {
-            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove requested.",
-            "en": "The link or item is removed from the trace's prior state. Event: remove requested."
+            "vi": "Liên kết hoặc phần tử được gỡ đúng theo trạng thái trước của trace. Sự kiện: remove recycle.",
+            "en": "The link or item is removed from the trace's prior state. Event: remove recycle."
           }
         }
       }

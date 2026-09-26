@@ -1,44 +1,148 @@
 from pathlib import Path
 
-def bubble(values, reverse=False):
-    output, comparisons, swaps = list(values), 0, 0
+def bubble(values, trace, reverse=False):
+    output = list(values)
+    comparisons = 0
+    swaps = 0
     for end in range(len(output) - 1, 0, -1):
         changed = False
+        pass_number = len(output) - end
         for index in range(end):
             comparisons += 1
-            wrong = output[index] < output[index + 1] if reverse else output[index] > output[index + 1]
+            left = output[index]
+            right = output[index + 1]
+            wrong = left < right if reverse else left > right
+            trace.append({
+                "event": "bubble_compare",
+                "pass": pass_number,
+                "left_index": index,
+                "right_index": index + 1,
+                "left": left,
+                "right": right,
+                "swap_required": wrong,
+            })
             if wrong:
-                output[index], output[index + 1] = output[index + 1], output[index]
-                swaps, changed = swaps + 1, True
+                before = list(output)
+                output[index] = right
+                output[index + 1] = left
+                swaps += 1
+                changed = True
+                trace.append({
+                    "event": "bubble_swap",
+                    "pass": pass_number,
+                    "indices": [index, index + 1],
+                    "before": before,
+                    "after": list(output),
+                })
+        trace.append({
+            "event": "bubble_pass_complete",
+            "pass": pass_number,
+            "changed": changed,
+            "sorted_suffix_start": end,
+            "values": list(output),
+        })
         if not changed:
             break
+    trace.append({"event": "bubble_complete", "values": list(output)})
     return output, comparisons, swaps
 
-def insertion(values):
+def insertion(values, trace):
     output = list(values)
     for index in range(1, len(output)):
-        item, position = output[index], index
+        item = output[index]
+        position = index
+        trace.append({
+            "event": "insertion_select_key",
+            "index": index,
+            "key": item,
+            "sorted_prefix": list(output[:index]),
+        })
         while position > 0 and output[position - 1] > item:
+            before = list(output)
             output[position] = output[position - 1]
+            trace.append({
+                "event": "insertion_shift",
+                "from_index": position - 1,
+                "to_index": position,
+                "value": output[position],
+                "before": before,
+                "after": list(output),
+            })
             position -= 1
+        before = list(output)
         output[position] = item
+        trace.append({
+            "event": "insertion_place_key",
+            "from_index": index,
+            "to_index": position,
+            "key": item,
+            "before": before,
+            "after": list(output),
+        })
+    trace.append({"event": "insertion_complete", "values": list(output)})
     return output
 
 def run(fixture):
     values = fixture.get("values", [])
+    trace = []
     if not all(isinstance(value, int) for value in values):
-        return {"status": "INVALID_KEY", "values": values, "trace": [{"event": "reject_key"}]}
-    ordered, comparisons, swaps = bubble(values, fixture.get("reverse", False))
-    insertion_ordered = insertion(values)
+        trace.append({
+            "event": "reject_key",
+            "before": list(values),
+            "after": list(values),
+        })
+        return {"status": "INVALID_KEY", "values": values, "trace": trace}
+    ordered, comparisons, swaps = bubble(values, trace, fixture.get("reverse", False))
+    insertion_ordered = insertion(values, trace)
     bounded = list(fixture.get("bounded", []))
     if len(bounded) >= fixture["capacity"]:
-        return {"status": "FULL", "values": bounded, "bubble": ordered, "insertion": insertion_ordered, "trace": [{"event": "capacity_reject"}]}
+        before = list(bounded)
+        trace.append({
+            "event": "capacity_reject",
+            "capacity": fixture["capacity"],
+            "before": before,
+            "after": list(bounded),
+        })
+        return {
+            "status": "FULL",
+            "values": bounded,
+            "bubble": ordered,
+            "insertion": insertion_ordered,
+            "trace": trace,
+        }
     item = fixture["insert"]
     position = 0
-    while position < len(bounded) and bounded[position] <= item:
+    while position < len(bounded):
+        current = bounded[position]
+        moves_right = current <= item
+        trace.append({
+            "event": "ordered_insert_compare",
+            "index": position,
+            "current": current,
+            "item": item,
+            "moves_right": moves_right,
+        })
+        if not moves_right:
+            break
         position += 1
+    before = list(bounded)
     bounded.insert(position, item)
-    return {"status": "OK", "bubble": ordered, "insertion": insertion_ordered, "bounded": bounded, "comparisons": comparisons, "swaps": swaps, "trace": [{"event": "bubble_complete"}, {"event": "ordered_insert", "position": position}]}
+    trace.append({
+        "event": "ordered_insert",
+        "position": position,
+        "item": item,
+        "before": before,
+        "after": list(bounded),
+    })
+    return {
+        "status": "OK",
+        "bubble": ordered,
+        "insertion": insertion_ordered,
+        "bounded": bounded,
+        "comparisons": comparisons,
+        "swaps": swaps,
+        "trace": trace,
+    }
 
 if __name__ == "__main__":
     import json

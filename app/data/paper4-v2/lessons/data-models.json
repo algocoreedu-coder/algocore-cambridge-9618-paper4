@@ -187,8 +187,8 @@
           "vi": "Mảng một chiều, hai chiều và giới hạn chỉ số"
         },
         "explanation": {
-          "vi": "Mảng một chiều dùng một chỉ số; mảng hai chiều dùng cặp chỉ số hàng–cột. Khi mô phỏng mảng cố định bằng list Python, cần giữ riêng capacity và không coi độ dài vật lý là số phần tử đang dùng trong mọi bài.",
-          "en": "A one-dimensional array uses one index; a two-dimensional array uses a row-column pair. When a Python list models a fixed array, keep capacity explicit and do not always treat physical length as the number of live elements."
+          "vi": "Mảng một chiều dùng một chỉ số; mảng hai chiều dùng cặp chỉ số hàng–cột. Khi mô phỏng mảng cố định bằng list Python, cần giữ riêng capacity và không coi độ dài vật lý là số phần tử đang dùng trong mọi bài. Phân biệt physical capacity với logical count: các index sống là 0..logical_count-1, còn 0..capacity-1 chỉ là miền ô được cấp. Với 2D, luôn đọc chỉ số theo row-column order của đề.",
+          "en": "A one-dimensional array uses one index; a two-dimensional array uses a row-column pair. When a Python list models a fixed array, keep capacity explicit and do not always treat physical length as the number of live elements. Separate physical capacity from logical count: live indices are 0..logical_count-1, while 0..capacity-1 is only the allocated-cell range. For 2D data, follow the task's row-column index order."
         },
         "python_connection": {
           "vi": "Artifact tạo bản sao list record ở L027 và so sánh `len(records)` với `capacity` ở L018–L020. Đây là mô hình mảng 1D đang chứa các record; Python list không tự áp đặt capacity của đề.",
@@ -210,6 +210,10 @@
           {
             "vi": "Dùng `[[0] * c] * r`, khiến các hàng cùng trỏ tới một list.",
             "en": "Using `[[0] * c] * r`, causing rows to reference the same list."
+          },
+          {
+            "vi": "Dùng `len(list)` đồng thời làm physical capacity và logical count.",
+            "en": "Using `len(list)` as both physical capacity and logical count."
           }
         ],
         "exam_signals": [
@@ -318,8 +322,8 @@
           "vi": "Vị trí kế tiếp và chèn vào mảng có giới hạn"
         },
         "explanation": {
-          "vi": "Chèn vào cấu trúc có giới hạn cần kiểm tra chỗ trống trước khi ghi. Live count chỉ số phần tử hợp lệ; capacity là số ô tối đa, nên trạng thái đầy xảy ra khi `live_count >= capacity`.",
-          "en": "Appending to a bounded structure requires a free-space check before writing. The live count is the number of valid items; capacity is the maximum cell count, so full means `live_count >= capacity`."
+          "vi": "Chèn vào cấu trúc có giới hạn cần kiểm tra chỗ trống trước khi ghi. Live count chỉ số phần tử hợp lệ; capacity là số ô tối đa, nên trạng thái đầy xảy ra khi `live_count >= capacity`. Quy trình phòng thi là check `logical_count < capacity`, ghi tại index `logical_count`, rồi tăng count đúng một lần; Python `append` chỉ mô phỏng bước ghi khi contract cho phép.",
+          "en": "Appending to a bounded structure requires a free-space check before writing. The live count is the number of valid items; capacity is the maximum cell count, so full means `live_count >= capacity`. The exam sequence is: check `logical_count < capacity`, write at index `logical_count`, then increment the count exactly once; Python `append` only simulates the write when the contract allows it."
         },
         "python_connection": {
           "vi": "L018 ghi nhận count/capacity, L019 chặn trạng thái đầy và L021 chỉ append sau khi kiểm tra. L022 tính index mới bằng `len(records)-1`, tức sau thao tác chèn thành công.",
@@ -341,6 +345,10 @@
           {
             "vi": "Dùng `>` thay vì `>=`, cho phép ghi khi count đã bằng capacity.",
             "en": "Using `>` instead of `>=`, allowing a write when count already equals capacity."
+          },
+          {
+            "vi": "Append trước capacity guard rồi cố hoàn tác khi đầy.",
+            "en": "Appending before the capacity guard and then trying to undo a full-state write."
           }
         ],
         "exam_signals": [
@@ -468,8 +476,8 @@
           "vi": "Tên, vai trò dữ liệu và biểu thức"
         },
         "explanation": {
-          "vi": "Identifier tốt cho biết vai trò của dữ liệu và giữ nhất quán giữa đặc tả, code và output. Biểu thức gán phải có một đích hợp lệ; biểu thức số học tạo giá trị số, còn biểu thức logic tạo Boolean dùng cho nhánh hoặc vòng lặp.",
-          "en": "A good identifier communicates a data role and remains consistent across specification, code, and output. Assignment needs a valid target; arithmetic expressions produce numeric values, while logical expressions produce Booleans for branches or loops."
+          "vi": "Identifier tốt cho biết vai trò của dữ liệu và giữ nhất quán giữa đặc tả, code và output. Biểu thức gán phải có một đích hợp lệ; biểu thức số học tạo giá trị số, còn biểu thức logic tạo Boolean dùng cho nhánh hoặc vòng lặp. Data dictionary nên nêu riêng `capacity`, `logical_count`, row, column và current index để tránh dùng một tên cho nhiều vai trò.",
+          "en": "A good identifier communicates a data role and remains consistent across specification, code, and output. Assignment needs a valid target; arithmetic expressions produce numeric values, while logical expressions produce Booleans for branches or loops. The data dictionary should name `capacity`, `logical_count`, row, column, and current index separately so one identifier is not reused for several roles."
         },
         "python_connection": {
           "vi": "Các tên `capacity`, `records`, `added` và `message` tại L014/L029 thể hiện vai trò rõ. Điều kiện L019 là biểu thức logic; phép `sum(...)/len(...)` ở L033 là biểu thức số học được gán cho `average`.",
@@ -592,8 +600,8 @@
           "vi": "Dữ liệu ngẫu nhiên và miền giá trị"
         },
         "explanation": {
-          "vi": "Khi tạo dữ liệu ngẫu nhiên, miền giá trị phải được xác định rõ và kiểm tra quy ước hai đầu có bao gồm hay không. Dữ liệu ngẫu nhiên phù hợp để tạo bộ thử, nhưng kết quả học tập cần có seed hoặc fixture cố định để tái lập.",
-          "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility."
+          "vi": "Khi tạo dữ liệu ngẫu nhiên, miền giá trị phải được xác định rõ và kiểm tra quy ước hai đầu có bao gồm hay không. Dữ liệu ngẫu nhiên phù hợp để tạo bộ thử, nhưng kết quả học tập cần có seed hoặc fixture cố định để tái lập. Mọi phép thống kê chỉ duyệt logical region; các ô chưa dùng trong physical capacity không được tính như dữ liệu đã sinh.",
+          "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility. Every summary scans only the logical region; unused cells in the physical capacity are not generated data."
         },
         "python_connection": {
           "vi": "Pilot không gọi bộ sinh ngẫu nhiên; nó nhận `random_values` đã cố định ở L030 rồi tính trung bình tại L032–L034. Vì vậy các line chứng minh bước xử lý dữ liệu, không chứng minh API/range sinh số.",
@@ -715,8 +723,8 @@
           "vi": "Trường bản ghi và lớp thay thế record"
         },
         "explanation": {
-          "vi": "Record gom các trường khác kiểu nhưng cùng mô tả một thực thể. Trong Python, dictionary hoặc một lớp đơn giản có thể biểu diễn record khi yêu cầu cho phép; lớp record thay thế không đồng nghĩa với thiết kế OOP đầy đủ có kế thừa và đa hình.",
-          "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism."
+          "vi": "Record gom các trường khác kiểu nhưng cùng mô tả một thực thể. Trong Python, dictionary hoặc một lớp đơn giản có thể biểu diễn record khi yêu cầu cho phép; lớp record thay thế không đồng nghĩa với thiết kế OOP đầy đủ có kế thừa và đa hình. Một record chiếm một logical slot; thêm field vào record không làm tăng logical count của mảng chứa record đó.",
+          "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism. One record occupies one logical slot; adding a field to a record does not increase the logical count of the containing array."
         },
         "python_connection": {
           "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng và `score: int`; L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
@@ -887,8 +895,8 @@
           "vi": "Kiểu, hằng, biến và phạm vi"
         },
         "explanation": {
-          "vi": "Kiểu dữ liệu xác định miền giá trị và phép toán hợp lệ; hằng biểu diễn giá trị không đổi còn biến lưu trạng thái có thể đổi. Phạm vi quyết định nơi một tên được truy cập, vì vậy dữ liệu cục bộ của hàm không tự động thay đổi dữ liệu bên ngoài.",
-          "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data."
+          "vi": "Kiểu dữ liệu xác định miền giá trị và phép toán hợp lệ; hằng biểu diễn giá trị không đổi còn biến lưu trạng thái có thể đổi. Phạm vi quyết định nơi một tên được truy cập, vì vậy dữ liệu cục bộ của hàm không tự động thay đổi dữ liệu bên ngoài. Trong mô hình mảng của đề, capacity và logical count là hai biến có vai trò khác nhau; cả hai phải được khai báo và khởi tạo trước khi tính valid-index interval.",
+          "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data. In the task's array model, capacity and logical count are different variables; both must be declared and initialised before deriving the valid-index interval."
         },
         "python_connection": {
           "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L010 kiểm tra `score` thật sự là `int` trước khi dùng.",
@@ -1434,6 +1442,7 @@
         "event_count": 9
       }
     ],
+    "trace_backed_association_patterns": [],
     "approved_static_or_representational_support": []
   },
   "marking": {
@@ -1755,6 +1764,11 @@
         "en": "Using `[[0] * c] * r`, causing rows to reference the same list."
       },
       {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.data-models.knowledge.array-representation",
+        "vi": "Dùng `len(list)` đồng thời làm physical capacity và logical count.",
+        "en": "Using `len(list)` as both physical capacity and logical count."
+      },
+      {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.data-models.knowledge.bounded-append",
         "vi": "Append trước rồi mới kiểm tra capacity.",
         "en": "Appending first and checking capacity afterwards."
@@ -1763,6 +1777,11 @@
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.data-models.knowledge.bounded-append",
         "vi": "Dùng `>` thay vì `>=`, cho phép ghi khi count đã bằng capacity.",
         "en": "Using `>` instead of `>=`, allowing a write when count already equals capacity."
+      },
+      {
+        "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.data-models.knowledge.bounded-append",
+        "vi": "Append trước capacity guard rồi cố hoàn tác khi đầy.",
+        "en": "Appending before the capacity guard and then trying to undo a full-state write."
       },
       {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.data-models.knowledge.identifier-contract",
@@ -1865,8 +1884,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.data-models.assessment.progression",
         "level": "faded",
         "prompt": {
-          "vi": "Hoàn thiện logic `add_record` để fixture boundary trả `FULL` mà không đổi mảng. Nộp đoạn Python, trace `check_record/check_capacity`, trạng thái trước/sau và một câu chỉ ra lỗi tăng count hoặc append trước guard.",
-          "en": "Complete `add_record` so the boundary fixture returns `FULL` without changing the array. Submit the Python fragment, the `check_record/check_capacity` trace, before/after state, and one sentence identifying the error caused by appending or incrementing before the guard."
+          "vi": "Hoàn thiện `add_record` để fixture boundary trả `FULL` mà không đổi physical array hoặc logical count. Nộp Python, trace guard-before-write và chỉ ra vì sao `len(list)` không tự động là logical count của fixed-capacity exam array.",
+          "en": "Complete `add_record` so the boundary fixture returns `FULL` without changing the physical array or logical count. Submit Python, a guard-before-write trace, and explain why `len(list)` is not automatically the logical count of a fixed-capacity exam array."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
@@ -1942,8 +1961,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.data-models.assessment.progression",
         "level": "guided",
         "prompt": {
-          "vi": "Với fixture normal, lập bảng trước/sau cho `records`, kiểm tra cấu trúc record `{name, score}`, dự đoán thứ tự `check_record → check_capacity → append`, rồi tính `random_average`. Giải thích vì sao record và vùng lưu phải được kiểm tra trước khi append.",
-          "en": "Using the normal fixture, make a before/after table for `records`, validate the `{name, score}` record shape, predict `check_record → check_capacity → append`, then calculate `random_average`. Explain why the record and store must be checked before append."
+          "vi": "Với fixture normal, lập bảng physical capacity/logical count/valid-index interval cho `records`, kiểm tra record `{name, score}`, dự đoán `check_record → check_capacity → append`, rồi tính `random_average` chỉ trên vùng sống. Thêm một ví dụ địa chỉ row-column cho mảng 2D.",
+          "en": "Using the normal fixture, make a physical-capacity/logical-count/valid-index-interval table for `records`, validate the `{name, score}` record, predict `check_record → check_capacity → append`, then calculate `random_average` over the live region only. Add one row-column addressing example for a 2D array."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
@@ -2021,8 +2040,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.data-models.assessment.progression",
         "level": "independent",
         "prompt": {
-          "vi": "Viết và chạy mô-đun xử lý cả ba fixture: xác thực record, append có giới hạn, giữ đúng cấu trúc lưu và tính trung bình dữ liệu số. Nộp output thực tế cho normal/boundary/failure, assertions cho trạng thái không đổi khi từ chối và giải thích quy tắc biên của mảng.",
-          "en": "Write and run a module for all three fixtures: validate records, perform bounded append, preserve the storage shape, and compute the numeric-data average. Submit actual outputs for normal/boundary/failure, assertions that rejected operations do not mutate state, and an explanation of the array boundary rule."
+          "vi": "Viết và chạy mô-đun cho ba fixture với capacity, logical count và valid indices tường minh; xác thực record, bounded append và tính trung bình vùng sống. Nộp normal/boundary/failure outputs, non-mutation assertions và giải thích khác biệt giữa Python list tiện dụng với exam array contract.",
+          "en": "Write and run a module for three fixtures with explicit capacity, logical count, and valid indices; validate records, perform bounded append, and average the live region. Submit normal/boundary/failure outputs, non-mutation assertions, and explain the difference between Python-list convenience and the exam-array contract."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
@@ -2768,6 +2787,16 @@
         "heading": "Data Types and Records",
         "bullet_locator": "Record guidance 2",
         "anchor_text": "Write pseudocode to read data from a record structure and save data to a record structure"
+      }
+    },
+    {
+      "source_id": "video_greg_hogg_dsa_lecture_02",
+      "authority": "Supplementary_education_source",
+      "locator": {
+        "source_id": "video_greg_hogg_dsa_lecture_02",
+        "heading": "Static and dynamic array models",
+        "bullet_locator": "youtube_seconds_10_675",
+        "anchor_text": "T2 supplementary concept source only; YouTube TQMvBTKn2p0 at 10 seconds"
       }
     }
   ]

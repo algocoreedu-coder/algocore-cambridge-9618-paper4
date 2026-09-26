@@ -42,7 +42,13 @@ const EVENT_TYPES = {
   return: "return",
   reject_non_integer: "reject",
   probe_insert: "compare",
+  insert_commit: "write",
+  insert_existing: "branch",
+  insert_reject_full: "reject",
   probe_search: "compare",
+  search_stop_empty: "branch",
+  search_found: "branch",
+  search_exhausted: "branch",
   reject_non_integer_key: "reject",
   read_record: "read",
   construct_object: "call",
@@ -82,9 +88,15 @@ const LINE_BINDINGS = {
     reject_non_integer: ["recursion.v1.L026", "recursion.v1.L027", "recursion.v1.L028"],
   },
   hashing: {
-    probe_insert: ["hashing.v1.L016", "hashing.v1.L017", "hashing.v1.L018", "hashing.v1.L019", "hashing.v1.L020", "hashing.v1.L021", "hashing.v1.L022"],
-    probe_search: ["hashing.v1.L028", "hashing.v1.L029", "hashing.v1.L030", "hashing.v1.L031", "hashing.v1.L032", "hashing.v1.L034", "hashing.v1.L035"],
-    reject_non_integer_key: ["hashing.v1.L041", "hashing.v1.L042", "hashing.v1.L043"],
+    probe_insert: ["hashing.v1.L016", "hashing.v1.L017", "hashing.v1.L018", "hashing.v1.L068", "hashing.v1.L069", "hashing.v1.L070", "hashing.v1.L071", "hashing.v1.L072", "hashing.v1.L073", "hashing.v1.L074", "hashing.v1.L075"],
+    insert_commit: ["hashing.v1.L020", "hashing.v1.L076", "hashing.v1.L021", "hashing.v1.L077", "hashing.v1.L078", "hashing.v1.L079", "hashing.v1.L080", "hashing.v1.L081", "hashing.v1.L082", "hashing.v1.L083", "hashing.v1.L022"],
+    insert_existing: ["hashing.v1.L023", "hashing.v1.L084", "hashing.v1.L085", "hashing.v1.L086", "hashing.v1.L087", "hashing.v1.L088", "hashing.v1.L089", "hashing.v1.L090", "hashing.v1.L024"],
+    insert_reject_full: ["hashing.v1.L091", "hashing.v1.L092", "hashing.v1.L093", "hashing.v1.L094", "hashing.v1.L095", "hashing.v1.L096", "hashing.v1.L097", "hashing.v1.L098", "hashing.v1.L025"],
+    probe_search: ["hashing.v1.L028", "hashing.v1.L029", "hashing.v1.L030", "hashing.v1.L099", "hashing.v1.L100", "hashing.v1.L101", "hashing.v1.L102", "hashing.v1.L103", "hashing.v1.L104", "hashing.v1.L105", "hashing.v1.L106"],
+    search_stop_empty: ["hashing.v1.L032", "hashing.v1.L107", "hashing.v1.L108", "hashing.v1.L109", "hashing.v1.L110", "hashing.v1.L111", "hashing.v1.L112", "hashing.v1.L033"],
+    search_found: ["hashing.v1.L034", "hashing.v1.L113", "hashing.v1.L114", "hashing.v1.L115", "hashing.v1.L116", "hashing.v1.L117", "hashing.v1.L118", "hashing.v1.L035"],
+    search_exhausted: ["hashing.v1.L119", "hashing.v1.L120", "hashing.v1.L121", "hashing.v1.L122", "hashing.v1.L123", "hashing.v1.L036"],
+    reject_non_integer_key: ["hashing.v1.L041", "hashing.v1.L124", "hashing.v1.L125", "hashing.v1.L126", "hashing.v1.L127", "hashing.v1.L128", "hashing.v1.L043"],
   },
   "object-files": {
     read_record: ["object-files.v1.L018", "object-files.v1.L019", "object-files.v1.L020", "object-files.v1.L021", "object-files.v1.L073", "object-files.v1.L024", "object-files.v1.L074", "object-files.v1.L026", "object-files.v1.L027"],
@@ -99,7 +111,7 @@ const FINAL_LINE_BINDINGS = {
   "binary-search": ["binary-search.v1.L064", "binary-search.v1.L065", "binary-search.v1.L066", "binary-search.v1.L067", "binary-search.v1.L068", "binary-search.v1.L069", "binary-search.v1.L070", "binary-search.v1.L071", "binary-search.v1.L072", "binary-search.v1.L073"],
   queue: ["queue.v1.L051", "queue.v1.L052", "queue.v1.L062", "queue.v1.L063", "queue.v1.L064", "queue.v1.L065", "queue.v1.L066", "queue.v1.L067", "queue.v1.L068", "queue.v1.L069", "queue.v1.L070", "queue.v1.L071", "queue.v1.L072", "queue.v1.L073"],
   recursion: ["recursion.v1.L028", "recursion.v1.L029", "recursion.v1.L030", "recursion.v1.L031", "recursion.v1.L032", "recursion.v1.L033", "recursion.v1.L034", "recursion.v1.L035"],
-  hashing: ["hashing.v1.L043", "hashing.v1.L048", "hashing.v1.L049", "hashing.v1.L050", "hashing.v1.L051", "hashing.v1.L052", "hashing.v1.L053", "hashing.v1.L054", "hashing.v1.L055", "hashing.v1.L056", "hashing.v1.L057"],
+  hashing: ["hashing.v1.L039", "hashing.v1.L040", "hashing.v1.L044", "hashing.v1.L045", "hashing.v1.L046", "hashing.v1.L047", "hashing.v1.L048", "hashing.v1.L049", "hashing.v1.L050", "hashing.v1.L051", "hashing.v1.L052", "hashing.v1.L053", "hashing.v1.L054", "hashing.v1.L055", "hashing.v1.L056", "hashing.v1.L057", "hashing.v1.L058"],
   "object-files": ["object-files.v1.L037", "object-files.v1.L038", "object-files.v1.L094", "object-files.v1.L095", "object-files.v1.L096", "object-files.v1.L097", "object-files.v1.L098", "object-files.v1.L099", "object-files.v1.L100", "object-files.v1.L101"],
 };
 
@@ -115,11 +127,56 @@ const PATTERN_FOCUS = {
   QUEUE_REDUCE: ["inspect"],
   QUEUE_SETUP: ["check_full", "check_empty", "reject_invalid_capacity"],
   ALGORITHM_REWRITE: ["call", "base_case", "return", "reject_non_integer"],
-  HASH_FUNCTION: ["probe_insert", "probe_search"],
-  HASH_INSERT: ["probe_insert"],
-  HASH_SEARCH: ["probe_search"],
-  HASH_SETUP: ["probe_insert", "probe_search", "reject_non_integer_key"],
+  HASH_FUNCTION: ["probe_insert", "insert_commit", "insert_existing", "insert_reject_full", "probe_search", "search_stop_empty", "search_found", "search_exhausted"],
+  HASH_INSERT: ["probe_insert", "insert_commit", "insert_existing", "insert_reject_full"],
+  HASH_SEARCH: ["probe_search", "search_stop_empty", "search_found", "search_exhausted"],
+  HASH_SETUP: ["probe_insert", "insert_commit", "insert_existing", "insert_reject_full", "probe_search", "search_stop_empty", "search_found", "search_exhausted", "reject_non_integer_key"],
   FILE_READ_OBJECTS: ["read_record", "construct_object", "update", "lookup_not_found"],
+};
+
+const DSA_VISUAL_QUESTIONS = {
+  "growth-counter": {
+    vi: "Số thao tác được đếm tăng như thế nào khi kích thước đầu vào n tăng?",
+    en: "How does the counted operation grow as input size n increases?",
+  },
+  "array-logical-capacity": {
+    vi: "Logical length khác physical capacity như thế nào trước và sau thao tác?",
+    en: "How does logical length differ from physical capacity before and after the operation?",
+  },
+  "hash-probe": {
+    vi: "Collision đưa probe tới ô nào và điều kiện nào kết thúc chuỗi probe?",
+    en: "Where does a collision send the probe, and which condition terminates the probe sequence?",
+  },
+  "queue-window": {
+    vi: "front, rear và count xác định vùng phần tử đang sống như thế nào?",
+    en: "How do front, rear, and count define the live queue window?",
+  },
+  "recursion-frames": {
+    vi: "Frame nào được tạo, frame nào đạt base case và giá trị unwind theo thứ tự nào?",
+    en: "Which frame is created, which reaches the base case, and in what order do values unwind?",
+  },
+  "binary-search-interval": {
+    vi: "Mỗi comparison loại bỏ miền nào khỏi khoảng low–high?",
+    en: "Which region does each comparison eliminate from the low-high interval?",
+  },
+};
+
+const PILOT_DSA_VISUAL_IDS_BY_PATTERN = {
+  ARRAY_APPEND: ["array-logical-capacity"],
+  DATA_RECORD: ["array-logical-capacity"],
+  DATA_STORAGE: ["array-logical-capacity"],
+  RANDOM_ARRAY: ["array-logical-capacity"],
+  BINARY_SEARCH: ["binary-search-interval", "growth-counter"],
+  HASH_FUNCTION: ["hash-probe"],
+  HASH_INSERT: ["hash-probe"],
+  HASH_SEARCH: ["hash-probe"],
+  HASH_SETUP: ["hash-probe"],
+  QUEUE_DEQUEUE: ["queue-window"],
+  QUEUE_ENQUEUE: ["queue-window"],
+  QUEUE_INSPECT: ["queue-window"],
+  QUEUE_REDUCE: ["queue-window"],
+  QUEUE_SETUP: ["queue-window"],
+  ALGORITHM_REWRITE: ["recursion-frames"],
 };
 
 const WORDING = {
@@ -146,7 +203,13 @@ const WORDING = {
   return: ["Frame này trả tổng từng phần nào?", "Which subtotal does this frame return?", "Frame hiện tại cộng giá trị của nó rồi trả kết quả lên frame gọi.", "The current frame adds its value and returns the result to its caller."],
   reject_non_integer: ["Dữ liệu có giữ invariant số nguyên không?", "Does the data preserve the integer invariant?", "Giá trị không phải số nguyên bị chặn trước lời gọi đệ quy.", "A non-integer is blocked before the recursive call."],
   probe_insert: ["Probe này va chạm hay tìm được ô trống?", "Does this probe collide or find an empty slot?", "Chỉ số probe được tính bằng linear probing; ô trống nhận key.", "Linear probing computes the index; an empty slot receives the key."],
+  insert_commit: ["Key được ghi vào ô trống nào?", "Which empty slot receives the key?", "Commit chỉ thay đổi đúng ô đã được probe xác nhận là trống.", "The commit changes only the slot that the probe confirmed was empty."],
+  insert_existing: ["Key đã tồn tại có làm thay đổi bảng không?", "Does an existing key change the table?", "Key trùng trả lại vị trí hiện có và giữ nguyên toàn bộ bảng.", "A duplicate key returns its existing position and leaves the table unchanged."],
+  insert_reject_full: ["Sau bao nhiêu probe có thể kết luận bảng đầy?", "After how many probes can the table be declared full?", "Duyệt đủ một vòng rồi từ chối mà không thay đổi bảng.", "A complete probe cycle rejects the insertion without mutating the table."],
   probe_search: ["Probe này tìm thấy key hay phải đi tiếp?", "Does this probe find the key or continue?", "Tìm kiếm theo đúng chuỗi probe đã dùng khi chèn.", "Search follows the same probe sequence used during insertion."],
+  search_stop_empty: ["Vì sao gặp ô trống chứng minh key không tồn tại?", "Why does an empty slot prove the key is absent?", "Ô trống kết thúc chuỗi linear probing nên tìm kiếm trả -1.", "An empty slot terminates the linear-probing chain, so search returns -1."],
+  search_found: ["Probe nào xác nhận vị trí của key?", "Which probe confirms the key position?", "Giá trị tại ô probe khớp key nên vị trí được trả về.", "The value in the probed slot matches the key, so its index is returned."],
+  search_exhausted: ["Điều gì bảo đảm failed search luôn kết thúc?", "What guarantees that a failed search terminates?", "Tối đa size probe được thực hiện; hết một vòng thì trả -1.", "At most size probes are performed; one complete cycle returns -1."],
   reject_non_integer_key: ["Mọi key có phải số nguyên không?", "Is every key an integer?", "Key sai kiểu bị từ chối trước khi tính địa chỉ băm.", "A key of the wrong type is rejected before hashing."],
   read_record: ["Dòng CSV này có đúng hai trường và pages hợp lệ không?", "Does this CSV row have two fields and valid pages?", "Dòng được đọc nguyên trạng trước khi kiểm tra cấu trúc và chuyển kiểu.", "The row is read verbatim before shape checks and conversion."],
   construct_object: ["Bản ghi hợp lệ tạo object nào?", "Which object is built from the valid row?", "Book được tạo từ title và pages đã chuyển sang số nguyên.", "A Book is constructed from the title and converted integer pages."],
@@ -230,9 +293,13 @@ function transition(slug, input, before, step, finalResult, isFinal) {
     if (step.event === "probe_insert") {
       const occupied = domain.slots[step.index] !== null;
       domain.last_probe = { mode: "insert", key: step.key, index: step.index, step: step.step, occupied };
-      if (!occupied) domain.slots[step.index] = step.key;
     }
+    if (step.event === "insert_commit") { domain.slots = clone(step.after); domain.status = "INSERTED"; }
+    if (step.event === "insert_existing") domain.status = "EXISTING";
+    if (step.event === "insert_reject_full") domain.status = "FULL";
     if (step.event === "probe_search") domain.last_probe = { mode: "search", key: step.key, index: step.index, step: step.step, value: domain.slots[step.index] };
+    if (step.event === "search_stop_empty" || step.event === "search_exhausted") domain.status = "NOT_FOUND";
+    if (step.event === "search_found") domain.status = "FOUND";
     if (step.event === "reject_non_integer_key") domain.status = "INVALID_KEY";
   } else {
     if (step.event === "read_record") domain.pending_record = { line: step.line, fields: clone(step.fields) };
@@ -295,15 +362,7 @@ function activeLines(slug, step, before, input, isFinal) {
     return line([10, 11, 12, 13, ...completion]);
   }
   if (slug === "hashing") {
-    if (step.event === "reject_non_integer_key") return line([41, 42, 43]);
-    if (step.event === "probe_insert") {
-      const slot = before.domain.slots[step.index];
-      const branch = slot === null ? [21, 22] : slot === step.key ? [23, 24] : [23];
-      return line([16, 17, 18, 19, 20, ...branch]);
-    }
-    const slot = before.domain.slots[step.index];
-    const branch = slot === null ? [32, 33] : slot === step.key ? [32, 34, 35] : [32, 34];
-    return line([28, 29, 30, 31, ...branch, ...(isFinal ? [51, 52, 53, 54, 55, 56, 57] : [])]);
+    return [...LINE_BINDINGS.hashing[step.event], ...(isFinal ? FINAL_LINE_BINDINGS.hashing : [])];
   }
   if (step.event === "read_record") {
     const badPages = Number.isNaN(Number(step.fields[2]));
@@ -325,6 +384,11 @@ function eventEnvelope({ slug, pattern, caseKind, traceId, sequence, before, aft
   const eventName = step.event;
   const wording = WORDING[eventName];
   const eventId = `${traceId}.event-${String(sequence + 1).padStart(3, "0")}`;
+  const dsaVisuals = (PILOT_DSA_VISUAL_IDS_BY_PATTERN[pattern] ?? []).map((id) => ({ id, ...DSA_VISUAL_QUESTIONS[id] }));
+  const dsaQuestion = {
+    vi: dsaVisuals.map((item) => item.vi).join(" "),
+    en: dsaVisuals.map((item) => item.en).join(" "),
+  };
   return {
     schema_version: "2.0.0",
     artifact_type: "VisualEventBinding",
@@ -344,12 +408,16 @@ function eventEnvelope({ slug, pattern, caseKind, traceId, sequence, before, aft
         ? { emitted_trace_event: clone(step), final_result: resultWithoutTrace(result) }
         : { emitted_trace_event: clone(step) },
       invariant_or_criterion: {
-        vi: `${pattern}: sự kiện ${eventName} phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.`,
-        en: `${pattern}: event ${eventName} must match the independently rerun trace and preserve the displayed state transition.`,
+        vi: `${dsaQuestion.vi ? `${dsaQuestion.vi} ` : ""}${pattern}: sự kiện ${eventName} phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.`,
+        en: `${dsaQuestion.en ? `${dsaQuestion.en} ` : ""}${pattern}: event ${eventName} must match the independently rerun trace and preserve the displayed state transition.`,
       },
       prediction: { vi: wording[0], en: wording[1] },
       feedback: { vi: wording[2], en: wording[3] },
-      visual_targets: [`visual.${slug}.state`, `visual.${slug}.${eventName}`],
+      visual_targets: [
+        ...dsaVisuals.map((item) => `visual.dsa.${item.id}`),
+        `visual.${slug}.state`,
+        `visual.${slug}.${eventName}`,
+      ],
       accessibility: {
         accessible_label: {
           vi: `Bước ${sequence + 1}: ${eventName}`,

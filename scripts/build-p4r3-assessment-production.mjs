@@ -91,6 +91,44 @@ const oopPrompts = {
   },
 };
 
+const dsaPrompts = {
+  performance: {
+    guided: bilingual("Từ bảng số phép toán theo n, nhận diện phần tăng theo n và phần setup một lần; giải thích lựa chọn linear search, binary search hoặc sort-then-search theo precondition và số lần query.", "From an operation-count table by n, identify the part that grows with n and the one-time setup; justify linear search, binary search, or sort-then-search from the precondition and query count."),
+    faded: bilingual("Hoàn thiện so sánh hai chiến lược bằng bốn ý: kích thước input, thao tác chi phối, tốc độ tăng và chi phí setup; chỉ dùng Big O sau khi đã nêu các ý đó.", "Complete a comparison of two strategies using four points: input size, dominant operation, growth rate, and setup cost; use Big O only after stating those points."),
+    independent: bilingual("Chọn thuật toán cho ba workload có cùng dữ liệu nhưng số query khác nhau; nộp operation counts, time/space complexity và điều kiện khiến lựa chọn thay đổi.", "Choose an algorithm for three workloads that share data but have different query counts; submit operation counts, time/space complexity, and the condition that changes the choice."),
+  },
+  "text-processing": {
+    guided: bilingual("Trace chuỗi bất biến bằng chỉ số: với mỗi ký tự, ghi index, current token/run và output; xử lý rõ delimiter hoặc run cuối.", "Trace an immutable string by index: for each character record the index, current token/run, and output; explicitly handle the final delimiter or run."),
+    faded: bilingual("Sửa vòng lặp đang bỏ mất token/run cuối hoặc cố gán trực tiếp vào ký tự chuỗi; giữ index-walk và tạo output mới.", "Repair a loop that drops the final token/run or attempts to assign directly to a string character; retain the index walk and build a new output."),
+    independent: bilingual("Cài đặt parser hoặc encoder theo yêu cầu, rồi chứng minh empty, one-character, repeated-delimiter và final-run cases không mất dữ liệu.", "Implement a required parser or encoder, then prove that empty, one-character, repeated-delimiter, and final-run cases lose no data."),
+  },
+  "linked-list": {
+    guided: bilingual("Trace linked list dạng mảng bằng start pointer, current index, next pointer và free-list head; lưu successor trước khi thay đổi liên kết.", "Trace an array-backed linked list using the start pointer, current index, next pointer, and free-list head; save the successor before changing a link."),
+    faded: bilingual("Sửa insert/remove đang làm mất predecessor hoặc successor. Nộp before/change/after table cho start, saved link, affected next pointers và free list.", "Repair insert/remove code that loses the predecessor or successor. Submit a before/change/after table for start, saved link, affected next pointers, and the free list."),
+    independent: bilingual("Cài đặt insert và remove cho linked list dạng mảng; chứng minh mỗi live node xuất hiện đúng một lần, không có cycle và node bị xóa trở về free list.", "Implement insert and remove for an array-backed linked list; prove each live node appears exactly once, no cycle exists, and a removed node returns to the free list."),
+  },
+  dictionary: {
+    guided: bilingual("Tách contract của dictionary ADT (find/insert/update/delete) khỏi một cách cài đặt cụ thể; trace missing-key và existing-key outcomes.", "Separate the dictionary ADT contract (find/insert/update/delete) from one particular implementation; trace missing-key and existing-key outcomes."),
+    faded: bilingual("Sửa thao tác đang nhầm dictionary interface với hash-table internals; chỉ khẳng định collision/probing khi implementation được nêu rõ.", "Repair an operation that confuses the dictionary interface with hash-table internals; assert collision/probing only when the implementation is explicitly given."),
+    independent: bilingual("Cài đặt chương trình dùng dictionary contract với unique keys và missing-key policy; giải thích phần nào của lời giải vẫn đúng nếu thay implementation.", "Implement a program using the dictionary contract with unique keys and a missing-key policy; explain which parts remain valid if the implementation changes."),
+  },
+  stack: {
+    guided: bilingual("Trace fixed-capacity stack với top convention đã khai báo; ghi guard, index đọc/ghi và live region cho mỗi push/pop.", "Trace a fixed-capacity stack with a declared top convention; record the guard, read/write index, and live region for every push/pop."),
+    faded: bilingual("Sửa push/pop có off-by-one hoặc mutate trước full/empty guard; chứng minh rejected operation giữ nguyên top và storage.", "Repair push/pop code with an off-by-one error or mutation before the full/empty guard; prove a rejected operation preserves top and storage."),
+    independent: bilingual("Dùng stack thủ công để giải một bài pairing hoặc reduction; nộp normal/boundary/failure evidence và invariant LIFO sau mỗi event.", "Use a manual stack to solve a pairing or reduction task; submit normal/boundary/failure evidence and the LIFO invariant after every event."),
+  },
+  "binary-tree": {
+    guided: bilingual("Trace đường insert/search trên binary search tree; tại mỗi node ghi comparison, nhánh chọn và child link tiếp theo.", "Trace an insertion/search path in a binary search tree; at each node record the comparison, chosen branch, and next child link."),
+    faded: bilingual("Sửa insert/search dùng sai nhánh hoặc quên None/duplicate case; nộp path trace và before/change/after cho child link bị ảnh hưởng.", "Repair insert/search code that chooses the wrong branch or omits the None/duplicate case; submit a path trace and before/change/after state for the affected child link."),
+    independent: bilingual("Cài đặt insert và search, rồi kiểm chứng root, leaf, absent và duplicate cases; giải thích tree shape quyết định đường đi thế nào.", "Implement insert and search, then verify root, leaf, absent, and duplicate cases; explain how tree shape determines the path."),
+  },
+  sorting: {
+    guided: bilingual("Trace từng comparison và swap/shift; đánh dấu sorted prefix hoặc suffix sau mỗi pass/insert.", "Trace every comparison and swap/shift; mark the sorted prefix or suffix after each pass/insertion."),
+    faded: bilingual("Sửa bubble/insertion sort đang sai loop bound hoặc ghi đè khi shift; nộp event trace tới divergence đầu tiên.", "Repair bubble/insertion sort with a wrong loop bound or an overwrite during shifting; submit the event trace up to the first divergence."),
+    independent: bilingual("Chọn và cài đặt sort phù hợp; kiểm chứng empty, one-item, already-sorted, reverse và duplicate data, đồng thời nêu dominant operation và growth.", "Choose and implement an appropriate sort; verify empty, one-item, already-sorted, reverse, and duplicate data while stating the dominant operation and growth."),
+  },
+};
+
 function atomCriterion(atom) {
   const details = [
     `disposition=${atom.disposition}`, `award_semantics=${atom.award_semantics}`,
@@ -119,6 +157,12 @@ function atomLocator(atom) {
 function prompts(slug) {
   if (oopPrompts[slug]) {
     return Object.fromEntries(Object.entries(oopPrompts[slug]).map(([level, prompt]) => [level, bilingual(
+      `${prompt.vi} Dùng fixture và output canonical của mức này làm bằng chứng thực thi.`,
+      `${prompt.en} Use this level's fixture and canonical output as execution evidence.`
+    )]));
+  }
+  if (dsaPrompts[slug]) {
+    return Object.fromEntries(Object.entries(dsaPrompts[slug]).map(([level, prompt]) => [level, bilingual(
       `${prompt.vi} Dùng fixture và output canonical của mức này làm bằng chứng thực thi.`,
       `${prompt.en} Use this level's fixture and canonical output as execution evidence.`
     )]));
@@ -212,8 +256,9 @@ const markingEnvelopes = productionChains.map((chain) => {
   };
 });
 
+const p4r9CapstoneId = "ac-9618-p4-2026-python.lesson.exam-workflow.practice.p4r9-dsa-capstone";
 const sourceItems = assessmentMap.assessment_items.filter((item) => productionLessonIds.has(item.lesson_id));
-const sourceByLessonLevel = new Map(sourceItems.map((item) => [`${item.lesson_id}:${item.level}`, item]));
+const sourceByLessonLevel = new Map(sourceItems.filter((item) => item.assessment_item_id !== p4r9CapstoneId).map((item) => [`${item.lesson_id}:${item.level}`, item]));
 const chainPatterns = new Set(markingEnvelopes.map((item) => item.record.pattern_id));
 // Every assessment shares the complete executable evidence pack; the prompt still controls progression.
 const caseByLevel = {
@@ -265,12 +310,40 @@ for (const slug of productionSlugs) {
   }
 }
 
+const capstoneSource = sourceItems.find((item) => item.assessment_item_id === p4r9CapstoneId);
+if (!capstoneSource) throw new Error(`Missing source assessment ${p4r9CapstoneId}`);
+const capstoneArtifact = await readJson(join(contentRoot, "python", "production", "exam-workflow", "artifact.json"));
+const capstoneRefs = [capstoneArtifact.python_artifact_id];
+for (const caseKind of ["normal", "boundary", "failure"]) {
+  const fixture = capstoneArtifact.fixtures.find((item) => item.case_kind === caseKind);
+  const expected = capstoneArtifact.expected_outputs.find((item) => item.fixture_ref === fixture?.fixture_id);
+  if (!fixture || !expected) throw new Error(`Missing exam-workflow:${caseKind} capstone evidence`);
+  capstoneRefs.push(fixture.fixture_id, expected.expected_output_id);
+}
+assessmentEnvelopes.push({
+  schema_version: "2.0.0", artifact_type: "AssessmentItem",
+  record: {
+    assessment_item_id: p4r9CapstoneId, lesson_id: lessonId("exam-workflow"),
+    pattern_ids: [...capstoneSource.pattern_ids], assessment_requirement_ids: [...capstoneSource.assessment_requirement_ids],
+    destination_id: capstoneSource.destination_id, level: "independent",
+    prompt: bilingual(
+      "DSA capstone: thiết kế main workflow dùng một biểu diễn array/ADT, một search hoặc sort và một mutable structure. Nộp code, giải thích lựa chọn bằng dominant operation cùng time/space complexity, rồi dùng ba fixture để cung cấp evidence matrix normal/boundary/failure với expected, actual và first divergence. Đây là bài AlgoCore tự biên soạn; các pattern đã có chỉ là liên kết kỹ năng và không tạo điểm Cambridge mới.",
+      "DSA capstone: design a main workflow using one array/ADT representation, one search or sort, and one mutable structure. Submit code, justify the choice using the dominant operation and time/space complexity, then use three fixtures to provide a normal/boundary/failure evidence matrix with expected, actual, and first divergence. This is an AlgoCore-authored task; existing patterns link skills and create no new Cambridge marks."),
+    shared_fixture_code_data_ids: capstoneRefs,
+    expected_artifact: bilingual("Chương trình DSA tích hợp, lập luận độ phức tạp và evidence matrix ba ca.", "An integrated DSA program, complexity argument, and three-case evidence matrix."),
+    hint: bilingual("Khóa representation invariant và precondition trước khi chọn thuật toán; tính expected trước khi chạy.", "Lock the representation invariant and precondition before choosing the algorithm; derive expected results before execution."),
+    feedback: bilingual("Tìm first divergence trong representation, algorithm hoặc mutable-state event; sửa đúng event đó rồi chạy lại đủ ba ca.", "Locate the first divergence in the representation, algorithm, or mutable-state event; repair that event and rerun all three cases."),
+    self_rubric: assessmentRubric("exam-workflow-p4r9-dsa-capstone", "independent", capstoneSource.pattern_ids, capstoneSource.assessment_requirement_ids, capstoneRefs, true),
+    disclosure_contract: { answer_hidden_initially: true, hint_hidden_initially: true, feedback_after_attempt: true },
+  },
+});
+
 const manifest = {
   schema_version: "paper4-p4r3-assessment-production-v1", target_release: "paper4-2026-s9-v2",
   generated_by: "scripts/build-p4r3-assessment-production.mjs",
   authority_boundary: {
     cambridge_atoms: "All 1,830 production atoms remain context-bound to direct QP/MS locators; editorial paraphrases do not create a mark scheme.",
-    practice_rubrics: "All 60 practice rubrics are AlgoCore-authored with official_marks=null.",
+    practice_rubrics: "All 61 practice rubrics are AlgoCore-authored with official_marks=null.",
     representational_patterns: "For six lessons lacking a Stage 4 chain, Python artifact pattern IDs describe only workflow/representation and never imply Cambridge marks.",
   },
   inputs: [

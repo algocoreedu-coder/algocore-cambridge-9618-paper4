@@ -133,6 +133,26 @@ def assert_subset(actual: dict, expected: dict, label: str) -> None:
             raise AssertionError(f"{label}: {key} expected {expected_value!r}, got {actual.get(key)!r}")
 
 
+def assert_p4r9_trace_contract(slug: str, case_kind: str, result: dict) -> None:
+    if slug != "hashing":
+        return
+    trace = result["trace"]
+    event_names = {step.get("event") for step in trace}
+    if case_kind == "normal":
+        required = {"probe_insert", "insert_commit", "probe_search", "search_found"}
+    elif case_kind == "boundary":
+        required = {"probe_insert", "insert_commit", "insert_reject_full", "probe_search", "search_exhausted"}
+    else:
+        required = {"reject_non_integer_key"}
+    missing = required - event_names
+    if missing:
+        raise AssertionError(f"{slug}/{case_kind}: missing P4R-9 trace events {sorted(missing)}")
+    for step in trace:
+        if step.get("event") in {"insert_reject_full", "reject_non_integer_key"}:
+            if step.get("before") != step.get("after"):
+                raise AssertionError(f"{slug}/{case_kind}: rejected operation mutated valid state")
+
+
 def run_case(source: Path, fixture: Path) -> dict:
     environment = dict(os.environ)
     environment["PYTHONHASHSEED"] = "0"
@@ -293,6 +313,7 @@ def execute(mode: str) -> None:
         for case_kind in CASES:
             case = run_case(source, source.parent / "fixtures" / f"{case_kind}.json")
             assert_subset(case["result"], meta["checks"][case_kind], f"{slug}/{case_kind}")
+            assert_p4r9_trace_contract(slug, case_kind, case["result"])
             cases.append(case)
         artifact_path = source.parent / "artifact.json"
         candidate = artifact_for(

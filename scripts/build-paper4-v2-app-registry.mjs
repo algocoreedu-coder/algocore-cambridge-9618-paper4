@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, "..");
 const RECORDS_DIR = path.join(ROOT, "content", "paper4", "records", "full");
-const CANONICAL_REGISTRY_AGGREGATE = "1ad3244f6ec6c8d33f9141bfc2458fffb92acb0980678c39be5e050cccf3527e";
+const CANONICAL_REGISTRY_AGGREGATE = "2c99660563e8b7c974941d488f3b11ed0ae4efb6f710249456625019fbfef7b4";
 const EDITORIAL_REGISTRY_PATH = path.resolve(ROOT, "..", "planning", "paper4", "stage-3", "LESSON_PACKAGES.json");
 const EDITORIAL_REGISTRY_SHA256 = "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2";
 
@@ -29,9 +29,9 @@ const EXPECTED_COUNTS = Object.freeze({
   knowledgeUnits: 108,
   pythonArtifacts: 26,
   visualScenarioTraces: 174,
-  visualEventBindings: 599,
+  visualEventBindings: 870,
   markingChains: 58,
-  assessmentItems: 78,
+  assessmentItems: 79,
   lessonReleaseRecords: 26,
   packages: 13,
   patterns: 58,
@@ -357,6 +357,7 @@ export async function createPaper4V2Outputs() {
   assert(patternIds.length === EXPECTED_COUNTS.patterns, `patterns: expected ${EXPECTED_COUNTS.patterns}, received ${patternIds.length}`);
 
   const patternMetadata = [];
+  const visualTargetsByPattern = new Map();
   const outputs = new Map();
 
   for (const patternId of patternIds) {
@@ -370,6 +371,7 @@ export async function createPaper4V2Outputs() {
     const chunkEventIds = traces.flatMap((trace) => trace.event_ids);
     assert(new Set(chunkEventIds).size === chunkEventIds.length, `${patternId} reuses event IDs across scenarios`);
     const chunkEvents = chunkEventIds.map((eventId) => publicEvent(eventById.get(eventId)));
+    visualTargetsByPattern.set(patternId, new Set(chunkEvents.flatMap((event) => event.visual_targets)));
     const validLineIds = new Set(ownerArtifact.lines.map((line) => line.line_id));
     for (const event of chunkEvents) {
       for (const lineId of event.active_line_ids) assert(validLineIds.has(lineId), `${event.event_id} has invalid active line ${lineId}`);
@@ -432,9 +434,16 @@ export async function createPaper4V2Outputs() {
     for (const unitId of release.knowledge_unit_ids) assert(knowledgeIds.has(unitId) && units.some((unit) => unit.knowledge_unit_id === unitId), `${release.slug} has unresolved KnowledgeUnit ${unitId}`);
     const chains = stableSort(records.markingChains.filter((chain) => chain.lesson_id === release.lesson_id), (chain) => chain.pattern_id);
     const assessments = stableSort(records.assessmentItems.filter((item) => item.lesson_id === release.lesson_id), (item) => `${item.level}:${item.assessment_item_id}`);
-    assert(assessments.length === 3, `${release.slug} must have three assessment items`);
+    const expectedAssessmentCount = release.slug === "exam-workflow" ? 4 : 3;
+    assert(assessments.length === expectedAssessmentCount, `${release.slug} must have ${expectedAssessmentCount} assessment items`);
+    if (release.slug === "exam-workflow") {
+      assert(assessments.some((item) => item.assessment_item_id === "ac-9618-p4-2026-python.lesson.exam-workflow.practice.p4r9-dsa-capstone"), "exam-workflow lacks the protected P4R-9 DSA capstone");
+    }
     const ownedPatternIds = stableSort(patternMetadata.filter((pattern) => pattern.owner_lesson_id === release.lesson_id).map((pattern) => pattern.pattern_id), (value) => value);
     const approvedAssociationPatternIds = stableSort(release.pattern_ids.filter((patternId) => !ownedPatternIds.includes(patternId)), (value) => value);
+    const traceBackedAssociationPatternIds = release.slug === "performance"
+      ? approvedAssociationPatternIds.filter((patternId) => visualTargetsByPattern.get(patternId)?.has("visual.dsa.growth-counter"))
+      : [];
     const isAssociationOnly = ownedPatternIds.length === 0;
     if (isAssociationOnly) {
       assert(chains.length === 0, `${release.slug} association-only lesson must not inherit Cambridge marking chains`);
@@ -476,6 +485,25 @@ export async function createPaper4V2Outputs() {
       },
       visual: {
         owned_patterns: ownedPatternIds.map((patternId) => patternMetadata.find((pattern) => pattern.pattern_id === patternId)),
+        trace_backed_association_patterns: traceBackedAssociationPatternIds.map((patternId) => {
+          const metadata = patternMetadata.find((pattern) => pattern.pattern_id === patternId);
+          assert(metadata, `${release.slug} has no canonical trace metadata for associated pattern ${patternId}`);
+          return {
+            ...metadata,
+            required_visual_target: "visual.dsa.growth-counter",
+            association_authority: "AlgoCore_representational_workflow_only",
+            official_marks: null,
+            reuse_notice: {
+              vi: "Lab này dùng lại trace Python canonical đã thực thi từ bài sở hữu dạng bài; liên kết này không chuyển quyền sở hữu dạng bài hoặc điểm Cambridge.",
+              en: "This lab reuses an executed canonical Python trace from the pattern-owner lesson; the association does not transfer pattern ownership or Cambridge marks.",
+            },
+            source_owner: {
+              lesson_id: metadata.owner_lesson_id,
+              lesson_slug: metadata.owner_lesson_slug,
+              python_artifact_id: metadata.python_artifact_id,
+            },
+          };
+        }),
         approved_static_or_representational_support: approvedAssociationPatternIds.map((patternId) => ({
           pattern_id: patternId,
           authority: "AlgoCore_representational_workflow_only",

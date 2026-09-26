@@ -26,6 +26,7 @@ const copy = {
   vi: {
     skip: "Bỏ qua đến nội dung bài học", course: "Cambridge 9618 · Paper 4 · Python · 2026", language: "Ngôn ngữ bài học",
     owned: "Dạng bài chính thức thuộc bài", support: "Liên kết biểu diễn hỗ trợ", noOfficial: "Các liên kết này là workflow/biểu diễn do AlgoCore biên soạn; không chuyển quyền sở hữu dạng bài hoặc điểm Cambridge.",
+    reusedTrace: "Lab dùng lại trace canonical", traceOwner: "Nguồn trace canonical",
     pythonEvidence: "Bằng chứng chạy Python", fixtures: "Ca kiểm thử canonical", input: "Input", expected: "Expected output", sourceHash: "Mã băm source",
     marking: "Chuỗi chấm điểm", markAtoms: "Tiêu chí nguồn đại diện", detection: "Cách phát hiện lỗi", repair: "Cách sửa", misconception: "Lỗi dễ mất điểm",
     practiceAuthority: "Thẩm quyền rubric", expectedArtifact: "Sản phẩm cần nộp", hint: "Mở gợi ý", feedback: "Mở phản hồi và cách sửa", rubric: "Tiêu chí tự chấm",
@@ -34,6 +35,7 @@ const copy = {
   en: {
     skip: "Skip to lesson content", course: "Cambridge 9618 · Paper 4 · Python · 2026", language: "Lesson language",
     owned: "Official patterns owned by this lesson", support: "Approved representational support", noOfficial: "These links are AlgoCore-authored workflow or representation support; they do not transfer official pattern ownership or Cambridge marks.",
+    reusedTrace: "Reused canonical trace lab", traceOwner: "Canonical trace source",
     pythonEvidence: "Python execution evidence", fixtures: "Canonical test cases", input: "Input", expected: "Expected output", sourceHash: "Source hash",
     marking: "Marking chain", markAtoms: "Representative source criteria", detection: "Error detection", repair: "Repair check", misconception: "Mark-losing pitfall",
     practiceAuthority: "Rubric authority", expectedArtifact: "Expected submission", hint: "Reveal hint", feedback: "Reveal feedback and repair", rubric: "Self-assessment criteria",
@@ -89,12 +91,27 @@ function Tests({ lesson, locale }: { readonly lesson: LessonDto; readonly locale
 }
 
 function ActionView({ lesson, locale }: { readonly lesson: LessonDto; readonly locale: LearningLocale }) {
+  const associatedPatterns = lesson.visual.trace_backed_association_patterns ?? [];
   return <div className={styles.stack}>
     {lesson.visual.owned_patterns.length === 0 && <PythonArtifact artifact={lesson.python} locale={locale} />}
     <Tests lesson={lesson} locale={locale} />
     {lesson.visual.owned_patterns.length > 0
       ? <Paper4VisualRuntime patterns={lesson.visual.owned_patterns} pythonArtifact={lesson.python} initialPatternId={lesson.visual.owned_patterns[0]?.pattern_id} initialLocale={locale} autoplayDelayMs={1800} headingLevel={3} />
-      : <aside className={styles.fallback} role="note"><strong>{copy[locale].support}</strong><p>{copy[locale].noOfficial}</p><Tags values={lesson.visual.approved_static_or_representational_support.map((item) => item.pattern_id)} /></aside>}
+      : associatedPatterns.length > 0
+        ? <>
+          <aside className={styles.traceReuse} role="note">
+            <strong>{copy[locale].reusedTrace}</strong>
+            <p>{associatedPatterns[0]?.reuse_notice[locale]}</p>
+            <dl>
+              {associatedPatterns.map((pattern) => <div key={pattern.pattern_id}>
+                <dt><code>{pattern.pattern_id}</code></dt>
+                <dd>{copy[locale].traceOwner}: <code>{pattern.source_owner.lesson_slug}</code> · <code>{pattern.source_owner.python_artifact_id}</code></dd>
+              </div>)}
+            </dl>
+          </aside>
+          <Paper4VisualRuntime patterns={associatedPatterns} initialPatternId={associatedPatterns[0]?.pattern_id} initialLocale={locale} autoplayDelayMs={1800} headingLevel={3} />
+        </>
+        : <aside className={styles.fallback} role="note"><strong>{copy[locale].support}</strong><p>{copy[locale].noOfficial}</p><Tags values={lesson.visual.approved_static_or_representational_support.map((item) => item.pattern_id)} /></aside>}
   </div>;
 }
 

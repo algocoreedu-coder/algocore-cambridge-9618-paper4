@@ -122,7 +122,9 @@ function fullCrossErrors(documents, sourceMap, evidenceRecords) {
   }
 
   const gapAssessments = idx.records.AssessmentItem.filter((record) => record.self_rubric?.pattern_authority === "AlgoCore_representational_workflow_only");
-  if (gapAssessments.length !== 18 || gapAssessments.some((record) => !GAP_LESSON_IDS.has(record.lesson_id))) fail(errors, "GAP_ASSESSMENT_EXACT_SET", `Expected 18 gap assessments over the six approved lessons; found ${gapAssessments.length}.`);
+  const p4r9CapstoneId = "ac-9618-p4-2026-python.lesson.exam-workflow.practice.p4r9-dsa-capstone";
+  const approvedRepresentationalAssessments = gapAssessments.filter((record) => GAP_LESSON_IDS.has(record.lesson_id) || record.assessment_item_id === p4r9CapstoneId);
+  if (gapAssessments.length !== 19 || approvedRepresentationalAssessments.length !== 19 || gapAssessments.filter((record) => record.assessment_item_id === p4r9CapstoneId).length !== 1) fail(errors, "GAP_ASSESSMENT_EXACT_SET", `Expected 18 gap assessments plus one P4R-9 cross-owner capstone; found ${gapAssessments.length}.`);
   for (const item of gapAssessments) {
     if (item.self_rubric?.authority !== "AlgoCore_authored_rubric" || item.self_rubric?.official_marks !== null) fail(errors, "GAP_AUTHORITY_INVALID", item.assessment_item_id);
   }
