@@ -44,6 +44,20 @@ class CircularQueue:
         return values
 
 
+def reduce_numeric(queue, preserve, trace):
+    original_count = queue.count
+    total = 0
+    for _ in range(original_count):
+        item = queue.dequeue()
+        if type(item) in (int, float):
+            total += item
+        trace.append({"event": "reduce_item", "item": item, "total": total})
+        if preserve:
+            queue.enqueue(item)
+    trace.append({"event": "reduce_complete", "mode": "preserve" if preserve else "consume", "total": total})
+    return total
+
+
 def run(fixture):
     trace = []
     try:
@@ -60,13 +74,23 @@ def run(fixture):
         else:
             return {"status": "UNKNOWN_OPERATION", "operation": operation[0], "trace": trace}
     live = queue.live_items()
-    numeric_total = sum(item for item in live if isinstance(item, (int, float)))
+    reduce_trace = []
+    reduce_values = fixture.get("reduce_values", live)
+    reduce_queue = CircularQueue(max(1, len(reduce_values)), [])
+    for item in reduce_values:
+        reduce_queue.enqueue(item)
+    reduce_mode = fixture.get("reduce_mode", "consume")
+    numeric_total = reduce_numeric(reduce_queue, reduce_mode == "preserve", reduce_trace)
+    reduce_live = reduce_queue.live_items()
+    trace.extend(reduce_trace)
     return {
         "status": "OK",
         "operation_results": operation_results,
         "removed": removed,
         "live": live,
         "numeric_total": numeric_total,
+        "reduce_mode": reduce_mode,
+        "reduce_live": reduce_live,
         "front": queue.front,
         "rear": queue.rear,
         "count": queue.count,

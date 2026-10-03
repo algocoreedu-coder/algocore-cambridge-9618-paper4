@@ -77,7 +77,7 @@ const stage3Editorial = JSON.parse(await readFile(STAGE3_EDITORIAL_PATH, "utf8")
 const stage3LessonById = new Map(stage3Editorial.lessons.map((lesson) => [lesson.lesson_id, lesson]));
 const stage3PackageById = new Map(stage3Editorial.packages.map((item) => [item.package_id, item]));
 assert(manifest.schema_version === "paper4-v2-course-manifest-v1", "Manifest schema mismatch");
-assert(manifest.canonical_registry_sha256 === "2c99660563e8b7c974941d488f3b11ed0ae4efb6f710249456625019fbfef7b4", "Canonical registry aggregate authority mismatch");
+assert(manifest.canonical_registry_sha256 === "12f6fb4216bdcd07620eee8071aa58555e1d100ea451f2518d7f6c38c4057d94", "Canonical registry aggregate authority mismatch");
 assert(manifest.editorial_registry.sha256 === "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2", "Stage 3 editorial hash mismatch");
 assert(JSON.stringify(manifest.editorial_registry.course_title) === JSON.stringify(stage3Editorial.titles), "Course title does not match Stage 3" );
 assert(manifest.counts.packages === 13, "Expected 13 packages");
@@ -87,7 +87,7 @@ assert(manifest.counts.sections_per_lesson === 10, "Expected ten sections per le
 assert(manifest.counts.knowledge_units === 108, "Expected 108 KnowledgeUnits");
 assert(manifest.counts.python_artifacts === 26, "Expected 26 PythonArtifacts");
 assert(manifest.counts.visual_scenario_traces === 174, "Expected 174 VisualScenarioTraces");
-assert(manifest.counts.visual_event_bindings === 870, "Expected 870 VisualEventBindings");
+assert(manifest.counts.visual_event_bindings === 945, "Expected 945 VisualEventBindings");
 assert(manifest.counts.marking_chains === 58, "Expected 58 MarkingChains");
 assert(manifest.counts.assessment_items === 79, "Expected 79 AssessmentItems");
 assert(manifest.counts.lesson_release_records === 26, "Expected 26 LessonReleaseRecords");
@@ -230,7 +230,7 @@ for (const patternMeta of manifest.patterns) {
 }
 assert(patternIds.size === 58, "Pattern exact set mismatch");
 assert(scenarioCount === 174 && traceIds.size === 174, "Scenario exact set mismatch");
-assert(eventCount === 870 && eventIds.size === 870, "Event exact set mismatch");
+assert(eventCount === 945 && eventIds.size === 945, "Event exact set mismatch");
 
 const loaderSource = await readFile(path.join(ROOT, "app", "data", "paper4-v2", "lesson-loaders.generated.ts"), "utf8");
 for (const slug of lessonSlugs) assert(loaderSource.includes(`\"${slug}\": () => import(\"./lessons/${slug}.json\")`), `${slug}: static loader is missing`);

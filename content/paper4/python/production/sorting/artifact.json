@@ -4,9 +4,9 @@
     "en": "Bubble, insertion and capacity-bounded ordered insertion.",
     "vi": "Bubble, insertion và ordered insert có giới hạn."
   },
-  "code_sha256": "44d856b6c7e166ea4708dbd1a3acbf375af8d65c6181f1efd91e49b09475cf2c",
+  "code_sha256": "960f6fa686def3d559fd15fee8d2a7d3db79e8e8a3977d0abc76b0426c974c7a",
   "entry_point": "run(fixture)",
-  "execution_log_sha256": "dbd5e978492a57ca3151eb425e286abba5220dd389c6b61ed04ce3f617be2dfe",
+  "execution_log_sha256": "6888818485c85db23b7e1b4f247bb1c2a68b4c5c7fa288c402c9e9c30b6239cc",
   "execution_status": "PASS",
   "expected_outputs": [
     {
@@ -396,6 +396,12 @@
             "index": 2,
             "item": 4,
             "moves_right": false
+          },
+          {
+            "event": "ordered_insert_shift",
+            "from_index": 2,
+            "to_index": 3,
+            "value": 7
           },
           {
             "after": [
@@ -1178,356 +1184,306 @@
     {
       "line_id": "sorting.production-v1.L085",
       "order": 85,
-      "text": "def run(fixture):"
+      "text": "def ordered_insert(values, item, capacity, trace):"
     },
     {
       "line_id": "sorting.production-v1.L086",
       "order": 86,
-      "text": "    values = fixture.get(\"values\", [])"
+      "text": "    if len(values) >= capacity:"
     },
     {
       "line_id": "sorting.production-v1.L087",
       "order": 87,
-      "text": "    trace = []"
+      "text": "        before = list(values)"
     },
     {
       "line_id": "sorting.production-v1.L088",
       "order": 88,
-      "text": "    if not all(isinstance(value, int) for value in values):"
+      "text": "        trace.append({\"event\": \"capacity_reject\", \"capacity\": capacity, \"before\": before, \"after\": list(values)})"
     },
     {
       "line_id": "sorting.production-v1.L089",
       "order": 89,
-      "text": "        trace.append({"
+      "text": "        return False"
     },
     {
       "line_id": "sorting.production-v1.L090",
       "order": 90,
-      "text": "            \"event\": \"reject_key\","
+      "text": "    position = 0"
     },
     {
       "line_id": "sorting.production-v1.L091",
       "order": 91,
-      "text": "            \"before\": list(values),"
+      "text": "    while position < len(values) and values[position] <= item:"
     },
     {
       "line_id": "sorting.production-v1.L092",
       "order": 92,
-      "text": "            \"after\": list(values),"
+      "text": "        trace.append({\"event\": \"ordered_insert_compare\", \"index\": position, \"current\": values[position], \"item\": item, \"moves_right\": True})"
     },
     {
       "line_id": "sorting.production-v1.L093",
       "order": 93,
-      "text": "        })"
+      "text": "        position += 1"
     },
     {
       "line_id": "sorting.production-v1.L094",
       "order": 94,
-      "text": "        return {\"status\": \"INVALID_KEY\", \"values\": values, \"trace\": trace}"
+      "text": "    if position < len(values):"
     },
     {
       "line_id": "sorting.production-v1.L095",
       "order": 95,
-      "text": "    ordered, comparisons, swaps = bubble(values, trace, fixture.get(\"reverse\", False))"
+      "text": "        trace.append({\"event\": \"ordered_insert_compare\", \"index\": position, \"current\": values[position], \"item\": item, \"moves_right\": False})"
     },
     {
       "line_id": "sorting.production-v1.L096",
       "order": 96,
-      "text": "    insertion_ordered = insertion(values, trace)"
+      "text": "    before = list(values)"
     },
     {
       "line_id": "sorting.production-v1.L097",
       "order": 97,
-      "text": "    bounded = list(fixture.get(\"bounded\", []))"
+      "text": "    values.append(None)"
     },
     {
       "line_id": "sorting.production-v1.L098",
       "order": 98,
-      "text": "    if len(bounded) >= fixture[\"capacity\"]:"
+      "text": "    for index in range(len(values) - 1, position, -1):"
     },
     {
       "line_id": "sorting.production-v1.L099",
       "order": 99,
-      "text": "        before = list(bounded)"
+      "text": "        values[index] = values[index - 1]"
     },
     {
       "line_id": "sorting.production-v1.L100",
       "order": 100,
-      "text": "        trace.append({"
+      "text": "        trace.append({\"event\": \"ordered_insert_shift\", \"from_index\": index - 1, \"to_index\": index, \"value\": values[index]})"
     },
     {
       "line_id": "sorting.production-v1.L101",
       "order": 101,
-      "text": "            \"event\": \"capacity_reject\","
+      "text": "    values[position] = item"
     },
     {
       "line_id": "sorting.production-v1.L102",
       "order": 102,
-      "text": "            \"capacity\": fixture[\"capacity\"],"
+      "text": "    trace.append({\"event\": \"ordered_insert\", \"position\": position, \"item\": item, \"before\": before, \"after\": list(values)})"
     },
     {
       "line_id": "sorting.production-v1.L103",
       "order": 103,
-      "text": "            \"before\": before,"
+      "text": "    return True"
     },
     {
       "line_id": "sorting.production-v1.L104",
       "order": 104,
-      "text": "            \"after\": list(bounded),"
+      "text": ""
     },
     {
       "line_id": "sorting.production-v1.L105",
       "order": 105,
-      "text": "        })"
+      "text": "def run(fixture):"
     },
     {
       "line_id": "sorting.production-v1.L106",
       "order": 106,
-      "text": "        return {"
+      "text": "    values = fixture.get(\"values\", [])"
     },
     {
       "line_id": "sorting.production-v1.L107",
       "order": 107,
-      "text": "            \"status\": \"FULL\","
+      "text": "    trace = []"
     },
     {
       "line_id": "sorting.production-v1.L108",
       "order": 108,
-      "text": "            \"values\": bounded,"
+      "text": "    if not all(isinstance(value, int) for value in values):"
     },
     {
       "line_id": "sorting.production-v1.L109",
       "order": 109,
-      "text": "            \"bubble\": ordered,"
+      "text": "        trace.append({"
     },
     {
       "line_id": "sorting.production-v1.L110",
       "order": 110,
-      "text": "            \"insertion\": insertion_ordered,"
+      "text": "            \"event\": \"reject_key\","
     },
     {
       "line_id": "sorting.production-v1.L111",
       "order": 111,
-      "text": "            \"trace\": trace,"
+      "text": "            \"before\": list(values),"
     },
     {
       "line_id": "sorting.production-v1.L112",
       "order": 112,
-      "text": "        }"
+      "text": "            \"after\": list(values),"
     },
     {
       "line_id": "sorting.production-v1.L113",
       "order": 113,
-      "text": "    item = fixture[\"insert\"]"
+      "text": "        })"
     },
     {
       "line_id": "sorting.production-v1.L114",
       "order": 114,
-      "text": "    position = 0"
+      "text": "        return {\"status\": \"INVALID_KEY\", \"values\": values, \"trace\": trace}"
     },
     {
       "line_id": "sorting.production-v1.L115",
       "order": 115,
-      "text": "    while position < len(bounded):"
+      "text": "    ordered, comparisons, swaps = bubble(values, trace, fixture.get(\"reverse\", False))"
     },
     {
       "line_id": "sorting.production-v1.L116",
       "order": 116,
-      "text": "        current = bounded[position]"
+      "text": "    insertion_ordered = insertion(values, trace)"
     },
     {
       "line_id": "sorting.production-v1.L117",
       "order": 117,
-      "text": "        moves_right = current <= item"
+      "text": "    bounded = list(fixture.get(\"bounded\", []))"
     },
     {
       "line_id": "sorting.production-v1.L118",
       "order": 118,
-      "text": "        trace.append({"
+      "text": "    item = fixture[\"insert\"]"
     },
     {
       "line_id": "sorting.production-v1.L119",
       "order": 119,
-      "text": "            \"event\": \"ordered_insert_compare\","
+      "text": "    if not ordered_insert(bounded, item, fixture[\"capacity\"], trace):"
     },
     {
       "line_id": "sorting.production-v1.L120",
       "order": 120,
-      "text": "            \"index\": position,"
+      "text": "        return {"
     },
     {
       "line_id": "sorting.production-v1.L121",
       "order": 121,
-      "text": "            \"current\": current,"
+      "text": "            \"status\": \"FULL\","
     },
     {
       "line_id": "sorting.production-v1.L122",
       "order": 122,
-      "text": "            \"item\": item,"
+      "text": "            \"values\": bounded,"
     },
     {
       "line_id": "sorting.production-v1.L123",
       "order": 123,
-      "text": "            \"moves_right\": moves_right,"
+      "text": "            \"bubble\": ordered,"
     },
     {
       "line_id": "sorting.production-v1.L124",
       "order": 124,
-      "text": "        })"
+      "text": "            \"insertion\": insertion_ordered,"
     },
     {
       "line_id": "sorting.production-v1.L125",
       "order": 125,
-      "text": "        if not moves_right:"
+      "text": "            \"trace\": trace,"
     },
     {
       "line_id": "sorting.production-v1.L126",
       "order": 126,
-      "text": "            break"
+      "text": "        }"
     },
     {
       "line_id": "sorting.production-v1.L127",
       "order": 127,
-      "text": "        position += 1"
+      "text": "    return {"
     },
     {
       "line_id": "sorting.production-v1.L128",
       "order": 128,
-      "text": "    before = list(bounded)"
+      "text": "        \"status\": \"OK\","
     },
     {
       "line_id": "sorting.production-v1.L129",
       "order": 129,
-      "text": "    bounded.insert(position, item)"
+      "text": "        \"bubble\": ordered,"
     },
     {
       "line_id": "sorting.production-v1.L130",
       "order": 130,
-      "text": "    trace.append({"
+      "text": "        \"insertion\": insertion_ordered,"
     },
     {
       "line_id": "sorting.production-v1.L131",
       "order": 131,
-      "text": "        \"event\": \"ordered_insert\","
+      "text": "        \"bounded\": bounded,"
     },
     {
       "line_id": "sorting.production-v1.L132",
       "order": 132,
-      "text": "        \"position\": position,"
+      "text": "        \"comparisons\": comparisons,"
     },
     {
       "line_id": "sorting.production-v1.L133",
       "order": 133,
-      "text": "        \"item\": item,"
+      "text": "        \"swaps\": swaps,"
     },
     {
       "line_id": "sorting.production-v1.L134",
       "order": 134,
-      "text": "        \"before\": before,"
+      "text": "        \"trace\": trace,"
     },
     {
       "line_id": "sorting.production-v1.L135",
       "order": 135,
-      "text": "        \"after\": list(bounded),"
+      "text": "    }"
     },
     {
       "line_id": "sorting.production-v1.L136",
       "order": 136,
-      "text": "    })"
+      "text": ""
     },
     {
       "line_id": "sorting.production-v1.L137",
       "order": 137,
-      "text": "    return {"
+      "text": "if __name__ == \"__main__\":"
     },
     {
       "line_id": "sorting.production-v1.L138",
       "order": 138,
-      "text": "        \"status\": \"OK\","
+      "text": "    import json"
     },
     {
       "line_id": "sorting.production-v1.L139",
       "order": 139,
-      "text": "        \"bubble\": ordered,"
+      "text": "    import sys"
     },
     {
       "line_id": "sorting.production-v1.L140",
       "order": 140,
-      "text": "        \"insertion\": insertion_ordered,"
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
     },
     {
       "line_id": "sorting.production-v1.L141",
       "order": 141,
-      "text": "        \"bounded\": bounded,"
+      "text": "    result = run(fixture)"
     },
     {
       "line_id": "sorting.production-v1.L142",
       "order": 142,
-      "text": "        \"comparisons\": comparisons,"
+      "text": "    if not result[\"trace\"]:"
     },
     {
       "line_id": "sorting.production-v1.L143",
       "order": 143,
-      "text": "        \"swaps\": swaps,"
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
     },
     {
       "line_id": "sorting.production-v1.L144",
       "order": 144,
-      "text": "        \"trace\": trace,"
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
     },
     {
       "line_id": "sorting.production-v1.L145",
       "order": 145,
-      "text": "    }"
-    },
-    {
-      "line_id": "sorting.production-v1.L146",
-      "order": 146,
-      "text": ""
-    },
-    {
-      "line_id": "sorting.production-v1.L147",
-      "order": 147,
-      "text": "if __name__ == \"__main__\":"
-    },
-    {
-      "line_id": "sorting.production-v1.L148",
-      "order": 148,
-      "text": "    import json"
-    },
-    {
-      "line_id": "sorting.production-v1.L149",
-      "order": 149,
-      "text": "    import sys"
-    },
-    {
-      "line_id": "sorting.production-v1.L150",
-      "order": 150,
-      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
-    },
-    {
-      "line_id": "sorting.production-v1.L151",
-      "order": 151,
-      "text": "    result = run(fixture)"
-    },
-    {
-      "line_id": "sorting.production-v1.L152",
-      "order": 152,
-      "text": "    if not result[\"trace\"]:"
-    },
-    {
-      "line_id": "sorting.production-v1.L153",
-      "order": 153,
-      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
-    },
-    {
-      "line_id": "sorting.production-v1.L154",
-      "order": 154,
-      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
-    },
-    {
-      "line_id": "sorting.production-v1.L155",
-      "order": 155,
       "text": ""
     }
   ],

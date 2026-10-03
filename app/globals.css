@@ -1,11 +1,56 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+
+/* Keep shell controls usable at the same touch target size as learning UI. */
+button[aria-label="Open Sidebar"],
+button[aria-label="Close Sidebar"],
+button[aria-label="Collapse Sidebar"],
+button[aria-label="Toggle Theme"],
+button[aria-label="Mở điều hướng"],
+button[aria-label="Đóng điều hướng"],
+button[aria-label="Thu gọn điều hướng"],
+button[aria-label="Đổi giao diện sáng tối"] {
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
 @import '../styles/algocore-theme.css';
 
 body { font-family: 'Segoe UI', Arial, sans-serif; }
 html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
 .paper4-docs-layout { --fd-layout-width: 100vw; }
+.paper4-global-skip-link {
+  position: fixed;
+  inset-block-start: var(--alg-space-3);
+  inset-inline-start: var(--alg-space-3);
+  z-index: 1000;
+  min-height: var(--alg-touch-target);
+  translate: 0 -200%;
+  border-radius: var(--alg-radius-md);
+  background: var(--alg-action-primary);
+  color: var(--alg-action-primary-foreground);
+  display: inline-flex;
+  align-items: center;
+  padding-inline: var(--alg-space-4);
+  font-weight: 800;
+  text-decoration: none;
+}
+.paper4-global-skip-link:focus { translate: 0; }
+
+.paper4-docs-layout #nd-sidebar a,
+.paper4-docs-layout #nd-sidebar button,
+.paper4-docs-layout #nd-sidebar-mobile a,
+.paper4-docs-layout #nd-sidebar-mobile button,
+.paper4-docs-layout a:has(> .brand-logo) {
+  min-height: var(--alg-touch-target);
+}
+
+.paper4-docs-layout #nd-sidebar a,
+.paper4-docs-layout #nd-sidebar button,
+.paper4-docs-layout #nd-sidebar-mobile a,
+.paper4-docs-layout #nd-sidebar-mobile button {
+  align-items: center;
+}
 .brand-logo { display: inline-flex; padding: 7px 12px; background: white; border-radius: 9px; }
 .brand-logo img { width: 146px; height: auto; }
 #nd-subnav .brand-logo { padding: 4px 8px; }
@@ -69,6 +114,9 @@ html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
 .paper4-locale-switch { display: flex; gap: 8px; margin: 16px 0; }
 .paper4-locale-switch a { border: 1px solid var(--color-fd-border); border-radius: 999px; padding: 7px 13px; text-decoration: none; font-weight: 650; }
 .paper4-locale-switch a[aria-current="page"] { background: var(--color-fd-primary); color: var(--color-fd-primary-foreground); border-color: var(--color-fd-primary); }
+.paper4-rehearsal-entry { display: inline-flex; min-height: var(--alg-touch-target); align-items: center; border-radius: var(--alg-radius-md); background: var(--alg-action-primary); padding-inline: var(--alg-space-4); color: var(--alg-action-primary-foreground); font-weight: 800; text-decoration: none; }
+.paper4-rehearsal-entry:hover { background: var(--alg-brand-teal-ui-hover); }
+.paper4-rehearsal-entry:focus-visible { outline: var(--alg-border-width-focus) solid var(--alg-focus-ring); outline-offset: 3px; }
 .paper4-course-map { margin: 12px 0 44px; }
 .paper4-package-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
 .paper4-package-card { border: 1px solid var(--color-fd-border); border-radius: 12px; background: var(--color-fd-card); padding: 18px; }
@@ -103,4 +151,15 @@ html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
   .paper4-practice-loop > div { grid-template-columns: 1fr; }
   .paper4-package-grid { grid-template-columns: 1fr; }
 }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .paper4-docs-layout,
+  .paper4-docs-layout *,
+  .paper4-docs-layout *::before,
+  .paper4-docs-layout *::after,
+  .paper4-global-skip-link {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

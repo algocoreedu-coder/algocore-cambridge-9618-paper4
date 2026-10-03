@@ -1,0 +1,954 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Linked lists: unlink, recycle, preserve both chains",
+    "vi": "Linked list: tháo link, recycle và giữ đúng cả hai chain"
+  },
+  "exam_family": {
+    "en": "Parallel-array linked-list setup, head insertion, first-match removal and free-node recycling",
+    "vi": "Khởi tạo linked list bằng parallel array, insert head, remove match đầu và recycle free node"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Follow links instead of physical row order, remove the first matching live node, and recycle its physical index without losing the live list or free list.",
+    "vi": "Đi theo link thay vì thứ tự hàng vật lý, remove live node khớp đầu tiên và recycle physical index của nó mà không làm mất live list hoặc free list."
+  },
+  "learner_outcomes": [
+    {
+      "en": "State the capacity >= 1 precondition and the meanings of head, free and -1.",
+      "vi": "Nêu precondition capacity >= 1 và ý nghĩa của head, free cùng -1."
+    },
+    {
+      "en": "Build logical order by following next links from head.",
+      "vi": "Dựng logical order bằng cách theo next link từ head."
+    },
+    {
+      "en": "Insert at head only after saving the free successor and old head.",
+      "vi": "Insert tại head chỉ sau khi lưu free successor và old head."
+    },
+    {
+      "en": "Remove the first match, reconnect the live chain and return the physical node to the free chain while preserving a complete disjoint partition.",
+      "vi": "Remove match đầu, nối lại live chain và trả physical node về free chain trong khi giữ partition đầy đủ, không giao nhau."
+    }
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one five-row node pool with live and free link overlays plus one active mutation",
+    "trace_rule": "one integrated setup/insert-head/remove-first/recycle pathway; traversal embedded as logical-order reveal",
+    "code_rule": "highlight no more than three Python lines for the current decision",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "reveal_policy": {
+      "en": "Predict the node, saved link or resulting chain before reveal.",
+      "vi": "Dự đoán node, link đã lưu hoặc chain kết quả trước khi mở đáp án."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "Which indices are live and which are free?",
+        "vi": "Index nào đang live và index nào đang free?"
+      },
+      "intro": {
+        "en": "A linked list stores logical order in links. Physical row order does not determine the next item.",
+        "vi": "Linked list lưu logical order trong các link. Thứ tự hàng vật lý không quyết định item tiếp theo."
+      },
+      "prompt_fragment": {
+        "en": "Use positive capacity. data and next are parallel arrays; head starts the live chain and free starts the free chain; -1 ends either chain.",
+        "vi": "Dùng capacity dương. data và next là parallel array; head bắt đầu live chain, free bắt đầu free chain; -1 kết thúc mỗi chain."
+      },
+      "cues": [
+        {
+          "en": "Follow next from head to read logical values.",
+          "vi": "Theo next từ head để đọc các logical value."
+        },
+        {
+          "en": "Follow next from free to find reusable physical nodes.",
+          "vi": "Theo next từ free để tìm physical node có thể tái sử dụng."
+        },
+        {
+          "en": "Save a link before overwriting the node that stores it.",
+          "vi": "Lưu link trước khi ghi đè node đang chứa link đó."
+        },
+        {
+          "en": "Remove-first stops at the first matching node in traversal order.",
+          "vi": "Remove-first dừng tại node khớp đầu tiên theo traversal order."
+        }
+      ],
+      "precondition": {
+        "en": "capacity >= 1. Invalid capacity is outside this lesson until the constructor is guarded.",
+        "vi": "capacity >= 1. Invalid capacity nằm ngoài bài này cho tới khi constructor có guard."
+      },
+      "output_contract": {
+        "en": "Insert and remove return Boolean outcomes here. -1 is the array-link null pointer for this representation, not a universal object-node value.",
+        "vi": "Insert và remove trả Boolean outcome trong bài này. -1 là null pointer của array link trong dạng biểu diễn này, không phải value phổ quát cho object node."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu mô hình"
+      },
+      "student_question": {
+        "en": "Which links must be saved before mutation?",
+        "vi": "Link nào phải được lưu trước mutation?"
+      },
+      "mental_model": {
+        "en": "One physical node pool is partitioned into two linked chains. An accepted insert moves one node free→live; an accepted removal moves one node live→free.",
+        "vi": "Một physical node pool được chia thành hai linked chain. Insert được chấp nhận chuyển một node free→live; remove được chấp nhận chuyển một node live→free."
+      },
+      "rules": [
+        {
+          "en": "Initial positive-capacity free chain is 0→1→…→capacity-1→-1; head is -1.",
+          "vi": "Free chain ban đầu với capacity dương là 0→1→…→capacity-1→-1; head là -1."
+        },
+        {
+          "en": "Insert-head saves next[free] and old head before changing free or links.",
+          "vi": "Insert-head lưu next[free] và old head trước khi đổi free hoặc link."
+        },
+        {
+          "en": "Remove follows next from head and keeps previous so it can reconnect around the first match.",
+          "vi": "Remove theo next từ head và giữ previous để nối vòng qua match đầu."
+        },
+        {
+          "en": "Before recycling, save the removed successor and old free head.",
+          "vi": "Trước khi recycle, lưu successor của node bị remove và old free head."
+        },
+        {
+          "en": "After every accepted mutation, live and free chains are disjoint and together contain every physical index exactly once.",
+          "vi": "Sau mỗi mutation được chấp nhận, live và free chain không giao nhau và cùng chứa mỗi physical index đúng một lần."
+        }
+      ],
+      "invariant": {
+        "en": "set(live_chain) ∩ set(free_chain) is empty, and their union is every index 0..capacity-1.",
+        "vi": "set(live_chain) ∩ set(free_chain) rỗng và hợp của chúng là mọi index 0..capacity-1."
+      },
+      "python_recipe": [
+        "node = free",
+        "next_free = next[node]",
+        "free = next_free",
+        "data[node] = value",
+        "next[node] = head",
+        "head = node",
+        "successor = next[node]",
+        "old_free = free",
+        "if previous == -1: head = successor",
+        "else: next[previous] = successor",
+        "data[node] = None",
+        "next[node] = old_free",
+        "free = node"
+      ],
+      "transfer_note": {
+        "en": "Tail insertion, object nodes using None, and a dedicated find return contract are separate representations/tasks. Re-derive their mutation and sentinel rules instead of borrowing this trace.",
+        "vi": "Tail insertion, object node dùng None và find return contract riêng là các dạng/task khác. Hãy suy ra lại mutation và sentinel thay vì mượn trace này."
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Remove and recycle",
+        "vi": "Remove và recycle"
+      },
+      "student_question": {
+        "en": "Which physical node moves from live to free?",
+        "vi": "Physical node nào chuyển từ live sang free?"
+      },
+      "representation": "parallel_arrays_live_free_partition",
+      "scenario": {
+        "label": {
+          "en": "Capacity 5: insert 4, 2, 1; remove first 2",
+          "vi": "Capacity 5: insert 4, 2, 1; remove 2 đầu tiên"
+        },
+        "capacity": 5,
+        "null_pointer": -1,
+        "initial": {
+          "data": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "next": [
+            1,
+            2,
+            3,
+            4,
+            -1
+          ],
+          "head": -1,
+          "free": 0,
+          "live_chain": [],
+          "free_chain": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "operations": [
+          [
+            "insert_head",
+            4
+          ],
+          [
+            "insert_head",
+            2
+          ],
+          [
+            "insert_head",
+            1
+          ],
+          [
+            "remove_first",
+            2
+          ]
+        ]
+      },
+      "steps": [
+        {
+          "step": 1,
+          "operation": [
+            "insert_head",
+            4
+          ],
+          "code_focus": [
+            "node = self.free",
+            "next_free = self.next[node]",
+            "saved_head = self.head"
+          ],
+          "prediction": {
+            "en": "Which node is allocated, and which two links must be saved?",
+            "vi": "Node nào được cấp phát và hai link nào phải được lưu?"
+          },
+          "answer": {
+            "en": "Allocate node 0. Save next_free=1 and old head=-1 before overwriting links; node 0 becomes head and free becomes 1.",
+            "vi": "Cấp phát node 0. Lưu next_free=1 và old head=-1 trước khi ghi đè link; node 0 thành head và free thành 1."
+          },
+          "expected": {
+            "outcome": true,
+            "data": [
+              4,
+              null,
+              null,
+              null,
+              null
+            ],
+            "next": [
+              -1,
+              2,
+              3,
+              4,
+              -1
+            ],
+            "head": 0,
+            "free": 1,
+            "logical": [
+              4
+            ],
+            "live_chain": [
+              0
+            ],
+            "free_chain": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "step": 2,
+          "operation": [
+            "insert_head",
+            2
+          ],
+          "code_focus": [
+            "self.free = next_free",
+            "self.next[node] = saved_head",
+            "self.head = node"
+          ],
+          "prediction": {
+            "en": "After inserting 2 at head, what are logical order and both chain heads?",
+            "vi": "Sau khi insert 2 tại head, logical order và hai chain head là gì?"
+          },
+          "answer": {
+            "en": "Allocate node 1, link it to old head 0, set head=1 and free=2. Logical order is [2,4].",
+            "vi": "Cấp phát node 1, link tới old head 0, đặt head=1 và free=2. Logical order là [2,4]."
+          },
+          "expected": {
+            "outcome": true,
+            "data": [
+              4,
+              2,
+              null,
+              null,
+              null
+            ],
+            "next": [
+              -1,
+              0,
+              3,
+              4,
+              -1
+            ],
+            "head": 1,
+            "free": 2,
+            "logical": [
+              2,
+              4
+            ],
+            "live_chain": [
+              1,
+              0
+            ],
+            "free_chain": [
+              2,
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "step": 3,
+          "operation": [
+            "insert_head",
+            1
+          ],
+          "code_focus": [
+            "self.data[node] = value",
+            "self.next[node] = saved_head",
+            "self.head = node"
+          ],
+          "prediction": {
+            "en": "Why is physical [4,2,1,…] read logically as [1,2,4]?",
+            "vi": "Vì sao physical [4,2,1,…] được đọc logic thành [1,2,4]?"
+          },
+          "answer": {
+            "en": "head becomes node 2, then links are 2→1→0→-1. Logical order follows links, not row 0→1→2.",
+            "vi": "head thành node 2, rồi các link là 2→1→0→-1. Logical order theo link, không theo hàng 0→1→2."
+          },
+          "expected": {
+            "outcome": true,
+            "data": [
+              4,
+              2,
+              1,
+              null,
+              null
+            ],
+            "next": [
+              -1,
+              0,
+              1,
+              4,
+              -1
+            ],
+            "head": 2,
+            "free": 3,
+            "logical": [
+              1,
+              2,
+              4
+            ],
+            "live_chain": [
+              2,
+              1,
+              0
+            ],
+            "free_chain": [
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "step": 4,
+          "operation": [
+            "remove_compare",
+            2
+          ],
+          "code_focus": [
+            "previous = -1",
+            "node = self.head",
+            "while node != -1:"
+          ],
+          "prediction": {
+            "en": "The first visited node is 2 with value 1. Where do previous and node move?",
+            "vi": "Node được thăm đầu là 2 với value 1. previous và node di chuyển tới đâu?"
+          },
+          "answer": {
+            "en": "It is not the target. Set previous=2 and follow next[2] to node=1. No list/free mutation occurs during comparison.",
+            "vi": "Đó không phải target. Đặt previous=2 và theo next[2] tới node=1. Không mutation list/free trong lúc so sánh."
+          },
+          "expected": {
+            "match": false,
+            "previous": 2,
+            "node": 1,
+            "state_unchanged": true
+          }
+        },
+        {
+          "step": 5,
+          "operation": [
+            "remove_match",
+            2
+          ],
+          "code_focus": [
+            "successor = self.next[node]",
+            "previous_free = self.free",
+            "self.next[previous] = successor"
+          ],
+          "prediction": {
+            "en": "At node 1, which successor and old free head must be saved before unlinking?",
+            "vi": "Tại node 1, successor và old free head nào phải được lưu trước khi tháo link?"
+          },
+          "answer": {
+            "en": "Save successor=0 and old free=3. Because previous is node 2, reconnect next[2] to 0; head stays 2.",
+            "vi": "Lưu successor=0 và old free=3. Vì previous là node 2, nối next[2] tới 0; head vẫn là 2."
+          },
+          "expected": {
+            "removed_node": 1,
+            "previous": 2,
+            "successor": 0,
+            "old_free": 3,
+            "head": 2
+          }
+        },
+        {
+          "step": 6,
+          "operation": [
+            "remove_recycle",
+            2
+          ],
+          "code_focus": [
+            "self.data[node] = None",
+            "self.next[node] = previous_free",
+            "self.free = node"
+          ],
+          "prediction": {
+            "en": "After recycling node 1, what are the live and free chains?",
+            "vi": "Sau khi recycle node 1, live và free chain là gì?"
+          },
+          "answer": {
+            "en": "Clear data[1], link node 1 to old free 3 and set free=1. Live is 2→0 ([1,4]); free is 1→3→4. Every index belongs to exactly one chain.",
+            "vi": "Xóa data[1], link node 1 tới old free 3 và đặt free=1. Live là 2→0 ([1,4]); free là 1→3→4. Mỗi index thuộc đúng một chain."
+          },
+          "expected": {
+            "outcome": true,
+            "data": [
+              4,
+              null,
+              1,
+              null,
+              null
+            ],
+            "next": [
+              -1,
+              3,
+              0,
+              4,
+              -1
+            ],
+            "head": 2,
+            "free": 1,
+            "logical": [
+              1,
+              4
+            ],
+            "live_chain": [
+              2,
+              0
+            ],
+            "free_chain": [
+              1,
+              3,
+              4
+            ]
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "After every accepted mutation, live and free chains are disjoint, cycle-free and together contain indices 0..4 exactly once.",
+        "vi": "Sau mỗi mutation được chấp nhận, live và free chain không giao nhau, không cycle và cùng chứa index 0..4 đúng một lần."
+      },
+      "variants": [
+        {
+          "kind": "boundary_singleton_remove",
+          "input": {
+            "capacity": 1,
+            "operations": [
+              [
+                "insert_head",
+                9
+              ],
+              [
+                "remove_first",
+                9
+              ]
+            ]
+          },
+          "expected": {
+            "inserted": true,
+            "removed": true,
+            "data": [
+              null
+            ],
+            "next": [
+              -1
+            ],
+            "head": -1,
+            "free": 0,
+            "logical": [],
+            "live_chain": [],
+            "free_chain": [
+              0
+            ]
+          },
+          "explanation": {
+            "en": "Removing the only node is simultaneously head and tail removal. The node becomes the free head again.",
+            "vi": "Remove node duy nhất đồng thời là remove head và tail. Node trở lại làm free head."
+          }
+        },
+        {
+          "kind": "rejected_full_and_missing",
+          "input": {
+            "capacity": 2,
+            "initial": [
+              1,
+              2
+            ],
+            "insert": 3,
+            "remove": 8
+          },
+          "expected": {
+            "inserted": false,
+            "removed": false,
+            "data": [
+              2,
+              1
+            ],
+            "next": [
+              -1,
+              0
+            ],
+            "head": 1,
+            "free": -1,
+            "logical": [
+              1,
+              2
+            ],
+            "state_unchanged_after_each_rejection": true
+          },
+          "explanation": {
+            "en": "With no free node, insert 3 returns False. Missing remove 8 also returns False. Every data, next, head and free field stays unchanged.",
+            "vi": "Khi không có free node, insert 3 trả False. Remove 8 không tồn tại cũng trả False. Mọi field data, next, head và free giữ nguyên."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I preserve both chains for another case?",
+        "vi": "Tôi có thể giữ đúng cả hai chain cho case khác không?"
+      },
+      "attempt_rule": {
+        "en": "Record the affected node, links and resulting logical order before opening support.",
+        "vi": "Ghi node bị ảnh hưởng, các link và logical order kết quả trước khi mở hỗ trợ."
+      },
+      "items": [
+        {
+          "level": "guided",
+          "title": {
+            "en": "Remove the head",
+            "vi": "Remove head"
+          },
+          "prompt": {
+            "en": "Live is 2→1→0 with values [1,2,3], free is 3→4. Remove first 1.",
+            "vi": "Live là 2→1→0 với value [1,2,3], free là 3→4. Remove 1 đầu tiên."
+          },
+          "hint": {
+            "en": "previous remains -1, so update head to the removed node's successor.",
+            "vi": "previous vẫn là -1, nên cập nhật head thành successor của node bị remove."
+          },
+          "model_answer": {
+            "en": "Save successor 1 and old free 3; set head=1, clear node 2, link 2→3 and set free=2. Logical [2,3].",
+            "vi": "Lưu successor 1 và old free 3; đặt head=1, xóa node 2, link 2→3 và đặt free=2. Logical [2,3]."
+          },
+          "success_check": {
+            "en": "Head changed and removed node became free without losing either chain.",
+            "vi": "Head đã đổi và node bị remove trở thành free mà không mất chain nào."
+          }
+        },
+        {
+          "level": "guided",
+          "title": {
+            "en": "Remove singleton or tail",
+            "vi": "Remove singleton hoặc tail"
+          },
+          "prompt": {
+            "en": "Explain the pointer difference between removing the only node and removing the tail of [1,2,3].",
+            "vi": "Giải thích khác biệt pointer giữa remove node duy nhất và remove tail của [1,2,3]."
+          },
+          "hint": {
+            "en": "Singleton updates head; tail updates the predecessor's next to -1.",
+            "vi": "Singleton cập nhật head; tail cập nhật next của predecessor thành -1."
+          },
+          "model_answer": {
+            "en": "Singleton sets head=-1 before recycling. Tail keeps head and sets next[previous]=-1 before recycling the tail node.",
+            "vi": "Singleton đặt head=-1 trước khi recycle. Tail giữ head và đặt next[previous]=-1 trước khi recycle tail node."
+          },
+          "success_check": {
+            "en": "Both cases preserve the remaining live chain and return one node to free.",
+            "vi": "Cả hai case giữ đúng live chain còn lại và trả một node về free."
+          }
+        },
+        {
+          "level": "faded",
+          "title": {
+            "en": "Remove only the first duplicate",
+            "vi": "Chỉ remove duplicate đầu"
+          },
+          "prompt": {
+            "en": "Logical values are [2,2,4]. What remains after remove_first(2)?",
+            "vi": "Logical value là [2,2,4]. Còn lại gì sau remove_first(2)?"
+          },
+          "hint": {
+            "en": "Traversal stops at the first matching live node.",
+            "vi": "Traversal dừng tại live node khớp đầu tiên."
+          },
+          "model_answer": {
+            "en": "[2,4] remains; the later 2 is still live.",
+            "vi": "[2,4] còn lại; value 2 phía sau vẫn live."
+          },
+          "success_check": {
+            "en": "Exactly one matching node was removed in traversal order.",
+            "vi": "Đúng một node khớp bị remove theo traversal order."
+          }
+        },
+        {
+          "level": "faded",
+          "title": {
+            "en": "Recycle then reuse",
+            "vi": "Recycle rồi reuse"
+          },
+          "prompt": {
+            "en": "After a removed node becomes free, which physical node does the next insert_head use?",
+            "vi": "Sau khi node bị remove trở thành free, insert_head tiếp theo dùng physical node nào?"
+          },
+          "hint": {
+            "en": "Allocation always takes the current free head.",
+            "vi": "Allocation luôn lấy free head hiện tại."
+          },
+          "model_answer": {
+            "en": "It reuses the removed physical node, saves its free successor, then moves that node back to the live head.",
+            "vi": "Nó reuse physical node vừa remove, lưu free successor của node đó, rồi chuyển node trở lại live head."
+          },
+          "success_check": {
+            "en": "One node moved free→live and the remaining free chain stayed connected.",
+            "vi": "Một node chuyển free→live và free chain còn lại vẫn được nối."
+          }
+        },
+        {
+          "level": "faded",
+          "title": {
+            "en": "Reject full insert and missing remove",
+            "vi": "Từ chối insert full và remove missing"
+          },
+          "prompt": {
+            "en": "State the outcomes and unchanged fields for a full insert and an absent target.",
+            "vi": "Nêu outcome và các field không đổi cho insert khi full và target không tồn tại."
+          },
+          "hint": {
+            "en": "Compare data, next, head and free before and after each rejection.",
+            "vi": "So sánh data, next, head và free trước/sau mỗi lần từ chối."
+          },
+          "model_answer": {
+            "en": "Both return False. data, next, head and free remain identical.",
+            "vi": "Cả hai trả False. data, next, head và free giữ nguyên hoàn toàn."
+          },
+          "success_check": {
+            "en": "No live/free membership changed after either rejection.",
+            "vi": "Không có membership live/free nào thay đổi sau cả hai lần từ chối."
+          }
+        },
+        {
+          "level": "faded",
+          "title": {
+            "en": "Tail insertion transfer",
+            "vi": "Transfer tail insertion"
+          },
+          "prompt": {
+            "en": "A different record-array question asks for tail insertion. Which extra state must be found before linking the free node?",
+            "vi": "Đề record-array khác yêu cầu tail insertion. Phải tìm state nào trước khi link free node?"
+          },
+          "hint": {
+            "en": "Follow the live links to the current tail; still save the free successor before overwrite.",
+            "vi": "Theo live link tới tail hiện tại; vẫn lưu free successor trước khi ghi đè."
+          },
+          "model_answer": {
+            "en": "Find the last live node, allocate one free node safely, link old tail to it and end the new node with the question's null sentinel.",
+            "vi": "Tìm live node cuối, cấp phát một free node an toàn, link old tail tới nó và kết thúc node mới bằng null sentinel của đề."
+          },
+          "success_check": {
+            "en": "This is labelled static transfer, not the executed head-insert pathway.",
+            "vi": "Đây là static transfer có nhãn, không phải pathway head-insert đã chạy."
+          }
+        },
+        {
+          "level": "faded",
+          "title": {
+            "en": "Object-node transfer",
+            "vi": "Transfer object-node"
+          },
+          "prompt": {
+            "en": "An object-node question uses HeadNode = None. What must remain separate from the array contract?",
+            "vi": "Đề object-node dùng HeadNode = None. Điều gì phải tách khỏi array contract?"
+          },
+          "hint": {
+            "en": "References and None replace integer indices and -1.",
+            "vi": "Reference và None thay cho integer index và -1."
+          },
+          "model_answer": {
+            "en": "Follow object next references and test None; do not use the array free-list or -1 pointer rules unless the question defines them.",
+            "vi": "Theo object next reference và kiểm tra None; không dùng array free-list hoặc quy tắc pointer -1 nếu đề không định nghĩa."
+          },
+          "success_check": {
+            "en": "The object representation stays a separate static contract.",
+            "vi": "Dạng object giữ thành một static contract riêng."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-10.4-02"
+          ]
+        },
+        {
+          "level": "independent",
+          "title": {
+            "en": "Dedicated search transfer",
+            "vi": "Transfer dedicated search"
+          },
+          "prompt": {
+            "en": "Write the contract for a find function before coding it: traversal start, stop, and result.",
+            "vi": "Viết contract cho hàm find trước khi code: điểm bắt đầu traversal, điều kiện dừng và result."
+          },
+          "hint": {
+            "en": "Follow links from head; choose pointer or Boolean exactly as requested.",
+            "vi": "Theo link từ head; chọn pointer hoặc Boolean đúng theo yêu cầu."
+          },
+          "model_answer": {
+            "en": "Start at head, compare while node != -1, follow next, and return the requested pointer/Boolean; do not scan physical rows.",
+            "vi": "Bắt đầu tại head, so sánh khi node != -1, theo next và trả pointer/Boolean được yêu cầu; không quét hàng vật lý."
+          },
+          "success_check": {
+            "en": "The search contract is explicit and does not borrow a missing dynamic trace.",
+            "vi": "Search contract rõ ràng và không mượn dynamic trace chưa có."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-09"
+          ]
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which saved link prevents a lost chain?",
+        "vi": "Link đã lưu nào ngăn mất chain?"
+      },
+      "before_code": [
+        {
+          "en": "Draw head, free and both chains before editing any next link.",
+          "vi": "Vẽ head, free và cả hai chain trước khi sửa bất kỳ next link nào."
+        }
+      ],
+      "core_code_caption": {
+        "en": "Partition checkpoint",
+        "vi": "Checkpoint partition"
+      },
+      "core_code": [
+        "live ∩ free = ∅",
+        "live ∪ free = every physical index",
+        "logical order: follow next from head"
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Reading physical array order as logical list order.",
+            "vi": "Đọc thứ tự mảng vật lý thành logical list order."
+          },
+          "consequence": {
+            "en": "Traversal, match position and output order are wrong.",
+            "vi": "Traversal, vị trí match và output order sai."
+          },
+          "repair": {
+            "en": "Start at head and follow next until -1.",
+            "vi": "Bắt đầu tại head và theo next tới -1."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Overwriting next[free] before saving the remaining free chain.",
+            "vi": "Ghi đè next[free] trước khi lưu free chain còn lại."
+          },
+          "consequence": {
+            "en": "Unused nodes become unreachable.",
+            "vi": "Các node chưa dùng trở nên không thể truy cập."
+          },
+          "repair": {
+            "en": "Save next_free before writing value or live link.",
+            "vi": "Lưu next_free trước khi ghi value hoặc live link."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Recycling a node before reconnecting the live predecessor/head.",
+            "vi": "Recycle node trước khi nối lại live predecessor/head."
+          },
+          "consequence": {
+            "en": "The live successor can be lost or linked into the free chain.",
+            "vi": "Live successor có thể bị mất hoặc bị link vào free chain."
+          },
+          "repair": {
+            "en": "Save successor, unlink from live, then clear and prepend to free.",
+            "vi": "Lưu successor, tháo khỏi live, rồi xóa và prepend vào free."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Using -1 array rules in an object-node None question, or allowing capacity <= 0 here.",
+            "vi": "Dùng quy tắc array -1 trong đề object-node None hoặc cho phép capacity <= 0 ở đây."
+          },
+          "consequence": {
+            "en": "The representation contract or constructor invariant is invalid.",
+            "vi": "Representation contract hoặc constructor invariant không hợp lệ."
+          },
+          "repair": {
+            "en": "Follow the declared representation and keep this projection at capacity >= 1.",
+            "vi": "Theo dạng biểu diễn đã nêu và giữ projection này ở capacity >= 1."
+          }
+        }
+      ],
+      "boundary_trace": [
+        {
+          "en": "For full insert or missing remove, compare data, next, head and free before and after; all must remain identical.",
+          "vi": "Với insert full hoặc remove missing, so sánh data, next, head và free trước/sau; tất cả phải giống hệt."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Did I follow links, save every overwritten link, reconnect live first, recycle second, and preserve the complete partition?",
+          "vi": "Tôi đã theo link, lưu mọi link sắp bị ghi đè, nối lại live trước, recycle sau và giữ partition đầy đủ chưa?"
+        }
+      ],
+      "authority_note": {
+        "en": "This projection uses positive-capacity parallel arrays. Tail insertion, object nodes and dedicated search are static transfers, and invalid capacity is excluded.",
+        "vi": "Projection này dùng parallel array với capacity dương. Tail insertion, object node và dedicated search là static transfer; invalid capacity bị loại khỏi scope."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the two-chain mutation order?",
+        "vi": "Tôi có thể dựng lại thứ tự mutation của hai chain không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "How do you read logical order?",
+            "vi": "Đọc logical order thế nào?"
+          },
+          "answer": {
+            "en": "Follow next from head until -1.",
+            "vi": "Theo next từ head tới -1."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What must be saved before insert overwrites a free node's link?",
+            "vi": "Phải lưu gì trước khi insert ghi đè link của free node?"
+          },
+          "answer": {
+            "en": "The selected node's free successor and the old live head.",
+            "vi": "Free successor của node đã chọn và old live head."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What must be saved before removal recycles a node?",
+            "vi": "Phải lưu gì trước khi removal recycle một node?"
+          },
+          "answer": {
+            "en": "The removed node's live successor and the old free head.",
+            "vi": "Live successor của node bị remove và old free head."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What does remove-first do with duplicates?",
+            "vi": "Remove-first làm gì với duplicate?"
+          },
+          "answer": {
+            "en": "It removes the first matching node reached from head and leaves later matches live.",
+            "vi": "Nó remove node khớp đầu tiên đi tới từ head và giữ các match sau vẫn live."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What is the partition check?",
+            "vi": "Partition check là gì?"
+          },
+          "answer": {
+            "en": "Live and free chains are disjoint and together contain every physical index exactly once.",
+            "vi": "Live và free chain không giao nhau và cùng chứa mỗi physical index đúng một lần."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "From memory, draw capacity five, insert 4,2,1 at head, remove first 2, and label every live/free node before and after recycling.",
+        "vi": "Từ trí nhớ, vẽ capacity năm, insert 4,2,1 tại head, remove 2 đầu tiên và ghi nhãn mọi live/free node trước/sau recycling."
+      },
+      "completion_check": {
+        "en": "I can explain each saved link and prove no node is lost, duplicated between chains or left unowned.",
+        "vi": "Tôi có thể giải thích từng link đã lưu và chứng minh không node nào bị mất, nằm ở cả hai chain hoặc không thuộc chain nào."
+      },
+      "next_lesson": {
+        "en": "Continue to recursion, where each call must preserve its own state and make progress toward a base case.",
+        "vi": "Học tiếp recursion, nơi mỗi call phải giữ state riêng và tiến tới base case."
+      },
+      "source_note": {
+        "en": "The primary positive-capacity pathway was executed and verified. Invalid capacity and alternative representations need separate contracts or remediation.",
+        "vi": "Pathway chính với capacity dương đã được chạy và kiểm chứng. Invalid capacity và các dạng biểu diễn khác cần contract hoặc remediation riêng."
+      }
+    }
+  }
+}

@@ -1,0 +1,148 @@
+import { spawn } from "node:child_process";
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import net from "node:net";
+import os from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const BASE_URL = (process.env.PAPER4_BASE_URL ?? "http://127.0.0.1:3022").replace(/\/$/, "");
+const ROUTE = "/paper-4/lessons/procedural-design";
+const RUNTIME = '[data-testid="paper4-procedural-design-trace"]';
+const EVIDENCE = path.resolve(ROOT, "../planning/paper4/completion-program-2026/lessons/procedural-design/evidence");
+const CHROME = [process.env.CHROME_PATH, "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", "C:\\Program Files\\Microsoft Edge\\Application\\msedge.exe"].filter(Boolean);
+const keys = {
+  stage: "algocore.paper4.learner.procedural-design.stage.v1",
+  trace: "algocore.paper4.learner.procedural-design.trace.v1",
+  practice: "algocore.paper4.learner.procedural-design.practice.v1",
+  protect: "algocore.paper4.learner.procedural-design.protect-marks.v1",
+  recall: "algocore.paper4.learner.procedural-design.recall.v1",
+};
+const checks = [], failures = [];
+function record(id, passed, message, evidence = {}) { const item = { id, passed: Boolean(passed), message, evidence }; checks.push(item); if (!item.passed) failures.push(item); }
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function exists(file) { try { await access(file); return true; } catch { return false; } }
+async function chromePath() { for (const candidate of CHROME) if (await exists(candidate)) return candidate; throw new Error("Chrome or Edge is required for browser QA."); }
+async function freePort() { return await new Promise((resolve, reject) => { const server = net.createServer(); server.once("error", reject); server.listen(0, "127.0.0.1", () => { const address = server.address(); server.close(() => resolve(address.port)); }); }); }
+
+class Cdp {
+  constructor(url) { this.socket = new WebSocket(url); this.id = 1; this.pending = new Map(); }
+  async open() { await new Promise((resolve, reject) => { this.socket.addEventListener("open", resolve, { once: true }); this.socket.addEventListener("error", reject, { once: true }); }); this.socket.addEventListener("message", (event) => { const value = JSON.parse(event.data); if (!value.id) return; const pending = this.pending.get(value.id); if (!pending) return; this.pending.delete(value.id); value.error ? pending.reject(new Error(value.error.message)) : pending.resolve(value.result); }); }
+  send(method, params = {}) { const id = this.id++; return new Promise((resolve, reject) => { this.pending.set(id, { resolve, reject }); this.socket.send(JSON.stringify({ id, method, params })); }); }
+  close() { this.socket.close(); }
+}
+async function evaluate(cdp, expression) { const result = await cdp.send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true, userGesture: true }); if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description ?? result.exceptionDetails.text ?? "Evaluation failed"); return result.result.value; }
+async function waitFor(cdp, expression, label, timeout = 20000) { const start = Date.now(); while (Date.now() - start < timeout) { if (await evaluate(cdp, `Boolean(${expression})`)) return; await delay(100); } throw new Error(`Timed out: ${label}`); }
+async function navigate(cdp, url) { await cdp.send("Page.navigate", { url }); await waitFor(cdp, `document.readyState === "complete" && document.querySelector('[data-learner-journey="six-stage"]')`, url); await delay(250); }
+async function viewport(cdp, width, height, scale = 1) { await cdp.send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: scale, mobile: false }); }
+async function click(cdp, selector) { await evaluate(cdp, `(() => { const element=document.querySelector(${JSON.stringify(selector)}); if(!element) throw new Error('Missing ${selector}'); element.focus(); element.click(); return true; })()`); await delay(120); }
+async function type(cdp, selector, value) { await evaluate(cdp, `(() => { const e=document.querySelector(${JSON.stringify(selector)}); if(!e) throw new Error('Missing ${selector}'); const setter=Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set; setter.call(e,${JSON.stringify(value)}); e.dispatchEvent(new Event('input',{bubbles:true})); return true; })()`); await delay(80); }
+async function key(cdp, key, modifiers = 0) { const code = key; const keyCode = key === "Tab" ? 9 : key === "Enter" ? 13 : key.charCodeAt(0); const text = key === "Enter" ? "\r" : ""; const payload = { key, code, windowsVirtualKeyCode: keyCode, nativeVirtualKeyCode: keyCode, text, unmodifiedText: text, modifiers }; await cdp.send("Input.dispatchKeyEvent", { type: key === "Tab" ? "rawKeyDown" : "keyDown", ...payload }); await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", ...payload }); await delay(120); }
+async function select(cdp, value) { await evaluate(cdp, `(() => { const e=document.querySelector('[data-scenario-select]'); const setter=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set; setter.call(e,${JSON.stringify(value)}); e.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`); await delay(100); }
+async function screenshot(cdp, name) { const image = await cdp.send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false }); await writeFile(path.join(EVIDENCE, name), Buffer.from(image.data, "base64")); }
+async function screenshotElement(cdp, selector, name) { const clip = await evaluate(cdp, `(() => { const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect(); return {x:r.left+scrollX,y:r.top+scrollY,width:r.width,height:r.height,scale:1}; })()`); const image = await cdp.send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true, fromSurface: true, clip }); await writeFile(path.join(EVIDENCE, name), Buffer.from(image.data, "base64")); }
+async function snapshot(cdp) { return await evaluate(cdp, `(() => { const r=document.querySelector(${JSON.stringify(RUNTIME)}); const visible=(e)=>e.getClientRects().length>0; return {locale:document.documentElement.lang,kind:r?.dataset.caseKind,index:Number(r?.dataset.checkpointIndex),phase:r?.dataset.phase,complete:r?.dataset.normalComplete,revealed:Boolean(r?.querySelector('[data-answer-revealed="true"]')),answerCount:r?.querySelectorAll('[data-answer-revealed="true"]').length??0,draft:r?.querySelector('textarea')?.value??'',options:[...r?.querySelectorAll('[data-scenario-select] option')??[]].map(e=>({value:e.value,disabled:e.disabled})),nodes:[...r?.querySelectorAll('[data-flow-node]')??[]].map(e=>({node:e.dataset.flowNode,current:e.getAttribute('aria-current')})),release:document.querySelector('[data-release-state]')?.getAttribute('data-release-state'),overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1}; })()`); }
+
+await mkdir(EVIDENCE, { recursive: true });
+const executable = await chromePath(); const debug = await freePort(); const profile = await mkdtemp(path.join(os.tmpdir(), "paper4-procedural-gate-"));
+const browser = spawn(executable, ["--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check", "--disable-extensions", `--remote-debugging-port=${debug}`, `--user-data-dir=${profile}`, "--window-size=1440,1000", "about:blank"], { windowsHide: true, stdio: "ignore" });
+let cdp; let browserName = executable;
+try {
+  let version; for (let attempt = 0; attempt < 100; attempt += 1) { try { const response = await fetch(`http://127.0.0.1:${debug}/json/version`); if (response.ok) { version = await response.json(); break; } } catch {} await delay(100); }
+  if (!version) throw new Error("Chrome DevTools endpoint did not start."); browserName = version.Browser;
+  const page = await (await fetch(`http://127.0.0.1:${debug}/json/new?${encodeURIComponent("about:blank")}`, { method: "PUT" })).json(); cdp = new Cdp(page.webSocketDebuggerUrl); await cdp.open();
+  await Promise.all([cdp.send("Page.enable"), cdp.send("Runtime.enable"), cdp.send("Accessibility.enable")]);
+
+  await viewport(cdp, 1440, 1000); await navigate(cdp, `${BASE_URL}${ROUTE}?lang=en#stage-trace`);
+  await evaluate(cdp, `Object.values(${JSON.stringify(keys)}).forEach((key)=>sessionStorage.removeItem(key)); location.reload()`);
+  await waitFor(cdp, `document.querySelector(${JSON.stringify(RUNTIME)})`, "clean trace");
+  let state = await snapshot(cdp);
+  record("PD-B01", state.release === "candidate-awaiting-user-evaluation" && state.kind === "normal" && state.index === 0 && state.phase === "predict", "User-review candidate opens at normal checkpoint 1 in predict phase", state);
+  record("PD-B02", state.answerCount === 0 && state.options.slice(1).every((option) => option.disabled) && state.nodes.length === 3 && state.nodes[0].current === "step", "Pre-attempt answer is absent and transfer cases stay locked behind the three-node flow", state);
+  const axBefore = await cdp.send("Accessibility.getFullAXTree");
+  const axTextBefore = axBefore.nodes.map((node) => node.name?.value ?? "").join(" ");
+  record("PD-B03", !axTextBefore.includes("bonus is the integer 5"), "Normal answer is absent from the accessibility tree before an attempt");
+
+  await type(cdp, "#procedural-trace-prediction", "Validation continues; scores is unchanged.");
+  await click(cdp, '[data-action="record-prediction"]'); state = await snapshot(cdp);
+  record("PD-B04", state.revealed && state.phase === "revealed" && state.complete === "false", "Checkpoint 1 reveals only after a non-empty prediction", state);
+  await click(cdp, '[data-action="next"]'); await type(cdp, "#procedural-trace-prediction", "[40, 70, 87], original unchanged");
+  await click(cdp, '[data-locale-switch][lang="vi"]'); await waitFor(cdp, `document.documentElement.lang==='vi' && document.querySelector(${JSON.stringify(RUNTIME)})?.dataset.checkpointIndex==='1'`, "immediate locale persistence"); state = await snapshot(cdp);
+  record("PD-B05", state.locale === "vi" && state.draft.includes("[40, 70, 87]") && !state.revealed, "Immediate EN→VI locale click preserves an unsubmitted checkpoint draft", state);
+  await click(cdp, '[data-action="record-prediction"]'); await click(cdp, '[data-action="next"]'); await type(cdp, "#procedural-trace-prediction", "PASS, DISTINCTION, DISTINCTION; status OK"); await click(cdp, '[data-action="record-prediction"]'); state = await snapshot(cdp);
+  record("PD-B06", state.index === 2 && state.revealed && state.complete === "true" && state.options.slice(1).every((option) => !option.disabled), "Only normal 3/3 unlocks boundary, failure and the Trace exit gate", state);
+  const exitEnabled = await evaluate(cdp, `!document.querySelector('[data-learner-stage="trace"] [data-exit-gate="prediction"]').disabled`);
+  record("PD-B07", exitEnabled, "Trace exit gate opens after all three normal checkpoints");
+
+  await select(cdp, "boundary"); state = await snapshot(cdp); record("PD-B08", state.kind === "boundary" && !state.revealed, "Boundary is one fresh prediction case", state);
+  await type(cdp, "#procedural-trace-prediction", "OK, empty lists, zero helper iterations"); await click(cdp, '[data-action="record-prediction"]'); state = await snapshot(cdp);
+  const boundaryText = await evaluate(cdp, `document.querySelector(${JSON.stringify(RUNTIME)}).textContent.replace(/\\s+/g,' ')`);
+  record("PD-B09", state.revealed && /zero iterations|zero iteration/i.test(boundaryText) && /\[\]/.test(boundaryText), "Boundary reveals OK with empty outputs and zero iterations", { ...state, excerpt: boundaryText.slice(-400) });
+  await select(cdp, "failure"); await type(cdp, "#procedural-trace-prediction", "INVALID_INPUT before transform or classify"); await click(cdp, '[data-action="record-prediction"]'); state = await snapshot(cdp);
+  const failureText = await evaluate(cdp, `document.querySelector(${JSON.stringify(RUNTIME)}).textContent.replace(/\\s+/g,' ')`);
+  record("PD-B10", state.kind === "failure" && state.revealed && /INVALID_INPUT/.test(failureText) && /(?:before.*transform|trước khi.*biến đổi)/i.test(failureText), "Failure rejects the string bonus before transformation", state);
+  await click(cdp, '[data-locale-switch][lang="en"]'); await waitFor(cdp, `document.documentElement.lang==='en' && document.querySelector(${JSON.stringify(RUNTIME)})?.dataset.caseKind==='failure'`, "VI→EN restored failure"); state = await snapshot(cdp);
+  record("PD-B11", state.kind === "failure" && state.revealed && state.complete === "true" && state.draft.includes("INVALID_INPUT"), "Locale round trip preserves variant draft, reveal and normal completion", state);
+
+  await evaluate(cdp, `sessionStorage.setItem(${JSON.stringify(keys.trace)}, JSON.stringify({schema_version:'wrong',projection_sha256:'wrong',scenario:'failure',checkpoint_index:2,phase:'revealed',drafts:{'failure:0':'leak'},revealed_checkpoint_ids:['normal:0']})); location.reload()`);
+  await waitFor(cdp, `document.querySelector(${JSON.stringify(RUNTIME)})?.dataset.caseKind==='normal'`, "stale storage rejection"); state = await snapshot(cdp);
+  record("PD-B12", state.kind === "normal" && state.index === 0 && state.phase === "predict" && state.draft === "" && state.complete === "false", "Malformed or stale trace storage is ignored completely", state);
+
+  await evaluate(cdp, `document.querySelector('[data-scenario-select]').focus()`); await key(cdp, "Tab"); const tab1 = await evaluate(cdp, `({tag:document.activeElement.tagName,insideCode:Boolean(document.activeElement.closest('[data-focused-code]'))})`); await key(cdp, "Tab"); const tab2 = await evaluate(cdp, `(() => { const e=document.activeElement; const s=getComputedStyle(e); return {tag:e.tagName,id:e.id,outlineStyle:s.outlineStyle,outlineWidth:parseFloat(s.outlineWidth)||0}; })()`); await type(cdp, "#procedural-trace-prediction", "Keyboard prediction"); await waitFor(cdp, `document.querySelector('[data-action="record-prediction"]') && !document.querySelector('[data-action="record-prediction"]').disabled`, "keyboard record enabled"); await evaluate(cdp, `document.querySelector('#procedural-trace-prediction').focus()`); await key(cdp, "Tab"); const tab3 = await evaluate(cdp, `(() => { const e=document.activeElement; const s=getComputedStyle(e); return {tag:e.tagName,action:e.dataset.action,outlineStyle:s.outlineStyle,outlineWidth:parseFloat(s.outlineWidth)||0}; })()`);
+  record("PD-K01", tab1.tag === "PRE" && tab1.insideCode && tab2.tag === "TEXTAREA" && tab2.id === "procedural-trace-prediction" && tab3.tag === "BUTTON" && tab3.action === "record-prediction", "Keyboard Tab order moves from scenario to focused code, prediction and the dominant action", { tab1, tab2, tab3 });
+  record("PD-K02", tab2.outlineStyle !== "none" && tab2.outlineWidth >= 2 && tab3.outlineStyle !== "none" && tab3.outlineWidth >= 2, "Keyboard-focused prediction and primary action have computed visible focus indicators", { textarea: tab2, action: tab3 });
+  await key(cdp, "Enter"); await waitFor(cdp, `document.querySelector(${JSON.stringify(RUNTIME)})?.dataset.phase==='revealed'`, "keyboard reveal"); await key(cdp, "Tab"); const nextFocus = await evaluate(cdp, `({action:document.activeElement.dataset.action,tag:document.activeElement.tagName})`); await key(cdp, "Enter"); await waitFor(cdp, `document.querySelector(${JSON.stringify(RUNTIME)})?.dataset.checkpointIndex==='1'`, "keyboard Next"); const transferredFocus = await evaluate(cdp, `({id:document.activeElement.id,tag:document.activeElement.tagName,focusVisible:document.activeElement.matches(':focus-visible')})`);
+  record("PD-K03", nextFocus.action === "next" && transferredFocus.id === "procedural-trace-prediction" && transferredFocus.tag === "TEXTAREA" && transferredFocus.focusVisible, "Enter activates reveal/Next and transfers visible focus to the new prediction field", { nextFocus, transferredFocus });
+
+  const contrast = async (theme) => await evaluate(cdp, `(() => { document.documentElement.classList.${theme === "dark" ? "add" : "remove"}('dark'); const line=document.querySelector('[data-focused-code] [data-active="true"]'); const text=line?.querySelector(':scope > span:last-child'); const number=line?.querySelector(':scope > [aria-hidden="true"]'); const rgb=value=>value.match(/[\\d.]+/g).slice(0,3).map(Number); const lum=value=>{const c=rgb(value).map(x=>x/255).map(x=>x<=.04045?x/12.92:Math.pow((x+.055)/1.055,2.4));return .2126*c[0]+.7152*c[1]+.0722*c[2]}; const ratio=(a,b)=>{a=lum(a);b=lum(b);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)}; const bg=getComputedStyle(line).backgroundColor; const fg=getComputedStyle(text).color; const numberFg=getComputedStyle(number).color; return {theme:${JSON.stringify(theme)},foreground:fg,lineNumberForeground:numberFg,background:bg,textRatio:ratio(fg,bg),lineNumberRatio:ratio(numberFg,bg)}; })()`);
+  const lightContrast = await contrast("light"); const darkContrast = await contrast("dark"); await evaluate(cdp, `document.documentElement.classList.remove('dark')`);
+  record("PD-B20", lightContrast.textRatio >= 4.5 && lightContrast.lineNumberRatio >= 4.5 && darkContrast.textRatio >= 4.5 && darkContrast.lineNumberRatio >= 4.5, "Focused code text and line numbers have at least 4.5:1 computed contrast in light and dark modes", { light: lightContrast, dark: darkContrast });
+
+  for (const [width, height, scale, id] of [[320, 900, 1, "320"], [768, 900, 1, "768"], [1265, 900, 1, "1265"], [1440, 1000, 1, "1440"], [640, 500, 2, "200pct"]]) {
+    await viewport(cdp, width, height, scale); await cdp.send("Page.reload", { ignoreCache: true }); await waitFor(cdp, `document.querySelector(${JSON.stringify(RUNTIME)})`, `${id} viewport`);
+    await evaluate(cdp, `document.querySelector(${JSON.stringify(RUNTIME)}).scrollIntoView({block:'start'})`); await delay(150);
+    const layout = await evaluate(cdp, `(() => { const root=document.querySelector(${JSON.stringify(RUNTIME)}); const visible=e=>e.getClientRects().length>0; const rect=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}}; const panels=[...root.querySelectorAll('[data-trace-panel]')].filter(visible); const panelRects=panels.map(e=>({id:e.dataset.tracePanel,...rect(e),clientWidth:e.clientWidth,scrollWidth:e.scrollWidth})); const lockNote=root.querySelector('[data-trace-lock-note]'); const controls=[...root.querySelectorAll('button,select,textarea')].filter(visible).map(e=>{const r=e.getBoundingClientRect();return {tag:e.tagName,w:r.width,h:r.height}}); const [a,b]=panelRects; const nonOverlap=Boolean(a&&b&&(a.right<=b.left+1||b.right<=a.left+1||a.bottom<=b.top+1||b.bottom<=a.top+1)); const stacked=Boolean(a&&b&&Math.abs(a.left-b.left)<=2&&b.top>=a.bottom-1); const nav=document.querySelector('[data-stage-navigation]'); const navRect=rect(nav); const activeHeader=document.querySelector('[data-learner-stage="trace"] [data-stage-header]'); const targets=[activeHeader,document.querySelector('[data-learner-stage="trace"] [data-trace-prompt]'),document.querySelector('[data-scenario-select]'),panels[0]].filter(Boolean).map(rect); const intersects=(x,y)=>x.left<y.right&&x.right>y.left&&x.top<y.bottom&&x.bottom>y.top; const buttons=[...nav.querySelectorAll('button')].map(e=>({text:e.textContent.trim(),...rect(e),scrollWidth:e.scrollWidth,clientWidth:e.clientWidth,current:e.getAttribute('aria-current')})); return {overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,undersized:controls.filter(x=>x.tag!=='TEXTAREA'&&(x.w<44||x.h<44)),panelCount:panels.length,panelRects,lockNoteReadable:Boolean(lockNote&&lockNote.scrollWidth<=lockNote.clientWidth+1),nonOverlap,stacked,panelsReadable:panelRects.every(x=>x.width>=240&&x.scrollWidth<=x.clientWidth+1&&x.left>=-1&&x.right<=innerWidth+1),width:innerWidth,dpr:devicePixelRatio,stagePosition:getComputedStyle(nav).position,stageNavigationRect:navRect,stageTargets:targets,stageOverlap:targets.some(target=>intersects(navRect,target)),stageButtons:buttons,allStageLabelsVisible:buttons.every(x=>x.left>=navRect.left-1&&x.right<=navRect.right+1&&x.scrollWidth<=x.clientWidth+1),currentStage:buttons.find(x=>x.current==='step')}; })()`);
+    const mustStack = id === "320" || id === "768" || id === "200pct";
+    record(`PD-R-${id}`, !layout.overflow && layout.undersized.length === 0 && layout.panelCount === 2 && layout.lockNoteReadable && layout.nonOverlap && layout.panelsReadable && (!mustStack || layout.stacked) && layout.stagePosition === "static" && !layout.stageOverlap && layout.allStageLabelsVisible && Boolean(layout.currentStage), `${id} viewport has two readable stable-marker panels, non-overlapping navigation and complete stage labels`, { ...layout, mustStack });
+    await screenshot(cdp, `procedural-design-trace-${id}.png`);
+    await screenshotElement(cdp, RUNTIME, `procedural-design-trace-panels-${id}.png`);
+    if (id === "768") { await click(cdp, '[data-locale-switch][lang="vi"]'); await waitFor(cdp, `document.documentElement.lang==='vi' && document.querySelector(${JSON.stringify(RUNTIME)})`, "VI 768 Trace"); await evaluate(cdp, `document.querySelector(${JSON.stringify(RUNTIME)}).scrollIntoView({block:'start'})`); await delay(120); await screenshot(cdp, "procedural-design-trace-vi-768.png"); await screenshotElement(cdp, RUNTIME, "procedural-design-trace-panels-vi-768.png"); await click(cdp, '[data-locale-switch][lang="en"]'); await waitFor(cdp, `document.documentElement.lang==='en' && document.querySelector(${JSON.stringify(RUNTIME)})`, "EN restore after VI screenshot"); }
+    await evaluate(cdp, `location.hash='#stage-recallAndContinue'; location.reload()`); await waitFor(cdp, `document.querySelector('[data-learner-stage="recallAndContinue"][data-stage-state="current"]')`, `${id} Recall stage`);
+    const recallNavigation = await evaluate(cdp, `(() => { const nav=document.querySelector('[data-stage-navigation]'); const nr=nav.getBoundingClientRect(); const current=nav.querySelector('[aria-current="step"]'); const cr=current.getBoundingClientRect(); const buttons=[...nav.querySelectorAll('button')]; return {currentText:current.textContent.trim(),currentFullyInside:cr.left>=nr.left-1&&cr.right<=nr.right+1&&current.scrollWidth<=current.clientWidth+1,allLabelsVisible:buttons.every(e=>{const r=e.getBoundingClientRect();return r.left>=nr.left-1&&r.right<=nr.right+1&&e.scrollWidth<=e.clientWidth+1}),overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1}; })()`);
+    record(`PD-N-${id}`, recallNavigation.currentFullyInside && recallNavigation.allLabelsVisible && !recallNavigation.overflow && /Recall|Gợi nhớ/.test(recallNavigation.currentText), `${id} keeps the newly current Recall label fully visible`, recallNavigation);
+    await evaluate(cdp, `location.hash='#stage-trace'; location.reload()`); await waitFor(cdp, `document.querySelector(${JSON.stringify(RUNTIME)})`, `${id} return to Trace`);
+  }
+
+  await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
+  const motion = await evaluate(cdp, `(() => { const root=document.querySelector(${JSON.stringify(RUNTIME)}); const seconds=v=>Math.max(...v.split(',').map(x=>x.trim().endsWith('ms')?parseFloat(x)/1000:parseFloat(x)||0)); const animated=[...root.querySelectorAll('*')].filter(e=>e.getClientRects().length).filter(e=>seconds(getComputedStyle(e).animationDuration)>0.00001||seconds(getComputedStyle(e).transitionDuration)>0.00001); return {matches:matchMedia('(prefers-reduced-motion: reduce)').matches,count:animated.length}; })()`);
+  record("PD-B13", motion.matches && motion.count === 0, "Reduced-motion mode leaves no animated learner-flow element", motion);
+
+  await cdp.send("Emulation.setEmulatedMedia", { features: [] }); await viewport(cdp, 320, 900, 1); await navigate(cdp, `${BASE_URL}${ROUTE}?lang=en#stage-protectMarks`); await cdp.send("Page.reload", { ignoreCache: true });
+  await waitFor(cdp, `document.querySelector('[data-protect-marks-mode="progressive"]')`, "Protect marks");
+  const protect = await evaluate(cdp, `(() => { const stage=document.querySelector('[data-learner-stage="protectMarks"]'); const flow=stage.querySelector('[data-protect-marks-mode="progressive"]'); return {index:Number(flow.dataset.riskIndex),count:Number(flow.dataset.riskCount),cards:flow.querySelectorAll('article').length,actions:flow.querySelectorAll('button').length,answers:flow.querySelectorAll('dt').length,repeated:stage.querySelectorAll('[data-learner-code-card],pre,.boundaryTrace,.authorityNote').length,overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1}; })()`);
+  record("PD-B14", protect.index === 0 && protect.count === 4 && protect.cards === 1 && protect.actions === 1 && protect.answers === 3 && protect.repeated === 0 && !protect.overflow, "Protect presents one of four risks, one action and no repeated recipe/trace/authority layer", protect);
+  await click(cdp, '[data-action="next-risk"]'); await click(cdp, '[data-locale-switch][lang="vi"]'); await waitFor(cdp, `document.documentElement.lang==='vi' && document.querySelector('[data-protect-marks-mode="progressive"]')?.dataset.riskIndex==='1'`, "Protect locale persistence");
+  record("PD-B15", true, "Protect risk index persists through the real locale link"); await screenshot(cdp, "procedural-design-protect-vi-320.png");
+
+  await navigate(cdp, `${BASE_URL}${ROUTE}?lang=en#stage-practise`); await cdp.send("Page.reload", { ignoreCache: true }); await waitFor(cdp, `document.querySelector('[data-practice-gate] textarea')`, "Practice"); await type(cdp, '[data-practice-gate] textarea', "contract draft retained"); await click(cdp, '[data-locale-switch][lang="vi"]'); await waitFor(cdp, `document.documentElement.lang==='vi' && document.querySelector('[data-practice-gate] textarea')?.value.includes('contract draft')`, "Practice locale persistence");
+  record("PD-B16", true, "Practice draft persists when locale is clicked immediately after typing");
+  await navigate(cdp, `${BASE_URL}${ROUTE}?lang=en#stage-recallAndContinue`); await cdp.send("Page.reload", { ignoreCache: true }); await waitFor(cdp, `document.querySelector('[data-recall-gate] textarea')`, "Recall"); await type(cdp, '[data-recall-gate] textarea', "inputs outputs side effects"); await click(cdp, '[data-locale-switch][lang="vi"]'); await waitFor(cdp, `document.documentElement.lang==='vi' && document.querySelector('[data-recall-gate] textarea')?.value.includes('inputs outputs')`, "Recall locale persistence");
+  record("PD-B17", true, "Recall draft persists when locale is clicked immediately after typing");
+
+  await evaluate(cdp, `sessionStorage.setItem('algocore.paper4.learner.data-models.trace.v1','reference-must-remain')`);
+  await click(cdp, '[data-action="restart-lesson"]');
+  const restartResult = await evaluate(cdp, `({procedural:Object.values(${JSON.stringify(keys)}).filter(key=>sessionStorage.getItem(key)!==null),reference:sessionStorage.getItem('algocore.paper4.learner.data-models.trace.v1'),stage:document.querySelector('[data-learner-stage="recognise"]')?.dataset.stageState})`);
+  record("PD-B18", restartResult.procedural.length === 0 && restartResult.reference === "reference-must-remain" && restartResult.stage === "current", "Restart clears only five procedural keys and preserves reference lesson progress", restartResult);
+
+  const axeSource = await readFile(path.join(ROOT, "node_modules/axe-core/axe.min.js"), "utf8"); await evaluate(cdp, axeSource); const axe = await evaluate(cdp, `axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}).then(r=>({violations:r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,html:n.html,failureSummary:n.failureSummary}))}))}))`);
+  record("PD-B19", axe.violations.length === 0, "Axe reports no WCAG A/AA violations on the candidate route", axe);
+} catch (error) {
+  record("PD-B00", false, "Browser gate could not complete", { error: error instanceof Error ? error.stack ?? error.message : String(error) });
+} finally {
+  cdp?.close(); if (browser.exitCode === null) { browser.kill(); await Promise.race([new Promise((resolve) => browser.once("exit", resolve)), delay(1500)]); }
+  if (path.resolve(profile).startsWith(path.resolve(os.tmpdir()) + path.sep)) { try { await rm(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 }); } catch {} }
+}
+const report = { schema_version: "paper4-procedural-design-browser-gate-v1", candidate_id: "P4-procedural-design-C1", decision: failures.length ? "FAIL" : "PASS", browser: browserName, base_url: BASE_URL, route: ROUTE, checks_run: checks.length, checks_passed: checks.length - failures.length, failures, checks };
+await writeFile(path.join(EVIDENCE, "LEARNER_BROWSER_GATE_RESULT.json"), `${JSON.stringify(report, null, 2)}\n`);
+console.log(JSON.stringify({ ...report, checks: undefined }, null, 2));
+if (failures.length) process.exitCode = 1;

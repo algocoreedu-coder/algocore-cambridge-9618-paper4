@@ -112,14 +112,16 @@ export type RuntimeRegistry = Readonly<{
 }>;
 
 export type PredictionStatus = "idle" | "correct" | "incorrect";
+export type RuntimeStepPhase = "predict" | "revealed";
 export type RuntimeState = Readonly<{
   patternId: string; scenarioId: string; eventIndex: number; eventId: string;
   locale: Locale; playing: boolean; predictionStatus: PredictionStatus;
-  predictionAnswer: string; inputRevision: number;
+  predictionAnswer: string; inputRevision: number; stepPhase: RuntimeStepPhase;
 }>;
 export type RuntimeAction =
   | { readonly type: "SELECT_PATTERN"; readonly patternId: string }
   | { readonly type: "TRACE_READY"; readonly patternId: string; readonly scenarioId: string; readonly firstEventId: string }
+  | { readonly type: "RESTORE_PROGRESS"; readonly patternId: string; readonly scenarioId: string; readonly eventIndex: number; readonly eventId: string; readonly stepPhase: RuntimeStepPhase; readonly predictionStatus: PredictionStatus; readonly predictionAnswer: string }
   | { readonly type: "PREVIOUS"; readonly eventId: string }
   | { readonly type: "NEXT"; readonly eventId: string; readonly keepPlaying?: boolean }
   | { readonly type: "PLAY" }
@@ -132,6 +134,8 @@ export type RuntimeAction =
 type RuntimeCommonProps = Readonly<{
   initialPatternId?: string; locale?: Locale; initialLocale?: Locale;
   autoplayDelayMs?: number; headingLevel?: 2 | 3; className?: string;
+  audience?: "learner" | "audit";
+  onLearnerProgress?: (progress: Readonly<{ hasRecordedPrediction: boolean }>) => void;
 }>;
 export type Paper4VisualRuntimeProps = RuntimeCommonProps & (
   | Readonly<{ patterns: readonly PatternMetadata[]; pythonArtifact?: PythonArtifactDto; registry?: never }>

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://algocore.education/schema/paper4-mock-pack-v1.json",
+  "title": "AlgoCore Paper 4 rehearsal paper",
+  "type": "object",
+  "required": ["schema_version", "paper_id", "authority", "title", "mode", "duration_minutes", "total_marks", "language_contract", "scope", "source_files", "submission_checklist", "evidence_document_checklist", "questions"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "paper_id": {"type": "string", "pattern": "^ac-p4-(diagnostic|half-[ab]|mock-[ab])-2026$"},
+    "authority": {"const": "AlgoCore_authored"},
+    "title": {"$ref": "#/$defs/localized"},
+    "mode": {"enum": ["untimed_diagnostic", "timed_half_paper", "timed_full_mock"]},
+    "duration_minutes": {"type": ["integer", "null"], "minimum": 1},
+    "total_marks": {"type": "integer", "minimum": 1},
+    "language_contract": {"const": "en_canonical_vi_support_same_tasks_marks_data"},
+    "scope": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+    "source_files": {"type": "array", "items": {"type": "string"}},
+    "submission_checklist": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/localized"}},
+    "evidence_document_checklist": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/localized"}},
+    "questions": {
+      "type": "array", "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["question_id", "marks", "recommended_minutes", "authority", "topics", "prompt", "deliverables", "evidence_required"],
+        "properties": {
+          "question_id": {"type": "string"},
+          "marks": {"type": "integer", "minimum": 1},
+          "recommended_minutes": {"type": "integer", "minimum": 1},
+          "authority": {"const": "AlgoCore_authored"},
+          "topics": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "prompt": {"$ref": "#/$defs/localized"},
+          "deliverables": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/localized"}},
+          "evidence_required": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/localized"}},
+          "graph_task_mode": {"enum": ["none", "describe_classify_justify_only"]}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "localized": {
+      "type": "object",
+      "required": ["en", "vi"],
+      "properties": {"en": {"type": "string", "minLength": 1}, "vi": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    }
+  }
+}

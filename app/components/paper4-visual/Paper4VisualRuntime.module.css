@@ -1,13 +1,18 @@
+:is(.runtime, .dataModelsRuntime) {
+  /* Compatibility aliases while the Paper 4 runtime migrates to AlgoCore roles.
+     Both runtime roots must own the same complete contract. */
+  --pv-ink: var(--alg-text-default);
+  --pv-muted: var(--alg-text-muted);
+  --pv-line: var(--alg-border-default);
+  --pv-paper: var(--alg-surface-canvas);
+  --pv-panel: var(--alg-surface-panel);
+  --pv-accent: var(--alg-action-primary);
+  --pv-accent-dark: var(--alg-action-primary-hover);
+  --pv-accent-soft: var(--alg-action-primary-soft);
+  --pv-focus: var(--alg-focus-ring);
+}
+
 .runtime {
-  --pv-ink: #17211e;
-  --pv-muted: #586963;
-  --pv-line: #c9d8d2;
-  --pv-paper: #fbfdfc;
-  --pv-panel: #ffffff;
-  --pv-accent: #087f5b;
-  --pv-accent-dark: #065f46;
-  --pv-accent-soft: #dff6ed;
-  --pv-focus: #9c4a00;
   color: var(--pv-ink);
   background:
     radial-gradient(circle at top right, rgb(8 127 91 / 10%), transparent 22rem),
@@ -18,7 +23,7 @@
   padding: clamp(1rem, 3vw, 2rem);
 }
 
-.runtime :where(button, input, select):focus-visible {
+:is(.runtime, .dataModelsRuntime) :where(button, input, select, textarea):focus-visible {
   outline: 3px solid var(--pv-focus);
   outline-offset: 3px;
 }
@@ -74,13 +79,14 @@
 }
 
 .settings select,
-.runtime select,
-.runtime input {
+:is(.runtime, .dataModelsRuntime) select,
+:is(.runtime, .dataModelsRuntime) input,
+:is(.runtime, .dataModelsRuntime) textarea {
   width: 100%;
   min-height: 2.75rem;
-  border: 1px solid #91aaa1;
+  border: 1px solid var(--alg-border-strong);
   border-radius: 0.65rem;
-  background: #fff;
+  background: var(--pv-panel);
   color: var(--pv-ink);
   padding: 0.65rem 0.75rem;
   font: inherit;
@@ -138,7 +144,7 @@
 .progressTrack {
   height: 0.45rem;
   overflow: hidden;
-  background: #dce7e3;
+  background: var(--alg-surface-panel-muted);
   border-radius: 999px;
   margin-top: 0.45rem;
 }
@@ -180,11 +186,11 @@
   margin: 1rem 0;
 }
 
-.runtime button {
+:is(.runtime, .dataModelsRuntime) button {
   min-height: 2.75rem;
-  border: 1px solid #78998d;
+  border: 1px solid var(--alg-border-interactive);
   border-radius: 0.65rem;
-  background: #fff;
+  background: var(--pv-panel);
   color: var(--pv-accent-dark);
   cursor: pointer;
   padding: 0.62rem 0.85rem;
@@ -192,15 +198,15 @@
   font-weight: 750;
 }
 
-.runtime button:hover:not(:disabled) {
+:is(.runtime, .dataModelsRuntime) button:hover:not(:disabled) {
   background: var(--pv-accent-soft);
   border-color: var(--pv-accent);
 }
 
-.runtime button:disabled {
-  color: #7a8782;
-  background: #edf1ef;
-  border-color: #d4dcd9;
+:is(.runtime, .dataModelsRuntime) button:disabled {
+  color: var(--pv-muted);
+  background: var(--alg-surface-panel-muted);
+  border-color: var(--pv-line);
   cursor: not-allowed;
 }
 
@@ -494,6 +500,22 @@
   padding: 1rem;
 }
 
+.learnerScenarioSelect {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+  border: 1px solid var(--pv-line);
+  border-radius: 0.75rem;
+  background: var(--pv-panel);
+  padding: 0.85rem;
+}
+
+.learnerScenarioSelect span {
+  color: var(--pv-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
 .scenarioForm label span {
   color: var(--pv-muted);
   font-size: 0.78rem;
@@ -673,7 +695,10 @@
 @media (prefers-reduced-motion: reduce) {
   .runtime *,
   .runtime *::before,
-  .runtime *::after {
+  .runtime *::after,
+  .dataModelsRuntime *,
+  .dataModelsRuntime *::before,
+  .dataModelsRuntime *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
@@ -682,36 +707,13 @@
 }
 
 :global(.dark) .runtime {
-  --pv-ink: #edf8f4;
-  --pv-muted: #b7ccc5;
-  --pv-line: #3a574e;
-  --pv-paper: #111c18;
-  --pv-panel: #17251f;
-  --pv-accent: #44d1a1;
-  --pv-accent-dark: #8ce8c8;
-  --pv-accent-soft: #183e32;
-  --pv-focus: #ffb86b;
   box-shadow: 0 1.25rem 4rem rgb(0 0 0 / 24%);
-}
-
-:global(.dark) .settings select,
-:global(.dark) .runtime select,
-:global(.dark) .runtime input,
-:global(.dark) .locale button,
-:global(.dark) .runtime button {
-  border-color: #58776d;
-  background: #17251f;
-  color: var(--pv-ink);
 }
 
 :global(.dark) .locale button[aria-pressed="true"],
 :global(.dark) .inlineForm button {
   background: #b8f3dd;
   color: #09271e;
-}
-
-:global(.dark) .progressTrack {
-  background: #314a42;
 }
 
 :global(.dark) .runContext,
@@ -727,12 +729,6 @@
 
 :global(.dark) .stateSequence section {
   background: #13211c;
-}
-
-:global(.dark) .runtime button:disabled {
-  border-color: #344a43;
-  background: #202d28;
-  color: #8ea29b;
 }
 
 :global(.dark) .invariantPanel,
@@ -784,5 +780,965 @@
   .practiceCard,
   .traceList li[aria-current="step"] {
     border: 1px solid CanvasText;
+  }
+}
+
+/* Binary Search pilot: two primary panels with a semantic, trace-driven Search Window. */
+.binaryHeader {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.binaryHeader :is(h2, h3) {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.binaryLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "scene"
+    "code"
+    "practice"
+    "controls";
+  gap: 0.85rem;
+  align-items: start;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.binaryLayout > * {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.searchScene {
+  grid-area: scene;
+  overflow: hidden;
+  border-width: 2px;
+  border-color: #78bba4;
+  background: linear-gradient(145deg, #f6fcfa, var(--pv-panel) 58%);
+}
+
+.searchHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.searchHeader h3 {
+  margin: 0;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+}
+
+.searchHeader h3:focus-visible {
+  outline: 3px solid var(--pv-focus);
+  outline-offset: 4px;
+  border-radius: 0.25rem;
+}
+
+.searchEyebrow {
+  color: var(--pv-accent-dark) !important;
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.35rem !important;
+  text-transform: uppercase;
+}
+
+.hearState {
+  justify-self: start;
+}
+
+.searchFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.25rem), 1fr));
+  gap: 0.45rem;
+  margin: 1rem 0;
+}
+
+.searchFacts div {
+  border: 1px solid var(--pv-line);
+  border-radius: 0.55rem;
+  background: var(--pv-panel);
+  min-width: 0;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.searchFacts dt {
+  color: var(--pv-muted);
+  font-size: 0.65rem;
+  font-weight: 800;
+  overflow-wrap: normal;
+  text-transform: uppercase;
+  white-space: nowrap;
+  word-break: normal;
+}
+
+.searchFacts dd {
+  color: var(--pv-ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.92rem;
+  font-weight: 850;
+  margin: 0.15rem 0 0;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  word-break: normal;
+}
+
+.searchFigure {
+  margin: 0;
+}
+
+.arrayViewport {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.35rem 0.2rem 0.75rem;
+  scrollbar-gutter: stable;
+}
+
+.arrayViewport:focus-visible {
+  outline: 3px solid var(--pv-focus);
+  outline-offset: 2px;
+}
+
+.searchArray {
+  display: flex;
+  align-items: stretch;
+  gap: 0.35rem;
+  list-style: none;
+  min-width: max-content;
+  margin: 0;
+  padding: 0.25rem 0.15rem 2.35rem;
+}
+
+.searchArray li {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  place-items: center;
+  width: 4.25rem;
+  min-height: 5.1rem;
+  border: 2px solid #87a89d;
+  border-radius: 0.65rem;
+  background: var(--pv-panel);
+  color: var(--pv-ink);
+  padding: 0.35rem;
+  transition: opacity 300ms ease, border-color 300ms ease, background-color 300ms ease;
+}
+
+.cellIndex {
+  color: var(--pv-muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.searchArray li > strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 1.05rem;
+}
+
+.cellState {
+  font-size: 0.61rem;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.searchArray li[data-cell-state="outside"] {
+  background-color: #edf1ef;
+  background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgb(78 98 91 / 14%) 6px 8px);
+  border-style: dashed;
+  opacity: 0.64;
+}
+
+.searchArray li[data-cell-state="middle"] {
+  border: 4px solid var(--pv-focus);
+  background: #fff8e7;
+}
+
+.searchArray li[data-cell-state="middle"]::before {
+  content: "▼";
+  position: absolute;
+  top: -1.25rem;
+  color: var(--pv-focus);
+  font-size: 0.8rem;
+}
+
+.searchArray li[data-cell-state="found"] {
+  border: 4px double #087250;
+  background: #dcf7ec;
+}
+
+.searchArray li[data-cell-state="found"]::before {
+  content: "✓";
+  position: absolute;
+  top: -1.15rem;
+  color: #075c43;
+  font-weight: 900;
+}
+
+.searchArray li[data-cell-state="inversion"] {
+  border: 4px solid #a44300;
+  background: #fff0e4;
+}
+
+.searchArray li[data-cell-state="inversion"]::before {
+  content: "!";
+  position: absolute;
+  top: -1.2rem;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #a44300;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.searchPointers {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  width: max-content;
+  color: var(--pv-accent-dark);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.65rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.searchPointers span::before {
+  content: "↑ ";
+}
+
+.searchFigure figcaption {
+  display: flex;
+  justify-content: flex-end;
+  color: var(--pv-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.inversionSummary {
+  border-left: 4px solid #a44300;
+  border-radius: 0.35rem;
+  background: #fff0e4;
+  color: #713000 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 850;
+  padding: 0.45rem 0.65rem;
+}
+
+.emptyWindow {
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  min-height: 8rem;
+  border: 2px dashed #8ba198;
+  border-radius: 0.7rem;
+  background: repeating-linear-gradient(135deg, #f4f7f6 0 9px, #e9efed 9px 11px);
+  text-align: center;
+}
+
+.emptyWindow strong {
+  font-size: 2rem;
+}
+
+.searchStatus {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+}
+
+.searchStatus > div {
+  border-left: 4px solid var(--pv-accent);
+  border-radius: 0.4rem;
+  background: var(--pv-accent-soft);
+  padding: 0.65rem;
+}
+
+.searchStatus > div:last-child {
+  border-left-color: #c17d25;
+  background: #fff8e7;
+}
+
+.searchStatus span {
+  color: var(--pv-muted);
+  font-size: 0.64rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.searchStatus p {
+  color: var(--pv-ink);
+  font-size: 0.82rem;
+  font-weight: 650;
+  margin: 0.25rem 0 0;
+}
+
+.binaryCode {
+  min-width: 0;
+  position: static;
+}
+
+.binaryLayout > .binaryCode {
+  grid-area: code;
+}
+
+.codeLocked {
+  display: grid;
+  place-items: center;
+  min-height: 9rem;
+  border: 2px dashed var(--pv-line);
+  border-radius: 0.65rem;
+  background: repeating-linear-gradient(135deg, transparent 0 9px, rgb(78 98 91 / 8%) 9px 11px);
+  color: var(--pv-muted) !important;
+  padding: 1rem;
+  text-align: center;
+}
+
+.binaryPractice {
+  margin-top: 0;
+}
+
+.binaryLayout > .binaryPractice {
+  grid-area: practice;
+}
+
+.binaryControls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  align-items: start;
+  align-self: start;
+  margin: 0;
+  width: 100%;
+}
+
+.binaryLayout > .binaryControls {
+  grid-area: controls;
+}
+
+.binaryControls button {
+  block-size: auto;
+  min-block-size: var(--alg-touch-target, 2.75rem);
+  width: 100%;
+}
+
+.predictionChoices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  gap: 0.45rem;
+  border: 0;
+  margin: 0 0 0.75rem;
+  padding: 0;
+}
+
+.predictionChoices legend {
+  color: var(--pv-ink);
+  font-weight: 750;
+  line-height: 1.5;
+  margin-bottom: 0.65rem;
+}
+
+.predictionChoices label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  border: 1px solid var(--pv-line);
+  border-radius: 0.55rem;
+  background: var(--pv-panel);
+  cursor: pointer;
+  min-height: 3rem;
+  min-width: 0;
+  padding: 0.65rem;
+}
+
+.predictionChoices label > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.predictionChoices label[data-selected="true"] {
+  border: 2px solid var(--pv-accent-dark);
+  background: var(--pv-accent-soft);
+}
+
+.predictionChoices input[type="radio"] {
+  block-size: 1.1rem;
+  flex: 0 0 auto;
+  inline-size: 1.1rem;
+  min-height: 1.1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.dataModelsRuntime {
+  container-type: inline-size;
+  color: var(--pv-ink);
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.dataModelsRuntime > * {
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.dataModelsRuntime button,
+.dataModelsRuntime select {
+  min-height: 44px;
+}
+
+.traceReminder {
+  border-left: 4px solid var(--pv-accent-dark);
+  border-radius: 0.45rem;
+  background: var(--pv-accent-soft);
+  color: var(--pv-ink);
+  line-height: 1.5;
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 0.65rem 0.8rem;
+}
+
+.dataModelsRuntime .learnerScenarioSelect {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dataModelsRuntime .learnerScenarioSelect select {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.noviceDecisionLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "code"
+    "scene"
+    "decision"
+    "controls";
+  gap: 0.8rem;
+  align-items: start;
+  min-width: 0;
+}
+
+.noviceDecisionLayout > .binaryCode {
+  grid-area: code;
+}
+
+.noviceDecisionLayout > .arrayRecordWorkbench {
+  grid-area: scene;
+}
+
+.noviceDecisionLayout > :is(.workedDecision, .choiceDecision) {
+  grid-area: decision;
+}
+
+.noviceDecisionLayout > .binaryControls {
+  grid-area: controls;
+}
+
+@container (min-width: 52rem) {
+  .noviceDecisionLayout {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-areas:
+      "code code"
+      "scene decision"
+      "controls controls";
+  }
+}
+
+@container (max-width: 28rem) {
+  .dataModelsRuntime {
+    gap: 0.55rem;
+  }
+
+  .dataModelsRuntime .progressMeta,
+  .dataModelsRuntime .progressTrack,
+  .dataModelsRuntime .learnerScenarioSelect {
+    margin-top: 0;
+  }
+
+  .dataModelsRuntime .traceReminder {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .dataModelsRuntime .learnerScenarioSelect {
+    gap: 0.3rem;
+    padding: 0.6rem;
+  }
+
+  .noviceDecisionLayout {
+    gap: 0.55rem;
+  }
+
+  .noviceDecisionLayout > .panel,
+  .noviceDecisionLayout > :is(.workedDecision, .choiceDecision) {
+    padding: 0.7rem;
+  }
+
+  .dataModelsRuntime [data-learner-code-card] {
+    margin-block: 0.6rem;
+  }
+
+  .dataModelsRuntime [data-learner-code-card] figcaption {
+    align-items: center;
+    flex-direction: row;
+    gap: 0.4rem;
+    padding: 0.4rem 0.55rem;
+  }
+
+  .dataModelsRuntime [data-learner-code-card] figcaption button {
+    inline-size: auto;
+    min-block-size: var(--alg-touch-target, 2.75rem);
+    padding-inline: 0.55rem;
+  }
+
+  .dataModelsRuntime [data-learner-code-card] pre {
+    padding: 0.65rem;
+  }
+
+  .dataModelsFacts,
+  .recordCard dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dataModelsFacts > div,
+  .recordCard,
+  .dataModelsOutput {
+    padding: 0.5rem;
+  }
+
+  .workedDecision {
+    gap: 0.5rem;
+  }
+
+  .workedDecision dl {
+    gap: 0.35rem;
+  }
+
+  .workedDecision dl > div {
+    padding: 0.45rem;
+  }
+
+  .workedDecision dd,
+  .examSentence {
+    line-height: 1.4;
+  }
+
+  .noviceDecisionLayout > .binaryControls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .noviceDecisionLayout > .binaryControls button {
+    font-size: 0.82rem;
+    line-height: 1.2;
+    padding-inline: 0.25rem;
+    white-space: nowrap;
+  }
+}
+
+.checkpointPrompt {
+  border-top: 1px solid var(--pv-line);
+  color: var(--pv-ink);
+  line-height: 1.55;
+  margin: 0.75rem 0 0;
+  overflow-wrap: anywhere;
+  padding-top: 0.75rem;
+}
+
+.workedDecision,
+.choiceDecision {
+  border: 2px solid color-mix(in srgb, var(--pv-accent) 48%, var(--pv-line));
+  border-radius: 0.8rem;
+  background: var(--pv-panel);
+  color: var(--pv-ink);
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: clamp(0.75rem, 3cqi, 1rem);
+}
+
+.workedDecision dl {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.workedDecision dl > div {
+  background: var(--pv-accent-soft);
+  border-radius: 0.55rem;
+  padding: 0.65rem;
+}
+
+.workedDecision dt {
+  color: var(--pv-muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.workedDecision dd {
+  font-weight: 750;
+  margin: 0.2rem 0 0;
+}
+
+.workedDecision > button {
+  justify-self: stretch;
+}
+
+.choiceDecision h3,
+.workedDecision h3,
+.correctReveal p,
+.retryHint,
+.examSentence,
+.completionNote {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.decisionOptions {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.decisionOptions button {
+  inline-size: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  white-space: normal;
+}
+
+.decisionOptions button[aria-pressed="true"] {
+  border-color: var(--pv-accent-dark);
+  background: var(--pv-accent-soft);
+}
+
+.retryHint {
+  border-left: 4px solid var(--alg-state-error);
+  background: var(--alg-state-error-surface);
+  border-radius: 0.45rem;
+  line-height: 1.5;
+  padding: 0.7rem;
+}
+
+.correctReveal {
+  border-left: 4px solid var(--pv-accent-dark);
+  background: var(--pv-accent-soft);
+  border-radius: 0.45rem;
+  display: grid;
+  gap: 0.65rem;
+  line-height: 1.55;
+  padding: 0.75rem;
+}
+
+.examSentence {
+  border-top: 1px solid var(--pv-line);
+  padding-top: 0.55rem;
+}
+
+.completionNote {
+  background: var(--pv-accent-soft);
+  border-radius: 0.55rem;
+  color: var(--pv-ink);
+  font-weight: 750;
+  padding: 0.7rem;
+}
+
+.arrayRecordWorkbench {
+  border: 2px solid color-mix(in srgb, var(--pv-accent) 48%, var(--pv-line));
+  background: linear-gradient(145deg, var(--pv-accent-soft), var(--pv-panel) 48%);
+  min-width: 0;
+}
+
+.dataModelsHeader h3 {
+  font-size: clamp(1rem, 3.4cqi, 1.35rem);
+  line-height: 1.35;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.dataModelsFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  gap: 0.55rem;
+  margin: 0.9rem 0;
+}
+
+.dataModelsFacts > div,
+.recordCard,
+.dataModelsOutput {
+  border: 1px solid var(--pv-line);
+  border-radius: 0.6rem;
+  background: var(--pv-panel);
+  min-width: 0;
+  padding: 0.7rem;
+}
+
+.dataModelsFacts dt,
+.recordCard dt {
+  color: var(--pv-muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.dataModelsFacts dd,
+.recordCard dd {
+  color: var(--pv-ink);
+  font-weight: 800;
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.dataModelsVisualGrid {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.recordCard h4,
+.arrayRibbonSection h4,
+.dataModelsOutput h4 {
+  color: var(--pv-ink);
+  font-size: 0.82rem;
+  margin: 0 0 0.55rem;
+}
+
+.recordCard dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.recordCard dl > div {
+  border-left: 4px solid var(--pv-accent);
+  background: var(--pv-accent-soft);
+  min-width: 0;
+  padding: 0.5rem;
+}
+
+.recordCard dl > div[data-field-present="false"] {
+  border-left-color: var(--alg-state-error);
+  background: var(--alg-state-error-surface);
+}
+
+.arrayRibbonSection {
+  min-width: 0;
+}
+
+.arrayRibbonViewport {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 0.15rem 0 0.45rem;
+}
+
+.arrayRibbon {
+  display: flex;
+  gap: 0.45rem;
+  list-style: none;
+  margin: 0;
+  min-width: max-content;
+  padding: 0;
+}
+
+.arrayRibbon li {
+  display: grid;
+  align-content: start;
+  gap: 0.22rem;
+  border: 2px solid var(--pv-line);
+  border-radius: 0.55rem;
+  background: var(--pv-panel);
+  inline-size: 7.5rem;
+  min-height: 6.2rem;
+  padding: 0.55rem;
+}
+
+.arrayRibbon li[data-active="true"] {
+  border: 4px solid var(--pv-accent-dark);
+  background: var(--pv-accent-soft);
+}
+
+.arrayRibbon li[data-slot-state="empty"] {
+  background: repeating-linear-gradient(135deg, transparent 0 8px, color-mix(in srgb, var(--pv-muted) 8%, transparent) 8px 10px);
+}
+
+.arrayRibbon li > span,
+.arrayRibbon li > small {
+  color: var(--pv-muted);
+  font-size: 0.7rem;
+}
+
+.arrayRibbon li > strong,
+.arrayRibbon li > em {
+  color: var(--pv-ink);
+  overflow-wrap: anywhere;
+}
+
+@container (max-width: 28rem) {
+  .arrayRibbonViewport {
+    overflow-x: visible;
+  }
+
+  .arrayRibbon {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr));
+    min-width: 0;
+  }
+
+  .arrayRibbon li {
+    inline-size: auto;
+    min-width: 0;
+  }
+}
+
+.dataModelsOutput {
+  border-left: 4px solid var(--pv-accent);
+  margin-top: 0.75rem;
+}
+
+.dataModelsOutput output {
+  color: var(--pv-ink);
+  display: block;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.dataModelsPrediction {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+.dataModelsPrediction span {
+  color: var(--pv-ink);
+  font-weight: 750;
+}
+
+.dataModelsPrediction textarea {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  resize: vertical;
+}
+
+.auditDetails {
+  border: 1px solid var(--pv-line);
+  border-radius: 0.7rem;
+  margin-top: 0.85rem;
+  padding: 0.75rem;
+}
+
+.auditDetails > summary {
+  color: var(--pv-accent-dark);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.auditGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0.8rem 0;
+}
+
+.auditGrid > section {
+  min-width: 0;
+}
+
+.auditGrid h3,
+.auditDetails > h3 {
+  font-size: 0.85rem;
+}
+
+.lineBinding {
+  overflow-wrap: anywhere;
+  color: var(--pv-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.7rem;
+}
+
+:global(.dark) .searchScene {
+  border-color: #397c67;
+  background: linear-gradient(145deg, #17362c, var(--pv-panel) 58%);
+}
+
+:global(.dark) .searchArray li[data-cell-state="outside"],
+:global(.dark) .emptyWindow {
+  background-color: #202d28;
+  background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgb(196 224 214 / 13%) 6px 8px);
+}
+
+:global(.dark) .searchArray li[data-cell-state="middle"] {
+  background: #3b2d18;
+}
+
+:global(.dark) .searchArray li[data-cell-state="found"] {
+  background: #123f31;
+  border-color: #8ce8c8;
+}
+
+:global(.dark) .searchArray li[data-cell-state="inversion"] {
+  background: #472615;
+  border-color: #ffbd82;
+}
+
+:global(.dark) .inversionSummary {
+  background: #472615;
+  color: #ffcfaa !important;
+}
+
+:global(.dark) .searchStatus > div:last-child {
+  background: #332718;
+}
+
+@media (max-width: 64rem) {
+  .auditGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 42rem) {
+  .hearState {
+    width: 100%;
+  }
+
+  .searchArray li {
+    width: 3.8rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .searchArray li,
+  .searchStatus > div,
+  .predictionChoices label {
+    border: 2px solid CanvasText;
+  }
+
+  .searchArray li[data-cell-state="middle"],
+  .searchArray li[data-cell-state="found"],
+  .searchArray li[data-cell-state="inversion"] {
+    border: 4px solid Highlight;
   }
 }

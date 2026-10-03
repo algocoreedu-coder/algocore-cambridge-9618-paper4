@@ -593,12 +593,12 @@
           "en": "Inserting one item into an ordered table centres on one checkable rule: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Distinguish inserting one record into an already sorted collection from running a complete insertion sort; the capacity guard still precedes all shifts."
         },
         "python_connection": {
-          "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L129 chứa đoạn mã “bounded.insert(position, item)” và minh họa trực tiếp Chèn một phần tử vào bảng đã có thứ tự: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-          "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L129 contain “bounded.insert(position, item)” and directly demonstrate Inserting one item into an ordered table: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. This is the A3-frozen and independently rerun production-v1 source."
+          "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L085 chứa đoạn mã “def ordered_insert(values, item, capacity, trace):” và minh họa trực tiếp Chèn một phần tử vào bảng đã có thứ tự: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+          "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L085 contain “def ordered_insert(values, item, capacity, trace):” and directly demonstrate Inserting one item into an ordered table: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. This is the A3-frozen and independently rerun production-v1 source."
         },
         "representation": {
-          "vi": "Biểu diễn Chèn một phần tử vào bảng đã có thứ tự bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L129, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
-          "en": "Represent Inserting one item into an ordered table with a four-column trace: before-state, condition or decision at sorting.production-v1.L129, applied change, and after-state. The trace must show that this rule still holds: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record."
+          "vi": "Biểu diễn Chèn một phần tử vào bảng đã có thứ tự bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L085, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
+          "en": "Represent Inserting one item into an ordered table with a four-column trace: before-state, condition or decision at sorting.production-v1.L085, applied change, and after-state. The trace must show that this rule still holds: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record."
         },
         "invariant_or_rule": {
           "vi": "Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
@@ -638,16 +638,16 @@
             "ac-9618-p4-2026-python.artifact.sorting.production-v1"
           ],
           "active_line_ids": [
-            "sorting.production-v1.L129"
+            "sorting.production-v1.L085"
           ],
           "code_link_intent": {
             "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
             "lesson_slug": "sorting",
             "semantic_role": "ordered-insert",
             "artifact_version": "production-v1",
-            "matched_text": "bounded.insert(position, item)",
+            "matched_text": "def ordered_insert(values, item, capacity, trace):",
             "resolved_line_ids": [
-              "sorting.production-v1.L129"
+              "sorting.production-v1.L085"
             ]
           },
           "fixture_kind": "failure",
@@ -1106,361 +1106,311 @@
       {
         "line_id": "sorting.production-v1.L085",
         "order": 85,
-        "text": "def run(fixture):"
+        "text": "def ordered_insert(values, item, capacity, trace):"
       },
       {
         "line_id": "sorting.production-v1.L086",
         "order": 86,
-        "text": "    values = fixture.get(\"values\", [])"
+        "text": "    if len(values) >= capacity:"
       },
       {
         "line_id": "sorting.production-v1.L087",
         "order": 87,
-        "text": "    trace = []"
+        "text": "        before = list(values)"
       },
       {
         "line_id": "sorting.production-v1.L088",
         "order": 88,
-        "text": "    if not all(isinstance(value, int) for value in values):"
+        "text": "        trace.append({\"event\": \"capacity_reject\", \"capacity\": capacity, \"before\": before, \"after\": list(values)})"
       },
       {
         "line_id": "sorting.production-v1.L089",
         "order": 89,
-        "text": "        trace.append({"
+        "text": "        return False"
       },
       {
         "line_id": "sorting.production-v1.L090",
         "order": 90,
-        "text": "            \"event\": \"reject_key\","
+        "text": "    position = 0"
       },
       {
         "line_id": "sorting.production-v1.L091",
         "order": 91,
-        "text": "            \"before\": list(values),"
+        "text": "    while position < len(values) and values[position] <= item:"
       },
       {
         "line_id": "sorting.production-v1.L092",
         "order": 92,
-        "text": "            \"after\": list(values),"
+        "text": "        trace.append({\"event\": \"ordered_insert_compare\", \"index\": position, \"current\": values[position], \"item\": item, \"moves_right\": True})"
       },
       {
         "line_id": "sorting.production-v1.L093",
         "order": 93,
-        "text": "        })"
+        "text": "        position += 1"
       },
       {
         "line_id": "sorting.production-v1.L094",
         "order": 94,
-        "text": "        return {\"status\": \"INVALID_KEY\", \"values\": values, \"trace\": trace}"
+        "text": "    if position < len(values):"
       },
       {
         "line_id": "sorting.production-v1.L095",
         "order": 95,
-        "text": "    ordered, comparisons, swaps = bubble(values, trace, fixture.get(\"reverse\", False))"
+        "text": "        trace.append({\"event\": \"ordered_insert_compare\", \"index\": position, \"current\": values[position], \"item\": item, \"moves_right\": False})"
       },
       {
         "line_id": "sorting.production-v1.L096",
         "order": 96,
-        "text": "    insertion_ordered = insertion(values, trace)"
+        "text": "    before = list(values)"
       },
       {
         "line_id": "sorting.production-v1.L097",
         "order": 97,
-        "text": "    bounded = list(fixture.get(\"bounded\", []))"
+        "text": "    values.append(None)"
       },
       {
         "line_id": "sorting.production-v1.L098",
         "order": 98,
-        "text": "    if len(bounded) >= fixture[\"capacity\"]:"
+        "text": "    for index in range(len(values) - 1, position, -1):"
       },
       {
         "line_id": "sorting.production-v1.L099",
         "order": 99,
-        "text": "        before = list(bounded)"
+        "text": "        values[index] = values[index - 1]"
       },
       {
         "line_id": "sorting.production-v1.L100",
         "order": 100,
-        "text": "        trace.append({"
+        "text": "        trace.append({\"event\": \"ordered_insert_shift\", \"from_index\": index - 1, \"to_index\": index, \"value\": values[index]})"
       },
       {
         "line_id": "sorting.production-v1.L101",
         "order": 101,
-        "text": "            \"event\": \"capacity_reject\","
+        "text": "    values[position] = item"
       },
       {
         "line_id": "sorting.production-v1.L102",
         "order": 102,
-        "text": "            \"capacity\": fixture[\"capacity\"],"
+        "text": "    trace.append({\"event\": \"ordered_insert\", \"position\": position, \"item\": item, \"before\": before, \"after\": list(values)})"
       },
       {
         "line_id": "sorting.production-v1.L103",
         "order": 103,
-        "text": "            \"before\": before,"
+        "text": "    return True"
       },
       {
         "line_id": "sorting.production-v1.L104",
         "order": 104,
-        "text": "            \"after\": list(bounded),"
+        "text": ""
       },
       {
         "line_id": "sorting.production-v1.L105",
         "order": 105,
-        "text": "        })"
+        "text": "def run(fixture):"
       },
       {
         "line_id": "sorting.production-v1.L106",
         "order": 106,
-        "text": "        return {"
+        "text": "    values = fixture.get(\"values\", [])"
       },
       {
         "line_id": "sorting.production-v1.L107",
         "order": 107,
-        "text": "            \"status\": \"FULL\","
+        "text": "    trace = []"
       },
       {
         "line_id": "sorting.production-v1.L108",
         "order": 108,
-        "text": "            \"values\": bounded,"
+        "text": "    if not all(isinstance(value, int) for value in values):"
       },
       {
         "line_id": "sorting.production-v1.L109",
         "order": 109,
-        "text": "            \"bubble\": ordered,"
+        "text": "        trace.append({"
       },
       {
         "line_id": "sorting.production-v1.L110",
         "order": 110,
-        "text": "            \"insertion\": insertion_ordered,"
+        "text": "            \"event\": \"reject_key\","
       },
       {
         "line_id": "sorting.production-v1.L111",
         "order": 111,
-        "text": "            \"trace\": trace,"
+        "text": "            \"before\": list(values),"
       },
       {
         "line_id": "sorting.production-v1.L112",
         "order": 112,
-        "text": "        }"
+        "text": "            \"after\": list(values),"
       },
       {
         "line_id": "sorting.production-v1.L113",
         "order": 113,
-        "text": "    item = fixture[\"insert\"]"
+        "text": "        })"
       },
       {
         "line_id": "sorting.production-v1.L114",
         "order": 114,
-        "text": "    position = 0"
+        "text": "        return {\"status\": \"INVALID_KEY\", \"values\": values, \"trace\": trace}"
       },
       {
         "line_id": "sorting.production-v1.L115",
         "order": 115,
-        "text": "    while position < len(bounded):"
+        "text": "    ordered, comparisons, swaps = bubble(values, trace, fixture.get(\"reverse\", False))"
       },
       {
         "line_id": "sorting.production-v1.L116",
         "order": 116,
-        "text": "        current = bounded[position]"
+        "text": "    insertion_ordered = insertion(values, trace)"
       },
       {
         "line_id": "sorting.production-v1.L117",
         "order": 117,
-        "text": "        moves_right = current <= item"
+        "text": "    bounded = list(fixture.get(\"bounded\", []))"
       },
       {
         "line_id": "sorting.production-v1.L118",
         "order": 118,
-        "text": "        trace.append({"
+        "text": "    item = fixture[\"insert\"]"
       },
       {
         "line_id": "sorting.production-v1.L119",
         "order": 119,
-        "text": "            \"event\": \"ordered_insert_compare\","
+        "text": "    if not ordered_insert(bounded, item, fixture[\"capacity\"], trace):"
       },
       {
         "line_id": "sorting.production-v1.L120",
         "order": 120,
-        "text": "            \"index\": position,"
+        "text": "        return {"
       },
       {
         "line_id": "sorting.production-v1.L121",
         "order": 121,
-        "text": "            \"current\": current,"
+        "text": "            \"status\": \"FULL\","
       },
       {
         "line_id": "sorting.production-v1.L122",
         "order": 122,
-        "text": "            \"item\": item,"
+        "text": "            \"values\": bounded,"
       },
       {
         "line_id": "sorting.production-v1.L123",
         "order": 123,
-        "text": "            \"moves_right\": moves_right,"
+        "text": "            \"bubble\": ordered,"
       },
       {
         "line_id": "sorting.production-v1.L124",
         "order": 124,
-        "text": "        })"
+        "text": "            \"insertion\": insertion_ordered,"
       },
       {
         "line_id": "sorting.production-v1.L125",
         "order": 125,
-        "text": "        if not moves_right:"
+        "text": "            \"trace\": trace,"
       },
       {
         "line_id": "sorting.production-v1.L126",
         "order": 126,
-        "text": "            break"
+        "text": "        }"
       },
       {
         "line_id": "sorting.production-v1.L127",
         "order": 127,
-        "text": "        position += 1"
+        "text": "    return {"
       },
       {
         "line_id": "sorting.production-v1.L128",
         "order": 128,
-        "text": "    before = list(bounded)"
+        "text": "        \"status\": \"OK\","
       },
       {
         "line_id": "sorting.production-v1.L129",
         "order": 129,
-        "text": "    bounded.insert(position, item)"
+        "text": "        \"bubble\": ordered,"
       },
       {
         "line_id": "sorting.production-v1.L130",
         "order": 130,
-        "text": "    trace.append({"
+        "text": "        \"insertion\": insertion_ordered,"
       },
       {
         "line_id": "sorting.production-v1.L131",
         "order": 131,
-        "text": "        \"event\": \"ordered_insert\","
+        "text": "        \"bounded\": bounded,"
       },
       {
         "line_id": "sorting.production-v1.L132",
         "order": 132,
-        "text": "        \"position\": position,"
+        "text": "        \"comparisons\": comparisons,"
       },
       {
         "line_id": "sorting.production-v1.L133",
         "order": 133,
-        "text": "        \"item\": item,"
+        "text": "        \"swaps\": swaps,"
       },
       {
         "line_id": "sorting.production-v1.L134",
         "order": 134,
-        "text": "        \"before\": before,"
+        "text": "        \"trace\": trace,"
       },
       {
         "line_id": "sorting.production-v1.L135",
         "order": 135,
-        "text": "        \"after\": list(bounded),"
+        "text": "    }"
       },
       {
         "line_id": "sorting.production-v1.L136",
         "order": 136,
-        "text": "    })"
+        "text": ""
       },
       {
         "line_id": "sorting.production-v1.L137",
         "order": 137,
-        "text": "    return {"
+        "text": "if __name__ == \"__main__\":"
       },
       {
         "line_id": "sorting.production-v1.L138",
         "order": 138,
-        "text": "        \"status\": \"OK\","
+        "text": "    import json"
       },
       {
         "line_id": "sorting.production-v1.L139",
         "order": 139,
-        "text": "        \"bubble\": ordered,"
+        "text": "    import sys"
       },
       {
         "line_id": "sorting.production-v1.L140",
         "order": 140,
-        "text": "        \"insertion\": insertion_ordered,"
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
       },
       {
         "line_id": "sorting.production-v1.L141",
         "order": 141,
-        "text": "        \"bounded\": bounded,"
+        "text": "    result = run(fixture)"
       },
       {
         "line_id": "sorting.production-v1.L142",
         "order": 142,
-        "text": "        \"comparisons\": comparisons,"
+        "text": "    if not result[\"trace\"]:"
       },
       {
         "line_id": "sorting.production-v1.L143",
         "order": 143,
-        "text": "        \"swaps\": swaps,"
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
       },
       {
         "line_id": "sorting.production-v1.L144",
         "order": 144,
-        "text": "        \"trace\": trace,"
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
       },
       {
         "line_id": "sorting.production-v1.L145",
         "order": 145,
-        "text": "    }"
-      },
-      {
-        "line_id": "sorting.production-v1.L146",
-        "order": 146,
-        "text": ""
-      },
-      {
-        "line_id": "sorting.production-v1.L147",
-        "order": 147,
-        "text": "if __name__ == \"__main__\":"
-      },
-      {
-        "line_id": "sorting.production-v1.L148",
-        "order": 148,
-        "text": "    import json"
-      },
-      {
-        "line_id": "sorting.production-v1.L149",
-        "order": 149,
-        "text": "    import sys"
-      },
-      {
-        "line_id": "sorting.production-v1.L150",
-        "order": 150,
-        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
-      },
-      {
-        "line_id": "sorting.production-v1.L151",
-        "order": 151,
-        "text": "    result = run(fixture)"
-      },
-      {
-        "line_id": "sorting.production-v1.L152",
-        "order": 152,
-        "text": "    if not result[\"trace\"]:"
-      },
-      {
-        "line_id": "sorting.production-v1.L153",
-        "order": 153,
-        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
-      },
-      {
-        "line_id": "sorting.production-v1.L154",
-        "order": 154,
-        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
-      },
-      {
-        "line_id": "sorting.production-v1.L155",
-        "order": 155,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "44d856b6c7e166ea4708dbd1a3acbf375af8d65c6181f1efd91e49b09475cf2c",
+    "code_sha256": "960f6fa686def3d559fd15fee8d2a7d3db79e8e8a3977d0abc76b0426c974c7a",
     "caption": {
       "en": "Bubble, insertion and capacity-bounded ordered insertion.",
       "vi": "Bubble, insertion và ordered insert có giới hạn."
@@ -1470,7 +1420,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r3.a3.sorting.production-v1.author-run",
       "independent_rerun_ref": "p4r3.a3.sorting.production-v1.independent-rerun",
-      "execution_log_sha256": "dbd5e978492a57ca3151eb425e286abba5220dd389c6b61ed04ce3f617be2dfe"
+      "execution_log_sha256": "6888818485c85db23b7e1b4f247bb1c2a68b4c5c7fa288c402c9e9c30b6239cc"
     }
   },
   "tests": {
@@ -1913,6 +1863,12 @@
               "moves_right": false
             },
             {
+              "event": "ordered_insert_shift",
+              "from_index": 2,
+              "to_index": 3,
+              "value": 7
+            },
+            {
               "after": [
                 1,
                 3,
@@ -2223,7 +2179,7 @@
     },
     "author_run_ref": "p4r3.a3.sorting.production-v1.author-run",
     "independent_rerun_ref": "p4r3.a3.sorting.production-v1.independent-rerun",
-    "execution_log_sha256": "dbd5e978492a57ca3151eb425e286abba5220dd389c6b61ed04ce3f617be2dfe"
+    "execution_log_sha256": "6888818485c85db23b7e1b4f247bb1c2a68b4c5c7fa288c402c9e9c30b6239cc"
   },
   "visual": {
     "owned_patterns": [
@@ -2232,27 +2188,27 @@
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.sorting",
         "owner_lesson_slug": "sorting",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.sorting.production-v1",
-        "trace_url": "/paper4-v2/traces/bubble-sort.json?v=44d856b6c7e166ea",
+        "trace_url": "/paper4-v2/traces/bubble-sort.json?v=960f6fa686def3d5",
         "scenario_count": 3,
-        "event_count": 50
+        "event_count": 51
       },
       {
         "pattern_id": "INSERTION_SORT",
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.sorting",
         "owner_lesson_slug": "sorting",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.sorting.production-v1",
-        "trace_url": "/paper4-v2/traces/insertion-sort.json?v=44d856b6c7e166ea",
+        "trace_url": "/paper4-v2/traces/insertion-sort.json?v=960f6fa686def3d5",
         "scenario_count": 3,
-        "event_count": 50
+        "event_count": 51
       },
       {
         "pattern_id": "ORDERED_INSERT",
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.sorting",
         "owner_lesson_slug": "sorting",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.sorting.production-v1",
-        "trace_url": "/paper4-v2/traces/ordered-insert.json?v=44d856b6c7e166ea",
+        "trace_url": "/paper4-v2/traces/ordered-insert.json?v=960f6fa686def3d5",
         "scenario_count": 3,
-        "event_count": 50
+        "event_count": 51
       }
     ],
     "trace_backed_association_patterns": [],
@@ -2585,13 +2541,14 @@
         "assessment_requirement_ids": [
           "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06",
           "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05",
-          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04"
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-08"
         ],
         "destination_id": "ac-9618-p4-2026-python.lesson.sorting.assessment.progression",
         "level": "faded",
         "prompt": {
-          "vi": "Sửa bubble/insertion sort đang sai loop bound hoặc ghi đè khi shift; nộp event trace tới divergence đầu tiên. Dùng fixture và output canonical của mức này làm bằng chứng thực thi.",
-          "en": "Repair bubble/insertion sort with a wrong loop bound or an overwrite during shifting; submit the event trace up to the first divergence. Use this level's fixture and canonical output as execution evidence."
+          "en": "Repair bubble/insertion sort with a wrong loop bound or an overwrite during shifting; submit the event trace up to the first divergence. Use this level's fixture and canonical output as execution evidence. Requirement evidence: [1] Implement bubble sort. [2] Implement insertion sort. [3] Write procedural code using constructs. [4] Explain effects of data size on sorting performance.",
+          "vi": "Sửa bubble/insertion sort đang sai loop bound hoặc ghi đè khi shift; nộp event trace tới divergence đầu tiên. Dùng fixture và output canonical của mức này làm bằng chứng thực thi. Bằng chứng theo yêu cầu: [1] Cài đặt sắp xếp nổi bọt. [2] Cài đặt sắp xếp chèn. [3] Viết mã thủ tục sử dụng cấu trúc điều khiển. [4] Giải thích ảnh hưởng của lượng dữ liệu tới hiệu năng sắp xếp."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.sorting.production-v1",
@@ -2619,12 +2576,36 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "sorting.faded.rubric.requirement",
+              "criterion_id": "sorting.f1.rubric.requirement-01",
               "description": {
-                "vi": "Bằng chứng trả lời đúng các requirement ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06, ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05, ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04 và dùng BUBBLE_SORT, INSERTION_SORT, ORDERED_INSERT như các pattern đã nối nguồn.",
-                "en": "Evidence answers requirements ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06, ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05, ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04 and uses BUBBLE_SORT, INSERTION_SORT, ORDERED_INSERT as source-linked patterns."
+                "vi": "Cài đặt sắp xếp nổi bọt: Cài đặt sắp xếp nổi bọt.",
+                "en": "Implement bubble sort: Implement bubble sort."
               },
-              "evidence_required": "Submitted code and trace explicitly identify the linked requirement and each listed pattern role."
+              "evidence_required": "Compares adjacent items with the required direction; Uses correct pass bounds; Terminates correctly under the specified stopping rule"
+            },
+            {
+              "criterion_id": "sorting.f1.rubric.requirement-02",
+              "description": {
+                "vi": "Cài đặt sắp xếp chèn: Cài đặt sắp xếp chèn.",
+                "en": "Implement insertion sort: Implement insertion sort."
+              },
+              "evidence_required": "Preserves a sorted prefix; Shifts complete records without loss; Inserts the saved item at the correct boundary"
+            },
+            {
+              "criterion_id": "sorting.f1.rubric.requirement-03",
+              "description": {
+                "vi": "Viết mã thủ tục sử dụng cấu trúc điều khiển: Viết mã thủ tục sử dụng cấu trúc điều khiển.",
+                "en": "Write procedural code using constructs: Write procedural code using constructs."
+              },
+              "evidence_required": "Conditions implement the stated rule; Loops visit the intended data and terminate; Normal and boundary cases show correct state/results without assuming all corpus techniques are named syllabus requirements"
+            },
+            {
+              "criterion_id": "sorting.f1.rubric.requirement-04",
+              "description": {
+                "vi": "Giải thích ảnh hưởng của lượng dữ liệu tới hiệu năng sắp xếp: Giải thích ảnh hưởng của lượng dữ liệu tới hiệu năng sắp xếp.",
+                "en": "Explain effects of data size on sorting performance: Explain effects of data size on sorting performance."
+              },
+              "evidence_required": "Keeps implementation and case comparable; Explains growth in counted operations; Does not confuse one measured runtime with a complexity proof"
             },
             {
               "criterion_id": "sorting.faded.rubric.execution",
@@ -2644,14 +2625,15 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho đủ 3/3 tiêu chí và mọi output canonical khớp.",
-            "en": "Pass only with evidence for all 3/3 criteria and matching canonical outputs."
+            "vi": "Đạt khi có bằng chứng cho đủ 6/6 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 6/6 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi regression-check các fixture đã đạt.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check previously passing fixtures."
           },
-          "pattern_authority": "source_linked_pattern_workflow"
+          "pattern_authority": "source_linked_pattern_workflow",
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -2669,13 +2651,14 @@
         "assessment_requirement_ids": [
           "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06",
           "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05",
-          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04"
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-07"
         ],
         "destination_id": "ac-9618-p4-2026-python.lesson.sorting.assessment.progression",
         "level": "guided",
         "prompt": {
-          "vi": "Trace từng comparison và swap/shift; đánh dấu sorted prefix hoặc suffix sau mỗi pass/insert. Dùng fixture và output canonical của mức này làm bằng chứng thực thi.",
-          "en": "Trace every comparison and swap/shift; mark the sorted prefix or suffix after each pass/insertion. Use this level's fixture and canonical output as execution evidence."
+          "en": "Trace every comparison and swap/shift; mark the sorted prefix or suffix after each pass/insertion. Use this level's fixture and canonical output as execution evidence. Requirement evidence: [1] Implement bubble sort. [2] Implement insertion sort. [3] Write procedural code using constructs. [4] Explain effects of initial order on sorting performance.",
+          "vi": "Trace từng comparison và swap/shift; đánh dấu sorted prefix hoặc suffix sau mỗi pass/insert. Dùng fixture và output canonical của mức này làm bằng chứng thực thi. Bằng chứng theo yêu cầu: [1] Cài đặt sắp xếp nổi bọt. [2] Cài đặt sắp xếp chèn. [3] Viết mã thủ tục sử dụng cấu trúc điều khiển. [4] Giải thích ảnh hưởng của thứ tự ban đầu tới hiệu năng sắp xếp."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.sorting.production-v1",
@@ -2703,12 +2686,36 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "sorting.guided.rubric.requirement",
+              "criterion_id": "sorting.g1.rubric.requirement-01",
               "description": {
-                "vi": "Bằng chứng trả lời đúng các requirement ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06, ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05, ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04 và dùng BUBBLE_SORT, INSERTION_SORT, ORDERED_INSERT như các pattern đã nối nguồn.",
-                "en": "Evidence answers requirements ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06, ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05, ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04 and uses BUBBLE_SORT, INSERTION_SORT, ORDERED_INSERT as source-linked patterns."
+                "vi": "Cài đặt sắp xếp nổi bọt: Cài đặt sắp xếp nổi bọt.",
+                "en": "Implement bubble sort: Implement bubble sort."
               },
-              "evidence_required": "Submitted code and trace explicitly identify the linked requirement and each listed pattern role."
+              "evidence_required": "Compares adjacent items with the required direction; Uses correct pass bounds; Terminates correctly under the specified stopping rule"
+            },
+            {
+              "criterion_id": "sorting.g1.rubric.requirement-02",
+              "description": {
+                "vi": "Cài đặt sắp xếp chèn: Cài đặt sắp xếp chèn.",
+                "en": "Implement insertion sort: Implement insertion sort."
+              },
+              "evidence_required": "Preserves a sorted prefix; Shifts complete records without loss; Inserts the saved item at the correct boundary"
+            },
+            {
+              "criterion_id": "sorting.g1.rubric.requirement-03",
+              "description": {
+                "vi": "Viết mã thủ tục sử dụng cấu trúc điều khiển: Viết mã thủ tục sử dụng cấu trúc điều khiển.",
+                "en": "Write procedural code using constructs: Write procedural code using constructs."
+              },
+              "evidence_required": "Conditions implement the stated rule; Loops visit the intended data and terminate; Normal and boundary cases show correct state/results without assuming all corpus techniques are named syllabus requirements"
+            },
+            {
+              "criterion_id": "sorting.g1.rubric.requirement-04",
+              "description": {
+                "vi": "Giải thích ảnh hưởng của thứ tự ban đầu tới hiệu năng sắp xếp: Giải thích ảnh hưởng của thứ tự ban đầu tới hiệu năng sắp xếp.",
+                "en": "Explain effects of initial order on sorting performance: Explain effects of initial order on sorting performance."
+              },
+              "evidence_required": "Separates input order from input size; Counts comparisons or shifts consistently; Accounts for whether early exit is present"
             },
             {
               "criterion_id": "sorting.guided.rubric.execution",
@@ -2728,14 +2735,15 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho đủ 3/3 tiêu chí và mọi output canonical khớp.",
-            "en": "Pass only with evidence for all 3/3 criteria and matching canonical outputs."
+            "vi": "Đạt khi có bằng chứng cho đủ 6/6 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 6/6 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi regression-check các fixture đã đạt.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check previously passing fixtures."
           },
-          "pattern_authority": "source_linked_pattern_workflow"
+          "pattern_authority": "source_linked_pattern_workflow",
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -2753,13 +2761,15 @@
         "assessment_requirement_ids": [
           "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06",
           "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05",
-          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04"
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-07",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-08"
         ],
         "destination_id": "ac-9618-p4-2026-python.lesson.sorting.assessment.progression",
         "level": "independent",
         "prompt": {
-          "vi": "Chọn và cài đặt sort phù hợp; kiểm chứng empty, one-item, already-sorted, reverse và duplicate data, đồng thời nêu dominant operation và growth. Dùng fixture và output canonical của mức này làm bằng chứng thực thi.",
-          "en": "Choose and implement an appropriate sort; verify empty, one-item, already-sorted, reverse, and duplicate data while stating the dominant operation and growth. Use this level's fixture and canonical output as execution evidence."
+          "en": "Choose and implement an appropriate sort; verify empty, one-item, already-sorted, reverse, and duplicate data while stating the dominant operation and growth. Use this level's fixture and canonical output as execution evidence. Requirement evidence: [1] Implement bubble sort. [2] Implement insertion sort. [3] Write procedural code using constructs. [4] Explain effects of initial order on sorting performance. [5] Explain effects of data size on sorting performance.",
+          "vi": "Chọn và cài đặt sort phù hợp; kiểm chứng empty, one-item, already-sorted, reverse và duplicate data, đồng thời nêu dominant operation và growth. Dùng fixture và output canonical của mức này làm bằng chứng thực thi. Bằng chứng theo yêu cầu: [1] Cài đặt sắp xếp nổi bọt. [2] Cài đặt sắp xếp chèn. [3] Viết mã thủ tục sử dụng cấu trúc điều khiển. [4] Giải thích ảnh hưởng của thứ tự ban đầu tới hiệu năng sắp xếp. [5] Giải thích ảnh hưởng của lượng dữ liệu tới hiệu năng sắp xếp."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.sorting.production-v1",
@@ -2787,12 +2797,44 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "sorting.independent.rubric.requirement",
+              "criterion_id": "sorting.i1.rubric.requirement-01",
               "description": {
-                "vi": "Bằng chứng trả lời đúng các requirement ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06, ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05, ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04 và dùng BUBBLE_SORT, INSERTION_SORT, ORDERED_INSERT như các pattern đã nối nguồn.",
-                "en": "Evidence answers requirements ac-9618-p4-2026-python.assessment-requirement.syl-19.1-06, ac-9618-p4-2026-python.assessment-requirement.syl-19.1-05, ac-9618-p4-2026-python.assessment-requirement.syl-20.1-04 and uses BUBBLE_SORT, INSERTION_SORT, ORDERED_INSERT as source-linked patterns."
+                "vi": "Cài đặt sắp xếp nổi bọt: Cài đặt sắp xếp nổi bọt.",
+                "en": "Implement bubble sort: Implement bubble sort."
               },
-              "evidence_required": "Submitted code and trace explicitly identify the linked requirement and each listed pattern role."
+              "evidence_required": "Compares adjacent items with the required direction; Uses correct pass bounds; Terminates correctly under the specified stopping rule"
+            },
+            {
+              "criterion_id": "sorting.i1.rubric.requirement-02",
+              "description": {
+                "vi": "Cài đặt sắp xếp chèn: Cài đặt sắp xếp chèn.",
+                "en": "Implement insertion sort: Implement insertion sort."
+              },
+              "evidence_required": "Preserves a sorted prefix; Shifts complete records without loss; Inserts the saved item at the correct boundary"
+            },
+            {
+              "criterion_id": "sorting.i1.rubric.requirement-03",
+              "description": {
+                "vi": "Viết mã thủ tục sử dụng cấu trúc điều khiển: Viết mã thủ tục sử dụng cấu trúc điều khiển.",
+                "en": "Write procedural code using constructs: Write procedural code using constructs."
+              },
+              "evidence_required": "Conditions implement the stated rule; Loops visit the intended data and terminate; Normal and boundary cases show correct state/results without assuming all corpus techniques are named syllabus requirements"
+            },
+            {
+              "criterion_id": "sorting.i1.rubric.requirement-04",
+              "description": {
+                "vi": "Giải thích ảnh hưởng của thứ tự ban đầu tới hiệu năng sắp xếp: Giải thích ảnh hưởng của thứ tự ban đầu tới hiệu năng sắp xếp.",
+                "en": "Explain effects of initial order on sorting performance: Explain effects of initial order on sorting performance."
+              },
+              "evidence_required": "Separates input order from input size; Counts comparisons or shifts consistently; Accounts for whether early exit is present"
+            },
+            {
+              "criterion_id": "sorting.i1.rubric.requirement-05",
+              "description": {
+                "vi": "Giải thích ảnh hưởng của lượng dữ liệu tới hiệu năng sắp xếp: Giải thích ảnh hưởng của lượng dữ liệu tới hiệu năng sắp xếp.",
+                "en": "Explain effects of data size on sorting performance: Explain effects of data size on sorting performance."
+              },
+              "evidence_required": "Keeps implementation and case comparable; Explains growth in counted operations; Does not confuse one measured runtime with a complexity proof"
             },
             {
               "criterion_id": "sorting.independent.rubric.execution",
@@ -2820,14 +2862,15 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho đủ 4/4 tiêu chí và mọi output canonical khớp.",
-            "en": "Pass only with evidence for all 4/4 criteria and matching canonical outputs."
+            "vi": "Đạt khi có bằng chứng cho đủ 8/8 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 8/8 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi regression-check các fixture đã đạt.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check previously passing fixtures."
           },
-          "pattern_authority": "source_linked_pattern_workflow"
+          "pattern_authority": "source_linked_pattern_workflow",
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -3084,11 +3127,11 @@
         "response_contract": {
           "mode": "recall_then_trace",
           "prompt": {
-            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: sorting.production-v1.L129.",
-            "en": "Answer from memory, state the rule, and trace at least one line: sorting.production-v1.L129."
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: sorting.production-v1.L085.",
+            "en": "Answer from memory, state the rule, and trace at least one line: sorting.production-v1.L085."
           },
           "evidence_refs": [
-            "sorting.production-v1.L129"
+            "sorting.production-v1.L085"
           ],
           "submit_before_answer": true
         },

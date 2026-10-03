@@ -60,8 +60,8 @@
       "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility. Every summary scans only the logical region; unused cells in the physical capacity are not generated data."
     },
     "python_connection": {
-      "vi": "Pilot không gọi bộ sinh ngẫu nhiên; nó nhận `random_values` đã cố định ở L030 rồi tính trung bình tại L032–L034. Vì vậy các line chứng minh bước xử lý dữ liệu, không chứng minh API/range sinh số.",
-      "en": "The pilot does not call a random generator; it receives fixed `random_values` at L030 and calculates an average at L032-L034. These lines therefore evidence data processing, not a generator API or its range."
+      "vi": "`generate_random_array` dùng `randint(lower, upper)` với seed cố định cho fixture. Vòng lặp chỉ tăng số phần tử khi candidate được chấp nhận, nên có thể kiểm tra cả hai biên và tính duy nhất mà vẫn chạy lại được đúng kết quả.",
+      "en": "`generate_random_array` uses `randint(lower, upper)` with a fixed fixture seed. The loop advances only when a candidate is accepted, so both inclusive bounds and uniqueness can be tested reproducibly."
     },
     "representation": {
       "vi": "Ghi miền bằng ký hiệu rõ như `[low, high]` và mảng kết quả theo thứ tự sinh. Tách cấu hình sinh khỏi thao tác tổng hợp.",
@@ -93,37 +93,37 @@
     ],
     "micro_example": {
       "scenario": {
-        "vi": "Fixture `[2, 4, 6]` đại diện ba giá trị đã sinh.",
-        "en": "Fixture `[2, 4, 6]` represents three generated values."
+        "vi": "Cần sinh 4 integer duy nhất trong miền bao gồm hai đầu `[65, 90]`.",
+        "en": "Generate 4 unique integers in the inclusive domain `[65, 90]`."
       },
       "walkthrough": {
-        "vi": "L032 xác nhận list không rỗng rồi L033 tính trung bình 4.0; list rỗng giữ `average=None`.",
-        "en": "L032 confirms the list is non-empty, then L033 computes 4.0; an empty list keeps `average=None`."
+        "vi": "L058 sinh candidate; L062 chỉ thêm candidate chưa xuất hiện. Fixture seed 7 tạo `[75, 69, 77, 85]` để trace có thể chạy lại chính xác.",
+        "en": "L058 generates a candidate; L062 adds only a candidate not already used. Fixture seed 7 produces `[75, 69, 77, 85]` so the trace is exactly reproducible."
       },
       "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
       "python_artifact_refs": [
         "ac-9618-p4-2026-python.artifact.data-models.pilot-v1"
       ],
       "active_line_ids": [
-        "data-models.v1.L030",
-        "data-models.v1.L032",
-        "data-models.v1.L033",
-        "data-models.v1.L034"
+        "data-models.v1.L050",
+        "data-models.v1.L058",
+        "data-models.v1.L062",
+        "data-models.v1.L067"
       ],
       "authority": "AlgoCore_authored_teaching_example"
     },
     "self_check": {
       "prompt": {
-        "vi": "Vì sao artifact này chưa xác nhận quy tắc cận của hàm random?",
-        "en": "Why does this artifact not establish the endpoint rules of a random function?"
+        "vi": "Điều gì bảo vệ cả miền giá trị và tính duy nhất?",
+        "en": "What protects both the value range and uniqueness?"
       },
       "answer": {
-        "vi": "Vì nó nhận dữ liệu từ fixture và không gọi hàm sinh ngẫu nhiên.",
-        "en": "Because it receives fixture data and never calls a random generator."
+        "vi": "`randint(lower, upper)` dùng miền bao gồm hai đầu; candidate chỉ được commit khi chưa có trong mảng nếu `unique=True`.",
+        "en": "`randint(lower, upper)` uses an inclusive domain; a candidate is committed only when absent from the array if `unique=True`."
       },
       "rationale": {
-        "vi": "Quy tắc API phải đến từ yêu cầu/đặc tả Python tương ứng.",
-        "en": "API rules must come from the applicable task or Python specification."
+        "vi": "Số phần tử chỉ tăng sau một lần commit, vì vậy candidate trùng không làm mảng bị thiếu vị trí.",
+        "en": "The item count advances only after a commit, so a duplicate candidate does not leave a missing position."
       },
       "answer_hidden_initially": true,
       "authority": "AlgoCore_authored_self_check"

@@ -1,0 +1,260 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {"en": "Text processing", "vi": "Xử lý chuỗi"},
+  "exam_family": {
+    "en": "Split, validate, convert and route a typed text record",
+    "vi": "Tách, kiểm tra, chuyển kiểu và định tuyến một bản ghi dạng text"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Turn one delimited record into a correctly typed key/value result, stop cleanly on malformed input, then transfer the same careful state tracking to comparison and run-length encoding.",
+    "vi": "Chuyển một record có delimiter thành kết quả key/value đúng kiểu, dừng an toàn khi input sai, sau đó vận dụng cách theo dõi trạng thái vào so sánh chuỗi và run-length encoding."
+  },
+  "learner_outcomes": [
+    {"en": "Recognise the delimiter, required field count and allowed tags in a text-record task.", "vi": "Nhận diện delimiter, số field bắt buộc và các tag được phép trong bài record dạng text."},
+    {"en": "Split once, validate before indexing further and convert only the value required by the tag.", "vi": "Split một lần, kiểm tra trước khi truy cập tiếp và chỉ chuyển kiểu value theo tag."},
+    {"en": "Trace normal, empty-field boundary and conversion-failure paths without continuing after return.", "vi": "Trace các path normal, boundary với field rỗng và lỗi chuyển kiểu mà không tiếp tục sau return."},
+    {"en": "Apply first-difference/prefix comparison and final-run flushing as separate transfer methods.", "vi": "Vận dụng so sánh theo ký tự khác đầu tiên/prefix và flush run cuối như các phương pháp transfer riêng."}
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one record moving through split, validate, convert and route",
+    "trace_rule": "one decision and no more than three focused code lines per step",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "transfer_rule": "comparison and RLE use compact static cards, not duplicate event simulators",
+    "reveal_policy": {"en": "Prediction or attempt comes before reveal.", "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."}
+  },
+  "stage_order": ["recognise", "understand", "trace", "practise", "protectMarks", "recallAndContinue"],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {"en": "Recognise", "vi": "Nhận diện"},
+      "student_question": {"en": "What does each field mean, and which field controls conversion?", "vi": "Mỗi field có ý nghĩa gì, và field nào điều khiển việc chuyển kiểu?"},
+      "intro": {
+        "en": "Use this method when one string contains fields separated by a delimiter and a tag tells you how to interpret the value.",
+        "vi": "Dùng phương pháp này khi một string chứa các field được ngăn bởi delimiter và một tag cho biết cách hiểu value."
+      },
+      "prompt_fragment": {
+        "en": "A record has TAG|KEY|VALUE. Accept exactly three fields. INT converts VALUE to an integer; TEXT keeps it as text. Return MALFORMED for any unsupported shape, tag or conversion.",
+        "vi": "Một record có dạng TAG|KEY|VALUE. Chấp nhận đúng ba field. INT chuyển VALUE thành số nguyên; TEXT giữ dạng text. Trả MALFORMED khi shape, tag hoặc phép chuyển không hợp lệ."
+      },
+      "cues": [
+        {"en": "The delimiter and exact field count belong to the question contract.", "vi": "Delimiter và số field chính xác thuộc hợp đồng của đề."},
+        {"en": "The first field selects the interpretation of the third field.", "vi": "Field đầu chọn cách hiểu field thứ ba."},
+        {"en": "Conversion can fail even after the field shape is valid.", "vi": "Phép chuyển kiểu có thể thất bại dù shape của field hợp lệ."},
+        {"en": "A failure returns before any result is routed.", "vi": "Failure return trước khi bất kỳ kết quả nào được route."}
+      ],
+      "precondition": {
+        "en": "record and delimiter are strings and delimiter is non-empty; the task defines the allowed tags.",
+        "vi": "record và delimiter là string, delimiter không rỗng; đề xác định các tag được phép."
+      },
+      "output_contract": {
+        "en": "Return OK with a one-entry typed mapping, or MALFORMED with an empty mapping.",
+        "vi": "Trả OK với mapping một phần tử đúng kiểu, hoặc MALFORMED với mapping rỗng."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {"en": "Understand", "vi": "Hiểu mô hình"},
+      "student_question": {"en": "Which check must pass before conversion and routing?", "vi": "Kiểm tra nào phải pass trước khi chuyển kiểu và route?"},
+      "mental_model": {
+        "en": "Treat the record as three labelled boxes. Split creates the boxes, the shape/tag guard approves their structure, conversion gives VALUE its type, and routing stores the result once.",
+        "vi": "Xem record như ba ô có nhãn. Split tạo các ô, guard shape/tag duyệt cấu trúc, conversion gán kiểu cho VALUE và routing lưu kết quả một lần."
+      },
+      "rules": [
+        {"en": "Split using the delimiter supplied by the task.", "vi": "Split bằng delimiter do đề cung cấp."},
+        {"en": "Check exactly three fields and an allowed tag before using the record.", "vi": "Kiểm tra đúng ba field và tag hợp lệ trước khi dùng record."},
+        {"en": "Convert VALUE only when the tag requires conversion.", "vi": "Chỉ chuyển kiểu VALUE khi tag yêu cầu."},
+        {"en": "Return on malformed input; route only a fully accepted value.", "vi": "Return khi input malformed; chỉ route value đã được chấp nhận hoàn toàn."}
+      ],
+      "invariant": {
+        "en": "A routed result has exactly one key, and its value type agrees with the record tag.",
+        "vi": "Kết quả routed có đúng một key, và kiểu của value phù hợp với tag trong record."
+      },
+      "python_recipe": {
+        "caption": {"en": "Teaching excerpt: parse and route one typed record", "vi": "Teaching excerpt: parse và route một typed record"},
+        "lines": [
+          "def parse_and_route(record, delimiter):",
+          "    fields = record.split(delimiter)",
+          "    if len(fields) != 3 or fields[0] not in {\"INT\", \"TEXT\"}:",
+          "        return \"MALFORMED\", {}",
+          "    tag, key, token = fields",
+          "    try:",
+          "        value = int(token) if tag == \"INT\" else token",
+          "    except ValueError:",
+          "        return \"MALFORMED\", {}",
+          "    return \"OK\", {key: value}"
+        ],
+        "contract_note": {
+          "en": "This excerpt isolates the primary parse-and-route task from the larger integrated artifact. It uses Python split; it does not demonstrate a manual delimiter scan.",
+          "vi": "Excerpt này tách nhiệm vụ parse-and-route chính khỏi artifact tích hợp lớn hơn. Nó dùng split của Python; nó không minh họa quét delimiter thủ công."
+        }
+      },
+      "transfer_note": {
+        "label": {"en": "Two separate transfer methods", "vi": "Hai phương pháp transfer riêng"},
+        "content": {
+          "en": "String comparison stops at the first different character, then uses length when one string is a prefix. RLE tracks the current character and count, writes a run when the character changes, and must write the final run after the loop.",
+          "vi": "So sánh string dừng ở ký tự khác đầu tiên, rồi dùng độ dài khi một string là prefix. RLE theo dõi ký tự hiện tại và count, ghi run khi ký tự đổi và phải ghi run cuối sau loop."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {"en": "Trace", "vi": "Trace từng bước"},
+      "student_question": {"en": "What is checked now, and has anything been routed yet?", "vi": "Lúc này kiểm tra gì, và đã route dữ liệu nào chưa?"},
+      "scenario": {
+        "label": {"en": "Parse INT|age|16 using |", "vi": "Parse INT|age|16 bằng |"},
+        "record": "INT|age|16",
+        "delimiter": "|",
+        "instruction": {"en": "Predict the fields, converted value and returned mapping before each reveal.", "vi": "Dự đoán fields, value sau chuyển kiểu và mapping trả về trước mỗi lần mở."}
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": ["fields = record.split(delimiter)", "if len(fields) != 3 or fields[0] not in {\"INT\", \"TEXT\"}:"],
+          "prediction": {"en": "Which fields are created, and does the guard return?", "vi": "Các field nào được tạo, và guard có return không?"},
+          "answer": {"en": "fields is [\"INT\", \"age\", \"16\"]. It has three fields and an allowed tag, so execution continues.", "vi": "fields là [\"INT\", \"age\", \"16\"]. Có ba field và tag hợp lệ nên chương trình tiếp tục."}
+        },
+        {
+          "step": 2,
+          "code_focus": ["tag, key, token = fields", "value = int(token) if tag == \"INT\" else token"],
+          "prediction": {"en": "What are key and value after conversion?", "vi": "key và value là gì sau conversion?"},
+          "answer": {"en": "key is \"age\" and the INT tag converts token \"16\" to integer 16. Nothing was routed before conversion succeeded.", "vi": "key là \"age\" và tag INT chuyển token \"16\" thành số nguyên 16. Chưa route gì trước khi conversion thành công."}
+        },
+        {
+          "step": 3,
+          "code_focus": ["return \"OK\", {key: value}"],
+          "prediction": {"en": "What exact result is returned?", "vi": "Kết quả chính xác nào được trả về?"},
+          "answer": {"en": "The function returns (\"OK\", {\"age\": 16}).", "vi": "Function trả (\"OK\", {\"age\": 16})."}
+        }
+      ],
+      "invariant_check": {
+        "en": "Routing happens once, after shape, tag and conversion checks have passed.",
+        "vi": "Routing xảy ra một lần, sau khi shape, tag và conversion đều pass."
+      },
+      "variants": [
+        {
+          "kind": "boundary",
+          "input": {"record": "TEXT||", "delimiter": "|"},
+          "expected": {"status": "OK", "routed": {"": ""}},
+          "explanation": {"en": "The record still has three fields. Under this contract, an empty key and empty TEXT value are preserved.", "vi": "Record vẫn có ba field. Theo hợp đồng này, key rỗng và value TEXT rỗng được giữ nguyên."}
+        },
+        {
+          "kind": "failure",
+          "input": {"record": "INT|age|sixteen", "delimiter": "|"},
+          "expected": {"status": "MALFORMED", "routed": {}},
+          "explanation": {"en": "The shape and tag pass, but integer conversion fails. The function returns before routing.", "vi": "Shape và tag pass nhưng conversion sang integer thất bại. Function return trước khi routing."}
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {"en": "Practise", "vi": "Luyện tập"},
+      "student_question": {"en": "Can I parse, reject and transfer the method to other text operations?", "vi": "Tôi có thể parse, reject và vận dụng phương pháp sang thao tác text khác không?"},
+      "attempt_rule": {"en": "Write the fields or next state before opening the hint or answer.", "vi": "Viết fields hoặc trạng thái tiếp theo trước khi mở gợi ý hay đáp án."},
+      "items": [
+        {
+          "level": {"en": "Guided", "vi": "Có hướng dẫn"},
+          "title": {"en": "Route a TEXT value", "vi": "Route một value TEXT"},
+          "prompt": {"en": "Trace TEXT|city|Hanoi using |.", "vi": "Trace TEXT|city|Hanoi bằng |."},
+          "hint": {"en": "TEXT keeps the third field as a string.", "vi": "TEXT giữ field thứ ba ở dạng string."},
+          "model_answer": {"en": "fields = [\"TEXT\", \"city\", \"Hanoi\"]; return (\"OK\", {\"city\": \"Hanoi\"}).", "vi": "fields = [\"TEXT\", \"city\", \"Hanoi\"]; trả (\"OK\", {\"city\": \"Hanoi\"})."},
+          "success_check": {"en": "The value stays text and is routed only after validation.", "vi": "Value giữ dạng text và chỉ được route sau validation."}
+        },
+        {
+          "level": {"en": "Faded", "vi": "Giảm gợi ý"},
+          "title": {"en": "Reject an invalid shape", "vi": "Từ chối shape sai"},
+          "prompt": {"en": "State the result for INT|age and for BOOL|ready|1.", "vi": "Nêu kết quả cho INT|age và BOOL|ready|1."},
+          "hint": {"en": "Check field count and allowed tag before conversion.", "vi": "Kiểm tra số field và tag được phép trước conversion."},
+          "model_answer": {"en": "Both return (\"MALFORMED\", {}): the first has two fields and the second has an unsupported tag.", "vi": "Cả hai trả (\"MALFORMED\", {}): record đầu có hai field và record sau có tag không được hỗ trợ."},
+          "success_check": {"en": "No conversion or routing is claimed after the guard returns.", "vi": "Không có conversion hoặc routing nào được cho là chạy sau khi guard return."}
+        },
+        {
+          "level": {"en": "Transfer", "vi": "Vận dụng"},
+          "title": {"en": "Compare with a prefix", "vi": "So sánh với prefix"},
+          "prompt": {"en": "Compare A with AA character by character. Explain the decision after the shared prefix.", "vi": "So sánh A với AA theo từng ký tự. Giải thích quyết định sau prefix chung."},
+          "hint": {"en": "No differing paired character exists; compare lengths.", "vi": "Không có cặp ký tự khác nhau; hãy so sánh độ dài."},
+          "model_answer": {"en": "A is less than AA because all compared characters match and A is shorter.", "vi": "A nhỏ hơn AA vì mọi ký tự đã so sánh đều giống nhau và A ngắn hơn."},
+          "success_check": {"en": "The answer uses the prefix-length rule rather than inventing a missing character.", "vi": "Câu trả lời dùng quy tắc độ dài prefix thay vì tự tạo ký tự còn thiếu."}
+        },
+        {
+          "level": {"en": "Transfer", "vi": "Vận dụng"},
+          "title": {"en": "Flush the final RLE run", "vi": "Flush run RLE cuối"},
+          "prompt": {"en": "Encode AAABBCCCC as [character, count] runs and identify the run written after the loop.", "vi": "Encode AAABBCCCC thành các run [character, count] và xác định run được ghi sau loop."},
+          "hint": {"en": "A and B are written on a change; the final C run needs a separate flush.", "vi": "A và B được ghi khi ký tự đổi; run C cuối cần flush riêng."},
+          "model_answer": {"en": "[[\"A\", 3], [\"B\", 2], [\"C\", 4]]; the C run is appended after the loop.", "vi": "[[\"A\", 3], [\"B\", 2], [\"C\", 4]]; run C được append sau loop."},
+          "success_check": {"en": "The final run is present even though no later character triggers a change.", "vi": "Run cuối vẫn xuất hiện dù không có ký tự sau để kích hoạt thay đổi."}
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {"en": "Protect your marks", "vi": "Tránh mất điểm"},
+      "student_question": {"en": "Which small text-processing errors change the result?", "vi": "Những lỗi xử lý text nhỏ nào làm thay đổi kết quả?"},
+      "before_code": [
+        {"en": "Write the record shape, allowed tags and conversion rule before coding.", "vi": "Viết shape của record, các tag được phép và quy tắc conversion trước khi code."}
+      ],
+      "core_code_caption": {"en": "Three-line submission checkpoint", "vi": "Checkpoint ba dòng trước khi nộp"},
+      "core_code": [
+        "fields = record.split(delimiter)",
+        "if len(fields) != 3:",
+        "    return \"MALFORMED\", {}"
+      ],
+      "mistakes": [
+        {
+          "mistake": {"en": "Indexing fields before checking the field count.", "vi": "Truy cập fields trước khi kiểm tra số field."},
+          "consequence": {"en": "A short record can raise an error or use the wrong meaning.", "vi": "Record thiếu field có thể gây lỗi hoặc bị hiểu sai."},
+          "repair": {"en": "Validate exact field count and tag before conversion or routing.", "vi": "Kiểm tra đúng số field và tag trước conversion hoặc routing."}
+        },
+        {
+          "mistake": {"en": "Converting every VALUE to integer regardless of tag.", "vi": "Chuyển mọi VALUE thành integer bất kể tag."},
+          "consequence": {"en": "Valid TEXT records fail or lose their intended type.", "vi": "Record TEXT hợp lệ bị fail hoặc mất kiểu dự kiến."},
+          "repair": {"en": "Use the tag to choose conversion; preserve TEXT as text.", "vi": "Dùng tag để chọn conversion; giữ TEXT ở dạng text."}
+        },
+        {
+          "mistake": {"en": "Calling built-in split a manual delimiter scan.", "vi": "Gọi split có sẵn là thao tác quét delimiter thủ công."},
+          "consequence": {"en": "The explanation claims an algorithm the code does not implement.", "vi": "Phần giải thích khẳng định một thuật toán mà code không cài đặt."},
+          "repair": {"en": "Describe built-in split honestly, or write and trace a manual scan when the question requires one.", "vi": "Mô tả trung thực built-in split, hoặc viết và trace quét thủ công khi đề yêu cầu."}
+        },
+        {
+          "mistake": {"en": "Forgetting the final RLE run after the loop.", "vi": "Quên run RLE cuối sau loop."},
+          "consequence": {"en": "The last group disappears from the encoded output.", "vi": "Nhóm cuối biến mất khỏi output đã encode."},
+          "repair": {"en": "Append the current character and count once after iteration ends.", "vi": "Append ký tự hiện tại và count một lần sau khi iteration kết thúc."}
+        }
+      ],
+      "boundary_trace": [
+        {"en": "An empty TEXT key/value may be valid under this contract; conversion failure returns before routing; prefix comparison uses length; RLE still flushes a singleton final run.", "vi": "Key/value TEXT rỗng có thể hợp lệ theo hợp đồng này; conversion failure return trước routing; so sánh prefix dùng độ dài; RLE vẫn flush một singleton run cuối."}
+      ],
+      "final_check": [
+        {"en": "Did I follow the exact delimiter/tag contract, stop after failure and keep each transfer algorithm's own rule?", "vi": "Tôi đã theo đúng hợp đồng delimiter/tag, dừng sau failure và giữ đúng quy tắc riêng của từng thuật toán transfer chưa?"}
+      ],
+      "authority_note": {
+        "en": "Follow the record format and text algorithm supplied by the question; do not infer one method from another operation's trace.",
+        "vi": "Làm theo format record và thuật toán text do đề cung cấp; không suy ra một phương pháp từ trace của thao tác khác."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {"en": "Recall and continue", "vi": "Gợi nhớ và học tiếp"},
+      "student_question": {"en": "Can I rebuild the parse-and-route method before coding?", "vi": "Tôi có thể dựng lại phương pháp parse-and-route trước khi code không?"},
+      "recall_items": [
+        {"prompt": {"en": "What four steps form the primary method?", "vi": "Bốn bước nào tạo thành phương pháp chính?"}, "answer": {"en": "Split, validate shape/tag, convert by tag, then route once.", "vi": "Split, kiểm tra shape/tag, chuyển kiểu theo tag, rồi route một lần."}},
+        {"prompt": {"en": "What does INT|age|sixteen return?", "vi": "INT|age|sixteen trả về gì?"}, "answer": {"en": "MALFORMED with an empty mapping because integer conversion fails.", "vi": "MALFORMED với mapping rỗng vì conversion sang integer thất bại."}},
+        {"prompt": {"en": "How is a prefix tie resolved in string comparison?", "vi": "Xử lý thế nào khi so sánh string có prefix chung?"}, "answer": {"en": "After all paired characters match, the shorter string is less; equal lengths mean equal strings.", "vi": "Sau khi mọi cặp ký tự đều giống nhau, string ngắn hơn là nhỏ hơn; độ dài bằng nhau nghĩa là hai string bằng nhau."}},
+        {"prompt": {"en": "Why does RLE need a final flush?", "vi": "Vì sao RLE cần final flush?"}, "answer": {"en": "No later character arrives to trigger writing the final current run.", "vi": "Không có ký tự sau để kích hoạt việc ghi current run cuối."}},
+        {"prompt": {"en": "What must be true before routing?", "vi": "Điều gì phải đúng trước routing?"}, "answer": {"en": "The shape and tag are valid and any required conversion has succeeded.", "vi": "Shape và tag hợp lệ, và mọi conversion bắt buộc đã thành công."}}
+      ],
+      "exit_task": {
+        "en": "From memory, write parse_and_route, trace one TEXT record and one failed INT record, then state the prefix and final-run rules without running code.",
+        "vi": "Từ trí nhớ, viết parse_and_route, trace một record TEXT và một record INT thất bại, rồi nêu quy tắc prefix và final-run mà không chạy code."
+      },
+      "next_step": {
+        "en": "Continue to file handling, where records are processed through a controlled read/write position.",
+        "vi": "Học tiếp file handling, nơi các record được xử lý qua vị trí đọc/ghi có kiểm soát."
+      }
+    }
+  }
+}

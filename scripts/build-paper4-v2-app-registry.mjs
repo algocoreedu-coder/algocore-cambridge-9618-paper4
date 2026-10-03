@@ -6,12 +6,14 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, "..");
 const RECORDS_DIR = path.join(ROOT, "content", "paper4", "records", "full");
-const CANONICAL_REGISTRY_AGGREGATE = "2c99660563e8b7c974941d488f3b11ed0ae4efb6f710249456625019fbfef7b4";
+const CANONICAL_REGISTRY_AGGREGATE = "12f6fb4216bdcd07620eee8071aa58555e1d100ea451f2518d7f6c38c4057d94";
 const EDITORIAL_REGISTRY_PATH = path.resolve(ROOT, "..", "planning", "paper4", "stage-3", "LESSON_PACKAGES.json");
 const EDITORIAL_REGISTRY_SHA256 = "01710c1a99028228bf5472ddf9457a4ac9c5df64ebd576785139d23d6fca0ad2";
 
-const OUTPUT_ROOTS = [
-  path.join(ROOT, "app", "data", "paper4-v2"),
+const GENERATED_OUTPUT_PATHS = [
+  path.join(ROOT, "app", "data", "paper4-v2", "lessons"),
+  path.join(ROOT, "app", "data", "paper4-v2", "course-manifest.json"),
+  path.join(ROOT, "app", "data", "paper4-v2", "lesson-loaders.generated.ts"),
   path.join(ROOT, "public", "paper4-v2", "traces"),
 ];
 
@@ -29,7 +31,7 @@ const EXPECTED_COUNTS = Object.freeze({
   knowledgeUnits: 108,
   pythonArtifacts: 26,
   visualScenarioTraces: 174,
-  visualEventBindings: 870,
+  visualEventBindings: 945,
   markingChains: 58,
   assessmentItems: 79,
   lessonReleaseRecords: 26,
@@ -620,7 +622,7 @@ export async function createPaper4V2Outputs() {
 
 export async function writePaper4V2Outputs() {
   const { outputs, stats } = await createPaper4V2Outputs();
-  for (const outputRoot of OUTPUT_ROOTS) await rm(outputRoot, { recursive: true, force: true });
+  for (const outputPath of GENERATED_OUTPUT_PATHS) await rm(outputPath, { recursive: true, force: true });
   for (const [relativePath, contents] of outputs) {
     const absolutePath = path.join(ROOT, relativePath);
     await mkdir(path.dirname(absolutePath), { recursive: true });

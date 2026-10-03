@@ -174,8 +174,8 @@
           "en": "Reading a file record involves parsing fields, checking count/types, converting values, then calling the constructor in the required parameter order. Append the object only after the complete record is valid to avoid partial state."
         },
         "python_connection": {
-          "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L075–L081 dispatch theo discriminator `BOOK`/`EBOOK`; L077 hoặc L079 gọi đúng constructor, rồi L082–L083 append và ghi loại object đã tạo.",
-          "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L075-L081 dispatch on the `BOOK`/`EBOOK` discriminator; L077 or L079 calls the matching constructor, then L082-L083 append and record the constructed object type."
+          "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L104–L105 loại số trang không dương trước khi L075–L081 dispatch theo discriminator; chỉ sau đó L077 hoặc L079 mới gọi constructor.",
+          "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L104-L105 reject a non-positive page count before L075-L081 dispatch on the discriminator; only then does L077 or L079 call a constructor."
         },
         "representation": {
           "vi": "Dùng pipeline `CSV fields -> validated typed values -> constructor arguments -> object list`; ghi line number cạnh record để truy lỗi.",
@@ -222,6 +222,8 @@
             "object-files.v1.L018",
             "object-files.v1.L073",
             "object-files.v1.L074",
+            "object-files.v1.L104",
+            "object-files.v1.L105",
             "object-files.v1.L075",
             "object-files.v1.L077",
             "object-files.v1.L079",
@@ -232,12 +234,12 @@
         },
         "self_check": {
           "prompt": {
-            "vi": "Vì sao L077/L079 nằm sau conversion L074?",
-            "en": "Why do L077/L079 come after conversion at L074?"
+            "vi": "Vì sao L077/L079 nằm sau conversion L074 và range check L104?",
+            "en": "Why do L077/L079 follow conversion L074 and range check L104?"
           },
           "answer": {
-            "vi": "Để cả hai constructor chỉ nhận `pages` đã chuyển thành int thành công.",
-            "en": "So both constructors receive `pages` only after successful integer conversion."
+            "vi": "Để constructor chỉ nhận `pages` đã chuyển thành integer dương hợp lệ.",
+            "en": "So a constructor receives only a successfully converted positive integer page count."
           },
           "rationale": {
             "vi": "Validation và dispatch trước mutation giữ list object nhất quán.",
@@ -319,8 +321,8 @@
           "en": "Lookup reads a key, traverses objects, and compares the correct identifier; on a match, it calls the required method/setter on that instance. The contract must decide whether to stop at the first match or process all matches and how to report not-found."
         },
         "python_connection": {
-          "vi": "L056–L060 là setter chỉ chấp nhận số trang nguyên dương. L086–L091 tìm theo `Title`, gọi setter và trả `UPDATED` hoặc `INVALID_UPDATE`; L092–L093 trả `NOT_FOUND` mà không sửa object. L094–L100 đưa cả status và state object sau thao tác vào output.",
-          "en": "L056-L060 implement a setter that accepts only a positive integer page count. L086-L091 search by `Title`, call the setter, and return `UPDATED` or `INVALID_UPDATE`; L092-L093 return `NOT_FOUND` without mutating an object. L094-L100 expose both status and post-operation object state."
+          "vi": "L056–L060 là setter chỉ chấp nhận số trang nguyên dương; L102 loại cả Boolean dù Python coi Boolean là integer. L086–L091 tìm theo `Title`, gọi setter và trả `UPDATED` hoặc `INVALID_UPDATE`; L092–L093 trả `NOT_FOUND` mà không sửa object.",
+          "en": "L056-L060 implement a setter that accepts only a positive integer page count; L102 also rejects Boolean even though Python treats it as integer. L086-L091 search by `Title`, call the setter, and return `UPDATED` or `INVALID_UPDATE`; L092-L093 return `NOT_FOUND` without mutation."
         },
         "representation": {
           "vi": "Dùng bảng trace `(index/object id, compared key, match?)`; khi match, nối tới method call và state before/after của object.",
@@ -365,7 +367,7 @@
           ],
           "active_line_ids": [
             "object-files.v1.L056",
-            "object-files.v1.L057",
+            "object-files.v1.L102",
             "object-files.v1.L059",
             "object-files.v1.L086",
             "object-files.v1.L088",
@@ -639,9 +641,9 @@
         "text": "    def set_pages(self, pages):"
       },
       {
-        "line_id": "object-files.v1.L057",
+        "line_id": "object-files.v1.L102",
         "order": 16,
-        "text": "        if not isinstance(pages, int) or pages <= 0:"
+        "text": "        if type(pages) is not int or pages <= 0:"
       },
       {
         "line_id": "object-files.v1.L058",
@@ -784,228 +786,243 @@
         "text": "            except ValueError:"
       },
       {
-        "line_id": "object-files.v1.L027",
+        "line_id": "object-files.v1.L103",
         "order": 45,
         "text": "                return None, f\"INVALID_PAGES_AT_LINE_{line_number}\""
       },
       {
-        "line_id": "object-files.v1.L075",
+        "line_id": "object-files.v1.L104",
         "order": 46,
+        "text": "            if pages <= 0:"
+      },
+      {
+        "line_id": "object-files.v1.L105",
+        "order": 47,
+        "text": "                trace.append({\"event\": \"reject_record\", \"line\": line_number, \"reason\": \"pages_must_be_positive\"})"
+      },
+      {
+        "line_id": "object-files.v1.L027",
+        "order": 48,
+        "text": "                return None, f\"INVALID_PAGES_AT_LINE_{line_number}\""
+      },
+      {
+        "line_id": "object-files.v1.L075",
+        "order": 49,
         "text": "            record_type = fields[0]"
       },
       {
         "line_id": "object-files.v1.L076",
-        "order": 47,
+        "order": 50,
         "text": "            if record_type == \"BOOK\" and len(fields) == 3:"
       },
       {
         "line_id": "object-files.v1.L077",
-        "order": 48,
+        "order": 51,
         "text": "                book = Book(fields[1], pages)"
       },
       {
         "line_id": "object-files.v1.L078",
-        "order": 49,
+        "order": 52,
         "text": "            elif record_type == \"EBOOK\" and len(fields) == 4:"
       },
       {
         "line_id": "object-files.v1.L079",
-        "order": 50,
+        "order": 53,
         "text": "                book = EBook(fields[1], pages, fields[3])"
       },
       {
         "line_id": "object-files.v1.L080",
-        "order": 51,
+        "order": 54,
         "text": "            else:"
       },
       {
         "line_id": "object-files.v1.L081",
-        "order": 52,
+        "order": 55,
         "text": "                return None, f\"INVALID_TYPE_AT_LINE_{line_number}\""
       },
       {
         "line_id": "object-files.v1.L082",
-        "order": 53,
+        "order": 56,
         "text": "            books.append(book)"
       },
       {
         "line_id": "object-files.v1.L083",
-        "order": 54,
+        "order": 57,
         "text": "            trace.append({\"event\": \"construct_object\", \"line\": line_number, \"type\": record_type, \"title\": fields[1]})"
       },
       {
         "line_id": "object-files.v1.L030",
-        "order": 55,
+        "order": 58,
         "text": "    return books, \"OK\""
       },
       {
         "line_id": "object-files.v1.L084",
-        "order": 56,
+        "order": 59,
         "text": ""
       },
       {
         "line_id": "object-files.v1.L085",
-        "order": 57,
+        "order": 60,
         "text": ""
       },
       {
         "line_id": "object-files.v1.L086",
-        "order": 58,
+        "order": 61,
         "text": "def lookup_and_update(books, title, new_pages, trace):"
       },
       {
         "line_id": "object-files.v1.L087",
-        "order": 59,
+        "order": 62,
         "text": "    for book in books:"
       },
       {
         "line_id": "object-files.v1.L088",
-        "order": 60,
+        "order": 63,
         "text": "        if book.Title == title:"
       },
       {
         "line_id": "object-files.v1.L089",
-        "order": 61,
+        "order": 64,
         "text": "            updated = book.set_pages(new_pages)"
       },
       {
         "line_id": "object-files.v1.L090",
-        "order": 62,
+        "order": 65,
         "text": "            trace.append({\"event\": \"update\", \"title\": title, \"new_pages\": new_pages, \"updated\": updated})"
       },
       {
         "line_id": "object-files.v1.L091",
-        "order": 63,
+        "order": 66,
         "text": "            return book, \"UPDATED\" if updated else \"INVALID_UPDATE\""
       },
       {
         "line_id": "object-files.v1.L092",
-        "order": 64,
+        "order": 67,
         "text": "    trace.append({\"event\": \"lookup_not_found\", \"title\": title})"
       },
       {
         "line_id": "object-files.v1.L093",
-        "order": 65,
+        "order": 68,
         "text": "    return None, \"NOT_FOUND\""
       },
       {
         "line_id": "object-files.v1.L031",
-        "order": 66,
+        "order": 69,
         "text": ""
       },
       {
         "line_id": "object-files.v1.L032",
-        "order": 67,
+        "order": 70,
         "text": ""
       },
       {
         "line_id": "object-files.v1.L033",
-        "order": 68,
+        "order": 71,
         "text": "def run(fixture, fixture_path):"
       },
       {
         "line_id": "object-files.v1.L034",
-        "order": 69,
+        "order": 72,
         "text": "    trace = []"
       },
       {
         "line_id": "object-files.v1.L035",
-        "order": 70,
+        "order": 73,
         "text": "    csv_path = Path(fixture_path).parent / fixture[\"csv_file\"]"
       },
       {
         "line_id": "object-files.v1.L036",
-        "order": 71,
+        "order": 74,
         "text": "    books, status = read_books(csv_path, trace)"
       },
       {
         "line_id": "object-files.v1.L037",
-        "order": 72,
+        "order": 75,
         "text": "    if books is None:"
       },
       {
         "line_id": "object-files.v1.L038",
-        "order": 73,
+        "order": 76,
         "text": "        return {\"status\": status, \"books\": [], \"trace\": trace}"
       },
       {
         "line_id": "object-files.v1.L094",
-        "order": 74,
+        "order": 77,
         "text": "    found, update_status = lookup_and_update(books, fixture[\"lookup_title\"], fixture[\"new_pages\"], trace)"
       },
       {
         "line_id": "object-files.v1.L095",
-        "order": 75,
+        "order": 78,
         "text": "    found_record = None if found is None else found.as_record()"
       },
       {
         "line_id": "object-files.v1.L096",
-        "order": 76,
+        "order": 79,
         "text": "    return {"
       },
       {
         "line_id": "object-files.v1.L097",
-        "order": 77,
+        "order": 80,
         "text": "        \"status\": update_status,"
       },
       {
         "line_id": "object-files.v1.L098",
-        "order": 78,
+        "order": 81,
         "text": "        \"books\": [book.as_record() for book in books],"
       },
       {
         "line_id": "object-files.v1.L099",
-        "order": 79,
+        "order": 82,
         "text": "        \"found\": found_record,"
       },
       {
         "line_id": "object-files.v1.L100",
-        "order": 80,
+        "order": 83,
         "text": "        \"trace\": trace,"
       },
       {
         "line_id": "object-files.v1.L101",
-        "order": 81,
+        "order": 84,
         "text": "    }"
       },
       {
         "line_id": "object-files.v1.L047",
-        "order": 82,
+        "order": 85,
         "text": ""
       },
       {
         "line_id": "object-files.v1.L048",
-        "order": 83,
+        "order": 86,
         "text": ""
       },
       {
         "line_id": "object-files.v1.L049",
-        "order": 84,
+        "order": 87,
         "text": "if __name__ == \"__main__\":"
       },
       {
         "line_id": "object-files.v1.L050",
-        "order": 85,
+        "order": 88,
         "text": "    fixture_path = sys.argv[1]"
       },
       {
         "line_id": "object-files.v1.L051",
-        "order": 86,
+        "order": 89,
         "text": "    with open(fixture_path, \"r\", encoding=\"utf-8\") as fixture_file:"
       },
       {
         "line_id": "object-files.v1.L052",
-        "order": 87,
+        "order": 90,
         "text": "        print(json.dumps(run(json.load(fixture_file), fixture_path), ensure_ascii=False, sort_keys=True))"
       },
       {
         "line_id": "object-files.v1.L053",
-        "order": 88,
+        "order": 91,
         "text": ""
       }
     ],
     "entry_point": "run(fixture, fixture_path)",
-    "code_sha256": "6da50f0a1298b7086a673e15cc4492f9b4a3151af36bb0d8fb9d34bfc3e46b8d",
+    "code_sha256": "b9c5b2a40d79e238ba403703c74d682d6e04d36b29909cae1ff56527ca8d90ce",
     "caption": {
       "vi": "Đọc CSV theo discriminator BOOK/EBOOK, dựng base/subclass và tra cứu, cập nhật qua method có validation.",
       "en": "Read CSV with BOOK/EBOOK discriminators, construct base/subclass objects, and validate lookup updates through a method."
@@ -1015,7 +1032,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r2.a3.object-files.pilot-v1.author-run",
       "independent_rerun_ref": "p4r2.a3.object-files.pilot-v1.independent-rerun",
-      "execution_log_sha256": "49dded789744d30a1c08e3c8007169f81a002086b5bbc305332ff94d2460114e"
+      "execution_log_sha256": "4b68f224aa54919f924dc5a8a02ae2fefab2aac47ac6635b132cd9e91da81e98"
     }
   },
   "tests": {
@@ -1044,7 +1061,7 @@
         "input": {
           "csv_file": "failure.csv",
           "lookup_title": "Algorithms",
-          "new_pages": -5
+          "new_pages": 350
         }
       }
     ],
@@ -1132,40 +1149,22 @@
         "expected_output_id": "object-files.failure.expected-output",
         "fixture_ref": "object-files.failure",
         "value": {
-          "books": [
-            {
-              "pages": 320,
-              "title": "Algorithms",
-              "type": "BOOK"
-            }
-          ],
-          "found": {
-            "pages": 320,
-            "title": "Algorithms",
-            "type": "BOOK"
-          },
-          "status": "INVALID_UPDATE",
+          "books": [],
+          "status": "INVALID_PAGES_AT_LINE_1",
           "trace": [
             {
               "event": "read_record",
               "fields": [
                 "BOOK",
                 "Algorithms",
-                "320"
+                "-5"
               ],
               "line": 1
             },
             {
-              "event": "construct_object",
+              "event": "reject_record",
               "line": 1,
-              "title": "Algorithms",
-              "type": "BOOK"
-            },
-            {
-              "event": "update",
-              "new_pages": -5,
-              "title": "Algorithms",
-              "updated": false
+              "reason": "pages_must_be_positive"
             }
           ]
         }
@@ -1178,7 +1177,7 @@
     },
     "author_run_ref": "p4r2.a3.object-files.pilot-v1.author-run",
     "independent_rerun_ref": "p4r2.a3.object-files.pilot-v1.independent-rerun",
-    "execution_log_sha256": "49dded789744d30a1c08e3c8007169f81a002086b5bbc305332ff94d2460114e"
+    "execution_log_sha256": "4b68f224aa54919f924dc5a8a02ae2fefab2aac47ac6635b132cd9e91da81e98"
   },
   "visual": {
     "owned_patterns": [
@@ -1187,9 +1186,9 @@
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.object-files",
         "owner_lesson_slug": "object-files",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.object-files.pilot-v1",
-        "trace_url": "/paper4-v2/traces/file-read-objects.json?v=6da50f0a1298b708",
+        "trace_url": "/paper4-v2/traces/file-read-objects.json?v=b9c5b2a40d79e238",
         "scenario_count": 3,
-        "event_count": 9
+        "event_count": 8
       }
     ],
     "trace_backed_association_patterns": [],
@@ -1336,8 +1335,8 @@
         "destination_id": "ac-9618-p4-2026-python.lesson.object-files.assessment.progression",
         "level": "faded",
         "prompt": {
-          "vi": "Hoàn thiện nhánh route record sang đúng class/subclass và cập nhật object đích theo hợp đồng artifact hiện tại. Dùng boundary để chứng minh lookup thiếu không làm đổi danh sách và failure để chỉ ra record bị từ chối trước construction; nộp Python và hai trace.",
-          "en": "Complete the branch that routes a record to the correct class/subclass and updates the target object under the current artifact contract. Use boundary to prove a missing lookup does not mutate the list and failure to identify rejection before construction; submit Python and two traces."
+          "en": "Complete the branch that routes a record to the correct class/subclass and updates the target object under the current artifact contract. Use boundary to prove a missing lookup does not mutate the list and failure to identify rejection before construction; submit Python and two traces. Requirement evidence: [1] Read a record from a file.",
+          "vi": "Hoàn thiện nhánh route record sang đúng class/subclass và cập nhật object đích theo hợp đồng artifact hiện tại. Dùng boundary để chứng minh lookup thiếu không làm đổi danh sách và failure để chỉ ra record bị từ chối trước construction; nộp Python và hai trace. Bằng chứng theo yêu cầu: [1] Đọc bản ghi từ tệp."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.object-files.pilot-v1",
@@ -1361,12 +1360,12 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "object-files.faded.rubric.requirement",
+              "criterion_id": "object-files.f1.rubric.requirement-01",
               "description": {
-                "vi": "Prompt được trả lời đủ cho FILE_READ_OBJECTS và có bằng chứng riêng cho từng pattern.",
-                "en": "The prompt is fully answered for FILE_READ_OBJECTS with distinct evidence for every pattern."
+                "vi": "Đọc bản ghi từ tệp: Đọc bản ghi từ tệp.",
+                "en": "Read a record from a file: Read a record from a file."
               },
-              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+              "evidence_required": "Respects record boundaries; Converts fields under the stated layout; Handles end-of-file without inventing an extra record or updating the wrong object"
             },
             {
               "criterion_id": "object-files.faded.rubric.execution",
@@ -1386,13 +1385,14 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
-            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+            "vi": "Đạt khi có bằng chứng cho đủ 3/3 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 3/3 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
-          }
+          },
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -1406,13 +1406,14 @@
           "FILE_READ_OBJECTS"
         ],
         "assessment_requirement_ids": [
-          "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-05"
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-05",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-19"
         ],
         "destination_id": "ac-9618-p4-2026-python.lesson.object-files.assessment.progression",
         "level": "guided",
         "prompt": {
-          "vi": "Với fixture normal, trace chuỗi `open/read record → validate fields → construct object → lookup`. Ghi object tạo từ từng record, kết quả lookup và điểm mà dữ liệu file trở thành thuộc tính object.",
-          "en": "For the normal fixture, trace `open/read record → validate fields → construct object → lookup`. Record the object created from each row, the lookup result, and where file data becomes object attributes."
+          "en": "For the normal fixture, trace `open/read record → validate fields → construct object → lookup`. Record the object created from each row, the lookup result, and where file data becomes object attributes. Requirement evidence: [1] Read a record from a file. [2] Write code demonstrating OOP.",
+          "vi": "Với fixture normal, trace chuỗi `open/read record → validate fields → construct object → lookup`. Ghi object tạo từ từng record, kết quả lookup và điểm mà dữ liệu file trở thành thuộc tính object. Bằng chứng theo yêu cầu: [1] Đọc bản ghi từ tệp. [2] Viết chương trình thể hiện OOP."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.object-files.pilot-v1",
@@ -1436,12 +1437,20 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "object-files.guided.rubric.requirement",
+              "criterion_id": "object-files.g1.rubric.requirement-01",
               "description": {
-                "vi": "Prompt được trả lời đủ cho FILE_READ_OBJECTS và có bằng chứng riêng cho từng pattern.",
-                "en": "The prompt is fully answered for FILE_READ_OBJECTS with distinct evidence for every pattern."
+                "vi": "Đọc bản ghi từ tệp: Đọc bản ghi từ tệp.",
+                "en": "Read a record from a file: Read a record from a file."
               },
-              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+              "evidence_required": "Respects record boundaries; Converts fields under the stated layout; Handles end-of-file without inventing an extra record or updating the wrong object"
+            },
+            {
+              "criterion_id": "object-files.g1.rubric.requirement-02",
+              "description": {
+                "vi": "Viết chương trình thể hiện OOP: Viết chương trình thể hiện OOP.",
+                "en": "Write code demonstrating OOP: Write code demonstrating OOP."
+              },
+              "evidence_required": "Executable behaviour is organised through object state and methods; Instances and calls fit their contracts; Tests cover the required interaction rather than only successful construction"
             },
             {
               "criterion_id": "object-files.guided.rubric.execution",
@@ -1461,13 +1470,14 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
-            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+            "vi": "Đạt khi có bằng chứng cho đủ 4/4 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 4/4 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
-          }
+          },
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -1481,13 +1491,14 @@
           "FILE_READ_OBJECTS"
         ],
         "assessment_requirement_ids": [
-          "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-05"
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-05",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-19"
         ],
         "destination_id": "ac-9618-p4-2026-python.lesson.object-files.assessment.progression",
         "level": "independent",
         "prompt": {
-          "vi": "Xây pipeline đọc file thành object, chọn class/subclass, lookup và update có kiểm tra; chạy normal/boundary/failure. Nộp code, file fixtures, output thực tế, trace read/construct/lookup/update và assertions cho record lỗi, lookup thiếu và commit hợp lệ.",
-          "en": "Build a checked pipeline that reads a file into objects, selects a class/subclass, and performs lookup and update; run normal/boundary/failure. Submit code, file fixtures, actual outputs, read/construct/lookup/update traces, and assertions for malformed rows, missing lookup, and valid commit."
+          "en": "Build a checked pipeline that reads a file into objects, selects a class/subclass, and performs lookup and update; run normal/boundary/failure. Submit code, file fixtures, actual outputs, read/construct/lookup/update traces, and assertions for malformed rows, missing lookup, and valid commit. Requirement evidence: [1] Read a record from a file. [2] Write code demonstrating OOP.",
+          "vi": "Xây pipeline đọc file thành object, chọn class/subclass, lookup và update có kiểm tra; chạy normal/boundary/failure. Nộp code, file fixtures, output thực tế, trace read/construct/lookup/update và assertions cho record lỗi, lookup thiếu và commit hợp lệ. Bằng chứng theo yêu cầu: [1] Đọc bản ghi từ tệp. [2] Viết chương trình thể hiện OOP."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.object-files.pilot-v1",
@@ -1515,12 +1526,20 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "object-files.independent.rubric.requirement",
+              "criterion_id": "object-files.i1.rubric.requirement-01",
               "description": {
-                "vi": "Prompt được trả lời đủ cho FILE_READ_OBJECTS và có bằng chứng riêng cho từng pattern.",
-                "en": "The prompt is fully answered for FILE_READ_OBJECTS with distinct evidence for every pattern."
+                "vi": "Đọc bản ghi từ tệp: Đọc bản ghi từ tệp.",
+                "en": "Read a record from a file: Read a record from a file."
               },
-              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+              "evidence_required": "Respects record boundaries; Converts fields under the stated layout; Handles end-of-file without inventing an extra record or updating the wrong object"
+            },
+            {
+              "criterion_id": "object-files.i1.rubric.requirement-02",
+              "description": {
+                "vi": "Viết chương trình thể hiện OOP: Viết chương trình thể hiện OOP.",
+                "en": "Write code demonstrating OOP: Write code demonstrating OOP."
+              },
+              "evidence_required": "Executable behaviour is organised through object state and methods; Instances and calls fit their contracts; Tests cover the required interaction rather than only successful construction"
             },
             {
               "criterion_id": "object-files.independent.rubric.execution",
@@ -1548,13 +1567,14 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho toàn bộ 4/4 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
-            "en": "Pass only with evidence for all 4/4 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+            "vi": "Đạt khi có bằng chứng cho đủ 5/5 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 5/5 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
-          }
+          },
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -1570,12 +1590,12 @@
       {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.object-files.knowledge.construct-from-record",
         "prompt": {
-          "vi": "Vì sao L077/L079 nằm sau conversion L074?",
-          "en": "Why do L077/L079 come after conversion at L074?"
+          "vi": "Vì sao L077/L079 nằm sau conversion L074 và range check L104?",
+          "en": "Why do L077/L079 follow conversion L074 and range check L104?"
         },
         "answer": {
-          "vi": "Để cả hai constructor chỉ nhận `pages` đã chuyển thành int thành công.",
-          "en": "So both constructors receive `pages` only after successful integer conversion."
+          "vi": "Để constructor chỉ nhận `pages` đã chuyển thành integer dương hợp lệ.",
+          "en": "So a constructor receives only a successfully converted positive integer page count."
         },
         "rationale": {
           "vi": "Validation và dispatch trước mutation giữ list object nhất quán.",
@@ -1586,13 +1606,15 @@
         "response_contract": {
           "mode": "recall_then_trace",
           "prompt": {
-            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: object-files.v1.L018, object-files.v1.L073, object-files.v1.L074, object-files.v1.L075, object-files.v1.L077, object-files.v1.L079, object-files.v1.L082, object-files.v1.L083.",
-            "en": "Answer from memory, state the rule, and trace at least one line: object-files.v1.L018, object-files.v1.L073, object-files.v1.L074, object-files.v1.L075, object-files.v1.L077, object-files.v1.L079, object-files.v1.L082, object-files.v1.L083."
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: object-files.v1.L018, object-files.v1.L073, object-files.v1.L074, object-files.v1.L104, object-files.v1.L105, object-files.v1.L075, object-files.v1.L077, object-files.v1.L079, object-files.v1.L082, object-files.v1.L083.",
+            "en": "Answer from memory, state the rule, and trace at least one line: object-files.v1.L018, object-files.v1.L073, object-files.v1.L074, object-files.v1.L104, object-files.v1.L105, object-files.v1.L075, object-files.v1.L077, object-files.v1.L079, object-files.v1.L082, object-files.v1.L083."
           },
           "evidence_refs": [
             "object-files.v1.L018",
             "object-files.v1.L073",
             "object-files.v1.L074",
+            "object-files.v1.L104",
+            "object-files.v1.L105",
             "object-files.v1.L075",
             "object-files.v1.L077",
             "object-files.v1.L079",
@@ -1668,12 +1690,12 @@
         "response_contract": {
           "mode": "recall_then_trace",
           "prompt": {
-            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: object-files.v1.L056, object-files.v1.L057, object-files.v1.L059, object-files.v1.L086, object-files.v1.L088, object-files.v1.L089, object-files.v1.L091, object-files.v1.L092, object-files.v1.L093, object-files.v1.L094, object-files.v1.L095.",
-            "en": "Answer from memory, state the rule, and trace at least one line: object-files.v1.L056, object-files.v1.L057, object-files.v1.L059, object-files.v1.L086, object-files.v1.L088, object-files.v1.L089, object-files.v1.L091, object-files.v1.L092, object-files.v1.L093, object-files.v1.L094, object-files.v1.L095."
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: object-files.v1.L056, object-files.v1.L102, object-files.v1.L059, object-files.v1.L086, object-files.v1.L088, object-files.v1.L089, object-files.v1.L091, object-files.v1.L092, object-files.v1.L093, object-files.v1.L094, object-files.v1.L095.",
+            "en": "Answer from memory, state the rule, and trace at least one line: object-files.v1.L056, object-files.v1.L102, object-files.v1.L059, object-files.v1.L086, object-files.v1.L088, object-files.v1.L089, object-files.v1.L091, object-files.v1.L092, object-files.v1.L093, object-files.v1.L094, object-files.v1.L095."
           },
           "evidence_refs": [
             "object-files.v1.L056",
-            "object-files.v1.L057",
+            "object-files.v1.L102",
             "object-files.v1.L059",
             "object-files.v1.L086",
             "object-files.v1.L088",

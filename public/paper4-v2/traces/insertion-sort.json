@@ -6,7 +6,7 @@
     "lesson_slug": "sorting",
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.sorting.production-v1",
     "artifact_version": "production-v1",
-    "code_sha256": "44d856b6c7e166ea4708dbd1a3acbf375af8d65c6181f1efd91e49b09475cf2c"
+    "code_sha256": "960f6fa686def3d559fd15fee8d2a7d3db79e8e8a3977d0abc76b0426c974c7a"
   },
   "python_artifact": {
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.sorting.production-v1",
@@ -442,361 +442,311 @@
       {
         "line_id": "sorting.production-v1.L085",
         "order": 85,
-        "text": "def run(fixture):"
+        "text": "def ordered_insert(values, item, capacity, trace):"
       },
       {
         "line_id": "sorting.production-v1.L086",
         "order": 86,
-        "text": "    values = fixture.get(\"values\", [])"
+        "text": "    if len(values) >= capacity:"
       },
       {
         "line_id": "sorting.production-v1.L087",
         "order": 87,
-        "text": "    trace = []"
+        "text": "        before = list(values)"
       },
       {
         "line_id": "sorting.production-v1.L088",
         "order": 88,
-        "text": "    if not all(isinstance(value, int) for value in values):"
+        "text": "        trace.append({\"event\": \"capacity_reject\", \"capacity\": capacity, \"before\": before, \"after\": list(values)})"
       },
       {
         "line_id": "sorting.production-v1.L089",
         "order": 89,
-        "text": "        trace.append({"
+        "text": "        return False"
       },
       {
         "line_id": "sorting.production-v1.L090",
         "order": 90,
-        "text": "            \"event\": \"reject_key\","
+        "text": "    position = 0"
       },
       {
         "line_id": "sorting.production-v1.L091",
         "order": 91,
-        "text": "            \"before\": list(values),"
+        "text": "    while position < len(values) and values[position] <= item:"
       },
       {
         "line_id": "sorting.production-v1.L092",
         "order": 92,
-        "text": "            \"after\": list(values),"
+        "text": "        trace.append({\"event\": \"ordered_insert_compare\", \"index\": position, \"current\": values[position], \"item\": item, \"moves_right\": True})"
       },
       {
         "line_id": "sorting.production-v1.L093",
         "order": 93,
-        "text": "        })"
+        "text": "        position += 1"
       },
       {
         "line_id": "sorting.production-v1.L094",
         "order": 94,
-        "text": "        return {\"status\": \"INVALID_KEY\", \"values\": values, \"trace\": trace}"
+        "text": "    if position < len(values):"
       },
       {
         "line_id": "sorting.production-v1.L095",
         "order": 95,
-        "text": "    ordered, comparisons, swaps = bubble(values, trace, fixture.get(\"reverse\", False))"
+        "text": "        trace.append({\"event\": \"ordered_insert_compare\", \"index\": position, \"current\": values[position], \"item\": item, \"moves_right\": False})"
       },
       {
         "line_id": "sorting.production-v1.L096",
         "order": 96,
-        "text": "    insertion_ordered = insertion(values, trace)"
+        "text": "    before = list(values)"
       },
       {
         "line_id": "sorting.production-v1.L097",
         "order": 97,
-        "text": "    bounded = list(fixture.get(\"bounded\", []))"
+        "text": "    values.append(None)"
       },
       {
         "line_id": "sorting.production-v1.L098",
         "order": 98,
-        "text": "    if len(bounded) >= fixture[\"capacity\"]:"
+        "text": "    for index in range(len(values) - 1, position, -1):"
       },
       {
         "line_id": "sorting.production-v1.L099",
         "order": 99,
-        "text": "        before = list(bounded)"
+        "text": "        values[index] = values[index - 1]"
       },
       {
         "line_id": "sorting.production-v1.L100",
         "order": 100,
-        "text": "        trace.append({"
+        "text": "        trace.append({\"event\": \"ordered_insert_shift\", \"from_index\": index - 1, \"to_index\": index, \"value\": values[index]})"
       },
       {
         "line_id": "sorting.production-v1.L101",
         "order": 101,
-        "text": "            \"event\": \"capacity_reject\","
+        "text": "    values[position] = item"
       },
       {
         "line_id": "sorting.production-v1.L102",
         "order": 102,
-        "text": "            \"capacity\": fixture[\"capacity\"],"
+        "text": "    trace.append({\"event\": \"ordered_insert\", \"position\": position, \"item\": item, \"before\": before, \"after\": list(values)})"
       },
       {
         "line_id": "sorting.production-v1.L103",
         "order": 103,
-        "text": "            \"before\": before,"
+        "text": "    return True"
       },
       {
         "line_id": "sorting.production-v1.L104",
         "order": 104,
-        "text": "            \"after\": list(bounded),"
+        "text": ""
       },
       {
         "line_id": "sorting.production-v1.L105",
         "order": 105,
-        "text": "        })"
+        "text": "def run(fixture):"
       },
       {
         "line_id": "sorting.production-v1.L106",
         "order": 106,
-        "text": "        return {"
+        "text": "    values = fixture.get(\"values\", [])"
       },
       {
         "line_id": "sorting.production-v1.L107",
         "order": 107,
-        "text": "            \"status\": \"FULL\","
+        "text": "    trace = []"
       },
       {
         "line_id": "sorting.production-v1.L108",
         "order": 108,
-        "text": "            \"values\": bounded,"
+        "text": "    if not all(isinstance(value, int) for value in values):"
       },
       {
         "line_id": "sorting.production-v1.L109",
         "order": 109,
-        "text": "            \"bubble\": ordered,"
+        "text": "        trace.append({"
       },
       {
         "line_id": "sorting.production-v1.L110",
         "order": 110,
-        "text": "            \"insertion\": insertion_ordered,"
+        "text": "            \"event\": \"reject_key\","
       },
       {
         "line_id": "sorting.production-v1.L111",
         "order": 111,
-        "text": "            \"trace\": trace,"
+        "text": "            \"before\": list(values),"
       },
       {
         "line_id": "sorting.production-v1.L112",
         "order": 112,
-        "text": "        }"
+        "text": "            \"after\": list(values),"
       },
       {
         "line_id": "sorting.production-v1.L113",
         "order": 113,
-        "text": "    item = fixture[\"insert\"]"
+        "text": "        })"
       },
       {
         "line_id": "sorting.production-v1.L114",
         "order": 114,
-        "text": "    position = 0"
+        "text": "        return {\"status\": \"INVALID_KEY\", \"values\": values, \"trace\": trace}"
       },
       {
         "line_id": "sorting.production-v1.L115",
         "order": 115,
-        "text": "    while position < len(bounded):"
+        "text": "    ordered, comparisons, swaps = bubble(values, trace, fixture.get(\"reverse\", False))"
       },
       {
         "line_id": "sorting.production-v1.L116",
         "order": 116,
-        "text": "        current = bounded[position]"
+        "text": "    insertion_ordered = insertion(values, trace)"
       },
       {
         "line_id": "sorting.production-v1.L117",
         "order": 117,
-        "text": "        moves_right = current <= item"
+        "text": "    bounded = list(fixture.get(\"bounded\", []))"
       },
       {
         "line_id": "sorting.production-v1.L118",
         "order": 118,
-        "text": "        trace.append({"
+        "text": "    item = fixture[\"insert\"]"
       },
       {
         "line_id": "sorting.production-v1.L119",
         "order": 119,
-        "text": "            \"event\": \"ordered_insert_compare\","
+        "text": "    if not ordered_insert(bounded, item, fixture[\"capacity\"], trace):"
       },
       {
         "line_id": "sorting.production-v1.L120",
         "order": 120,
-        "text": "            \"index\": position,"
+        "text": "        return {"
       },
       {
         "line_id": "sorting.production-v1.L121",
         "order": 121,
-        "text": "            \"current\": current,"
+        "text": "            \"status\": \"FULL\","
       },
       {
         "line_id": "sorting.production-v1.L122",
         "order": 122,
-        "text": "            \"item\": item,"
+        "text": "            \"values\": bounded,"
       },
       {
         "line_id": "sorting.production-v1.L123",
         "order": 123,
-        "text": "            \"moves_right\": moves_right,"
+        "text": "            \"bubble\": ordered,"
       },
       {
         "line_id": "sorting.production-v1.L124",
         "order": 124,
-        "text": "        })"
+        "text": "            \"insertion\": insertion_ordered,"
       },
       {
         "line_id": "sorting.production-v1.L125",
         "order": 125,
-        "text": "        if not moves_right:"
+        "text": "            \"trace\": trace,"
       },
       {
         "line_id": "sorting.production-v1.L126",
         "order": 126,
-        "text": "            break"
+        "text": "        }"
       },
       {
         "line_id": "sorting.production-v1.L127",
         "order": 127,
-        "text": "        position += 1"
+        "text": "    return {"
       },
       {
         "line_id": "sorting.production-v1.L128",
         "order": 128,
-        "text": "    before = list(bounded)"
+        "text": "        \"status\": \"OK\","
       },
       {
         "line_id": "sorting.production-v1.L129",
         "order": 129,
-        "text": "    bounded.insert(position, item)"
+        "text": "        \"bubble\": ordered,"
       },
       {
         "line_id": "sorting.production-v1.L130",
         "order": 130,
-        "text": "    trace.append({"
+        "text": "        \"insertion\": insertion_ordered,"
       },
       {
         "line_id": "sorting.production-v1.L131",
         "order": 131,
-        "text": "        \"event\": \"ordered_insert\","
+        "text": "        \"bounded\": bounded,"
       },
       {
         "line_id": "sorting.production-v1.L132",
         "order": 132,
-        "text": "        \"position\": position,"
+        "text": "        \"comparisons\": comparisons,"
       },
       {
         "line_id": "sorting.production-v1.L133",
         "order": 133,
-        "text": "        \"item\": item,"
+        "text": "        \"swaps\": swaps,"
       },
       {
         "line_id": "sorting.production-v1.L134",
         "order": 134,
-        "text": "        \"before\": before,"
+        "text": "        \"trace\": trace,"
       },
       {
         "line_id": "sorting.production-v1.L135",
         "order": 135,
-        "text": "        \"after\": list(bounded),"
+        "text": "    }"
       },
       {
         "line_id": "sorting.production-v1.L136",
         "order": 136,
-        "text": "    })"
+        "text": ""
       },
       {
         "line_id": "sorting.production-v1.L137",
         "order": 137,
-        "text": "    return {"
+        "text": "if __name__ == \"__main__\":"
       },
       {
         "line_id": "sorting.production-v1.L138",
         "order": 138,
-        "text": "        \"status\": \"OK\","
+        "text": "    import json"
       },
       {
         "line_id": "sorting.production-v1.L139",
         "order": 139,
-        "text": "        \"bubble\": ordered,"
+        "text": "    import sys"
       },
       {
         "line_id": "sorting.production-v1.L140",
         "order": 140,
-        "text": "        \"insertion\": insertion_ordered,"
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
       },
       {
         "line_id": "sorting.production-v1.L141",
         "order": 141,
-        "text": "        \"bounded\": bounded,"
+        "text": "    result = run(fixture)"
       },
       {
         "line_id": "sorting.production-v1.L142",
         "order": 142,
-        "text": "        \"comparisons\": comparisons,"
+        "text": "    if not result[\"trace\"]:"
       },
       {
         "line_id": "sorting.production-v1.L143",
         "order": 143,
-        "text": "        \"swaps\": swaps,"
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
       },
       {
         "line_id": "sorting.production-v1.L144",
         "order": 144,
-        "text": "        \"trace\": trace,"
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
       },
       {
         "line_id": "sorting.production-v1.L145",
         "order": 145,
-        "text": "    }"
-      },
-      {
-        "line_id": "sorting.production-v1.L146",
-        "order": 146,
-        "text": ""
-      },
-      {
-        "line_id": "sorting.production-v1.L147",
-        "order": 147,
-        "text": "if __name__ == \"__main__\":"
-      },
-      {
-        "line_id": "sorting.production-v1.L148",
-        "order": 148,
-        "text": "    import json"
-      },
-      {
-        "line_id": "sorting.production-v1.L149",
-        "order": 149,
-        "text": "    import sys"
-      },
-      {
-        "line_id": "sorting.production-v1.L150",
-        "order": 150,
-        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
-      },
-      {
-        "line_id": "sorting.production-v1.L151",
-        "order": 151,
-        "text": "    result = run(fixture)"
-      },
-      {
-        "line_id": "sorting.production-v1.L152",
-        "order": 152,
-        "text": "    if not result[\"trace\"]:"
-      },
-      {
-        "line_id": "sorting.production-v1.L153",
-        "order": 153,
-        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
-      },
-      {
-        "line_id": "sorting.production-v1.L154",
-        "order": 154,
-        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
-      },
-      {
-        "line_id": "sorting.production-v1.L155",
-        "order": 155,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "44d856b6c7e166ea4708dbd1a3acbf375af8d65c6181f1efd91e49b09475cf2c",
+    "code_sha256": "960f6fa686def3d559fd15fee8d2a7d3db79e8e8a3977d0abc76b0426c974c7a",
     "caption": {
       "en": "Bubble, insertion and capacity-bounded ordered insertion.",
       "vi": "Bubble, insertion và ordered insert có giới hạn."
@@ -806,7 +756,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r3.a3.sorting.production-v1.author-run",
       "independent_rerun_ref": "p4r3.a3.sorting.production-v1.independent-rerun",
-      "execution_log_sha256": "dbd5e978492a57ca3151eb425e286abba5220dd389c6b61ed04ce3f617be2dfe"
+      "execution_log_sha256": "6888818485c85db23b7e1b4f247bb1c2a68b4c5c7fa288c402c9e9c30b6239cc"
     }
   },
   "scenarios": [
@@ -944,7 +894,8 @@
         "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-026",
         "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-027",
         "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-028",
-        "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-029"
+        "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-029",
+        "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-030"
       ],
       "expected_output_ref": "sorting.normal.expected-output",
       "fixture_ref": "sorting.normal"
@@ -1164,10 +1115,10 @@
       "sequence": 2,
       "event_type": "write",
       "active_line_ids": [
-        "sorting.production-v1.L131",
-        "sorting.production-v1.L082",
-        "sorting.production-v1.L096",
-        "sorting.production-v1.L137"
+        "sorting.production-v1.L102",
+        "sorting.production-v1.L085",
+        "sorting.production-v1.L092",
+        "sorting.production-v1.L127"
       ],
       "before": {
         "fixture_ref": "sorting.boundary",
@@ -1318,7 +1269,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -1444,7 +1395,7 @@
       "active_line_ids": [
         "sorting.production-v1.L031",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L095"
+        "sorting.production-v1.L115"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -1616,7 +1567,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -1797,7 +1748,7 @@
       "active_line_ids": [
         "sorting.production-v1.L031",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L095"
+        "sorting.production-v1.L115"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -2264,7 +2215,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -2521,7 +2472,7 @@
       "active_line_ids": [
         "sorting.production-v1.L031",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L095"
+        "sorting.production-v1.L115"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -3816,7 +3767,7 @@
       "active_line_ids": [
         "sorting.production-v1.L064",
         "sorting.production-v1.L082",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -5049,7 +5000,7 @@
       "active_line_ids": [
         "sorting.production-v1.L064",
         "sorting.production-v1.L082",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -5517,7 +5468,7 @@
       "active_line_ids": [
         "sorting.production-v1.L064",
         "sorting.production-v1.L082",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -7087,10 +7038,10 @@
       "sequence": 17,
       "event_type": "reject",
       "active_line_ids": [
-        "sorting.production-v1.L101",
+        "sorting.production-v1.L088",
         "sorting.production-v1.L015",
         "sorting.production-v1.L030",
-        "sorting.production-v1.L137"
+        "sorting.production-v1.L127"
       ],
       "before": {
         "fixture_ref": "sorting.failure",
@@ -7692,7 +7643,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -7822,7 +7773,7 @@
       "active_line_ids": [
         "sorting.production-v1.L031",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L095"
+        "sorting.production-v1.L115"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -8004,7 +7955,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -8193,7 +8144,7 @@
       "active_line_ids": [
         "sorting.production-v1.L031",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L095"
+        "sorting.production-v1.L115"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -8433,7 +8384,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -8680,7 +8631,7 @@
       "active_line_ids": [
         "sorting.production-v1.L031",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L095"
+        "sorting.production-v1.L115"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -9292,7 +9243,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -9621,7 +9572,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -9968,7 +9919,7 @@
       "active_line_ids": [
         "sorting.production-v1.L031",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L095"
+        "sorting.production-v1.L115"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -10780,7 +10731,7 @@
       "active_line_ids": [
         "sorting.production-v1.L016",
         "sorting.production-v1.L046",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L092"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -12622,7 +12573,7 @@
       "active_line_ids": [
         "sorting.production-v1.L064",
         "sorting.production-v1.L082",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -14299,7 +14250,7 @@
       "active_line_ids": [
         "sorting.production-v1.L064",
         "sorting.production-v1.L082",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -16249,7 +16200,7 @@
       "active_line_ids": [
         "sorting.production-v1.L064",
         "sorting.production-v1.L082",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -16963,7 +16914,7 @@
       "active_line_ids": [
         "sorting.production-v1.L064",
         "sorting.production-v1.L082",
-        "sorting.production-v1.L015"
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -19292,9 +19243,9 @@
       "sequence": 25,
       "event_type": "write",
       "active_line_ids": [
-        "sorting.production-v1.L119",
-        "sorting.production-v1.L082",
-        "sorting.production-v1.L096"
+        "sorting.production-v1.L092",
+        "sorting.production-v1.L095",
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -20099,9 +20050,9 @@
       "sequence": 26,
       "event_type": "write",
       "active_line_ids": [
-        "sorting.production-v1.L119",
-        "sorting.production-v1.L082",
-        "sorting.production-v1.L096"
+        "sorting.production-v1.L092",
+        "sorting.production-v1.L095",
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -20920,9 +20871,9 @@
       "sequence": 27,
       "event_type": "write",
       "active_line_ids": [
-        "sorting.production-v1.L119",
-        "sorting.production-v1.L082",
-        "sorting.production-v1.L096"
+        "sorting.production-v1.L092",
+        "sorting.production-v1.L095",
+        "sorting.production-v1.L100"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -21755,10 +21706,9 @@
       "sequence": 28,
       "event_type": "write",
       "active_line_ids": [
-        "sorting.production-v1.L131",
-        "sorting.production-v1.L082",
-        "sorting.production-v1.L096",
-        "sorting.production-v1.L137"
+        "sorting.production-v1.L100",
+        "sorting.production-v1.L092",
+        "sorting.production-v1.L095"
       ],
       "before": {
         "fixture_ref": "sorting.normal",
@@ -22147,20 +22097,10 @@
       },
       "delta": {
         "execution_trace_event": {
-          "after": [
-            1,
-            3,
-            4,
-            7
-          ],
-          "before": [
-            1,
-            3,
-            7
-          ],
-          "event": "ordered_insert",
-          "item": 4,
-          "position": 2
+          "event": "ordered_insert_shift",
+          "from_index": 2,
+          "to_index": 3,
+          "value": 7
         },
         "pattern_focus": true
       },
@@ -22546,6 +22486,875 @@
             "moves_right": false
           },
           {
+            "event": "ordered_insert_shift",
+            "from_index": 2,
+            "to_index": 3,
+            "value": 7
+          }
+        ],
+        "latest_event": "ordered_insert_shift",
+        "execution_status": "OK"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "ordered_insert_shift",
+          "from_index": 2,
+          "to_index": 3,
+          "value": 7
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Pass, shift hoặc tree path nào thay đổi trong khi invariant vẫn được bảo toàn? Số thao tác được đếm tăng như thế nào khi kích thước đầu vào n tăng? INSERTION_SORT: sự kiện ordered_insert_shift phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "Which pass, shift, or tree path changes while the invariant remains true? How does the counted operation grow as input size n increases? INSERTION_SORT: event ordered_insert_shift must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (ordered insert shift)",
+        "en": "Which value will be written or updated? (ordered insert shift)"
+      },
+      "feedback": {
+        "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: ordered insert shift.",
+        "en": "The write preserves prior data and applies the exact change in the trace. Event: ordered insert shift."
+      },
+      "visual_targets": [
+        "visual.dsa.sort-tree-state",
+        "visual.dsa.growth-counter",
+        "visual.insertion-sort.state",
+        "visual.insertion-sort.ordered-insert-shift"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 29: ordered_insert_shift",
+          "en": "Step 29: ordered_insert_shift"
+        },
+        "action_description": {
+          "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (ordered insert shift)",
+          "en": "Which value will be written or updated? (ordered insert shift)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-029.focus",
+        "focus_order": 28,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: ordered insert shift.",
+            "en": "The write preserves prior data and applies the exact change in the trace. Event: ordered insert shift."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-030",
+      "trace_id": "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1",
+      "sequence": 29,
+      "event_type": "write",
+      "active_line_ids": [
+        "sorting.production-v1.L102",
+        "sorting.production-v1.L085",
+        "sorting.production-v1.L092",
+        "sorting.production-v1.L127"
+      ],
+      "before": {
+        "fixture_ref": "sorting.normal",
+        "fixture_input": {
+          "bounded": [
+            1,
+            3,
+            7
+          ],
+          "capacity": 5,
+          "insert": 4,
+          "values": [
+            5,
+            1,
+            4,
+            2
+          ]
+        },
+        "trace_cursor": 29,
+        "history": [
+          {
+            "event": "bubble_compare",
+            "left": 5,
+            "left_index": 0,
+            "pass": 1,
+            "right": 1,
+            "right_index": 1,
+            "swap_required": true
+          },
+          {
+            "after": [
+              1,
+              5,
+              4,
+              2
+            ],
+            "before": [
+              5,
+              1,
+              4,
+              2
+            ],
+            "event": "bubble_swap",
+            "indices": [
+              0,
+              1
+            ],
+            "pass": 1
+          },
+          {
+            "event": "bubble_compare",
+            "left": 5,
+            "left_index": 1,
+            "pass": 1,
+            "right": 4,
+            "right_index": 2,
+            "swap_required": true
+          },
+          {
+            "after": [
+              1,
+              4,
+              5,
+              2
+            ],
+            "before": [
+              1,
+              5,
+              4,
+              2
+            ],
+            "event": "bubble_swap",
+            "indices": [
+              1,
+              2
+            ],
+            "pass": 1
+          },
+          {
+            "event": "bubble_compare",
+            "left": 5,
+            "left_index": 2,
+            "pass": 1,
+            "right": 2,
+            "right_index": 3,
+            "swap_required": true
+          },
+          {
+            "after": [
+              1,
+              4,
+              2,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              5,
+              2
+            ],
+            "event": "bubble_swap",
+            "indices": [
+              2,
+              3
+            ],
+            "pass": 1
+          },
+          {
+            "changed": true,
+            "event": "bubble_pass_complete",
+            "pass": 1,
+            "sorted_suffix_start": 3,
+            "values": [
+              1,
+              4,
+              2,
+              5
+            ]
+          },
+          {
+            "event": "bubble_compare",
+            "left": 1,
+            "left_index": 0,
+            "pass": 2,
+            "right": 4,
+            "right_index": 1,
+            "swap_required": false
+          },
+          {
+            "event": "bubble_compare",
+            "left": 4,
+            "left_index": 1,
+            "pass": 2,
+            "right": 2,
+            "right_index": 2,
+            "swap_required": true
+          },
+          {
+            "after": [
+              1,
+              2,
+              4,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              2,
+              5
+            ],
+            "event": "bubble_swap",
+            "indices": [
+              1,
+              2
+            ],
+            "pass": 2
+          },
+          {
+            "changed": true,
+            "event": "bubble_pass_complete",
+            "pass": 2,
+            "sorted_suffix_start": 2,
+            "values": [
+              1,
+              2,
+              4,
+              5
+            ]
+          },
+          {
+            "event": "bubble_compare",
+            "left": 1,
+            "left_index": 0,
+            "pass": 3,
+            "right": 2,
+            "right_index": 1,
+            "swap_required": false
+          },
+          {
+            "changed": false,
+            "event": "bubble_pass_complete",
+            "pass": 3,
+            "sorted_suffix_start": 1,
+            "values": [
+              1,
+              2,
+              4,
+              5
+            ]
+          },
+          {
+            "event": "bubble_complete",
+            "values": [
+              1,
+              2,
+              4,
+              5
+            ]
+          },
+          {
+            "event": "insertion_select_key",
+            "index": 1,
+            "key": 1,
+            "sorted_prefix": [
+              5
+            ]
+          },
+          {
+            "after": [
+              5,
+              5,
+              4,
+              2
+            ],
+            "before": [
+              5,
+              1,
+              4,
+              2
+            ],
+            "event": "insertion_shift",
+            "from_index": 0,
+            "to_index": 1,
+            "value": 5
+          },
+          {
+            "after": [
+              1,
+              5,
+              4,
+              2
+            ],
+            "before": [
+              5,
+              5,
+              4,
+              2
+            ],
+            "event": "insertion_place_key",
+            "from_index": 1,
+            "key": 1,
+            "to_index": 0
+          },
+          {
+            "event": "insertion_select_key",
+            "index": 2,
+            "key": 4,
+            "sorted_prefix": [
+              1,
+              5
+            ]
+          },
+          {
+            "after": [
+              1,
+              5,
+              5,
+              2
+            ],
+            "before": [
+              1,
+              5,
+              4,
+              2
+            ],
+            "event": "insertion_shift",
+            "from_index": 1,
+            "to_index": 2,
+            "value": 5
+          },
+          {
+            "after": [
+              1,
+              4,
+              5,
+              2
+            ],
+            "before": [
+              1,
+              5,
+              5,
+              2
+            ],
+            "event": "insertion_place_key",
+            "from_index": 2,
+            "key": 4,
+            "to_index": 1
+          },
+          {
+            "event": "insertion_select_key",
+            "index": 3,
+            "key": 2,
+            "sorted_prefix": [
+              1,
+              4,
+              5
+            ]
+          },
+          {
+            "after": [
+              1,
+              4,
+              5,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              5,
+              2
+            ],
+            "event": "insertion_shift",
+            "from_index": 2,
+            "to_index": 3,
+            "value": 5
+          },
+          {
+            "after": [
+              1,
+              4,
+              4,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              5,
+              5
+            ],
+            "event": "insertion_shift",
+            "from_index": 1,
+            "to_index": 2,
+            "value": 4
+          },
+          {
+            "after": [
+              1,
+              2,
+              4,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              4,
+              5
+            ],
+            "event": "insertion_place_key",
+            "from_index": 3,
+            "key": 2,
+            "to_index": 1
+          },
+          {
+            "event": "insertion_complete",
+            "values": [
+              1,
+              2,
+              4,
+              5
+            ]
+          },
+          {
+            "current": 1,
+            "event": "ordered_insert_compare",
+            "index": 0,
+            "item": 4,
+            "moves_right": true
+          },
+          {
+            "current": 3,
+            "event": "ordered_insert_compare",
+            "index": 1,
+            "item": 4,
+            "moves_right": true
+          },
+          {
+            "current": 7,
+            "event": "ordered_insert_compare",
+            "index": 2,
+            "item": 4,
+            "moves_right": false
+          },
+          {
+            "event": "ordered_insert_shift",
+            "from_index": 2,
+            "to_index": 3,
+            "value": 7
+          }
+        ],
+        "latest_event": "ordered_insert_shift",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "after": [
+            1,
+            3,
+            4,
+            7
+          ],
+          "before": [
+            1,
+            3,
+            7
+          ],
+          "event": "ordered_insert",
+          "item": 4,
+          "position": 2
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "sorting.normal",
+        "fixture_input": {
+          "bounded": [
+            1,
+            3,
+            7
+          ],
+          "capacity": 5,
+          "insert": 4,
+          "values": [
+            5,
+            1,
+            4,
+            2
+          ]
+        },
+        "trace_cursor": 30,
+        "history": [
+          {
+            "event": "bubble_compare",
+            "left": 5,
+            "left_index": 0,
+            "pass": 1,
+            "right": 1,
+            "right_index": 1,
+            "swap_required": true
+          },
+          {
+            "after": [
+              1,
+              5,
+              4,
+              2
+            ],
+            "before": [
+              5,
+              1,
+              4,
+              2
+            ],
+            "event": "bubble_swap",
+            "indices": [
+              0,
+              1
+            ],
+            "pass": 1
+          },
+          {
+            "event": "bubble_compare",
+            "left": 5,
+            "left_index": 1,
+            "pass": 1,
+            "right": 4,
+            "right_index": 2,
+            "swap_required": true
+          },
+          {
+            "after": [
+              1,
+              4,
+              5,
+              2
+            ],
+            "before": [
+              1,
+              5,
+              4,
+              2
+            ],
+            "event": "bubble_swap",
+            "indices": [
+              1,
+              2
+            ],
+            "pass": 1
+          },
+          {
+            "event": "bubble_compare",
+            "left": 5,
+            "left_index": 2,
+            "pass": 1,
+            "right": 2,
+            "right_index": 3,
+            "swap_required": true
+          },
+          {
+            "after": [
+              1,
+              4,
+              2,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              5,
+              2
+            ],
+            "event": "bubble_swap",
+            "indices": [
+              2,
+              3
+            ],
+            "pass": 1
+          },
+          {
+            "changed": true,
+            "event": "bubble_pass_complete",
+            "pass": 1,
+            "sorted_suffix_start": 3,
+            "values": [
+              1,
+              4,
+              2,
+              5
+            ]
+          },
+          {
+            "event": "bubble_compare",
+            "left": 1,
+            "left_index": 0,
+            "pass": 2,
+            "right": 4,
+            "right_index": 1,
+            "swap_required": false
+          },
+          {
+            "event": "bubble_compare",
+            "left": 4,
+            "left_index": 1,
+            "pass": 2,
+            "right": 2,
+            "right_index": 2,
+            "swap_required": true
+          },
+          {
+            "after": [
+              1,
+              2,
+              4,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              2,
+              5
+            ],
+            "event": "bubble_swap",
+            "indices": [
+              1,
+              2
+            ],
+            "pass": 2
+          },
+          {
+            "changed": true,
+            "event": "bubble_pass_complete",
+            "pass": 2,
+            "sorted_suffix_start": 2,
+            "values": [
+              1,
+              2,
+              4,
+              5
+            ]
+          },
+          {
+            "event": "bubble_compare",
+            "left": 1,
+            "left_index": 0,
+            "pass": 3,
+            "right": 2,
+            "right_index": 1,
+            "swap_required": false
+          },
+          {
+            "changed": false,
+            "event": "bubble_pass_complete",
+            "pass": 3,
+            "sorted_suffix_start": 1,
+            "values": [
+              1,
+              2,
+              4,
+              5
+            ]
+          },
+          {
+            "event": "bubble_complete",
+            "values": [
+              1,
+              2,
+              4,
+              5
+            ]
+          },
+          {
+            "event": "insertion_select_key",
+            "index": 1,
+            "key": 1,
+            "sorted_prefix": [
+              5
+            ]
+          },
+          {
+            "after": [
+              5,
+              5,
+              4,
+              2
+            ],
+            "before": [
+              5,
+              1,
+              4,
+              2
+            ],
+            "event": "insertion_shift",
+            "from_index": 0,
+            "to_index": 1,
+            "value": 5
+          },
+          {
+            "after": [
+              1,
+              5,
+              4,
+              2
+            ],
+            "before": [
+              5,
+              5,
+              4,
+              2
+            ],
+            "event": "insertion_place_key",
+            "from_index": 1,
+            "key": 1,
+            "to_index": 0
+          },
+          {
+            "event": "insertion_select_key",
+            "index": 2,
+            "key": 4,
+            "sorted_prefix": [
+              1,
+              5
+            ]
+          },
+          {
+            "after": [
+              1,
+              5,
+              5,
+              2
+            ],
+            "before": [
+              1,
+              5,
+              4,
+              2
+            ],
+            "event": "insertion_shift",
+            "from_index": 1,
+            "to_index": 2,
+            "value": 5
+          },
+          {
+            "after": [
+              1,
+              4,
+              5,
+              2
+            ],
+            "before": [
+              1,
+              5,
+              5,
+              2
+            ],
+            "event": "insertion_place_key",
+            "from_index": 2,
+            "key": 4,
+            "to_index": 1
+          },
+          {
+            "event": "insertion_select_key",
+            "index": 3,
+            "key": 2,
+            "sorted_prefix": [
+              1,
+              4,
+              5
+            ]
+          },
+          {
+            "after": [
+              1,
+              4,
+              5,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              5,
+              2
+            ],
+            "event": "insertion_shift",
+            "from_index": 2,
+            "to_index": 3,
+            "value": 5
+          },
+          {
+            "after": [
+              1,
+              4,
+              4,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              5,
+              5
+            ],
+            "event": "insertion_shift",
+            "from_index": 1,
+            "to_index": 2,
+            "value": 4
+          },
+          {
+            "after": [
+              1,
+              2,
+              4,
+              5
+            ],
+            "before": [
+              1,
+              4,
+              4,
+              5
+            ],
+            "event": "insertion_place_key",
+            "from_index": 3,
+            "key": 2,
+            "to_index": 1
+          },
+          {
+            "event": "insertion_complete",
+            "values": [
+              1,
+              2,
+              4,
+              5
+            ]
+          },
+          {
+            "current": 1,
+            "event": "ordered_insert_compare",
+            "index": 0,
+            "item": 4,
+            "moves_right": true
+          },
+          {
+            "current": 3,
+            "event": "ordered_insert_compare",
+            "index": 1,
+            "item": 4,
+            "moves_right": true
+          },
+          {
+            "current": 7,
+            "event": "ordered_insert_compare",
+            "index": 2,
+            "item": 4,
+            "moves_right": false
+          },
+          {
+            "event": "ordered_insert_shift",
+            "from_index": 2,
+            "to_index": 3,
+            "value": 7
+          },
+          {
             "after": [
               1,
               3,
@@ -22649,8 +23458,8 @@
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 29: ordered_insert",
-          "en": "Step 29: ordered_insert"
+          "vi": "Bước 30: ordered_insert",
+          "en": "Step 30: ordered_insert"
         },
         "action_description": {
           "vi": "Giá trị nào sẽ được ghi hoặc cập nhật? (ordered insert)",
@@ -22661,8 +23470,8 @@
           "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
           "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
         },
-        "focus_target": "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-029.focus",
-        "focus_order": 28,
+        "focus_target": "ac-9618-p4-2026-python.trace.sorting.insertion-sort.normal.production-v1.event-030.focus",
+        "focus_order": 29,
         "live_status": {
           "mode": "polite",
           "message": {

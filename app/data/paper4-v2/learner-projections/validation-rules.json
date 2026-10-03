@@ -1,0 +1,345 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Validation rules",
+    "vi": "Quy tắc kiểm tra dữ liệu"
+  },
+  "exam_family": {
+    "en": "Ordered validation, unique selection and supplied calculation rules",
+    "vi": "Validation theo thứ tự, chọn giá trị không trùng và quy tắc tính được đề cung cấp"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Apply validation guards in the right order, accept a unique value once, and prove that rejection leaves the data unchanged.",
+    "vi": "Áp dụng các guard validation đúng thứ tự, chỉ nhận một giá trị không trùng một lần và chứng minh rằng dữ liệu không đổi khi bị từ chối."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Recognise bounds, uniqueness and supplied calculation rules in a question.",
+      "vi": "Nhận diện giới hạn, yêu cầu không trùng và quy tắc tính do đề cung cấp."
+    },
+    {
+      "en": "Place type, range, duplicate and final prerequisite guards in a safe order.",
+      "vi": "Đặt các guard kiểu dữ liệu, khoảng, trùng lặp và điều kiện cuối theo thứ tự an toàn."
+    },
+    {
+      "en": "Trace the first failing guard and explain why later checks do not run.",
+      "vi": "Trace guard đầu tiên thất bại và giải thích vì sao các kiểm tra sau không chạy."
+    },
+    {
+      "en": "Use a question-supplied weights and modulus rule without inventing a formula.",
+      "vi": "Dùng quy tắc weights và modulus do đề cung cấp mà không tự đặt công thức."
+    }
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one ordered guard path ending in accept or reject",
+    "trace_rule": "one guard decision and no more than three focused lines per step",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "transfer_rule": "keep range, calculation and comparison transfers compact and separate from the canonical trace",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {"en": "Recognise", "vi": "Nhận diện"},
+      "student_question": {
+        "en": "Which condition can reject the candidate first?",
+        "vi": "Điều kiện nào có thể từ chối candidate trước tiên?"
+      },
+      "intro": {
+        "en": "Use this method when the question gives a valid range, forbids repeated choices, or supplies a calculation that must pass before a value is accepted.",
+        "vi": "Dùng phương pháp này khi đề cho khoảng hợp lệ, cấm chọn trùng hoặc cung cấp phép tính phải đúng trước khi nhận một giá trị."
+      },
+      "prompt_fragment": {
+        "en": "Add candidate to accepted only when it is an integer inside the inclusive range, is not already present and passes the supplied check-digit rule.",
+        "vi": "Chỉ thêm candidate vào accepted khi đó là số nguyên trong khoảng tính cả hai đầu, chưa có trong list và vượt qua quy tắc check digit do đề cung cấp."
+      },
+      "cues": [
+        {"en": "The range is inclusive: minimum and maximum are valid.", "vi": "Khoảng tính cả hai đầu: minimum và maximum đều hợp lệ."},
+        {"en": "The word unique means a duplicate must be rejected before append.", "vi": "Từ unique nghĩa là phải từ chối giá trị trùng trước khi append."},
+        {"en": "The question supplies the weights, order and modulus; they are not universal constants.", "vi": "Đề cung cấp weights, thứ tự và modulus; đây không phải hằng số dùng chung."},
+        {"en": "A rejected candidate must not change accepted.", "vi": "Candidate bị từ chối không được làm thay đổi accepted."}
+      ],
+      "precondition": {
+        "en": "accepted is the current integer list; the question defines minimum, maximum and any check-digit rule.",
+        "vi": "accepted là list số nguyên hiện tại; đề xác định minimum, maximum và quy tắc check digit nếu có."
+      },
+      "output_contract": {
+        "en": "Return a status and a new accepted list. Append exactly once only after every required guard passes.",
+        "vi": "Trả về status và list accepted mới. Chỉ append đúng một lần sau khi mọi guard bắt buộc đều pass."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {"en": "Understand", "vi": "Hiểu mô hình"},
+      "student_question": {
+        "en": "Why does the order of guards matter?",
+        "vi": "Vì sao thứ tự các guard lại quan trọng?"
+      },
+      "mental_model": {
+        "en": "Imagine one gate at a time. The first failed gate returns immediately. Only a value that reaches the end is appended, so rejection cannot mutate the accepted list.",
+        "vi": "Hãy hình dung từng cổng kiểm tra. Cổng đầu tiên thất bại sẽ return ngay. Chỉ giá trị đi đến cuối mới được append, nên việc từ chối không làm thay đổi accepted."
+      },
+      "rules": [
+        {"en": "Reject the wrong type before comparing it with numeric bounds.", "vi": "Từ chối sai kiểu dữ liệu trước khi so sánh với giới hạn số."},
+        {"en": "Use < minimum or > maximum for an inclusive range.", "vi": "Dùng < minimum hoặc > maximum cho khoảng tính cả hai đầu."},
+        {"en": "Reject a duplicate before any expensive or irrelevant later check.", "vi": "Từ chối giá trị trùng trước phép kiểm tra sau tốn kém hoặc không còn liên quan."},
+        {"en": "Copy and append only after every required condition passes.", "vi": "Chỉ copy và append sau khi mọi điều kiện bắt buộc đều pass."}
+      ],
+      "invariant": {
+        "en": "On every rejection, the returned list has the same values and order as accepted before the call.",
+        "vi": "Với mọi lần từ chối, list trả về có cùng giá trị và thứ tự như accepted trước lời gọi."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Teaching excerpt: ordered guards and one safe append",
+          "vi": "Teaching excerpt: guard theo thứ tự và một lần append an toàn"
+        },
+        "lines": [
+          "def accept_unique(accepted, candidate, minimum, maximum, digit_matches):",
+          "    if type(candidate) is not int:",
+          "        return \"INVALID_INPUT\", list(accepted)",
+          "    if candidate < minimum or candidate > maximum:",
+          "        return \"INVALID_INPUT\", list(accepted)",
+          "    if candidate in accepted:",
+          "        return \"DUPLICATE\", list(accepted)",
+          "    if not digit_matches:",
+          "        return \"CHECK_DIGIT_MISMATCH\", list(accepted)",
+          "    updated = list(accepted)",
+          "    updated.append(candidate)",
+          "    return \"ACCEPTED\", updated"
+        ],
+        "contract_note": {
+          "en": "digit_matches represents the result of the separate rule supplied by the question. This teaching excerpt makes the acceptance order visible; use the exact names and formula from the task you answer.",
+          "vi": "digit_matches biểu diễn kết quả của quy tắc riêng do đề cung cấp. Teaching excerpt này làm rõ thứ tự chấp nhận; hãy dùng đúng tên và công thức của bài đang làm."
+        }
+      },
+      "transfer_note": {
+        "label": {"en": "Computing the supplied check digit", "vi": "Tính check digit do đề cung cấp"},
+        "content": {
+          "en": "For code 123, weights [1, 2, 3] and modulus 7, calculate (1×1 + 2×2 + 3×3) mod 7 = 0. Compare that result with the supplied digit; do not reuse these constants unless the question supplies them.",
+          "vi": "Với code 123, weights [1, 2, 3] và modulus 7, tính (1×1 + 2×2 + 3×3) mod 7 = 0. So sánh kết quả với digit được cho; không dùng lại các hằng số này nếu đề không cung cấp."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {"en": "Trace", "vi": "Trace từng bước"},
+      "student_question": {
+        "en": "Which guard runs now, and does the list change?",
+        "vi": "Guard nào chạy lúc này, và list có thay đổi không?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Try candidate 4 with accepted [2], inclusive range 1..6 and a matching supplied digit",
+          "vi": "Thử candidate 4 với accepted [2], khoảng 1..6 tính cả hai đầu và supplied digit khớp"
+        },
+        "accepted": [2],
+        "candidate": 4,
+        "minimum": 1,
+        "maximum": 6,
+        "digit_matches": true,
+        "instruction": {
+          "en": "Predict the first failing guard or the new list before revealing each step.",
+          "vi": "Dự đoán guard đầu tiên thất bại hoặc list mới trước khi mở từng bước."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "if type(candidate) is not int:",
+            "if candidate < minimum or candidate > maximum:"
+          ],
+          "prediction": {"en": "Does candidate 4 fail type or range?", "vi": "Candidate 4 có sai kiểu hoặc ngoài khoảng không?"},
+          "answer": {"en": "No. It is an integer and 1 ≤ 4 ≤ 6. accepted is still [2].", "vi": "Không. Đây là số nguyên và 1 ≤ 4 ≤ 6. accepted vẫn là [2]."}
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "if candidate in accepted:",
+            "if not digit_matches:"
+          ],
+          "prediction": {"en": "Does a duplicate or digit-mismatch return run?", "vi": "Có chạy return do trùng hoặc digit không khớp không?"},
+          "answer": {"en": "No. 4 is not in [2], and the supplied calculation matches. The list has not changed yet.", "vi": "Không. 4 không có trong [2], và phép tính được cung cấp khớp. List vẫn chưa thay đổi."}
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "updated = list(accepted)",
+            "updated.append(candidate)",
+            "return \"ACCEPTED\", updated"
+          ],
+          "prediction": {"en": "What status and list are returned?", "vi": "Status và list nào được trả về?"},
+          "answer": {"en": "The function returns (\"ACCEPTED\", [2, 4]). The original accepted list remains [2].", "vi": "Function trả (\"ACCEPTED\", [2, 4]). List accepted ban đầu vẫn là [2]."}
+        }
+      ],
+      "invariant_check": {
+        "en": "The original list never changes; the returned list changes only on ACCEPTED.",
+        "vi": "List ban đầu không bao giờ thay đổi; list trả về chỉ thay đổi khi ACCEPTED."
+      },
+      "variants": [
+        {
+          "kind": "boundary",
+          "input": {"accepted": [], "candidate": 1, "minimum": 1, "maximum": 1, "digit_matches": true},
+          "expected": {"status": "ACCEPTED", "returned": [1], "original": []},
+          "explanation": {"en": "The only value in the inclusive range is valid and is appended once.", "vi": "Giá trị duy nhất trong khoảng tính cả hai đầu là hợp lệ và được append một lần."}
+        },
+        {
+          "kind": "failure",
+          "input": {"accepted": [3], "candidate": 3, "minimum": 1, "maximum": 6, "digit_matches": false},
+          "expected": {"status": "DUPLICATE", "returned": [3], "original": [3]},
+          "explanation": {"en": "The duplicate guard returns first. The later digit condition is deliberately not examined.", "vi": "Guard trùng lặp return trước. Điều kiện digit phía sau cố ý không được kiểm tra."}
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {"en": "Practise", "vi": "Luyện tập"},
+      "student_question": {
+        "en": "Can I apply the same guard order to changed data?",
+        "vi": "Tôi có thể áp dụng cùng thứ tự guard cho dữ liệu khác không?"
+      },
+      "attempt_rule": {
+        "en": "Write the first returned status and final list before opening the hint or answer.",
+        "vi": "Viết status được trả đầu tiên và list cuối trước khi mở gợi ý hoặc đáp án."
+      },
+      "items": [
+        {
+          "level": {"en": "Guided", "vi": "Có hướng dẫn"},
+          "title": {"en": "Follow the normal path", "vi": "Theo normal path"},
+          "prompt": {"en": "Trace accepted [2, 5], candidate 4, range 1..6 and digit_matches True.", "vi": "Trace accepted [2, 5], candidate 4, khoảng 1..6 và digit_matches True."},
+          "hint": {"en": "Test the guards in source order and append only at the end.", "vi": "Kiểm tra các guard theo thứ tự code và chỉ append ở cuối."},
+          "model_answer": {"en": "All guards pass; return (\"ACCEPTED\", [2, 5, 4]). The original remains [2, 5].", "vi": "Mọi guard đều pass; trả (\"ACCEPTED\", [2, 5, 4]). List ban đầu vẫn là [2, 5]."},
+          "success_check": {"en": "The candidate is appended once and only after every guard passes.", "vi": "Candidate được append một lần và chỉ sau khi mọi guard pass."}
+        },
+        {
+          "level": {"en": "Guided", "vi": "Có hướng dẫn"},
+          "title": {"en": "Test both range boundaries", "vi": "Kiểm tra hai boundary của khoảng"},
+          "prompt": {"en": "For an empty list and range 1..6, state the result for candidate 1, candidate 6 and candidate 7 when digit_matches is True.", "vi": "Với list rỗng và khoảng 1..6, nêu kết quả cho candidate 1, candidate 6 và candidate 7 khi digit_matches là True."},
+          "hint": {"en": "The endpoints are included; 7 is greater than maximum.", "vi": "Hai đầu mút đều được tính; 7 lớn hơn maximum."},
+          "model_answer": {"en": "1 and 6 can be ACCEPTED; 7 returns INVALID_INPUT without append.", "vi": "1 và 6 có thể ACCEPTED; 7 trả INVALID_INPUT mà không append."},
+          "success_check": {"en": "The answer treats minimum and maximum as valid values.", "vi": "Câu trả lời xem minimum và maximum là các giá trị hợp lệ."}
+        },
+        {
+          "level": {"en": "Faded", "vi": "Giảm gợi ý"},
+          "title": {"en": "Stop at the first failure", "vi": "Dừng ở lỗi đầu tiên"},
+          "prompt": {"en": "accepted is [3], candidate is 3 and digit_matches is False. Which status is returned, and why is the later condition irrelevant?", "vi": "accepted là [3], candidate là 3 và digit_matches là False. Status nào được trả, và vì sao điều kiện sau không còn liên quan?"},
+          "hint": {"en": "Find the first true return condition in the function.", "vi": "Tìm điều kiện return đầu tiên có giá trị True trong function."},
+          "model_answer": {"en": "DUPLICATE is returned. The function exits before it reaches the digit-mismatch guard; [3] is unchanged.", "vi": "DUPLICATE được trả về. Function thoát trước khi tới guard digit không khớp; [3] không đổi."},
+          "success_check": {"en": "The answer does not report two failures from one early-return path.", "vi": "Câu trả lời không báo hai lỗi từ một luồng early-return."}
+        },
+        {
+          "level": {"en": "Transfer", "vi": "Vận dụng"},
+          "title": {"en": "Apply a supplied calculation rule", "vi": "Áp dụng quy tắc tính được cung cấp"},
+          "prompt": {"en": "A task supplies code 241, weights [3, 2, 1], modulus 10 and supplied digit 7. Calculate the digit and decide digit_matches.", "vi": "Bài cho code 241, weights [3, 2, 1], modulus 10 và supplied digit 7. Tính digit và quyết định digit_matches."},
+          "hint": {"en": "Multiply corresponding digits and weights, add, then take modulus 10.", "vi": "Nhân từng digit với weight tương ứng, cộng lại rồi lấy modulus 10."},
+          "model_answer": {"en": "(2×3 + 4×2 + 1×1) mod 10 = 15 mod 10 = 5, so digit_matches is False.", "vi": "(2×3 + 4×2 + 1×1) mod 10 = 15 mod 10 = 5, nên digit_matches là False."},
+          "success_check": {"en": "The answer uses exactly the weights, order and modulus supplied in this task.", "vi": "Câu trả lời dùng đúng weights, thứ tự và modulus được cung cấp trong bài này."}
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {"en": "Protect your marks", "vi": "Tránh mất điểm"},
+      "student_question": {
+        "en": "Which small mistakes change the required result?",
+        "vi": "Những lỗi nhỏ nào làm thay đổi kết quả được yêu cầu?"
+      },
+      "before_code": [
+        {"en": "Write the required guard order and mark the single point where append is allowed.", "vi": "Viết thứ tự guard bắt buộc và đánh dấu vị trí duy nhất được phép append."}
+      ],
+      "core_code_caption": {"en": "Three-line submission checkpoint", "vi": "Checkpoint ba dòng trước khi nộp"},
+      "core_code": [
+        "if candidate in accepted:",
+        "    return \"DUPLICATE\", list(accepted)",
+        "updated.append(candidate)"
+      ],
+      "mistakes": [
+        {
+          "mistake": {"en": "Using candidate <= minimum or candidate >= maximum for an inclusive range.", "vi": "Dùng candidate <= minimum hoặc candidate >= maximum cho khoảng tính cả hai đầu."},
+          "consequence": {"en": "Valid endpoint values are rejected.", "vi": "Các giá trị hợp lệ ở đầu mút bị từ chối."},
+          "repair": {"en": "Reject only candidate < minimum or candidate > maximum.", "vi": "Chỉ từ chối candidate < minimum hoặc candidate > maximum."}
+        },
+        {
+          "mistake": {"en": "Appending before all guards have passed.", "vi": "Append trước khi mọi guard đều pass."},
+          "consequence": {"en": "A rejected candidate can remain in the list.", "vi": "Candidate bị từ chối vẫn có thể nằm trong list."},
+          "repair": {"en": "Place one append after the final required check.", "vi": "Đặt một lần append sau kiểm tra bắt buộc cuối cùng."}
+        },
+        {
+          "mistake": {"en": "Reporting every invalid property after an earlier return.", "vi": "Báo mọi tính chất không hợp lệ sau một return xảy ra trước."},
+          "consequence": {"en": "The trace claims code ran after the function had already stopped.", "vi": "Bản trace khẳng định code chạy sau khi function đã dừng."},
+          "repair": {"en": "Stop the trace at the first executed return.", "vi": "Dừng trace tại return đầu tiên thực sự được chạy."}
+        },
+        {
+          "mistake": {"en": "Reusing remembered weights or modulus instead of the values in the question.", "vi": "Dùng weights hoặc modulus đã nhớ thay vì các giá trị trong đề."},
+          "consequence": {"en": "The calculated digit belongs to a different rule.", "vi": "Digit được tính thuộc một quy tắc khác."},
+          "repair": {"en": "Copy the supplied order, weights and modulus into a short working table first.", "vi": "Chép thứ tự, weights và modulus được cho vào bảng tính ngắn trước."}
+        }
+      ],
+      "boundary_trace": [
+        {"en": "Minimum and maximum are accepted; a duplicate returns before any later check; every rejection preserves the list.", "vi": "Minimum và maximum được chấp nhận; giá trị trùng return trước mọi kiểm tra sau; mọi lần từ chối đều giữ nguyên list."}
+      ],
+      "final_check": [
+        {"en": "Did I use the question's exact bounds and calculation rule, stop at the first failure and append only once?", "vi": "Tôi đã dùng đúng giới hạn và quy tắc tính của đề, dừng ở lỗi đầu tiên và chỉ append một lần chưa?"}
+      ],
+      "authority_note": {
+        "en": "The question defines bounds, weights, order, modulus and comparison. Do not invent a universal validation rule.",
+        "vi": "Đề xác định giới hạn, weights, thứ tự, modulus và phép so sánh. Không tự đặt một quy tắc validation dùng chung."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {"en": "Recall and continue", "vi": "Gợi nhớ và học tiếp"},
+      "student_question": {
+        "en": "Can I rebuild the safe guard order from memory?",
+        "vi": "Tôi có thể dựng lại thứ tự guard an toàn từ trí nhớ không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {"en": "Which numeric test rejects values outside an inclusive range?", "vi": "Phép kiểm tra số nào từ chối giá trị ngoài khoảng tính cả hai đầu?"},
+          "answer": {"en": "candidate < minimum or candidate > maximum.", "vi": "candidate < minimum hoặc candidate > maximum."}
+        },
+        {
+          "prompt": {"en": "Why check duplicates before append?", "vi": "Vì sao kiểm tra trùng trước append?"},
+          "answer": {"en": "A duplicate must return without changing the accepted collection.", "vi": "Giá trị trùng phải return mà không làm thay đổi collection accepted."}
+        },
+        {
+          "prompt": {"en": "What happens after the first executed return?", "vi": "Điều gì xảy ra sau return đầu tiên được chạy?"},
+          "answer": {"en": "The function stops; later guards and append do not run.", "vi": "Function dừng; các guard sau và append không chạy."}
+        },
+        {
+          "prompt": {"en": "Where do check-digit weights and modulus come from?", "vi": "Weights và modulus của check digit đến từ đâu?"},
+          "answer": {"en": "From the specific question or task contract, not from a universal formula.", "vi": "Từ câu hỏi hoặc hợp đồng bài cụ thể, không phải một công thức dùng chung."}
+        },
+        {
+          "prompt": {"en": "What proves rejection caused no mutation?", "vi": "Điều gì chứng minh việc từ chối không gây mutation?"},
+          "answer": {"en": "The before and returned lists have the same values and order, and append was never reached.", "vi": "List trước và list trả về có cùng giá trị, thứ tự, và append không được chạy."}
+        }
+      ],
+      "exit_task": {
+        "en": "From memory, write the four guards and single append point, then trace one accepted endpoint and one duplicate without running code.",
+        "vi": "Từ trí nhớ, viết bốn guard và vị trí append duy nhất, sau đó trace một endpoint được chấp nhận và một giá trị trùng mà không chạy code."
+      },
+      "next_step": {
+        "en": "Continue to testing, where normal, boundary and invalid cases become a deliberate test plan.",
+        "vi": "Học tiếp testing, nơi các trường hợp normal, boundary và invalid trở thành test plan có chủ đích."
+      }
+    }
+  }
+}

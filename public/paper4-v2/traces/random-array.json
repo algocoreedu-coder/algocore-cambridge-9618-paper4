@@ -6,7 +6,7 @@
     "lesson_slug": "data-models",
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
     "artifact_version": "pilot-v1",
-    "code_sha256": "f0d82991ca3ca9660af2c3a87c46830edd746f1e8a5d062d46af309e6027dfa2"
+    "code_sha256": "92c4c190af04e900991dd7180129e18620d8b3743e9ac23d968219b46c6a17a4"
   },
   "python_artifact": {
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
@@ -26,238 +26,368 @@
         "text": "import json"
       },
       {
-        "line_id": "data-models.v1.L002",
+        "line_id": "data-models.v1.L048",
         "order": 2,
+        "text": "import random"
+      },
+      {
+        "line_id": "data-models.v1.L002",
+        "order": 3,
         "text": "import sys"
       },
       {
         "line_id": "data-models.v1.L003",
-        "order": 3,
-        "text": ""
-      },
-      {
-        "line_id": "data-models.v1.L004",
         "order": 4,
         "text": ""
       },
       {
-        "line_id": "data-models.v1.L005",
+        "line_id": "data-models.v1.L004",
         "order": 5,
+        "text": ""
+      },
+      {
+        "line_id": "data-models.v1.L005",
+        "order": 6,
         "text": "def valid_record(record):"
       },
       {
         "line_id": "data-models.v1.L006",
-        "order": 6,
+        "order": 7,
         "text": "    return ("
       },
       {
         "line_id": "data-models.v1.L007",
-        "order": 7,
+        "order": 8,
         "text": "        isinstance(record, dict)"
       },
       {
         "line_id": "data-models.v1.L008",
-        "order": 8,
+        "order": 9,
         "text": "        and isinstance(record.get(\"name\"), str)"
       },
       {
         "line_id": "data-models.v1.L009",
-        "order": 9,
+        "order": 10,
         "text": "        and record[\"name\"] != \"\""
       },
       {
-        "line_id": "data-models.v1.L010",
-        "order": 10,
-        "text": "        and isinstance(record.get(\"score\"), int)"
+        "line_id": "data-models.v1.L049",
+        "order": 11,
+        "text": "        and type(record.get(\"score\")) is int"
       },
       {
         "line_id": "data-models.v1.L011",
-        "order": 11,
+        "order": 12,
         "text": "    )"
       },
       {
         "line_id": "data-models.v1.L012",
-        "order": 12,
-        "text": ""
-      },
-      {
-        "line_id": "data-models.v1.L013",
         "order": 13,
         "text": ""
       },
       {
-        "line_id": "data-models.v1.L014",
+        "line_id": "data-models.v1.L013",
         "order": 14,
+        "text": ""
+      },
+      {
+        "line_id": "data-models.v1.L014",
+        "order": 15,
         "text": "def add_record(records, capacity, record, trace):"
       },
       {
         "line_id": "data-models.v1.L015",
-        "order": 15,
+        "order": 16,
         "text": "    trace.append({\"event\": \"check_record\", \"valid\": valid_record(record)})"
       },
       {
         "line_id": "data-models.v1.L016",
-        "order": 16,
+        "order": 17,
         "text": "    if not valid_record(record):"
       },
       {
         "line_id": "data-models.v1.L017",
-        "order": 17,
+        "order": 18,
         "text": "        return False, \"INVALID_RECORD\""
       },
       {
         "line_id": "data-models.v1.L018",
-        "order": 18,
+        "order": 19,
         "text": "    trace.append({\"event\": \"check_capacity\", \"count\": len(records), \"capacity\": capacity})"
       },
       {
         "line_id": "data-models.v1.L019",
-        "order": 19,
+        "order": 20,
         "text": "    if len(records) >= capacity:"
       },
       {
         "line_id": "data-models.v1.L020",
-        "order": 20,
+        "order": 21,
         "text": "        return False, \"FULL\""
       },
       {
         "line_id": "data-models.v1.L021",
-        "order": 21,
+        "order": 22,
         "text": "    records.append(record)"
       },
       {
         "line_id": "data-models.v1.L022",
-        "order": 22,
+        "order": 23,
         "text": "    trace.append({\"event\": \"append\", \"index\": len(records) - 1, \"record\": record})"
       },
       {
         "line_id": "data-models.v1.L023",
-        "order": 23,
+        "order": 24,
         "text": "    return True, \"ADDED\""
       },
       {
         "line_id": "data-models.v1.L024",
-        "order": 24,
-        "text": ""
-      },
-      {
-        "line_id": "data-models.v1.L025",
         "order": 25,
         "text": ""
       },
       {
-        "line_id": "data-models.v1.L026",
+        "line_id": "data-models.v1.L025",
         "order": 26,
-        "text": "def run(fixture):"
+        "text": ""
       },
       {
-        "line_id": "data-models.v1.L027",
+        "line_id": "data-models.v1.L050",
         "order": 27,
-        "text": "    records = [dict(record) for record in fixture[\"records\"]]"
+        "text": "def generate_random_array(count, lower, upper, seed, unique, trace):"
       },
       {
-        "line_id": "data-models.v1.L028",
+        "line_id": "data-models.v1.L051",
         "order": 28,
-        "text": "    trace = []"
+        "text": "    if count < 0 or lower > upper:"
       },
       {
-        "line_id": "data-models.v1.L029",
+        "line_id": "data-models.v1.L052",
         "order": 29,
-        "text": "    added, message = add_record(records, fixture[\"capacity\"], fixture[\"new_record\"], trace)"
+        "text": "        raise ValueError(\"invalid random array contract\")"
       },
       {
-        "line_id": "data-models.v1.L030",
+        "line_id": "data-models.v1.L053",
         "order": 30,
-        "text": "    random_values = fixture[\"random_values\"]"
+        "text": "    if unique and count > upper - lower + 1:"
       },
       {
-        "line_id": "data-models.v1.L031",
+        "line_id": "data-models.v1.L054",
         "order": 31,
-        "text": "    average = None"
+        "text": "        raise ValueError(\"random range is too small for unique values\")"
       },
       {
-        "line_id": "data-models.v1.L032",
+        "line_id": "data-models.v1.L055",
         "order": 32,
-        "text": "    if len(random_values) > 0:"
+        "text": "    generator = random.Random(seed)"
       },
       {
-        "line_id": "data-models.v1.L033",
+        "line_id": "data-models.v1.L056",
         "order": 33,
-        "text": "        average = sum(random_values) / len(random_values)"
+        "text": "    values = []"
       },
       {
-        "line_id": "data-models.v1.L034",
+        "line_id": "data-models.v1.L057",
         "order": 34,
-        "text": "    trace.append({\"event\": \"summarise_random_data\", \"count\": len(random_values), \"average\": average})"
+        "text": "    while len(values) < count:"
       },
       {
-        "line_id": "data-models.v1.L035",
+        "line_id": "data-models.v1.L058",
         "order": 35,
-        "text": "    return {"
+        "text": "        candidate = generator.randint(lower, upper)"
       },
       {
-        "line_id": "data-models.v1.L036",
+        "line_id": "data-models.v1.L059",
         "order": 36,
-        "text": "        \"status\": message,"
+        "text": "        accepted = not unique or candidate not in values"
       },
       {
-        "line_id": "data-models.v1.L037",
+        "line_id": "data-models.v1.L060",
         "order": 37,
-        "text": "        \"append_success\": added,"
+        "text": "        trace.append({\"event\": \"generate_random_value\", \"candidate\": candidate, \"accepted\": accepted})"
       },
       {
-        "line_id": "data-models.v1.L038",
+        "line_id": "data-models.v1.L061",
         "order": 38,
-        "text": "        \"records\": records,"
+        "text": "        if accepted:"
       },
       {
-        "line_id": "data-models.v1.L039",
+        "line_id": "data-models.v1.L062",
         "order": 39,
-        "text": "        \"random_average\": average,"
+        "text": "            values.append(candidate)"
       },
       {
-        "line_id": "data-models.v1.L040",
+        "line_id": "data-models.v1.L063",
         "order": 40,
-        "text": "        \"trace\": trace,"
+        "text": "    return values"
       },
       {
-        "line_id": "data-models.v1.L041",
+        "line_id": "data-models.v1.L064",
         "order": 41,
-        "text": "    }"
+        "text": ""
       },
       {
-        "line_id": "data-models.v1.L042",
+        "line_id": "data-models.v1.L065",
         "order": 42,
         "text": ""
       },
       {
-        "line_id": "data-models.v1.L043",
+        "line_id": "data-models.v1.L026",
         "order": 43,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "data-models.v1.L027",
+        "order": 44,
+        "text": "    records = [dict(record) for record in fixture[\"records\"]]"
+      },
+      {
+        "line_id": "data-models.v1.L028",
+        "order": 45,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "data-models.v1.L029",
+        "order": 46,
+        "text": "    added, message = add_record(records, fixture[\"capacity\"], fixture[\"new_record\"], trace)"
+      },
+      {
+        "line_id": "data-models.v1.L066",
+        "order": 47,
+        "text": "    random_contract = fixture[\"random_contract\"]"
+      },
+      {
+        "line_id": "data-models.v1.L067",
+        "order": 48,
+        "text": "    random_values = generate_random_array("
+      },
+      {
+        "line_id": "data-models.v1.L068",
+        "order": 49,
+        "text": "        random_contract[\"count\"],"
+      },
+      {
+        "line_id": "data-models.v1.L069",
+        "order": 50,
+        "text": "        random_contract[\"lower\"],"
+      },
+      {
+        "line_id": "data-models.v1.L070",
+        "order": 51,
+        "text": "        random_contract[\"upper\"],"
+      },
+      {
+        "line_id": "data-models.v1.L071",
+        "order": 52,
+        "text": "        random_contract[\"seed\"],"
+      },
+      {
+        "line_id": "data-models.v1.L072",
+        "order": 53,
+        "text": "        random_contract.get(\"unique\", False),"
+      },
+      {
+        "line_id": "data-models.v1.L073",
+        "order": 54,
+        "text": "        trace,"
+      },
+      {
+        "line_id": "data-models.v1.L074",
+        "order": 55,
+        "text": "    )"
+      },
+      {
+        "line_id": "data-models.v1.L031",
+        "order": 56,
+        "text": "    average = None"
+      },
+      {
+        "line_id": "data-models.v1.L032",
+        "order": 57,
+        "text": "    if len(random_values) > 0:"
+      },
+      {
+        "line_id": "data-models.v1.L033",
+        "order": 58,
+        "text": "        average = sum(random_values) / len(random_values)"
+      },
+      {
+        "line_id": "data-models.v1.L034",
+        "order": 59,
+        "text": "    trace.append({\"event\": \"summarise_random_data\", \"count\": len(random_values), \"average\": average})"
+      },
+      {
+        "line_id": "data-models.v1.L035",
+        "order": 60,
+        "text": "    return {"
+      },
+      {
+        "line_id": "data-models.v1.L036",
+        "order": 61,
+        "text": "        \"status\": message,"
+      },
+      {
+        "line_id": "data-models.v1.L037",
+        "order": 62,
+        "text": "        \"append_success\": added,"
+      },
+      {
+        "line_id": "data-models.v1.L038",
+        "order": 63,
+        "text": "        \"records\": records,"
+      },
+      {
+        "line_id": "data-models.v1.L075",
+        "order": 64,
+        "text": "        \"random_values\": random_values,"
+      },
+      {
+        "line_id": "data-models.v1.L039",
+        "order": 65,
+        "text": "        \"random_average\": average,"
+      },
+      {
+        "line_id": "data-models.v1.L040",
+        "order": 66,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "data-models.v1.L041",
+        "order": 67,
+        "text": "    }"
+      },
+      {
+        "line_id": "data-models.v1.L042",
+        "order": 68,
+        "text": ""
+      },
+      {
+        "line_id": "data-models.v1.L043",
+        "order": 69,
         "text": ""
       },
       {
         "line_id": "data-models.v1.L044",
-        "order": 44,
+        "order": 70,
         "text": "if __name__ == \"__main__\":"
       },
       {
         "line_id": "data-models.v1.L045",
-        "order": 45,
+        "order": 71,
         "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
       },
       {
         "line_id": "data-models.v1.L046",
-        "order": 46,
+        "order": 72,
         "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
       },
       {
         "line_id": "data-models.v1.L047",
-        "order": 47,
+        "order": 73,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "f0d82991ca3ca9660af2c3a87c46830edd746f1e8a5d062d46af309e6027dfa2",
+    "code_sha256": "92c4c190af04e900991dd7180129e18620d8b3743e9ac23d968219b46c6a17a4",
     "caption": {
       "vi": "Bản ghi có kiểm tra kiểu, mảng có sức chứa và dữ liệu ngẫu nhiên xác định.",
       "en": "Typed records, a capacity-bounded array and deterministic random data."
@@ -267,7 +397,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r2.a3.data-models.pilot-v1.author-run",
       "independent_rerun_ref": "p4r2.a3.data-models.pilot-v1.independent-rerun",
-      "execution_log_sha256": "ae2890a001f6dcd78ee0a07ff96df501361692519cb1839c4bf8b582095872a7"
+      "execution_log_sha256": "d1d5486efa7390f54731a9c2651ed194a788441ea1a91ac8c5d0c6385e2cb64c"
     }
   },
   "scenarios": [
@@ -285,7 +415,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [],
+          "random_contract": {
+            "count": 0,
+            "lower": 1,
+            "upper": 1,
+            "seed": 0,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -304,6 +440,7 @@
           ],
           "record_valid": null,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -326,11 +463,16 @@
         "fixture_input": {
           "capacity": 3,
           "new_record": {
-            "name": "Binh"
+            "name": "Binh",
+            "score": true
           },
-          "random_values": [
-            50
-          ],
+          "random_contract": {
+            "count": 1,
+            "lower": 50,
+            "upper": 50,
+            "seed": 0,
+            "unique": false
+          },
           "records": [
             {
               "name": "An",
@@ -349,12 +491,14 @@
           ],
           "record_valid": null,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
       "event_ids": [
         "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-001",
-        "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-002"
+        "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-002",
+        "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-003"
       ],
       "expected_output_ref": "data-models.failure.expected-output",
       "fixture_ref": "data-models.failure"
@@ -373,10 +517,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -395,6 +542,7 @@
           ],
           "record_valid": null,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -402,7 +550,11 @@
         "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-001",
         "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-002",
         "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-003",
-        "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-004"
+        "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-004",
+        "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-005",
+        "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-006",
+        "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-007",
+        "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-008"
       ],
       "expected_output_ref": "data-models.normal.expected-output",
       "fixture_ref": "data-models.normal"
@@ -415,13 +567,6 @@
       "sequence": 0,
       "event_type": "compare",
       "active_line_ids": [
-        "data-models.v1.L005",
-        "data-models.v1.L006",
-        "data-models.v1.L007",
-        "data-models.v1.L008",
-        "data-models.v1.L009",
-        "data-models.v1.L010",
-        "data-models.v1.L011",
         "data-models.v1.L015",
         "data-models.v1.L016"
       ],
@@ -433,7 +578,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [],
+          "random_contract": {
+            "count": 0,
+            "lower": 1,
+            "upper": 1,
+            "seed": 0,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -452,6 +603,7 @@
           ],
           "record_valid": null,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -470,7 +622,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [],
+          "random_contract": {
+            "count": 0,
+            "lower": 1,
+            "upper": 1,
+            "seed": 0,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -489,6 +647,7 @@
           ],
           "record_valid": true,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -547,8 +706,7 @@
       "event_type": "compare",
       "active_line_ids": [
         "data-models.v1.L018",
-        "data-models.v1.L019",
-        "data-models.v1.L020"
+        "data-models.v1.L019"
       ],
       "before": {
         "fixture_ref": "data-models.boundary",
@@ -558,7 +716,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [],
+          "random_contract": {
+            "count": 0,
+            "lower": 1,
+            "upper": 1,
+            "seed": 0,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -577,6 +741,7 @@
           ],
           "record_valid": true,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -596,7 +761,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [],
+          "random_contract": {
+            "count": 0,
+            "lower": 1,
+            "upper": 1,
+            "seed": 0,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -615,6 +786,7 @@
           ],
           "record_valid": true,
           "capacity_ok": false,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -673,7 +845,6 @@
       "sequence": 2,
       "event_type": "emit",
       "active_line_ids": [
-        "data-models.v1.L030",
         "data-models.v1.L031",
         "data-models.v1.L032",
         "data-models.v1.L033",
@@ -682,6 +853,7 @@
         "data-models.v1.L036",
         "data-models.v1.L037",
         "data-models.v1.L038",
+        "data-models.v1.L075",
         "data-models.v1.L039",
         "data-models.v1.L040"
       ],
@@ -693,7 +865,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [],
+          "random_contract": {
+            "count": 0,
+            "lower": 1,
+            "upper": 1,
+            "seed": 0,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -712,6 +890,7 @@
           ],
           "record_valid": true,
           "capacity_ok": false,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -731,7 +910,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [],
+          "random_contract": {
+            "count": 0,
+            "lower": 1,
+            "upper": 1,
+            "seed": 0,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -750,6 +935,7 @@
           ],
           "record_valid": true,
           "capacity_ok": false,
+          "random_values": [],
           "random_average": null,
           "status": "FULL"
         }
@@ -763,6 +949,7 @@
         "final_result": {
           "append_success": false,
           "random_average": null,
+          "random_values": [],
           "records": [
             {
               "name": "An",
@@ -820,27 +1007,24 @@
       "sequence": 0,
       "event_type": "compare",
       "active_line_ids": [
-        "data-models.v1.L005",
-        "data-models.v1.L006",
-        "data-models.v1.L007",
-        "data-models.v1.L008",
-        "data-models.v1.L009",
-        "data-models.v1.L010",
-        "data-models.v1.L011",
         "data-models.v1.L015",
-        "data-models.v1.L016",
-        "data-models.v1.L017"
+        "data-models.v1.L016"
       ],
       "before": {
         "fixture_ref": "data-models.failure",
         "fixture_input": {
           "capacity": 3,
           "new_record": {
-            "name": "Binh"
+            "name": "Binh",
+            "score": true
           },
-          "random_values": [
-            50
-          ],
+          "random_contract": {
+            "count": 1,
+            "lower": 50,
+            "upper": 50,
+            "seed": 0,
+            "unique": false
+          },
           "records": [
             {
               "name": "An",
@@ -859,6 +1043,7 @@
           ],
           "record_valid": null,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -874,11 +1059,16 @@
         "fixture_input": {
           "capacity": 3,
           "new_record": {
-            "name": "Binh"
+            "name": "Binh",
+            "score": true
           },
-          "random_values": [
-            50
-          ],
+          "random_contract": {
+            "count": 1,
+            "lower": 50,
+            "upper": 50,
+            "seed": 0,
+            "unique": false
+          },
           "records": [
             {
               "name": "An",
@@ -897,6 +1087,7 @@
           ],
           "record_valid": false,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -952,30 +1143,31 @@
       "event_id": "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-002",
       "trace_id": "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1",
       "sequence": 1,
-      "event_type": "emit",
+      "event_type": "write",
       "active_line_ids": [
-        "data-models.v1.L030",
-        "data-models.v1.L031",
-        "data-models.v1.L032",
-        "data-models.v1.L033",
-        "data-models.v1.L034",
-        "data-models.v1.L035",
-        "data-models.v1.L036",
-        "data-models.v1.L037",
-        "data-models.v1.L038",
-        "data-models.v1.L039",
-        "data-models.v1.L040"
+        "data-models.v1.L050",
+        "data-models.v1.L057",
+        "data-models.v1.L058",
+        "data-models.v1.L059",
+        "data-models.v1.L060",
+        "data-models.v1.L061",
+        "data-models.v1.L062"
       ],
       "before": {
         "fixture_ref": "data-models.failure",
         "fixture_input": {
           "capacity": 3,
           "new_record": {
-            "name": "Binh"
+            "name": "Binh",
+            "score": true
           },
-          "random_values": [
-            50
-          ],
+          "random_contract": {
+            "count": 1,
+            "lower": 50,
+            "upper": 50,
+            "seed": 0,
+            "unique": false
+          },
           "records": [
             {
               "name": "An",
@@ -994,6 +1186,160 @@
           ],
           "record_valid": false,
           "capacity_ok": null,
+          "random_values": [],
+          "random_average": null
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "accepted": true,
+          "candidate": 50,
+          "event": "generate_random_value"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "data-models.failure",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": true
+          },
+          "random_contract": {
+            "count": 1,
+            "lower": 50,
+            "upper": 50,
+            "seed": 0,
+            "unique": false
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 2,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ],
+          "record_valid": false,
+          "capacity_ok": null,
+          "random_values": [
+            50
+          ],
+          "random_average": null
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "accepted": true,
+          "candidate": 50,
+          "event": "generate_random_value"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Logical length khác physical capacity như thế nào trước và sau thao tác? RANDOM_ARRAY: sự kiện generate_random_value phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How does logical length differ from physical capacity before and after the operation? RANDOM_ARRAY: event generate_random_value must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+        "en": "Is the candidate in range and accepted?"
+      },
+      "feedback": {
+        "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+        "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+      },
+      "visual_targets": [
+        "visual.dsa.array-logical-capacity",
+        "visual.data-models.state",
+        "visual.data-models.generate_random_value"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: generate_random_value",
+          "en": "Step 2: generate_random_value"
+        },
+        "action_description": {
+          "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+          "en": "Is the candidate in range and accepted?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+            "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1",
+      "sequence": 2,
+      "event_type": "emit",
+      "active_line_ids": [
+        "data-models.v1.L031",
+        "data-models.v1.L032",
+        "data-models.v1.L033",
+        "data-models.v1.L034",
+        "data-models.v1.L035",
+        "data-models.v1.L036",
+        "data-models.v1.L037",
+        "data-models.v1.L038",
+        "data-models.v1.L075",
+        "data-models.v1.L039",
+        "data-models.v1.L040"
+      ],
+      "before": {
+        "fixture_ref": "data-models.failure",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": true
+          },
+          "random_contract": {
+            "count": 1,
+            "lower": 50,
+            "upper": 50,
+            "seed": 0,
+            "unique": false
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 2,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ],
+          "record_valid": false,
+          "capacity_ok": null,
+          "random_values": [
+            50
+          ],
           "random_average": null
         }
       },
@@ -1010,11 +1356,16 @@
         "fixture_input": {
           "capacity": 3,
           "new_record": {
-            "name": "Binh"
+            "name": "Binh",
+            "score": true
           },
-          "random_values": [
-            50
-          ],
+          "random_contract": {
+            "count": 1,
+            "lower": 50,
+            "upper": 50,
+            "seed": 0,
+            "unique": false
+          },
           "records": [
             {
               "name": "An",
@@ -1022,7 +1373,7 @@
             }
           ]
         },
-        "trace_cursor": 2,
+        "trace_cursor": 3,
         "last_event": "summarise_random_data",
         "domain": {
           "records": [
@@ -1033,6 +1384,9 @@
           ],
           "record_valid": false,
           "capacity_ok": null,
+          "random_values": [
+            50
+          ],
           "random_average": 50,
           "status": "INVALID_RECORD"
         }
@@ -1046,6 +1400,9 @@
         "final_result": {
           "append_success": false,
           "random_average": 50,
+          "random_values": [
+            50
+          ],
           "records": [
             {
               "name": "An",
@@ -1074,8 +1431,8 @@
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 2: summarise_random_data",
-          "en": "Step 2: summarise_random_data"
+          "vi": "Bước 3: summarise_random_data",
+          "en": "Step 3: summarise_random_data"
         },
         "action_description": {
           "vi": "Tập số ngẫu nhiên rỗng hay có giá trị trung bình?",
@@ -1086,8 +1443,8 @@
           "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
           "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
         },
-        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-002.focus",
-        "focus_order": 1,
+        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.failure.pilot-v1.event-003.focus",
+        "focus_order": 2,
         "live_status": {
           "mode": "polite",
           "message": {
@@ -1103,13 +1460,6 @@
       "sequence": 0,
       "event_type": "compare",
       "active_line_ids": [
-        "data-models.v1.L005",
-        "data-models.v1.L006",
-        "data-models.v1.L007",
-        "data-models.v1.L008",
-        "data-models.v1.L009",
-        "data-models.v1.L010",
-        "data-models.v1.L011",
         "data-models.v1.L015",
         "data-models.v1.L016"
       ],
@@ -1121,10 +1471,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1143,6 +1496,7 @@
           ],
           "record_valid": null,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -1161,10 +1515,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1183,6 +1540,7 @@
           ],
           "record_valid": true,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -1251,10 +1609,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1273,6 +1634,7 @@
           ],
           "record_valid": true,
           "capacity_ok": null,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -1292,10 +1654,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1314,6 +1679,7 @@
           ],
           "record_valid": true,
           "capacity_ok": true,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -1373,8 +1739,7 @@
       "event_type": "write",
       "active_line_ids": [
         "data-models.v1.L021",
-        "data-models.v1.L022",
-        "data-models.v1.L023"
+        "data-models.v1.L022"
       ],
       "before": {
         "fixture_ref": "data-models.normal",
@@ -1384,10 +1749,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1406,6 +1774,7 @@
           ],
           "record_valid": true,
           "capacity_ok": true,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -1428,10 +1797,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1454,6 +1826,7 @@
           ],
           "record_valid": true,
           "capacity_ok": true,
+          "random_values": [],
           "random_average": null
         }
       },
@@ -1513,19 +1886,15 @@
       "event_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-004",
       "trace_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1",
       "sequence": 3,
-      "event_type": "emit",
+      "event_type": "write",
       "active_line_ids": [
-        "data-models.v1.L030",
-        "data-models.v1.L031",
-        "data-models.v1.L032",
-        "data-models.v1.L033",
-        "data-models.v1.L034",
-        "data-models.v1.L035",
-        "data-models.v1.L036",
-        "data-models.v1.L037",
-        "data-models.v1.L038",
-        "data-models.v1.L039",
-        "data-models.v1.L040"
+        "data-models.v1.L050",
+        "data-models.v1.L057",
+        "data-models.v1.L058",
+        "data-models.v1.L059",
+        "data-models.v1.L060",
+        "data-models.v1.L061",
+        "data-models.v1.L062"
       ],
       "before": {
         "fixture_ref": "data-models.normal",
@@ -1535,10 +1904,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1561,13 +1933,658 @@
           ],
           "record_valid": true,
           "capacity_ok": true,
+          "random_values": [],
           "random_average": null
         }
       },
       "delta": {
         "execution_trace_event": {
-          "average": 77.5,
-          "count": 2,
+          "accepted": true,
+          "candidate": 75,
+          "event": "generate_random_value"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "data-models.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": 81
+          },
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 4,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            },
+            {
+              "name": "Binh",
+              "score": 81
+            }
+          ],
+          "record_valid": true,
+          "capacity_ok": true,
+          "random_values": [
+            75
+          ],
+          "random_average": null
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "accepted": true,
+          "candidate": 75,
+          "event": "generate_random_value"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Logical length khác physical capacity như thế nào trước và sau thao tác? RANDOM_ARRAY: sự kiện generate_random_value phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How does logical length differ from physical capacity before and after the operation? RANDOM_ARRAY: event generate_random_value must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+        "en": "Is the candidate in range and accepted?"
+      },
+      "feedback": {
+        "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+        "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+      },
+      "visual_targets": [
+        "visual.dsa.array-logical-capacity",
+        "visual.data-models.state",
+        "visual.data-models.generate_random_value"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: generate_random_value",
+          "en": "Step 4: generate_random_value"
+        },
+        "action_description": {
+          "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+          "en": "Is the candidate in range and accepted?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+            "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1",
+      "sequence": 4,
+      "event_type": "write",
+      "active_line_ids": [
+        "data-models.v1.L050",
+        "data-models.v1.L057",
+        "data-models.v1.L058",
+        "data-models.v1.L059",
+        "data-models.v1.L060",
+        "data-models.v1.L061",
+        "data-models.v1.L062"
+      ],
+      "before": {
+        "fixture_ref": "data-models.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": 81
+          },
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 4,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            },
+            {
+              "name": "Binh",
+              "score": 81
+            }
+          ],
+          "record_valid": true,
+          "capacity_ok": true,
+          "random_values": [
+            75
+          ],
+          "random_average": null
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "accepted": true,
+          "candidate": 69,
+          "event": "generate_random_value"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "data-models.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": 81
+          },
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 5,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            },
+            {
+              "name": "Binh",
+              "score": 81
+            }
+          ],
+          "record_valid": true,
+          "capacity_ok": true,
+          "random_values": [
+            75,
+            69
+          ],
+          "random_average": null
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "accepted": true,
+          "candidate": 69,
+          "event": "generate_random_value"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Logical length khác physical capacity như thế nào trước và sau thao tác? RANDOM_ARRAY: sự kiện generate_random_value phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How does logical length differ from physical capacity before and after the operation? RANDOM_ARRAY: event generate_random_value must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+        "en": "Is the candidate in range and accepted?"
+      },
+      "feedback": {
+        "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+        "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+      },
+      "visual_targets": [
+        "visual.dsa.array-logical-capacity",
+        "visual.data-models.state",
+        "visual.data-models.generate_random_value"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: generate_random_value",
+          "en": "Step 5: generate_random_value"
+        },
+        "action_description": {
+          "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+          "en": "Is the candidate in range and accepted?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+            "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-006",
+      "trace_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1",
+      "sequence": 5,
+      "event_type": "write",
+      "active_line_ids": [
+        "data-models.v1.L050",
+        "data-models.v1.L057",
+        "data-models.v1.L058",
+        "data-models.v1.L059",
+        "data-models.v1.L060",
+        "data-models.v1.L061",
+        "data-models.v1.L062"
+      ],
+      "before": {
+        "fixture_ref": "data-models.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": 81
+          },
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 5,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            },
+            {
+              "name": "Binh",
+              "score": 81
+            }
+          ],
+          "record_valid": true,
+          "capacity_ok": true,
+          "random_values": [
+            75,
+            69
+          ],
+          "random_average": null
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "accepted": true,
+          "candidate": 77,
+          "event": "generate_random_value"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "data-models.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": 81
+          },
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 6,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            },
+            {
+              "name": "Binh",
+              "score": 81
+            }
+          ],
+          "record_valid": true,
+          "capacity_ok": true,
+          "random_values": [
+            75,
+            69,
+            77
+          ],
+          "random_average": null
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "accepted": true,
+          "candidate": 77,
+          "event": "generate_random_value"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Logical length khác physical capacity như thế nào trước và sau thao tác? RANDOM_ARRAY: sự kiện generate_random_value phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How does logical length differ from physical capacity before and after the operation? RANDOM_ARRAY: event generate_random_value must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+        "en": "Is the candidate in range and accepted?"
+      },
+      "feedback": {
+        "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+        "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+      },
+      "visual_targets": [
+        "visual.dsa.array-logical-capacity",
+        "visual.data-models.state",
+        "visual.data-models.generate_random_value"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 6: generate_random_value",
+          "en": "Step 6: generate_random_value"
+        },
+        "action_description": {
+          "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+          "en": "Is the candidate in range and accepted?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-006.focus",
+        "focus_order": 5,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+            "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-007",
+      "trace_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1",
+      "sequence": 6,
+      "event_type": "write",
+      "active_line_ids": [
+        "data-models.v1.L050",
+        "data-models.v1.L057",
+        "data-models.v1.L058",
+        "data-models.v1.L059",
+        "data-models.v1.L060",
+        "data-models.v1.L061",
+        "data-models.v1.L062"
+      ],
+      "before": {
+        "fixture_ref": "data-models.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": 81
+          },
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 6,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            },
+            {
+              "name": "Binh",
+              "score": 81
+            }
+          ],
+          "record_valid": true,
+          "capacity_ok": true,
+          "random_values": [
+            75,
+            69,
+            77
+          ],
+          "random_average": null
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "accepted": true,
+          "candidate": 85,
+          "event": "generate_random_value"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "data-models.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": 81
+          },
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 7,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            },
+            {
+              "name": "Binh",
+              "score": 81
+            }
+          ],
+          "record_valid": true,
+          "capacity_ok": true,
+          "random_values": [
+            75,
+            69,
+            77,
+            85
+          ],
+          "random_average": null
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "accepted": true,
+          "candidate": 85,
+          "event": "generate_random_value"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "Logical length khác physical capacity như thế nào trước và sau thao tác? RANDOM_ARRAY: sự kiện generate_random_value phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How does logical length differ from physical capacity before and after the operation? RANDOM_ARRAY: event generate_random_value must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+        "en": "Is the candidate in range and accepted?"
+      },
+      "feedback": {
+        "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+        "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+      },
+      "visual_targets": [
+        "visual.dsa.array-logical-capacity",
+        "visual.data-models.state",
+        "visual.data-models.generate_random_value"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 7: generate_random_value",
+          "en": "Step 7: generate_random_value"
+        },
+        "action_description": {
+          "vi": "Candidate nằm trong miền và có được chấp nhận không?",
+          "en": "Is the candidate in range and accepted?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-007.focus",
+        "focus_order": 6,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.",
+            "en": "A candidate is committed only when it satisfies the range and uniqueness contract."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-008",
+      "trace_id": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1",
+      "sequence": 7,
+      "event_type": "emit",
+      "active_line_ids": [
+        "data-models.v1.L031",
+        "data-models.v1.L032",
+        "data-models.v1.L033",
+        "data-models.v1.L034",
+        "data-models.v1.L035",
+        "data-models.v1.L036",
+        "data-models.v1.L037",
+        "data-models.v1.L038",
+        "data-models.v1.L075",
+        "data-models.v1.L039",
+        "data-models.v1.L040"
+      ],
+      "before": {
+        "fixture_ref": "data-models.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "new_record": {
+            "name": "Binh",
+            "score": 81
+          },
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            }
+          ]
+        },
+        "trace_cursor": 7,
+        "last_event": "generate_random_value",
+        "domain": {
+          "records": [
+            {
+              "name": "An",
+              "score": 72
+            },
+            {
+              "name": "Binh",
+              "score": 81
+            }
+          ],
+          "record_valid": true,
+          "capacity_ok": true,
+          "random_values": [
+            75,
+            69,
+            77,
+            85
+          ],
+          "random_average": null
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "average": 76.5,
+          "count": 4,
           "event": "summarise_random_data"
         },
         "pattern_focus": true
@@ -1580,10 +2597,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1591,7 +2611,7 @@
             }
           ]
         },
-        "trace_cursor": 4,
+        "trace_cursor": 8,
         "last_event": "summarise_random_data",
         "domain": {
           "records": [
@@ -1606,19 +2626,31 @@
           ],
           "record_valid": true,
           "capacity_ok": true,
-          "random_average": 77.5,
+          "random_values": [
+            75,
+            69,
+            77,
+            85
+          ],
+          "random_average": 76.5,
           "status": "ADDED"
         }
       },
       "output_delta": {
         "emitted_trace_event": {
-          "average": 77.5,
-          "count": 2,
+          "average": 76.5,
+          "count": 4,
           "event": "summarise_random_data"
         },
         "final_result": {
           "append_success": true,
-          "random_average": 77.5,
+          "random_average": 76.5,
+          "random_values": [
+            75,
+            69,
+            77,
+            85
+          ],
           "records": [
             {
               "name": "An",
@@ -1651,8 +2683,8 @@
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 4: summarise_random_data",
-          "en": "Step 4: summarise_random_data"
+          "vi": "Bước 8: summarise_random_data",
+          "en": "Step 8: summarise_random_data"
         },
         "action_description": {
           "vi": "Tập số ngẫu nhiên rỗng hay có giá trị trung bình?",
@@ -1663,8 +2695,8 @@
           "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
           "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
         },
-        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-004.focus",
-        "focus_order": 3,
+        "focus_target": "ac-9618-p4-2026-python.trace.data-models.random-array.normal.pilot-v1.event-008.focus",
+        "focus_order": 7,
         "live_status": {
           "mode": "polite",
           "message": {

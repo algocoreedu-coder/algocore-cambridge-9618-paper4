@@ -6,7 +6,7 @@
     "lesson_slug": "exam-workflow",
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.exam-workflow.production-v1",
     "artifact_version": "production-v1",
-    "code_sha256": "c1d8aacf9e6c8de677cde79c8a0c4689a855ccda874c39a6994244656cf35f39"
+    "code_sha256": "254844df1860ad580af50a66d161c466c10f0a3da6b9ea4a244434489333c11c"
   },
   "python_artifact": {
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.exam-workflow.production-v1",
@@ -87,111 +87,126 @@
       {
         "line_id": "exam-workflow.production-v1.L014",
         "order": 14,
-        "text": "    try:"
+        "text": "    stage = \"load\""
       },
       {
         "line_id": "exam-workflow.production-v1.L015",
         "order": 15,
-        "text": "        rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})"
+        "text": "    try:"
       },
       {
         "line_id": "exam-workflow.production-v1.L016",
         "order": 16,
-        "text": "        validate(rows); trace.append({\"event\": \"validate\"}); evidence.append({\"requirement\": \"validate\", \"passed\": True})"
+        "text": "        rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})"
       },
       {
         "line_id": "exam-workflow.production-v1.L017",
         "order": 17,
-        "text": "        selected = process(rows, fixture[\"minimum\"]); trace.append({\"event\": \"process\", \"count\": len(selected)}); evidence.append({\"requirement\": \"process\", \"passed\": True})"
+        "text": "        stage = \"validate\""
       },
       {
         "line_id": "exam-workflow.production-v1.L018",
         "order": 18,
-        "text": "        output = format_output(selected); trace.append({\"event\": \"format\", \"output\": output}); evidence.append({\"requirement\": \"format\", \"passed\": True})"
+        "text": "        validate(rows); trace.append({\"event\": \"validate\"}); evidence.append({\"requirement\": \"validate\", \"passed\": True})"
       },
       {
         "line_id": "exam-workflow.production-v1.L019",
         "order": 19,
-        "text": "        return {\"status\": \"OK\", \"output\": output, \"selected\": selected, \"evidence\": evidence, \"first_failed_stage\": None, \"trace\": trace}"
+        "text": "        stage = \"process\""
       },
       {
         "line_id": "exam-workflow.production-v1.L020",
         "order": 20,
-        "text": "    except (KeyError, TypeError, ValueError) as error:"
+        "text": "        selected = process(rows, fixture[\"minimum\"]); trace.append({\"event\": \"process\", \"count\": len(selected)}); evidence.append({\"requirement\": \"process\", \"passed\": True})"
       },
       {
         "line_id": "exam-workflow.production-v1.L021",
         "order": 21,
-        "text": "        failed = \"load\" if not trace else \"validate\""
+        "text": "        stage = \"format\""
       },
       {
         "line_id": "exam-workflow.production-v1.L022",
         "order": 22,
-        "text": "        evidence.append({\"requirement\": failed, \"passed\": False, \"actual\": str(error)})"
+        "text": "        output = format_output(selected); trace.append({\"event\": \"format\", \"output\": output}); evidence.append({\"requirement\": \"format\", \"passed\": True})"
       },
       {
         "line_id": "exam-workflow.production-v1.L023",
         "order": 23,
-        "text": "        trace.append({\"event\": \"block_downstream\", \"failed\": failed})"
+        "text": "        return {\"status\": \"OK\", \"output\": output, \"selected\": selected, \"evidence\": evidence, \"first_failed_stage\": None, \"trace\": trace}"
       },
       {
         "line_id": "exam-workflow.production-v1.L024",
         "order": 24,
-        "text": "        return {\"status\": \"FAILED\", \"output\": \"\", \"selected\": [], \"evidence\": evidence, \"first_failed_stage\": failed, \"trace\": trace}"
+        "text": "    except (KeyError, TypeError, ValueError) as error:"
       },
       {
         "line_id": "exam-workflow.production-v1.L025",
         "order": 25,
-        "text": ""
+        "text": "        evidence.append({\"requirement\": stage, \"passed\": False, \"actual\": str(error)})"
       },
       {
         "line_id": "exam-workflow.production-v1.L026",
         "order": 26,
-        "text": "if __name__ == \"__main__\":"
+        "text": "        trace.append({\"event\": \"block_downstream\", \"failed\": stage})"
       },
       {
         "line_id": "exam-workflow.production-v1.L027",
         "order": 27,
-        "text": "    import json"
+        "text": "        return {\"status\": \"FAILED\", \"output\": \"\", \"selected\": [], \"evidence\": evidence, \"first_failed_stage\": stage, \"trace\": trace}"
       },
       {
         "line_id": "exam-workflow.production-v1.L028",
         "order": 28,
-        "text": "    import sys"
+        "text": ""
       },
       {
         "line_id": "exam-workflow.production-v1.L029",
         "order": 29,
-        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+        "text": "if __name__ == \"__main__\":"
       },
       {
         "line_id": "exam-workflow.production-v1.L030",
         "order": 30,
-        "text": "    result = run(fixture)"
+        "text": "    import json"
       },
       {
         "line_id": "exam-workflow.production-v1.L031",
         "order": 31,
-        "text": "    if not result[\"trace\"]:"
+        "text": "    import sys"
       },
       {
         "line_id": "exam-workflow.production-v1.L032",
         "order": 32,
-        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
       },
       {
         "line_id": "exam-workflow.production-v1.L033",
         "order": 33,
-        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+        "text": "    result = run(fixture)"
       },
       {
         "line_id": "exam-workflow.production-v1.L034",
         "order": 34,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "exam-workflow.production-v1.L035",
+        "order": 35,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "exam-workflow.production-v1.L036",
+        "order": 36,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "exam-workflow.production-v1.L037",
+        "order": 37,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "c1d8aacf9e6c8de677cde79c8a0c4689a855ccda874c39a6994244656cf35f39",
+    "code_sha256": "254844df1860ad580af50a66d161c466c10f0a3da6b9ea4a244434489333c11c",
     "caption": {
       "en": "An exam workflow from load through evidence-backed formatting.",
       "vi": "Luồng load, validate, process, format và bằng chứng thi."
@@ -201,7 +216,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r3.a3.exam-workflow.production-v1.author-run",
       "independent_rerun_ref": "p4r3.a3.exam-workflow.production-v1.independent-rerun",
-      "execution_log_sha256": "b06d7b9b552cad48e9b738995c6ed97332cf7432ab5477c0616947f97ca697a0"
+      "execution_log_sha256": "5c645864ecc9d80e62fc253b16775b2ad29ccb35747a0146687ab58d47c6def7"
     }
   },
   "scenarios": [
@@ -240,11 +255,10 @@
       "initial_state": {
         "fixture_ref": "exam-workflow.failure",
         "fixture_input": {
-          "minimum": 60,
           "rows": [
             {
-              "name": "Bad",
-              "score": 101
+              "name": "Ada",
+              "score": 90
             }
           ]
         },
@@ -255,7 +269,8 @@
       },
       "event_ids": [
         "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-001",
-        "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-002"
+        "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-002",
+        "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-003"
       ],
       "expected_output_ref": "exam-workflow.failure.expected-output",
       "fixture_ref": "exam-workflow.failure"
@@ -303,8 +318,8 @@
       "sequence": 0,
       "event_type": "read",
       "active_line_ids": [
-        "exam-workflow.production-v1.L015",
-        "exam-workflow.production-v1.L021",
+        "exam-workflow.production-v1.L016",
+        "exam-workflow.production-v1.L014",
         "exam-workflow.production-v1.L003"
       ],
       "before": {
@@ -394,8 +409,8 @@
       "sequence": 1,
       "event_type": "compare",
       "active_line_ids": [
-        "exam-workflow.production-v1.L016",
-        "exam-workflow.production-v1.L021",
+        "exam-workflow.production-v1.L018",
+        "exam-workflow.production-v1.L017",
         "exam-workflow.production-v1.L006"
       ],
       "before": {
@@ -491,9 +506,9 @@
       "sequence": 2,
       "event_type": "branch",
       "active_line_ids": [
-        "exam-workflow.production-v1.L017",
-        "exam-workflow.production-v1.L009",
-        "exam-workflow.production-v1.L015"
+        "exam-workflow.production-v1.L020",
+        "exam-workflow.production-v1.L019",
+        "exam-workflow.production-v1.L009"
       ],
       "before": {
         "fixture_ref": "exam-workflow.boundary",
@@ -597,10 +612,10 @@
       "sequence": 3,
       "event_type": "emit",
       "active_line_ids": [
-        "exam-workflow.production-v1.L018",
+        "exam-workflow.production-v1.L022",
+        "exam-workflow.production-v1.L021",
         "exam-workflow.production-v1.L010",
-        "exam-workflow.production-v1.L015",
-        "exam-workflow.production-v1.L024"
+        "exam-workflow.production-v1.L027"
       ],
       "before": {
         "fixture_ref": "exam-workflow.boundary",
@@ -760,18 +775,17 @@
       "sequence": 0,
       "event_type": "read",
       "active_line_ids": [
-        "exam-workflow.production-v1.L015",
-        "exam-workflow.production-v1.L021",
+        "exam-workflow.production-v1.L016",
+        "exam-workflow.production-v1.L014",
         "exam-workflow.production-v1.L003"
       ],
       "before": {
         "fixture_ref": "exam-workflow.failure",
         "fixture_input": {
-          "minimum": 60,
           "rows": [
             {
-              "name": "Bad",
-              "score": 101
+              "name": "Ada",
+              "score": 90
             }
           ]
         },
@@ -790,11 +804,10 @@
       "after": {
         "fixture_ref": "exam-workflow.failure",
         "fixture_input": {
-          "minimum": 60,
           "rows": [
             {
-              "name": "Bad",
-              "score": 101
+              "name": "Ada",
+              "score": 90
             }
           ]
         },
@@ -859,21 +872,19 @@
       "event_id": "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-002",
       "trace_id": "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1",
       "sequence": 1,
-      "event_type": "reject",
+      "event_type": "compare",
       "active_line_ids": [
-        "exam-workflow.production-v1.L023",
-        "exam-workflow.production-v1.L015",
-        "exam-workflow.production-v1.L016",
-        "exam-workflow.production-v1.L024"
+        "exam-workflow.production-v1.L018",
+        "exam-workflow.production-v1.L017",
+        "exam-workflow.production-v1.L006"
       ],
       "before": {
         "fixture_ref": "exam-workflow.failure",
         "fixture_input": {
-          "minimum": 60,
           "rows": [
             {
-              "name": "Bad",
-              "score": 101
+              "name": "Ada",
+              "score": 90
             }
           ]
         },
@@ -889,19 +900,17 @@
       },
       "delta": {
         "execution_trace_event": {
-          "event": "block_downstream",
-          "failed": "validate"
+          "event": "validate"
         },
         "pattern_focus": true
       },
       "after": {
         "fixture_ref": "exam-workflow.failure",
         "fixture_input": {
-          "minimum": 60,
           "rows": [
             {
-              "name": "Bad",
-              "score": 101
+              "name": "Ada",
+              "score": 90
             }
           ]
         },
@@ -912,8 +921,121 @@
             "event": "load"
           },
           {
+            "event": "validate"
+          }
+        ],
+        "latest_event": "validate",
+        "execution_status": "FAILED"
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "validate"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "OUTPUT_FORMAT: sự kiện validate phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "OUTPUT_FORMAT: event validate must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Kết quả so sánh sẽ chọn nhánh nào? (validate)",
+        "en": "Which branch will the comparison select? (validate)"
+      },
+      "feedback": {
+        "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: validate.",
+        "en": "The comparison uses the exact operands and independently rerun result. Event: validate."
+      },
+      "visual_targets": [
+        "visual.output-format.state",
+        "visual.output-format.validate"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 2: validate",
+          "en": "Step 2: validate"
+        },
+        "action_description": {
+          "vi": "Kết quả so sánh sẽ chọn nhánh nào? (validate)",
+          "en": "Which branch will the comparison select? (validate)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-002.focus",
+        "focus_order": 1,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "So sánh dùng đúng toán hạng và kết quả đã được chạy lại. Sự kiện: validate.",
+            "en": "The comparison uses the exact operands and independently rerun result. Event: validate."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-003",
+      "trace_id": "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1",
+      "sequence": 2,
+      "event_type": "reject",
+      "active_line_ids": [
+        "exam-workflow.production-v1.L026",
+        "exam-workflow.production-v1.L016",
+        "exam-workflow.production-v1.L018",
+        "exam-workflow.production-v1.L027"
+      ],
+      "before": {
+        "fixture_ref": "exam-workflow.failure",
+        "fixture_input": {
+          "rows": [
+            {
+              "name": "Ada",
+              "score": 90
+            }
+          ]
+        },
+        "trace_cursor": 2,
+        "history": [
+          {
+            "count": 1,
+            "event": "load"
+          },
+          {
+            "event": "validate"
+          }
+        ],
+        "latest_event": "validate",
+        "execution_status": "FAILED"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "block_downstream",
+          "failed": "process"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "exam-workflow.failure",
+        "fixture_input": {
+          "rows": [
+            {
+              "name": "Ada",
+              "score": 90
+            }
+          ]
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "count": 1,
+            "event": "load"
+          },
+          {
+            "event": "validate"
+          },
+          {
             "event": "block_downstream",
-            "failed": "validate"
+            "failed": "process"
           }
         ],
         "latest_event": "block_downstream",
@@ -925,12 +1047,16 @@
               "requirement": "load"
             },
             {
-              "actual": "invalid row",
-              "passed": false,
+              "passed": true,
               "requirement": "validate"
+            },
+            {
+              "actual": "'minimum'",
+              "passed": false,
+              "requirement": "process"
             }
           ],
-          "first_failed_stage": "validate",
+          "first_failed_stage": "process",
           "output": "",
           "selected": [],
           "status": "FAILED"
@@ -939,7 +1065,7 @@
       "output_delta": {
         "emitted_trace_event": {
           "event": "block_downstream",
-          "failed": "validate"
+          "failed": "process"
         },
         "final_result": {
           "evidence": [
@@ -948,12 +1074,16 @@
               "requirement": "load"
             },
             {
-              "actual": "invalid row",
-              "passed": false,
+              "passed": true,
               "requirement": "validate"
+            },
+            {
+              "actual": "'minimum'",
+              "passed": false,
+              "requirement": "process"
             }
           ],
-          "first_failed_stage": "validate",
+          "first_failed_stage": "process",
           "output": "",
           "selected": [],
           "status": "FAILED"
@@ -977,8 +1107,8 @@
       ],
       "accessibility": {
         "accessible_label": {
-          "vi": "Bước 2: block_downstream",
-          "en": "Step 2: block_downstream"
+          "vi": "Bước 3: block_downstream",
+          "en": "Step 3: block_downstream"
         },
         "action_description": {
           "vi": "Điều kiện nào khiến dữ liệu bị từ chối? (block downstream)",
@@ -989,8 +1119,8 @@
           "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
           "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
         },
-        "focus_target": "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-002.focus",
-        "focus_order": 1,
+        "focus_target": "ac-9618-p4-2026-python.trace.exam-workflow.output-format.failure.production-v1.event-003.focus",
+        "focus_order": 2,
         "live_status": {
           "mode": "assertive",
           "message": {
@@ -1006,8 +1136,8 @@
       "sequence": 0,
       "event_type": "read",
       "active_line_ids": [
-        "exam-workflow.production-v1.L015",
-        "exam-workflow.production-v1.L021",
+        "exam-workflow.production-v1.L016",
+        "exam-workflow.production-v1.L014",
         "exam-workflow.production-v1.L003"
       ],
       "before": {
@@ -1115,8 +1245,8 @@
       "sequence": 1,
       "event_type": "compare",
       "active_line_ids": [
-        "exam-workflow.production-v1.L016",
-        "exam-workflow.production-v1.L021",
+        "exam-workflow.production-v1.L018",
+        "exam-workflow.production-v1.L017",
         "exam-workflow.production-v1.L006"
       ],
       "before": {
@@ -1230,9 +1360,9 @@
       "sequence": 2,
       "event_type": "branch",
       "active_line_ids": [
-        "exam-workflow.production-v1.L017",
-        "exam-workflow.production-v1.L009",
-        "exam-workflow.production-v1.L015"
+        "exam-workflow.production-v1.L020",
+        "exam-workflow.production-v1.L019",
+        "exam-workflow.production-v1.L009"
       ],
       "before": {
         "fixture_ref": "exam-workflow.normal",
@@ -1354,10 +1484,10 @@
       "sequence": 3,
       "event_type": "emit",
       "active_line_ids": [
-        "exam-workflow.production-v1.L018",
+        "exam-workflow.production-v1.L022",
+        "exam-workflow.production-v1.L021",
         "exam-workflow.production-v1.L010",
-        "exam-workflow.production-v1.L015",
-        "exam-workflow.production-v1.L024"
+        "exam-workflow.production-v1.L027"
       ],
       "before": {
         "fixture_ref": "exam-workflow.normal",

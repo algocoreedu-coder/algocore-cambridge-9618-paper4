@@ -1542,8 +1542,8 @@
         "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility. Every summary scans only the logical region; unused cells in the physical capacity are not generated data."
       },
       "python_connection": {
-        "vi": "Pilot không gọi bộ sinh ngẫu nhiên; nó nhận `random_values` đã cố định ở L030 rồi tính trung bình tại L032–L034. Vì vậy các line chứng minh bước xử lý dữ liệu, không chứng minh API/range sinh số.",
-        "en": "The pilot does not call a random generator; it receives fixed `random_values` at L030 and calculates an average at L032-L034. These lines therefore evidence data processing, not a generator API or its range."
+        "vi": "`generate_random_array` dùng `randint(lower, upper)` với seed cố định cho fixture. Vòng lặp chỉ tăng số phần tử khi candidate được chấp nhận, nên có thể kiểm tra cả hai biên và tính duy nhất mà vẫn chạy lại được đúng kết quả.",
+        "en": "`generate_random_array` uses `randint(lower, upper)` with a fixed fixture seed. The loop advances only when a candidate is accepted, so both inclusive bounds and uniqueness can be tested reproducibly."
       },
       "representation": {
         "vi": "Ghi miền bằng ký hiệu rõ như `[low, high]` và mảng kết quả theo thứ tự sinh. Tách cấu hình sinh khỏi thao tác tổng hợp.",
@@ -1575,37 +1575,37 @@
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture `[2, 4, 6]` đại diện ba giá trị đã sinh.",
-          "en": "Fixture `[2, 4, 6]` represents three generated values."
+          "vi": "Cần sinh 4 integer duy nhất trong miền bao gồm hai đầu `[65, 90]`.",
+          "en": "Generate 4 unique integers in the inclusive domain `[65, 90]`."
         },
         "walkthrough": {
-          "vi": "L032 xác nhận list không rỗng rồi L033 tính trung bình 4.0; list rỗng giữ `average=None`.",
-          "en": "L032 confirms the list is non-empty, then L033 computes 4.0; an empty list keeps `average=None`."
+          "vi": "L058 sinh candidate; L062 chỉ thêm candidate chưa xuất hiện. Fixture seed 7 tạo `[75, 69, 77, 85]` để trace có thể chạy lại chính xác.",
+          "en": "L058 generates a candidate; L062 adds only a candidate not already used. Fixture seed 7 produces `[75, 69, 77, 85]` so the trace is exactly reproducible."
         },
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
         "python_artifact_refs": [
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1"
         ],
         "active_line_ids": [
-          "data-models.v1.L030",
-          "data-models.v1.L032",
-          "data-models.v1.L033",
-          "data-models.v1.L034"
+          "data-models.v1.L050",
+          "data-models.v1.L058",
+          "data-models.v1.L062",
+          "data-models.v1.L067"
         ],
         "authority": "AlgoCore_authored_teaching_example"
       },
       "self_check": {
         "prompt": {
-          "vi": "Vì sao artifact này chưa xác nhận quy tắc cận của hàm random?",
-          "en": "Why does this artifact not establish the endpoint rules of a random function?"
+          "vi": "Điều gì bảo vệ cả miền giá trị và tính duy nhất?",
+          "en": "What protects both the value range and uniqueness?"
         },
         "answer": {
-          "vi": "Vì nó nhận dữ liệu từ fixture và không gọi hàm sinh ngẫu nhiên.",
-          "en": "Because it receives fixture data and never calls a random generator."
+          "vi": "`randint(lower, upper)` dùng miền bao gồm hai đầu; candidate chỉ được commit khi chưa có trong mảng nếu `unique=True`.",
+          "en": "`randint(lower, upper)` uses an inclusive domain; a candidate is committed only when absent from the array if `unique=True`."
         },
         "rationale": {
-          "vi": "Quy tắc API phải đến từ yêu cầu/đặc tả Python tương ứng.",
-          "en": "API rules must come from the applicable task or Python specification."
+          "vi": "Số phần tử chỉ tăng sau một lần commit, vì vậy candidate trùng không làm mảng bị thiếu vị trí.",
+          "en": "The item count advances only after a commit, so a duplicate candidate does not leave a missing position."
         },
         "answer_hidden_initially": true,
         "authority": "AlgoCore_authored_self_check"
@@ -1676,8 +1676,8 @@
         "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism. One record occupies one logical slot; adding a field to a record does not increase the logical count of the containing array."
       },
       "python_connection": {
-        "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng và `score: int`; L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
-        "en": "L005-L011 verify that a record is a dict with a non-empty `name: str` and `score: int`; L021 inserts the whole record as one unit. These lines illustrate field structure, not evidence for a task-specific class requirement."
+        "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng; L049 yêu cầu `score` đúng kiểu integer và L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
+        "en": "L005-L011 verify that a record is a dict with a non-empty `name: str`; L049 requires an exact integer `score`, and L021 inserts the whole record as one unit. These lines illustrate field structure, not evidence for a task-specific class requirement."
       },
       "representation": {
         "vi": "Vẽ record như một hộp có các trường được đặt tên, ví dụ `{name: str, score: int}`. Truy cập bằng tên trường thay vì vị trí mơ hồ.",
@@ -1722,7 +1722,7 @@
         ],
         "active_line_ids": [
           "data-models.v1.L005",
-          "data-models.v1.L010",
+          "data-models.v1.L049",
           "data-models.v1.L021"
         ],
         "authority": "AlgoCore_authored_teaching_example"
@@ -1859,8 +1859,8 @@
         "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data. In the task's array model, capacity and logical count are different variables; both must be declared and initialised before deriving the valid-index interval."
       },
       "python_connection": {
-        "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L010 kiểm tra `score` thật sự là `int` trước khi dùng.",
-        "en": "In the data-models artifact, `records`, `capacity`, and `trace` are local parameters at L014; `added` and `message` at L029 exist only inside `run`. L010 checks that `score` is actually an `int` before use."
+        "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L049 dùng kiểm tra kiểu chính xác để loại `bool`, vì Python coi Boolean là một lớp con của integer.",
+        "en": "In the data-models artifact, `records`, `capacity`, and `trace` are local parameters at L014; `added` and `message` at L029 exist only inside `run`. L049 uses an exact type check to reject `bool`, because Python treats Boolean as a subclass of integer."
       },
       "representation": {
         "vi": "Theo dõi mỗi tên bằng ba thuộc tính: kiểu dự kiến, giá trị hiện tại và phạm vi. Ví dụ `capacity: int`, `added: bool`, `message: str`.",
@@ -1904,7 +1904,7 @@
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1"
         ],
         "active_line_ids": [
-          "data-models.v1.L010",
+          "data-models.v1.L049",
           "data-models.v1.L014",
           "data-models.v1.L029"
         ],
@@ -1912,12 +1912,12 @@
       },
       "self_check": {
         "prompt": {
-          "vi": "Vì sao L010 kiểm tra `int` trước khi chèn record?",
-          "en": "Why does L010 check for `int` before inserting the record?"
+          "vi": "Vì sao L049 dùng `type(score) is int` thay vì `isinstance(score, int)`?",
+          "en": "Why does L049 use `type(score) is int` instead of `isinstance(score, int)`?"
         },
         "answer": {
-          "vi": "Để bảo vệ hợp đồng kiểu của trường `score` và ngăn dữ liệu sai đi vào cấu trúc.",
-          "en": "To protect the type contract of `score` and prevent invalid data entering the structure."
+          "vi": "Để bảo vệ hợp đồng integer và không nhận `True` hoặc `False` như điểm số.",
+          "en": "To protect the integer contract and avoid accepting `True` or `False` as a score."
         },
         "rationale": {
           "vi": "Nếu bỏ kiểm tra, lỗi có thể xuất hiện muộn ở phép tính khác và khó truy nguồn.",
@@ -2699,12 +2699,12 @@
         "en": "Composing existing routines and preserving dependencies centres on one checkable rule: Main passes each stage's output to the next stage and blocks downstream mutation when loading or validation fails. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. DSA integration starts by selecting a representation and algorithm from the contract, then main passes state through validate/process/output in explicit dependency order."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L015 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Ghép hàm đã có và giữ quan hệ phụ thuộc: Main truyền đúng output của bước trước vào bước sau và chặn downstream mutation khi validation/load thất bại. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, lines exam-workflow.production-v1.L015 contain “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” and directly demonstrate Composing existing routines and preserving dependencies: Main passes each stage's output to the next stage and blocks downstream mutation when loading or validation fails. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L016 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Ghép hàm đã có và giữ quan hệ phụ thuộc: Main truyền đúng output của bước trước vào bước sau và chặn downstream mutation khi validation/load thất bại. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, lines exam-workflow.production-v1.L016 contain “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” and directly demonstrate Composing existing routines and preserving dependencies: Main passes each stage's output to the next stage and blocks downstream mutation when loading or validation fails. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Ghép hàm đã có và giữ quan hệ phụ thuộc bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại exam-workflow.production-v1.L015, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Main truyền đúng output của bước trước vào bước sau và chặn downstream mutation khi validation/load thất bại.",
-        "en": "Represent Composing existing routines and preserving dependencies with a four-column trace: before-state, condition or decision at exam-workflow.production-v1.L015, applied change, and after-state. The trace must show that this rule still holds: Main passes each stage's output to the next stage and blocks downstream mutation when loading or validation fails."
+        "vi": "Biểu diễn Ghép hàm đã có và giữ quan hệ phụ thuộc bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại exam-workflow.production-v1.L016, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Main truyền đúng output của bước trước vào bước sau và chặn downstream mutation khi validation/load thất bại.",
+        "en": "Represent Composing existing routines and preserving dependencies with a four-column trace: before-state, condition or decision at exam-workflow.production-v1.L016, applied change, and after-state. The trace must show that this rule still holds: Main passes each stage's output to the next stage and blocks downstream mutation when loading or validation fails."
       },
       "invariant_or_rule": {
         "vi": "Main truyền đúng output của bước trước vào bước sau và chặn downstream mutation khi validation/load thất bại.",
@@ -2744,7 +2744,7 @@
           "ac-9618-p4-2026-python.artifact.exam-workflow.production-v1"
         ],
         "active_line_ids": [
-          "exam-workflow.production-v1.L015"
+          "exam-workflow.production-v1.L016"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
@@ -2753,7 +2753,7 @@
           "artifact_version": "production-v1",
           "matched_text": "rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})",
           "resolved_line_ids": [
-            "exam-workflow.production-v1.L015"
+            "exam-workflow.production-v1.L016"
           ]
         },
         "fixture_kind": "normal",
@@ -2873,12 +2873,12 @@
         "en": "File names, code, output and evidence by exam part centres on one checkable rule: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. A DSA evidence matrix has normal, boundary, and failure rows joining requirement → code owner → fixture → actual output → invariant check."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L015 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Tên file, code, output và bằng chứng theo ý đề: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, lines exam-workflow.production-v1.L015 contain “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” and directly demonstrate File names, code, output and evidence by exam part: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L016 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Tên file, code, output và bằng chứng theo ý đề: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, lines exam-workflow.production-v1.L016 contain “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” and directly demonstrate File names, code, output and evidence by exam part: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Tên file, code, output và bằng chứng theo ý đề bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại exam-workflow.production-v1.L015, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra.",
-        "en": "Represent File names, code, output and evidence by exam part with a four-column trace: before-state, condition or decision at exam-workflow.production-v1.L015, applied change, and after-state. The trace must show that this rule still holds: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator."
+        "vi": "Biểu diễn Tên file, code, output và bằng chứng theo ý đề bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại exam-workflow.production-v1.L016, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra.",
+        "en": "Represent File names, code, output and evidence by exam part with a four-column trace: before-state, condition or decision at exam-workflow.production-v1.L016, applied change, and after-state. The trace must show that this rule still holds: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator."
       },
       "invariant_or_rule": {
         "vi": "Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra.",
@@ -2906,8 +2906,8 @@
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture exam-workflow.failure dùng input chính xác {\"minimum\":60,\"rows\":[{\"name\":\"Bad\",\"score\":101}]} để kiểm tra Tên file, code, output và bằng chứng theo ý đề. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra.",
-          "en": "Fixture exam-workflow.failure uses the exact input {\"minimum\":60,\"rows\":[{\"name\":\"Bad\",\"score\":101}]} to test File names, code, output and evidence by exam part. Before running it, the learner predicts the output and after-state from this rule: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator."
+          "vi": "Fixture exam-workflow.failure dùng input chính xác {\"rows\":[{\"name\":\"Ada\",\"score\":90}]} để kiểm tra Tên file, code, output và bằng chứng theo ý đề. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Mỗi phần bằng chứng nêu requirement, code version, input, expected/actual output và locator có thể kiểm tra.",
+          "en": "Fixture exam-workflow.failure uses the exact input {\"rows\":[{\"name\":\"Ada\",\"score\":90}]} to test File names, code, output and evidence by exam part. Before running it, the learner predicts the output and after-state from this rule: Each evidence entry identifies the requirement, code version, input, expected/actual output, and a checkable locator."
         },
         "walkthrough": {
           "vi": "Áp dụng quy tắc của “Tên file, code, output và bằng chứng theo ý đề”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",
@@ -2918,7 +2918,7 @@
           "ac-9618-p4-2026-python.artifact.exam-workflow.production-v1"
         ],
         "active_line_ids": [
-          "exam-workflow.production-v1.L015"
+          "exam-workflow.production-v1.L016"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
@@ -2927,7 +2927,7 @@
           "artifact_version": "production-v1",
           "matched_text": "rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})",
           "resolved_line_ids": [
-            "exam-workflow.production-v1.L015"
+            "exam-workflow.production-v1.L016"
           ]
         },
         "fixture_kind": "failure",
@@ -3237,12 +3237,12 @@
         "en": "Distinguishing official sources from learning guidance centres on one checkable rule: Only QP/MS receive official authority; authored explanations, examples, and rubrics always carry an AlgoCore label. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. The videos support explanation only; the syllabus, coursebook, QP, and MS continue to govern scope, representation, and official marking claims."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L015 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Phân biệt nguồn chính thức và hướng dẫn học: Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, lines exam-workflow.production-v1.L015 contain “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” and directly demonstrate Distinguishing official sources from learning guidance: Only QP/MS receive official authority; authored explanations, examples, and rubrics always carry an AlgoCore label. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, các dòng exam-workflow.production-v1.L016 chứa đoạn mã “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” và minh họa trực tiếp Phân biệt nguồn chính thức và hướng dẫn học: Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.exam-workflow.production-v1, lines exam-workflow.production-v1.L016 contain “rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})” and directly demonstrate Distinguishing official sources from learning guidance: Only QP/MS receive official authority; authored explanations, examples, and rubrics always carry an AlgoCore label. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Phân biệt nguồn chính thức và hướng dẫn học bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại exam-workflow.production-v1.L015, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore.",
-        "en": "Represent Distinguishing official sources from learning guidance with a four-column trace: before-state, condition or decision at exam-workflow.production-v1.L015, applied change, and after-state. The trace must show that this rule still holds: Only QP/MS receive official authority; authored explanations, examples, and rubrics always carry an AlgoCore label."
+        "vi": "Biểu diễn Phân biệt nguồn chính thức và hướng dẫn học bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại exam-workflow.production-v1.L016, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore.",
+        "en": "Represent Distinguishing official sources from learning guidance with a four-column trace: before-state, condition or decision at exam-workflow.production-v1.L016, applied change, and after-state. The trace must show that this rule still holds: Only QP/MS receive official authority; authored explanations, examples, and rubrics always carry an AlgoCore label."
       },
       "invariant_or_rule": {
         "vi": "Chỉ QP/MS được gán thẩm quyền chính thức; giải thích, ví dụ và rubric tự soạn luôn mang nhãn AlgoCore.",
@@ -3282,7 +3282,7 @@
           "ac-9618-p4-2026-python.artifact.exam-workflow.production-v1"
         ],
         "active_line_ids": [
-          "exam-workflow.production-v1.L015"
+          "exam-workflow.production-v1.L016"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
@@ -3291,7 +3291,7 @@
           "artifact_version": "production-v1",
           "matched_text": "rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})",
           "resolved_line_ids": [
-            "exam-workflow.production-v1.L015"
+            "exam-workflow.production-v1.L016"
           ]
         },
         "fixture_kind": "normal",
@@ -3815,16 +3815,16 @@
         "vi": "Đỉnh, cạnh và các đặc trưng đồ thị"
       },
       "explanation": {
-        "vi": "Đỉnh, cạnh và các đặc trưng đồ thị tập trung vào một quy tắc có thể kiểm tra: Mỗi edge nối các vertex theo directedness và weight contract; isolated vertex vẫn thuộc graph. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "Vertices, edges and graph characteristics centres on one checkable rule: Each edge joins vertices according to the directedness and weight contract; an isolated vertex still belongs to the graph. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "en": "A graph models entities as vertices and relationships as edges. An edge is directed only when A-to-B differs from B-to-A, and it is weighted only when the relationship has a meaningful value such as distance, time or cost. An isolated entity can still be a vertex.",
+        "vi": "Graph mô hình entity bằng vertex và relationship bằng edge. Edge chỉ directed khi A-to-B khác B-to-A và chỉ weighted khi relationship có giá trị có ý nghĩa như distance, time hoặc cost. Một entity cô lập vẫn có thể là vertex."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.graphs.production-v1, các dòng graphs.production-v1.L005 chứa đoạn mã “def add_edge(self, start, end):” và minh họa trực tiếp Đỉnh, cạnh và các đặc trưng đồ thị: Mỗi edge nối các vertex theo directedness và weight contract; isolated vertex vẫn thuộc graph. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.graphs.production-v1, lines graphs.production-v1.L005 contain “def add_edge(self, start, end):” and directly demonstrate Vertices, edges and graph characteristics: Each edge joins vertices according to the directedness and weight contract; an isolated vertex still belongs to the graph. This is the A3-frozen and independently rerun production-v1 source."
+        "en": "No graph-structure implementation is required for this 2026 Paper 4 objective. Use the scenario facts to identify vertices and edges, then describe and justify direction and weight.",
+        "vi": "Mục tiêu Paper 4 năm 2026 này không yêu cầu cài đặt graph structure. Dùng dữ kiện tình huống để xác định vertex và edge, sau đó mô tả và giải thích direction và weight."
       },
       "representation": {
-        "vi": "Biểu diễn Đỉnh, cạnh và các đặc trưng đồ thị bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại graphs.production-v1.L005, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Mỗi edge nối các vertex theo directedness và weight contract; isolated vertex vẫn thuộc graph.",
-        "en": "Represent Vertices, edges and graph characteristics with a four-column trace: before-state, condition or decision at graphs.production-v1.L005, applied change, and after-state. The trace must show that this rule still holds: Each edge joins vertices according to the directedness and weight contract; an isolated vertex still belongs to the graph."
+        "en": "Use a four-part scenario table: entity → vertex, relationship → edge, one-way or reciprocal → direction, and measurable route property → weight. Every selected feature must point back to one stated fact.",
+        "vi": "Dùng bảng tình huống bốn phần: entity → vertex, relationship → edge, một chiều hoặc hai chiều → direction và thuộc tính đo được của route → weight. Mỗi feature được chọn phải nối lại một dữ kiện đã nêu."
       },
       "invariant_or_rule": {
         "vi": "Mỗi edge nối các vertex theo directedness và weight contract; isolated vertex vẫn thuộc graph.",
@@ -3832,65 +3832,47 @@
       },
       "misconceptions": [
         {
-          "vi": "Áp dụng cú pháp hoặc shortcut Python trước khi xác định hợp đồng của “Đỉnh, cạnh và các đặc trưng đồ thị”.",
-          "en": "Applying Python syntax or a shortcut before establishing the contract for “Vertices, edges and graph characteristics”."
+          "en": "Assuming every graph is directed or weighted instead of using the scenario evidence.",
+          "vi": "Giả định mọi graph đều directed hoặc weighted thay vì dùng evidence của tình huống."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "en": "Removing an isolated vertex simply because it has no current edge.",
+          "vi": "Loại isolated vertex chỉ vì nó hiện không có edge."
         }
       ],
       "exam_signals": [
         {
-          "vi": "Đề yêu cầu triển khai, hoàn thiện, trace hoặc giải thích đỉnh, cạnh và các đặc trưng đồ thị.",
-          "en": "The task asks the candidate to implement, complete, trace, or explain vertices, edges and graph characteristics."
+          "en": "The task asks you to identify vertices and edges or describe graph features.",
+          "vi": "Đề yêu cầu xác định vertex và edge hoặc mô tả graph features."
         },
         {
-          "vi": "Điểm phụ thuộc vào state/pointer/index/output chính xác và cách xử lý trường hợp biên hoặc không hợp lệ.",
-          "en": "Credit depends on exact state, pointer, index, or output behaviour and the handling of a boundary or invalid case."
+          "en": "The task asks whether direction or weight is meaningful and requires a justification from the situation.",
+          "vi": "Đề hỏi direction hoặc weight có ý nghĩa không và yêu cầu giải thích từ tình huống."
         }
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture graphs.normal dùng input chính xác {\"directed\":false,\"edges\":[[\"A\",\"B\"],[\"B\",\"C\"]],\"vertices\":[\"A\",\"B\",\"C\"]} để kiểm tra Đỉnh, cạnh và các đặc trưng đồ thị. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Mỗi edge nối các vertex theo directedness và weight contract; isolated vertex vẫn thuộc graph.",
-          "en": "Fixture graphs.normal uses the exact input {\"directed\":false,\"edges\":[[\"A\",\"B\"],[\"B\",\"C\"]],\"vertices\":[\"A\",\"B\",\"C\"]} to test Vertices, edges and graph characteristics. Before running it, the learner predicts the output and after-state from this rule: Each edge joins vertices according to the directedness and weight contract; an isolated vertex still belongs to the graph."
+          "en": "A delivery network contains depots connected by routes. Some routes are one-way and each route has a journey time.",
+          "vi": "Một delivery network gồm các depot nối bằng route. Một số route một chiều và mỗi route có journey time."
         },
         "walkthrough": {
-          "vi": "Áp dụng quy tắc của “Đỉnh, cạnh và các đặc trưng đồ thị”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",
-          "en": "Apply the rule for “Vertices, edges and graph characteristics”: record the before-state, perform one checkable step, then compare after-state/output with the contract. If the precondition fails, return failure without committing a change."
+          "en": "Depots are vertices and routes are edges. One-way routes justify directed edges; journey time justifies a weight. A depot with no current route remains an isolated vertex. No graph code is required.",
+          "vi": "Depot là vertex và route là edge. Route một chiều justify directed edge; journey time justify weight. Depot chưa có route vẫn là isolated vertex. Không yêu cầu code graph."
         },
-        "python_artifact_id": "ac-9618-p4-2026-python.artifact.graphs.production-v1",
-        "python_artifact_refs": [
-          "ac-9618-p4-2026-python.artifact.graphs.production-v1"
-        ],
-        "active_line_ids": [
-          "graphs.production-v1.L005"
-        ],
-        "code_link_intent": {
-          "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
-          "lesson_slug": "graphs",
-          "semantic_role": "characteristics",
-          "artifact_version": "production-v1",
-          "matched_text": "def add_edge(self, start, end):",
-          "resolved_line_ids": [
-            "graphs.production-v1.L005"
-          ]
-        },
-        "fixture_kind": "normal",
-        "authority": "AlgoCore_authored_teaching_example"
+        "authority": "AlgoCore_authored_syllabus_scoped_teaching_example"
       },
       "self_check": {
         "prompt": {
-          "vi": "Invariant nào phải còn đúng sau khi xử lý “Đỉnh, cạnh và các đặc trưng đồ thị”?",
-          "en": "Which invariant must still hold after processing “Vertices, edges and graph characteristics”?"
+          "en": "In the delivery scenario, what evidence justifies direction and weight?",
+          "vi": "Trong delivery scenario, evidence nào justify direction và weight?"
         },
         "answer": {
-          "vi": "Mỗi edge nối các vertex theo directedness và weight contract; isolated vertex vẫn thuộc graph.",
-          "en": "Each edge joins vertices according to the directedness and weight contract; an isolated vertex still belongs to the graph."
+          "en": "One-way routes justify direction; journey time is a measurable route property and therefore justifies weight.",
+          "vi": "Route một chiều justify direction; journey time là thuộc tính route đo được nên justify weight."
         },
         "rationale": {
-          "vi": "Nêu invariant trước khi code giúp chọn đúng điều kiện, thứ tự cập nhật và failure path mà examiner có thể kiểm tra.",
-          "en": "Stating the invariant before coding determines the correct condition, update order, and examiner-checkable failure path."
+          "en": "Each graph feature earns its place by matching a stated relationship fact; features are not added by default.",
+          "vi": "Mỗi graph feature được chọn vì khớp một relationship fact đã nêu; không thêm feature theo mặc định."
         },
         "answer_hidden_initially": true,
         "authority": "AlgoCore_authored_self_check"
@@ -3943,16 +3925,16 @@
         "vi": "Khi quan hệ dữ liệu có dạng đồ thị"
       },
       "explanation": {
-        "vi": "Khi quan hệ dữ liệu có dạng đồ thị tập trung vào một quy tắc có thể kiểm tra: Chọn graph khi quan hệ many-to-many hoặc network là trọng tâm; không suy ra yêu cầu code traversal nếu syllabus không yêu cầu. Khi làm Paper 4, học sinh phải dùng quy tắc này để giải thích điều kiện, thứ tự cập nhật và trạng thái sau thao tác.",
-        "en": "When data relationships form a graph centres on one checkable rule: Choose a graph when many-to-many or network relationships are central; do not infer a traversal-coding requirement absent from the syllabus. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation."
+        "en": "Choose a graph when the important information is a network of many-to-many relationships, such as routes between depots or connections between users. Justify the choice by naming what the vertices and edges mean and why a list or single sequence would hide those relationships.",
+        "vi": "Chọn graph khi thông tin quan trọng là network của relationship many-to-many, như route giữa các depot hoặc connection giữa users. Giải thích lựa chọn bằng cách nêu vertex và edge có nghĩa gì và vì sao list hoặc một sequence duy nhất sẽ che các relationship đó."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.graphs.production-v1, các dòng graphs.production-v1.L020 chứa đoạn mã “matrix = [[1 if right in graph.adj[left] else 0 for right in vertices] for left in vertices]” và minh họa trực tiếp Khi quan hệ dữ liệu có dạng đồ thị: Chọn graph khi quan hệ many-to-many hoặc network là trọng tâm; không suy ra yêu cầu code traversal nếu syllabus không yêu cầu. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.graphs.production-v1, lines graphs.production-v1.L020 contain “matrix = [[1 if right in graph.adj[left] else 0 for right in vertices] for left in vertices]” and directly demonstrate When data relationships form a graph: Choose a graph when many-to-many or network relationships are central; do not infer a traversal-coding requirement absent from the syllabus. This is the A3-frozen and independently rerun production-v1 source."
+        "en": "For the 2026 syllabus, compare the scenario with graph characteristics and justify the model. Do not infer a requirement to write traversal, adjacency-list or adjacency-matrix code.",
+        "vi": "Với syllabus 2026, đối chiếu tình huống với graph characteristics và giải thích mô hình. Không suy ra yêu cầu viết traversal, adjacency-list hoặc adjacency-matrix code."
       },
       "representation": {
-        "vi": "Biểu diễn Khi quan hệ dữ liệu có dạng đồ thị bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại graphs.production-v1.L020, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Chọn graph khi quan hệ many-to-many hoặc network là trọng tâm; không suy ra yêu cầu code traversal nếu syllabus không yêu cầu.",
-        "en": "Represent When data relationships form a graph with a four-column trace: before-state, condition or decision at graphs.production-v1.L020, applied change, and after-state. The trace must show that this rule still holds: Choose a graph when many-to-many or network relationships are central; do not infer a traversal-coding requirement absent from the syllabus."
+        "en": "Write a short justification chain: scenario entity → vertex; scenario relationship → edge; reciprocity → directed or undirected; measurable relationship value → weighted or unweighted; network structure → why graph is suitable.",
+        "vi": "Viết chuỗi giải thích ngắn: scenario entity → vertex; scenario relationship → edge; tính hai chiều → directed hoặc undirected; value đo được của relationship → weighted hoặc unweighted; network structure → vì sao graph phù hợp."
       },
       "invariant_or_rule": {
         "vi": "Chọn graph khi quan hệ many-to-many hoặc network là trọng tâm; không suy ra yêu cầu code traversal nếu syllabus không yêu cầu.",
@@ -3960,65 +3942,47 @@
       },
       "misconceptions": [
         {
-          "vi": "Áp dụng cú pháp hoặc shortcut Python trước khi xác định hợp đồng của “Khi quan hệ dữ liệu có dạng đồ thị”.",
-          "en": "Applying Python syntax or a shortcut before establishing the contract for “When data relationships form a graph”."
+          "en": "Choosing a graph merely because a diagram could be drawn, without identifying a network relationship.",
+          "vi": "Chọn graph chỉ vì có thể vẽ diagram mà không xác định network relationship."
         },
         {
-          "vi": "Chỉ kiểm tra happy path nên bỏ qua trạng thái biên/thất bại và vô tình làm đổi dữ liệu đã hợp lệ.",
-          "en": "Testing only the happy path, thereby missing boundary/failure state and accidentally changing valid data."
+          "en": "Turning a describe-and-justify question into an unrequested Python implementation task.",
+          "vi": "Biến câu hỏi describe-and-justify thành nhiệm vụ cài đặt Python không được yêu cầu."
         }
       ],
       "exam_signals": [
         {
-          "vi": "Đề yêu cầu triển khai, hoàn thiện, trace hoặc giải thích khi quan hệ dữ liệu có dạng đồ thị.",
-          "en": "The task asks the candidate to implement, complete, trace, or explain when data relationships form a graph."
+          "en": "The situation contains many entities connected to several other entities.",
+          "vi": "Tình huống có nhiều entity nối với nhiều entity khác."
         },
         {
-          "vi": "Điểm phụ thuộc vào state/pointer/index/output chính xác và cách xử lý trường hợp biên hoặc không hợp lệ.",
-          "en": "Credit depends on exact state, pointer, index, or output behaviour and the handling of a boundary or invalid case."
+          "en": "The question asks you to justify why a graph is suitable for the relationships.",
+          "vi": "Câu hỏi yêu cầu giải thích vì sao graph phù hợp với các relationship."
         }
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture graphs.boundary dùng input chính xác {\"directed\":true,\"edges\":[[\"A\",\"A\"]],\"vertices\":[\"A\"]} để kiểm tra Khi quan hệ dữ liệu có dạng đồ thị. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Chọn graph khi quan hệ many-to-many hoặc network là trọng tâm; không suy ra yêu cầu code traversal nếu syllabus không yêu cầu.",
-          "en": "Fixture graphs.boundary uses the exact input {\"directed\":true,\"edges\":[[\"A\",\"A\"]],\"vertices\":[\"A\"]} to test When data relationships form a graph. Before running it, the learner predicts the output and after-state from this rule: Choose a graph when many-to-many or network relationships are central; do not infer a traversal-coding requirement absent from the syllabus."
+          "en": "A social platform records which users follow other users. Following is not automatically reciprocal, and no numeric cost is stored.",
+          "vi": "Một social platform lưu user nào follow user nào. Follow không tự động hai chiều và không lưu numeric cost."
         },
         "walkthrough": {
-          "vi": "Áp dụng quy tắc của “Khi quan hệ dữ liệu có dạng đồ thị”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",
-          "en": "Apply the rule for “When data relationships form a graph”: record the before-state, perform one checkable step, then compare after-state/output with the contract. If the precondition fails, return failure without committing a change."
+          "en": "Users are vertices and follow relationships are edges. The edges are directed because A following B does not imply B follows A. The graph is unweighted because the scenario gives no meaningful numeric edge property.",
+          "vi": "User là vertex và follow relationship là edge. Edge directed vì A follow B không kéo theo B follow A. Graph unweighted vì tình huống không cho numeric edge property có ý nghĩa."
         },
-        "python_artifact_id": "ac-9618-p4-2026-python.artifact.graphs.production-v1",
-        "python_artifact_refs": [
-          "ac-9618-p4-2026-python.artifact.graphs.production-v1"
-        ],
-        "active_line_ids": [
-          "graphs.production-v1.L020"
-        ],
-        "code_link_intent": {
-          "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
-          "lesson_slug": "graphs",
-          "semantic_role": "structure-choice",
-          "artifact_version": "production-v1",
-          "matched_text": "matrix = [[1 if right in graph.adj[left] else 0 for right in vertices] for left in vertices]",
-          "resolved_line_ids": [
-            "graphs.production-v1.L020"
-          ]
-        },
-        "fixture_kind": "boundary",
-        "authority": "AlgoCore_authored_teaching_example"
+        "authority": "AlgoCore_authored_syllabus_scoped_teaching_example"
       },
       "self_check": {
         "prompt": {
-          "vi": "Invariant nào phải còn đúng sau khi xử lý “Khi quan hệ dữ liệu có dạng đồ thị”?",
-          "en": "Which invariant must still hold after processing “When data relationships form a graph”?"
+          "en": "Why is a directed, unweighted graph suitable for the follow scenario?",
+          "vi": "Vì sao directed, unweighted graph phù hợp với follow scenario?"
         },
         "answer": {
-          "vi": "Chọn graph khi quan hệ many-to-many hoặc network là trọng tâm; không suy ra yêu cầu code traversal nếu syllabus không yêu cầu.",
-          "en": "Choose a graph when many-to-many or network relationships are central; do not infer a traversal-coding requirement absent from the syllabus."
+          "en": "The graph represents many-to-many user relationships; direction records who follows whom, and no weight is justified because no numeric relationship value is given.",
+          "vi": "Graph biểu diễn relationship many-to-many giữa users; direction lưu ai follow ai và không justify weight vì không có numeric relationship value."
         },
         "rationale": {
-          "vi": "Nêu invariant trước khi code giúp chọn đúng điều kiện, thứ tự cập nhật và failure path mà examiner có thể kiểm tra.",
-          "en": "Stating the invariant before coding determines the correct condition, update order, and examiner-checkable failure path."
+          "en": "A complete justification maps every chosen graph feature to one fact in the scenario.",
+          "vi": "Giải thích đầy đủ map mỗi graph feature đã chọn với một fact trong tình huống."
         },
         "answer_hidden_initially": true,
         "authority": "AlgoCore_authored_self_check"
@@ -5382,8 +5346,8 @@
         "en": "Reading a file record involves parsing fields, checking count/types, converting values, then calling the constructor in the required parameter order. Append the object only after the complete record is valid to avoid partial state."
       },
       "python_connection": {
-        "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L075–L081 dispatch theo discriminator `BOOK`/`EBOOK`; L077 hoặc L079 gọi đúng constructor, rồi L082–L083 append và ghi loại object đã tạo.",
-        "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L075-L081 dispatch on the `BOOK`/`EBOOK` discriminator; L077 or L079 calls the matching constructor, then L082-L083 append and record the constructed object type."
+        "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L104–L105 loại số trang không dương trước khi L075–L081 dispatch theo discriminator; chỉ sau đó L077 hoặc L079 mới gọi constructor.",
+        "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L104-L105 reject a non-positive page count before L075-L081 dispatch on the discriminator; only then does L077 or L079 call a constructor."
       },
       "representation": {
         "vi": "Dùng pipeline `CSV fields -> validated typed values -> constructor arguments -> object list`; ghi line number cạnh record để truy lỗi.",
@@ -5430,6 +5394,8 @@
           "object-files.v1.L018",
           "object-files.v1.L073",
           "object-files.v1.L074",
+          "object-files.v1.L104",
+          "object-files.v1.L105",
           "object-files.v1.L075",
           "object-files.v1.L077",
           "object-files.v1.L079",
@@ -5440,12 +5406,12 @@
       },
       "self_check": {
         "prompt": {
-          "vi": "Vì sao L077/L079 nằm sau conversion L074?",
-          "en": "Why do L077/L079 come after conversion at L074?"
+          "vi": "Vì sao L077/L079 nằm sau conversion L074 và range check L104?",
+          "en": "Why do L077/L079 follow conversion L074 and range check L104?"
         },
         "answer": {
-          "vi": "Để cả hai constructor chỉ nhận `pages` đã chuyển thành int thành công.",
-          "en": "So both constructors receive `pages` only after successful integer conversion."
+          "vi": "Để constructor chỉ nhận `pages` đã chuyển thành integer dương hợp lệ.",
+          "en": "So a constructor receives only a successfully converted positive integer page count."
         },
         "rationale": {
           "vi": "Validation và dispatch trước mutation giữ list object nhất quán.",
@@ -5538,8 +5504,8 @@
         "en": "Lookup reads a key, traverses objects, and compares the correct identifier; on a match, it calls the required method/setter on that instance. The contract must decide whether to stop at the first match or process all matches and how to report not-found."
       },
       "python_connection": {
-        "vi": "L056–L060 là setter chỉ chấp nhận số trang nguyên dương. L086–L091 tìm theo `Title`, gọi setter và trả `UPDATED` hoặc `INVALID_UPDATE`; L092–L093 trả `NOT_FOUND` mà không sửa object. L094–L100 đưa cả status và state object sau thao tác vào output.",
-        "en": "L056-L060 implement a setter that accepts only a positive integer page count. L086-L091 search by `Title`, call the setter, and return `UPDATED` or `INVALID_UPDATE`; L092-L093 return `NOT_FOUND` without mutating an object. L094-L100 expose both status and post-operation object state."
+        "vi": "L056–L060 là setter chỉ chấp nhận số trang nguyên dương; L102 loại cả Boolean dù Python coi Boolean là integer. L086–L091 tìm theo `Title`, gọi setter và trả `UPDATED` hoặc `INVALID_UPDATE`; L092–L093 trả `NOT_FOUND` mà không sửa object.",
+        "en": "L056-L060 implement a setter that accepts only a positive integer page count; L102 also rejects Boolean even though Python treats it as integer. L086-L091 search by `Title`, call the setter, and return `UPDATED` or `INVALID_UPDATE`; L092-L093 return `NOT_FOUND` without mutation."
       },
       "representation": {
         "vi": "Dùng bảng trace `(index/object id, compared key, match?)`; khi match, nối tới method call và state before/after của object.",
@@ -5584,7 +5550,7 @@
         ],
         "active_line_ids": [
           "object-files.v1.L056",
-          "object-files.v1.L057",
+          "object-files.v1.L102",
           "object-files.v1.L059",
           "object-files.v1.L086",
           "object-files.v1.L088",
@@ -10310,8 +10276,8 @@
         "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing. State whether the operation consumes the queue or only reads it; if reduction uses dequeue, the postcondition must describe the changed queue."
       },
       "python_connection": {
-        "vi": "Pilot chọn preserve: L062 gọi `live_items`, rồi L063 tính tổng số từ bản sao logical. Không dequeue trong bước reduce, nên queue vẫn giữ dữ liệu; artifact chưa triển khai biến thể recursive consuming.",
-        "en": "The pilot chooses preserve: L062 calls `live_items`, then L063 totals numeric values from the logical copy. It does not dequeue during reduction, so the queue is preserved; the artifact does not implement a recursive consuming variant."
+        "vi": "`reduce_numeric` chốt số phần tử ban đầu tại L082 rồi gọi `dequeue` đúng số lần đó ở L085. L087 cập nhật accumulator; L089 enqueue lại item chỉ khi policy là preserve. Vì vậy cùng một thuật toán thể hiện rõ hai hậu trạng thái consume và preserve.",
+        "en": "`reduce_numeric` freezes the initial item count at L082 and calls `dequeue` exactly that many times at L085. L087 updates the accumulator; L089 enqueues the item again only under the preserve policy. The same algorithm therefore makes the consume and preserve post-states explicit."
       },
       "representation": {
         "vi": "Ghi accumulator cùng item đang xử lý và đánh dấu rõ policy `preserve` hoặc `consume`; với recursion, mỗi frame giữ phần còn chờ cộng.",
@@ -10355,21 +10321,23 @@
           "ac-9618-p4-2026-python.artifact.queue.pilot-v1"
         ],
         "active_line_ids": [
-          "queue.v1.L062",
-          "queue.v1.L063",
-          "queue.v1.L027",
-          "queue.v1.L039"
+          "queue.v1.L081",
+          "queue.v1.L082",
+          "queue.v1.L085",
+          "queue.v1.L087",
+          "queue.v1.L089",
+          "queue.v1.L091"
         ],
         "authority": "AlgoCore_authored_teaching_example"
       },
       "self_check": {
         "prompt": {
-          "vi": "Artifact pilot đang dùng policy nào, và line nào chứng minh?",
-          "en": "Which policy does the pilot use, and which lines establish it?"
+          "vi": "Line nào phân biệt consume và preserve?",
+          "en": "Which line separates consume from preserve?"
         },
         "answer": {
-          "vi": "Preserve; L062 lấy bản sao từ `live_items` và L063 reduce bản sao, không gọi dequeue.",
-          "en": "Preserve; L062 obtains a copy from `live_items` and L063 reduces that copy without calling dequeue."
+          "vi": "L089 chỉ enqueue lại item khi `preserve=True`; nếu false, các lần dequeue làm queue rỗng.",
+          "en": "L089 enqueues the item again only when `preserve=True`; otherwise the dequeues empty the queue."
         },
         "rationale": {
           "vi": "Policy phải được đọc từ source contract trước khi chọn thuật toán.",
@@ -12905,12 +12873,12 @@
         "en": "Inserting one item into an ordered table centres on one checkable rule: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Distinguish inserting one record into an already sorted collection from running a complete insertion sort; the capacity guard still precedes all shifts."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L129 chứa đoạn mã “bounded.insert(position, item)” và minh họa trực tiếp Chèn một phần tử vào bảng đã có thứ tự: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L129 contain “bounded.insert(position, item)” and directly demonstrate Inserting one item into an ordered table: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, các dòng sorting.production-v1.L085 chứa đoạn mã “def ordered_insert(values, item, capacity, trace):” và minh họa trực tiếp Chèn một phần tử vào bảng đã có thứ tự: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.sorting.production-v1, lines sorting.production-v1.L085 contain “def ordered_insert(values, item, capacity, trace):” and directly demonstrate Inserting one item into an ordered table: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Chèn một phần tử vào bảng đã có thứ tự bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L129, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
-        "en": "Represent Inserting one item into an ordered table with a four-column trace: before-state, condition or decision at sorting.production-v1.L129, applied change, and after-state. The trace must show that this rule still holds: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record."
+        "vi": "Biểu diễn Chèn một phần tử vào bảng đã có thứ tự bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại sorting.production-v1.L085, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
+        "en": "Represent Inserting one item into an ordered table with a four-column trace: before-state, condition or decision at sorting.production-v1.L085, applied change, and after-state. The trace must show that this rule still holds: Find the position using the comparator, check capacity, shift the suffix by one cell, then write the whole record."
       },
       "invariant_or_rule": {
         "vi": "Tìm vị trí theo comparator, kiểm tra capacity, dịch suffix đúng một ô rồi ghi record nguyên vẹn.",
@@ -12950,16 +12918,16 @@
           "ac-9618-p4-2026-python.artifact.sorting.production-v1"
         ],
         "active_line_ids": [
-          "sorting.production-v1.L129"
+          "sorting.production-v1.L085"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "sorting",
           "semantic_role": "ordered-insert",
           "artifact_version": "production-v1",
-          "matched_text": "bounded.insert(position, item)",
+          "matched_text": "def ordered_insert(values, item, capacity, trace):",
           "resolved_line_ids": [
-            "sorting.production-v1.L129"
+            "sorting.production-v1.L085"
           ]
         },
         "fixture_kind": "failure",
@@ -13056,12 +13024,12 @@
         "en": "Paired stacks and restoration on failure centres on one checkable rule: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Trace temporary pops and the push-back order to prove that failure restores the live region exactly."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L026 chứa đoạn mã “before = {\"top\": stack.top, \"live\": stack.live()}” và minh họa trực tiếp Hai stack và phục hồi khi không ghép được: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.stack.production-v1, lines stack.production-v1.L026 contain “before = {\"top\": stack.top, \"live\": stack.live()}” and directly demonstrate Paired stacks and restoration on failure: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L029 chứa đoạn mã “def pair_stacks(left_stack, right_stack, trace):” và minh họa trực tiếp Hai stack và phục hồi khi không ghép được: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.stack.production-v1, lines stack.production-v1.L029 contain “def pair_stacks(left_stack, right_stack, trace):” and directly demonstrate Paired stacks and restoration on failure: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Hai stack và phục hồi khi không ghép được bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại stack.production-v1.L026, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu.",
-        "en": "Represent Paired stacks and restoration on failure with a four-column trace: before-state, condition or decision at stack.production-v1.L026, applied change, and after-state. The trace must show that this rule still holds: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state."
+        "vi": "Biểu diễn Hai stack và phục hồi khi không ghép được bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại stack.production-v1.L029, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu.",
+        "en": "Represent Paired stacks and restoration on failure with a four-column trace: before-state, condition or decision at stack.production-v1.L029, applied change, and after-state. The trace must show that this rule still holds: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state."
       },
       "invariant_or_rule": {
         "vi": "Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu.",
@@ -13089,8 +13057,8 @@
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture stack.normal dùng input chính xác {\"capacity\":4,\"operands\":[9,4],\"operations\":[[\"push\",10],[\"push\",20],[\"pop\"],[\"push\",30]]} để kiểm tra Hai stack và phục hồi khi không ghép được. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu.",
-          "en": "Fixture stack.normal uses the exact input {\"capacity\":4,\"operands\":[9,4],\"operations\":[[\"push\",10],[\"push\",20],[\"pop\"],[\"push\",30]]} to test Paired stacks and restoration on failure. Before running it, the learner predicts the output and after-state from this rule: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state."
+          "vi": "Fixture stack.normal dùng input chính xác {\"capacity\":4,\"operands\":[9,4],\"operations\":[[\"push\",10],[\"push\",20],[\"pop\"],[\"push\",30]],\"pair_left\":[\"red\"],\"pair_right\":[\"fox\"]} để kiểm tra Hai stack và phục hồi khi không ghép được. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Nếu cặp không hợp lệ, mọi item đã lấy tạm phải được push lại theo thứ tự phục hồi trạng thái ban đầu.",
+          "en": "Fixture stack.normal uses the exact input {\"capacity\":4,\"operands\":[9,4],\"operations\":[[\"push\",10],[\"push\",20],[\"pop\"],[\"push\",30]],\"pair_left\":[\"red\"],\"pair_right\":[\"fox\"]} to test Paired stacks and restoration on failure. Before running it, the learner predicts the output and after-state from this rule: If a pair is invalid, every temporarily popped item must be pushed back in the order that restores the initial state."
         },
         "walkthrough": {
           "vi": "Áp dụng quy tắc của “Hai stack và phục hồi khi không ghép được”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",
@@ -13101,16 +13069,16 @@
           "ac-9618-p4-2026-python.artifact.stack.production-v1"
         ],
         "active_line_ids": [
-          "stack.production-v1.L026"
+          "stack.production-v1.L029"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "stack",
           "semantic_role": "paired-restoration",
           "artifact_version": "production-v1",
-          "matched_text": "before = {\"top\": stack.top, \"live\": stack.live()}",
+          "matched_text": "def pair_stacks(left_stack, right_stack, trace):",
           "resolved_line_ids": [
-            "stack.production-v1.L026"
+            "stack.production-v1.L029"
           ]
         },
         "fixture_kind": "normal",
@@ -13221,8 +13189,8 @@
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture stack.failure dùng input chính xác {\"capacity\":2,\"operands\":[5],\"operations\":[[\"push\",1],[\"push\",2],[\"push\",3],[\"pop\"],[\"pop\"],[\"pop\"]]} để kiểm tra Pop và tình huống rỗng. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Kiểm tra underflow trước khi đọc; trả đúng phần tử trên cùng rồi cập nhật pointer đúng một bước.",
-          "en": "Fixture stack.failure uses the exact input {\"capacity\":2,\"operands\":[5],\"operations\":[[\"push\",1],[\"push\",2],[\"push\",3],[\"pop\"],[\"pop\"],[\"pop\"]]} to test Pop and the empty condition. Before running it, the learner predicts the output and after-state from this rule: Check underflow before reading; return the top item and update the pointer by exactly one step."
+          "vi": "Fixture stack.failure dùng input chính xác {\"capacity\":2,\"operands\":[5],\"operations\":[[\"push\",1],[\"push\",2],[\"push\",3],[\"pop\"],[\"pop\"],[\"pop\"]],\"pair_left\":[\"blue\"],\"pair_right\":[]} để kiểm tra Pop và tình huống rỗng. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Kiểm tra underflow trước khi đọc; trả đúng phần tử trên cùng rồi cập nhật pointer đúng một bước.",
+          "en": "Fixture stack.failure uses the exact input {\"capacity\":2,\"operands\":[5],\"operations\":[[\"push\",1],[\"push\",2],[\"push\",3],[\"pop\"],[\"pop\"],[\"pop\"]],\"pair_left\":[\"blue\"],\"pair_right\":[]} to test Pop and the empty condition. Before running it, the learner predicts the output and after-state from this rule: Check underflow before reading; return the top item and update the pointer by exactly one step."
         },
         "walkthrough": {
           "vi": "Áp dụng quy tắc của “Pop và tình huống rỗng”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",
@@ -13353,8 +13321,8 @@
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture stack.boundary dùng input chính xác {\"capacity\":1,\"operands\":[],\"operations\":[[\"pop\"],[\"push\",7],[\"push\",8]]} để kiểm tra Push và tình huống đầy. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Kiểm tra overflow trước khi ghi; thứ tự tăng pointer và ghi phụ thuộc quy ước top đã công bố.",
-          "en": "Fixture stack.boundary uses the exact input {\"capacity\":1,\"operands\":[],\"operations\":[[\"pop\"],[\"push\",7],[\"push\",8]]} to test Push and the full condition. Before running it, the learner predicts the output and after-state from this rule: Check overflow before writing; pointer update and write order depend on the declared top convention."
+          "vi": "Fixture stack.boundary dùng input chính xác {\"capacity\":1,\"operands\":[],\"operations\":[[\"pop\"],[\"push\",7],[\"push\",8]],\"pair_left\":[],\"pair_right\":[]} để kiểm tra Push và tình huống đầy. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Kiểm tra overflow trước khi ghi; thứ tự tăng pointer và ghi phụ thuộc quy ước top đã công bố.",
+          "en": "Fixture stack.boundary uses the exact input {\"capacity\":1,\"operands\":[],\"operations\":[[\"pop\"],[\"push\",7],[\"push\",8]],\"pair_left\":[],\"pair_right\":[]} to test Push and the full condition. Before running it, the learner predicts the output and after-state from this rule: Check overflow before writing; pointer update and write order depend on the declared top convention."
         },
         "walkthrough": {
           "vi": "Áp dụng quy tắc của “Push và tình huống đầy”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",
@@ -13467,12 +13435,12 @@
         "en": "Popping operands and reducing to a result centres on one checkable rule: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation. In Paper 4, the learner uses this rule to explain the condition, update order, and state after the operation. Attach operand order to each pop; do not infer it from LIFO alone when the operator is non-commutative."
       },
       "python_connection": {
-        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L035 chứa đoạn mã “right, left = reduce_stack.pop(), reduce_stack.pop()” và minh họa trực tiếp Lấy toán hạng và tính kết quả: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
-        "en": "In artifact ac-9618-p4-2026-python.artifact.stack.production-v1, lines stack.production-v1.L035 contain “right, left = reduce_stack.pop(), reduce_stack.pop()” and directly demonstrate Popping operands and reducing to a result: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation. This is the A3-frozen and independently rerun production-v1 source."
+        "vi": "Trong artifact ac-9618-p4-2026-python.artifact.stack.production-v1, các dòng stack.production-v1.L044 chứa đoạn mã “def reduce_operands(values):” và minh họa trực tiếp Lấy toán hạng và tính kết quả: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề. Đây là source production-v1 đã được A3 đóng băng và chạy kiểm chứng.",
+        "en": "In artifact ac-9618-p4-2026-python.artifact.stack.production-v1, lines stack.production-v1.L044 contain “def reduce_operands(values):” and directly demonstrate Popping operands and reducing to a result: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation. This is the A3-frozen and independently rerun production-v1 source."
       },
       "representation": {
-        "vi": "Biểu diễn Lấy toán hạng và tính kết quả bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại stack.production-v1.L035, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề.",
-        "en": "Represent Popping operands and reducing to a result with a four-column trace: before-state, condition or decision at stack.production-v1.L035, applied change, and after-state. The trace must show that this rule still holds: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation."
+        "vi": "Biểu diễn Lấy toán hạng và tính kết quả bằng một trace có bốn cột: trạng thái trước, điều kiện hoặc quyết định tại stack.production-v1.L044, thay đổi được thực hiện, và trạng thái sau. Trace phải cho thấy quy tắc sau vẫn đúng: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề.",
+        "en": "Represent Popping operands and reducing to a result with a four-column trace: before-state, condition or decision at stack.production-v1.L044, applied change, and after-state. The trace must show that this rule still holds: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation."
       },
       "invariant_or_rule": {
         "vi": "Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề.",
@@ -13500,8 +13468,8 @@
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture stack.boundary dùng input chính xác {\"capacity\":1,\"operands\":[],\"operations\":[[\"pop\"],[\"push\",7],[\"push\",8]]} để kiểm tra Lấy toán hạng và tính kết quả. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề.",
-          "en": "Fixture stack.boundary uses the exact input {\"capacity\":1,\"operands\":[],\"operations\":[[\"pop\"],[\"push\",7],[\"push\",8]]} to test Popping operands and reducing to a result. Before running it, the learner predicts the output and after-state from this rule: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation."
+          "vi": "Fixture stack.boundary dùng input chính xác {\"capacity\":1,\"operands\":[],\"operations\":[[\"pop\"],[\"push\",7],[\"push\",8]],\"pair_left\":[],\"pair_right\":[]} để kiểm tra Lấy toán hạng và tính kết quả. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Với phép không giao hoán, toán hạng lấy sau là bên trái hay bên phải phải theo đúng notation của đề.",
+          "en": "Fixture stack.boundary uses the exact input {\"capacity\":1,\"operands\":[],\"operations\":[[\"pop\"],[\"push\",7],[\"push\",8]],\"pair_left\":[],\"pair_right\":[]} to test Popping operands and reducing to a result. Before running it, the learner predicts the output and after-state from this rule: For a non-commutative operator, whether the later pop is the left or right operand must follow the supplied notation."
         },
         "walkthrough": {
           "vi": "Áp dụng quy tắc của “Lấy toán hạng và tính kết quả”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",
@@ -13512,16 +13480,16 @@
           "ac-9618-p4-2026-python.artifact.stack.production-v1"
         ],
         "active_line_ids": [
-          "stack.production-v1.L035"
+          "stack.production-v1.L044"
         ],
         "code_link_intent": {
           "status": "RESOLVED_A3_FROZEN_LINE_ROLE_MAP",
           "lesson_slug": "stack",
           "semantic_role": "reduce-operands",
           "artifact_version": "production-v1",
-          "matched_text": "right, left = reduce_stack.pop(), reduce_stack.pop()",
+          "matched_text": "def reduce_operands(values):",
           "resolved_line_ids": [
-            "stack.production-v1.L035"
+            "stack.production-v1.L044"
           ]
         },
         "fixture_kind": "boundary",
@@ -13669,8 +13637,8 @@
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture stack.normal dùng input chính xác {\"capacity\":4,\"operands\":[9,4],\"operations\":[[\"push\",10],[\"push\",20],[\"pop\"],[\"push\",30]]} để kiểm tra Mảng, con trỏ đỉnh và quy ước rỗng. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Chọn một quy ước top-used hoặc next-free và suy ra empty/full từ cùng quy ước trong mọi operation.",
-          "en": "Fixture stack.normal uses the exact input {\"capacity\":4,\"operands\":[9,4],\"operations\":[[\"push\",10],[\"push\",20],[\"pop\"],[\"push\",30]]} to test Array, top pointer and empty conventions. Before running it, the learner predicts the output and after-state from this rule: Choose either top-used or next-free and derive empty/full consistently from that convention in every operation."
+          "vi": "Fixture stack.normal dùng input chính xác {\"capacity\":4,\"operands\":[9,4],\"operations\":[[\"push\",10],[\"push\",20],[\"pop\"],[\"push\",30]],\"pair_left\":[\"red\"],\"pair_right\":[\"fox\"]} để kiểm tra Mảng, con trỏ đỉnh và quy ước rỗng. Trước khi chạy, học sinh dự đoán output và trạng thái sau theo quy tắc: Chọn một quy ước top-used hoặc next-free và suy ra empty/full từ cùng quy ước trong mọi operation.",
+          "en": "Fixture stack.normal uses the exact input {\"capacity\":4,\"operands\":[9,4],\"operations\":[[\"push\",10],[\"push\",20],[\"pop\"],[\"push\",30]],\"pair_left\":[\"red\"],\"pair_right\":[\"fox\"]} to test Array, top pointer and empty conventions. Before running it, the learner predicts the output and after-state from this rule: Choose either top-used or next-free and derive empty/full consistently from that convention in every operation."
         },
         "walkthrough": {
           "vi": "Áp dụng quy tắc của “Mảng, con trỏ đỉnh và quy ước rỗng”; ghi before-state, thực hiện đúng một bước có thể kiểm tra, rồi đối chiếu after-state/output với hợp đồng. Nếu điều kiện trước không đạt, trả failure mà không commit thay đổi.",

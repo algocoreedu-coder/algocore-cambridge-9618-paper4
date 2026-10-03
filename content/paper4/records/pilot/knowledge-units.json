@@ -929,8 +929,8 @@
         "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility. Every summary scans only the logical region; unused cells in the physical capacity are not generated data."
       },
       "python_connection": {
-        "vi": "Pilot không gọi bộ sinh ngẫu nhiên; nó nhận `random_values` đã cố định ở L030 rồi tính trung bình tại L032–L034. Vì vậy các line chứng minh bước xử lý dữ liệu, không chứng minh API/range sinh số.",
-        "en": "The pilot does not call a random generator; it receives fixed `random_values` at L030 and calculates an average at L032-L034. These lines therefore evidence data processing, not a generator API or its range."
+        "vi": "`generate_random_array` dùng `randint(lower, upper)` với seed cố định cho fixture. Vòng lặp chỉ tăng số phần tử khi candidate được chấp nhận, nên có thể kiểm tra cả hai biên và tính duy nhất mà vẫn chạy lại được đúng kết quả.",
+        "en": "`generate_random_array` uses `randint(lower, upper)` with a fixed fixture seed. The loop advances only when a candidate is accepted, so both inclusive bounds and uniqueness can be tested reproducibly."
       },
       "representation": {
         "vi": "Ghi miền bằng ký hiệu rõ như `[low, high]` và mảng kết quả theo thứ tự sinh. Tách cấu hình sinh khỏi thao tác tổng hợp.",
@@ -962,37 +962,37 @@
       ],
       "micro_example": {
         "scenario": {
-          "vi": "Fixture `[2, 4, 6]` đại diện ba giá trị đã sinh.",
-          "en": "Fixture `[2, 4, 6]` represents three generated values."
+          "vi": "Cần sinh 4 integer duy nhất trong miền bao gồm hai đầu `[65, 90]`.",
+          "en": "Generate 4 unique integers in the inclusive domain `[65, 90]`."
         },
         "walkthrough": {
-          "vi": "L032 xác nhận list không rỗng rồi L033 tính trung bình 4.0; list rỗng giữ `average=None`.",
-          "en": "L032 confirms the list is non-empty, then L033 computes 4.0; an empty list keeps `average=None`."
+          "vi": "L058 sinh candidate; L062 chỉ thêm candidate chưa xuất hiện. Fixture seed 7 tạo `[75, 69, 77, 85]` để trace có thể chạy lại chính xác.",
+          "en": "L058 generates a candidate; L062 adds only a candidate not already used. Fixture seed 7 produces `[75, 69, 77, 85]` so the trace is exactly reproducible."
         },
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
         "python_artifact_refs": [
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1"
         ],
         "active_line_ids": [
-          "data-models.v1.L030",
-          "data-models.v1.L032",
-          "data-models.v1.L033",
-          "data-models.v1.L034"
+          "data-models.v1.L050",
+          "data-models.v1.L058",
+          "data-models.v1.L062",
+          "data-models.v1.L067"
         ],
         "authority": "AlgoCore_authored_teaching_example"
       },
       "self_check": {
         "prompt": {
-          "vi": "Vì sao artifact này chưa xác nhận quy tắc cận của hàm random?",
-          "en": "Why does this artifact not establish the endpoint rules of a random function?"
+          "vi": "Điều gì bảo vệ cả miền giá trị và tính duy nhất?",
+          "en": "What protects both the value range and uniqueness?"
         },
         "answer": {
-          "vi": "Vì nó nhận dữ liệu từ fixture và không gọi hàm sinh ngẫu nhiên.",
-          "en": "Because it receives fixture data and never calls a random generator."
+          "vi": "`randint(lower, upper)` dùng miền bao gồm hai đầu; candidate chỉ được commit khi chưa có trong mảng nếu `unique=True`.",
+          "en": "`randint(lower, upper)` uses an inclusive domain; a candidate is committed only when absent from the array if `unique=True`."
         },
         "rationale": {
-          "vi": "Quy tắc API phải đến từ yêu cầu/đặc tả Python tương ứng.",
-          "en": "API rules must come from the applicable task or Python specification."
+          "vi": "Số phần tử chỉ tăng sau một lần commit, vì vậy candidate trùng không làm mảng bị thiếu vị trí.",
+          "en": "The item count advances only after a commit, so a duplicate candidate does not leave a missing position."
         },
         "answer_hidden_initially": true,
         "authority": "AlgoCore_authored_self_check"
@@ -1063,8 +1063,8 @@
         "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism. One record occupies one logical slot; adding a field to a record does not increase the logical count of the containing array."
       },
       "python_connection": {
-        "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng và `score: int`; L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
-        "en": "L005-L011 verify that a record is a dict with a non-empty `name: str` and `score: int`; L021 inserts the whole record as one unit. These lines illustrate field structure, not evidence for a task-specific class requirement."
+        "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng; L049 yêu cầu `score` đúng kiểu integer và L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
+        "en": "L005-L011 verify that a record is a dict with a non-empty `name: str`; L049 requires an exact integer `score`, and L021 inserts the whole record as one unit. These lines illustrate field structure, not evidence for a task-specific class requirement."
       },
       "representation": {
         "vi": "Vẽ record như một hộp có các trường được đặt tên, ví dụ `{name: str, score: int}`. Truy cập bằng tên trường thay vì vị trí mơ hồ.",
@@ -1109,7 +1109,7 @@
         ],
         "active_line_ids": [
           "data-models.v1.L005",
-          "data-models.v1.L010",
+          "data-models.v1.L049",
           "data-models.v1.L021"
         ],
         "authority": "AlgoCore_authored_teaching_example"
@@ -1246,8 +1246,8 @@
         "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data. In the task's array model, capacity and logical count are different variables; both must be declared and initialised before deriving the valid-index interval."
       },
       "python_connection": {
-        "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L010 kiểm tra `score` thật sự là `int` trước khi dùng.",
-        "en": "In the data-models artifact, `records`, `capacity`, and `trace` are local parameters at L014; `added` and `message` at L029 exist only inside `run`. L010 checks that `score` is actually an `int` before use."
+        "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L049 dùng kiểm tra kiểu chính xác để loại `bool`, vì Python coi Boolean là một lớp con của integer.",
+        "en": "In the data-models artifact, `records`, `capacity`, and `trace` are local parameters at L014; `added` and `message` at L029 exist only inside `run`. L049 uses an exact type check to reject `bool`, because Python treats Boolean as a subclass of integer."
       },
       "representation": {
         "vi": "Theo dõi mỗi tên bằng ba thuộc tính: kiểu dự kiến, giá trị hiện tại và phạm vi. Ví dụ `capacity: int`, `added: bool`, `message: str`.",
@@ -1291,7 +1291,7 @@
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1"
         ],
         "active_line_ids": [
-          "data-models.v1.L010",
+          "data-models.v1.L049",
           "data-models.v1.L014",
           "data-models.v1.L029"
         ],
@@ -1299,12 +1299,12 @@
       },
       "self_check": {
         "prompt": {
-          "vi": "Vì sao L010 kiểm tra `int` trước khi chèn record?",
-          "en": "Why does L010 check for `int` before inserting the record?"
+          "vi": "Vì sao L049 dùng `type(score) is int` thay vì `isinstance(score, int)`?",
+          "en": "Why does L049 use `type(score) is int` instead of `isinstance(score, int)`?"
         },
         "answer": {
-          "vi": "Để bảo vệ hợp đồng kiểu của trường `score` và ngăn dữ liệu sai đi vào cấu trúc.",
-          "en": "To protect the type contract of `score` and prevent invalid data entering the structure."
+          "vi": "Để bảo vệ hợp đồng integer và không nhận `True` hoặc `False` như điểm số.",
+          "en": "To protect the integer contract and avoid accepting `True` or `False` as a score."
         },
         "rationale": {
           "vi": "Nếu bỏ kiểm tra, lỗi có thể xuất hiện muộn ở phép tính khác và khó truy nguồn.",
@@ -1963,8 +1963,8 @@
         "en": "Reading a file record involves parsing fields, checking count/types, converting values, then calling the constructor in the required parameter order. Append the object only after the complete record is valid to avoid partial state."
       },
       "python_connection": {
-        "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L075–L081 dispatch theo discriminator `BOOK`/`EBOOK`; L077 hoặc L079 gọi đúng constructor, rồi L082–L083 append và ghi loại object đã tạo.",
-        "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L075-L081 dispatch on the `BOOK`/`EBOOK` discriminator; L077 or L079 calls the matching constructor, then L082-L083 append and record the constructed object type."
+        "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L104–L105 loại số trang không dương trước khi L075–L081 dispatch theo discriminator; chỉ sau đó L077 hoặc L079 mới gọi constructor.",
+        "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L104-L105 reject a non-positive page count before L075-L081 dispatch on the discriminator; only then does L077 or L079 call a constructor."
       },
       "representation": {
         "vi": "Dùng pipeline `CSV fields -> validated typed values -> constructor arguments -> object list`; ghi line number cạnh record để truy lỗi.",
@@ -2011,6 +2011,8 @@
           "object-files.v1.L018",
           "object-files.v1.L073",
           "object-files.v1.L074",
+          "object-files.v1.L104",
+          "object-files.v1.L105",
           "object-files.v1.L075",
           "object-files.v1.L077",
           "object-files.v1.L079",
@@ -2021,12 +2023,12 @@
       },
       "self_check": {
         "prompt": {
-          "vi": "Vì sao L077/L079 nằm sau conversion L074?",
-          "en": "Why do L077/L079 come after conversion at L074?"
+          "vi": "Vì sao L077/L079 nằm sau conversion L074 và range check L104?",
+          "en": "Why do L077/L079 follow conversion L074 and range check L104?"
         },
         "answer": {
-          "vi": "Để cả hai constructor chỉ nhận `pages` đã chuyển thành int thành công.",
-          "en": "So both constructors receive `pages` only after successful integer conversion."
+          "vi": "Để constructor chỉ nhận `pages` đã chuyển thành integer dương hợp lệ.",
+          "en": "So a constructor receives only a successfully converted positive integer page count."
         },
         "rationale": {
           "vi": "Validation và dispatch trước mutation giữ list object nhất quán.",
@@ -2119,8 +2121,8 @@
         "en": "Lookup reads a key, traverses objects, and compares the correct identifier; on a match, it calls the required method/setter on that instance. The contract must decide whether to stop at the first match or process all matches and how to report not-found."
       },
       "python_connection": {
-        "vi": "L056–L060 là setter chỉ chấp nhận số trang nguyên dương. L086–L091 tìm theo `Title`, gọi setter và trả `UPDATED` hoặc `INVALID_UPDATE`; L092–L093 trả `NOT_FOUND` mà không sửa object. L094–L100 đưa cả status và state object sau thao tác vào output.",
-        "en": "L056-L060 implement a setter that accepts only a positive integer page count. L086-L091 search by `Title`, call the setter, and return `UPDATED` or `INVALID_UPDATE`; L092-L093 return `NOT_FOUND` without mutating an object. L094-L100 expose both status and post-operation object state."
+        "vi": "L056–L060 là setter chỉ chấp nhận số trang nguyên dương; L102 loại cả Boolean dù Python coi Boolean là integer. L086–L091 tìm theo `Title`, gọi setter và trả `UPDATED` hoặc `INVALID_UPDATE`; L092–L093 trả `NOT_FOUND` mà không sửa object.",
+        "en": "L056-L060 implement a setter that accepts only a positive integer page count; L102 also rejects Boolean even though Python treats it as integer. L086-L091 search by `Title`, call the setter, and return `UPDATED` or `INVALID_UPDATE`; L092-L093 return `NOT_FOUND` without mutation."
       },
       "representation": {
         "vi": "Dùng bảng trace `(index/object id, compared key, match?)`; khi match, nối tới method call và state before/after của object.",
@@ -2165,7 +2167,7 @@
         ],
         "active_line_ids": [
           "object-files.v1.L056",
-          "object-files.v1.L057",
+          "object-files.v1.L102",
           "object-files.v1.L059",
           "object-files.v1.L086",
           "object-files.v1.L088",
@@ -2856,8 +2858,8 @@
         "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing. State whether the operation consumes the queue or only reads it; if reduction uses dequeue, the postcondition must describe the changed queue."
       },
       "python_connection": {
-        "vi": "Pilot chọn preserve: L062 gọi `live_items`, rồi L063 tính tổng số từ bản sao logical. Không dequeue trong bước reduce, nên queue vẫn giữ dữ liệu; artifact chưa triển khai biến thể recursive consuming.",
-        "en": "The pilot chooses preserve: L062 calls `live_items`, then L063 totals numeric values from the logical copy. It does not dequeue during reduction, so the queue is preserved; the artifact does not implement a recursive consuming variant."
+        "vi": "`reduce_numeric` chốt số phần tử ban đầu tại L082 rồi gọi `dequeue` đúng số lần đó ở L085. L087 cập nhật accumulator; L089 enqueue lại item chỉ khi policy là preserve. Vì vậy cùng một thuật toán thể hiện rõ hai hậu trạng thái consume và preserve.",
+        "en": "`reduce_numeric` freezes the initial item count at L082 and calls `dequeue` exactly that many times at L085. L087 updates the accumulator; L089 enqueues the item again only under the preserve policy. The same algorithm therefore makes the consume and preserve post-states explicit."
       },
       "representation": {
         "vi": "Ghi accumulator cùng item đang xử lý và đánh dấu rõ policy `preserve` hoặc `consume`; với recursion, mỗi frame giữ phần còn chờ cộng.",
@@ -2901,21 +2903,23 @@
           "ac-9618-p4-2026-python.artifact.queue.pilot-v1"
         ],
         "active_line_ids": [
-          "queue.v1.L062",
-          "queue.v1.L063",
-          "queue.v1.L027",
-          "queue.v1.L039"
+          "queue.v1.L081",
+          "queue.v1.L082",
+          "queue.v1.L085",
+          "queue.v1.L087",
+          "queue.v1.L089",
+          "queue.v1.L091"
         ],
         "authority": "AlgoCore_authored_teaching_example"
       },
       "self_check": {
         "prompt": {
-          "vi": "Artifact pilot đang dùng policy nào, và line nào chứng minh?",
-          "en": "Which policy does the pilot use, and which lines establish it?"
+          "vi": "Line nào phân biệt consume và preserve?",
+          "en": "Which line separates consume from preserve?"
         },
         "answer": {
-          "vi": "Preserve; L062 lấy bản sao từ `live_items` và L063 reduce bản sao, không gọi dequeue.",
-          "en": "Preserve; L062 obtains a copy from `live_items` and L063 reduces that copy without calling dequeue."
+          "vi": "L089 chỉ enqueue lại item khi `preserve=True`; nếu false, các lần dequeue làm queue rỗng.",
+          "en": "L089 enqueues the item again only when `preserve=True`; otherwise the dequeues empty the queue."
         },
         "rationale": {
           "vi": "Policy phải được đọc từ source contract trước khi chọn thuật toán.",

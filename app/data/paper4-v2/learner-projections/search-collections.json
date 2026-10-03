@@ -1,0 +1,600 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Linear search, counting and record selection",
+    "vi": "Tìm tuyến tính, đếm và chọn bản ghi"
+  },
+  "exam_family": {
+    "en": "Choose and implement the correct sequential-scan result contract",
+    "vi": "Chọn và cài đặt đúng hợp đồng kết quả khi quét tuần tự"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Scan unsorted data, preserve the first matching index, return an explicit missing result, then adapt the stop and update rule for count, filter and group tasks.",
+    "vi": "Quét dữ liệu chưa sắp, giữ index khớp đầu tiên, trả kết quả không tìm thấy rõ ràng, rồi điều chỉnh quy tắc dừng và cập nhật cho bài đếm, lọc và gom nhóm."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Identify the exact result contract before writing a scan.",
+      "vi": "Xác định chính xác hợp đồng kết quả trước khi viết vòng quét."
+    },
+    {
+      "en": "Trace a first-index linear search without replacing the first match.",
+      "vi": "Trace linear search tìm index đầu tiên mà không thay thế match đầu."
+    },
+    {
+      "en": "Treat empty and absent-target cases as valid results under the declared sentinel contract.",
+      "vi": "Xem collection rỗng và target không tồn tại là kết quả hợp lệ theo hợp đồng sentinel đã nêu."
+    },
+    {
+      "en": "Explain why count and filter continue after a match and why grouping updates or creates exactly one group.",
+      "vi": "Giải thích vì sao count và filter tiếp tục sau một match và vì sao grouping chỉ cập nhật hoặc tạo đúng một nhóm."
+    }
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one indexed array with cursor, target and found state",
+    "trace_rule": "one decision and no more than three focused code lines per step",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "transfer_rule": "count, filter and group are attempt-gated static transfers, not duplicate traces",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What result must this scan produce?",
+        "vi": "Vòng quét này phải tạo ra kết quả gì?"
+      },
+      "intro": {
+        "en": "Use a sequential scan when order is not guaranteed. Before coding, decide whether the task wants one match, a Boolean, a count, all matching records or grouped totals.",
+        "vi": "Dùng quét tuần tự khi dữ liệu không bảo đảm đã sắp. Trước khi code, xác định đề cần một match, Boolean, số đếm, mọi record khớp hay tổng theo nhóm."
+      },
+      "prompt_fragment": {
+        "en": "For this primary example, return the index of the first target in values, or -1 when it is absent.",
+        "vi": "Trong ví dụ chính này, trả index của target xuất hiện đầu tiên trong values, hoặc -1 khi không tồn tại."
+      },
+      "cues": [
+        {
+          "en": "The data is not guaranteed to be sorted.",
+          "vi": "Dữ liệu không được bảo đảm đã sắp."
+        },
+        {
+          "en": "The question states a target and a required result type.",
+          "vi": "Đề nêu target và kiểu kết quả bắt buộc."
+        },
+        {
+          "en": "One-result tasks may stop or preserve the first match; count and filter must examine the full live range.",
+          "vi": "Bài cần một kết quả có thể dừng hoặc giữ match đầu; count và filter phải xét toàn bộ phạm vi sống."
+        },
+        {
+          "en": "Grouping uses a key to update one existing group or create one new group.",
+          "vi": "Grouping dùng key để cập nhật một nhóm có sẵn hoặc tạo một nhóm mới."
+        }
+      ],
+      "precondition": {
+        "en": "values is an iterable sequence; equality with target is defined; -1 is reserved as this example’s not-found sentinel.",
+        "vi": "values là sequence có thể lặp; phép so sánh bằng với target được xác định; -1 được dành làm sentinel không tìm thấy của ví dụ này."
+      },
+      "output_contract": {
+        "en": "Return the zero-based index of the first match, otherwise -1. A real question may require a different contract.",
+        "vi": "Trả index bắt đầu từ 0 của match đầu tiên, nếu không có thì trả -1. Một đề thực tế có thể yêu cầu hợp đồng khác."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu mô hình"
+      },
+      "student_question": {
+        "en": "What must remain true while the cursor moves?",
+        "vi": "Điều gì phải luôn đúng khi cursor di chuyển?"
+      },
+      "mental_model": {
+        "en": "Move one cursor from left to right. found is -1 until the first match; once set, later matches cannot replace it.",
+        "vi": "Di chuyển một cursor từ trái sang phải. found là -1 cho đến match đầu; sau khi được gán, các match sau không thể thay thế nó."
+      },
+      "rules": [
+        {
+          "en": "State the live range, comparison and result contract before the loop.",
+          "vi": "Nêu phạm vi sống, phép so sánh và hợp đồng kết quả trước vòng lặp."
+        },
+        {
+          "en": "Initialise found to the declared not-found sentinel.",
+          "vi": "Khởi tạo found bằng sentinel không tìm thấy đã nêu."
+        },
+        {
+          "en": "Inspect each live item in index order and set found only while it is still -1.",
+          "vi": "Kiểm tra từng phần tử sống theo thứ tự index và chỉ gán found khi nó vẫn là -1."
+        },
+        {
+          "en": "Return the final result after the scan; adapt the stop/update rule only when the question changes contract.",
+          "vi": "Trả kết quả cuối sau vòng quét; chỉ điều chỉnh quy tắc dừng/cập nhật khi đề đổi hợp đồng."
+        }
+      ],
+      "invariant": {
+        "en": "After index i, found is -1 if no checked item matches; otherwise it is the first matching index among checked items.",
+        "vi": "Sau index i, found là -1 nếu chưa có phần tử đã kiểm tra nào khớp; nếu có, found là index khớp đầu tiên trong các phần tử đã kiểm tra."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Teaching excerpt: preserve the first matching index",
+          "vi": "Teaching excerpt: giữ index khớp đầu tiên"
+        },
+        "lines": [
+          "def first_index(values, target):",
+          "    found = -1",
+          "    for index, value in enumerate(values):",
+          "        if found == -1 and value == target:",
+          "            found = index",
+          "    return found"
+        ],
+        "contract_note": {
+          "en": "This AlgoCore teaching function uses -1 for this example. Cambridge questions may instead require a Boolean, retained position or later object update.",
+          "vi": "Function dạy học AlgoCore này dùng -1 cho ví dụ này. Đề Cambridge có thể yêu cầu Boolean, vị trí được lưu hoặc cập nhật object sau đó."
+        }
+      },
+      "transfer_note": {
+        "label": {
+          "en": "Three separate transfer contracts",
+          "vi": "Ba hợp đồng transfer riêng"
+        },
+        "content": {
+          "en": "Count increments for every match; filter appends every record satisfying the full predicate; group aggregation updates one matching group or creates one new group.",
+          "vi": "Count tăng cho mọi match; filter append mọi record thỏa đầy đủ predicate; group aggregation cập nhật một nhóm khớp hoặc tạo một nhóm mới."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "What are cursor and found after this decision?",
+        "vi": "cursor và found là gì sau quyết định này?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Find the first 4 in [4, 2, 4, 8]",
+          "vi": "Tìm số 4 đầu tiên trong [4, 2, 4, 8]"
+        },
+        "values": [
+          4,
+          2,
+          4,
+          8
+        ],
+        "target": 4,
+        "instruction": {
+          "en": "Predict the comparison and found state before each reveal.",
+          "vi": "Dự đoán phép so sánh và trạng thái found trước mỗi lần mở."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "found = -1",
+            "for index, value in enumerate(values):",
+            "if found == -1 and value == target:"
+          ],
+          "prediction": {
+            "en": "At index 0, does the condition run and what becomes found?",
+            "vi": "Tại index 0, condition có chạy không và found trở thành gì?"
+          },
+          "answer": {
+            "en": "value is 4 and found is -1, so the condition is true and found becomes 0.",
+            "vi": "value là 4 và found là -1, nên condition đúng và found trở thành 0."
+          }
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "if found == -1 and value == target:",
+            "    found = index"
+          ],
+          "prediction": {
+            "en": "Index 1 misses and index 2 matches. Can index 2 replace found?",
+            "vi": "Index 1 không khớp và index 2 khớp. Index 2 có thể thay found không?"
+          },
+          "answer": {
+            "en": "Index 1 leaves found at 0. At index 2, value matches but found == -1 is false, so the first index remains 0.",
+            "vi": "Index 1 giữ found bằng 0. Tại index 2, value khớp nhưng found == -1 là false, nên index đầu tiên vẫn là 0."
+          }
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "for index, value in enumerate(values):",
+            "    return found"
+          ],
+          "prediction": {
+            "en": "After index 3, what exact result is returned?",
+            "vi": "Sau index 3, kết quả chính xác nào được trả về?"
+          },
+          "answer": {
+            "en": "Index 3 does not match. The scan ends and returns 0.",
+            "vi": "Index 3 không khớp. Vòng quét kết thúc và trả 0."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "found changes at most once and always names the first matching index among inspected items.",
+        "vi": "found thay đổi nhiều nhất một lần và luôn là index khớp đầu tiên trong các phần tử đã kiểm tra."
+      },
+      "variants": [
+        {
+          "kind": "boundary",
+          "input": {
+            "values": [],
+            "target": 9
+          },
+          "expected": {
+            "found": -1
+          },
+          "explanation": {
+            "en": "There are no live items to inspect, so the declared sentinel -1 is returned. This is a valid boundary result.",
+            "vi": "Không có phần tử sống nào để kiểm tra, nên sentinel -1 đã nêu được trả về. Đây là kết quả boundary hợp lệ."
+          }
+        },
+        {
+          "kind": "not_found",
+          "input": {
+            "values": [
+              1,
+              3,
+              5
+            ],
+            "target": 2
+          },
+          "expected": {
+            "found": -1
+          },
+          "explanation": {
+            "en": "All three items are inspected and none matches, so -1 is returned. Absence is a valid search result, not an execution failure.",
+            "vi": "Cả ba phần tử đều được kiểm tra và không phần tử nào khớp, nên trả -1. Không tìm thấy là kết quả tìm kiếm hợp lệ, không phải execution failure."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I choose the correct scan contract?",
+        "vi": "Tôi có thể chọn đúng hợp đồng quét không?"
+      },
+      "attempt_rule": {
+        "en": "Write the result and stop/update rule before opening support.",
+        "vi": "Viết kết quả và quy tắc dừng/cập nhật trước khi mở hỗ trợ."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Find a last-position target",
+            "vi": "Tìm target ở vị trí cuối"
+          },
+          "prompt": {
+            "en": "Use first_index on [7, 4, 9] with target 9. State the returned value.",
+            "vi": "Dùng first_index với [7, 4, 9] và target 9. Nêu giá trị trả về."
+          },
+          "hint": {
+            "en": "Inspect indexes in order and keep the first match.",
+            "vi": "Kiểm tra các index theo thứ tự và giữ match đầu."
+          },
+          "model_answer": {
+            "en": "The returned index is 2.",
+            "vi": "Index trả về là 2."
+          },
+          "success_check": {
+            "en": "The result is an index, not the matching value.",
+            "vi": "Kết quả là index, không phải value khớp."
+          }
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm gợi ý"
+          },
+          "title": {
+            "en": "Change the result contract",
+            "vi": "Đổi hợp đồng kết quả"
+          },
+          "prompt": {
+            "en": "Rewrite the outcome rule for a Boolean search of [1, 3, 5] for 2.",
+            "vi": "Viết lại quy tắc kết quả cho tìm kiếm Boolean trên [1, 3, 5] với target 2."
+          },
+          "hint": {
+            "en": "A Boolean contract returns True on a match and False after exhaustion.",
+            "vi": "Hợp đồng Boolean trả True khi khớp và False sau khi quét hết."
+          },
+          "model_answer": {
+            "en": "No element matches, so return False after the scan.",
+            "vi": "Không phần tử nào khớp, nên trả False sau vòng quét."
+          },
+          "success_check": {
+            "en": "The answer follows the Boolean contract instead of returning -1.",
+            "vi": "Câu trả lời theo hợp đồng Boolean thay vì trả -1."
+          }
+        },
+        {
+          "level": {
+            "en": "Transfer",
+            "vi": "Vận dụng"
+          },
+          "title": {
+            "en": "Count every match",
+            "vi": "Đếm mọi match"
+          },
+          "prompt": {
+            "en": "How many times does 4 occur in [4, 2, 4, 8], and may the scan stop after index 0?",
+            "vi": "Số 4 xuất hiện bao nhiêu lần trong [4, 2, 4, 8], và vòng quét có được dừng sau index 0 không?"
+          },
+          "hint": {
+            "en": "A count-all task must examine the complete range.",
+            "vi": "Bài count-all phải kiểm tra toàn bộ phạm vi."
+          },
+          "model_answer": {
+            "en": "The count is 2. The scan must continue after index 0 to find the match at index 2.",
+            "vi": "Số đếm là 2. Vòng quét phải tiếp tục sau index 0 để tìm match tại index 2."
+          },
+          "success_check": {
+            "en": "One is added exactly once for each matching item.",
+            "vi": "Cộng một đúng một lần cho mỗi phần tử khớp."
+          }
+        },
+        {
+          "level": {
+            "en": "Transfer",
+            "vi": "Vận dụng"
+          },
+          "title": {
+            "en": "Filter every matching record",
+            "vi": "Lọc mọi record khớp"
+          },
+          "prompt": {
+            "en": "For records with amount 5, 2 and 4, retain every record with amount >= 4. State the retained amounts.",
+            "vi": "Với các record có amount 5, 2 và 4, giữ mọi record có amount >= 4. Nêu các amount được giữ."
+          },
+          "hint": {
+            "en": "Apply the same predicate to every record and append each match.",
+            "vi": "Áp dụng cùng predicate cho mọi record và append từng match."
+          },
+          "model_answer": {
+            "en": "Retain amounts 5 and 4, in their scan order.",
+            "vi": "Giữ amount 5 và 4 theo thứ tự quét."
+          },
+          "success_check": {
+            "en": "The scan did not stop after the first retained record.",
+            "vi": "Vòng quét không dừng sau record được giữ đầu tiên."
+          }
+        },
+        {
+          "level": {
+            "en": "Transfer",
+            "vi": "Vận dụng"
+          },
+          "title": {
+            "en": "Update or create one group",
+            "vi": "Cập nhật hoặc tạo một nhóm"
+          },
+          "prompt": {
+            "en": "Groups are A:5 and B:2. Process item A:4. Which group changes, and is a new group created?",
+            "vi": "Các nhóm là A:5 và B:2. Xử lý item A:4. Nhóm nào thay đổi và có tạo nhóm mới không?"
+          },
+          "hint": {
+            "en": "Scan existing live groups before creating a new key.",
+            "vi": "Quét các nhóm sống có sẵn trước khi tạo key mới."
+          },
+          "model_answer": {
+            "en": "Update A to 9. B stays 2 and no new group is created.",
+            "vi": "Cập nhật A thành 9. B vẫn là 2 và không tạo nhóm mới."
+          },
+          "success_check": {
+            "en": "The item contributes once to exactly one group.",
+            "vi": "Item đóng góp một lần vào đúng một nhóm."
+          }
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which small scan error changes the required result?",
+        "vi": "Lỗi quét nhỏ nào làm thay đổi kết quả bắt buộc?"
+      },
+      "before_code": [
+        {
+          "en": "Write the result type, live range, stop rule and not-found result before coding.",
+          "vi": "Viết kiểu kết quả, phạm vi sống, quy tắc dừng và kết quả không tìm thấy trước khi code."
+        }
+      ],
+      "core_code_caption": {
+        "en": "Three-line submission checkpoint",
+        "vi": "Checkpoint ba dòng trước khi nộp"
+      },
+      "core_code": [
+        "found = -1",
+        "for index, value in enumerate(values):",
+        "    if found == -1 and value == target:"
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Returning a value when the question asks for an index or Boolean.",
+            "vi": "Trả value khi đề yêu cầu index hoặc Boolean."
+          },
+          "consequence": {
+            "en": "The scan may find the correct item but return the wrong contract.",
+            "vi": "Vòng quét có thể tìm đúng item nhưng trả sai hợp đồng."
+          },
+          "repair": {
+            "en": "Write the exact required result type before the loop.",
+            "vi": "Viết chính xác kiểu kết quả bắt buộc trước vòng lặp."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Scanning storage capacity instead of the live range.",
+            "vi": "Quét capacity thay vì phạm vi sống."
+          },
+          "consequence": {
+            "en": "Unused entries may be compared or processed.",
+            "vi": "Các ô chưa dùng có thể bị so sánh hoặc xử lý."
+          },
+          "repair": {
+            "en": "Use the question’s live length or exact occupied bounds.",
+            "vi": "Dùng live length hoặc bounds đang sử dụng theo đề."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Stopping after the first match in a count-all or filter-all task.",
+            "vi": "Dừng sau match đầu trong bài count-all hoặc filter-all."
+          },
+          "consequence": {
+            "en": "Later matching items are omitted.",
+            "vi": "Các phần tử khớp phía sau bị bỏ sót."
+          },
+          "repair": {
+            "en": "Match the stop rule to the requested result contract.",
+            "vi": "Khớp quy tắc dừng với hợp đồng kết quả được yêu cầu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Leaving the not-found result implicit.",
+            "vi": "Để kết quả không tìm thấy ở trạng thái ngầm định."
+          },
+          "consequence": {
+            "en": "The caller may receive None or stale state instead of the required result.",
+            "vi": "Nơi gọi có thể nhận None hoặc state cũ thay vì kết quả bắt buộc."
+          },
+          "repair": {
+            "en": "Initialise and return the explicit sentinel or Boolean required by the question.",
+            "vi": "Khởi tạo và trả sentinel hoặc Boolean rõ ràng theo yêu cầu đề."
+          }
+        }
+      ],
+      "boundary_trace": [
+        {
+          "en": "Empty and absent inputs both return -1 in this example, but for different reasons; neither is an execution failure.",
+          "vi": "Input rỗng và target không tồn tại đều trả -1 trong ví dụ này, nhưng vì lý do khác nhau; cả hai đều không phải execution failure."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Did I use the required result type, scan only live data, stop at the correct time and return an explicit missing result?",
+          "vi": "Tôi đã dùng đúng kiểu kết quả, chỉ quét dữ liệu sống, dừng đúng lúc và trả kết quả không tìm thấy rõ ràng chưa?"
+        }
+      ],
+      "authority_note": {
+        "en": "Follow the result, accessor, comparison and live-range contract stated by the question; do not reuse one pattern’s trace as proof of another.",
+        "vi": "Làm theo hợp đồng kết quả, accessor, phép so sánh và phạm vi sống do đề nêu; không dùng trace của pattern này làm bằng chứng cho pattern khác."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the scan and choose its result contract?",
+        "vi": "Tôi có thể dựng lại vòng quét và chọn hợp đồng kết quả không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "What must be decided before writing a search loop?",
+            "vi": "Điều gì phải được quyết định trước khi viết vòng lặp search?"
+          },
+          "answer": {
+            "en": "The live range, comparison rule, required result type, stop rule and not-found result.",
+            "vi": "Phạm vi sống, quy tắc so sánh, kiểu kết quả bắt buộc, quy tắc dừng và kết quả không tìm thấy."
+          }
+        },
+        {
+          "prompt": {
+            "en": "Why does the repeated 4 at index 2 not replace index 0?",
+            "vi": "Vì sao số 4 lặp tại index 2 không thay index 0?"
+          },
+          "answer": {
+            "en": "found is updated only while it is -1, so the first match is preserved.",
+            "vi": "found chỉ được cập nhật khi còn là -1, nên match đầu được giữ lại."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What does an empty values list return in this example?",
+            "vi": "Danh sách values rỗng trả gì trong ví dụ này?"
+          },
+          "answer": {
+            "en": "-1, the declared not-found sentinel.",
+            "vi": "-1, sentinel không tìm thấy đã nêu."
+          }
+        },
+        {
+          "prompt": {
+            "en": "Why must count and filter continue after a match?",
+            "vi": "Vì sao count và filter phải tiếp tục sau một match?"
+          },
+          "answer": {
+            "en": "Their contracts require every match, so later matching items still affect the result.",
+            "vi": "Hợp đồng của chúng yêu cầu mọi match, nên các phần tử khớp phía sau vẫn ảnh hưởng kết quả."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What are the two outcomes when grouping one item?",
+            "vi": "Hai kết quả khi grouping một item là gì?"
+          },
+          "answer": {
+            "en": "Update exactly one existing group, or create exactly one new group when no key matches.",
+            "vi": "Cập nhật đúng một nhóm có sẵn, hoặc tạo đúng một nhóm mới khi không có key khớp."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "From memory, write first_index, trace a repeated target and an absent target, then state how the update/stop rule changes for count, filter and group.",
+        "vi": "Từ trí nhớ, viết first_index, trace một target lặp và một target không tồn tại, rồi nêu cách quy tắc cập nhật/dừng thay đổi cho count, filter và group."
+      },
+      "next_step": {
+        "en": "Continue to sorting, where the data order itself becomes part of the algorithm contract.",
+        "vi": "Học tiếp sorting, nơi thứ tự dữ liệu trở thành một phần của hợp đồng thuật toán."
+      }
+    }
+  }
+}

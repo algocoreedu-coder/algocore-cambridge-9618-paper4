@@ -39,20 +39,21 @@ export function AppProviders({
   }, [locale]);
 
   useEffect(() => {
-    const preservePaper4Locale = (event: MouseEvent) => {
+    const preserveLearningLocale = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
       const anchor = target.closest<HTMLAnchorElement>("a[href]");
       if (!anchor || anchor.target || anchor.hasAttribute("download") || anchor.hasAttribute("data-locale-switch")) return;
       const url = new URL(anchor.href, window.location.href);
-      if (url.origin !== window.location.origin || !url.pathname.startsWith("/paper-4")) return;
+      const isLearningRoute = /^\/paper-[234](?:\/|$)/.test(url.pathname);
+      if (url.origin !== window.location.origin || !isLearningRoute) return;
       if (url.searchParams.get("lang") === locale) return;
       url.searchParams.set("lang", locale);
       anchor.href = `${url.pathname}?${url.searchParams.toString()}${url.hash}`;
     };
-    document.addEventListener("click", preservePaper4Locale, true);
-    return () => document.removeEventListener("click", preservePaper4Locale, true);
+    document.addEventListener("click", preserveLearningLocale, true);
+    return () => document.removeEventListener("click", preserveLearningLocale, true);
   }, [locale]);
 
   useEffect(() => {

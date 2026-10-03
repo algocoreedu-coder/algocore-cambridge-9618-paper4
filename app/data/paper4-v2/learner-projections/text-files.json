@@ -1,0 +1,569 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Text-file processing",
+    "vi": "Xử lý text file"
+  },
+  "exam_family": {
+    "en": "Read, write, append and organised file processing",
+    "vi": "Đọc, ghi, nối và xử lý tổ chức file"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Choose the correct file mode, process complete records safely, and clearly distinguish serial storage from key-ordered sequential file organisation in questions.",
+    "vi": "Chọn đúng file mode, xử lý record hoàn chỉnh an toàn và phân biệt rõ serial storage với tổ chức sequential file theo key trong câu hỏi."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Recognise this question family and extract its contract.",
+      "vi": "Nhận diện dạng câu hỏi và rút ra contract."
+    },
+    {
+      "en": "Explain the governing rule before attempting the task.",
+      "vi": "Giải thích quy tắc chính trước khi làm."
+    },
+    {
+      "en": "Trace a normal path and protect the relevant boundary or failure state.",
+      "vi": "Trace normal path và bảo vệ boundary hoặc failure state liên quan."
+    }
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What is this question asking me to preserve?",
+        "vi": "Câu hỏi yêu cầu tôi giữ điều gì?"
+      },
+      "intro": {
+        "en": "Choose the correct file mode, process complete records safely, and clearly distinguish serial storage from key-ordered sequential file organisation in questions.",
+        "vi": "Chọn đúng file mode, xử lý record hoàn chỉnh an toàn và phân biệt rõ serial storage với tổ chức sequential file theo key trong câu hỏi."
+      },
+      "prompt_fragment": {
+        "en": "open, read, write, append, line, record, serial, sequential",
+        "vi": "open, read, write, append, line, record, serial, sequential"
+      },
+      "cues": [
+        {
+          "en": "open, read, write, append, line, record, serial, sequential",
+          "vi": "open, read, write, append, line, record, serial, sequential"
+        },
+        {
+          "en": "Know the file name, record format, mode and expected missing-file behaviour.",
+          "vi": "Biết file name, record format, mode và hành vi khi thiếu file."
+        },
+        {
+          "en": "Produce the requested records and close the file even when processing fails.",
+          "vi": "Tạo các record được yêu cầu và đóng file kể cả khi xử lý lỗi."
+        }
+      ],
+      "precondition": {
+        "en": "Know the file name, record format, mode and expected missing-file behaviour.",
+        "vi": "Biết file name, record format, mode và hành vi khi thiếu file."
+      },
+      "output_contract": {
+        "en": "Produce the requested records and close the file even when processing fails.",
+        "vi": "Tạo các record được yêu cầu và đóng file kể cả khi xử lý lỗi."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu quy tắc"
+      },
+      "student_question": {
+        "en": "What rule controls every correct step?",
+        "vi": "Quy tắc nào kiểm soát mọi bước đúng?"
+      },
+      "mental_model": {
+        "en": "The mode controls whether content is read, replaced or extended. File organisation describes record order, not the loop used to read.",
+        "vi": "Mode quyết định đọc, thay hoặc nối nội dung. File organisation mô tả thứ tự record, không phải vòng lặp đọc."
+      },
+      "rules": [
+        {
+          "en": "Use read mode for existing input, write mode to replace/create, and append mode to add at the end.",
+          "vi": "Dùng read mode cho input có sẵn, write để thay/tạo, append để nối cuối."
+        },
+        {
+          "en": "Write one complete record with its line separator.",
+          "vi": "Ghi một record hoàn chỉnh kèm line separator."
+        },
+        {
+          "en": "Serial records follow arrival order; sequential records are maintained in key order.",
+          "vi": "Serial record theo thứ tự đến; sequential record được duy trì theo thứ tự key."
+        }
+      ],
+      "invariant": {
+        "en": "Each accepted record is written exactly once in the required format and mode.",
+        "vi": "Mỗi record hợp lệ được ghi đúng một lần theo format và mode yêu cầu."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Focused exam recipe",
+          "vi": "Khung làm bài trọng tâm"
+        },
+        "lines": [
+          "with open('scores.txt', 'a', encoding='utf-8') as file:",
+          "    file.write(name + ',' + str(score) + '\\n')",
+          "with open('scores.txt', 'r', encoding='utf-8') as file:",
+          "    for line in file:",
+          "        fields = line.rstrip('\\n').split(',')"
+        ],
+        "contract_note": {
+          "en": "Use this as a small teaching excerpt; adapt names and exact behaviour to the question contract.",
+          "vi": "Dùng đây như đoạn hướng dẫn ngắn; điều chỉnh tên và hành vi theo đúng contract của đề."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "Which file mode preserves the required records, and how is one complete text record encoded?",
+        "vi": "File mode nào giữ đúng record cần thiết và một text record hoàn chỉnh được encode thế nào?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Write, append and read comma-separated score records",
+          "vi": "Write, append và read comma-separated score records"
+        },
+        "instruction": {
+          "en": "Predict mode effect, exact line text and parsed fields before reveal.",
+          "vi": "Dự đoán tác động mode, line text chính xác và parsed fields trước khi mở."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "with open('scores.txt', 'a', encoding='utf-8') as file:"
+          ],
+          "prediction": {
+            "en": "If yesterday's data must remain, should today's record use 'w' or 'a'?",
+            "vi": "Nếu phải giữ data hôm qua, record hôm nay dùng 'w' hay 'a'?"
+          },
+          "answer": {
+            "en": "Use 'a' because append writes at the end without truncating existing records.",
+            "vi": "Dùng 'a' vì append ghi cuối file mà không truncate records hiện có."
+          }
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "file.write(name + ',' + str(score) + '\\n')"
+          ],
+          "prediction": {
+            "en": "For Asha and 73, what exact text is written?",
+            "vi": "Với Asha và 73, text chính xác nào được write?"
+          },
+          "answer": {
+            "en": "Write 'Asha,73\\n'; converting 73 to text and adding newline completes one record.",
+            "vi": "Write 'Asha,73\\n'; convert 73 thành text và thêm newline để hoàn tất một record."
+          }
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "for line in file:",
+            "fields = line.rstrip('\\n').split(',')"
+          ],
+          "prediction": {
+            "en": "When the line is read back, what are fields and which value still needs conversion?",
+            "vi": "Khi đọc line lại, fields là gì và value nào vẫn cần conversion?"
+          },
+          "answer": {
+            "en": "fields is ['Asha','73']; convert '73' to integer before numeric processing.",
+            "vi": "fields là ['Asha','73']; convert '73' thành integer trước numeric processing."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "Each accepted record is written exactly once in the required format and mode.",
+        "vi": "Mỗi record hợp lệ được ghi đúng một lần theo format và mode yêu cầu."
+      },
+      "variants": [
+        {
+          "kind": "boundary_empty_file",
+          "input": {
+            "lines": []
+          },
+          "expected": {
+            "records": 0,
+            "loop_iterations": 0
+          },
+          "explanation": {
+            "en": "The loop runs zero times and produces an empty result without inventing a record.",
+            "vi": "Loop chạy zero lần và tạo empty result mà không tự sinh record."
+          },
+          "question": {
+            "en": "The input text file has no lines. How many loop iterations and records result?",
+            "vi": "Input text file không có line. Có bao nhiêu loop iterations và records?"
+          },
+          "options": [
+            {
+              "id": "zero-records",
+              "label": {
+                "en": "0 iterations and an empty result",
+                "vi": "0 iterations và empty result"
+              }
+            },
+            {
+              "id": "one-blank",
+              "label": {
+                "en": "1 blank record",
+                "vi": "1 blank record"
+              }
+            }
+          ],
+          "correct_option_id": "zero-records",
+          "retry_hint": {
+            "en": "A for line in file loop runs once per existing line.",
+            "vi": "Loop for line in file chạy một lần cho mỗi line hiện có."
+          },
+          "correct_feedback": {
+            "en": "With no lines, the loop never runs and no record is invented.",
+            "vi": "Không có line nên loop không chạy và không tạo record."
+          },
+          "misconception_feedback": {
+            "en": "An empty file is not the same as a file containing one blank line.",
+            "vi": "Empty file không giống file có một blank line."
+          }
+        },
+        {
+          "kind": "failure_malformed_record",
+          "input": {
+            "line": "Asha"
+          },
+          "expected": {
+            "accepted": false,
+            "reason": "field_count"
+          },
+          "explanation": {
+            "en": "Check the field count before unpacking or conversion; reject the malformed line safely.",
+            "vi": "Check field count trước unpack/conversion; reject malformed line an toàn."
+          },
+          "question": {
+            "en": "The line 'Asha' has no comma. What should happen before unpacking name and score?",
+            "vi": "Line 'Asha' không có comma. Điều gì nên xảy ra trước unpack name và score?"
+          },
+          "options": [
+            {
+              "id": "reject-line",
+              "label": {
+                "en": "Reject the line after field-count check",
+                "vi": "Reject line sau field-count check"
+              }
+            },
+            {
+              "id": "invent-score",
+              "label": {
+                "en": "Use an empty score and accept it",
+                "vi": "Dùng empty score rồi accept"
+              }
+            }
+          ],
+          "correct_option_id": "reject-line",
+          "retry_hint": {
+            "en": "Split first and require exactly two fields before conversion.",
+            "vi": "Split trước và yêu cầu đúng hai fields trước conversion."
+          },
+          "correct_feedback": {
+            "en": "The field-count guard rejects the malformed record safely.",
+            "vi": "Field-count guard reject malformed record an toàn."
+          },
+          "misconception_feedback": {
+            "en": "Inventing a missing score hides bad source data and can fail later during integer conversion.",
+            "vi": "Tự tạo missing score che bad source data và có thể fail lúc integer conversion."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I solve the same contract with less support?",
+        "vi": "Tôi có thể giải cùng contract với ít hỗ trợ hơn không?"
+      },
+      "attempt_rule": {
+        "en": "Attempt the task before opening the hint or model answer.",
+        "vi": "Làm thử trước khi mở hint hoặc model answer."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Choose the mode",
+            "vi": "Chọn mode để thay report hôm qua, rồi để thêm record hôm nay"
+          },
+          "prompt": {
+            "en": "Choose the mode for replacing yesterday's report, then for adding today's record.",
+            "vi": "Chọn mode để thay report hôm qua, rồi để thêm record hôm nay."
+          },
+          "hint": {
+            "en": "Choose 'w' only when replacement/truncation is required; choose 'a' to preserve existing lines.",
+            "vi": "Chọn 'w' chỉ khi cần replace/truncate; chọn 'a' để giữ lines hiện có."
+          },
+          "model_answer": {
+            "en": "Use 'w' to replace/create and 'a' to append.",
+            "vi": "Dùng 'w' để thay/tạo và 'a' để nối."
+          },
+          "success_check": {
+            "en": "The answer uses 'w' for replacement and 'a' for preserving then adding.",
+            "vi": "Đáp án dùng 'w' để replace và 'a' để giữ rồi thêm."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-02",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-03"
+          ]
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm hỗ trợ"
+          },
+          "title": {
+            "en": "Write one record",
+            "vi": "Ghi name 'Asha' và score 73 thành một dòng phân cách bằng dấu phẩy, có line ending"
+          },
+          "prompt": {
+            "en": "Write name 'Asha' and score 73 as one comma-separated line including the line ending.",
+            "vi": "Ghi name 'Asha' và score 73 thành một dòng phân cách bằng dấu phẩy, có line ending."
+          },
+          "hint": {
+            "en": "Build name, comma, converted score and newline in that exact order.",
+            "vi": "Ghép name, comma, score đã convert và newline đúng thứ tự."
+          },
+          "model_answer": {
+            "en": "file.write('Asha,73\\n') writes one complete record.",
+            "vi": "file.write('Asha,73\\n') ghi một record hoàn chỉnh."
+          },
+          "success_check": {
+            "en": "The exact record is Asha,73 followed by one newline.",
+            "vi": "Record chính xác là Asha,73 theo sau bởi một newline."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-06"
+          ]
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Độc lập"
+          },
+          "title": {
+            "en": "Separate organisation from access",
+            "vi": "Giải thích dữ liệu theo thứ tự đến là serial hay sequential, rồi nêu quy tắc thêm cho sequential theo ID"
+          },
+          "prompt": {
+            "en": "Explain whether arrival-order data is serial or sequential, then state the extra rule for sequential organisation by ID.",
+            "vi": "Giải thích dữ liệu theo thứ tự đến là serial hay sequential, rồi nêu quy tắc thêm cho sequential theo ID."
+          },
+          "hint": {
+            "en": "State the ordering rule: arrival order is serial; key-sorted records are sequential.",
+            "vi": "Nêu ordering rule: arrival order là serial; records sort theo key là sequential."
+          },
+          "model_answer": {
+            "en": "Arrival order is serial. Sequential organisation keeps records ordered by the chosen key such as ID.",
+            "vi": "Thứ tự đến là serial. Sequential giữ record theo thứ tự key đã chọn như ID."
+          },
+          "success_check": {
+            "en": "The answer distinguishes serial arrival order from sequential key order.",
+            "vi": "Đáp án phân biệt serial arrival order với sequential key order."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-10.3-01",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-07",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-20.2-08"
+          ]
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which mistake would break the contract first?",
+        "vi": "Lỗi nào phá contract đầu tiên?"
+      },
+      "before_code": [
+        {
+          "en": "Know the file name, record format, mode and expected missing-file behaviour.",
+          "vi": "Biết file name, record format, mode và hành vi khi thiếu file."
+        },
+        {
+          "en": "Produce the requested records and close the file even when processing fails.",
+          "vi": "Tạo các record được yêu cầu và đóng file kể cả khi xử lý lỗi."
+        }
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Coding before fixing the input, output and stopping contract.",
+            "vi": "Viết code trước khi chốt input, output và stopping contract."
+          },
+          "consequence": {
+            "en": "A plausible algorithm can answer a different question.",
+            "vi": "Thuật toán nhìn hợp lý nhưng có thể trả lời câu hỏi khác."
+          },
+          "repair": {
+            "en": "Write the contract in one sentence before the first code line.",
+            "vi": "Viết contract thành một câu trước dòng code đầu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Changing state before checking the relevant boundary.",
+            "vi": "Đổi state trước khi kiểm tra boundary liên quan."
+          },
+          "consequence": {
+            "en": "Rejected input can corrupt a previously valid structure.",
+            "vi": "Input bị từ chối vẫn có thể làm hỏng structure đang hợp lệ."
+          },
+          "repair": {
+            "en": "Place the guard before mutation and trace the rejected path.",
+            "vi": "Đặt guard trước mutation và trace path bị từ chối."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Stopping after one normal example.",
+            "vi": "Dừng sau một ví dụ normal."
+          },
+          "consequence": {
+            "en": "A boundary or failure path remains untested.",
+            "vi": "Boundary hoặc failure path chưa được kiểm tra."
+          },
+          "repair": {
+            "en": "Check one normal, one boundary and one relevant failure case.",
+            "vi": "Kiểm tra một normal, một boundary và một failure phù hợp."
+          }
+        }
+      ],
+      "core_code_caption": {
+        "en": "Compact method reminder",
+        "vi": "Nhắc phương pháp ngắn"
+      },
+      "core_code": [
+        "with open('scores.txt', 'a', encoding='utf-8') as file:",
+        "    file.write(name + ',' + str(score) + '\\n')",
+        "with open('scores.txt', 'r', encoding='utf-8') as file:",
+        "    for line in file:",
+        "        fields = line.rstrip('\\n').split(',')"
+      ],
+      "boundary_trace": [
+        {
+          "en": "Know the file name, record format, mode and expected missing-file behaviour.",
+          "vi": "Biết file name, record format, mode và hành vi khi thiếu file."
+        },
+        {
+          "en": "Each accepted record is written exactly once in the required format and mode.",
+          "vi": "Mỗi record hợp lệ được ghi đúng một lần theo format và mode yêu cầu."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Produce the requested records and close the file even when processing fails.",
+          "vi": "Tạo các record được yêu cầu và đóng file kể cả khi xử lý lỗi."
+        },
+        {
+          "en": "Each accepted record is written exactly once in the required format and mode.",
+          "vi": "Mỗi record hợp lệ được ghi đúng một lần theo format và mode yêu cầu."
+        }
+      ],
+      "authority_note": {
+        "en": "The worked method is AlgoCore teacher-authored guidance grounded in the course sources; follow the exact contract in each examination question.",
+        "vi": "Phương pháp là hướng dẫn do giáo viên AlgoCore biên soạn từ nguồn khóa học; luôn theo đúng contract của từng câu hỏi thi."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the method without the worked example?",
+        "vi": "Tôi có thể tự dựng lại phương pháp khi không nhìn ví dụ không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "State the precondition.",
+            "vi": "Nêu precondition."
+          },
+          "answer": {
+            "en": "Know the file name, record format, mode and expected missing-file behaviour.",
+            "vi": "Biết file name, record format, mode và hành vi khi thiếu file."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the invariant or rule.",
+            "vi": "Nêu invariant hoặc rule."
+          },
+          "answer": {
+            "en": "Each accepted record is written exactly once in the required format and mode.",
+            "vi": "Mỗi record hợp lệ được ghi đúng một lần theo format và mode yêu cầu."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the required output.",
+            "vi": "Nêu output cần có."
+          },
+          "answer": {
+            "en": "Produce the requested records and close the file even when processing fails.",
+            "vi": "Tạo các record được yêu cầu và đóng file kể cả khi xử lý lỗi."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "Solve the independent task again from memory, then compare only after recording your result.",
+        "vi": "Làm lại independent task từ trí nhớ, rồi chỉ so đáp án sau khi đã ghi kết quả."
+      },
+      "next_step": {
+        "en": "Continue when you can explain the contract and trace the first boundary without help.",
+        "vi": "Học tiếp khi bạn có thể giải thích contract và trace boundary đầu tiên mà không cần trợ giúp."
+      }
+    }
+  },
+  "display_contract": {
+    "default_stage": "Recognise",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    },
+    "primary_code_limit": {
+      "en": "Show only the focused recipe or current lines.",
+      "vi": "Chỉ hiển thị khung code hoặc dòng đang tập trung."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ]
+}

@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CONTENT_ROOT = path.join(ROOT, "content", "paper4");
 const RECORD_ROOT = path.join(CONTENT_ROOT, "records", "full");
+const PROMPT_EVIDENCE_PATH = path.join(CONTENT_ROOT, "teacher", "prompt-level-assessment-evidence.json");
+export const RELEASE_DECISION_PATH = path.join(CONTENT_ROOT, "release", "lesson-release-decisions.json");
 const EVIDENCE_ROOT = path.resolve(ROOT, "..", "planning", "paper4", "next-phase", "evidence", "p4r-5", "a4");
 
 export const RECORD_TYPES = [
@@ -21,7 +23,7 @@ export const EXPECTED_COUNTS = {
   KnowledgeUnit: 108,
   PythonArtifact: 26,
   VisualScenarioTrace: 174,
-  VisualEventBinding: 870,
+  VisualEventBinding: 945,
   MarkingChain: 58,
   AssessmentItem: 79,
   LessonReleaseRecord: 26,
@@ -155,7 +157,7 @@ function sourceRefsForLesson(lesson) {
   });
 }
 
-function releaseForLesson(lesson, grouped) {
+function releaseForLesson(lesson, grouped, releaseDecision) {
   const lessonId = lesson.lesson_id;
   const knowledge = grouped.KnowledgeUnit.filter((item) => item.record.lesson_id === lessonId);
   const python = grouped.PythonArtifact.filter((item) => item.record.lesson_id === lessonId);
@@ -187,13 +189,29 @@ function releaseForLesson(lesson, grouped) {
     practice_refs: assessments.filter((item) => item.record.level !== "retrieval").map((item) => item.record.assessment_item_id).sort(),
     retrieval_refs: assessments.filter((item) => item.record.level === "retrieval").map((item) => item.record.assessment_item_id).sort(),
     source_refs: sourceRefsForLesson(lesson),
-    locale_parity: "PASS",
-    academic_review: "PASS",
-    execution_review: "PASS",
-    ux_review: "PENDING",
-    lead_gate: "PENDING",
-    release_allowed: false,
+    locale_parity: releaseDecision.locale_parity,
+    academic_review: releaseDecision.academic_review,
+    execution_review: releaseDecision.execution_review,
+    ux_review: releaseDecision.ux_review,
+    lead_gate: releaseDecision.lead_gate,
+    release_allowed: releaseDecision.release_allowed,
   });
+}
+
+export async function loadReleaseDecisionManifest(sourceMap) {
+  const manifest = await readJson(RELEASE_DECISION_PATH);
+  const expectedIds = sourceMap.lessons.map((lesson) => lesson.lesson_id).sort();
+  const actualIds = (manifest.lessons ?? []).map((lesson) => lesson.lesson_id).sort();
+  if (manifest.schema_version !== "paper4-release-decision-v1") throw new Error("Release decision manifest schema_version must be paper4-release-decision-v1.");
+  if (JSON.stringify(actualIds) !== JSON.stringify(expectedIds)) throw new Error("Release decision manifest lesson set must equal the 26 source-mapped lessons.");
+  const duplicateIds = actualIds.filter((id, index) => id === actualIds[index - 1]);
+  if (duplicateIds.length) throw new Error(`Release decision manifest contains duplicate lesson ids: ${duplicateIds.join(", ")}.`);
+  const sourceById = new Map(sourceMap.lessons.map((lesson) => [lesson.lesson_id, lesson]));
+  for (const decision of manifest.lessons) {
+    const source = sourceById.get(decision.lesson_id);
+    if (decision.slug !== source.slug || decision.package_id !== source.package_id) throw new Error(`${decision.lesson_id}: release decision identity differs from the source map.`);
+  }
+  return manifest;
 }
 
 export async function compileFullRegistry() {
@@ -215,15 +233,47 @@ export async function compileFullRegistry() {
     ...await readJson(path.join(CONTENT_ROOT, "assessments", "pilot", "assessment-items.json")),
     ...await readJson(path.join(CONTENT_ROOT, "assessments", "production", "assessment-items.json")),
   ];
+  const promptEvidence = await readJson(PROMPT_EVIDENCE_PATH);
+  const promptById = new Map(promptEvidence.records.map((item) => [item.assessment_item_id, item]));
+  const assessmentIds = assessments.map((item) => item.record.assessment_item_id).sort();
+  const promptIds = promptEvidence.records.map((item) => item.assessment_item_id).sort();
+  if (JSON.stringify(assessmentIds) !== JSON.stringify(promptIds)) throw new Error("Prompt-level evidence must resolve the exact 79 canonical assessment item IDs.");
+  for (const envelope of assessments) {
+    const record = envelope.record;
+    const reviewed = promptById.get(record.assessment_item_id);
+    if (reviewed.status !== "TEACHER_APPROVED_PROMPT_LEVEL" || reviewed.prompt_alignment_status !== "TEACHER_REVIEWED_PROMPT_PROVEN_2026_10_02") {
+      throw new Error(`${record.assessment_item_id}: prompt-level Teacher approval is missing.`);
+    }
+    record.prompt = structuredClone(reviewed.enriched_prompt);
+    record.assessment_requirement_ids = [...reviewed.requirement_ids];
+    const executionCriteria = record.self_rubric.criteria.filter((criterion) => !criterion.criterion_id.endsWith(".rubric.requirement"));
+    const requirementCriteria = reviewed.requirement_evidence.map((evidence, index) => ({
+      criterion_id: `${record.assessment_item_id}.rubric.requirement-${String(index + 1).padStart(2, "0")}`,
+      description: {
+        vi: `${evidence.capability.vi}: ${evidence.prompt_clause.vi}`,
+        en: `${evidence.capability.en}: ${evidence.prompt_clause.en}`,
+      },
+      evidence_required: evidence.rubric_criteria_en.join("; "),
+    }));
+    record.self_rubric.criteria = [...requirementCriteria, ...executionCriteria];
+    record.self_rubric.prompt_requirement_authority = "AlgoCore_teacher_prompt_level";
+    const criterionCount = record.self_rubric.criteria.length;
+    record.self_rubric.pass_rule = {
+      vi: `Đạt khi có bằng chứng cho đủ ${criterionCount}/${criterionCount} tiêu chí áp dụng và mọi output canonical khớp.`,
+      en: `Pass only with evidence for all ${criterionCount}/${criterionCount} applicable criteria and matching canonical outputs.`,
+    };
+  }
   const sourceMap = await readJson(path.join(CONTENT_ROOT, "mappings", "lesson-source-map.json"));
+  const releaseDecisionManifest = await loadReleaseDecisionManifest(sourceMap);
+  const releaseDecisionByLesson = new Map(releaseDecisionManifest.lessons.map((decision) => [decision.lesson_id, decision]));
 
   const documents = [...knowledge, ...python, ...visual, ...marking, ...assessments];
   const grouped = Object.fromEntries(RECORD_TYPES.map((type) => [type, documents.filter((item) => item.artifact_type === type)]));
-  grouped.LessonReleaseRecord = sourceMap.lessons.map((lesson) => releaseForLesson(lesson, grouped));
+  grouped.LessonReleaseRecord = sourceMap.lessons.map((lesson) => releaseForLesson(lesson, grouped, releaseDecisionByLesson.get(lesson.lesson_id)));
   for (const type of RECORD_TYPES) {
     grouped[type].sort((a, b) => String(a.record[TYPE_IDS[type]]).localeCompare(String(b.record[TYPE_IDS[type]])));
   }
-  return { grouped, sourceMap };
+  return { grouped, sourceMap, releaseDecisionManifest };
 }
 
 export function renderRegistryFiles(grouped) {
@@ -266,7 +316,15 @@ async function main() {
     total_records: RECORD_TYPES.reduce((sum, type) => sum + first.grouped[type].length, 0),
     registry_file_sha256: digest.fileHashes,
     registry_aggregate_sha256: digest.aggregate,
-    release_policy: { pending_lead_gates: 26, release_allowed_true: 0 },
+    release_policy: {
+      pending_locale_parity: first.grouped.LessonReleaseRecord.filter((item) => item.record.locale_parity === "PENDING").length,
+      pending_academic_reviews: first.grouped.LessonReleaseRecord.filter((item) => item.record.academic_review === "PENDING").length,
+      pending_execution_reviews: first.grouped.LessonReleaseRecord.filter((item) => item.record.execution_review === "PENDING").length,
+      pending_ux_reviews: first.grouped.LessonReleaseRecord.filter((item) => item.record.ux_review === "PENDING").length,
+      pending_lead_gates: first.grouped.LessonReleaseRecord.filter((item) => item.record.lead_gate === "PENDING").length,
+      release_allowed_true: first.grouped.LessonReleaseRecord.filter((item) => item.record.release_allowed === true).length,
+      decision_manifest: path.relative(ROOT, RELEASE_DECISION_PATH).replaceAll(path.sep, "/"),
+    },
   };
   await writeFile(path.join(EVIDENCE_ROOT, "BUILD_RESULT.json"), jsonText(result));
   console.log(jsonText(result).trim());

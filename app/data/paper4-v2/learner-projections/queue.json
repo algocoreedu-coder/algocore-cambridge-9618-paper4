@@ -1,0 +1,405 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Queues: follow FIFO through wrap-around",
+    "vi": "Queue: theo dõi FIFO qua điểm wrap-around"
+  },
+  "exam_family": {
+    "en": "Circular fixed-array queue setup, enqueue, dequeue, wrap, underflow and overflow",
+    "vi": "Khởi tạo queue mảng vòng, enqueue, dequeue, wrap, underflow và overflow"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Declare what front, rear and count mean, trace enqueue and dequeue through wrap-around, and read logical FIFO order even when physical array order looks different.",
+    "vi": "Nêu rõ front, rear và count có nghĩa gì, trace enqueue và dequeue qua wrap-around, đồng thời đọc đúng thứ tự FIFO logic dù thứ tự vật lý trong mảng khác đi."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Use count to distinguish empty from full when front equals rear.",
+      "vi": "Dùng count để phân biệt empty và full khi front bằng rear."
+    },
+    {
+      "en": "Apply guard, write/read, modulo pointer update and count update in the correct order.",
+      "vi": "Áp dụng guard, ghi/đọc, cập nhật pointer bằng modulo và cập nhật count đúng thứ tự."
+    },
+    {
+      "en": "Reconstruct logical FIFO order from front and count after wrap-around.",
+      "vi": "Dựng lại thứ tự FIFO logic từ front và count sau wrap-around."
+    },
+    {
+      "en": "Preserve every queue field on underflow or overflow and keep alternative conventions separate.",
+      "vi": "Giữ nguyên mọi trường của queue khi underflow hoặc overflow và tách riêng các quy ước khác."
+    }
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one circular three-slot queue with front, rear, count and one pending operation",
+    "trace_rule": "one integrated circular setup/enqueue/dequeue/wrap pathway; inspection embedded after completion",
+    "code_rule": "highlight no more than three Python lines for the current decision",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "reveal_policy": {
+      "en": "Predict the outcome, pointer or logical order before reveal.",
+      "vi": "Dự đoán outcome, pointer hoặc thứ tự logic trước khi mở đáp án."
+    }
+  },
+  "stage_order": ["recognise", "understand", "trace", "practise", "protectMarks", "recallAndContinue"],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {"en": "Recognise", "vi": "Nhận diện"},
+      "student_question": {
+        "en": "Which queue representation does the question define?",
+        "vi": "Đề định nghĩa dạng biểu diễn queue nào?"
+      },
+      "intro": {
+        "en": "A queue is first in, first out. The array algorithm depends on whether it is circular or linear and what each pointer means.",
+        "vi": "Queue hoạt động first in, first out. Thuật toán mảng phụ thuộc queue là circular hay linear và ý nghĩa của từng pointer."
+      },
+      "prompt_fragment": {
+        "en": "front is the next removal index, rear is the next insertion index, and count stores the number of live items in a circular array.",
+        "vi": "front là index removal tiếp theo, rear là index insertion tiếp theo và count lưu số item sống trong mảng vòng."
+      },
+      "cues": [
+        {
+          "en": "Circular means accepted pointer moves use modulo capacity.",
+          "vi": "Circular nghĩa là các lần di chuyển pointer được chấp nhận dùng modulo capacity."
+        },
+        {
+          "en": "Empty is count == 0; full is count == capacity.",
+          "vi": "Empty là count == 0; full là count == capacity."
+        },
+        {
+          "en": "rear names the next insertion cell, not the last live item.",
+          "vi": "rear chỉ ô insertion tiếp theo, không phải item sống cuối cùng."
+        },
+        {
+          "en": "Logical FIFO order starts at front and may cross index zero after wrap.",
+          "vi": "Thứ tự FIFO logic bắt đầu tại front và có thể đi qua index 0 sau wrap."
+        }
+      ],
+      "precondition": {
+        "en": "Capacity must be positive. Do not mix circular/linear or next-free/last-item rules inside one algorithm.",
+        "vi": "Capacity phải dương. Không trộn quy tắc circular/linear hoặc next-free/last-item trong cùng một thuật toán."
+      },
+      "output_contract": {
+        "en": "This verified implementation uses False for rejected enqueue and None for rejected dequeue; a question may specify another contract.",
+        "vi": "Implementation đã kiểm chứng này dùng False cho enqueue bị từ chối và None cho dequeue bị từ chối; đề có thể quy định contract khác."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {"en": "Understand", "vi": "Hiểu mô hình"},
+      "student_question": {
+        "en": "Which update order preserves the circular invariant?",
+        "vi": "Thứ tự cập nhật nào giữ đúng circular invariant?"
+      },
+      "mental_model": {
+        "en": "front points to the next item leaving; rear points to the next free insertion slot; count tells how many steps belong to the logical queue.",
+        "vi": "front trỏ tới item rời queue tiếp theo; rear trỏ tới ô insertion trống tiếp theo; count cho biết có bao nhiêu bước thuộc logical queue."
+      },
+      "rules": [
+        {
+          "en": "Setup: allocate capacity slots and set front = rear = count = 0.",
+          "vi": "Setup: cấp phát capacity ô và đặt front = rear = count = 0."
+        },
+        {
+          "en": "Enqueue: if count == capacity, reject without changing state.",
+          "vi": "Enqueue: nếu count == capacity, từ chối mà không đổi state."
+        },
+        {
+          "en": "Accepted enqueue writes at rear, advances rear modulo capacity, then increments count.",
+          "vi": "Enqueue được chấp nhận ghi tại rear, tiến rear theo modulo capacity, rồi tăng count."
+        },
+        {
+          "en": "Dequeue: if count == 0, reject without changing state.",
+          "vi": "Dequeue: nếu count == 0, từ chối mà không đổi state."
+        },
+        {
+          "en": "Accepted dequeue saves items[front], optionally clears it, advances front modulo capacity, then decrements count.",
+          "vi": "Dequeue được chấp nhận lưu items[front], tùy chọn xóa ô, tiến front theo modulo capacity, rồi giảm count."
+        }
+      ],
+      "invariant": {
+        "en": "Logical item at offset k is items[(front + k) % capacity] for k from 0 to count - 1.",
+        "vi": "Item logic tại offset k là items[(front + k) % capacity] với k từ 0 đến count - 1."
+      },
+      "python_recipe": [
+        "def enqueue(self, item):",
+        "    if self.count == len(self.items): return False",
+        "    self.items[self.rear] = item",
+        "    self.rear = (self.rear + 1) % len(self.items)",
+        "    self.count += 1",
+        "    return True",
+        "def dequeue(self):",
+        "    if self.count == 0: return None",
+        "    item = self.items[self.front]",
+        "    self.items[self.front] = None",
+        "    self.front = (self.front + 1) % len(self.items)",
+        "    self.count -= 1",
+        "    return item"
+      ],
+      "transfer_note": {
+        "en": "Other questions may define rear as last occupied or use a linear array with no wrap. Re-derive empty, full and update order from that stated convention.",
+        "vi": "Đề khác có thể định nghĩa rear là ô đang dùng cuối cùng hoặc dùng mảng linear không wrap. Hãy suy ra lại empty, full và thứ tự cập nhật từ quy ước đã nêu."
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {"en": "Trace FIFO through wrap", "vi": "Trace FIFO qua wrap"},
+      "student_question": {
+        "en": "What changes, and what is the logical queue now?",
+        "vi": "Điều gì thay đổi và logical queue hiện là gì?"
+      },
+      "representation": "circular_array_front_rear_count",
+      "scenario": {
+        "label": {
+          "en": "Capacity 3: enqueue 10, enqueue 20, dequeue, enqueue 30, enqueue 40",
+          "vi": "Capacity 3: enqueue 10, enqueue 20, dequeue, enqueue 30, enqueue 40"
+        },
+        "capacity": 3,
+        "initial_items": [null, null, null],
+        "initial_front": 0,
+        "initial_rear": 0,
+        "initial_count": 0,
+        "operations": [["enqueue", 10], ["enqueue", 20], ["dequeue"], ["enqueue", 30], ["enqueue", 40]]
+      },
+      "steps": [
+        {
+          "step": 1,
+          "operation": ["enqueue", 10],
+          "code_focus": [
+            "self.items[self.rear] = item",
+            "self.rear = (self.rear + 1) % len(self.items)",
+            "self.count += 1"
+          ],
+          "prediction": {"en": "Where is 10 written, and what do rear and count become?", "vi": "10 được ghi ở đâu, rear và count trở thành bao nhiêu?"},
+          "answer": {"en": "Write 10 at index 0, advance rear to 1 and set count to 1. Logical queue: [10].", "vi": "Ghi 10 tại index 0, tiến rear lên 1 và đặt count thành 1. Logical queue: [10]."},
+          "expected": {"outcome": true, "items": [10, null, null], "front": 0, "rear": 1, "count": 1, "logical": [10]}
+        },
+        {
+          "step": 2,
+          "operation": ["enqueue", 20],
+          "code_focus": [
+            "self.items[self.rear] = item",
+            "self.rear = (self.rear + 1) % len(self.items)",
+            "self.count += 1"
+          ],
+          "prediction": {"en": "After enqueue(20), which index is next free?", "vi": "Sau enqueue(20), index nào là next free?"},
+          "answer": {"en": "Write 20 at index 1, advance rear to 2 and set count to 2. Logical queue: [10, 20].", "vi": "Ghi 20 tại index 1, tiến rear lên 2 và đặt count thành 2. Logical queue: [10, 20]."},
+          "expected": {"outcome": true, "items": [10, 20, null], "front": 0, "rear": 2, "count": 2, "logical": [10, 20]}
+        },
+        {
+          "step": 3,
+          "operation": ["dequeue"],
+          "code_focus": [
+            "item = self.items[self.front]",
+            "self.front = (self.front + 1) % len(self.items)",
+            "self.count -= 1"
+          ],
+          "prediction": {"en": "Which value leaves first, and where does front move?", "vi": "Value nào rời trước và front di chuyển tới đâu?"},
+          "answer": {"en": "FIFO removes 10 from index 0. Clear it, advance front to 1 and set count to 1. Logical queue: [20].", "vi": "FIFO loại 10 tại index 0. Xóa ô, tiến front lên 1 và đặt count thành 1. Logical queue: [20]."},
+          "expected": {"outcome": 10, "items": [null, 20, null], "front": 1, "rear": 2, "count": 1, "logical": [20]}
+        },
+        {
+          "step": 4,
+          "operation": ["enqueue", 30],
+          "code_focus": [
+            "self.items[self.rear] = item",
+            "self.rear = (self.rear + 1) % len(self.items)",
+            "self.count += 1"
+          ],
+          "prediction": {"en": "After writing 30 at index 2, where does rear wrap?", "vi": "Sau khi ghi 30 tại index 2, rear wrap tới đâu?"},
+          "answer": {"en": "rear advances from 2 to (2 + 1) % 3 = 0. count becomes 2; logical queue is [20, 30].", "vi": "rear tiến từ 2 tới (2 + 1) % 3 = 0. count thành 2; logical queue là [20, 30]."},
+          "expected": {"outcome": true, "items": [null, 20, 30], "front": 1, "rear": 0, "count": 2, "logical": [20, 30]}
+        },
+        {
+          "step": 5,
+          "operation": ["enqueue", 40],
+          "code_focus": [
+            "self.items[self.rear] = item",
+            "self.rear = (self.rear + 1) % len(self.items)",
+            "self.count += 1"
+          ],
+          "prediction": {"en": "When front and rear both become 1, is the queue empty or full, and what is FIFO order?", "vi": "Khi front và rear cùng bằng 1, queue empty hay full và thứ tự FIFO là gì?"},
+          "answer": {"en": "Write 40 at index 0, advance rear to 1 and set count to 3. count proves the queue is full. Physical [40,20,30] reads logically from front as [20,30,40].", "vi": "Ghi 40 tại index 0, tiến rear lên 1 và đặt count thành 3. count chứng minh queue full. Mảng vật lý [40,20,30] được đọc logic từ front thành [20,30,40]."},
+          "expected": {"outcome": true, "items": [40, 20, 30], "front": 1, "rear": 1, "count": 3, "logical": [20, 30, 40]}
+        }
+      ],
+      "invariant_check": {
+        "en": "count defines occupancy; front defines logical start; modulo defines wrap. Accepted operations preserve FIFO and rejected operations preserve the complete state.",
+        "vi": "count xác định occupancy; front xác định điểm bắt đầu logic; modulo xác định wrap. Operation được chấp nhận giữ FIFO và operation bị từ chối giữ nguyên toàn bộ state."
+      },
+      "inspection": {
+        "logical_values": [20, 30, 40],
+        "numeric_total": 90,
+        "state_unchanged": true,
+        "explanation": {
+          "en": "Inspection walks count offsets from front without mutating the queue. The total 90 is only micro-evidence over that copied logical view, not a general Reduce pathway.",
+          "vi": "Inspection đi qua count offset từ front mà không mutation queue. Tổng 90 chỉ là micro-evidence trên logical view đã copy, không phải pathway Reduce tổng quát."
+        }
+      },
+      "variants": [
+        {
+          "kind": "boundary_empty_dequeue",
+          "input": {"capacity": 2, "items": [null, null], "front": 0, "rear": 0, "count": 0, "operation": ["dequeue"]},
+          "expected": {"outcome": null, "items": [null, null], "front": 0, "rear": 0, "count": 0, "logical": [], "state_unchanged": true},
+          "explanation": {"en": "The empty guard rejects dequeue before any clearing, pointer update or count change.", "vi": "Empty guard từ chối dequeue trước mọi thao tác xóa ô, cập nhật pointer hoặc đổi count."}
+        },
+        {
+          "kind": "boundary_full_enqueue",
+          "input": {"capacity": 2, "items": [5, 6], "front": 0, "rear": 0, "count": 2, "operation": ["enqueue", 7]},
+          "expected": {"outcome": false, "items": [5, 6], "front": 0, "rear": 0, "count": 2, "logical": [5, 6], "state_unchanged": true},
+          "explanation": {"en": "The full guard rejects enqueue. front equals rear here because the queue is full, and count disambiguates it from empty.", "vi": "Full guard từ chối enqueue. front bằng rear ở đây vì queue full và count phân biệt trạng thái này với empty."}
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {"en": "Practise", "vi": "Luyện tập"},
+      "student_question": {"en": "Can I preserve FIFO under this declared convention?", "vi": "Tôi có thể giữ FIFO theo đúng quy ước đã nêu không?"},
+      "attempt_rule": {"en": "Record a state, outcome or short explanation before opening support.", "vi": "Ghi state, outcome hoặc giải thích ngắn trước khi mở hỗ trợ."},
+      "items": [
+        {
+          "level": "guided",
+          "title": {"en": "Enqueue and wrap", "vi": "Enqueue và wrap"},
+          "prompt": {"en": "Capacity 4, rear 3, count 2. Where is X written and where does rear move?", "vi": "Capacity 4, rear 3, count 2. X được ghi ở đâu và rear di chuyển tới đâu?"},
+          "hint": {"en": "rear is next insertion; update it with modulo after the write.", "vi": "rear là next insertion; cập nhật bằng modulo sau khi ghi."},
+          "model_answer": {"en": "Write X at index 3, move rear to 0 and increase count to 3.", "vi": "Ghi X tại index 3, đưa rear về 0 và tăng count lên 3."},
+          "success_check": {"en": "Write-before-wrap and count update match the primary invariant.", "vi": "Write-before-wrap và cập nhật count khớp primary invariant."}
+        },
+        {
+          "level": "guided",
+          "title": {"en": "Dequeue and logical order", "vi": "Dequeue và thứ tự logic"},
+          "prompt": {"en": "Physical items are [40,20,30], front 1, count 3. What leaves and what order remains?", "vi": "Items vật lý là [40,20,30], front 1, count 3. Value nào rời và thứ tự nào còn lại?"},
+          "hint": {"en": "Start at front and follow modulo order, not raw array order.", "vi": "Bắt đầu tại front và theo thứ tự modulo, không theo thứ tự mảng thô."},
+          "model_answer": {"en": "20 leaves. front moves to 2, count becomes 2 and logical order is [30,40].", "vi": "20 rời queue. front tới 2, count thành 2 và thứ tự logic là [30,40]."},
+          "success_check": {"en": "FIFO follows logical order across the array boundary.", "vi": "FIFO theo thứ tự logic qua biên của mảng."}
+        },
+        {
+          "level": "faded",
+          "title": {"en": "Reject without mutation", "vi": "Từ chối mà không mutation"},
+          "prompt": {"en": "Explain empty dequeue and full enqueue using guard, outcome and unchanged fields.", "vi": "Giải thích empty dequeue và full enqueue bằng guard, outcome và các field không đổi."},
+          "hint": {"en": "Name items, front, rear and count in both before/after states.", "vi": "Nêu items, front, rear và count trong cả state trước/sau."},
+          "model_answer": {"en": "Empty returns None; full returns False. In each case items, front, rear and count are unchanged.", "vi": "Empty trả None; full trả False. Trong mỗi trường hợp items, front, rear và count đều không đổi."},
+          "success_check": {"en": "No pointer, count or storage mutation occurs after rejection.", "vi": "Không có mutation pointer, count hoặc storage sau khi bị từ chối."}
+        },
+        {
+          "level": "faded",
+          "title": {"en": "Circular rear is last occupied", "vi": "Circular rear là ô đang dùng cuối"},
+          "prompt": {"en": "A new question says rear is the last occupied cell and empty uses front = rear = -1. What must you re-derive?", "vi": "Đề mới nói rear là ô đang dùng cuối và empty dùng front = rear = -1. Bạn phải suy ra lại điều gì?"},
+          "hint": {"en": "Do not reuse next-free initial values or write order.", "vi": "Không tái sử dụng giá trị khởi tạo hoặc thứ tự ghi của next-free."},
+          "model_answer": {"en": "Follow the stated sentinel/count contract; first enqueue initialises both pointers, later enqueue advances rear before writing, and empty reset is task-specific.", "vi": "Theo sentinel/count contract đã nêu; enqueue đầu khởi tạo cả hai pointer, enqueue sau tiến rear trước khi ghi và reset khi empty phụ thuộc task."},
+          "success_check": {"en": "The rear-last convention stays separate from the primary rear-next-free trace.", "vi": "Quy ước rear-last tách riêng khỏi trace rear-next-free chính."}
+        },
+        {
+          "level": "faded",
+          "title": {"en": "Linear rear is next free", "vi": "Linear rear là next free"},
+          "prompt": {"en": "For a linear queue with rear as next free, state the key difference from this circular lesson.", "vi": "Với linear queue có rear là next free, hãy nêu khác biệt chính so với bài circular này."},
+          "hint": {"en": "Look for modulo and reuse of freed leading cells.", "vi": "Xem modulo và việc tái sử dụng ô đầu đã được giải phóng."},
+          "model_answer": {"en": "There is no modulo wrap and no reuse of freed leading slots; full occurs when rear reaches capacity under that contract.", "vi": "Không có modulo wrap và không tái sử dụng ô đầu đã giải phóng; full xảy ra khi rear đạt capacity theo contract đó."},
+          "success_check": {"en": "No circular behavior was added to the linear representation.", "vi": "Không thêm hành vi circular vào dạng linear."}
+        },
+        {
+          "level": "independent",
+          "title": {"en": "Linear rear is last occupied", "vi": "Linear rear là ô đang dùng cuối"},
+          "prompt": {"en": "A linear queue starts front = rear = -1 and rear means last occupied. State full and enqueue order.", "vi": "Linear queue bắt đầu front = rear = -1 và rear nghĩa là ô đang dùng cuối. Hãy nêu full và thứ tự enqueue."},
+          "hint": {"en": "The last valid index is capacity - 1.", "vi": "Index hợp lệ cuối là capacity - 1."},
+          "model_answer": {"en": "Full is rear == capacity - 1; an accepted enqueue increments rear before writing. First-item and reset rules follow the question contract.", "vi": "Full là rear == capacity - 1; enqueue được chấp nhận tăng rear trước khi ghi. Quy tắc item đầu và reset theo contract của đề."},
+          "success_check": {"en": "The answer has no wrap and does not treat rear as next free.", "vi": "Đáp án không có wrap và không coi rear là next free."}
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {"en": "Protect your marks", "vi": "Tránh mất điểm"},
+      "student_question": {"en": "Which queue convention mistake changes the answer?", "vi": "Lỗi quy ước queue nào làm thay đổi đáp án?"},
+      "before_code": [
+        {"en": "Write whether the queue is circular or linear and define front, rear and count before coding.", "vi": "Viết queue là circular hay linear và định nghĩa front, rear, count trước khi code."}
+      ],
+      "core_code_caption": {"en": "Primary invariant checkpoint", "vi": "Checkpoint primary invariant"},
+      "core_code": [
+        "empty: count == 0",
+        "full: count == len(items)",
+        "logical[k]: items[(front + k) % len(items)]"
+      ],
+      "mistakes": [
+        {
+          "mistake": {"en": "Using front == rear alone to decide empty.", "vi": "Chỉ dùng front == rear để quyết định empty."},
+          "consequence": {"en": "A full circular queue is misclassified as empty.", "vi": "Circular queue full bị phân loại nhầm thành empty."},
+          "repair": {"en": "Use count: zero is empty and capacity is full.", "vi": "Dùng count: zero là empty và capacity là full."}
+        },
+        {
+          "mistake": {"en": "Reading physical array order as FIFO order after wrap.", "vi": "Đọc thứ tự mảng vật lý thành thứ tự FIFO sau wrap."},
+          "consequence": {"en": "The wrong item is reported as next to leave.", "vi": "Item sai bị báo là item rời tiếp theo."},
+          "repair": {"en": "Start at front and follow count modulo positions.", "vi": "Bắt đầu tại front và đi qua count vị trí theo modulo."}
+        },
+        {
+          "mistake": {"en": "Updating a pointer or count before the full/empty guard.", "vi": "Cập nhật pointer hoặc count trước full/empty guard."},
+          "consequence": {"en": "A rejected operation corrupts the queue state.", "vi": "Operation bị từ chối làm hỏng queue state."},
+          "repair": {"en": "Return from the guard before changing storage, pointers or count.", "vi": "Return từ guard trước khi đổi storage, pointer hoặc count."}
+        },
+        {
+          "mistake": {"en": "Copying an update rule from another rear convention.", "vi": "Sao chép quy tắc cập nhật từ quy ước rear khác."},
+          "consequence": {"en": "Enqueue writes one slot early or late, or adds wrap to a linear queue.", "vi": "Enqueue ghi sớm hoặc muộn một ô, hoặc thêm wrap vào linear queue."},
+          "repair": {"en": "Derive initial, full and mutation order from the question's declared representation.", "vi": "Suy ra trạng thái đầu, full và thứ tự mutation từ dạng biểu diễn đề đã nêu."}
+        }
+      ],
+      "boundary_trace": [
+        {"en": "For underflow or overflow, show the rejected outcome and compare all four fields before and after: items, front, rear and count.", "vi": "Với underflow hoặc overflow, cho thấy outcome bị từ chối và so sánh đủ bốn field trước/sau: items, front, rear và count."}
+      ],
+      "final_check": [
+        {"en": "Did I declare representation and pointer meanings, guard before mutation, update count once, and read logical order from front?", "vi": "Tôi đã nêu dạng biểu diễn và ý nghĩa pointer, guard trước mutation, cập nhật count đúng một lần và đọc thứ tự logic từ front chưa?"}
+      ],
+      "authority_note": {
+        "en": "This lesson uses executed, verified behavior. It does not provide dynamic evidence for recursive, destructive or RLE reduction.",
+        "vi": "Bài này dùng hành vi đã chạy và kiểm chứng. Bài không cung cấp bằng chứng động cho reduction recursive, destructive hay RLE."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {"en": "Recall and continue", "vi": "Gợi nhớ và học tiếp"},
+      "student_question": {"en": "Can I rebuild the circular invariant and read FIFO after wrap?", "vi": "Tôi có thể dựng lại circular invariant và đọc FIFO sau wrap không?"},
+      "recall_items": [
+        {
+          "prompt": {"en": "What do front and rear mean in the primary convention?", "vi": "front và rear có nghĩa gì trong quy ước chính?"},
+          "answer": {"en": "front is next removal; rear is next insertion.", "vi": "front là next removal; rear là next insertion."}
+        },
+        {
+          "prompt": {"en": "Why is count required when front equals rear?", "vi": "Vì sao cần count khi front bằng rear?"},
+          "answer": {"en": "count 0 means empty while count capacity means full.", "vi": "count 0 nghĩa là empty, còn count bằng capacity nghĩa là full."}
+        },
+        {
+          "prompt": {"en": "What is accepted enqueue order?", "vi": "Thứ tự enqueue được chấp nhận là gì?"},
+          "answer": {"en": "Check full, write at rear, advance rear modulo capacity, increment count.", "vi": "Kiểm tra full, ghi tại rear, tiến rear theo modulo capacity, tăng count."}
+        },
+        {
+          "prompt": {"en": "What is accepted dequeue order?", "vi": "Thứ tự dequeue được chấp nhận là gì?"},
+          "answer": {"en": "Check empty, save at front, optionally clear, advance front modulo capacity, decrement count.", "vi": "Kiểm tra empty, lưu tại front, tùy chọn xóa, tiến front theo modulo capacity, giảm count."}
+        },
+        {
+          "prompt": {"en": "How do you read logical order after wrap?", "vi": "Đọc thứ tự logic sau wrap như thế nào?"},
+          "answer": {"en": "Read count positions from front using (front + offset) % capacity.", "vi": "Đọc count vị trí từ front bằng (front + offset) % capacity."}
+        }
+      ],
+      "exit_task": {
+        "en": "From memory, write circular enqueue and dequeue, trace physical [40,20,30] with front 1 and count 3, then explain one full and one empty rejection without changing state.",
+        "vi": "Từ trí nhớ, viết circular enqueue và dequeue, trace mảng vật lý [40,20,30] với front 1 và count 3, rồi giải thích một lần full và một lần empty bị từ chối mà không đổi state."
+      },
+      "completion_check": {
+        "en": "I can separate physical storage from FIFO order and derive every update from the declared convention.",
+        "vi": "Tôi có thể tách physical storage khỏi thứ tự FIFO và suy ra mọi cập nhật từ quy ước đã nêu."
+      },
+      "next_lesson": {
+        "en": "Continue to linked lists, where links replace circular array positions.",
+        "vi": "Học tiếp linked list, nơi link thay thế vị trí mảng vòng."
+      },
+      "source_note": {
+        "en": "The primary behavior was executed and verified. Broader Reduce variants need separate execution evidence.",
+        "vi": "Hành vi chính đã được chạy và kiểm chứng. Các biến thể Reduce rộng hơn cần bằng chứng chạy riêng."
+      }
+    }
+  }
+}

@@ -84,9 +84,9 @@
       "text": "    def set_pages(self, pages):"
     },
     {
-      "line_id": "object-files.v1.L057",
+      "line_id": "object-files.v1.L102",
       "order": 16,
-      "text": "        if not isinstance(pages, int) or pages <= 0:"
+      "text": "        if type(pages) is not int or pages <= 0:"
     },
     {
       "line_id": "object-files.v1.L058",
@@ -229,223 +229,238 @@
       "text": "            except ValueError:"
     },
     {
-      "line_id": "object-files.v1.L027",
+      "line_id": "object-files.v1.L103",
       "order": 45,
       "text": "                return None, f\"INVALID_PAGES_AT_LINE_{line_number}\""
     },
     {
-      "line_id": "object-files.v1.L075",
+      "line_id": "object-files.v1.L104",
       "order": 46,
+      "text": "            if pages <= 0:"
+    },
+    {
+      "line_id": "object-files.v1.L105",
+      "order": 47,
+      "text": "                trace.append({\"event\": \"reject_record\", \"line\": line_number, \"reason\": \"pages_must_be_positive\"})"
+    },
+    {
+      "line_id": "object-files.v1.L027",
+      "order": 48,
+      "text": "                return None, f\"INVALID_PAGES_AT_LINE_{line_number}\""
+    },
+    {
+      "line_id": "object-files.v1.L075",
+      "order": 49,
       "text": "            record_type = fields[0]"
     },
     {
       "line_id": "object-files.v1.L076",
-      "order": 47,
+      "order": 50,
       "text": "            if record_type == \"BOOK\" and len(fields) == 3:"
     },
     {
       "line_id": "object-files.v1.L077",
-      "order": 48,
+      "order": 51,
       "text": "                book = Book(fields[1], pages)"
     },
     {
       "line_id": "object-files.v1.L078",
-      "order": 49,
+      "order": 52,
       "text": "            elif record_type == \"EBOOK\" and len(fields) == 4:"
     },
     {
       "line_id": "object-files.v1.L079",
-      "order": 50,
+      "order": 53,
       "text": "                book = EBook(fields[1], pages, fields[3])"
     },
     {
       "line_id": "object-files.v1.L080",
-      "order": 51,
+      "order": 54,
       "text": "            else:"
     },
     {
       "line_id": "object-files.v1.L081",
-      "order": 52,
+      "order": 55,
       "text": "                return None, f\"INVALID_TYPE_AT_LINE_{line_number}\""
     },
     {
       "line_id": "object-files.v1.L082",
-      "order": 53,
+      "order": 56,
       "text": "            books.append(book)"
     },
     {
       "line_id": "object-files.v1.L083",
-      "order": 54,
+      "order": 57,
       "text": "            trace.append({\"event\": \"construct_object\", \"line\": line_number, \"type\": record_type, \"title\": fields[1]})"
     },
     {
       "line_id": "object-files.v1.L030",
-      "order": 55,
+      "order": 58,
       "text": "    return books, \"OK\""
     },
     {
       "line_id": "object-files.v1.L084",
-      "order": 56,
+      "order": 59,
       "text": ""
     },
     {
       "line_id": "object-files.v1.L085",
-      "order": 57,
+      "order": 60,
       "text": ""
     },
     {
       "line_id": "object-files.v1.L086",
-      "order": 58,
+      "order": 61,
       "text": "def lookup_and_update(books, title, new_pages, trace):"
     },
     {
       "line_id": "object-files.v1.L087",
-      "order": 59,
+      "order": 62,
       "text": "    for book in books:"
     },
     {
       "line_id": "object-files.v1.L088",
-      "order": 60,
+      "order": 63,
       "text": "        if book.Title == title:"
     },
     {
       "line_id": "object-files.v1.L089",
-      "order": 61,
+      "order": 64,
       "text": "            updated = book.set_pages(new_pages)"
     },
     {
       "line_id": "object-files.v1.L090",
-      "order": 62,
+      "order": 65,
       "text": "            trace.append({\"event\": \"update\", \"title\": title, \"new_pages\": new_pages, \"updated\": updated})"
     },
     {
       "line_id": "object-files.v1.L091",
-      "order": 63,
+      "order": 66,
       "text": "            return book, \"UPDATED\" if updated else \"INVALID_UPDATE\""
     },
     {
       "line_id": "object-files.v1.L092",
-      "order": 64,
+      "order": 67,
       "text": "    trace.append({\"event\": \"lookup_not_found\", \"title\": title})"
     },
     {
       "line_id": "object-files.v1.L093",
-      "order": 65,
+      "order": 68,
       "text": "    return None, \"NOT_FOUND\""
     },
     {
       "line_id": "object-files.v1.L031",
-      "order": 66,
+      "order": 69,
       "text": ""
     },
     {
       "line_id": "object-files.v1.L032",
-      "order": 67,
+      "order": 70,
       "text": ""
     },
     {
       "line_id": "object-files.v1.L033",
-      "order": 68,
+      "order": 71,
       "text": "def run(fixture, fixture_path):"
     },
     {
       "line_id": "object-files.v1.L034",
-      "order": 69,
+      "order": 72,
       "text": "    trace = []"
     },
     {
       "line_id": "object-files.v1.L035",
-      "order": 70,
+      "order": 73,
       "text": "    csv_path = Path(fixture_path).parent / fixture[\"csv_file\"]"
     },
     {
       "line_id": "object-files.v1.L036",
-      "order": 71,
+      "order": 74,
       "text": "    books, status = read_books(csv_path, trace)"
     },
     {
       "line_id": "object-files.v1.L037",
-      "order": 72,
+      "order": 75,
       "text": "    if books is None:"
     },
     {
       "line_id": "object-files.v1.L038",
-      "order": 73,
+      "order": 76,
       "text": "        return {\"status\": status, \"books\": [], \"trace\": trace}"
     },
     {
       "line_id": "object-files.v1.L094",
-      "order": 74,
+      "order": 77,
       "text": "    found, update_status = lookup_and_update(books, fixture[\"lookup_title\"], fixture[\"new_pages\"], trace)"
     },
     {
       "line_id": "object-files.v1.L095",
-      "order": 75,
+      "order": 78,
       "text": "    found_record = None if found is None else found.as_record()"
     },
     {
       "line_id": "object-files.v1.L096",
-      "order": 76,
+      "order": 79,
       "text": "    return {"
     },
     {
       "line_id": "object-files.v1.L097",
-      "order": 77,
+      "order": 80,
       "text": "        \"status\": update_status,"
     },
     {
       "line_id": "object-files.v1.L098",
-      "order": 78,
+      "order": 81,
       "text": "        \"books\": [book.as_record() for book in books],"
     },
     {
       "line_id": "object-files.v1.L099",
-      "order": 79,
+      "order": 82,
       "text": "        \"found\": found_record,"
     },
     {
       "line_id": "object-files.v1.L100",
-      "order": 80,
+      "order": 83,
       "text": "        \"trace\": trace,"
     },
     {
       "line_id": "object-files.v1.L101",
-      "order": 81,
+      "order": 84,
       "text": "    }"
     },
     {
       "line_id": "object-files.v1.L047",
-      "order": 82,
+      "order": 85,
       "text": ""
     },
     {
       "line_id": "object-files.v1.L048",
-      "order": 83,
+      "order": 86,
       "text": ""
     },
     {
       "line_id": "object-files.v1.L049",
-      "order": 84,
+      "order": 87,
       "text": "if __name__ == \"__main__\":"
     },
     {
       "line_id": "object-files.v1.L050",
-      "order": 85,
+      "order": 88,
       "text": "    fixture_path = sys.argv[1]"
     },
     {
       "line_id": "object-files.v1.L051",
-      "order": 86,
+      "order": 89,
       "text": "    with open(fixture_path, \"r\", encoding=\"utf-8\") as fixture_file:"
     },
     {
       "line_id": "object-files.v1.L052",
-      "order": 87,
+      "order": 90,
       "text": "        print(json.dumps(run(json.load(fixture_file), fixture_path), ensure_ascii=False, sort_keys=True))"
     },
     {
       "line_id": "object-files.v1.L053",
-      "order": 88,
+      "order": 91,
       "text": ""
     }
   ],
@@ -475,7 +490,7 @@
       "input": {
         "csv_file": "failure.csv",
         "lookup_title": "Algorithms",
-        "new_pages": -5
+        "new_pages": 350
       }
     }
   ],
@@ -563,40 +578,22 @@
       "expected_output_id": "object-files.failure.expected-output",
       "fixture_ref": "object-files.failure",
       "value": {
-        "books": [
-          {
-            "pages": 320,
-            "title": "Algorithms",
-            "type": "BOOK"
-          }
-        ],
-        "found": {
-          "pages": 320,
-          "title": "Algorithms",
-          "type": "BOOK"
-        },
-        "status": "INVALID_UPDATE",
+        "books": [],
+        "status": "INVALID_PAGES_AT_LINE_1",
         "trace": [
           {
             "event": "read_record",
             "fields": [
               "BOOK",
               "Algorithms",
-              "320"
+              "-5"
             ],
             "line": 1
           },
           {
-            "event": "construct_object",
+            "event": "reject_record",
             "line": 1,
-            "title": "Algorithms",
-            "type": "BOOK"
-          },
-          {
-            "event": "update",
-            "new_pages": -5,
-            "title": "Algorithms",
-            "updated": false
+            "reason": "pages_must_be_positive"
           }
         ]
       }
@@ -612,10 +609,10 @@
   ],
   "author_run_ref": "p4r2.a3.object-files.pilot-v1.author-run",
   "independent_rerun_ref": "p4r2.a3.object-files.pilot-v1.independent-rerun",
-  "execution_log_sha256": "49dded789744d30a1c08e3c8007169f81a002086b5bbc305332ff94d2460114e",
+  "execution_log_sha256": "4b68f224aa54919f924dc5a8a02ae2fefab2aac47ac6635b132cd9e91da81e98",
   "syntax_status": "PASS",
   "execution_status": "PASS",
-  "code_sha256": "6da50f0a1298b7086a673e15cc4492f9b4a3151af36bb0d8fb9d34bfc3e46b8d",
+  "code_sha256": "b9c5b2a40d79e238ba403703c74d682d6e04d36b29909cae1ff56527ca8d90ce",
   "caption": {
     "vi": "Đọc CSV theo discriminator BOOK/EBOOK, dựng base/subclass và tra cứu, cập nhật qua method có validation.",
     "en": "Read CSV with BOOK/EBOOK discriminators, construct base/subclass objects, and validate lookup updates through a method."

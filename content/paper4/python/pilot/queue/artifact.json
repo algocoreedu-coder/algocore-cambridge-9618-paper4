@@ -243,173 +243,293 @@
       "text": ""
     },
     {
-      "line_id": "queue.v1.L047",
+      "line_id": "queue.v1.L081",
       "order": 47,
+      "text": "def reduce_numeric(queue, preserve, trace):"
+    },
+    {
+      "line_id": "queue.v1.L082",
+      "order": 48,
+      "text": "    original_count = queue.count"
+    },
+    {
+      "line_id": "queue.v1.L083",
+      "order": 49,
+      "text": "    total = 0"
+    },
+    {
+      "line_id": "queue.v1.L084",
+      "order": 50,
+      "text": "    for _ in range(original_count):"
+    },
+    {
+      "line_id": "queue.v1.L085",
+      "order": 51,
+      "text": "        item = queue.dequeue()"
+    },
+    {
+      "line_id": "queue.v1.L086",
+      "order": 52,
+      "text": "        if type(item) in (int, float):"
+    },
+    {
+      "line_id": "queue.v1.L087",
+      "order": 53,
+      "text": "            total += item"
+    },
+    {
+      "line_id": "queue.v1.L088",
+      "order": 54,
+      "text": "        trace.append({\"event\": \"reduce_item\", \"item\": item, \"total\": total})"
+    },
+    {
+      "line_id": "queue.v1.L089",
+      "order": 55,
+      "text": "        if preserve:"
+    },
+    {
+      "line_id": "queue.v1.L090",
+      "order": 56,
+      "text": "            queue.enqueue(item)"
+    },
+    {
+      "line_id": "queue.v1.L091",
+      "order": 57,
+      "text": "    trace.append({\"event\": \"reduce_complete\", \"mode\": \"preserve\" if preserve else \"consume\", \"total\": total})"
+    },
+    {
+      "line_id": "queue.v1.L092",
+      "order": 58,
+      "text": "    return total"
+    },
+    {
+      "line_id": "queue.v1.L093",
+      "order": 59,
+      "text": ""
+    },
+    {
+      "line_id": "queue.v1.L094",
+      "order": 60,
+      "text": ""
+    },
+    {
+      "line_id": "queue.v1.L047",
+      "order": 61,
       "text": "def run(fixture):"
     },
     {
       "line_id": "queue.v1.L048",
-      "order": 48,
+      "order": 62,
       "text": "    trace = []"
     },
     {
       "line_id": "queue.v1.L049",
-      "order": 49,
+      "order": 63,
       "text": "    try:"
     },
     {
       "line_id": "queue.v1.L050",
-      "order": 50,
+      "order": 64,
       "text": "        queue = CircularQueue(fixture[\"capacity\"], trace)"
     },
     {
       "line_id": "queue.v1.L051",
-      "order": 51,
+      "order": 65,
       "text": "    except ValueError as error:"
     },
     {
       "line_id": "queue.v1.L052",
-      "order": 52,
+      "order": 66,
       "text": "        return {\"status\": \"INVALID_CAPACITY\", \"message\": str(error), \"trace\": trace}"
     },
     {
       "line_id": "queue.v1.L053",
-      "order": 53,
+      "order": 67,
       "text": "    removed = []"
     },
     {
       "line_id": "queue.v1.L054",
-      "order": 54,
+      "order": 68,
       "text": "    operation_results = []"
     },
     {
       "line_id": "queue.v1.L055",
-      "order": 55,
+      "order": 69,
       "text": "    for operation in fixture[\"operations\"]:"
     },
     {
       "line_id": "queue.v1.L056",
-      "order": 56,
+      "order": 70,
       "text": "        if operation[0] == \"enqueue\":"
     },
     {
       "line_id": "queue.v1.L057",
-      "order": 57,
+      "order": 71,
       "text": "            operation_results.append(queue.enqueue(operation[1]))"
     },
     {
       "line_id": "queue.v1.L058",
-      "order": 58,
+      "order": 72,
       "text": "        elif operation[0] == \"dequeue\":"
     },
     {
       "line_id": "queue.v1.L059",
-      "order": 59,
+      "order": 73,
       "text": "            removed.append(queue.dequeue())"
     },
     {
       "line_id": "queue.v1.L060",
-      "order": 60,
+      "order": 74,
       "text": "        else:"
     },
     {
       "line_id": "queue.v1.L061",
-      "order": 61,
+      "order": 75,
       "text": "            return {\"status\": \"UNKNOWN_OPERATION\", \"operation\": operation[0], \"trace\": trace}"
     },
     {
       "line_id": "queue.v1.L062",
-      "order": 62,
+      "order": 76,
       "text": "    live = queue.live_items()"
     },
     {
-      "line_id": "queue.v1.L063",
-      "order": 63,
-      "text": "    numeric_total = sum(item for item in live if isinstance(item, (int, float)))"
+      "line_id": "queue.v1.L095",
+      "order": 77,
+      "text": "    reduce_trace = []"
+    },
+    {
+      "line_id": "queue.v1.L096",
+      "order": 78,
+      "text": "    reduce_values = fixture.get(\"reduce_values\", live)"
+    },
+    {
+      "line_id": "queue.v1.L106",
+      "order": 79,
+      "text": "    reduce_queue = CircularQueue(max(1, len(reduce_values)), [])"
+    },
+    {
+      "line_id": "queue.v1.L098",
+      "order": 80,
+      "text": "    for item in reduce_values:"
+    },
+    {
+      "line_id": "queue.v1.L099",
+      "order": 81,
+      "text": "        reduce_queue.enqueue(item)"
+    },
+    {
+      "line_id": "queue.v1.L100",
+      "order": 82,
+      "text": "    reduce_mode = fixture.get(\"reduce_mode\", \"consume\")"
+    },
+    {
+      "line_id": "queue.v1.L101",
+      "order": 83,
+      "text": "    numeric_total = reduce_numeric(reduce_queue, reduce_mode == \"preserve\", reduce_trace)"
+    },
+    {
+      "line_id": "queue.v1.L102",
+      "order": 84,
+      "text": "    reduce_live = reduce_queue.live_items()"
+    },
+    {
+      "line_id": "queue.v1.L103",
+      "order": 85,
+      "text": "    trace.extend(reduce_trace)"
     },
     {
       "line_id": "queue.v1.L064",
-      "order": 64,
+      "order": 86,
       "text": "    return {"
     },
     {
       "line_id": "queue.v1.L065",
-      "order": 65,
+      "order": 87,
       "text": "        \"status\": \"OK\","
     },
     {
       "line_id": "queue.v1.L066",
-      "order": 66,
+      "order": 88,
       "text": "        \"operation_results\": operation_results,"
     },
     {
       "line_id": "queue.v1.L067",
-      "order": 67,
+      "order": 89,
       "text": "        \"removed\": removed,"
     },
     {
       "line_id": "queue.v1.L068",
-      "order": 68,
+      "order": 90,
       "text": "        \"live\": live,"
     },
     {
       "line_id": "queue.v1.L069",
-      "order": 69,
+      "order": 91,
       "text": "        \"numeric_total\": numeric_total,"
     },
     {
+      "line_id": "queue.v1.L104",
+      "order": 92,
+      "text": "        \"reduce_mode\": reduce_mode,"
+    },
+    {
+      "line_id": "queue.v1.L105",
+      "order": 93,
+      "text": "        \"reduce_live\": reduce_live,"
+    },
+    {
       "line_id": "queue.v1.L070",
-      "order": 70,
+      "order": 94,
       "text": "        \"front\": queue.front,"
     },
     {
       "line_id": "queue.v1.L071",
-      "order": 71,
+      "order": 95,
       "text": "        \"rear\": queue.rear,"
     },
     {
       "line_id": "queue.v1.L072",
-      "order": 72,
+      "order": 96,
       "text": "        \"count\": queue.count,"
     },
     {
       "line_id": "queue.v1.L073",
-      "order": 73,
+      "order": 97,
       "text": "        \"trace\": trace,"
     },
     {
       "line_id": "queue.v1.L074",
-      "order": 74,
+      "order": 98,
       "text": "    }"
     },
     {
       "line_id": "queue.v1.L075",
-      "order": 75,
+      "order": 99,
       "text": ""
     },
     {
       "line_id": "queue.v1.L076",
-      "order": 76,
+      "order": 100,
       "text": ""
     },
     {
       "line_id": "queue.v1.L077",
-      "order": 77,
+      "order": 101,
       "text": "if __name__ == \"__main__\":"
     },
     {
       "line_id": "queue.v1.L078",
-      "order": 78,
+      "order": 102,
       "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
     },
     {
       "line_id": "queue.v1.L079",
-      "order": 79,
+      "order": 103,
       "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
     },
     {
       "line_id": "queue.v1.L080",
-      "order": 80,
+      "order": 104,
       "text": ""
     }
   ],
@@ -440,7 +560,13 @@
             "enqueue",
             40
           ]
-        ]
+        ],
+        "reduce_values": [
+          20,
+          30,
+          40
+        ],
+        "reduce_mode": "consume"
       }
     },
     {
@@ -464,7 +590,12 @@
             "enqueue",
             7
           ]
-        ]
+        ],
+        "reduce_values": [
+          5,
+          6
+        ],
+        "reduce_mode": "preserve"
       }
     },
     {
@@ -472,7 +603,9 @@
       "case_kind": "failure",
       "input": {
         "capacity": 0,
-        "operations": []
+        "operations": [],
+        "reduce_values": [],
+        "reduce_mode": "consume"
       }
     }
   ],
@@ -496,6 +629,8 @@
           true
         ],
         "rear": 1,
+        "reduce_live": [],
+        "reduce_mode": "consume",
         "removed": [
           10
         ],
@@ -557,6 +692,26 @@
               30,
               40
             ]
+          },
+          {
+            "event": "reduce_item",
+            "item": 20,
+            "total": 20
+          },
+          {
+            "event": "reduce_item",
+            "item": 30,
+            "total": 50
+          },
+          {
+            "event": "reduce_item",
+            "item": 40,
+            "total": 90
+          },
+          {
+            "event": "reduce_complete",
+            "mode": "consume",
+            "total": 90
           }
         ]
       }
@@ -578,6 +733,11 @@
           false
         ],
         "rear": 0,
+        "reduce_live": [
+          5,
+          6
+        ],
+        "reduce_mode": "preserve",
         "removed": [
           null
         ],
@@ -618,6 +778,21 @@
               5,
               6
             ]
+          },
+          {
+            "event": "reduce_item",
+            "item": 5,
+            "total": 5
+          },
+          {
+            "event": "reduce_item",
+            "item": 6,
+            "total": 11
+          },
+          {
+            "event": "reduce_complete",
+            "mode": "preserve",
+            "total": 11
           }
         ]
       }
@@ -647,10 +822,10 @@
   ],
   "author_run_ref": "p4r2.a3.queue.pilot-v1.author-run",
   "independent_rerun_ref": "p4r2.a3.queue.pilot-v1.independent-rerun",
-  "execution_log_sha256": "86163a0e755b9f768508381036a1e13ed715645c428bc19408de53a376917d5e",
+  "execution_log_sha256": "6db3236b49764108f2e5e258c6b1a562d7fe5fb0b84b489ca3e4b0e8e46ba128",
   "syntax_status": "PASS",
   "execution_status": "PASS",
-  "code_sha256": "70b10587cc66936da9dbbd65d3af17bba8842c95b18d39b23ca770877f13c52a",
+  "code_sha256": "226a5829331e7945a8f12cc28e27660dbf475ab39fd12a2cc67d014d77950ff7",
   "caption": {
     "vi": "Hàng đợi vòng duy trì front, rear và count qua enqueue, dequeue, inspect và reduce.",
     "en": "A circular queue maintaining front, rear and count through enqueue, dequeue, inspect and reduce."

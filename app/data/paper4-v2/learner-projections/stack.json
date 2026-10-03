@@ -1,0 +1,438 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Stacks: protect the top invariant",
+    "vi": "Stack: bảo vệ invariant của top"
+  },
+  "exam_family": {
+    "en": "Fixed-array stack setup, push, pop, underflow and overflow",
+    "vi": "Khởi tạo stack mảng cố định, push, pop, underflow và overflow"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Declare what the pointer means, trace push and pop in the right order, and keep the stack unchanged when a full or empty guard rejects an operation.",
+    "vi": "Nêu rõ pointer có nghĩa gì, trace push và pop đúng thứ tự, đồng thời giữ nguyên stack khi guard full hoặc empty từ chối operation."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Use top = -1 for an empty current-top stack and identify the live range 0..top.",
+      "vi": "Dùng top = -1 cho current-top stack rỗng và xác định live range 0..top."
+    },
+    {
+      "en": "For push, check full before incrementing top and writing the new value.",
+      "vi": "Với push, kiểm tra full trước khi tăng top và ghi value mới."
+    },
+    {
+      "en": "For pop, check empty before reading the current top value and decrementing top.",
+      "vi": "Với pop, kiểm tra empty trước khi đọc value ở top hiện tại và giảm top."
+    },
+    {
+      "en": "Keep state unchanged on overflow or underflow and translate the invariant to a separately labelled next-free convention.",
+      "vi": "Giữ state không đổi khi overflow hoặc underflow và chuyển invariant sang quy ước next-free được ghi nhãn riêng."
+    }
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one fixed-array stack with one current-top pointer and one pending operation",
+    "trace_rule": "one integrated current-top setup/push/pop pathway; boundary and rejected operations unlock after normal completion",
+    "code_rule": "highlight no more than three Python lines for the current decision",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "reveal_policy": {
+      "en": "Predict the pointer, live stack or outcome before reveal.",
+      "vi": "Dự đoán pointer, live stack hoặc outcome trước khi mở đáp án."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {"en": "Recognise", "vi": "Nhận diện"},
+      "student_question": {
+        "en": "What does this stack pointer mean?",
+        "vi": "Pointer của stack này có nghĩa gì?"
+      },
+      "intro": {
+        "en": "A stack is last in, first out. Before tracing any code, read the question's pointer convention.",
+        "vi": "Stack hoạt động last in, first out. Trước khi trace code, hãy đọc quy ước pointer của đề."
+      },
+      "prompt_fragment": {
+        "en": "The variable top stores the index of the last live item. The stack uses a fixed array of capacity 4.",
+        "vi": "Biến top lưu index của item sống cuối cùng. Stack dùng mảng cố định có capacity 4."
+      },
+      "cues": [
+        {
+          "en": "Current-top wording: top is the index of the last occupied slot.",
+          "vi": "Cách nói current-top: top là index của ô đang dùng cuối cùng."
+        },
+        {
+          "en": "Empty means top == -1; full means top == capacity - 1.",
+          "vi": "Empty nghĩa là top == -1; full nghĩa là top == capacity - 1."
+        },
+        {
+          "en": "Push and pop must state a rejection outcome when full or empty.",
+          "vi": "Push và pop phải nêu outcome từ chối khi full hoặc empty."
+        },
+        {
+          "en": "If the question uses next free instead, rewrite every empty/full test and update order from that invariant.",
+          "vi": "Nếu đề dùng next free, hãy viết lại mọi kiểm tra empty/full và thứ tự cập nhật từ invariant đó."
+        }
+      ],
+      "precondition": {
+        "en": "Do not mix current-top and next-free rules inside one algorithm.",
+        "vi": "Không trộn quy tắc current-top và next-free trong cùng một thuật toán."
+      },
+      "output_contract": {
+        "en": "This lesson uses False for rejected push and None for rejected pop because that is the executed Python contract, not a universal exam API.",
+        "vi": "Bài này dùng False cho push bị từ chối và None cho pop bị từ chối vì đó là contract Python đã chạy, không phải API thi phổ quát."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {"en": "Understand", "vi": "Hiểu mô hình"},
+      "student_question": {
+        "en": "Which order keeps top and the live array consistent?",
+        "vi": "Thứ tự nào giữ top và mảng sống nhất quán?"
+      },
+      "mental_model": {
+        "en": "top points at the last live item. The next push slot is top + 1; the next pop item is items[top].",
+        "vi": "top trỏ tới item sống cuối cùng. Ô cho push tiếp theo là top + 1; item cho pop tiếp theo là items[top]."
+      },
+      "rules": [
+        {
+          "en": "Setup: allocate capacity slots and set top = -1.",
+          "vi": "Setup: cấp phát capacity ô và đặt top = -1."
+        },
+        {
+          "en": "Push: if top + 1 == capacity, reject without changing state.",
+          "vi": "Push: nếu top + 1 == capacity, từ chối mà không đổi state."
+        },
+        {
+          "en": "Successful push increments top before writing items[top].",
+          "vi": "Push thành công tăng top trước khi ghi items[top]."
+        },
+        {
+          "en": "Pop: if top == -1, reject without changing state.",
+          "vi": "Pop: nếu top == -1, từ chối mà không đổi state."
+        },
+        {
+          "en": "Successful pop reads or saves items[top] before clearing and decrementing top.",
+          "vi": "Pop thành công đọc hoặc lưu items[top] trước khi xóa ô và giảm top."
+        }
+      ],
+      "invariant": {
+        "en": "Live items occupy exactly indices 0..top; when top is -1, the live range is empty.",
+        "vi": "Các item sống chiếm chính xác index 0..top; khi top là -1, live range rỗng."
+      },
+      "python_recipe": [
+        "def push(self, value):",
+        "    if self.top + 1 == len(self.items):",
+        "        return False",
+        "    self.top += 1",
+        "    self.items[self.top] = value",
+        "    return True",
+        "def pop(self):",
+        "    if self.top == -1:",
+        "        return None",
+        "    value = self.items[self.top]",
+        "    self.items[self.top] = None",
+        "    self.top -= 1",
+        "    return value"
+      ],
+      "transfer_note": {
+        "en": "A next-free pointer uses empty 0, full capacity, write then increment, and reads pointer - 1 on pop. It is a separate convention: current_top = next_free - 1.",
+        "vi": "Next-free pointer dùng empty 0, full capacity, ghi rồi tăng và đọc pointer - 1 khi pop. Đây là quy ước riêng: current_top = next_free - 1."
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {"en": "Trace the current top", "vi": "Trace current top"},
+      "student_question": {
+        "en": "What changes after this one stack operation?",
+        "vi": "Điều gì thay đổi sau một operation của stack?"
+      },
+      "representation": "fixed_array_current_top",
+      "scenario": {
+        "label": {
+          "en": "Capacity 4: push 10, push 20, pop, push 30",
+          "vi": "Capacity 4: push 10, push 20, pop, push 30"
+        },
+        "capacity": 4,
+        "initial_items": [null, null, null, null],
+        "initial_top": -1,
+        "operations": [["push", 10], ["push", 20], ["pop"], ["push", 30]]
+      },
+      "steps": [
+        {
+          "step": 1,
+          "operation": ["push", 10],
+          "code_focus": [
+            "if self.top + 1 == len(self.items): return False",
+            "self.top += 1",
+            "self.items[self.top] = value"
+          ],
+          "prediction": {
+            "en": "After push(10), what are top and the live stack?",
+            "vi": "Sau push(10), top và live stack là gì?"
+          },
+          "answer": {
+            "en": "The full guard is false. Increment top from -1 to 0, then write 10 at index 0. The live stack is [10].",
+            "vi": "Full guard là false. Tăng top từ -1 lên 0, rồi ghi 10 tại index 0. Live stack là [10]."
+          },
+          "expected": {"outcome": true, "items": [10, null, null, null], "live": [10], "top": 0}
+        },
+        {
+          "step": 2,
+          "operation": ["push", 20],
+          "code_focus": [
+            "if self.top + 1 == len(self.items): return False",
+            "self.top += 1",
+            "self.items[self.top] = value"
+          ],
+          "prediction": {
+            "en": "Which index receives 20, and what does top become?",
+            "vi": "Index nào nhận 20 và top trở thành bao nhiêu?"
+          },
+          "answer": {
+            "en": "Increment top from 0 to 1, then write 20 at index 1. The live stack is [10, 20].",
+            "vi": "Tăng top từ 0 lên 1, rồi ghi 20 tại index 1. Live stack là [10, 20]."
+          },
+          "expected": {"outcome": true, "items": [10, 20, null, null], "live": [10, 20], "top": 1}
+        },
+        {
+          "step": 3,
+          "operation": ["pop"],
+          "code_focus": [
+            "value = self.items[self.top]",
+            "self.items[self.top] = None",
+            "self.top -= 1"
+          ],
+          "prediction": {
+            "en": "Which value is returned, and when may top decrease?",
+            "vi": "Value nào được trả về và khi nào top mới được giảm?"
+          },
+          "answer": {
+            "en": "Read 20 from index 1 first, clear that physical slot, then decrement top to 0. The live stack is [10].",
+            "vi": "Đọc 20 từ index 1 trước, xóa ô vật lý đó, rồi giảm top xuống 0. Live stack là [10]."
+          },
+          "expected": {"outcome": 20, "items": [10, null, null, null], "live": [10], "top": 0}
+        },
+        {
+          "step": 4,
+          "operation": ["push", 30],
+          "code_focus": [
+            "self.top += 1",
+            "self.items[self.top] = value",
+            "return True"
+          ],
+          "prediction": {
+            "en": "After push(30), which slot is live again?",
+            "vi": "Sau push(30), ô nào trở thành live trở lại?"
+          },
+          "answer": {
+            "en": "Increment top to 1 and write 30 at index 1. The final live stack is [10, 30].",
+            "vi": "Tăng top lên 1 và ghi 30 tại index 1. Live stack cuối là [10, 30]."
+          },
+          "expected": {"outcome": true, "items": [10, 30, null, null], "live": [10, 30], "top": 1}
+        }
+      ],
+      "invariant_check": {
+        "en": "After every accepted operation, live items occupy 0..top. A rejected operation leaves items, live range and top unchanged.",
+        "vi": "Sau mỗi operation được chấp nhận, item sống chiếm 0..top. Operation bị từ chối giữ nguyên items, live range và top."
+      },
+      "variants": [
+        {
+          "kind": "boundary_empty_pop",
+          "input": {"capacity": 1, "items": [null], "top": -1, "operation": ["pop"]},
+          "expected": {"outcome": null, "items": [null], "live": [], "top": -1, "state_unchanged": true},
+          "explanation": {
+            "en": "The empty guard rejects pop. None is this implementation's outcome; top and storage stay unchanged.",
+            "vi": "Empty guard từ chối pop. None là outcome của implementation này; top và storage giữ nguyên."
+          }
+        },
+        {
+          "kind": "rejected_operations",
+          "input": {"capacity": 2, "operations": [["push", 1], ["push", 2], ["push", 3], ["pop"], ["pop"], ["pop"]]},
+          "expected": {"outcomes": [true, true, false, 2, 1, null], "live": [], "top": -1, "status": "OK"},
+          "explanation": {
+            "en": "The third push is overflow and the final pop is underflow. Each rejected operation preserves state; status OK means the runner completed, not that every operation succeeded.",
+            "vi": "Push thứ ba là overflow và pop cuối là underflow. Mỗi operation bị từ chối giữ nguyên state; status OK nghĩa là runner hoàn tất, không phải mọi operation đều thành công."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {"en": "Practise", "vi": "Luyện tập"},
+      "student_question": {
+        "en": "Can I apply the invariant without mixing conventions?",
+        "vi": "Tôi có thể áp dụng invariant mà không trộn quy ước không?"
+      },
+      "attempt_rule": {
+        "en": "Record a pointer, outcome or short explanation before opening support.",
+        "vi": "Ghi pointer, outcome hoặc giải thích ngắn trước khi mở hỗ trợ."
+      },
+      "items": [
+        {
+          "level": "guided",
+          "title": {"en": "Push in current-top form", "vi": "Push theo current-top"},
+          "prompt": {
+            "en": "Capacity is 4, top is 1 and live is [6, 9]. Trace push(12).",
+            "vi": "Capacity là 4, top là 1 và live là [6, 9]. Trace push(12)."
+          },
+          "hint": {"en": "Check full, then change the pointer before writing.", "vi": "Kiểm tra full, rồi đổi pointer trước khi ghi."},
+          "model_answer": {"en": "Not full; top becomes 2, then 12 is written at index 2. Live becomes [6, 9, 12].", "vi": "Chưa full; top thành 2, rồi ghi 12 tại index 2. Live thành [6, 9, 12]."},
+          "success_check": {"en": "The pointer and write order match current-top.", "vi": "Pointer và thứ tự ghi khớp current-top."}
+        },
+        {
+          "level": "guided",
+          "title": {"en": "Pop in current-top form", "vi": "Pop theo current-top"},
+          "prompt": {
+            "en": "top is 2 and live is [6, 9, 12]. Trace pop().",
+            "vi": "top là 2 và live là [6, 9, 12]. Trace pop()."
+          },
+          "hint": {"en": "Save the current top value before decrementing.", "vi": "Lưu value ở top hiện tại trước khi giảm."},
+          "model_answer": {"en": "Return 12, clear index 2 if required, then set top to 1. Live becomes [6, 9].", "vi": "Trả 12, xóa index 2 nếu cần, rồi đặt top thành 1. Live thành [6, 9]."},
+          "success_check": {"en": "LIFO and read-before-decrement are both preserved.", "vi": "LIFO và read-before-decrement đều được giữ đúng."}
+        },
+        {
+          "level": "faded",
+          "title": {"en": "Reject without mutation", "vi": "Từ chối mà không mutation"},
+          "prompt": {
+            "en": "For capacity 2 with live [1, 2] and top 1, explain push(3). Then explain pop() on an empty stack.",
+            "vi": "Với capacity 2, live [1, 2] và top 1, hãy giải thích push(3). Sau đó giải thích pop() trên stack rỗng."
+          },
+          "hint": {"en": "State the guard, outcome and unchanged state in each case.", "vi": "Nêu guard, outcome và state không đổi trong mỗi trường hợp."},
+          "model_answer": {"en": "push(3) returns False and leaves [1, 2], top 1. Empty pop returns None and leaves [], top -1.", "vi": "push(3) trả False và giữ [1, 2], top 1. Pop rỗng trả None và giữ [], top -1."},
+          "success_check": {"en": "Both rejections preserve the complete logical state.", "vi": "Cả hai lần từ chối đều giữ nguyên toàn bộ logical state."}
+        },
+        {
+          "level": "faded",
+          "title": {"en": "Translate to next free", "vi": "Chuyển sang next free"},
+          "prompt": {
+            "en": "A question says pointer is the next free index. State empty, full, push order and pop index for capacity 3.",
+            "vi": "Đề nói pointer là next free index. Hãy nêu empty, full, thứ tự push và pop index cho capacity 3."
+          },
+          "hint": {"en": "Translate with next_free = current_top + 1.", "vi": "Chuyển bằng next_free = current_top + 1."},
+          "model_answer": {"en": "Empty is 0; full is 3; push writes at pointer then increments; pop uses pointer - 1 while moving the pointer back.", "vi": "Empty là 0; full là 3; push ghi tại pointer rồi tăng; pop dùng pointer - 1 đồng thời đưa pointer lùi lại."},
+          "success_check": {"en": "Every rule belongs to next-free; no current-top test was reused.", "vi": "Mọi quy tắc đều thuộc next-free; không tái sử dụng kiểm tra current-top."}
+        },
+        {
+          "level": "independent",
+          "title": {"en": "Rebuild the methods", "vi": "Dựng lại các method"},
+          "prompt": {
+            "en": "From memory, write current-top push and pop with unchanged-state overflow and underflow.",
+            "vi": "Từ trí nhớ, viết current-top push và pop với overflow và underflow giữ nguyên state."
+          },
+          "hint": {"en": "Each method begins with its guard; mutation happens only after the guard passes.", "vi": "Mỗi method bắt đầu bằng guard; mutation chỉ xảy ra sau khi guard qua."},
+          "model_answer": {"en": "Use the 13-line recipe: full guard → increment → write; empty guard → read/save → optional clear → decrement → return.", "vi": "Dùng recipe 13 dòng: full guard → tăng → ghi; empty guard → đọc/lưu → xóa tùy chọn → giảm → return."},
+          "success_check": {"en": "The answer declares current-top and preserves guard-before-mutation order.", "vi": "Đáp án nêu current-top và giữ thứ tự guard-before-mutation."}
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {"en": "Protect your marks", "vi": "Tránh mất điểm"},
+      "student_question": {
+        "en": "Which pointer mistake breaks the stack?",
+        "vi": "Lỗi pointer nào làm hỏng stack?"
+      },
+      "before_code": [
+        {"en": "Write one sentence defining the pointer before writing empty, full, push or pop.", "vi": "Viết một câu định nghĩa pointer trước khi viết empty, full, push hoặc pop."}
+      ],
+      "core_code_caption": {"en": "Current-top checkpoint", "vi": "Checkpoint current-top"},
+      "core_code": [
+        "empty: top == -1",
+        "full: top + 1 == len(items)",
+        "live: items[0:top + 1]"
+      ],
+      "mistakes": [
+        {
+          "mistake": {"en": "Mixing current-top empty -1 with next-free write-before-increment.", "vi": "Trộn empty -1 của current-top với write-before-increment của next-free."},
+          "consequence": {"en": "The first item is written to the wrong slot or a full test is off by one.", "vi": "Item đầu được ghi sai ô hoặc kiểm tra full bị lệch một."},
+          "repair": {"en": "Declare the pointer meaning and derive all tests and update order from it.", "vi": "Nêu ý nghĩa pointer và suy ra mọi kiểm tra cùng thứ tự cập nhật từ đó."}
+        },
+        {
+          "mistake": {"en": "Changing top or storage before checking full or empty.", "vi": "Đổi top hoặc storage trước khi kiểm tra full hoặc empty."},
+          "consequence": {"en": "A rejected operation corrupts state.", "vi": "Operation bị từ chối làm hỏng state."},
+          "repair": {"en": "Return from the guard before any mutation.", "vi": "Return từ guard trước mọi mutation."}
+        },
+        {
+          "mistake": {"en": "Decrementing top before reading the popped value.", "vi": "Giảm top trước khi đọc value được pop."},
+          "consequence": {"en": "Pop returns the item below the real top or reads outside the live range.", "vi": "Pop trả item dưới top thật hoặc đọc ngoài live range."},
+          "repair": {"en": "Save items[top] first, then clear and decrement.", "vi": "Lưu items[top] trước, rồi xóa và giảm."}
+        },
+        {
+          "mistake": {"en": "Treating False, None or status OK as universal stack meanings.", "vi": "Coi False, None hoặc status OK là ý nghĩa stack phổ quát."},
+          "consequence": {"en": "The answer may violate the question's return contract or misread a rejected operation as success.", "vi": "Đáp án có thể vi phạm return contract của đề hoặc hiểu operation bị từ chối là thành công."},
+          "repair": {"en": "Use the question's stated sentinel/success contract; here OK means only that the runner completed.", "vi": "Dùng sentinel/success contract do đề nêu; ở đây OK chỉ nghĩa là runner hoàn tất."}
+        }
+      ],
+      "boundary_trace": [
+        {"en": "On overflow or underflow, state the rejected outcome and explicitly show that items, live range and pointer are unchanged.", "vi": "Khi overflow hoặc underflow, nêu outcome bị từ chối và cho thấy rõ items, live range cùng pointer không đổi."}
+      ],
+      "final_check": [
+        {"en": "Did I declare the convention, guard before mutation, and read before decrement?", "vi": "Tôi đã nêu convention, guard trước mutation và đọc trước khi giảm chưa?"}
+      ],
+      "authority_note": {
+        "en": "Return values are question-specific. This lesson does not claim separate executed Reduce or Pair pathways.",
+        "vi": "Return value phụ thuộc từng đề. Bài này không tuyên bố có pathway Reduce hoặc Pair đã được chạy riêng."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {"en": "Recall and continue", "vi": "Gợi nhớ và học tiếp"},
+      "student_question": {
+        "en": "Can I reconstruct the invariant and both operation orders?",
+        "vi": "Tôi có thể dựng lại invariant và thứ tự của cả hai operation không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {"en": "What does top = -1 mean in this lesson?", "vi": "top = -1 có nghĩa gì trong bài này?"},
+          "answer": {"en": "The current-top stack is empty and has no live index.", "vi": "Current-top stack rỗng và không có live index."}
+        },
+        {
+          "prompt": {"en": "What is the successful push order?", "vi": "Thứ tự push thành công là gì?"},
+          "answer": {"en": "Check full, increment top, write items[top], return success.", "vi": "Kiểm tra full, tăng top, ghi items[top], return thành công."}
+        },
+        {
+          "prompt": {"en": "What is the successful pop order?", "vi": "Thứ tự pop thành công là gì?"},
+          "answer": {"en": "Check empty, save items[top], optionally clear, decrement top, return the saved value.", "vi": "Kiểm tra empty, lưu items[top], tùy chọn xóa, giảm top, return value đã lưu."}
+        },
+        {
+          "prompt": {"en": "What must happen to state after overflow or underflow?", "vi": "State phải thế nào sau overflow hoặc underflow?"},
+          "answer": {"en": "The logical stack and pointer remain unchanged.", "vi": "Logical stack và pointer giữ nguyên."}
+        },
+        {
+          "prompt": {"en": "How does next-free differ?", "vi": "Next-free khác thế nào?"},
+          "answer": {"en": "Empty is 0, full is capacity, push writes then increments, and current_top = next_free - 1.", "vi": "Empty là 0, full là capacity, push ghi rồi tăng và current_top = next_free - 1."}
+        }
+      ],
+      "exit_task": {
+        "en": "From memory, write current-top push and pop, trace one overflow and one underflow, then translate the same capacity to next-free without mixing rules.",
+        "vi": "Từ trí nhớ, viết current-top push và pop, trace một overflow cùng một underflow, rồi chuyển cùng capacity sang next-free mà không trộn quy tắc."
+      },
+      "completion_check": {
+        "en": "I can explain every pointer change and prove rejected operations leave state unchanged.",
+        "vi": "Tôi có thể giải thích mọi thay đổi pointer và chứng minh operation bị từ chối giữ state không đổi."
+      },
+      "next_lesson": {
+        "en": "Continue to queues, where insertion and removal happen at different ends.",
+        "vi": "Học tiếp queue, nơi insertion và removal xảy ra ở hai đầu khác nhau."
+      },
+      "source_note": {
+        "en": "The current-top pathway is executed. Next-free is a source-grounded static transfer; full Reduce and Pair pathways require separate execution evidence.",
+        "vi": "Pathway current-top đã được chạy. Next-free là transfer tĩnh có nguồn; pathway Reduce và Pair đầy đủ cần bằng chứng chạy riêng."
+      }
+    }
+  }
+}

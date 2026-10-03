@@ -15,6 +15,7 @@ const importTypescript = async (file) => {
 
 const traceApi = await importTypescript(path.join(appRoot, "app/components/paper4-visual/traceLoader.ts"));
 const reducerApi = await importTypescript(path.join(appRoot, "app/components/paper4-visual/reducer.ts"));
+const binarySearchApi = await importTypescript(path.join(appRoot, "app/components/paper4-visual/binarySearchAdapter.ts"));
 const manifest = await json(path.join(appRoot, "app/data/paper4-v2/course-manifest.json"));
 const lessonBySlug = new Map();
 for (const lessonMeta of manifest.lessons) {
@@ -111,6 +112,124 @@ if (reducer.scenarioId !== scenarioB.scenario_id || reducer.eventId !== eventsB[
   fail("CHANGE_INPUT_NOT_ATOMIC", JSON.stringify(reducer));
 }
 
+const binaryMetadata = manifest.patterns.find((item) => item.pattern_id === "BINARY_SEARCH");
+const binaryLesson = binaryMetadata ? lessonBySlug.get(binaryMetadata.owner_lesson_slug) : null;
+let binaryProjectionCounts = {};
+let binaryAdaptedEvents = 0;
+let binaryMalformedFallbacks = 0;
+let binaryProgressRestoreChecks = 0;
+let binaryProgressRejections = 0;
+if (!binaryMetadata || !binaryLesson) {
+  fail("BINARY_SEARCH_METADATA_MISSING", "BINARY_SEARCH");
+} else {
+  const binaryTraceFile = path.join(appRoot, "public", binaryMetadata.trace_url.split("?", 1)[0].replace(/^\//, ""));
+  const binaryChunkValue = await json(binaryTraceFile);
+  let binaryChunk;
+  try { binaryChunk = traceApi.validateTraceChunk(binaryChunkValue, binaryMetadata, binaryLesson.python); }
+  catch (error) { fail("BINARY_SEARCH_CHUNK_INVALID", error.message); }
+  if (binaryChunk) {
+    if (binaryChunk.scenarios.length !== 3 || binaryChunk.events.length !== 15) fail("BINARY_SEARCH_DENOMINATOR_DRIFT", `scenarios=${binaryChunk.scenarios.length},events=${binaryChunk.events.length}`);
+    const expectedCounts = { normal: 3, boundary: 1, failure: 1 };
+    const expectedResults = new Map(binaryLesson.tests.expected_outputs.map((item) => [item.fixture_ref, item.value]));
+    const semanticTargets = new Set(["visual.dsa.binary-search-interval", "visual.dsa.growth-counter", "visual.binary-search.state"]);
+    for (const scenario of binaryChunk.scenarios) {
+      const fullEvents = traceApi.selectScenarioEvents(binaryChunk, scenario.scenario_id);
+      const projected = binarySearchApi.projectLearningEvents("BINARY_SEARCH", fullEvents);
+      binaryProjectionCounts[scenario.case_kind] = projected.length;
+      if (projected.length !== expectedCounts[scenario.case_kind]) fail("BINARY_SEARCH_CORE_PROJECTION", `${scenario.case_kind}: ${projected.length}`);
+      if (!projected.every((event) => fullEvents.includes(event)) || projected.some((event, index) => index > 0 && fullEvents.indexOf(event) <= fullEvents.indexOf(projected[index - 1]))) {
+        fail("BINARY_SEARCH_PROJECTION_IDENTITY", scenario.scenario_id);
+      }
+      const models = projected.map((event) => binarySearchApi.adaptBinarySearchEvent(event, "revealed"));
+      for (let index = 0; index < models.length; index += 1) {
+        const model = models[index];
+        const event = projected[index];
+        if (!model) { fail("BINARY_SEARCH_ADAPTER_REJECTED_CANONICAL", event.event_id); continue; }
+        binaryAdaptedEvents += 1;
+        const clonedModel = binarySearchApi.adaptBinarySearchEvent(structuredClone(event), "revealed");
+        if (JSON.stringify(model) !== JSON.stringify(clonedModel)) fail("BINARY_SEARCH_ADAPTER_NONDETERMINISTIC", event.event_id);
+        if (model.focusLineIds.length < 1 || model.focusLineIds.length > 3 || model.focusLineIds.some((lineId) => !event.active_line_ids.includes(lineId))) fail("BINARY_SEARCH_FOCUS_LINES", event.event_id);
+        if (model.activeVisualTargets.length < 1 || model.activeVisualTargets.length > 3 || new Set(model.activeVisualTargets).size !== model.activeVisualTargets.length) fail("BINARY_SEARCH_ACTIVE_VISUAL_TARGETS", event.event_id);
+        for (const target of semanticTargets) if (!event.visual_targets.includes(target)) fail("BINARY_SEARCH_SEMANTIC_TARGET", `${event.event_id}: ${target}`);
+        if (!event.visual_targets.includes(model.eventSpecificTarget)) fail("BINARY_SEARCH_EVENT_TARGET", `${event.event_id}: ${model.eventSpecificTarget}`);
+      }
+      const finalModel = models.at(-1);
+      const expected = expectedResults.get(scenario.fixture_ref);
+      if (!finalModel || !expected || finalModel.status !== expected.status || finalModel.result !== expected.index) fail("BINARY_SEARCH_RESULT_DRIFT", scenario.fixture_ref);
+      if (scenario.case_kind === "normal") {
+        const signatures = models.map((model) => model && [model.probe.low, model.probe.middle, model.probe.high, model.retained.low, model.retained.high, model.status].join("|"));
+        const expectedSignatures = ["0|3|6|4|6|READY", "4|5|6|4|4|READY", "4|4|4|4|4|FOUND"];
+        if (JSON.stringify(signatures) !== JSON.stringify(expectedSignatures)) fail("BINARY_SEARCH_NORMAL_STATES", JSON.stringify(signatures));
+      }
+      if (scenario.case_kind === "boundary" && (finalModel.values.length !== 0 || finalModel.probe.low !== 0 || finalModel.probe.high !== -1)) fail("BINARY_SEARCH_BOUNDARY_STATE", JSON.stringify(finalModel));
+      if (scenario.case_kind === "failure" && JSON.stringify(finalModel.inversion) !== JSON.stringify([1, 2])) fail("BINARY_SEARCH_INVERSION_STATE", JSON.stringify(finalModel.inversion));
+    }
+
+    const normalScenario = binaryChunk.scenarios.find((item) => item.case_kind === "normal");
+    const normalEvent = normalScenario ? traceApi.selectScenarioEvents(binaryChunk, normalScenario.scenario_id)[0] : null;
+    if (normalEvent) {
+      for (const mutate of [
+        (event) => { event.delta.execution_trace_event.middle = 999; },
+        (event) => { event.after.domain.values[0] = 999; },
+        (event) => { event.delta.execution_trace_event.event = "unknown_event"; },
+      ]) {
+        const mutation = structuredClone(normalEvent);
+        mutate(mutation);
+        if (binarySearchApi.adaptBinarySearchEvent(mutation, "predict") === null) binaryMalformedFallbacks += 1;
+      }
+    }
+    if (binaryMalformedFallbacks !== 3) fail("BINARY_SEARCH_MALFORMED_ACCEPTED", `${binaryMalformedFallbacks}/3`);
+
+    const normalScenarioForReducer = binaryChunk.scenarios.find((item) => item.case_kind === "normal");
+    const normalCore = normalScenarioForReducer ? binarySearchApi.projectLearningEvents("BINARY_SEARCH", traceApi.selectScenarioEvents(binaryChunk, normalScenarioForReducer.scenario_id)) : [];
+    if (normalScenarioForReducer && normalCore.length > 1) {
+      let binaryReducer = reducerApi.createInitialRuntimeState("BINARY_SEARCH", "en");
+      binaryReducer = reducerApi.runtimeReducer(binaryReducer, { type: "TRACE_READY", patternId: "BINARY_SEARCH", scenarioId: normalScenarioForReducer.scenario_id, firstEventId: normalCore[0].event_id });
+      binaryReducer = reducerApi.runtimeReducer(binaryReducer, { type: "SUBMIT_PREDICTION", status: "incorrect", answer: "retain-middle" });
+      if (binaryReducer.stepPhase !== "revealed" || binaryReducer.predictionAnswer !== "retain-middle") fail("BINARY_SEARCH_REVEAL_PHASE", JSON.stringify(binaryReducer));
+      binaryReducer = reducerApi.runtimeReducer(binaryReducer, { type: "NEXT", eventId: normalCore[1].event_id });
+      if (binaryReducer.stepPhase !== "predict" || binaryReducer.predictionStatus !== "idle") fail("BINARY_SEARCH_NEXT_PHASE", JSON.stringify(binaryReducer));
+      const storedAtSecondPrompt = binarySearchApi.createBinarySearchStoredProgress(binaryReducer, binaryChunk);
+      const restoredAtSecondPrompt = binarySearchApi.restoreBinarySearchProgress(JSON.parse(JSON.stringify(storedAtSecondPrompt)), binaryChunk);
+      if (!restoredAtSecondPrompt || restoredAtSecondPrompt.scenarioId !== normalScenarioForReducer.scenario_id || restoredAtSecondPrompt.eventIndex !== 1 || restoredAtSecondPrompt.eventId !== normalCore[1].event_id || restoredAtSecondPrompt.stepPhase !== "predict" || restoredAtSecondPrompt.predictionStatus !== "idle" || restoredAtSecondPrompt.predictionAnswer !== "") {
+        fail("BINARY_SEARCH_PROGRESS_PROMPT_RESTORE", JSON.stringify(restoredAtSecondPrompt));
+      } else binaryProgressRestoreChecks += 1;
+
+      const secondModel = binarySearchApi.adaptBinarySearchEvent(normalCore[1], "revealed");
+      binaryReducer = reducerApi.runtimeReducer(binaryReducer, { type: "SUBMIT_PREDICTION", status: "correct", answer: secondModel.prediction.correctKey });
+      const storedRevealed = binarySearchApi.createBinarySearchStoredProgress(binaryReducer, binaryChunk);
+      const restoredRevealed = binarySearchApi.restoreBinarySearchProgress(structuredClone(storedRevealed), binaryChunk);
+      if (!restoredRevealed || restoredRevealed.eventIndex !== 1 || restoredRevealed.stepPhase !== "revealed" || restoredRevealed.predictionStatus !== "correct" || restoredRevealed.predictionAnswer !== secondModel.prediction.correctKey) {
+        fail("BINARY_SEARCH_PROGRESS_REVEALED_RESTORE", JSON.stringify(restoredRevealed));
+      } else binaryProgressRestoreChecks += 1;
+
+      let localeRestoreReducer = reducerApi.createInitialRuntimeState("BINARY_SEARCH", "vi");
+      localeRestoreReducer = reducerApi.runtimeReducer(localeRestoreReducer, { type: "RESTORE_PROGRESS", ...restoredRevealed });
+      if (localeRestoreReducer.locale !== "vi" || localeRestoreReducer.eventIndex !== 1 || localeRestoreReducer.stepPhase !== "revealed" || localeRestoreReducer.predictionAnswer !== secondModel.prediction.correctKey) {
+        fail("BINARY_SEARCH_PROGRESS_LOCALE_IDENTITY", JSON.stringify(localeRestoreReducer));
+      } else binaryProgressRestoreChecks += 1;
+
+      const recursiveEventId = traceApi.selectScenarioEvents(binaryChunk, normalScenarioForReducer.scenario_id).find((item) => !normalCore.includes(item))?.event_id;
+      for (const mutate of [
+        (value) => { value.codeSha256 = "0".repeat(64); },
+        (value) => { value.scenarioId = "unknown-scenario"; },
+        (value) => { value.eventIndex = 0; },
+        (value) => { value.eventId = recursiveEventId; },
+        (value) => { value.stepPhase = "revealed"; value.predictionStatus = "correct"; value.predictionAnswer = "retain-middle"; },
+        (value) => { value.schema_version = "stale-progress-v0"; },
+      ]) {
+        const mutation = structuredClone(storedAtSecondPrompt);
+        mutate(mutation);
+        if (binarySearchApi.restoreBinarySearchProgress(mutation, binaryChunk) === null) binaryProgressRejections += 1;
+      }
+      if (binaryProgressRejections !== 6) fail("BINARY_SEARCH_PROGRESS_INVALID_ACCEPTED", `${binaryProgressRejections}/6`);
+
+      binaryReducer = reducerApi.runtimeReducer(binaryReducer, { type: "PREVIOUS", eventId: normalCore[0].event_id });
+      if (binaryReducer.stepPhase !== "revealed" || binaryReducer.eventIndex !== 0) fail("BINARY_SEARCH_PREVIOUS_PHASE", JSON.stringify(binaryReducer));
+    }
+  }
+}
+
 const result = {
   schema_version: "paper4-v2-runtime-check-v1",
   decision: failures.length === 0 ? "PASS" : "FAIL",
@@ -125,6 +244,11 @@ const result = {
     negative_trace_mutations_rejected: `${negativeMutationsRejected}/3`,
     reducer_atomic_change_input: failures.every((item) => item.code !== "CHANGE_INPUT_NOT_ATOMIC"),
     reducer_locale_identity_preserved: failures.every((item) => item.code !== "LOCALE_CHANGED_RUNTIME_IDENTITY"),
+    binary_search_core_projection: binaryProjectionCounts,
+    binary_search_adapted_events: binaryAdaptedEvents,
+    binary_search_malformed_fallbacks: `${binaryMalformedFallbacks}/3`,
+    binary_search_progress_restore_checks: `${binaryProgressRestoreChecks}/3`,
+    binary_search_invalid_progress_rejected: `${binaryProgressRejections}/6`,
   },
   failures,
 };

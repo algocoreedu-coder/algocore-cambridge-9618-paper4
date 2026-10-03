@@ -22,6 +22,7 @@ const EVENT_TYPES = {
   check_record: "compare",
   check_capacity: "compare",
   append: "write",
+  generate_random_value: "write",
   summarise_random_data: "emit",
   inspect_middle: "compare",
   search_exhausted: "branch",
@@ -36,6 +37,8 @@ const EVENT_TYPES = {
   check_empty: "compare",
   dequeue: "unlink",
   inspect: "read",
+  reduce_item: "advance",
+  reduce_complete: "emit",
   reject_invalid_capacity: "reject",
   call: "call",
   base_case: "branch",
@@ -51,6 +54,7 @@ const EVENT_TYPES = {
   search_exhausted: "branch",
   reject_non_integer_key: "reject",
   read_record: "read",
+  reject_record: "reject",
   construct_object: "call",
   update: "write",
   lookup_not_found: "branch",
@@ -61,7 +65,8 @@ const LINE_BINDINGS = {
     check_record: ["data-models.v1.L015", "data-models.v1.L016"],
     check_capacity: ["data-models.v1.L018", "data-models.v1.L019"],
     append: ["data-models.v1.L021", "data-models.v1.L022"],
-    summarise_random_data: ["data-models.v1.L030", "data-models.v1.L031", "data-models.v1.L032", "data-models.v1.L033", "data-models.v1.L034"],
+    generate_random_value: ["data-models.v1.L050", "data-models.v1.L057", "data-models.v1.L058", "data-models.v1.L059", "data-models.v1.L060", "data-models.v1.L061", "data-models.v1.L062"],
+    summarise_random_data: ["data-models.v1.L031", "data-models.v1.L032", "data-models.v1.L033", "data-models.v1.L034"],
   },
   "binary-search": {
     inspect_middle: ["binary-search.v1.L015", "binary-search.v1.L016", "binary-search.v1.L017", "binary-search.v1.L018", "binary-search.v1.L019", "binary-search.v1.L020", "binary-search.v1.L021", "binary-search.v1.L022", "binary-search.v1.L023"],
@@ -79,6 +84,8 @@ const LINE_BINDINGS = {
     check_empty: ["queue.v1.L028", "queue.v1.L029", "queue.v1.L030"],
     dequeue: ["queue.v1.L031", "queue.v1.L032", "queue.v1.L033", "queue.v1.L034", "queue.v1.L035", "queue.v1.L036"],
     inspect: ["queue.v1.L039", "queue.v1.L040", "queue.v1.L041", "queue.v1.L042", "queue.v1.L043"],
+    reduce_item: ["queue.v1.L081", "queue.v1.L082", "queue.v1.L083", "queue.v1.L084", "queue.v1.L085", "queue.v1.L086", "queue.v1.L087", "queue.v1.L088", "queue.v1.L089", "queue.v1.L090"],
+    reduce_complete: ["queue.v1.L091", "queue.v1.L092"],
     reject_invalid_capacity: ["queue.v1.L007", "queue.v1.L008", "queue.v1.L009"],
   },
   recursion: {
@@ -99,7 +106,8 @@ const LINE_BINDINGS = {
     reject_non_integer_key: ["hashing.v1.L041", "hashing.v1.L124", "hashing.v1.L125", "hashing.v1.L126", "hashing.v1.L127", "hashing.v1.L128", "hashing.v1.L043"],
   },
   "object-files": {
-    read_record: ["object-files.v1.L018", "object-files.v1.L019", "object-files.v1.L020", "object-files.v1.L021", "object-files.v1.L073", "object-files.v1.L024", "object-files.v1.L074", "object-files.v1.L026", "object-files.v1.L027"],
+    read_record: ["object-files.v1.L018", "object-files.v1.L019", "object-files.v1.L020", "object-files.v1.L021", "object-files.v1.L073", "object-files.v1.L024", "object-files.v1.L074", "object-files.v1.L026", "object-files.v1.L103", "object-files.v1.L027"],
+    reject_record: ["object-files.v1.L104", "object-files.v1.L105", "object-files.v1.L027"],
     construct_object: ["object-files.v1.L007", "object-files.v1.L008", "object-files.v1.L009", "object-files.v1.L010", "object-files.v1.L075", "object-files.v1.L076", "object-files.v1.L077", "object-files.v1.L078", "object-files.v1.L079", "object-files.v1.L082", "object-files.v1.L083"],
     update: ["object-files.v1.L086", "object-files.v1.L087", "object-files.v1.L088", "object-files.v1.L089", "object-files.v1.L090", "object-files.v1.L091"],
     lookup_not_found: ["object-files.v1.L086", "object-files.v1.L087", "object-files.v1.L088", "object-files.v1.L092", "object-files.v1.L093"],
@@ -107,9 +115,9 @@ const LINE_BINDINGS = {
 };
 
 const FINAL_LINE_BINDINGS = {
-  "data-models": ["data-models.v1.L035", "data-models.v1.L036", "data-models.v1.L037", "data-models.v1.L038", "data-models.v1.L039", "data-models.v1.L040"],
+  "data-models": ["data-models.v1.L035", "data-models.v1.L036", "data-models.v1.L037", "data-models.v1.L038", "data-models.v1.L075", "data-models.v1.L039", "data-models.v1.L040"],
   "binary-search": ["binary-search.v1.L064", "binary-search.v1.L065", "binary-search.v1.L066", "binary-search.v1.L067", "binary-search.v1.L068", "binary-search.v1.L069", "binary-search.v1.L070", "binary-search.v1.L071", "binary-search.v1.L072", "binary-search.v1.L073"],
-  queue: ["queue.v1.L051", "queue.v1.L052", "queue.v1.L062", "queue.v1.L063", "queue.v1.L064", "queue.v1.L065", "queue.v1.L066", "queue.v1.L067", "queue.v1.L068", "queue.v1.L069", "queue.v1.L070", "queue.v1.L071", "queue.v1.L072", "queue.v1.L073"],
+  queue: ["queue.v1.L051", "queue.v1.L052", "queue.v1.L062", "queue.v1.L095", "queue.v1.L096", "queue.v1.L106", "queue.v1.L098", "queue.v1.L099", "queue.v1.L100", "queue.v1.L101", "queue.v1.L102", "queue.v1.L103", "queue.v1.L064", "queue.v1.L065", "queue.v1.L066", "queue.v1.L067", "queue.v1.L068", "queue.v1.L069", "queue.v1.L104", "queue.v1.L105", "queue.v1.L070", "queue.v1.L071", "queue.v1.L072", "queue.v1.L073"],
   recursion: ["recursion.v1.L028", "recursion.v1.L029", "recursion.v1.L030", "recursion.v1.L031", "recursion.v1.L032", "recursion.v1.L033", "recursion.v1.L034", "recursion.v1.L035"],
   hashing: ["hashing.v1.L039", "hashing.v1.L040", "hashing.v1.L044", "hashing.v1.L045", "hashing.v1.L046", "hashing.v1.L047", "hashing.v1.L048", "hashing.v1.L049", "hashing.v1.L050", "hashing.v1.L051", "hashing.v1.L052", "hashing.v1.L053", "hashing.v1.L054", "hashing.v1.L055", "hashing.v1.L056", "hashing.v1.L057", "hashing.v1.L058"],
   "object-files": ["object-files.v1.L037", "object-files.v1.L038", "object-files.v1.L094", "object-files.v1.L095", "object-files.v1.L096", "object-files.v1.L097", "object-files.v1.L098", "object-files.v1.L099", "object-files.v1.L100", "object-files.v1.L101"],
@@ -119,19 +127,19 @@ const PATTERN_FOCUS = {
   ARRAY_APPEND: ["check_capacity", "append"],
   DATA_RECORD: ["check_record", "append"],
   DATA_STORAGE: ["check_record", "append"],
-  RANDOM_ARRAY: ["summarise_random_data"],
+  RANDOM_ARRAY: ["generate_random_value", "summarise_random_data"],
   BINARY_SEARCH: ["inspect_middle", "search_exhausted", "reject_unsorted_input", "recursive_call", "recursive_inspect", "recursive_progress_left", "recursive_progress_right", "recursive_base_not_found"],
   QUEUE_DEQUEUE: ["check_empty", "dequeue"],
   QUEUE_ENQUEUE: ["check_full", "enqueue"],
   QUEUE_INSPECT: ["inspect"],
-  QUEUE_REDUCE: ["inspect"],
+  QUEUE_REDUCE: ["reduce_item", "reduce_complete"],
   QUEUE_SETUP: ["check_full", "check_empty", "reject_invalid_capacity"],
   ALGORITHM_REWRITE: ["call", "base_case", "return", "reject_non_integer"],
   HASH_FUNCTION: ["probe_insert", "insert_commit", "insert_existing", "insert_reject_full", "probe_search", "search_stop_empty", "search_found", "search_exhausted"],
   HASH_INSERT: ["probe_insert", "insert_commit", "insert_existing", "insert_reject_full"],
   HASH_SEARCH: ["probe_search", "search_stop_empty", "search_found", "search_exhausted"],
   HASH_SETUP: ["probe_insert", "insert_commit", "insert_existing", "insert_reject_full", "probe_search", "search_stop_empty", "search_found", "search_exhausted", "reject_non_integer_key"],
-  FILE_READ_OBJECTS: ["read_record", "construct_object", "update", "lookup_not_found"],
+  FILE_READ_OBJECTS: ["read_record", "reject_record", "construct_object", "update", "lookup_not_found"],
 };
 
 const DSA_VISUAL_QUESTIONS = {
@@ -183,6 +191,7 @@ const WORDING = {
   check_record: ["Bản ghi có đủ trường và đúng kiểu không?", "Does the record contain the required fields and types?", "Kết quả kiểm tra bản ghi quyết định có tiếp tục hay không.", "The record check decides whether execution may continue."],
   check_capacity: ["Mảng còn chỗ để thêm bản ghi không?", "Is there capacity for another record?", "Số phần tử được so với sức chứa trước khi ghi.", "The item count is compared with capacity before writing."],
   append: ["Bản ghi sẽ được ghi vào chỉ số nào?", "At which index will the record be written?", "Bản ghi đã được thêm vào cuối danh sách hiện hành.", "The record was appended at the end of the live list."],
+  generate_random_value: ["Candidate nằm trong miền và có được chấp nhận không?", "Is the candidate in range and accepted?", "Candidate chỉ được commit khi thỏa hợp đồng về miền và tính duy nhất.", "A candidate is committed only when it satisfies the range and uniqueness contract."],
   summarise_random_data: ["Tập số ngẫu nhiên rỗng hay có giá trị trung bình?", "Is the random data empty, or does it have an average?", "Số lượng và trung bình được phát ra từ đúng fixture.", "The count and average are emitted from the exact fixture."],
   inspect_middle: ["Phần tử giữa sẽ thu hẹp nửa nào của khoảng tìm kiếm?", "Which half will the middle value eliminate?", "Giá trị giữa được so với đích và biên kế tiếp được suy ra.", "The middle value is compared with the target and the next bounds are derived."],
   search_exhausted: ["Điều gì chứng minh đích không tồn tại?", "What proves that the target is absent?", "low đã vượt high nên tìm kiếm kết thúc với NOT_FOUND.", "low has crossed high, so the search ends with NOT_FOUND."],
@@ -197,6 +206,8 @@ const WORDING = {
   check_empty: ["Hàng đợi có phần tử để lấy ra không?", "Does the queue contain an item to remove?", "count bằng 0 tạo nhánh underflow an toàn.", "A zero count selects the safe underflow branch."],
   dequeue: ["front nào bị xóa và dịch chuyển?", "Which front slot is cleared and advanced?", "Ô front được xóa, front quay vòng và count giảm.", "The front slot is cleared, front wraps and count decreases."],
   inspect: ["Thứ tự logic của các phần tử sống là gì?", "What is the logical order of the live items?", "Duyệt từ front khôi phục đúng thứ tự FIFO dù mảng đã quay vòng.", "Walking from front reconstructs FIFO order after wraparound."],
+  reduce_item: ["Item nào được lấy tiếp và accumulator đổi ra sao?", "Which item is removed next, and how does the accumulator change?", "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.", "The reduction processes one FIFO item and updates the total."],
+  reduce_complete: ["Queue phải rỗng hay được giữ nguyên sau reduce?", "Should the queue be empty or preserved after reduction?", "Hậu trạng thái được kiểm theo policy consume hoặc preserve.", "The post-state is checked against the consume or preserve policy."],
   reject_invalid_capacity: ["Sức chứa này có thể tạo hàng đợi không?", "Can this capacity create a queue?", "Sức chứa không dương bị từ chối trước khi cấp phát.", "A non-positive capacity is rejected before allocation."],
   call: ["Frame đệ quy mới mang chỉ số nào?", "Which index belongs to the new recursive frame?", "Một frame mới được đẩy với chỉ số hiện tại.", "A new frame is pushed with the current index."],
   base_case: ["Điều kiện dừng đã đạt chưa?", "Has the stopping condition been reached?", "index bằng độ dài tạo giá trị cơ sở 0.", "An index equal to the length produces the base value 0."],
@@ -212,6 +223,7 @@ const WORDING = {
   search_exhausted: ["Điều gì bảo đảm failed search luôn kết thúc?", "What guarantees that a failed search terminates?", "Tối đa size probe được thực hiện; hết một vòng thì trả -1.", "At most size probes are performed; one complete cycle returns -1."],
   reject_non_integer_key: ["Mọi key có phải số nguyên không?", "Is every key an integer?", "Key sai kiểu bị từ chối trước khi tính địa chỉ băm.", "A key of the wrong type is rejected before hashing."],
   read_record: ["Dòng CSV này có đúng hai trường và pages hợp lệ không?", "Does this CSV row have two fields and valid pages?", "Dòng được đọc nguyên trạng trước khi kiểm tra cấu trúc và chuyển kiểu.", "The row is read verbatim before shape checks and conversion."],
+  reject_record: ["Record có bị từ chối trước khi tạo object không?", "Is the record rejected before object construction?", "Số trang không dương bị chặn nên không object nào được tạo.", "A non-positive page count is blocked, so no object is constructed."],
   construct_object: ["Bản ghi hợp lệ tạo object nào?", "Which object is built from the valid row?", "Book được tạo từ title và pages đã chuyển sang số nguyên.", "A Book is constructed from the title and converted integer pages."],
   update: ["Object tìm thấy có chấp nhận số trang mới không?", "Does the matched object accept the new page count?", "Setter giữ invariant pages dương và báo rõ cập nhật thành công hay thất bại.", "The setter preserves the positive-pages invariant and reports success or failure."],
   lookup_not_found: ["Điều gì xảy ra khi không object nào khớp tiêu đề?", "What happens when no object matches the title?", "Duyệt hết danh sách tạo kết quả NOT_FOUND rõ ràng.", "Exhausting the list produces an explicit NOT_FOUND result."],
@@ -232,9 +244,9 @@ function resultWithoutTrace(result) {
 }
 
 function initialDomain(slug, input) {
-  if (slug === "data-models") return { records: clone(input.records), record_valid: null, capacity_ok: null, random_average: null };
+  if (slug === "data-models") return { records: clone(input.records), record_valid: null, capacity_ok: null, random_values: [], random_average: null };
   if (slug === "binary-search") return { values: clone(input.values), target: input.target, low: 0, high: input.values.length - 1, middle: null, recursive_stack: [], recursive_low: null, recursive_high: null, recursive_middle: null, status: "READY" };
-  if (slug === "queue") return { capacity: input.capacity, items: input.capacity > 0 ? Array(input.capacity).fill(null) : [], front: 0, rear: 0, count: 0, live: [] };
+  if (slug === "queue") return { capacity: input.capacity, items: input.capacity > 0 ? Array(input.capacity).fill(null) : [], front: 0, rear: 0, count: 0, live: [], reduce_total: 0, reduce_mode: input.reduce_mode ?? "consume" };
   if (slug === "recursion") return { values: clone(input.values), call_stack: [], returned: {}, status: "READY" };
   if (slug === "hashing") return { size: input.size, slots: input.size > 0 ? Array(input.size).fill(null) : [], last_probe: null, status: "READY" };
   return { books: [], pending_record: null, lookup_title: input.lookup_title, new_pages: input.new_pages, found: null, status: "READY" };
@@ -250,6 +262,7 @@ function transition(slug, input, before, step, finalResult, isFinal) {
     if (step.event === "check_record") domain.record_valid = step.valid;
     if (step.event === "check_capacity") domain.capacity_ok = step.count < step.capacity;
     if (step.event === "append") domain.records.push(clone(step.record));
+    if (step.event === "generate_random_value" && step.accepted) domain.random_values.push(step.candidate);
     if (step.event === "summarise_random_data") domain.random_average = step.average;
   } else if (slug === "binary-search") {
     if (step.event === "inspect_middle") {
@@ -283,6 +296,8 @@ function transition(slug, input, before, step, finalResult, isFinal) {
       domain.count -= 1;
     }
     if (step.event === "inspect") domain.live = clone(step.values);
+    if (step.event === "reduce_item") domain.reduce_total = step.total;
+    if (step.event === "reduce_complete") { domain.reduce_total = step.total; domain.reduce_mode = step.mode; }
     if (step.event === "reject_invalid_capacity") domain.status = "INVALID_CAPACITY";
   } else if (slug === "recursion") {
     if (step.event === "call") domain.call_stack.push(step.index);
@@ -303,6 +318,7 @@ function transition(slug, input, before, step, finalResult, isFinal) {
     if (step.event === "reject_non_integer_key") domain.status = "INVALID_KEY";
   } else {
     if (step.event === "read_record") domain.pending_record = { line: step.line, fields: clone(step.fields) };
+    if (step.event === "reject_record") { domain.pending_record = null; domain.status = "INVALID_RECORD"; }
     if (step.event === "construct_object") {
       const fields = domain.pending_record.fields;
       const record = { type: step.type, title: step.title, pages: Number(fields[2]), line: step.line };
@@ -325,6 +341,9 @@ function transition(slug, input, before, step, finalResult, isFinal) {
 function activeLines(slug, step, before, input, isFinal) {
   if (!LINE_BINDINGS[slug]?.[step.event]) throw new Error(`${slug}: no declared source binding for ${step.event}.`);
   if (isFinal && !FINAL_LINE_BINDINGS[slug]) throw new Error(`${slug}: no declared final-output binding.`);
+  if (["data-models", "queue", "object-files"].includes(slug)) {
+    return [...LINE_BINDINGS[slug][step.event], ...(isFinal ? FINAL_LINE_BINDINGS[slug] : [])];
+  }
   const line = (numbers) => numbers.map((number) => `${slug}.v1.L${String(number).padStart(3, "0")}`);
   if (slug === "data-models") {
     if (step.event === "check_record") return line(step.valid ? [5, 6, 7, 8, 9, 10, 11, 15, 16] : [5, 6, 7, 8, 9, 10, 11, 15, 16, 17]);

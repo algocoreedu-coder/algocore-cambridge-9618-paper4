@@ -11,17 +11,20 @@ def format_output(rows): return "\n".join(f"{index + 1}. {row['name']}: {row['sc
 
 def run(fixture):
     trace, evidence = [], []
+    stage = "load"
     try:
         rows = load(fixture["rows"]); trace.append({"event": "load", "count": len(rows)}); evidence.append({"requirement": "load", "passed": True})
+        stage = "validate"
         validate(rows); trace.append({"event": "validate"}); evidence.append({"requirement": "validate", "passed": True})
+        stage = "process"
         selected = process(rows, fixture["minimum"]); trace.append({"event": "process", "count": len(selected)}); evidence.append({"requirement": "process", "passed": True})
+        stage = "format"
         output = format_output(selected); trace.append({"event": "format", "output": output}); evidence.append({"requirement": "format", "passed": True})
         return {"status": "OK", "output": output, "selected": selected, "evidence": evidence, "first_failed_stage": None, "trace": trace}
     except (KeyError, TypeError, ValueError) as error:
-        failed = "load" if not trace else "validate"
-        evidence.append({"requirement": failed, "passed": False, "actual": str(error)})
-        trace.append({"event": "block_downstream", "failed": failed})
-        return {"status": "FAILED", "output": "", "selected": [], "evidence": evidence, "first_failed_stage": failed, "trace": trace}
+        evidence.append({"requirement": stage, "passed": False, "actual": str(error)})
+        trace.append({"event": "block_downstream", "failed": stage})
+        return {"status": "FAILED", "output": "", "selected": [], "evidence": evidence, "first_failed_stage": stage, "trace": trace}
 
 if __name__ == "__main__":
     import json

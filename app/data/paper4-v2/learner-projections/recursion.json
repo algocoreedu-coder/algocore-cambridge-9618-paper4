@@ -1,0 +1,1043 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Recursion: follow calls down and answers back",
+    "vi": "Đệ quy: theo dõi lời gọi đi xuống và kết quả quay về"
+  },
+  "exam_family": {
+    "en": "Identify, write and trace a recursive function; preserve behaviour when rewriting",
+    "vi": "Nhận diện, viết và trace hàm đệ quy; giữ nguyên hành vi khi rewrite"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Find the base case and progress step, trace a separate frame for every call, then calculate each returned subtotal in last-in-first-out order.",
+    "vi": "Tìm base case và bước tiến, trace một frame riêng cho mỗi call, rồi tính từng subtotal trả về theo thứ tự vào sau-ra trước."
+  },
+  "learner_outcomes": [
+    {
+      "en": "State the base condition, base value and decreasing progress measure before tracing.",
+      "vi": "Nêu base condition, base value và progress measure giảm dần trước khi trace."
+    },
+    {
+      "en": "Keep each call frame's index, current value and pending addition separate.",
+      "vi": "Giữ riêng index, current value và phép cộng đang chờ của từng call frame."
+    },
+    {
+      "en": "Trace winding and unwinding to obtain the exact returned value.",
+      "vi": "Trace winding và unwinding để tìm đúng giá trị trả về."
+    },
+    {
+      "en": "Write or rewrite recursion without losing the child result, changing the terminal state or changing observable order.",
+      "vi": "Viết hoặc rewrite recursion mà không làm mất child result, đổi terminal state hoặc đổi thứ tự quan sát được."
+    }
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one call-stack tower and one returned-subtotal lane for suffix_sum([4, 7, 2])",
+    "trace_rule": "one integrated descent, base and unwind pathway; empty and invalid input appear only after the primary path",
+    "code_rule": "highlight no more than three Python lines for the current decision",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "reveal_policy": {
+      "en": "Predict the next call or returned subtotal before reveal.",
+      "vi": "Dự đoán call tiếp theo hoặc subtotal trả về trước khi mở đáp án."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "Where does this recursion stop, and how does every call move toward that point?",
+        "vi": "Recursion này dừng ở đâu và mỗi call tiến tới điểm đó như thế nào?"
+      },
+      "intro": {
+        "en": "A useful recursive function has a reachable base case and a recursive case that solves a strictly smaller problem.",
+        "vi": "Một hàm đệ quy đúng có base case có thể đạt tới và recursive case giải một bài toán nhỏ hơn rõ ràng."
+      },
+      "prompt_fragment": {
+        "en": "Return 0 when index reaches len(values); otherwise sum the suffix at index + 1 and add the current value after it returns.",
+        "vi": "Trả 0 khi index đạt len(values); nếu chưa, tính tổng suffix tại index + 1 rồi cộng current value sau khi kết quả quay về."
+      },
+      "cues": [
+        {
+          "en": "Base condition: index == len(values).",
+          "vi": "Base condition: index == len(values)."
+        },
+        {
+          "en": "Base value: 0, the identity for addition.",
+          "vi": "Base value: 0, phần tử đơn vị của phép cộng."
+        },
+        {
+          "en": "Progress: index increases by one, so len(values) - index decreases by one.",
+          "vi": "Progress: index tăng một, vì vậy len(values) - index giảm một."
+        },
+        {
+          "en": "Pending work: each caller waits to add its own value to the child's subtotal.",
+          "vi": "Pending work: mỗi caller chờ cộng value của mình vào subtotal từ child."
+        }
+      ],
+      "precondition": {
+        "en": "The verified public call starts at index 0 with a present list of non-Boolean integers. Do not expose an arbitrary starting index.",
+        "vi": "Public call đã kiểm chứng bắt đầu tại index 0 với một list số nguyên không gồm Boolean. Không mở arbitrary starting index."
+      },
+      "output_contract": {
+        "en": "The function returns one integer. The empty list returns 0; the wrapper rejects a declared non-integer value before recursion begins.",
+        "vi": "Hàm trả một integer. List rỗng trả 0; wrapper từ chối non-integer đã khai báo trước khi recursion bắt đầu."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu mô hình"
+      },
+      "student_question": {
+        "en": "What does each frame remember while the child call runs?",
+        "vi": "Mỗi frame nhớ gì trong khi child call chạy?"
+      },
+      "mental_model": {
+        "en": "Every call owns a separate index. Frames 0, 1 and 2 pause with one addition pending; frame 3 returns the base value, then the paused frames finish in reverse order.",
+        "vi": "Mỗi call sở hữu một index riêng. Frame 0, 1 và 2 tạm dừng với một phép cộng đang chờ; frame 3 trả base value, rồi các frame đang chờ hoàn tất theo thứ tự ngược lại."
+      },
+      "rules": [
+        {
+          "en": "Check the base condition before reading values[index].",
+          "vi": "Kiểm tra base condition trước khi đọc values[index]."
+        },
+        {
+          "en": "Return the base value immediately when the terminal state is reached.",
+          "vi": "Return base value ngay khi đạt terminal state."
+        },
+        {
+          "en": "Make the child call on a strictly smaller remaining suffix.",
+          "vi": "Gọi child trên phần suffix còn lại nhỏ hơn rõ ràng."
+        },
+        {
+          "en": "Save or directly return the child result; a bare recursive call loses the value.",
+          "vi": "Lưu hoặc trực tiếp return child result; một recursive call đứng riêng sẽ làm mất giá trị."
+        },
+        {
+          "en": "During unwind, combine exactly once in last-in-first-out order.",
+          "vi": "Trong unwind, combine đúng một lần theo thứ tự vào sau-ra trước."
+        }
+      ],
+      "invariant": {
+        "en": "A frame at index i returns the sum of values from i to the end; its child at i + 1 returns the smaller suffix sum.",
+        "vi": "Frame tại index i trả tổng values từ i tới cuối; child tại i + 1 trả tổng suffix nhỏ hơn."
+      },
+      "python_recipe": [
+        "def recursive_sum(values, index):",
+        "    if index == len(values):",
+        "        return 0",
+        "    subtotal = recursive_sum(values, index + 1)",
+        "    return values[index] + subtotal"
+      ],
+      "transfer_note": {
+        "en": "When a question asks for iteration, preserve parameters, terminal state, update/output order and final return. Matching one fixture is test evidence, not a proof for every input.",
+        "vi": "Khi đề yêu cầu iteration, giữ nguyên parameters, terminal state, thứ tự update/output và final return. Khớp một fixture là bằng chứng test, không phải chứng minh cho mọi input."
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace calls and returns",
+        "vi": "Trace call và return"
+      },
+      "student_question": {
+        "en": "Which frame is active, and what value is passed back next?",
+        "vi": "Frame nào đang active và value nào được trả về tiếp theo?"
+      },
+      "representation": "call_stack_with_unwind_lane",
+      "scenario": {
+        "label": {
+          "en": "recursive_sum([4, 7, 2], 0)",
+          "vi": "recursive_sum([4, 7, 2], 0)"
+        },
+        "values": [
+          4,
+          7,
+          2
+        ],
+        "initial_index": 0,
+        "expected_result": 13,
+        "event_order": [
+          "call:0",
+          "call:1",
+          "call:2",
+          "call:3",
+          "base:3=0",
+          "return:2=2",
+          "return:1=9",
+          "return:0=13"
+        ]
+      },
+      "steps": [
+        {
+          "step": 1,
+          "event": "call",
+          "phase": "descending",
+          "phase_label": {
+            "en": "Calling deeper",
+            "vi": "Gọi sâu hơn"
+          },
+          "active_index": 0,
+          "stack": [
+            0
+          ],
+          "pending_values": [
+            4
+          ],
+          "code_focus": [
+            "if index == len(values):",
+            "subtotal = recursive_sum(values, index + 1)"
+          ],
+          "prediction": {
+            "en": "At index 0, does this frame return or call a child?",
+            "vi": "Tại index 0, frame này return hay gọi child?"
+          },
+          "answer": {
+            "en": "It calls index 1. Frame 0 keeps index 0 and waits to add 4; no addition happens yet.",
+            "vi": "Nó gọi index 1. Frame 0 giữ index 0 và chờ cộng 4; chưa có phép cộng nào xảy ra."
+          },
+          "expected": {
+            "next_index": 1,
+            "returned": null,
+            "pending": "4 + child subtotal"
+          }
+        },
+        {
+          "step": 2,
+          "event": "call",
+          "phase": "descending",
+          "phase_label": {
+            "en": "Calling deeper",
+            "vi": "Gọi sâu hơn"
+          },
+          "active_index": 1,
+          "stack": [
+            0,
+            1
+          ],
+          "pending_values": [
+            4,
+            7
+          ],
+          "code_focus": [
+            "if index == len(values):",
+            "subtotal = recursive_sum(values, index + 1)"
+          ],
+          "prediction": {
+            "en": "What is different in the new frame at index 1?",
+            "vi": "Điều gì khác trong frame mới tại index 1?"
+          },
+          "answer": {
+            "en": "Frame 1 owns index 1 and value 7, then calls index 2. Frame 0 still owns index 0 and is waiting.",
+            "vi": "Frame 1 sở hữu index 1 và value 7, rồi gọi index 2. Frame 0 vẫn sở hữu index 0 và đang chờ."
+          },
+          "expected": {
+            "next_index": 2,
+            "returned": null,
+            "pending": "7 + child subtotal"
+          }
+        },
+        {
+          "step": 3,
+          "event": "call",
+          "phase": "descending",
+          "phase_label": {
+            "en": "Calling deeper",
+            "vi": "Gọi sâu hơn"
+          },
+          "active_index": 2,
+          "stack": [
+            0,
+            1,
+            2
+          ],
+          "pending_values": [
+            4,
+            7,
+            2
+          ],
+          "code_focus": [
+            "if index == len(values):",
+            "subtotal = recursive_sum(values, index + 1)"
+          ],
+          "prediction": {
+            "en": "What does the frame at index 2 do?",
+            "vi": "Frame tại index 2 làm gì?"
+          },
+          "answer": {
+            "en": "It keeps value 2 pending and calls index 3. The addition 2 + child subtotal has not happened yet.",
+            "vi": "Nó giữ value 2 ở trạng thái pending và gọi index 3. Phép cộng 2 + child subtotal chưa xảy ra."
+          },
+          "expected": {
+            "next_index": 3,
+            "returned": null,
+            "pending": "2 + child subtotal"
+          }
+        },
+        {
+          "step": 4,
+          "event": "call",
+          "phase": "descending",
+          "phase_label": {
+            "en": "Calling deeper",
+            "vi": "Gọi sâu hơn"
+          },
+          "active_index": 3,
+          "stack": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "pending_values": [
+            4,
+            7,
+            2
+          ],
+          "code_focus": [
+            "if index == len(values):"
+          ],
+          "prediction": {
+            "en": "At index 3, is values[3] read?",
+            "vi": "Tại index 3, values[3] có được đọc không?"
+          },
+          "answer": {
+            "en": "No. The frame checks the base condition first; 3 equals len(values). Current value: not read.",
+            "vi": "Không. Frame kiểm tra base condition trước; 3 bằng len(values). Current value: không đọc."
+          },
+          "expected": {
+            "base_condition": true,
+            "read_current_value": false,
+            "returned": null
+          }
+        },
+        {
+          "step": 5,
+          "event": "base_case",
+          "phase": "base",
+          "phase_label": {
+            "en": "Base case",
+            "vi": "Base case"
+          },
+          "active_index": 3,
+          "stack": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "pending_values": [
+            4,
+            7,
+            2
+          ],
+          "code_focus": [
+            "if index == len(values):",
+            "    return 0"
+          ],
+          "prediction": {
+            "en": "What does the base frame return, and where does that value come from?",
+            "vi": "Base frame trả gì và value đó đến từ đâu?"
+          },
+          "answer": {
+            "en": "It returns 0 from the base case. The 0 is the identity for addition; it is not stored in the list.",
+            "vi": "Nó trả 0 từ base case. Số 0 là identity của phép cộng; nó không được lưu trong list."
+          },
+          "expected": {
+            "returned": 0,
+            "read_current_value": false,
+            "stack_after": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "step": 6,
+          "event": "return",
+          "phase": "unwinding",
+          "phase_label": {
+            "en": "Returning",
+            "vi": "Trả kết quả"
+          },
+          "active_index": 2,
+          "stack": [
+            0,
+            1,
+            2
+          ],
+          "pending_values": [
+            4,
+            7,
+            2
+          ],
+          "code_focus": [
+            "subtotal = recursive_sum(values, index + 1)",
+            "return values[index] + subtotal"
+          ],
+          "prediction": {
+            "en": "Which frame resumes first, and what does it return?",
+            "vi": "Frame nào tiếp tục đầu tiên và nó return gì?"
+          },
+          "answer": {
+            "en": "Frame 2 receives subtotal 0, calculates 2 + 0, and returns 2.",
+            "vi": "Frame 2 nhận subtotal 0, tính 2 + 0 và trả 2."
+          },
+          "expected": {
+            "child_subtotal": 0,
+            "calculation": "2 + 0",
+            "returned": 2,
+            "stack_after": [
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "step": 7,
+          "event": "return",
+          "phase": "unwinding",
+          "phase_label": {
+            "en": "Returning",
+            "vi": "Trả kết quả"
+          },
+          "active_index": 1,
+          "stack": [
+            0,
+            1
+          ],
+          "pending_values": [
+            4,
+            7
+          ],
+          "code_focus": [
+            "subtotal = recursive_sum(values, index + 1)",
+            "return values[index] + subtotal"
+          ],
+          "prediction": {
+            "en": "Frame 1 receives subtotal 2. What does it return?",
+            "vi": "Frame 1 nhận subtotal 2. Nó return gì?"
+          },
+          "answer": {
+            "en": "It calculates 7 + 2 and returns 9.",
+            "vi": "Nó tính 7 + 2 và trả 9."
+          },
+          "expected": {
+            "child_subtotal": 2,
+            "calculation": "7 + 2",
+            "returned": 9,
+            "stack_after": [
+              0
+            ]
+          }
+        },
+        {
+          "step": 8,
+          "event": "return",
+          "phase": "complete",
+          "phase_label": {
+            "en": "Complete",
+            "vi": "Hoàn tất"
+          },
+          "active_index": 0,
+          "stack": [
+            0
+          ],
+          "pending_values": [
+            4
+          ],
+          "code_focus": [
+            "subtotal = recursive_sum(values, index + 1)",
+            "return values[index] + subtotal"
+          ],
+          "prediction": {
+            "en": "Frame 0 receives subtotal 9. What is the final return and final stack?",
+            "vi": "Frame 0 nhận subtotal 9. Final return và final stack là gì?"
+          },
+          "answer": {
+            "en": "It calculates 4 + 9, returns 13, and leaves the stack empty. For this checked input, the iterative form also returns 13.",
+            "vi": "Nó tính 4 + 9, trả 13 và để stack rỗng. Với input đã kiểm tra này, dạng iterative cũng trả 13."
+          },
+          "expected": {
+            "child_subtotal": 9,
+            "calculation": "4 + 9",
+            "returned": 13,
+            "stack_after": [],
+            "iterative_fixture_result": 13
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "Every call moved from index i to i + 1; the base frame returned 0; every earlier frame returned its current value plus the child subtotal exactly once.",
+        "vi": "Mỗi call đi từ index i tới i + 1; base frame trả 0; mỗi frame trước đó trả current value cộng child subtotal đúng một lần."
+      },
+      "variants": [
+        {
+          "kind": "boundary_empty_list",
+          "input": {
+            "values": [],
+            "initial_index": 0
+          },
+          "event_order": [
+            "call:0",
+            "base:0=0"
+          ],
+          "expected": {
+            "result": 0,
+            "stack_after": [],
+            "recursive_calls_after_base": 0
+          },
+          "explanation": {
+            "en": "index 0 already equals len(values), so the first frame returns 0 immediately.",
+            "vi": "index 0 đã bằng len(values), vì vậy frame đầu tiên trả 0 ngay lập tức."
+          }
+        },
+        {
+          "kind": "rejected_non_integer_input",
+          "input": {
+            "values": [
+              4,
+              "seven",
+              2
+            ]
+          },
+          "event_order": [
+            "reject_non_integer"
+          ],
+          "expected": {
+            "status": "INVALID_VALUE",
+            "frames_created": 0
+          },
+          "explanation": {
+            "en": "The wrapper rejects the declared invalid value before recursive_sum runs. This is input validation, not a recursion failure.",
+            "vi": "Wrapper từ chối invalid value đã khai báo trước khi recursive_sum chạy. Đây là input validation, không phải recursion failure."
+          }
+        }
+      ],
+      "static_limits": [
+        {
+          "en": "A direct start index other than 0 is outside this public contract.",
+          "vi": "Direct start index khác 0 nằm ngoài public contract này."
+        },
+        {
+          "en": "Boolean values, malformed fixture shapes and very deep inputs remain outside the dynamic pathway.",
+          "vi": "Boolean values, malformed fixture shape và input quá sâu nằm ngoài dynamic pathway."
+        },
+        {
+          "en": "The iterative form is a later rewrite check, not a second animated trace.",
+          "vi": "Dạng iterative là bài kiểm tra rewrite sau đó, không phải animated trace thứ hai."
+        }
+      ],
+      "orientation": {
+        "runtime_event": false,
+        "prediction": {
+          "en": "Before tracing, name the base condition, base value and quantity that gets smaller.",
+          "vi": "Trước khi trace, hãy nêu base condition, base value và đại lượng giảm dần."
+        },
+        "answer": {
+          "en": "Stop when index == len(values), return 0, and decrease len(values) - index by calling index + 1.",
+          "vi": "Dừng khi index == len(values), trả 0 và làm len(values) - index giảm bằng cách gọi index + 1."
+        },
+        "code_focus": [
+          "if index == len(values):",
+          "    return 0",
+          "subtotal = recursive_sum(values, index + 1)"
+        ]
+      }
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I preserve base, progress and returned work?",
+        "vi": "Tôi có thể giữ đúng base, progress và returned work không?"
+      },
+      "attempt_rule": {
+        "en": "Record a trace, code line or short explanation before opening support.",
+        "vi": "Ghi trace, code line hoặc giải thích ngắn trước khi mở hỗ trợ."
+      },
+      "items": [
+        {
+          "level": "guided",
+          "title": {
+            "en": "Label the recursive contract",
+            "vi": "Gắn nhãn recursive contract"
+          },
+          "prompt": {
+            "en": "In recursive_sum(values, index), identify the base guard, base value, general case and progress measure. Explain why the next call is closer to stopping.",
+            "vi": "Trong recursive_sum(values, index), hãy xác định base guard, base value, general case và progress measure. Giải thích vì sao call tiếp theo gần điều kiện dừng hơn."
+          },
+          "hint": {
+            "en": "Name the stopping test, the value returned there, the smaller suffix and len(values) - index.",
+            "vi": "Nêu stopping test, value return tại đó, suffix nhỏ hơn và len(values) - index."
+          },
+          "model_answer": {
+            "en": "Guard: index == len(values); base value: 0; general case: solve index + 1 then add values[index]; len(values) - index decreases by one.",
+            "vi": "Guard: index == len(values); base value: 0; general case: giải index + 1 rồi cộng values[index]; len(values) - index giảm một."
+          },
+          "success_check": {
+            "en": "All four labels and one termination sentence are present.",
+            "vi": "Có đủ bốn nhãn và một câu giải thích termination."
+          },
+          "marking_atoms": [
+            "RA2_BASE_GUARD",
+            "RA3_BASE_VALUE",
+            "RA4_PROGRESS",
+            "RA5_CHILD_RETURN"
+          ],
+          "reveal_rule": {
+            "en": "Reveal the first missing label after attempt; show the full teacher-created model only after retry.",
+            "vi": "Sau lần thử, chỉ mở nhãn thiếu đầu tiên; chỉ hiện model do giáo viên biên soạn sau khi làm lại."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-19.2-02"
+          ]
+        },
+        {
+          "level": "guided",
+          "title": {
+            "en": "Trace call-down, base and unwind",
+            "vi": "Trace call-down, base và unwind"
+          },
+          "prompt": {
+            "en": "For [4,7,2], give the call indices, first returned value and subtotal from each waiting frame. Keep call and return order separate.",
+            "vi": "Với [4,7,2], nêu call index, value return đầu tiên và subtotal từ mỗi frame đang chờ. Tách call order và return order."
+          },
+          "hint": {
+            "en": "No addition happens while calls are descending.",
+            "vi": "Không có phép cộng nào xảy ra khi call đang đi xuống."
+          },
+          "model_answer": {
+            "en": "Calls 0→1→2→3. Frame 3 returns 0 without reading values[3]. Then index 2 returns 2, index 1 returns 9 and index 0 returns 13.",
+            "vi": "Call 0→1→2→3. Frame 3 trả 0 mà không đọc values[3]. Sau đó index 2 trả 2, index 1 trả 9 và index 0 trả 13."
+          },
+          "success_check": {
+            "en": "Separate frame state, pending work and LIFO return order are explicit.",
+            "vi": "Frame state riêng, pending work và LIFO return order được nêu rõ."
+          },
+          "marking_atoms": [
+            "RA2_BASE_GUARD",
+            "RA3_BASE_VALUE",
+            "RA5_CHILD_RETURN",
+            "RA7_TRACE_STACK"
+          ],
+          "reveal_rule": {
+            "en": "Reveal one next event and at most three code lines after each prediction.",
+            "vi": "Sau mỗi dự đoán, chỉ mở một event tiếp theo và tối đa ba dòng code."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-19.2-04",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-19.2-06",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-19.2-07"
+          ]
+        },
+        {
+          "level": "faded",
+          "title": {
+            "en": "Write a value-returning recursive function",
+            "vi": "Viết recursive function trả value"
+          },
+          "prompt": {
+            "en": "Write count_from(values, target, index) to count matches from index to the end. Return 0 at the end, inspect one item, call index + 1 and add 1 only for a match. Give the result for [2,5,2,2], target 2, index 0.",
+            "vi": "Viết count_from(values, target, index) để đếm match từ index tới cuối. Return 0 ở cuối, kiểm tra một item, gọi index + 1 và chỉ cộng 1 khi match. Nêu result cho [2,5,2,2], target 2, index 0."
+          },
+          "hint": {
+            "en": "State base–progress–return before writing code; every path returns an integer.",
+            "vi": "Nêu base–progress–return trước khi viết code; mọi path đều return integer."
+          },
+          "model_answer": {
+            "en": "Base returns 0. Otherwise return (1 if values[index] == target else 0) + count_from(values, target, index + 1). The result is 3; empty input gives 0.",
+            "vi": "Base return 0. Nếu chưa, return (1 if values[index] == target else 0) + count_from(values, target, index + 1). Result là 3; input rỗng cho 0."
+          },
+          "success_check": {
+            "en": "Signature, base, progress and child-result propagation are all preserved.",
+            "vi": "Signature, base, progress và child-result propagation đều được giữ."
+          },
+          "marking_atoms": [
+            "RA1_CONTRACT",
+            "RA2_BASE_GUARD",
+            "RA3_BASE_VALUE",
+            "RA4_PROGRESS",
+            "RA5_CHILD_RETURN"
+          ],
+          "reveal_rule": {
+            "en": "Dry-trace normal and empty cases before showing the teacher-created model.",
+            "vi": "Dry-trace case thường và rỗng trước khi hiện model do giáo viên biên soạn."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-19.2-03"
+          ]
+        },
+        {
+          "level": "faded",
+          "title": {
+            "en": "Explain frames, benefit and cost",
+            "vi": "Giải thích frame, benefit và cost"
+          },
+          "prompt": {
+            "en": "Why does [4,7,2] need four frames? Give one benefit linked to recursive structure and one stack-related cost.",
+            "vi": "Vì sao [4,7,2] cần bốn frame? Nêu một benefit gắn với cấu trúc đệ quy và một cost liên quan tới stack."
+          },
+          "hint": {
+            "en": "Answer in three slots: frame purpose, structure-linked benefit, stack-linked cost.",
+            "vi": "Trả lời theo ba ô: vai trò frame, benefit gắn cấu trúc, cost gắn stack."
+          },
+          "model_answer": {
+            "en": "Frames keep distinct indices and pending additions for 0,1,2,3. Recursion mirrors current value plus the rest clearly, but one frame per call uses stack memory and deep input can hit the recursion limit.",
+            "vi": "Các frame giữ index và pending addition riêng cho 0,1,2,3. Recursion bám rõ cấu trúc current value cộng phần còn lại, nhưng mỗi call dùng một stack frame và input sâu có thể chạm recursion limit."
+          },
+          "success_check": {
+            "en": "The answer names local frame state, a structural benefit and a mechanism-linked cost.",
+            "vi": "Câu trả lời nêu local frame state, structural benefit và cost gắn với cơ chế."
+          },
+          "marking_atoms": [
+            "RA7_TRACE_STACK",
+            "RA9_BENEFIT_COST"
+          ],
+          "reveal_rule": {
+            "en": "Reveal one sentence for each missing slot after attempt.",
+            "vi": "Sau lần thử, mỗi lần chỉ mở một câu cho ô còn thiếu."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-19.2-05"
+          ]
+        },
+        {
+          "level": "independent",
+          "title": {
+            "en": "Rewrite the linear recursion as iteration",
+            "vi": "Rewrite linear recursion thành iteration"
+          },
+          "prompt": {
+            "en": "Rewrite recursive_sum(values, 0) as an iterative Python function with the same list input and integer return. Map base value, progress and final return; check [4,7,2] and [].",
+            "vi": "Rewrite recursive_sum(values, 0) thành hàm Python iterative với cùng list input và integer return. Map base value, progress và final return; kiểm tra [4,7,2] và []."
+          },
+          "hint": {
+            "en": "Use 0 as accumulator identity and visit each value once. Tests are evidence for the checked cases only.",
+            "vi": "Dùng 0 làm accumulator identity và duyệt mỗi value một lần. Test chỉ là bằng chứng cho các case đã kiểm tra."
+          },
+          "model_answer": {
+            "en": "Initialise total = 0, add each value once, return total. The checked outputs are 13 and 0. The loop maps the base identity and progress but does not prove equivalence for every input.",
+            "vi": "Khởi tạo total = 0, cộng mỗi value một lần, return total. Output đã kiểm tra là 13 và 0. Loop map base identity và progress nhưng không chứng minh tương đương cho mọi input."
+          },
+          "success_check": {
+            "en": "Contract, terminal behavior, progress/state mapping and return are compared, not only one output.",
+            "vi": "Contract, terminal behavior, progress/state mapping và return được so sánh, không chỉ một output."
+          },
+          "marking_atoms": [
+            "RA1_CONTRACT",
+            "RA3_BASE_VALUE",
+            "RA4_PROGRESS",
+            "RA5_CHILD_RETURN",
+            "RA8_REWRITE_EQUIVALENCE"
+          ],
+          "static_transfer": true,
+          "reveal_rule": {
+            "en": "Require code plus a three-row mapping and attempts for both cases before the teacher-created model.",
+            "vi": "Yêu cầu code, bảng mapping ba hàng và thử cả hai case trước khi hiện model do giáo viên biên soạn."
+          }
+        },
+        {
+          "level": "independent",
+          "title": {
+            "en": "Boundary or recursion defect?",
+            "vi": "Boundary hay recursion defect?"
+          },
+          "prompt": {
+            "en": "Classify: A recursive_sum([],0); B a self-call with the same index; C a child call whose result is neither returned nor combined. Give the smallest repair for B and C.",
+            "vi": "Phân loại: A recursive_sum([],0); B self-call với cùng index; C child call có result không được return hay combine. Nêu sửa đổi nhỏ nhất cho B và C."
+          },
+          "hint": {
+            "en": "Use classification → first wrong line → repair. Do not execute B.",
+            "vi": "Dùng classification → dòng sai đầu tiên → repair. Không chạy B."
+          },
+          "model_answer": {
+            "en": "A is the executed boundary and returns 0. B has no progress; use index + 1. C loses the child value; return it or save and combine it.",
+            "vi": "A là boundary đã chạy và trả 0. B không có progress; dùng index + 1. C làm mất child value; return hoặc lưu rồi combine."
+          },
+          "success_check": {
+            "en": "Valid boundary is separated from unsafe non-progress and lost-return defects.",
+            "vi": "Valid boundary được tách khỏi lỗi no-progress và lost-return không an toàn."
+          },
+          "marking_atoms": [
+            "RA2_BASE_GUARD",
+            "RA3_BASE_VALUE",
+            "RA4_PROGRESS",
+            "RA5_CHILD_RETURN"
+          ],
+          "reveal_rule": {
+            "en": "Reveal diagnosis before repair, one case at a time.",
+            "vi": "Mở diagnosis trước repair, mỗi lần một case."
+          }
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which small recursion error changes the whole answer?",
+        "vi": "Lỗi recursion nhỏ nào làm thay đổi toàn bộ đáp án?"
+      },
+      "before_code": [
+        {
+          "en": "Write base condition, base value and progress step before completing the recursive branch.",
+          "vi": "Viết base condition, base value và progress step trước khi hoàn thiện recursive branch."
+        }
+      ],
+      "core_code_caption": {
+        "en": "Recursion contract checkpoint",
+        "vi": "Checkpoint recursion contract"
+      },
+      "core_code": [
+        "base: index == len(values) -> return 0",
+        "progress: index -> index + 1",
+        "combine: return values[index] + child subtotal"
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Changing the required function contract or ignoring the returned value at the call site.",
+            "vi": "Đổi function contract được yêu cầu hoặc bỏ qua returned value tại call site."
+          },
+          "consequence": {
+            "en": "Correct-looking logic no longer supplies the requested parameter or output evidence.",
+            "vi": "Logic nhìn đúng nhưng không còn cung cấp parameter hoặc output evidence đề yêu cầu."
+          },
+          "repair": {
+            "en": "Copy name, parameters, order, return meaning and call/output behavior exactly before coding.",
+            "vi": "Giữ chính xác name, parameters, order, return meaning và call/output behavior trước khi code."
+          },
+          "marking_atoms": [
+            "RA1_CONTRACT",
+            "RA6_CALL_OUTPUT"
+          ]
+        },
+        {
+          "mistake": {
+            "en": "Pairing the right base guard with the wrong base value.",
+            "vi": "Ghép base guard đúng với base value sai."
+          },
+          "consequence": {
+            "en": "Unwind starts from the wrong identity and every subtotal can be wrong.",
+            "vi": "Unwind bắt đầu từ identity sai và mọi subtotal có thể sai."
+          },
+          "repair": {
+            "en": "Ask both: is this the exact terminal state, and what value is correct without another call?",
+            "vi": "Hỏi cả hai: đây có đúng terminal state không, và value nào đúng khi không gọi tiếp?"
+          },
+          "marking_atoms": [
+            "RA2_BASE_GUARD",
+            "RA3_BASE_VALUE"
+          ]
+        },
+        {
+          "mistake": {
+            "en": "Missing progress or discarding the child result.",
+            "vi": "Thiếu progress hoặc bỏ child result."
+          },
+          "consequence": {
+            "en": "The call may not terminate, or the caller cannot produce the required value.",
+            "vi": "Call có thể không dừng, hoặc caller không tạo được value cần thiết."
+          },
+          "repair": {
+            "en": "Circle the changed argument and underline the returned or combined child expression on every recursive branch.",
+            "vi": "Khoanh argument đã đổi và gạch dưới child expression được return hoặc combine trên mọi recursive branch."
+          },
+          "marking_atoms": [
+            "RA4_PROGRESS",
+            "RA5_CHILD_RETURN"
+          ]
+        },
+        {
+          "mistake": {
+            "en": "Mixing descending calls and returned calculations in one trace column.",
+            "vi": "Trộn descending call và returned calculation trong một cột trace."
+          },
+          "consequence": {
+            "en": "Pending work is lost or values are added twice.",
+            "vi": "Pending work bị mất hoặc value bị cộng hai lần."
+          },
+          "repair": {
+            "en": "Record frame-local index and pending work first; reveal the return column only during LIFO unwind.",
+            "vi": "Ghi frame-local index và pending work trước; chỉ mở cột return trong LIFO unwind."
+          },
+          "marking_atoms": [
+            "RA7_TRACE_STACK"
+          ]
+        },
+        {
+          "mistake": {
+            "en": "Calling a loop rewrite equivalent after matching one output.",
+            "vi": "Kết luận loop rewrite tương đương sau khi chỉ khớp một output."
+          },
+          "consequence": {
+            "en": "Parameters, boundary behavior, effects or operation order may have changed.",
+            "vi": "Parameters, boundary behavior, effects hoặc operation order có thể đã đổi."
+          },
+          "repair": {
+            "en": "Compare contract, terminal state, progress/state mapping, observable order and return; test normal and boundary without calling tests a proof.",
+            "vi": "So sánh contract, terminal state, progress/state mapping, observable order và return; test normal và boundary nhưng không gọi test là proof."
+          },
+          "marking_atoms": [
+            "RA6_CALL_OUTPUT",
+            "RA8_REWRITE_EQUIVALENCE"
+          ]
+        }
+      ],
+      "boundary_trace": [
+        {
+          "en": "For [], show call index 0, the true base guard and return 0. For [4, 'seven', 2], state that validation rejects input before any frame is created.",
+          "vi": "Với [], cho thấy call index 0, base guard true và return 0. Với [4, 'seven', 2], nêu validation từ chối input trước khi tạo frame."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Did I preserve the required parameters, reachable base, strict progress, child result and return on every path?",
+          "vi": "Tôi đã giữ đúng parameters, reachable base, strict progress, child result và return trên mọi path chưa?"
+        }
+      ],
+      "authority_note": {
+        "en": "The dynamic path is executed evidence for the declared inputs. Boolean input, malformed fixture shape, arbitrary direct index, deep recursion and iterative equivalence beyond those fixtures are limits, not dynamic claims.",
+        "vi": "Dynamic path là bằng chứng đã chạy cho các input đã khai báo. Boolean input, malformed fixture shape, arbitrary direct index, recursion sâu và iterative equivalence ngoài các fixture đó là giới hạn, không phải dynamic claim."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the recursion contract and unwind without help?",
+        "vi": "Tôi có thể tự dựng lại recursion contract và unwind không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "What stops recursive_sum, and what does the general case postpone?",
+            "vi": "Điều gì dừng recursive_sum và general case hoãn việc gì?"
+          },
+          "answer": {
+            "en": "index == len(values) returns 0; each caller postpones adding its value until the child returns.",
+            "vi": "index == len(values) trả 0; mỗi caller hoãn cộng value cho tới khi child return."
+          },
+          "marking_atoms": [
+            "RA2_BASE_GUARD",
+            "RA3_BASE_VALUE",
+            "RA5_CHILD_RETURN"
+          ]
+        },
+        {
+          "prompt": {
+            "en": "Give call-index order and returned-subtotal order for [4,7,2].",
+            "vi": "Nêu call-index order và returned-subtotal order cho [4,7,2]."
+          },
+          "answer": {
+            "en": "Calls 0→1→2→3; returned values 0→2→9→13; frames complete 3→2→1→0.",
+            "vi": "Call 0→1→2→3; value return 0→2→9→13; frame hoàn tất 3→2→1→0."
+          },
+          "marking_atoms": [
+            "RA7_TRACE_STACK"
+          ]
+        },
+        {
+          "prompt": {
+            "en": "What progress measure decreases on every valid call?",
+            "vi": "Progress measure nào giảm sau mỗi valid call?"
+          },
+          "answer": {
+            "en": "len(values) - index; calling index + 1 decreases it by one until zero.",
+            "vi": "len(values) - index; gọi index + 1 làm nó giảm một cho tới zero."
+          },
+          "marking_atoms": [
+            "RA4_PROGRESS"
+          ]
+        },
+        {
+          "prompt": {
+            "en": "Complete the rule: a value-producing recursive function must …",
+            "vi": "Hoàn thành quy tắc: recursive function tạo value phải …"
+          },
+          "answer": {
+            "en": "Return the correct base value and propagate or combine the child return on every recursive path.",
+            "vi": "Return đúng base value và propagate hoặc combine child return trên mọi recursive path."
+          },
+          "marking_atoms": [
+            "RA3_BASE_VALUE",
+            "RA5_CHILD_RETURN"
+          ]
+        },
+        {
+          "prompt": {
+            "en": "State one suitable reason to choose recursion and one stack-related limitation.",
+            "vi": "Nêu một lý do phù hợp để chọn recursion và một hạn chế liên quan tới stack."
+          },
+          "answer": {
+            "en": "It can mirror recursive problem structure clearly; each call creates a frame, so deep recursion consumes stack and can hit the recursion limit.",
+            "vi": "Nó có thể bám rõ recursive problem structure; mỗi call tạo một frame nên recursion sâu dùng stack và có thể chạm recursion limit."
+          },
+          "marking_atoms": [
+            "RA9_BENEFIT_COST"
+          ]
+        },
+        {
+          "prompt": {
+            "en": "Why does [] return 0, why is same-index recursion unsafe, and what must an iterative rewrite preserve?",
+            "vi": "Vì sao [] trả 0, vì sao same-index recursion không an toàn và iterative rewrite phải giữ gì?"
+          },
+          "answer": {
+            "en": "Empty input already meets the base guard and 0 is the additive identity; same-index recursion makes no progress; rewrite preserves contract, terminal behavior, state/progress mapping, observable order and return.",
+            "vi": "Input rỗng đã thỏa base guard và 0 là additive identity; same-index recursion không có progress; rewrite giữ contract, terminal behavior, state/progress mapping, observable order và return."
+          },
+          "marking_atoms": [
+            "RA2_BASE_GUARD",
+            "RA3_BASE_VALUE",
+            "RA4_PROGRESS",
+            "RA8_REWRITE_EQUIVALENCE"
+          ]
+        }
+      ],
+      "exit_task": {
+        "en": "From memory, write recursive_sum, then trace calls and returns for [3, 6] and explain why [] returns 0.",
+        "vi": "Từ trí nhớ, viết recursive_sum, rồi trace call và return cho [3, 6] và giải thích vì sao [] trả 0."
+      },
+      "completion_check": {
+        "en": "I can prove termination, keep frames separate and calculate every returned subtotal in order.",
+        "vi": "Tôi có thể chứng minh termination, giữ frame tách biệt và tính mọi returned subtotal đúng thứ tự."
+      },
+      "next_lesson": {
+        "en": "Continue to binary trees, where recursive calls naturally work on smaller left and right subtrees.",
+        "vi": "Học tiếp binary tree, nơi recursive call tự nhiên làm việc trên left và right subtree nhỏ hơn."
+      },
+      "source_note": {
+        "en": "The primary, empty boundary and declared non-integer rejection were executed and verified. Other input shapes and deep recursion need separate evidence or remediation.",
+        "vi": "Primary path, empty boundary và non-integer rejection đã khai báo đều được chạy và kiểm chứng. Input shape khác và recursion sâu cần bằng chứng hoặc remediation riêng."
+      }
+    }
+  }
+}

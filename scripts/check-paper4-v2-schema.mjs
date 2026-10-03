@@ -379,7 +379,11 @@ export function validateRegistry(documents) {
       const representationalOnly = assessment.self_rubric?.authority === "AlgoCore_authored_rubric"
         && assessment.self_rubric?.official_marks === null
         && assessment.self_rubric?.pattern_authority === "AlgoCore_representational_workflow_only";
-      if (!joined && !representationalOnly) errors.push({ ...issue("ASSESSMENT_REQUIREMENT_JOIN_INVALID", "/record/assessment_requirement_ids", `Requirement ${requirementId} has no marking chain for this lesson and pattern.`), document: index });
+      const teacherPromptLevel = assessment.self_rubric?.authority === "AlgoCore_authored_rubric"
+        && assessment.self_rubric?.official_marks === null
+        && assessment.self_rubric?.prompt_requirement_authority === "AlgoCore_teacher_prompt_level"
+        && assessment.self_rubric?.criteria?.some((criterion) => criterion.criterion_id?.startsWith(`${assessment.assessment_item_id}.rubric.requirement-`));
+      if (!joined && !representationalOnly && !teacherPromptLevel) errors.push({ ...issue("ASSESSMENT_REQUIREMENT_JOIN_INVALID", "/record/assessment_requirement_ids", `Requirement ${requirementId} has no marking chain, representational disposition, or Teacher-reviewed prompt criterion for this lesson.`), document: index });
     }
   }
   return errors;

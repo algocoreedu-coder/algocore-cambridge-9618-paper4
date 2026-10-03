@@ -62,8 +62,8 @@
       "en": "Reading a file record involves parsing fields, checking count/types, converting values, then calling the constructor in the required parameter order. Append the object only after the complete record is valid to avoid partial state."
     },
     "python_connection": {
-      "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L075–L081 dispatch theo discriminator `BOOK`/`EBOOK`; L077 hoặc L079 gọi đúng constructor, rồi L082–L083 append và ghi loại object đã tạo.",
-      "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L075-L081 dispatch on the `BOOK`/`EBOOK` discriminator; L077 or L079 calls the matching constructor, then L082-L083 append and record the constructed object type."
+      "vi": "L018–L021 đọc từng CSV record; L073–L074 kiểm tra layout và chuyển `pages` ở field 2. L104–L105 loại số trang không dương trước khi L075–L081 dispatch theo discriminator; chỉ sau đó L077 hoặc L079 mới gọi constructor.",
+      "en": "L018-L021 read each CSV record; L073-L074 validate its layout and convert `pages` from field 2. L104-L105 reject a non-positive page count before L075-L081 dispatch on the discriminator; only then does L077 or L079 call a constructor."
     },
     "representation": {
       "vi": "Dùng pipeline `CSV fields -> validated typed values -> constructor arguments -> object list`; ghi line number cạnh record để truy lỗi.",
@@ -110,6 +110,8 @@
         "object-files.v1.L018",
         "object-files.v1.L073",
         "object-files.v1.L074",
+        "object-files.v1.L104",
+        "object-files.v1.L105",
         "object-files.v1.L075",
         "object-files.v1.L077",
         "object-files.v1.L079",
@@ -120,12 +122,12 @@
     },
     "self_check": {
       "prompt": {
-        "vi": "Vì sao L077/L079 nằm sau conversion L074?",
-        "en": "Why do L077/L079 come after conversion at L074?"
+        "vi": "Vì sao L077/L079 nằm sau conversion L074 và range check L104?",
+        "en": "Why do L077/L079 follow conversion L074 and range check L104?"
       },
       "answer": {
-        "vi": "Để cả hai constructor chỉ nhận `pages` đã chuyển thành int thành công.",
-        "en": "So both constructors receive `pages` only after successful integer conversion."
+        "vi": "Để constructor chỉ nhận `pages` đã chuyển thành integer dương hợp lệ.",
+        "en": "So a constructor receives only a successfully converted positive integer page count."
       },
       "rationale": {
         "vi": "Validation và dispatch trước mutation giữ list object nhất quán.",

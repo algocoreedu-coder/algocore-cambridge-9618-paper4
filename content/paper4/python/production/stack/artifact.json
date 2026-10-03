@@ -4,9 +4,9 @@
     "en": "A fixed-array stack with push, pop and correct operand order.",
     "vi": "Stack mảng cố định với push, pop và đúng thứ tự toán hạng."
   },
-  "code_sha256": "c85dcb37f7901eb7342709fe615345a78ea7cf60e53dfd6839ec0667fabfaac0",
+  "code_sha256": "e163984bfc12108cb7fda240d762a666c6ee20ffa88fe01650b95d1aae6741bf",
   "entry_point": "run(fixture)",
-  "execution_log_sha256": "14456629751e6b8e6af6535564eeda689be50673f57697388cc1d0a3186ecd7a",
+  "execution_log_sha256": "83ec29e60b477a5cd345e02bb19cc61c52f3ae1159d1eb7b0324792f8aea9c4d",
   "execution_status": "PASS",
   "expected_outputs": [
     {
@@ -17,6 +17,12 @@
           10,
           30
         ],
+        "pair": [
+          "red",
+          "fox"
+        ],
+        "pair_left": [],
+        "pair_right": [],
         "reduced": 5,
         "results": [
           true,
@@ -91,6 +97,25 @@
             },
             "event": "push",
             "outcome": true
+          },
+          {
+            "after": {
+              "left": [],
+              "right": []
+            },
+            "before": {
+              "left": [
+                "red"
+              ],
+              "right": [
+                "fox"
+              ]
+            },
+            "event": "pair_commit",
+            "pair": [
+              "red",
+              "fox"
+            ]
           }
         ]
       }
@@ -102,6 +127,9 @@
         "live": [
           7
         ],
+        "pair": null,
+        "pair_left": [],
+        "pair_right": [],
         "reduced": null,
         "results": [
           null,
@@ -152,6 +180,17 @@
             },
             "event": "push",
             "outcome": false
+          },
+          {
+            "after": {
+              "left": [],
+              "right": []
+            },
+            "before": {
+              "left": [],
+              "right": []
+            },
+            "event": "pair_rollback"
           }
         ]
       }
@@ -161,6 +200,11 @@
       "fixture_ref": "stack.failure",
       "value": {
         "live": [],
+        "pair": null,
+        "pair_left": [
+          "blue"
+        ],
+        "pair_right": [],
         "reduced": null,
         "results": [
           true,
@@ -264,6 +308,21 @@
             },
             "event": "pop",
             "outcome": null
+          },
+          {
+            "after": {
+              "left": [
+                "blue"
+              ],
+              "right": []
+            },
+            "before": {
+              "left": [
+                "blue"
+              ],
+              "right": []
+            },
+            "event": "pair_rollback"
           }
         ]
       }
@@ -296,6 +355,12 @@
             "push",
             30
           ]
+        ],
+        "pair_left": [
+          "red"
+        ],
+        "pair_right": [
+          "fox"
         ]
       }
     },
@@ -317,7 +382,9 @@
             "push",
             8
           ]
-        ]
+        ],
+        "pair_left": [],
+        "pair_right": []
       }
     },
     {
@@ -350,7 +417,11 @@
           [
             "pop"
           ]
-        ]
+        ],
+        "pair_left": [
+          "blue"
+        ],
+        "pair_right": []
       }
     }
   ],
@@ -471,126 +542,256 @@
     {
       "line_id": "stack.production-v1.L023",
       "order": 23,
-      "text": "def run(fixture):"
+      "text": "def stack_from(values):"
     },
     {
       "line_id": "stack.production-v1.L024",
       "order": 24,
-      "text": "    stack, trace, results = Stack(fixture[\"capacity\"]), [], []"
+      "text": "    stack = Stack(len(values))"
     },
     {
       "line_id": "stack.production-v1.L025",
       "order": 25,
-      "text": "    for operation in fixture[\"operations\"]:"
+      "text": "    for value in values:"
     },
     {
       "line_id": "stack.production-v1.L026",
       "order": 26,
-      "text": "        before = {\"top\": stack.top, \"live\": stack.live()}"
+      "text": "        stack.push(value)"
     },
     {
       "line_id": "stack.production-v1.L027",
       "order": 27,
-      "text": "        if operation[0] == \"push\":"
+      "text": "    return stack"
     },
     {
       "line_id": "stack.production-v1.L028",
       "order": 28,
-      "text": "            outcome = stack.push(operation[1])"
+      "text": ""
     },
     {
       "line_id": "stack.production-v1.L029",
       "order": 29,
-      "text": "        else:"
+      "text": "def pair_stacks(left_stack, right_stack, trace):"
     },
     {
       "line_id": "stack.production-v1.L030",
       "order": 30,
-      "text": "            outcome = stack.pop()"
+      "text": "    before = {\"left\": left_stack.live(), \"right\": right_stack.live()}"
     },
     {
       "line_id": "stack.production-v1.L031",
       "order": 31,
-      "text": "        results.append(outcome)"
+      "text": "    left_item = left_stack.pop()"
     },
     {
       "line_id": "stack.production-v1.L032",
       "order": 32,
-      "text": "        trace.append({\"event\": operation[0], \"before\": before, \"after\": {\"top\": stack.top, \"live\": stack.live()}, \"outcome\": outcome})"
+      "text": "    right_item = right_stack.pop()"
     },
     {
       "line_id": "stack.production-v1.L033",
       "order": 33,
-      "text": "    reduce_stack = Stack(max(2, len(fixture.get(\"operands\", []))))"
+      "text": "    if left_item is None or right_item is None:"
     },
     {
       "line_id": "stack.production-v1.L034",
       "order": 34,
-      "text": "    for value in fixture.get(\"operands\", []): reduce_stack.push(value)"
+      "text": "        if left_item is not None:"
     },
     {
       "line_id": "stack.production-v1.L035",
       "order": 35,
-      "text": "    right, left = reduce_stack.pop(), reduce_stack.pop()"
+      "text": "            left_stack.push(left_item)"
     },
     {
       "line_id": "stack.production-v1.L036",
       "order": 36,
-      "text": "    reduced = None if left is None or right is None else left - right"
+      "text": "        if right_item is not None:"
     },
     {
       "line_id": "stack.production-v1.L037",
       "order": 37,
-      "text": "    return {\"status\": \"OK\", \"results\": results, \"live\": stack.live(), \"top\": stack.top, \"reduced\": reduced, \"trace\": trace}"
+      "text": "            right_stack.push(right_item)"
     },
     {
       "line_id": "stack.production-v1.L038",
       "order": 38,
-      "text": ""
+      "text": "        trace.append({\"event\": \"pair_rollback\", \"before\": before, \"after\": {\"left\": left_stack.live(), \"right\": right_stack.live()}})"
     },
     {
       "line_id": "stack.production-v1.L039",
       "order": 39,
-      "text": "if __name__ == \"__main__\":"
+      "text": "        return None"
     },
     {
       "line_id": "stack.production-v1.L040",
       "order": 40,
-      "text": "    import json"
+      "text": "    pair = [left_item, right_item]"
     },
     {
       "line_id": "stack.production-v1.L041",
       "order": 41,
-      "text": "    import sys"
+      "text": "    trace.append({\"event\": \"pair_commit\", \"pair\": pair, \"before\": before, \"after\": {\"left\": left_stack.live(), \"right\": right_stack.live()}})"
     },
     {
       "line_id": "stack.production-v1.L042",
       "order": 42,
-      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      "text": "    return pair"
     },
     {
       "line_id": "stack.production-v1.L043",
       "order": 43,
-      "text": "    result = run(fixture)"
+      "text": ""
     },
     {
       "line_id": "stack.production-v1.L044",
       "order": 44,
-      "text": "    if not result[\"trace\"]:"
+      "text": "def reduce_operands(values):"
     },
     {
       "line_id": "stack.production-v1.L045",
       "order": 45,
-      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      "text": "    stack = stack_from(values)"
     },
     {
       "line_id": "stack.production-v1.L046",
       "order": 46,
-      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      "text": "    right, left = stack.pop(), stack.pop()"
     },
     {
       "line_id": "stack.production-v1.L047",
       "order": 47,
+      "text": "    return None if left is None or right is None else left - right"
+    },
+    {
+      "line_id": "stack.production-v1.L048",
+      "order": 48,
+      "text": ""
+    },
+    {
+      "line_id": "stack.production-v1.L049",
+      "order": 49,
+      "text": "def run(fixture):"
+    },
+    {
+      "line_id": "stack.production-v1.L050",
+      "order": 50,
+      "text": "    stack, trace, results = Stack(fixture[\"capacity\"]), [], []"
+    },
+    {
+      "line_id": "stack.production-v1.L051",
+      "order": 51,
+      "text": "    for operation in fixture[\"operations\"]:"
+    },
+    {
+      "line_id": "stack.production-v1.L052",
+      "order": 52,
+      "text": "        before = {\"top\": stack.top, \"live\": stack.live()}"
+    },
+    {
+      "line_id": "stack.production-v1.L053",
+      "order": 53,
+      "text": "        if operation[0] == \"push\":"
+    },
+    {
+      "line_id": "stack.production-v1.L054",
+      "order": 54,
+      "text": "            outcome = stack.push(operation[1])"
+    },
+    {
+      "line_id": "stack.production-v1.L055",
+      "order": 55,
+      "text": "        else:"
+    },
+    {
+      "line_id": "stack.production-v1.L056",
+      "order": 56,
+      "text": "            outcome = stack.pop()"
+    },
+    {
+      "line_id": "stack.production-v1.L057",
+      "order": 57,
+      "text": "        results.append(outcome)"
+    },
+    {
+      "line_id": "stack.production-v1.L058",
+      "order": 58,
+      "text": "        trace.append({\"event\": operation[0], \"before\": before, \"after\": {\"top\": stack.top, \"live\": stack.live()}, \"outcome\": outcome})"
+    },
+    {
+      "line_id": "stack.production-v1.L059",
+      "order": 59,
+      "text": "    left_stack = stack_from(fixture.get(\"pair_left\", []))"
+    },
+    {
+      "line_id": "stack.production-v1.L060",
+      "order": 60,
+      "text": "    right_stack = stack_from(fixture.get(\"pair_right\", []))"
+    },
+    {
+      "line_id": "stack.production-v1.L061",
+      "order": 61,
+      "text": "    pair = pair_stacks(left_stack, right_stack, trace)"
+    },
+    {
+      "line_id": "stack.production-v1.L062",
+      "order": 62,
+      "text": "    reduced = reduce_operands(fixture.get(\"operands\", []))"
+    },
+    {
+      "line_id": "stack.production-v1.L063",
+      "order": 63,
+      "text": "    return {\"status\": \"OK\", \"results\": results, \"live\": stack.live(), \"top\": stack.top, \"pair\": pair, \"pair_left\": left_stack.live(), \"pair_right\": right_stack.live(), \"reduced\": reduced, \"trace\": trace}"
+    },
+    {
+      "line_id": "stack.production-v1.L064",
+      "order": 64,
+      "text": ""
+    },
+    {
+      "line_id": "stack.production-v1.L065",
+      "order": 65,
+      "text": "if __name__ == \"__main__\":"
+    },
+    {
+      "line_id": "stack.production-v1.L066",
+      "order": 66,
+      "text": "    import json"
+    },
+    {
+      "line_id": "stack.production-v1.L067",
+      "order": 67,
+      "text": "    import sys"
+    },
+    {
+      "line_id": "stack.production-v1.L068",
+      "order": 68,
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "line_id": "stack.production-v1.L069",
+      "order": 69,
+      "text": "    result = run(fixture)"
+    },
+    {
+      "line_id": "stack.production-v1.L070",
+      "order": 70,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "stack.production-v1.L071",
+      "order": 71,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "stack.production-v1.L072",
+      "order": 72,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "stack.production-v1.L073",
+      "order": 73,
       "text": ""
     }
   ],

@@ -1,0 +1,916 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Data, arrays and records",
+    "vi": "Dữ liệu, mảng và bản ghi"
+  },
+  "exam_family": {
+    "en": "Data, loops, validation and rule-based calculation",
+    "vi": "Dữ liệu, vòng lặp, kiểm tra hợp lệ và tính theo quy tắc"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Validate a named-field record, check the bounded array before writing, and explain exactly whether the live records change.",
+    "vi": "Kiểm tra record có field được đặt tên, kiểm tra mảng có giới hạn trước khi ghi và giải thích chính xác các record đang dùng có thay đổi hay không."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Distinguish the live-record count from the maximum capacity.",
+      "vi": "Phân biệt số record đang dùng với capacity tối đa."
+    },
+    {
+      "en": "Check required record fields and types before storing the record.",
+      "vi": "Kiểm tra các field và kiểu bắt buộc trước khi lưu record."
+    },
+    {
+      "en": "Write and trace a guard-before-write bounded append in Python.",
+      "vi": "Viết và trace thao tác append có giới hạn, kiểm tra trước khi ghi bằng Python."
+    },
+    {
+      "en": "Prove that full or invalid input leaves the records unchanged.",
+      "vi": "Chứng minh input đầy hoặc không hợp lệ không làm thay đổi danh sách record."
+    }
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    },
+    "primary_code_limit": {
+      "en": "Show the 13-line teaching excerpt or the current 1–3 focused lines.",
+      "vi": "Chỉ hiển thị teaching excerpt 13 dòng hoặc 1–3 dòng đang tập trung."
+    },
+    "teacher_content": {
+      "en": "Source locators, execution records and internal labels stay outside the learner sequence.",
+      "vi": "Locator nguồn, hồ sơ chạy và nhãn nội bộ nằm ngoài luồng học sinh."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What must be checked before this record is stored?",
+        "vi": "Cần kiểm tra gì trước khi lưu record này?"
+      },
+      "intro": {
+        "en": "Use this method when a task stores named-field records in a bounded array and a new record may be accepted or rejected.",
+        "vi": "Dùng phương pháp này khi bài toán lưu record có các field được đặt tên trong mảng có giới hạn và record mới có thể được chấp nhận hoặc từ chối."
+      },
+      "prompt_fragment": {
+        "en": "The array can store at most three student records. Each record must contain a non-empty name and an integer score. Add the new record if it is valid and space is available; otherwise leave the array unchanged.",
+        "vi": "Mảng lưu tối đa ba record học sinh. Mỗi record phải có name không rỗng và score kiểu số nguyên. Thêm record mới nếu hợp lệ và còn chỗ; nếu không, giữ nguyên mảng."
+      },
+      "cues": [
+        {
+          "en": "The task states a maximum number of records or a fixed capacity.",
+          "vi": "Đề nêu số record tối đa hoặc capacity cố định."
+        },
+        {
+          "en": "One record contains several named fields that belong together.",
+          "vi": "Một record chứa nhiều field được đặt tên và thuộc cùng một đối tượng."
+        },
+        {
+          "en": "The task requires validation and a success/failure result.",
+          "vi": "Đề yêu cầu kiểm tra hợp lệ và trả kết quả thành công/thất bại."
+        },
+        {
+          "en": "Rejected input must not change existing records.",
+          "vi": "Input bị từ chối không được làm thay đổi các record hiện có."
+        }
+      ],
+      "precondition": {
+        "en": "The existing live-record count must be between 0 and capacity, and each accepted record must follow the stated field contract.",
+        "vi": "Số record đang dùng phải nằm từ 0 đến capacity, và mỗi record được chấp nhận phải đúng hợp đồng field đã nêu."
+      },
+      "output_contract": {
+        "en": "Return a success flag and status. On success, append once; on invalid or full input, return the matching status and do not mutate the records.",
+        "vi": "Trả về cờ thành công và status. Khi thành công, append đúng một lần; khi record không hợp lệ hoặc mảng đầy, trả status tương ứng và không thay đổi records."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu mô hình"
+      },
+      "student_question": {
+        "en": "Which state and ordering keep the append safe?",
+        "vi": "Trạng thái và thứ tự kiểm tra nào giúp append an toàn?"
+      },
+      "mental_model": {
+        "en": "In this Python model, records contains only live records, so len(records) is the logical count. capacity is a separate maximum because a Python list would otherwise grow automatically.",
+        "vi": "Trong mô hình Python này, records chỉ chứa các record đang dùng nên len(records) là logical count. capacity là giới hạn tối đa riêng vì Python list sẽ tự tăng nếu không kiểm tra."
+      },
+      "rules": [
+        {
+          "en": "Validate every required field before checking where to write.",
+          "vi": "Kiểm tra mọi field bắt buộc trước khi xác định vị trí ghi."
+        },
+        {
+          "en": "The structure is full when len(records) >= capacity.",
+          "vi": "Cấu trúc đầy khi len(records) >= capacity."
+        },
+        {
+          "en": "If both guards pass, the new index is the old logical count.",
+          "vi": "Nếu cả hai guard đều đúng, index mới chính là logical count cũ."
+        },
+        {
+          "en": "Append exactly once and return the status on every branch.",
+          "vi": "Append đúng một lần và trả status ở mọi nhánh."
+        }
+      ],
+      "invariant": {
+        "en": "The live-record count never exceeds capacity. A rejected operation leaves every existing record and its index unchanged.",
+        "vi": "Số record đang dùng không bao giờ vượt capacity. Thao tác bị từ chối giữ nguyên mọi record hiện có và index của chúng."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Teaching excerpt: validate, guard capacity, then append",
+          "vi": "Teaching excerpt: kiểm tra record, guard capacity rồi append"
+        },
+        "lines": [
+          "def valid_record(record):",
+          "    return isinstance(record, dict) and (",
+          "        isinstance(record.get(\"name\"), str)",
+          "        and record.get(\"name\") != \"\"",
+          "        and type(record.get(\"score\")) is int",
+          "    )",
+          "def add_record(records, capacity, record):",
+          "    if not valid_record(record):",
+          "        return False, \"INVALID_RECORD\"",
+          "    if len(records) >= capacity:",
+          "        return False, \"FULL\"",
+          "    records.append(record)",
+          "    return True, \"ADDED\""
+        ],
+        "contract_note": {
+          "en": "This AlgoCore teaching excerpt follows the verified guard-before-write behaviour and uses an exact integer-type check. Follow the field names, capacity convention and returned status required by the question you are answering.",
+          "vi": "AlgoCore teaching excerpt này theo đúng hành vi kiểm tra trước khi ghi đã được xác minh và dùng phép kiểm tra chính xác kiểu số nguyên. Hãy làm theo field name, quy ước capacity và status trả về mà câu hỏi đang yêu cầu."
+        }
+      },
+      "transfer_note": {
+        "label": {
+          "en": "Transfer to a two-dimensional array",
+          "vi": "Chuyển sang mảng hai chiều"
+        },
+        "content": {
+          "en": "A two-dimensional item uses a row-column pair instead of one index. Keep the prompt's row-column order and check both bounds before access; this does not change the guard-before-write rule.",
+          "vi": "Một phần tử hai chiều dùng cặp row-column thay vì một index. Giữ đúng thứ tự row-column của đề và kiểm tra cả hai cận trước khi truy cập; điều này không thay đổi quy tắc kiểm tra trước khi ghi."
+        }
+      },
+      "representation_contrast": {
+        "prompt": {
+          "en": "If Jobs is preallocated with 100 rows, why does len(Jobs) == 100 not mean that 100 jobs are stored?",
+          "vi": "Nếu Jobs được cấp sẵn 100 row, vì sao len(Jobs) == 100 không có nghĩa là đã lưu 100 job?"
+        },
+        "answer": {
+          "en": "len(Jobs) reports the allocated row count. A separate value such as NumberOfJobs must record how many rows currently contain live jobs.",
+          "vi": "len(Jobs) cho biết số row đã được cấp. Một giá trị riêng như NumberOfJobs phải ghi số row hiện đang chứa job được sử dụng."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "Will this operation append, and which state changes?",
+        "vi": "Thao tác này có append không, và trạng thái nào thay đổi?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Add Binh to a bounded list of student records",
+          "vi": "Thêm Binh vào danh sách record học sinh có giới hạn"
+        },
+        "initial_records": [
+          {
+            "name": "An",
+            "score": 72
+          }
+        ],
+        "capacity": 3,
+        "new_record": {
+          "name": "Binh",
+          "score": 81
+        },
+        "instruction": {
+          "en": "Follow three small Python decisions before the new record is added.",
+          "vi": "Xem Python đưa ra ba quyết định nhỏ trước khi thêm record mới."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "before": {
+            "logical_count": 1,
+            "capacity": 3,
+            "records_changed": false
+          },
+          "code_focus": [
+            "if not valid_record(record):",
+            "    return False, \"INVALID_RECORD\""
+          ],
+          "after": {
+            "record_valid": true,
+            "logical_count": 1,
+            "records_changed": false
+          },
+          "mode": "worked",
+          "heading": {
+            "en": "Worked example — Is the new record valid?",
+            "vi": "Ví dụ mẫu — Record mới có hợp lệ không?"
+          },
+          "worked_rows": [
+            {
+              "label": {
+                "en": "Current values",
+                "vi": "Giá trị hiện tại"
+              },
+              "value": {
+                "en": "name = \"Binh\", score = 81",
+                "vi": "name = \"Binh\", score = 81"
+              }
+            },
+            {
+              "label": {
+                "en": "Calculate",
+                "vi": "Tính"
+              },
+              "value": {
+                "en": "valid_record(record) → True, so not True → False",
+                "vi": "valid_record(record) → True, nên not True → False"
+              }
+            },
+            {
+              "label": {
+                "en": "What Python does",
+                "vi": "Python làm gì"
+              },
+              "value": {
+                "en": "The if condition is False, so Python skips the return and continues.",
+                "vi": "Điều kiện if là False, nên Python bỏ qua lệnh return và tiếp tục."
+              }
+            },
+            {
+              "label": {
+                "en": "What changes",
+                "vi": "Điều gì thay đổi"
+              },
+              "value": {
+                "en": "Nothing yet. records is still [An/72].",
+                "vi": "Chưa có gì thay đổi. records vẫn là [An/72]."
+              }
+            }
+          ],
+          "exam_sentence": {
+            "en": "The record is valid, so the function skips INVALID_RECORD and continues; records is unchanged.",
+            "vi": "Record hợp lệ, nên hàm bỏ qua INVALID_RECORD và tiếp tục; records giữ nguyên."
+          },
+          "continue_label": {
+            "en": "I understand — next decision",
+            "vi": "Tôi đã hiểu — sang quyết định tiếp theo"
+          }
+        },
+        {
+          "step": 2,
+          "before": {
+            "record_valid": true,
+            "logical_count": 1,
+            "capacity": 3
+          },
+          "code_focus": [
+            "if len(records) >= capacity:",
+            "    return False, \"FULL\""
+          ],
+          "after": {
+            "capacity_ok": true,
+            "logical_count": 1,
+            "records_changed": false
+          },
+          "mode": "choice",
+          "heading": {
+            "en": "Decision 2 — Is there space?",
+            "vi": "Quyết định 2 — Còn chỗ không?"
+          },
+          "context": {
+            "en": "There is 1 live record and capacity = 3, so the test is 1 >= 3.",
+            "vi": "Có 1 record đang dùng và capacity = 3, nên điều kiện là 1 >= 3."
+          },
+          "question": {
+            "en": "What does Python do?",
+            "vi": "Python làm gì?"
+          },
+          "options": [
+            {
+              "id": "return-full",
+              "label": {
+                "en": "Return FULL",
+                "vi": "Return FULL"
+              }
+            },
+            {
+              "id": "continue-append",
+              "label": {
+                "en": "Continue to append",
+                "vi": "Tiếp tục đến append"
+              }
+            }
+          ],
+          "correct_option_id": "continue-append",
+          "retry_hint": {
+            "en": "Substitute the values: is 1 >= 3 True or False?",
+            "vi": "Hãy thay giá trị vào điều kiện: 1 >= 3 là True hay False?"
+          },
+          "correct_feedback": {
+            "en": "Correct. 1 >= 3 is False, so Python skips return FULL and continues. records is still unchanged.",
+            "vi": "Đúng. 1 >= 3 là False, nên Python bỏ qua return FULL và tiếp tục. records vẫn giữ nguyên."
+          },
+          "exam_sentence": {
+            "en": "The list is not full because 1 < 3, so the function continues to the append; records is unchanged at this point.",
+            "vi": "Danh sách chưa đầy vì 1 < 3, nên hàm tiếp tục đến append; tại thời điểm này records vẫn giữ nguyên."
+          }
+        },
+        {
+          "step": 3,
+          "before": {
+            "capacity_ok": true,
+            "logical_count": 1,
+            "next_index": 1
+          },
+          "code_focus": [
+            "records.append(record)",
+            "return True, \"ADDED\""
+          ],
+          "after": {
+            "logical_count": 2,
+            "records": [
+              {
+                "name": "An",
+                "score": 72
+              },
+              {
+                "name": "Binh",
+                "score": 81
+              }
+            ],
+            "result": [
+              true,
+              "ADDED"
+            ]
+          },
+          "mode": "choice",
+          "heading": {
+            "en": "Decision 3 — Where is Binh stored?",
+            "vi": "Quyết định 3 — Binh được lưu ở đâu?"
+          },
+          "context": {
+            "en": "Before append, len(records) = 1.",
+            "vi": "Trước append, len(records) = 1."
+          },
+          "question": {
+            "en": "Choose the result:",
+            "vi": "Chọn kết quả:"
+          },
+          "options": [
+            {
+              "id": "index-0-added",
+              "label": {
+                "en": "Index 0, new count 2, return (True, \"ADDED\")",
+                "vi": "Index 0, count mới 2, return (True, \"ADDED\")"
+              }
+            },
+            {
+              "id": "index-1-added",
+              "label": {
+                "en": "Index 1, new count 2, return (True, \"ADDED\")",
+                "vi": "Index 1, count mới 2, return (True, \"ADDED\")"
+              }
+            },
+            {
+              "id": "no-append-full",
+              "label": {
+                "en": "No append, count stays 1, return (False, \"FULL\")",
+                "vi": "Không append, count vẫn 1, return (False, \"FULL\")"
+              }
+            }
+          ],
+          "correct_option_id": "index-1-added",
+          "retry_hint": {
+            "en": "Use the old count as the next free index.",
+            "vi": "Hãy dùng count cũ làm index trống tiếp theo."
+          },
+          "correct_feedback": {
+            "en": "Correct. Append uses the next free index, which equals the old count: index 1. The count becomes 2 and the function returns (True, \"ADDED\").",
+            "vi": "Đúng. Append dùng index trống tiếp theo, bằng count cũ: index 1. Count trở thành 2 và hàm trả (True, \"ADDED\")."
+          },
+          "exam_sentence": {
+            "en": "Binh is stored at index 1; the live count changes from 1 to 2, then the function returns (True, \"ADDED\").",
+            "vi": "Binh được lưu tại index 1; số record đang dùng đổi từ 1 thành 2, sau đó hàm trả (True, \"ADDED\")."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "Python adds the record only after it is valid and space is available; otherwise, records stays unchanged.",
+        "vi": "Python chỉ thêm record sau khi record hợp lệ và còn chỗ; nếu không, records giữ nguyên."
+      },
+      "variants": [
+        {
+          "kind": "boundary",
+          "label": {
+            "en": "Full capacity",
+            "vi": "Capacity đã đầy"
+          },
+          "input": {
+            "records": [
+              {
+                "name": "An",
+                "score": 72
+              }
+            ],
+            "capacity": 1,
+            "new_record": {
+              "name": "Binh",
+              "score": 81
+            }
+          },
+          "expected": {
+            "records": [
+              {
+                "name": "An",
+                "score": 72
+              }
+            ],
+            "result": [
+              false,
+              "FULL"
+            ]
+          },
+          "explanation": {
+            "en": "The record is valid, but 1 >= 1, so the function returns FULL before append and records remains unchanged.",
+            "vi": "Record hợp lệ nhưng 1 >= 1, nên hàm trả FULL trước append và records giữ nguyên."
+          },
+          "question": {
+            "en": "len(records) = 1, capacity = 1. What happens?",
+            "vi": "len(records) = 1, capacity = 1. Điều gì xảy ra?"
+          },
+          "options": [
+            {
+              "id": "return-full",
+              "label": {
+                "en": "Return FULL and keep records unchanged",
+                "vi": "Return FULL và giữ nguyên records"
+              }
+            },
+            {
+              "id": "continue-append",
+              "label": {
+                "en": "Continue to append",
+                "vi": "Tiếp tục append"
+              }
+            }
+          ],
+          "correct_option_id": "return-full",
+          "retry_hint": {
+            "en": "Substitute the values: is 1 >= 1 True or False?",
+            "vi": "Hãy thay giá trị: 1 >= 1 là True hay False?"
+          },
+          "correct_feedback": {
+            "en": "1 >= 1 is True, so Python returns FULL before append. records is unchanged.",
+            "vi": "1 >= 1 là True, nên Python return FULL trước append. records giữ nguyên."
+          }
+        },
+        {
+          "kind": "failure",
+          "label": {
+            "en": "Missing required field",
+            "vi": "Thiếu field bắt buộc"
+          },
+          "input": {
+            "records": [
+              {
+                "name": "An",
+                "score": 72
+              }
+            ],
+            "capacity": 3,
+            "new_record": {
+              "name": "Binh"
+            }
+          },
+          "expected": {
+            "records": [
+              {
+                "name": "An",
+                "score": 72
+              }
+            ],
+            "result": [
+              false,
+              "INVALID_RECORD"
+            ]
+          },
+          "explanation": {
+            "en": "The score field is missing, so validation returns first. Capacity is not used to justify a write and records remains unchanged.",
+            "vi": "Field score bị thiếu nên nhánh validation trả kết quả trước. Capacity không được dùng để biện minh cho bước ghi và records giữ nguyên."
+          },
+          "question": {
+            "en": "score is missing. What happens first?",
+            "vi": "Thiếu score. Điều gì xảy ra trước?"
+          },
+          "options": [
+            {
+              "id": "return-invalid",
+              "label": {
+                "en": "Return INVALID_RECORD and keep records unchanged",
+                "vi": "Return INVALID_RECORD và giữ nguyên records"
+              }
+            },
+            {
+              "id": "check-capacity",
+              "label": {
+                "en": "Check capacity",
+                "vi": "Kiểm tra capacity"
+              }
+            }
+          ],
+          "correct_option_id": "return-invalid",
+          "retry_hint": {
+            "en": "Check validation before capacity.",
+            "vi": "Hãy kiểm tra validation trước capacity."
+          },
+          "correct_feedback": {
+            "en": "Validation fails, so Python returns INVALID_RECORD before the capacity check. records is unchanged.",
+            "vi": "Validation thất bại, nên Python return INVALID_RECORD trước bước kiểm tra capacity. records giữ nguyên."
+          }
+        }
+      ],
+      "reminder": {
+        "en": "For each highlighted line: value → stop or continue → change or unchanged.",
+        "vi": "Với mỗi dòng được tô sáng: giá trị → dừng hay tiếp tục → thay đổi hay giữ nguyên."
+      }
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I apply the same guards to changed data before seeing the answer?",
+        "vi": "Tôi có thể áp dụng cùng các guard cho dữ liệu đã thay đổi trước khi xem đáp án không?"
+      },
+      "attempt_rule": {
+        "en": "Record your predicted result and final records before opening the hint or model answer.",
+        "vi": "Ghi kết quả dự đoán và records cuối trước khi mở gợi ý hoặc đáp án mẫu."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Trace a successful append",
+            "vi": "Trace một append thành công"
+          },
+          "prompt": {
+            "en": "records = [{name: 'Asha', score: 70}], capacity = 3, new_record = {name: 'Bo', score: 84}. Record the validation result, capacity comparison, write index and returned pair.",
+            "vi": "records = [{name: 'Asha', score: 70}], capacity = 3, new_record = {name: 'Bo', score: 84}. Ghi kết quả validation, phép so sánh capacity, index ghi và cặp giá trị trả về."
+          },
+          "hint": {
+            "en": "Both required fields are present. Compare the old count with capacity before calculating the final state.",
+            "vi": "Cả hai field bắt buộc đều có. So sánh count cũ với capacity trước khi tính trạng thái cuối."
+          },
+          "model_answer": {
+            "en": "The record is valid; 1 < 3; append at index 1; records ends with two items; return (True, 'ADDED').",
+            "vi": "Record hợp lệ; 1 < 3; append tại index 1; records có hai phần tử; trả (True, 'ADDED')."
+          },
+          "success_check": {
+            "en": "The write happens only after both guards pass and the new index equals the old count.",
+            "vi": "Bước ghi chỉ xảy ra sau khi cả hai guard đúng và index mới bằng count cũ."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-01",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-03",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-11.1-01",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-11.1-02",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-9.2-02"
+          ]
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm gợi ý"
+          },
+          "title": {
+            "en": "Use the final free slot",
+            "vi": "Dùng ô trống cuối cùng"
+          },
+          "prompt": {
+            "en": "records has two valid items, capacity is 3, and the new record is valid. Predict the write index, final count and status. Explain why the structure is full only after the append.",
+            "vi": "records có hai phần tử hợp lệ, capacity bằng 3 và record mới hợp lệ. Dự đoán index ghi, count cuối và status. Giải thích vì sao cấu trúc chỉ đầy sau append."
+          },
+          "hint": {
+            "en": "The guard checks the old count before the write.",
+            "vi": "Guard kiểm tra count cũ trước bước ghi."
+          },
+          "model_answer": {
+            "en": "Because 2 < 3, write at index 2 and return ADDED. The new count is 3, which equals capacity, so a later append would return FULL.",
+            "vi": "Vì 2 < 3, ghi tại index 2 và trả ADDED. Count mới là 3, bằng capacity, nên lần append tiếp theo sẽ trả FULL."
+          },
+          "success_check": {
+            "en": "A final free slot is valid; full means the old count is already at least capacity.",
+            "vi": "Ô trống cuối vẫn hợp lệ; full nghĩa là count cũ đã lớn hơn hoặc bằng capacity."
+          }
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Tự làm"
+          },
+          "title": {
+            "en": "Reject without mutation",
+            "vi": "Từ chối mà không thay đổi trạng thái"
+          },
+          "prompt": {
+            "en": "For the full-capacity case and the missing-score case, give the returned pair and final records. State which guard returns first in each case.",
+            "vi": "Với trường hợp capacity đã đầy và trường hợp thiếu score, cho biết cặp giá trị trả về và records cuối. Nêu guard nào trả kết quả trước trong từng trường hợp."
+          },
+          "hint": {
+            "en": "Validation is checked before capacity. Neither rejected branch reaches append.",
+            "vi": "Validation được kiểm tra trước capacity. Cả hai nhánh bị từ chối đều không đi đến append."
+          },
+          "model_answer": {
+            "en": "A valid record in a full structure returns (False, 'FULL') from the capacity guard. A record without score returns (False, 'INVALID_RECORD') from validation. Existing records are unchanged in both cases.",
+            "vi": "Record hợp lệ trong cấu trúc đầy trả (False, 'FULL') từ capacity guard. Record thiếu score trả (False, 'INVALID_RECORD') từ validation. Records hiện có giữ nguyên trong cả hai trường hợp."
+          },
+          "success_check": {
+            "en": "The answer identifies the first returning guard and proves that append is not executed.",
+            "vi": "Câu trả lời xác định đúng guard trả kết quả đầu tiên và chứng minh append không được thực hiện."
+          }
+        },
+        {
+          "level": {
+            "en": "Transfer",
+            "vi": "Vận dụng"
+          },
+          "title": {
+            "en": "Transfer array bounds and data requirements",
+            "vi": "Vận dụng cận mảng và yêu cầu dữ liệu"
+          },
+          "prompt": {
+            "en": "A table has 3 rows and 4 columns. Decide whether [2][3] and [3][2] are valid when indices start at 0. Then a different task asks for 20 unique random integers from 0 to 100 inclusive: state the three properties that its tests must prove.",
+            "vi": "Một bảng có 3 row và 4 column. Quyết định [2][3] và [3][2] có hợp lệ không khi index bắt đầu từ 0. Sau đó, một bài khác yêu cầu 20 số nguyên ngẫu nhiên không trùng từ 0 đến 100, gồm cả hai cận: nêu ba thuộc tính mà test phải chứng minh."
+          },
+          "hint": {
+            "en": "Check row and column bounds separately. For the random-data requirement, check count, range and duplicates; the verified append trace does not generate random values.",
+            "vi": "Kiểm tra riêng cận row và column. Với yêu cầu dữ liệu ngẫu nhiên, kiểm tra số lượng, miền giá trị và phần tử trùng; trace append đã kiểm chứng không tạo giá trị ngẫu nhiên."
+          },
+          "model_answer": {
+            "en": "[2][3] is valid because 0 <= 2 < 3 and 0 <= 3 < 4. [3][2] is invalid because row index 3 is outside 0..2. For the separate random task, prove len(values) == 20, every value satisfies 0 <= value <= 100, and len(set(values)) == 20.",
+            "vi": "[2][3] hợp lệ vì 0 <= 2 < 3 và 0 <= 3 < 4. [3][2] không hợp lệ vì row index 3 nằm ngoài 0..2. Với bài ngẫu nhiên riêng, cần chứng minh len(values) == 20, mọi value thỏa 0 <= value <= 100 và len(set(values)) == 20."
+          },
+          "success_check": {
+            "en": "The answer checks row and column separately and does not confuse fixed fixture values with proof of random generation, range or uniqueness.",
+            "vi": "Câu trả lời kiểm tra riêng row và column, đồng thời không nhầm giá trị fixture cố định với bằng chứng tạo số ngẫu nhiên, miền giá trị hoặc tính không trùng."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-10.2-01",
+            "ac-9618-p4-2026-python.assessment-requirement.syl-10.2-02"
+          ]
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which mistakes break the record contract or mutate a rejected case?",
+        "vi": "Những lỗi nào làm sai hợp đồng record hoặc thay đổi một trường hợp phải bị từ chối?"
+      },
+      "before_code": [
+        {
+          "en": "Write the required field names and types before coding the validator.",
+          "vi": "Ghi các field name và kiểu bắt buộc trước khi viết validator."
+        },
+        {
+          "en": "State whether records contains only live items and record the separate maximum capacity.",
+          "vi": "Nêu rõ records chỉ chứa các phần tử đang dùng hay không và ghi capacity tối đa riêng."
+        },
+        {
+          "en": "Write the success/failure status required by the question.",
+          "vi": "Ghi status thành công/thất bại mà câu hỏi yêu cầu."
+        }
+      ],
+      "core_code_caption": {
+        "en": "Guard-before-write code to check before submission",
+        "vi": "Code kiểm tra trước khi ghi cần tự kiểm trước khi nộp"
+      },
+      "core_code": [
+        "def valid_record(record):",
+        "    return isinstance(record, dict) and (",
+        "        isinstance(record.get(\"name\"), str)",
+        "        and record.get(\"name\") != \"\"",
+        "        and type(record.get(\"score\")) is int",
+        "    )",
+        "def add_record(records, capacity, record):",
+        "    if not valid_record(record):",
+        "        return False, \"INVALID_RECORD\"",
+        "    if len(records) >= capacity:",
+        "        return False, \"FULL\"",
+        "    records.append(record)",
+        "    return True, \"ADDED\""
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Using len(records) as the maximum capacity.",
+            "vi": "Dùng len(records) làm capacity tối đa."
+          },
+          "consequence": {
+            "en": "The list may be treated as full immediately or allowed to grow without the task's bound.",
+            "vi": "List có thể bị coi là đầy ngay lập tức hoặc được tăng không giới hạn theo yêu cầu đề."
+          },
+          "repair": {
+            "en": "Keep capacity as a separate value; in this model len(records) is the live count.",
+            "vi": "Giữ capacity là giá trị riêng; trong mô hình này len(records) là số record đang dùng."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Appending before validation and capacity checks.",
+            "vi": "Append trước khi kiểm tra record và capacity."
+          },
+          "consequence": {
+            "en": "An invalid or full case changes records even though it should be rejected.",
+            "vi": "Trường hợp record sai hoặc mảng đầy vẫn làm thay đổi records dù phải bị từ chối."
+          },
+          "repair": {
+            "en": "Return from failed guards before the single append statement.",
+            "vi": "Return ở các guard thất bại trước câu lệnh append duy nhất."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Checking only that a field exists.",
+            "vi": "Chỉ kiểm tra field có tồn tại."
+          },
+          "consequence": {
+            "en": "An empty name or non-integer score enters the record collection.",
+            "vi": "Name rỗng hoặc score không phải số nguyên được đưa vào collection."
+          },
+          "repair": {
+            "en": "Check required field presence, type and any stated validity rule.",
+            "vi": "Kiểm tra field bắt buộc, kiểu và mọi quy tắc hợp lệ được nêu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Writing to logical_count + 1 in a fixed-array version.",
+            "vi": "Ghi vào logical_count + 1 trong phiên bản mảng cố định."
+          },
+          "consequence": {
+            "en": "The next free index is skipped and an out-of-range write may occur at the final slot.",
+            "vi": "Index trống kế tiếp bị bỏ qua và có thể ghi ngoài cận ở ô cuối."
+          },
+          "repair": {
+            "en": "Write at the old logical count, then increase the count exactly once.",
+            "vi": "Ghi tại logical count cũ, sau đó tăng count đúng một lần."
+          },
+          "applies_when": {
+            "en": "When the question uses a preallocated fixed array and separate logical count.",
+            "vi": "Khi câu hỏi dùng mảng cấp sẵn và logical count riêng."
+          }
+        }
+      ],
+      "boundary_trace": [
+        {
+          "en": "records = [{name: 'An', score: 72}], capacity = 1",
+          "vi": "records = [{name: 'An', score: 72}], capacity = 1"
+        },
+        {
+          "en": "new_record is valid; live count is 1",
+          "vi": "new_record hợp lệ; số record đang dùng là 1"
+        },
+        {
+          "en": "1 >= 1, so return (False, 'FULL') before append; records is unchanged",
+          "vi": "1 >= 1, nên trả (False, 'FULL') trước append; records giữ nguyên"
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Do field names, types and validity rules match the prompt?",
+          "vi": "Field name, kiểu và quy tắc hợp lệ có khớp đề không?"
+        },
+        {
+          "en": "Is capacity separate from the live count?",
+          "vi": "Capacity có tách khỏi số record đang dùng không?"
+        },
+        {
+          "en": "Do all rejection branches return before mutation?",
+          "vi": "Mọi nhánh từ chối có return trước khi thay đổi trạng thái không?"
+        },
+        {
+          "en": "Does one successful call add exactly one record at the next live index?",
+          "vi": "Một lần gọi thành công có thêm đúng một record tại index đang dùng kế tiếp không?"
+        }
+      ],
+      "authority_note": {
+        "en": "These checks support recurring Paper 4 data-storage and bounded-write tasks. Follow the exact record fields, capacity convention and return contract in the question you are answering.",
+        "vi": "Các kiểm tra này hỗ trợ những bài lưu dữ liệu và ghi có giới hạn thường gặp trong Paper 4. Hãy làm theo đúng field, quy ước capacity và hợp đồng return của câu hỏi đang trả lời."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I reconstruct the safe write without help?",
+        "vi": "Tôi có thể tự dựng lại thao tác ghi an toàn mà không cần trợ giúp không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "What is the difference between capacity and len(records) in this lesson's Python model?",
+            "vi": "Capacity khác len(records) như thế nào trong mô hình Python của bài này?"
+          },
+          "answer": {
+            "en": "capacity is the maximum allowed number of records; len(records) is the current live-record count.",
+            "vi": "capacity là số record tối đa được phép; len(records) là số record đang dùng hiện tại."
+          }
+        },
+        {
+          "prompt": {
+            "en": "Which guard must run first, and why?",
+            "vi": "Guard nào phải chạy trước, và vì sao?"
+          },
+          "answer": {
+            "en": "Validate the record first so an invalid record returns INVALID_RECORD and never reaches the write.",
+            "vi": "Kiểm tra record trước để record không hợp lệ trả INVALID_RECORD và không bao giờ đi đến bước ghi."
+          }
+        },
+        {
+          "prompt": {
+            "en": "Where is a valid record appended when the old live count is n?",
+            "vi": "Record hợp lệ được thêm tại đâu khi số record đang dùng cũ là n?"
+          },
+          "answer": {
+            "en": "At index n; after the append, the new live count is n + 1.",
+            "vi": "Tại index n; sau append, số record đang dùng mới là n + 1."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What must be true after an invalid or full call?",
+            "vi": "Điều gì phải đúng sau một lần gọi với record không hợp lệ hoặc capacity đã đầy?"
+          },
+          "answer": {
+            "en": "The returned status explains the rejection and every existing record remains unchanged.",
+            "vi": "Status trả về giải thích việc từ chối và mọi record hiện có giữ nguyên."
+          }
+        },
+        {
+          "prompt": {
+            "en": "How do you check a position in a two-dimensional array?",
+            "vi": "Kiểm tra một vị trí trong mảng hai chiều như thế nào?"
+          },
+          "answer": {
+            "en": "Check the row against 0..rows-1 and the column against 0..columns-1, in the order stated by the prompt.",
+            "vi": "Kiểm tra row trong 0..rows-1 và column trong 0..columns-1, theo đúng thứ tự đề đã nêu."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "Write the 13-line teaching excerpt from memory, then trace one successful and one rejected call without running the code.",
+        "vi": "Viết lại teaching excerpt 13 dòng từ trí nhớ, sau đó trace một lần gọi thành công và một lần bị từ chối mà không chạy code."
+      },
+      "next_step": {
+        "en": "Continue to procedural design, where this guarded write becomes one subroutine with an explicit input, output and mutation contract.",
+        "vi": "Học tiếp thiết kế thủ tục, nơi thao tác ghi có guard này trở thành một subroutine với hợp đồng input, output và thay đổi trạng thái rõ ràng."
+      }
+    }
+  }
+}

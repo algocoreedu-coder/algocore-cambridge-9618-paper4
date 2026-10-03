@@ -1,0 +1,613 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Binary search in a sorted array",
+    "vi": "Tìm kiếm nhị phân trong mảng đã sắp"
+  },
+  "exam_family": {
+    "en": "Sorting, ordered insertion and binary search",
+    "vi": "Sắp xếp, chèn có thứ tự và tìm kiếm nhị phân"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Decide whether binary search is valid for the given data.",
+      "vi": "Quyết định có thể dùng tìm kiếm nhị phân với dữ liệu đã cho hay không."
+    },
+    {
+      "en": "Write an iterative closed-interval binary search in Python.",
+      "vi": "Viết tìm kiếm nhị phân dạng lặp với khoảng đóng bằng Python."
+    },
+    {
+      "en": "Trace how the candidate interval shrinks and explain why the search terminates.",
+      "vi": "Trace cách khoảng ứng viên thu hẹp và giải thích vì sao thuật toán kết thúc."
+    },
+    {
+      "en": "Test found, absent, boundary and invalid-input cases.",
+      "vi": "Kiểm tra các trường hợp tìm thấy, không tìm thấy, biên và input không hợp lệ."
+    }
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What is the task asking me to produce?",
+        "vi": "Đề đang yêu cầu tôi tạo ra kết quả gì?"
+      },
+      "intro": {
+        "en": "Use binary search when the data is ordered and the task asks you to locate a target by repeatedly discarding half of the remaining positions.",
+        "vi": "Dùng tìm kiếm nhị phân khi dữ liệu đã có thứ tự và đề yêu cầu tìm target bằng cách liên tục loại một nửa số vị trí còn lại."
+      },
+      "prompt_fragment": {
+        "en": "The values are already in ascending order. Write a function that returns the index of the target, or -1 if it is absent.",
+        "vi": "Các giá trị đã được sắp tăng dần. Viết hàm trả về index của target, hoặc -1 nếu không có target."
+      },
+      "cues": [
+        {
+          "en": "The prompt says the data is sorted or gives an ordered array.",
+          "vi": "Đề nói dữ liệu đã sắp hoặc cung cấp một mảng có thứ tự."
+        },
+        {
+          "en": "The task names binary search or asks you to complete its midpoint and bound updates.",
+          "vi": "Đề nêu tìm kiếm nhị phân hoặc yêu cầu hoàn thiện midpoint và cập nhật cận."
+        },
+        {
+          "en": "The result is an index, position or stated not-found value.",
+          "vi": "Kết quả là index, vị trí hoặc giá trị không tìm thấy đã quy định."
+        },
+        {
+          "en": "Built-in searching may be forbidden because the algorithm itself is being assessed.",
+          "vi": "Có thể không được dùng tìm kiếm dựng sẵn vì đề đang đánh giá chính thuật toán."
+        }
+      ],
+      "precondition": {
+        "en": "The array must be sorted using the same comparison direction used by the search.",
+        "vi": "Mảng phải được sắp theo đúng chiều so sánh mà phép tìm kiếm sử dụng."
+      },
+      "output_contract": {
+        "en": "Return the matching index; return -1 only after the candidate interval becomes empty.",
+        "vi": "Trả về index khớp; chỉ trả về -1 sau khi khoảng ứng viên trở thành rỗng."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu mô hình"
+      },
+      "student_question": {
+        "en": "Which model and rule keep the search correct?",
+        "vi": "Mô hình và quy tắc nào giữ cho phép tìm kiếm đúng?"
+      },
+      "mental_model": {
+        "en": "The closed interval [low, high] contains every index that can still be the answer. Positions outside it have already been proved impossible.",
+        "vi": "Khoảng đóng [low, high] chứa mọi index vẫn có thể là đáp án. Các vị trí bên ngoài đã được chứng minh là không thể."
+      },
+      "rules": [
+        {
+          "en": "Start with low = 0 and high = len(values) - 1.",
+          "vi": "Bắt đầu với low = 0 và high = len(values) - 1."
+        },
+        {
+          "en": "Continue only while low <= high.",
+          "vi": "Chỉ tiếp tục khi low <= high."
+        },
+        {
+          "en": "Use integer division: middle = (low + high) // 2.",
+          "vi": "Dùng phép chia nguyên: middle = (low + high) // 2."
+        },
+        {
+          "en": "Return middle when values[middle] equals the target.",
+          "vi": "Trả về middle khi values[middle] bằng target."
+        },
+        {
+          "en": "Otherwise exclude middle with high = middle - 1 or low = middle + 1.",
+          "vi": "Nếu chưa bằng, loại middle bằng high = middle - 1 hoặc low = middle + 1."
+        }
+      ],
+      "invariant": {
+        "en": "If the target exists, its index remains inside [low, high]. Every unsuccessful comparison makes this interval strictly smaller.",
+        "vi": "Nếu target tồn tại, index của nó vẫn nằm trong [low, high]. Mỗi lần so sánh chưa tìm thấy đều làm khoảng này nhỏ đi nghiêm ngặt."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Iterative closed-interval recipe",
+          "vi": "Khung tìm kiếm dạng lặp với khoảng đóng"
+        },
+        "lines": [
+          "low, high = 0, len(values) - 1",
+          "while low <= high:",
+          "    middle = (low + high) // 2",
+          "    if values[middle] == target:",
+          "        return middle",
+          "    if target < values[middle]:",
+          "        high = middle - 1",
+          "    else:",
+          "        low = middle + 1",
+          "return -1"
+        ],
+        "contract_note": {
+          "en": "Use the parameters, bound convention and not-found value stated in the question when they differ from this lesson.",
+          "vi": "Nếu đề dùng tham số, quy ước cận hoặc giá trị không tìm thấy khác bài này, hãy làm theo hợp đồng của đề."
+        }
+      },
+      "recursive_extension": {
+        "label": {
+          "en": "Only when a recursive version is requested",
+          "vi": "Chỉ dùng khi đề yêu cầu bản đệ quy"
+        },
+        "content": {
+          "en": "Use low > high as the not-found base case. Pass a strictly smaller interval to the child call and return the child result.",
+          "vi": "Dùng low > high làm base case không tìm thấy. Truyền khoảng nhỏ hơn nghiêm ngặt vào lời gọi con và return kết quả của lời gọi con."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "What changes next, and why?",
+        "vi": "Điều gì thay đổi tiếp theo, và vì sao?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Find 31 in an ascending array",
+          "vi": "Tìm 31 trong mảng tăng dần"
+        },
+        "values": [
+          4,
+          9,
+          17,
+          23,
+          31,
+          42,
+          58
+        ],
+        "target": 31,
+        "instruction": {
+          "en": "Predict the next bound before revealing each step.",
+          "vi": "Dự đoán cận tiếp theo trước khi mở từng bước."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "before": {
+            "low": 0,
+            "high": 6,
+            "middle": 3,
+            "middle_value": 23
+          },
+          "prediction": {
+            "en": "The target is larger than 23. Which bound changes?",
+            "vi": "Target lớn hơn 23. Cận nào thay đổi?"
+          },
+          "reveal": {
+            "en": "Set low to 4. Indices 0 to 3, including middle, are discarded.",
+            "vi": "Đặt low thành 4. Các index từ 0 đến 3, gồm cả middle, bị loại."
+          },
+          "code_focus": [
+            "else:",
+            "    low = middle + 1"
+          ],
+          "after": {
+            "low": 4,
+            "high": 6
+          }
+        },
+        {
+          "step": 2,
+          "before": {
+            "low": 4,
+            "high": 6,
+            "middle": 5,
+            "middle_value": 42
+          },
+          "prediction": {
+            "en": "The target is smaller than 42. Which bound changes?",
+            "vi": "Target nhỏ hơn 42. Cận nào thay đổi?"
+          },
+          "reveal": {
+            "en": "Set high to 4. Indices 5 to 6 are discarded.",
+            "vi": "Đặt high thành 4. Các index từ 5 đến 6 bị loại."
+          },
+          "code_focus": [
+            "if target < values[middle]:",
+            "    high = middle - 1"
+          ],
+          "after": {
+            "low": 4,
+            "high": 4
+          }
+        },
+        {
+          "step": 3,
+          "before": {
+            "low": 4,
+            "high": 4,
+            "middle": 4,
+            "middle_value": 31
+          },
+          "prediction": {
+            "en": "The middle value equals the target. What is returned?",
+            "vi": "Giá trị giữa bằng target. Hàm trả về gì?"
+          },
+          "reveal": {
+            "en": "Return index 4. The target has been found.",
+            "vi": "Trả về index 4. Đã tìm thấy target."
+          },
+          "code_focus": [
+            "if values[middle] == target:",
+            "    return middle"
+          ],
+          "after": {
+            "result": 4
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "After each step, every index that could still contain 31 remains inside [low, high].",
+        "vi": "Sau mỗi bước, mọi index vẫn có thể chứa 31 đều nằm trong [low, high]."
+      }
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I solve a changed case without seeing the answer first?",
+        "vi": "Tôi có thể giải một trường hợp đã thay đổi trước khi xem đáp án không?"
+      },
+      "attempt_rule": {
+        "en": "Record an answer or trace before revealing the hint or model answer.",
+        "vi": "Ghi lại câu trả lời hoặc trace trước khi mở gợi ý hay đáp án mẫu."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Prove that the interval makes progress",
+            "vi": "Chứng minh khoảng có tiến triển"
+          },
+          "prompt": {
+            "en": "Trace values = [4, 9] with target = 9. Record low, high, middle and the middle value, then give the next interval.",
+            "vi": "Trace values = [4, 9] với target = 9. Ghi low, high, middle và giá trị giữa, sau đó cho biết khoảng tiếp theo."
+          },
+          "hint": {
+            "en": "The first middle index is 0. The target is larger than values[0].",
+            "vi": "Index giữa đầu tiên là 0. Target lớn hơn values[0]."
+          },
+          "model_answer": {
+            "en": "low=0, high=1, middle=0, value=4; set low=1. Then middle=1 and the function returns index 1.",
+            "vi": "low=0, high=1, middle=0, value=4; đặt low=1. Sau đó middle=1 và hàm trả về index 1."
+          },
+          "success_check": {
+            "en": "The first update is low = middle + 1, so the interval becomes [1,1].",
+            "vi": "Cập nhật đầu tiên là low = middle + 1, nên khoảng trở thành [1,1]."
+          }
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm gợi ý"
+          },
+          "title": {
+            "en": "Handle the smallest boundaries",
+            "vi": "Xử lý các biên nhỏ nhất"
+          },
+          "prompt": {
+            "en": "For values = [7], give the result when target = 7 and when target = 5. Then state the initial low and high for an empty list.",
+            "vi": "Với values = [7], cho biết kết quả khi target = 7 và khi target = 5. Sau đó nêu low và high ban đầu cho danh sách rỗng."
+          },
+          "hint": {
+            "en": "A one-item interval starts at [0,0]. An empty interval starts with low greater than high.",
+            "vi": "Khoảng một phần tử bắt đầu là [0,0]. Khoảng rỗng bắt đầu với low lớn hơn high."
+          },
+          "model_answer": {
+            "en": "Target 7 returns index 0. Target 5 makes high become -1 and returns -1. An empty list starts with low=0 and high=-1, so the loop does not run.",
+            "vi": "Target 7 trả về index 0. Target 5 làm high thành -1 và trả về -1. Danh sách rỗng bắt đầu với low=0 và high=-1, nên vòng lặp không chạy."
+          },
+          "success_check": {
+            "en": "Both found and not-found paths terminate without reading outside the list.",
+            "vi": "Cả đường tìm thấy và không tìm thấy đều kết thúc mà không đọc ngoài danh sách."
+          }
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Tự làm"
+          },
+          "title": {
+            "en": "Trace an absent target and check the precondition",
+            "vi": "Trace target không tồn tại và kiểm tra tiền điều kiện"
+          },
+          "prompt": {
+            "en": "Trace values = [3, 8, 12, 19] with target = 10 until the interval is empty. Then decide whether binary search may run directly on [4, 17, 9, 23].",
+            "vi": "Trace values = [3, 8, 12, 19] với target = 10 cho đến khi khoảng rỗng. Sau đó quyết định có thể chạy tìm kiếm nhị phân trực tiếp trên [4, 17, 9, 23] hay không."
+          },
+          "hint": {
+            "en": "For the sorted case, write one row for each midpoint. For the second case, check ordering before calculating a midpoint.",
+            "vi": "Với trường hợp đã sắp, viết một dòng cho mỗi midpoint. Với trường hợp thứ hai, kiểm tra thứ tự trước khi tính midpoint."
+          },
+          "model_answer": {
+            "en": "The midpoint values are 8, then 12; the bounds become low=2, high=1, so return -1. Do not run binary search directly on [4, 17, 9, 23] because it is not sorted in ascending order.",
+            "vi": "Các giá trị giữa lần lượt là 8 rồi 12; cận trở thành low=2, high=1, nên trả về -1. Không chạy tìm kiếm nhị phân trực tiếp trên [4, 17, 9, 23] vì mảng không được sắp tăng dần."
+          },
+          "success_check": {
+            "en": "The trace ends only when low > high, and the unsorted input is rejected before searching.",
+            "vi": "Trace chỉ kết thúc khi low > high, và input chưa sắp bị từ chối trước khi tìm kiếm."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-19.1-02"
+          ]
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which mistakes break the solution or the question contract?",
+        "vi": "Những lỗi nào làm hỏng lời giải hoặc hợp đồng của đề?"
+      },
+      "before_code": [
+        {
+          "en": "Check that the data is sorted in the comparison direction used by the search.",
+          "vi": "Kiểm tra dữ liệu đã được sắp theo chiều so sánh mà phép tìm kiếm sử dụng."
+        },
+        {
+          "en": "Choose one interval convention and keep it throughout. This lesson uses [low, high].",
+          "vi": "Chọn một quy ước khoảng và giữ nguyên đến cuối. Bài này dùng [low, high]."
+        },
+        {
+          "en": "Use the not-found result required by the question. This lesson uses -1.",
+          "vi": "Dùng kết quả không tìm thấy mà đề yêu cầu. Bài này dùng -1."
+        }
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Using / for the midpoint.",
+            "vi": "Dùng / để tính midpoint."
+          },
+          "consequence": {
+            "en": "Python produces a float, which cannot be used as a list index.",
+            "vi": "Python tạo ra số thực, không thể dùng làm index của list."
+          },
+          "repair": {
+            "en": "Use (low + high) // 2.",
+            "vi": "Dùng (low + high) // 2."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Updating a bound to middle.",
+            "vi": "Cập nhật một cận bằng middle."
+          },
+          "consequence": {
+            "en": "The interval may not shrink, so the same state can repeat forever.",
+            "vi": "Khoảng có thể không nhỏ đi, nên cùng trạng thái có thể lặp mãi."
+          },
+          "repair": {
+            "en": "Exclude middle with high = middle - 1 or low = middle + 1.",
+            "vi": "Loại middle bằng high = middle - 1 hoặc low = middle + 1."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Mixing closed and half-open interval rules.",
+            "vi": "Trộn quy tắc khoảng đóng và khoảng nửa mở."
+          },
+          "consequence": {
+            "en": "An edge item may be skipped or an invalid index may be read.",
+            "vi": "Một phần tử ở biên có thể bị bỏ qua hoặc chương trình có thể đọc index không hợp lệ."
+          },
+          "repair": {
+            "en": "For [low, high], initialise high to len(values) - 1 and loop while low <= high.",
+            "vi": "Với [low, high], khởi tạo high bằng len(values) - 1 và lặp khi low <= high."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Forgetting the not-found path.",
+            "vi": "Quên đường xử lý không tìm thấy."
+          },
+          "consequence": {
+            "en": "Some inputs return None or never produce the required result.",
+            "vi": "Một số input trả về None hoặc không tạo ra kết quả đề yêu cầu."
+          },
+          "repair": {
+            "en": "Return the agreed sentinel only after the interval is empty.",
+            "vi": "Chỉ trả về sentinel đã thống nhất sau khi khoảng rỗng."
+          }
+        },
+        {
+          "mistake": {
+            "en": "In a recursive answer, calling the child without return.",
+            "vi": "Trong lời giải đệ quy, gọi hàm con nhưng không return."
+          },
+          "consequence": {
+            "en": "A deeper call can find the target, but its result is lost.",
+            "vi": "Lời gọi sâu hơn có thể tìm thấy target nhưng kết quả bị mất."
+          },
+          "repair": {
+            "en": "Return every recursive child call.",
+            "vi": "Return mọi lời gọi đệ quy con."
+          },
+          "applies_when": {
+            "en": "Only for a recursive question.",
+            "vi": "Chỉ áp dụng cho câu đệ quy."
+          }
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Is the input ordered as the algorithm assumes?",
+          "vi": "Input có được sắp đúng như thuật toán giả định không?"
+        },
+        {
+          "en": "Is middle an integer inside the current interval?",
+          "vi": "middle có phải số nguyên nằm trong khoảng hiện tại không?"
+        },
+        {
+          "en": "Does every unsuccessful comparison make the interval smaller?",
+          "vi": "Mỗi lần chưa tìm thấy có làm khoảng nhỏ đi không?"
+        },
+        {
+          "en": "Can the code return both a found index and the required not-found value?",
+          "vi": "Code có thể trả cả index tìm thấy và giá trị không tìm thấy theo yêu cầu không?"
+        },
+        {
+          "en": "If the version is recursive, does each branch return the child result?",
+          "vi": "Nếu là bản đệ quy, mọi nhánh có return kết quả của lời gọi con không?"
+        }
+      ],
+      "core_code_caption": {
+        "en": "Closed-interval code to check before submission",
+        "vi": "Code khoảng đóng cần tự kiểm trước khi nộp"
+      },
+      "core_code": [
+        "low, high = 0, len(values) - 1",
+        "while low <= high:",
+        "    middle = (low + high) // 2",
+        "    if values[middle] == target:",
+        "        return middle",
+        "    if target < values[middle]:",
+        "        high = middle - 1",
+        "    else:",
+        "        low = middle + 1",
+        "return -1"
+      ],
+      "boundary_trace": [
+        {
+          "en": "values = [4, 9], target = 9",
+          "vi": "values = [4, 9], target = 9"
+        },
+        {
+          "en": "low=0, high=1, middle=0, values[middle]=4",
+          "vi": "low=0, high=1, middle=0, values[middle]=4"
+        },
+        {
+          "en": "The target is larger, so low becomes 1. Using low = middle would repeat the same state.",
+          "vi": "Target lớn hơn, nên low trở thành 1. Dùng low = middle sẽ lặp lại cùng trạng thái."
+        }
+      ],
+      "authority_note": {
+        "en": "These checks reflect recurring assessed features in Paper 4 questions. Follow the exact contract in the question you are answering.",
+        "vi": "Các kiểm tra này phản ánh những thành phần thường được đánh giá trong câu hỏi Paper 4. Hãy làm theo đúng hợp đồng của câu hỏi đang trả lời."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I explain the method without help?",
+        "vi": "Tôi có thể giải thích phương pháp mà không cần trợ giúp không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "What must be true before binary search can safely discard half of the data?",
+            "vi": "Điều gì phải đúng trước khi tìm kiếm nhị phân có thể loại an toàn một nửa dữ liệu?"
+          },
+          "answer": {
+            "en": "The data must be sorted using the same comparison direction as the search.",
+            "vi": "Dữ liệu phải được sắp theo cùng chiều so sánh với phép tìm kiếm."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What does the interval [low, high] mean?",
+            "vi": "Khoảng [low, high] có ý nghĩa gì?"
+          },
+          "answer": {
+            "en": "It contains every index that can still be the answer.",
+            "vi": "Nó chứa mọi index vẫn có thể là đáp án."
+          }
+        },
+        {
+          "prompt": {
+            "en": "Why must an unsuccessful step use middle - 1 or middle + 1?",
+            "vi": "Vì sao một bước chưa tìm thấy phải dùng middle - 1 hoặc middle + 1?"
+          },
+          "answer": {
+            "en": "Middle has already been tested, so excluding it makes the interval strictly smaller.",
+            "vi": "Middle đã được kiểm tra, nên loại nó sẽ làm khoảng nhỏ đi nghiêm ngặt."
+          }
+        },
+        {
+          "prompt": {
+            "en": "When does the iterative search return the not-found value?",
+            "vi": "Khi nào phép tìm kiếm dạng lặp trả về giá trị không tìm thấy?"
+          },
+          "answer": {
+            "en": "After low becomes greater than high and the candidate interval is empty.",
+            "vi": "Sau khi low lớn hơn high và khoảng ứng viên trở thành rỗng."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What extra rule protects a recursive binary search?",
+            "vi": "Quy tắc bổ sung nào bảo vệ tìm kiếm nhị phân đệ quy?"
+          },
+          "answer": {
+            "en": "Every child call uses a smaller interval and its result is returned.",
+            "vi": "Mỗi lời gọi con dùng khoảng nhỏ hơn và kết quả của nó được return."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "Write the iterative recipe from memory, then explain in one sentence why it terminates.",
+        "vi": "Viết lại khung dạng lặp từ trí nhớ, sau đó giải thích bằng một câu vì sao nó kết thúc."
+      },
+      "next_step": {
+        "en": "Continue to sorting and ordered insertion, where the meaning of “ordered” determines comparisons, swaps and shifts.",
+        "vi": "Học tiếp sắp xếp và chèn có thứ tự, nơi ý nghĩa của “có thứ tự” quyết định phép so sánh, đổi chỗ và dịch phần tử."
+      }
+    }
+  },
+  "display_contract": {
+    "default_stage": "Recognise",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    },
+    "primary_code_limit": {
+      "en": "Show only the recipe or the current 1–3 focused lines.",
+      "vi": "Chỉ hiển thị khung code hoặc 1–3 dòng đang tập trung."
+    },
+    "teacher_content": {
+      "en": "Source locators, evidence records and implementation metadata stay outside the learner sequence.",
+      "vi": "Locator nguồn, hồ sơ bằng chứng và metadata triển khai nằm ngoài luồng học sinh."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ]
+}

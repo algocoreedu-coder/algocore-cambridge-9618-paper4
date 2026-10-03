@@ -6,7 +6,7 @@
     "lesson_slug": "stack",
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.stack.production-v1",
     "artifact_version": "production-v1",
-    "code_sha256": "c85dcb37f7901eb7342709fe615345a78ea7cf60e53dfd6839ec0667fabfaac0"
+    "code_sha256": "e163984bfc12108cb7fda240d762a666c6ee20ffa88fe01650b95d1aae6741bf"
   },
   "python_artifact": {
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.stack.production-v1",
@@ -134,131 +134,261 @@
       {
         "line_id": "stack.production-v1.L023",
         "order": 23,
-        "text": "def run(fixture):"
+        "text": "def stack_from(values):"
       },
       {
         "line_id": "stack.production-v1.L024",
         "order": 24,
-        "text": "    stack, trace, results = Stack(fixture[\"capacity\"]), [], []"
+        "text": "    stack = Stack(len(values))"
       },
       {
         "line_id": "stack.production-v1.L025",
         "order": 25,
-        "text": "    for operation in fixture[\"operations\"]:"
+        "text": "    for value in values:"
       },
       {
         "line_id": "stack.production-v1.L026",
         "order": 26,
-        "text": "        before = {\"top\": stack.top, \"live\": stack.live()}"
+        "text": "        stack.push(value)"
       },
       {
         "line_id": "stack.production-v1.L027",
         "order": 27,
-        "text": "        if operation[0] == \"push\":"
+        "text": "    return stack"
       },
       {
         "line_id": "stack.production-v1.L028",
         "order": 28,
-        "text": "            outcome = stack.push(operation[1])"
+        "text": ""
       },
       {
         "line_id": "stack.production-v1.L029",
         "order": 29,
-        "text": "        else:"
+        "text": "def pair_stacks(left_stack, right_stack, trace):"
       },
       {
         "line_id": "stack.production-v1.L030",
         "order": 30,
-        "text": "            outcome = stack.pop()"
+        "text": "    before = {\"left\": left_stack.live(), \"right\": right_stack.live()}"
       },
       {
         "line_id": "stack.production-v1.L031",
         "order": 31,
-        "text": "        results.append(outcome)"
+        "text": "    left_item = left_stack.pop()"
       },
       {
         "line_id": "stack.production-v1.L032",
         "order": 32,
-        "text": "        trace.append({\"event\": operation[0], \"before\": before, \"after\": {\"top\": stack.top, \"live\": stack.live()}, \"outcome\": outcome})"
+        "text": "    right_item = right_stack.pop()"
       },
       {
         "line_id": "stack.production-v1.L033",
         "order": 33,
-        "text": "    reduce_stack = Stack(max(2, len(fixture.get(\"operands\", []))))"
+        "text": "    if left_item is None or right_item is None:"
       },
       {
         "line_id": "stack.production-v1.L034",
         "order": 34,
-        "text": "    for value in fixture.get(\"operands\", []): reduce_stack.push(value)"
+        "text": "        if left_item is not None:"
       },
       {
         "line_id": "stack.production-v1.L035",
         "order": 35,
-        "text": "    right, left = reduce_stack.pop(), reduce_stack.pop()"
+        "text": "            left_stack.push(left_item)"
       },
       {
         "line_id": "stack.production-v1.L036",
         "order": 36,
-        "text": "    reduced = None if left is None or right is None else left - right"
+        "text": "        if right_item is not None:"
       },
       {
         "line_id": "stack.production-v1.L037",
         "order": 37,
-        "text": "    return {\"status\": \"OK\", \"results\": results, \"live\": stack.live(), \"top\": stack.top, \"reduced\": reduced, \"trace\": trace}"
+        "text": "            right_stack.push(right_item)"
       },
       {
         "line_id": "stack.production-v1.L038",
         "order": 38,
-        "text": ""
+        "text": "        trace.append({\"event\": \"pair_rollback\", \"before\": before, \"after\": {\"left\": left_stack.live(), \"right\": right_stack.live()}})"
       },
       {
         "line_id": "stack.production-v1.L039",
         "order": 39,
-        "text": "if __name__ == \"__main__\":"
+        "text": "        return None"
       },
       {
         "line_id": "stack.production-v1.L040",
         "order": 40,
-        "text": "    import json"
+        "text": "    pair = [left_item, right_item]"
       },
       {
         "line_id": "stack.production-v1.L041",
         "order": 41,
-        "text": "    import sys"
+        "text": "    trace.append({\"event\": \"pair_commit\", \"pair\": pair, \"before\": before, \"after\": {\"left\": left_stack.live(), \"right\": right_stack.live()}})"
       },
       {
         "line_id": "stack.production-v1.L042",
         "order": 42,
-        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+        "text": "    return pair"
       },
       {
         "line_id": "stack.production-v1.L043",
         "order": 43,
-        "text": "    result = run(fixture)"
+        "text": ""
       },
       {
         "line_id": "stack.production-v1.L044",
         "order": 44,
-        "text": "    if not result[\"trace\"]:"
+        "text": "def reduce_operands(values):"
       },
       {
         "line_id": "stack.production-v1.L045",
         "order": 45,
-        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+        "text": "    stack = stack_from(values)"
       },
       {
         "line_id": "stack.production-v1.L046",
         "order": 46,
-        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+        "text": "    right, left = stack.pop(), stack.pop()"
       },
       {
         "line_id": "stack.production-v1.L047",
         "order": 47,
+        "text": "    return None if left is None or right is None else left - right"
+      },
+      {
+        "line_id": "stack.production-v1.L048",
+        "order": 48,
+        "text": ""
+      },
+      {
+        "line_id": "stack.production-v1.L049",
+        "order": 49,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "stack.production-v1.L050",
+        "order": 50,
+        "text": "    stack, trace, results = Stack(fixture[\"capacity\"]), [], []"
+      },
+      {
+        "line_id": "stack.production-v1.L051",
+        "order": 51,
+        "text": "    for operation in fixture[\"operations\"]:"
+      },
+      {
+        "line_id": "stack.production-v1.L052",
+        "order": 52,
+        "text": "        before = {\"top\": stack.top, \"live\": stack.live()}"
+      },
+      {
+        "line_id": "stack.production-v1.L053",
+        "order": 53,
+        "text": "        if operation[0] == \"push\":"
+      },
+      {
+        "line_id": "stack.production-v1.L054",
+        "order": 54,
+        "text": "            outcome = stack.push(operation[1])"
+      },
+      {
+        "line_id": "stack.production-v1.L055",
+        "order": 55,
+        "text": "        else:"
+      },
+      {
+        "line_id": "stack.production-v1.L056",
+        "order": 56,
+        "text": "            outcome = stack.pop()"
+      },
+      {
+        "line_id": "stack.production-v1.L057",
+        "order": 57,
+        "text": "        results.append(outcome)"
+      },
+      {
+        "line_id": "stack.production-v1.L058",
+        "order": 58,
+        "text": "        trace.append({\"event\": operation[0], \"before\": before, \"after\": {\"top\": stack.top, \"live\": stack.live()}, \"outcome\": outcome})"
+      },
+      {
+        "line_id": "stack.production-v1.L059",
+        "order": 59,
+        "text": "    left_stack = stack_from(fixture.get(\"pair_left\", []))"
+      },
+      {
+        "line_id": "stack.production-v1.L060",
+        "order": 60,
+        "text": "    right_stack = stack_from(fixture.get(\"pair_right\", []))"
+      },
+      {
+        "line_id": "stack.production-v1.L061",
+        "order": 61,
+        "text": "    pair = pair_stacks(left_stack, right_stack, trace)"
+      },
+      {
+        "line_id": "stack.production-v1.L062",
+        "order": 62,
+        "text": "    reduced = reduce_operands(fixture.get(\"operands\", []))"
+      },
+      {
+        "line_id": "stack.production-v1.L063",
+        "order": 63,
+        "text": "    return {\"status\": \"OK\", \"results\": results, \"live\": stack.live(), \"top\": stack.top, \"pair\": pair, \"pair_left\": left_stack.live(), \"pair_right\": right_stack.live(), \"reduced\": reduced, \"trace\": trace}"
+      },
+      {
+        "line_id": "stack.production-v1.L064",
+        "order": 64,
+        "text": ""
+      },
+      {
+        "line_id": "stack.production-v1.L065",
+        "order": 65,
+        "text": "if __name__ == \"__main__\":"
+      },
+      {
+        "line_id": "stack.production-v1.L066",
+        "order": 66,
+        "text": "    import json"
+      },
+      {
+        "line_id": "stack.production-v1.L067",
+        "order": 67,
+        "text": "    import sys"
+      },
+      {
+        "line_id": "stack.production-v1.L068",
+        "order": 68,
+        "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      },
+      {
+        "line_id": "stack.production-v1.L069",
+        "order": 69,
+        "text": "    result = run(fixture)"
+      },
+      {
+        "line_id": "stack.production-v1.L070",
+        "order": 70,
+        "text": "    if not result[\"trace\"]:"
+      },
+      {
+        "line_id": "stack.production-v1.L071",
+        "order": 71,
+        "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      },
+      {
+        "line_id": "stack.production-v1.L072",
+        "order": 72,
+        "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      },
+      {
+        "line_id": "stack.production-v1.L073",
+        "order": 73,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "c85dcb37f7901eb7342709fe615345a78ea7cf60e53dfd6839ec0667fabfaac0",
+    "code_sha256": "e163984bfc12108cb7fda240d762a666c6ee20ffa88fe01650b95d1aae6741bf",
     "caption": {
       "en": "A fixed-array stack with push, pop and correct operand order.",
       "vi": "Stack mảng cố định với push, pop và đúng thứ tự toán hạng."
@@ -268,7 +398,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r3.a3.stack.production-v1.author-run",
       "independent_rerun_ref": "p4r3.a3.stack.production-v1.independent-rerun",
-      "execution_log_sha256": "14456629751e6b8e6af6535564eeda689be50673f57697388cc1d0a3186ecd7a"
+      "execution_log_sha256": "83ec29e60b477a5cd345e02bb19cc61c52f3ae1159d1eb7b0324792f8aea9c4d"
     }
   },
   "scenarios": [
@@ -295,7 +425,9 @@
               "push",
               8
             ]
-          ]
+          ],
+          "pair_left": [],
+          "pair_right": []
         },
         "trace_cursor": 0,
         "history": [],
@@ -305,7 +437,8 @@
       "event_ids": [
         "ac-9618-p4-2026-python.trace.stack.stack-pop.boundary.production-v1.event-001",
         "ac-9618-p4-2026-python.trace.stack.stack-pop.boundary.production-v1.event-002",
-        "ac-9618-p4-2026-python.trace.stack.stack-pop.boundary.production-v1.event-003"
+        "ac-9618-p4-2026-python.trace.stack.stack-pop.boundary.production-v1.event-003",
+        "ac-9618-p4-2026-python.trace.stack.stack-pop.boundary.production-v1.event-004"
       ],
       "expected_output_ref": "stack.boundary.expected-output",
       "fixture_ref": "stack.boundary"
@@ -345,7 +478,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 0,
         "history": [],
@@ -358,7 +495,8 @@
         "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-003",
         "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-004",
         "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-005",
-        "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-006"
+        "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-006",
+        "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-007"
       ],
       "expected_output_ref": "stack.failure.expected-output",
       "fixture_ref": "stack.failure"
@@ -393,6 +531,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 0,
@@ -404,7 +548,8 @@
         "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-001",
         "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-002",
         "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-003",
-        "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-004"
+        "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-004",
+        "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-005"
       ],
       "expected_output_ref": "stack.normal.expected-output",
       "fixture_ref": "stack.normal"
@@ -418,8 +563,8 @@
       "event_type": "unlink",
       "active_line_ids": [
         "stack.production-v1.L013",
-        "stack.production-v1.L032",
-        "stack.production-v1.L030"
+        "stack.production-v1.L038",
+        "stack.production-v1.L041"
       ],
       "before": {
         "fixture_ref": "stack.boundary",
@@ -438,7 +583,9 @@
               "push",
               8
             ]
-          ]
+          ],
+          "pair_left": [],
+          "pair_right": []
         },
         "trace_cursor": 0,
         "history": [],
@@ -477,7 +624,9 @@
               "push",
               8
             ]
-          ]
+          ],
+          "pair_left": [],
+          "pair_right": []
         },
         "trace_cursor": 1,
         "history": [
@@ -559,9 +708,9 @@
       "sequence": 1,
       "event_type": "write",
       "active_line_ids": [
-        "stack.production-v1.L027",
+        "stack.production-v1.L053",
         "stack.production-v1.L007",
-        "stack.production-v1.L032"
+        "stack.production-v1.L038"
       ],
       "before": {
         "fixture_ref": "stack.boundary",
@@ -580,7 +729,9 @@
               "push",
               8
             ]
-          ]
+          ],
+          "pair_left": [],
+          "pair_right": []
         },
         "trace_cursor": 1,
         "history": [
@@ -634,7 +785,9 @@
               "push",
               8
             ]
-          ]
+          ],
+          "pair_left": [],
+          "pair_right": []
         },
         "trace_cursor": 2,
         "history": [
@@ -732,10 +885,9 @@
       "sequence": 2,
       "event_type": "write",
       "active_line_ids": [
-        "stack.production-v1.L027",
+        "stack.production-v1.L053",
         "stack.production-v1.L007",
-        "stack.production-v1.L032",
-        "stack.production-v1.L037"
+        "stack.production-v1.L038"
       ],
       "before": {
         "fixture_ref": "stack.boundary",
@@ -754,7 +906,9 @@
               "push",
               8
             ]
-          ]
+          ],
+          "pair_left": [],
+          "pair_right": []
         },
         "trace_cursor": 2,
         "history": [
@@ -824,7 +978,9 @@
               "push",
               8
             ]
-          ]
+          ],
+          "pair_left": [],
+          "pair_right": []
         },
         "trace_cursor": 3,
         "history": [
@@ -872,20 +1028,7 @@
           }
         ],
         "latest_event": "push",
-        "execution_status": "OK",
-        "verified_result": {
-          "live": [
-            7
-          ],
-          "reduced": null,
-          "results": [
-            null,
-            true,
-            false
-          ],
-          "status": "OK",
-          "top": 0
-        }
+        "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
@@ -903,19 +1046,6 @@
           },
           "event": "push",
           "outcome": false
-        },
-        "final_result": {
-          "live": [
-            7
-          ],
-          "reduced": null,
-          "results": [
-            null,
-            true,
-            false
-          ],
-          "status": "OK",
-          "top": 0
         }
       },
       "invariant_or_criterion": {
@@ -961,14 +1091,275 @@
       }
     },
     {
+      "event_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.boundary.production-v1.event-004",
+      "trace_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.boundary.production-v1",
+      "sequence": 3,
+      "event_type": "assign",
+      "active_line_ids": [
+        "stack.production-v1.L038",
+        "stack.production-v1.L041",
+        "stack.production-v1.L058",
+        "stack.production-v1.L063"
+      ],
+      "before": {
+        "fixture_ref": "stack.boundary",
+        "fixture_input": {
+          "capacity": 1,
+          "operands": [],
+          "operations": [
+            [
+              "pop"
+            ],
+            [
+              "push",
+              7
+            ],
+            [
+              "push",
+              8
+            ]
+          ],
+          "pair_left": [],
+          "pair_right": []
+        },
+        "trace_cursor": 3,
+        "history": [
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "pop",
+            "outcome": null
+          },
+          {
+            "after": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": false
+          }
+        ],
+        "latest_event": "push",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "after": {
+            "left": [],
+            "right": []
+          },
+          "before": {
+            "left": [],
+            "right": []
+          },
+          "event": "pair_rollback"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "stack.boundary",
+        "fixture_input": {
+          "capacity": 1,
+          "operands": [],
+          "operations": [
+            [
+              "pop"
+            ],
+            [
+              "push",
+              7
+            ],
+            [
+              "push",
+              8
+            ]
+          ],
+          "pair_left": [],
+          "pair_right": []
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "pop",
+            "outcome": null
+          },
+          {
+            "after": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                7
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": false
+          },
+          {
+            "after": {
+              "left": [],
+              "right": []
+            },
+            "before": {
+              "left": [],
+              "right": []
+            },
+            "event": "pair_rollback"
+          }
+        ],
+        "latest_event": "pair_rollback",
+        "execution_status": "OK",
+        "verified_result": {
+          "live": [
+            7
+          ],
+          "pair": null,
+          "pair_left": [],
+          "pair_right": [],
+          "reduced": null,
+          "results": [
+            null,
+            true,
+            false
+          ],
+          "status": "OK",
+          "top": 0
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "after": {
+            "left": [],
+            "right": []
+          },
+          "before": {
+            "left": [],
+            "right": []
+          },
+          "event": "pair_rollback"
+        },
+        "final_result": {
+          "live": [
+            7
+          ],
+          "pair": null,
+          "pair_left": [],
+          "pair_right": [],
+          "reduced": null,
+          "results": [
+            null,
+            true,
+            false
+          ],
+          "status": "OK",
+          "top": 0
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "top và vùng dữ liệu sống thay đổi theo thứ tự nào trước và sau push/pop? STACK_POP: sự kiện pair_rollback phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "In what order do top and the live data region change before and after push/pop? STACK_POP: event pair_rollback must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Trạng thái nào thay đổi sau bước này? (pair rollback)",
+        "en": "Which state changes after this step? (pair rollback)"
+      },
+      "feedback": {
+        "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: pair rollback.",
+        "en": "The new state preserves the event and values from the trace. Event: pair rollback."
+      },
+      "visual_targets": [
+        "visual.dsa.stack-pointer",
+        "visual.stack-pop.state",
+        "visual.stack-pop.pair-rollback"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 4: pair_rollback",
+          "en": "Step 4: pair_rollback"
+        },
+        "action_description": {
+          "vi": "Trạng thái nào thay đổi sau bước này? (pair rollback)",
+          "en": "Which state changes after this step? (pair rollback)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.stack.stack-pop.boundary.production-v1.event-004.focus",
+        "focus_order": 3,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: pair rollback.",
+            "en": "The new state preserves the event and values from the trace. Event: pair rollback."
+          }
+        }
+      }
+    },
+    {
       "event_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-001",
       "trace_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1",
       "sequence": 0,
       "event_type": "write",
       "active_line_ids": [
-        "stack.production-v1.L027",
+        "stack.production-v1.L053",
         "stack.production-v1.L007",
-        "stack.production-v1.L032"
+        "stack.production-v1.L038"
       ],
       "before": {
         "fixture_ref": "stack.failure",
@@ -999,7 +1390,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 0,
         "history": [],
@@ -1052,7 +1447,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 1,
         "history": [
@@ -1138,9 +1537,9 @@
       "sequence": 1,
       "event_type": "write",
       "active_line_ids": [
-        "stack.production-v1.L027",
+        "stack.production-v1.L053",
         "stack.production-v1.L007",
-        "stack.production-v1.L032"
+        "stack.production-v1.L038"
       ],
       "before": {
         "fixture_ref": "stack.failure",
@@ -1171,7 +1570,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 1,
         "history": [
@@ -1242,7 +1645,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 2,
         "history": [
@@ -1348,9 +1755,9 @@
       "sequence": 2,
       "event_type": "write",
       "active_line_ids": [
-        "stack.production-v1.L027",
+        "stack.production-v1.L053",
         "stack.production-v1.L007",
-        "stack.production-v1.L032"
+        "stack.production-v1.L038"
       ],
       "before": {
         "fixture_ref": "stack.failure",
@@ -1381,7 +1788,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 2,
         "history": [
@@ -1470,7 +1881,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 3,
         "history": [
@@ -1596,8 +2011,8 @@
       "event_type": "unlink",
       "active_line_ids": [
         "stack.production-v1.L013",
-        "stack.production-v1.L032",
-        "stack.production-v1.L030"
+        "stack.production-v1.L038",
+        "stack.production-v1.L041"
       ],
       "before": {
         "fixture_ref": "stack.failure",
@@ -1628,7 +2043,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 3,
         "history": [
@@ -1734,7 +2153,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 4,
         "history": [
@@ -1876,8 +2299,8 @@
       "event_type": "unlink",
       "active_line_ids": [
         "stack.production-v1.L013",
-        "stack.production-v1.L032",
-        "stack.production-v1.L030"
+        "stack.production-v1.L038",
+        "stack.production-v1.L041"
       ],
       "before": {
         "fixture_ref": "stack.failure",
@@ -1908,7 +2331,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 4,
         "history": [
@@ -2028,7 +2455,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 5,
         "history": [
@@ -2181,9 +2612,8 @@
       "event_type": "unlink",
       "active_line_ids": [
         "stack.production-v1.L013",
-        "stack.production-v1.L032",
-        "stack.production-v1.L030",
-        "stack.production-v1.L037"
+        "stack.production-v1.L038",
+        "stack.production-v1.L041"
       ],
       "before": {
         "fixture_ref": "stack.failure",
@@ -2214,7 +2644,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 5,
         "history": [
@@ -2346,7 +2780,11 @@
             [
               "pop"
             ]
-          ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
         },
         "trace_cursor": 6,
         "history": [
@@ -2444,21 +2882,7 @@
           }
         ],
         "latest_event": "pop",
-        "execution_status": "OK",
-        "verified_result": {
-          "live": [],
-          "reduced": null,
-          "results": [
-            true,
-            true,
-            false,
-            2,
-            1,
-            null
-          ],
-          "status": "OK",
-          "top": -1
-        }
+        "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
@@ -2472,20 +2896,6 @@
           },
           "event": "pop",
           "outcome": null
-        },
-        "final_result": {
-          "live": [],
-          "reduced": null,
-          "results": [
-            true,
-            true,
-            false,
-            2,
-            1,
-            null
-          ],
-          "status": "OK",
-          "top": -1
         }
       },
       "invariant_or_criterion": {
@@ -2531,14 +2941,421 @@
       }
     },
     {
+      "event_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-007",
+      "trace_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1",
+      "sequence": 6,
+      "event_type": "assign",
+      "active_line_ids": [
+        "stack.production-v1.L038",
+        "stack.production-v1.L041",
+        "stack.production-v1.L058",
+        "stack.production-v1.L063"
+      ],
+      "before": {
+        "fixture_ref": "stack.failure",
+        "fixture_input": {
+          "capacity": 2,
+          "operands": [
+            5
+          ],
+          "operations": [
+            [
+              "push",
+              1
+            ],
+            [
+              "push",
+              2
+            ],
+            [
+              "push",
+              3
+            ],
+            [
+              "pop"
+            ],
+            [
+              "pop"
+            ],
+            [
+              "pop"
+            ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
+        },
+        "trace_cursor": 6,
+        "history": [
+          {
+            "after": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "event": "push",
+            "outcome": false
+          },
+          {
+            "after": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "event": "pop",
+            "outcome": 2
+          },
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "event": "pop",
+            "outcome": 1
+          },
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "pop",
+            "outcome": null
+          }
+        ],
+        "latest_event": "pop",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "after": {
+            "left": [
+              "blue"
+            ],
+            "right": []
+          },
+          "before": {
+            "left": [
+              "blue"
+            ],
+            "right": []
+          },
+          "event": "pair_rollback"
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "stack.failure",
+        "fixture_input": {
+          "capacity": 2,
+          "operands": [
+            5
+          ],
+          "operations": [
+            [
+              "push",
+              1
+            ],
+            [
+              "push",
+              2
+            ],
+            [
+              "push",
+              3
+            ],
+            [
+              "pop"
+            ],
+            [
+              "pop"
+            ],
+            [
+              "pop"
+            ]
+          ],
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": []
+        },
+        "trace_cursor": 7,
+        "history": [
+          {
+            "after": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "event": "push",
+            "outcome": false
+          },
+          {
+            "after": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                1,
+                2
+              ],
+              "top": 1
+            },
+            "event": "pop",
+            "outcome": 2
+          },
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [
+                1
+              ],
+              "top": 0
+            },
+            "event": "pop",
+            "outcome": 1
+          },
+          {
+            "after": {
+              "live": [],
+              "top": -1
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "pop",
+            "outcome": null
+          },
+          {
+            "after": {
+              "left": [
+                "blue"
+              ],
+              "right": []
+            },
+            "before": {
+              "left": [
+                "blue"
+              ],
+              "right": []
+            },
+            "event": "pair_rollback"
+          }
+        ],
+        "latest_event": "pair_rollback",
+        "execution_status": "OK",
+        "verified_result": {
+          "live": [],
+          "pair": null,
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": [],
+          "reduced": null,
+          "results": [
+            true,
+            true,
+            false,
+            2,
+            1,
+            null
+          ],
+          "status": "OK",
+          "top": -1
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "after": {
+            "left": [
+              "blue"
+            ],
+            "right": []
+          },
+          "before": {
+            "left": [
+              "blue"
+            ],
+            "right": []
+          },
+          "event": "pair_rollback"
+        },
+        "final_result": {
+          "live": [],
+          "pair": null,
+          "pair_left": [
+            "blue"
+          ],
+          "pair_right": [],
+          "reduced": null,
+          "results": [
+            true,
+            true,
+            false,
+            2,
+            1,
+            null
+          ],
+          "status": "OK",
+          "top": -1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "top và vùng dữ liệu sống thay đổi theo thứ tự nào trước và sau push/pop? STACK_POP: sự kiện pair_rollback phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "In what order do top and the live data region change before and after push/pop? STACK_POP: event pair_rollback must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Trạng thái nào thay đổi sau bước này? (pair rollback)",
+        "en": "Which state changes after this step? (pair rollback)"
+      },
+      "feedback": {
+        "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: pair rollback.",
+        "en": "The new state preserves the event and values from the trace. Event: pair rollback."
+      },
+      "visual_targets": [
+        "visual.dsa.stack-pointer",
+        "visual.stack-pop.state",
+        "visual.stack-pop.pair-rollback"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 7: pair_rollback",
+          "en": "Step 7: pair_rollback"
+        },
+        "action_description": {
+          "vi": "Trạng thái nào thay đổi sau bước này? (pair rollback)",
+          "en": "Which state changes after this step? (pair rollback)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.stack.stack-pop.failure.production-v1.event-007.focus",
+        "focus_order": 6,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: pair rollback.",
+            "en": "The new state preserves the event and values from the trace. Event: pair rollback."
+          }
+        }
+      }
+    },
+    {
       "event_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-001",
       "trace_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1",
       "sequence": 0,
       "event_type": "write",
       "active_line_ids": [
-        "stack.production-v1.L027",
+        "stack.production-v1.L053",
         "stack.production-v1.L007",
-        "stack.production-v1.L032"
+        "stack.production-v1.L038"
       ],
       "before": {
         "fixture_ref": "stack.normal",
@@ -2564,6 +3381,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 0,
@@ -2612,6 +3435,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 1,
@@ -2698,9 +3527,9 @@
       "sequence": 1,
       "event_type": "write",
       "active_line_ids": [
-        "stack.production-v1.L027",
+        "stack.production-v1.L053",
         "stack.production-v1.L007",
-        "stack.production-v1.L032"
+        "stack.production-v1.L038"
       ],
       "before": {
         "fixture_ref": "stack.normal",
@@ -2726,6 +3555,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 1,
@@ -2792,6 +3627,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 2,
@@ -2899,8 +3740,8 @@
       "event_type": "unlink",
       "active_line_ids": [
         "stack.production-v1.L013",
-        "stack.production-v1.L032",
-        "stack.production-v1.L030"
+        "stack.production-v1.L038",
+        "stack.production-v1.L041"
       ],
       "before": {
         "fixture_ref": "stack.normal",
@@ -2926,6 +3767,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 2,
@@ -3009,6 +3856,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 3,
@@ -3132,10 +3985,9 @@
       "sequence": 3,
       "event_type": "write",
       "active_line_ids": [
-        "stack.production-v1.L027",
+        "stack.production-v1.L053",
         "stack.production-v1.L007",
-        "stack.production-v1.L032",
-        "stack.production-v1.L037"
+        "stack.production-v1.L038"
       ],
       "before": {
         "fixture_ref": "stack.normal",
@@ -3161,6 +4013,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 3,
@@ -3261,6 +4119,12 @@
               "push",
               30
             ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
           ]
         },
         "trace_cursor": 4,
@@ -3332,22 +4196,7 @@
           }
         ],
         "latest_event": "push",
-        "execution_status": "OK",
-        "verified_result": {
-          "live": [
-            10,
-            30
-          ],
-          "reduced": 5,
-          "results": [
-            true,
-            true,
-            20,
-            true
-          ],
-          "status": "OK",
-          "top": 1
-        }
+        "execution_status": "OK"
       },
       "output_delta": {
         "emitted_trace_event": {
@@ -3366,21 +4215,6 @@
           },
           "event": "push",
           "outcome": true
-        },
-        "final_result": {
-          "live": [
-            10,
-            30
-          ],
-          "reduced": 5,
-          "results": [
-            true,
-            true,
-            20,
-            true
-          ],
-          "status": "OK",
-          "top": 1
         }
       },
       "invariant_or_criterion": {
@@ -3421,6 +4255,369 @@
           "message": {
             "vi": "Phép ghi giữ nguyên dữ liệu trước đó và áp dụng đúng thay đổi trong trace. Sự kiện: push.",
             "en": "The write preserves prior data and applies the exact change in the trace. Event: push."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-005",
+      "trace_id": "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1",
+      "sequence": 4,
+      "event_type": "assign",
+      "active_line_ids": [
+        "stack.production-v1.L041",
+        "stack.production-v1.L038",
+        "stack.production-v1.L058",
+        "stack.production-v1.L063"
+      ],
+      "before": {
+        "fixture_ref": "stack.normal",
+        "fixture_input": {
+          "capacity": 4,
+          "operands": [
+            9,
+            4
+          ],
+          "operations": [
+            [
+              "push",
+              10
+            ],
+            [
+              "push",
+              20
+            ],
+            [
+              "pop"
+            ],
+            [
+              "push",
+              30
+            ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
+          ]
+        },
+        "trace_cursor": 4,
+        "history": [
+          {
+            "after": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                10,
+                20
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                10,
+                20
+              ],
+              "top": 1
+            },
+            "event": "pop",
+            "outcome": 20
+          },
+          {
+            "after": {
+              "live": [
+                10,
+                30
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          }
+        ],
+        "latest_event": "push",
+        "execution_status": "OK"
+      },
+      "delta": {
+        "execution_trace_event": {
+          "after": {
+            "left": [],
+            "right": []
+          },
+          "before": {
+            "left": [
+              "red"
+            ],
+            "right": [
+              "fox"
+            ]
+          },
+          "event": "pair_commit",
+          "pair": [
+            "red",
+            "fox"
+          ]
+        },
+        "pattern_focus": true
+      },
+      "after": {
+        "fixture_ref": "stack.normal",
+        "fixture_input": {
+          "capacity": 4,
+          "operands": [
+            9,
+            4
+          ],
+          "operations": [
+            [
+              "push",
+              10
+            ],
+            [
+              "push",
+              20
+            ],
+            [
+              "pop"
+            ],
+            [
+              "push",
+              30
+            ]
+          ],
+          "pair_left": [
+            "red"
+          ],
+          "pair_right": [
+            "fox"
+          ]
+        },
+        "trace_cursor": 5,
+        "history": [
+          {
+            "after": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [],
+              "top": -1
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                10,
+                20
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "before": {
+              "live": [
+                10,
+                20
+              ],
+              "top": 1
+            },
+            "event": "pop",
+            "outcome": 20
+          },
+          {
+            "after": {
+              "live": [
+                10,
+                30
+              ],
+              "top": 1
+            },
+            "before": {
+              "live": [
+                10
+              ],
+              "top": 0
+            },
+            "event": "push",
+            "outcome": true
+          },
+          {
+            "after": {
+              "left": [],
+              "right": []
+            },
+            "before": {
+              "left": [
+                "red"
+              ],
+              "right": [
+                "fox"
+              ]
+            },
+            "event": "pair_commit",
+            "pair": [
+              "red",
+              "fox"
+            ]
+          }
+        ],
+        "latest_event": "pair_commit",
+        "execution_status": "OK",
+        "verified_result": {
+          "live": [
+            10,
+            30
+          ],
+          "pair": [
+            "red",
+            "fox"
+          ],
+          "pair_left": [],
+          "pair_right": [],
+          "reduced": 5,
+          "results": [
+            true,
+            true,
+            20,
+            true
+          ],
+          "status": "OK",
+          "top": 1
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "after": {
+            "left": [],
+            "right": []
+          },
+          "before": {
+            "left": [
+              "red"
+            ],
+            "right": [
+              "fox"
+            ]
+          },
+          "event": "pair_commit",
+          "pair": [
+            "red",
+            "fox"
+          ]
+        },
+        "final_result": {
+          "live": [
+            10,
+            30
+          ],
+          "pair": [
+            "red",
+            "fox"
+          ],
+          "pair_left": [],
+          "pair_right": [],
+          "reduced": 5,
+          "results": [
+            true,
+            true,
+            20,
+            true
+          ],
+          "status": "OK",
+          "top": 1
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "top và vùng dữ liệu sống thay đổi theo thứ tự nào trước và sau push/pop? STACK_POP: sự kiện pair_commit phải khớp trace chạy lại độc lập, line Python production-v1 và chuyển trạng thái đang hiển thị.",
+        "en": "In what order do top and the live data region change before and after push/pop? STACK_POP: event pair_commit must match the independent rerun trace, production-v1 Python lines, and displayed state transition."
+      },
+      "prediction": {
+        "vi": "Trạng thái nào thay đổi sau bước này? (pair commit)",
+        "en": "Which state changes after this step? (pair commit)"
+      },
+      "feedback": {
+        "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: pair commit.",
+        "en": "The new state preserves the event and values from the trace. Event: pair commit."
+      },
+      "visual_targets": [
+        "visual.dsa.stack-pointer",
+        "visual.stack-pop.state",
+        "visual.stack-pop.pair-commit"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 5: pair_commit",
+          "en": "Step 5: pair_commit"
+        },
+        "action_description": {
+          "vi": "Trạng thái nào thay đổi sau bước này? (pair commit)",
+          "en": "Which state changes after this step? (pair commit)"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái/phải để đổi bước; nhấn Enter để nghe phản hồi của bước đang chọn.",
+          "en": "Use Left/Right Arrow to change step; press Enter to hear feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.stack.stack-pop.normal.production-v1.event-005.focus",
+        "focus_order": 4,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Trạng thái mới giữ đúng sự kiện và giá trị trong trace. Sự kiện: pair commit.",
+            "en": "The new state preserves the event and values from the trace. Event: pair commit."
           }
         }
       }

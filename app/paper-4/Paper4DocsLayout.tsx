@@ -2,10 +2,12 @@
 
 import type { Root } from "fumadocs-core/page-tree";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import { BookOpen, Braces, FlaskConical, Home } from "lucide-react";
+import { BookOpen, Braces, Clock3, Home } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useMemo, type ReactNode } from "react";
 
 import { useLearningLocale } from "@/app/AppProviders";
+import { Button } from "@/app/components/algocore-ui";
 import type { CourseManifest } from "@/app/components/paper4-learning";
 import manifestData from "@/app/data/paper4-v2/course-manifest.json";
 
@@ -14,6 +16,8 @@ const lessonBySlug = new Map(manifest.lessons.map((lesson) => [lesson.slug, less
 
 export function Paper4DocsLayout({ children }: { readonly children: ReactNode }) {
   const locale = useLearningLocale();
+  const pathname = usePathname();
+  const isLesson = pathname.startsWith("/paper-4/lessons/");
   const tree = useMemo<Root>(() => ({
     $id: "paper4-root",
     name: "A Level 9618",
@@ -29,9 +33,16 @@ export function Paper4DocsLayout({ children }: { readonly children: ReactNode })
           {
             $id: "paper4-hub",
             type: "page",
-            name: locale === "vi" ? "Trang khóa học · Visual Lab" : "Course hub · Visual Lab",
+            name: locale === "vi" ? "Trang khóa học" : "Course hub",
             url: `/paper-4?lang=${locale}`,
-            icon: <FlaskConical />,
+            icon: <Home />,
+          },
+          {
+            $id: "paper4-rehearsals",
+            type: "page",
+            name: locale === "vi" ? "Luyện đề tổng hợp" : "Mixed rehearsal",
+            url: `/paper-4/rehearsals?lang=${locale}`,
+            icon: <Clock3 />,
           },
           ...manifest.packages.map((pkg) => ({
             $id: pkg.package_id,
@@ -55,10 +66,15 @@ export function Paper4DocsLayout({ children }: { readonly children: ReactNode })
     ],
   }), [locale]);
 
-  const lessonCount = locale === "vi" ? `${manifest.counts.lessons} bài` : `${manifest.counts.lessons} lessons`;
-  const patternCount = locale === "vi" ? `${manifest.counts.patterns} dạng` : `${manifest.counts.patterns} patterns`;
+  const skipToLesson = () => {
+    requestAnimationFrame(() => document.getElementById("lesson-content")?.focus());
+  };
 
-  return <DocsLayout
+  return <>
+    {isLesson && <a className="paper4-global-skip-link" href="#lesson-content" onClick={skipToLesson}>
+      {locale === "vi" ? "Bỏ qua đến nội dung bài học" : "Skip to lesson content"}
+    </a>}
+    <DocsLayout
     key={locale}
     tree={tree}
     containerProps={{ className: "paper4-docs-layout" }}
@@ -68,8 +84,15 @@ export function Paper4DocsLayout({ children }: { readonly children: ReactNode })
     }}
     sidebar={{
       collapsible: true,
-      banner: <div key="paper4-sidebar-banner" className="course-label"><span>CAMBRIDGE 9618 · 2026</span><strong>{locale === "vi" ? "Học Paper 4" : "Paper 4 Learning"}</strong><p>Python · {lessonCount} · {patternCount}</p></div>,
-      footer: <div key="paper4-sidebar-footer" className="sidebar-note"><Home size={17} /><span>AlgoCore Learning Page<small>{locale === "vi" ? "Canonical v2 · Python đã kiểm chứng" : "Canonical v2 · verified Python"}</small></span></div>,
+      banner: <div key="paper4-sidebar-banner" className="course-label"><span>CAMBRIDGE 9618 · 2026</span><strong>{locale === "vi" ? "Học Paper 4" : "Paper 4 Learning"}</strong><p>Python · VI · EN</p></div>,
+      footer: <div key="paper4-sidebar-footer">
+        <div className="sidebar-note"><Home size={17} /><span>AlgoCore Learning Page<small>{locale === "vi" ? "Nhận diện · Hiểu · Trace · Luyện tập" : "Recognise · Understand · Trace · Practise"}</small></span></div>
+        <form action="/api/auth/logout" method="post">
+          <input type="hidden" name="lang" value={locale} />
+          <Button type="submit" variant="secondary" size="compact">{locale === "vi" ? "Đăng xuất" : "Sign out"}</Button>
+        </form>
+      </div>,
     }}
-  >{children}</DocsLayout>;
+    >{children}</DocsLayout>
+  </>;
 }

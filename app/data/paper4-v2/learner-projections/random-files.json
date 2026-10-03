@@ -1,0 +1,559 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Direct-access fixed-record model",
+    "vi": "Mô hình direct-access record cố định"
+  },
+  "exam_family": {
+    "en": "Record address, fixed size and safe update",
+    "vi": "Record address, kích thước cố định và update an toàn"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Calculate a direct record address, seek to the correct position, and update one fixed-size record while preserving every neighbouring record.",
+    "vi": "Tính direct record address, seek đúng vị trí và update một fixed-size record mà vẫn giữ mọi record lân cận."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Recognise this question family and extract its contract.",
+      "vi": "Nhận diện dạng câu hỏi và rút ra contract."
+    },
+    {
+      "en": "Explain the governing rule before attempting the task.",
+      "vi": "Giải thích quy tắc chính trước khi làm."
+    },
+    {
+      "en": "Trace a normal path and protect the relevant boundary or failure state.",
+      "vi": "Trace normal path và bảo vệ boundary hoặc failure state liên quan."
+    }
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What is this question asking me to preserve?",
+        "vi": "Câu hỏi yêu cầu tôi giữ điều gì?"
+      },
+      "intro": {
+        "en": "Calculate a direct record address, seek to the correct position, and update one fixed-size record while preserving every neighbouring record.",
+        "vi": "Tính direct record address, seek đúng vị trí và update một fixed-size record mà vẫn giữ mọi record lân cận."
+      },
+      "prompt_fragment": {
+        "en": "random file, direct access, fixed record length, seek, address",
+        "vi": "random file, direct access, fixed record length, seek, address"
+      },
+      "cues": [
+        {
+          "en": "random file, direct access, fixed record length, seek, address",
+          "vi": "random file, direct access, fixed record length, seek, address"
+        },
+        {
+          "en": "Record number, first-record convention, record size and encoding are fixed.",
+          "vi": "Record number, quy ước record đầu, record size và encoding đã cố định."
+        },
+        {
+          "en": "Read or replace exactly the requested record at its calculated byte position.",
+          "vi": "Đọc hoặc thay đúng record được yêu cầu tại byte position đã tính."
+        }
+      ],
+      "precondition": {
+        "en": "Record number, first-record convention, record size and encoding are fixed.",
+        "vi": "Record number, quy ước record đầu, record size và encoding đã cố định."
+      },
+      "output_contract": {
+        "en": "Read or replace exactly the requested record at its calculated byte position.",
+        "vi": "Đọc hoặc thay đúng record được yêu cầu tại byte position đã tính."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu quy tắc"
+      },
+      "student_question": {
+        "en": "What rule controls every correct step?",
+        "vi": "Quy tắc nào kiểm soát mọi bước đúng?"
+      },
+      "mental_model": {
+        "en": "Equal-size records make address calculation possible. The classroom byte model illustrates direct access; supplied examination files are text, not binary inputs.",
+        "vi": "Record cùng kích thước cho phép tính address. Mô hình byte minh họa direct access; file đề cung cấp là text, không phải binary input."
+      },
+      "rules": [
+        {
+          "en": "Use one consistent zero-based or one-based record-number convention.",
+          "vi": "Dùng nhất quán quy ước record number bắt đầu từ 0 hoặc 1."
+        },
+        {
+          "en": "Calculate address before seek: index multiplied by fixed record size.",
+          "vi": "Tính address trước seek: index nhân fixed record size."
+        },
+        {
+          "en": "Encode every replacement to exactly the fixed size or reject it.",
+          "vi": "Mã hóa mọi replacement đúng fixed size hoặc từ chối."
+        }
+      ],
+      "invariant": {
+        "en": "An update changes exactly one fixed-size record and leaves file length and neighbouring records unchanged.",
+        "vi": "Update đổi đúng một fixed-size record và giữ file length cùng record lân cận."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Focused exam recipe",
+          "vi": "Khung làm bài trọng tâm"
+        },
+        "lines": [
+          "address = record_index * RECORD_SIZE",
+          "file.seek(address)",
+          "raw = file.read(RECORD_SIZE)",
+          "replacement = encode_fixed(record)",
+          "file.seek(address); file.write(replacement)"
+        ],
+        "contract_note": {
+          "en": "Use this as a small teaching excerpt; adapt names and exact behaviour to the question contract.",
+          "vi": "Dùng đây như đoạn hướng dẫn ngắn; điều chỉnh tên và hành vi theo đúng contract của đề."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "Which fixed byte address identifies the record, and will the update preserve record width?",
+        "vi": "Fixed byte address nào xác định record và update có giữ record width không?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Read and replace record 4 in a fixed-width direct-access file",
+          "vi": "Đọc và thay record 4 trong fixed-width direct-access file"
+        },
+        "instruction": {
+          "en": "Predict address, bytes read and width validation before reveal.",
+          "vi": "Dự đoán address, bytes đọc và width validation trước khi mở."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "address = record_index * RECORD_SIZE"
+          ],
+          "prediction": {
+            "en": "With zero-based record 4 and RECORD_SIZE 20, what byte address is calculated?",
+            "vi": "Với record 4 zero-based và RECORD_SIZE 20, byte address là bao nhiêu?"
+          },
+          "answer": {
+            "en": "4 * 20 = 80, so the record starts at byte address 80.",
+            "vi": "4 * 20 = 80 nên record bắt đầu tại byte address 80."
+          }
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "file.seek(address)",
+            "raw = file.read(RECORD_SIZE)"
+          ],
+          "prediction": {
+            "en": "Where does the cursor move and how many bytes are read?",
+            "vi": "Cursor di chuyển tới đâu và đọc bao nhiêu bytes?"
+          },
+          "answer": {
+            "en": "seek moves to byte 80 and read requests exactly 20 bytes for one fixed-width record.",
+            "vi": "seek tới byte 80 và read yêu cầu đúng 20 bytes cho một fixed-width record."
+          }
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "replacement = encode_fixed(record)",
+            "file.seek(address); file.write(replacement)"
+          ],
+          "prediction": {
+            "en": "If replacement is 18 bytes, may it be written directly?",
+            "vi": "Nếu replacement dài 18 bytes, có được write trực tiếp không?"
+          },
+          "answer": {
+            "en": "No. Pad it according to the declared format or reject it; writing 18 bytes would break fixed record boundaries.",
+            "vi": "Không. Pad theo format đã khai báo hoặc reject; write 18 bytes sẽ phá fixed record boundaries."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "An update changes exactly one fixed-size record and leaves file length and neighbouring records unchanged.",
+        "vi": "Update đổi đúng một fixed-size record và giữ file length cùng record lân cận."
+      },
+      "variants": [
+        {
+          "kind": "boundary_first_record",
+          "input": {
+            "record_index": 0,
+            "record_size": 20
+          },
+          "expected": {
+            "address": 0
+          },
+          "explanation": {
+            "en": "The first zero-based record begins at byte 0.",
+            "vi": "Record zero-based đầu tiên bắt đầu tại byte 0."
+          },
+          "question": {
+            "en": "With zero-based numbering and RECORD_SIZE 20, where does record 0 begin?",
+            "vi": "Với numbering zero-based và RECORD_SIZE 20, record 0 bắt đầu ở đâu?"
+          },
+          "options": [
+            {
+              "id": "address-zero",
+              "label": {
+                "en": "Byte address 0",
+                "vi": "Byte address 0"
+              }
+            },
+            {
+              "id": "address-twenty",
+              "label": {
+                "en": "Byte address 20",
+                "vi": "Byte address 20"
+              }
+            }
+          ],
+          "correct_option_id": "address-zero",
+          "retry_hint": {
+            "en": "Use address = record_index * RECORD_SIZE.",
+            "vi": "Dùng address = record_index * RECORD_SIZE."
+          },
+          "correct_feedback": {
+            "en": "0 * 20 = 0, so the first record begins at byte 0.",
+            "vi": "0 * 20 = 0 nên record đầu bắt đầu byte 0."
+          },
+          "misconception_feedback": {
+            "en": "Adding one to a zero-based index shifts every access to the wrong record.",
+            "vi": "Cộng một vào zero-based index làm mọi access lệch record."
+          }
+        },
+        {
+          "kind": "failure_out_of_range",
+          "input": {
+            "record_index": 9,
+            "record_count": 5
+          },
+          "expected": {
+            "write": false,
+            "state_unchanged": true
+          },
+          "explanation": {
+            "en": "Validate the index before seek/write so an absent record does not extend or corrupt the file.",
+            "vi": "Validate index trước seek/write để record không tồn tại không kéo dài hoặc làm hỏng file."
+          },
+          "question": {
+            "en": "The file has 5 records and record_index is 9. What should happen before seek/write?",
+            "vi": "File có 5 records và record_index là 9. Điều gì nên xảy ra trước seek/write?"
+          },
+          "options": [
+            {
+              "id": "reject-index",
+              "label": {
+                "en": "Reject the index; do not write",
+                "vi": "Reject index; không write"
+              }
+            },
+            {
+              "id": "extend-file",
+              "label": {
+                "en": "Seek past the end and create record 9",
+                "vi": "Seek qua end và tạo record 9"
+              }
+            }
+          ],
+          "correct_option_id": "reject-index",
+          "retry_hint": {
+            "en": "A valid zero-based index is from 0 through record_count - 1.",
+            "vi": "Zero-based index hợp lệ từ 0 tới record_count - 1."
+          },
+          "correct_feedback": {
+            "en": "Index 9 is outside 0..4, so reject it and preserve the file.",
+            "vi": "Index 9 ngoài 0..4 nên reject và giữ file nguyên."
+          },
+          "misconception_feedback": {
+            "en": "Seeking beyond the existing records can extend the file instead of updating a valid record.",
+            "vi": "Seek vượt records hiện có có thể kéo dài file thay vì update record hợp lệ."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I solve the same contract with less support?",
+        "vi": "Tôi có thể giải cùng contract với ít hỗ trợ hơn không?"
+      },
+      "attempt_rule": {
+        "en": "Attempt the task before opening the hint or model answer.",
+        "vi": "Làm thử trước khi mở hint hoặc model answer."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Calculate an address",
+            "vi": "Record dài 20 byte và numbering bắt đầu từ 0"
+          },
+          "prompt": {
+            "en": "Records are 20 bytes and numbering is zero-based. Calculate the address of record 4.",
+            "vi": "Record dài 20 byte và numbering bắt đầu từ 0. Tính address của record 4."
+          },
+          "hint": {
+            "en": "Multiply the zero-based index by the fixed record size.",
+            "vi": "Nhân zero-based index với fixed record size."
+          },
+          "model_answer": {
+            "en": "4 * 20 = byte address 80.",
+            "vi": "4 * 20 = byte address 80."
+          },
+          "success_check": {
+            "en": "The calculation gives byte address 80.",
+            "vi": "Phép tính cho byte address 80."
+          }
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm hỗ trợ"
+          },
+          "title": {
+            "en": "Protect fixed size",
+            "vi": "Replacement mã hóa thành 18 byte"
+          },
+          "prompt": {
+            "en": "A replacement encodes to 18 bytes. State why writing it directly is unsafe.",
+            "vi": "Replacement mã hóa thành 18 byte. Nêu vì sao ghi trực tiếp không an toàn."
+          },
+          "hint": {
+            "en": "Compare encoded length with RECORD_SIZE before writing.",
+            "vi": "So encoded length với RECORD_SIZE trước khi write."
+          },
+          "model_answer": {
+            "en": "It would break the fixed-record layout unless padded by the declared format; otherwise reject it.",
+            "vi": "Nó phá fixed-record layout nếu không được pad theo format; nếu không thì phải từ chối."
+          },
+          "success_check": {
+            "en": "The answer pads or rejects the 18-byte value and preserves every later boundary.",
+            "vi": "Đáp án pad hoặc reject value 18-byte và giữ mọi boundary phía sau."
+          }
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Độc lập"
+          },
+          "title": {
+            "en": "State the model boundary",
+            "vi": "Giải thích mô hình byte-address dạy điều gì và nên mong đợi loại source file nào từ đề"
+          },
+          "prompt": {
+            "en": "Explain what this byte-address model teaches and what you should expect from supplied examination source files.",
+            "vi": "Giải thích mô hình byte-address dạy điều gì và nên mong đợi loại source file nào từ đề."
+          },
+          "hint": {
+            "en": "Separate the direct-address model from the actual text source files supplied in the exam.",
+            "vi": "Tách direct-address model khỏi text source files thực tế được cấp trong exam."
+          },
+          "model_answer": {
+            "en": "It teaches direct address calculation and fixed-size updates; supplied source files are text rather than binary files.",
+            "vi": "Nó dạy tính direct address và fixed-size update; source file đề cung cấp là text thay vì binary file."
+          },
+          "success_check": {
+            "en": "The answer distinguishes fixed-width direct access from supplied text input files.",
+            "vi": "Đáp án phân biệt fixed-width direct access với supplied text input files."
+          }
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which mistake would break the contract first?",
+        "vi": "Lỗi nào phá contract đầu tiên?"
+      },
+      "before_code": [
+        {
+          "en": "Record number, first-record convention, record size and encoding are fixed.",
+          "vi": "Record number, quy ước record đầu, record size và encoding đã cố định."
+        },
+        {
+          "en": "Read or replace exactly the requested record at its calculated byte position.",
+          "vi": "Đọc hoặc thay đúng record được yêu cầu tại byte position đã tính."
+        }
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Coding before fixing the input, output and stopping contract.",
+            "vi": "Viết code trước khi chốt input, output và stopping contract."
+          },
+          "consequence": {
+            "en": "A plausible algorithm can answer a different question.",
+            "vi": "Thuật toán nhìn hợp lý nhưng có thể trả lời câu hỏi khác."
+          },
+          "repair": {
+            "en": "Write the contract in one sentence before the first code line.",
+            "vi": "Viết contract thành một câu trước dòng code đầu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Changing state before checking the relevant boundary.",
+            "vi": "Đổi state trước khi kiểm tra boundary liên quan."
+          },
+          "consequence": {
+            "en": "Rejected input can corrupt a previously valid structure.",
+            "vi": "Input bị từ chối vẫn có thể làm hỏng structure đang hợp lệ."
+          },
+          "repair": {
+            "en": "Place the guard before mutation and trace the rejected path.",
+            "vi": "Đặt guard trước mutation và trace path bị từ chối."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Stopping after one normal example.",
+            "vi": "Dừng sau một ví dụ normal."
+          },
+          "consequence": {
+            "en": "A boundary or failure path remains untested.",
+            "vi": "Boundary hoặc failure path chưa được kiểm tra."
+          },
+          "repair": {
+            "en": "Check one normal, one boundary and one relevant failure case.",
+            "vi": "Kiểm tra một normal, một boundary và một failure phù hợp."
+          }
+        }
+      ],
+      "core_code_caption": {
+        "en": "Compact method reminder",
+        "vi": "Nhắc phương pháp ngắn"
+      },
+      "core_code": [
+        "address = record_index * RECORD_SIZE",
+        "file.seek(address)",
+        "raw = file.read(RECORD_SIZE)",
+        "replacement = encode_fixed(record)",
+        "file.seek(address); file.write(replacement)"
+      ],
+      "boundary_trace": [
+        {
+          "en": "Record number, first-record convention, record size and encoding are fixed.",
+          "vi": "Record number, quy ước record đầu, record size và encoding đã cố định."
+        },
+        {
+          "en": "An update changes exactly one fixed-size record and leaves file length and neighbouring records unchanged.",
+          "vi": "Update đổi đúng một fixed-size record và giữ file length cùng record lân cận."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Read or replace exactly the requested record at its calculated byte position.",
+          "vi": "Đọc hoặc thay đúng record được yêu cầu tại byte position đã tính."
+        },
+        {
+          "en": "An update changes exactly one fixed-size record and leaves file length and neighbouring records unchanged.",
+          "vi": "Update đổi đúng một fixed-size record và giữ file length cùng record lân cận."
+        }
+      ],
+      "authority_note": {
+        "en": "The worked method is AlgoCore teacher-authored guidance grounded in the course sources; follow the exact contract in each examination question.",
+        "vi": "Phương pháp là hướng dẫn do giáo viên AlgoCore biên soạn từ nguồn khóa học; luôn theo đúng contract của từng câu hỏi thi."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the method without the worked example?",
+        "vi": "Tôi có thể tự dựng lại phương pháp khi không nhìn ví dụ không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "State the precondition.",
+            "vi": "Nêu precondition."
+          },
+          "answer": {
+            "en": "Record number, first-record convention, record size and encoding are fixed.",
+            "vi": "Record number, quy ước record đầu, record size và encoding đã cố định."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the invariant or rule.",
+            "vi": "Nêu invariant hoặc rule."
+          },
+          "answer": {
+            "en": "An update changes exactly one fixed-size record and leaves file length and neighbouring records unchanged.",
+            "vi": "Update đổi đúng một fixed-size record và giữ file length cùng record lân cận."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the required output.",
+            "vi": "Nêu output cần có."
+          },
+          "answer": {
+            "en": "Read or replace exactly the requested record at its calculated byte position.",
+            "vi": "Đọc hoặc thay đúng record được yêu cầu tại byte position đã tính."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "Solve the independent task again from memory, then compare only after recording your result.",
+        "vi": "Làm lại independent task từ trí nhớ, rồi chỉ so đáp án sau khi đã ghi kết quả."
+      },
+      "next_step": {
+        "en": "Continue when you can explain the contract and trace the first boundary without help.",
+        "vi": "Học tiếp khi bạn có thể giải thích contract và trace boundary đầu tiên mà không cần trợ giúp."
+      }
+    }
+  },
+  "display_contract": {
+    "default_stage": "Recognise",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    },
+    "primary_code_limit": {
+      "en": "Show only the focused recipe or current lines.",
+      "vi": "Chỉ hiển thị khung code hoặc dòng đang tập trung."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ]
+}

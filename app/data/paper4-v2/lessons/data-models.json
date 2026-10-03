@@ -604,8 +604,8 @@
           "en": "When generating random data, define the value range and whether each endpoint is inclusive. Random data can create test sets, but learning evidence needs a seed or fixed fixture for reproducibility. Every summary scans only the logical region; unused cells in the physical capacity are not generated data."
         },
         "python_connection": {
-          "vi": "Pilot không gọi bộ sinh ngẫu nhiên; nó nhận `random_values` đã cố định ở L030 rồi tính trung bình tại L032–L034. Vì vậy các line chứng minh bước xử lý dữ liệu, không chứng minh API/range sinh số.",
-          "en": "The pilot does not call a random generator; it receives fixed `random_values` at L030 and calculates an average at L032-L034. These lines therefore evidence data processing, not a generator API or its range."
+          "vi": "`generate_random_array` dùng `randint(lower, upper)` với seed cố định cho fixture. Vòng lặp chỉ tăng số phần tử khi candidate được chấp nhận, nên có thể kiểm tra cả hai biên và tính duy nhất mà vẫn chạy lại được đúng kết quả.",
+          "en": "`generate_random_array` uses `randint(lower, upper)` with a fixed fixture seed. The loop advances only when a candidate is accepted, so both inclusive bounds and uniqueness can be tested reproducibly."
         },
         "representation": {
           "vi": "Ghi miền bằng ký hiệu rõ như `[low, high]` và mảng kết quả theo thứ tự sinh. Tách cấu hình sinh khỏi thao tác tổng hợp.",
@@ -637,37 +637,37 @@
         ],
         "micro_example": {
           "scenario": {
-            "vi": "Fixture `[2, 4, 6]` đại diện ba giá trị đã sinh.",
-            "en": "Fixture `[2, 4, 6]` represents three generated values."
+            "vi": "Cần sinh 4 integer duy nhất trong miền bao gồm hai đầu `[65, 90]`.",
+            "en": "Generate 4 unique integers in the inclusive domain `[65, 90]`."
           },
           "walkthrough": {
-            "vi": "L032 xác nhận list không rỗng rồi L033 tính trung bình 4.0; list rỗng giữ `average=None`.",
-            "en": "L032 confirms the list is non-empty, then L033 computes 4.0; an empty list keeps `average=None`."
+            "vi": "L058 sinh candidate; L062 chỉ thêm candidate chưa xuất hiện. Fixture seed 7 tạo `[75, 69, 77, 85]` để trace có thể chạy lại chính xác.",
+            "en": "L058 generates a candidate; L062 adds only a candidate not already used. Fixture seed 7 produces `[75, 69, 77, 85]` so the trace is exactly reproducible."
           },
           "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
           "python_artifact_refs": [
             "ac-9618-p4-2026-python.artifact.data-models.pilot-v1"
           ],
           "active_line_ids": [
-            "data-models.v1.L030",
-            "data-models.v1.L032",
-            "data-models.v1.L033",
-            "data-models.v1.L034"
+            "data-models.v1.L050",
+            "data-models.v1.L058",
+            "data-models.v1.L062",
+            "data-models.v1.L067"
           ],
           "authority": "AlgoCore_authored_teaching_example"
         },
         "self_check": {
           "prompt": {
-            "vi": "Vì sao artifact này chưa xác nhận quy tắc cận của hàm random?",
-            "en": "Why does this artifact not establish the endpoint rules of a random function?"
+            "vi": "Điều gì bảo vệ cả miền giá trị và tính duy nhất?",
+            "en": "What protects both the value range and uniqueness?"
           },
           "answer": {
-            "vi": "Vì nó nhận dữ liệu từ fixture và không gọi hàm sinh ngẫu nhiên.",
-            "en": "Because it receives fixture data and never calls a random generator."
+            "vi": "`randint(lower, upper)` dùng miền bao gồm hai đầu; candidate chỉ được commit khi chưa có trong mảng nếu `unique=True`.",
+            "en": "`randint(lower, upper)` uses an inclusive domain; a candidate is committed only when absent from the array if `unique=True`."
           },
           "rationale": {
-            "vi": "Quy tắc API phải đến từ yêu cầu/đặc tả Python tương ứng.",
-            "en": "API rules must come from the applicable task or Python specification."
+            "vi": "Số phần tử chỉ tăng sau một lần commit, vì vậy candidate trùng không làm mảng bị thiếu vị trí.",
+            "en": "The item count advances only after a commit, so a duplicate candidate does not leave a missing position."
           },
           "answer_hidden_initially": true,
           "authority": "AlgoCore_authored_self_check"
@@ -727,8 +727,8 @@
           "en": "A record groups differently typed fields that describe one entity. In Python, a dictionary or a simple class may represent a record when allowed; a record-replacement class is not the same as a full OOP design with inheritance and polymorphism. One record occupies one logical slot; adding a field to a record does not increase the logical count of the containing array."
         },
         "python_connection": {
-          "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng và `score: int`; L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
-          "en": "L005-L011 verify that a record is a dict with a non-empty `name: str` and `score: int`; L021 inserts the whole record as one unit. These lines illustrate field structure, not evidence for a task-specific class requirement."
+          "vi": "L005–L011 xác nhận record là dict có `name: str` không rỗng; L049 yêu cầu `score` đúng kiểu integer và L021 chèn toàn bộ record như một đơn vị. Các line này minh họa cấu trúc trường, chưa phải bằng chứng cho một yêu cầu class cụ thể.",
+          "en": "L005-L011 verify that a record is a dict with a non-empty `name: str`; L049 requires an exact integer `score`, and L021 inserts the whole record as one unit. These lines illustrate field structure, not evidence for a task-specific class requirement."
         },
         "representation": {
           "vi": "Vẽ record như một hộp có các trường được đặt tên, ví dụ `{name: str, score: int}`. Truy cập bằng tên trường thay vì vị trí mơ hồ.",
@@ -773,7 +773,7 @@
           ],
           "active_line_ids": [
             "data-models.v1.L005",
-            "data-models.v1.L010",
+            "data-models.v1.L049",
             "data-models.v1.L021"
           ],
           "authority": "AlgoCore_authored_teaching_example"
@@ -899,8 +899,8 @@
           "en": "A data type defines the allowed values and operations; a constant represents a fixed value while a variable stores changing state. Scope determines where a name is accessible, so local function data does not automatically change external data. In the task's array model, capacity and logical count are different variables; both must be declared and initialised before deriving the valid-index interval."
         },
         "python_connection": {
-          "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L010 kiểm tra `score` thật sự là `int` trước khi dùng.",
-          "en": "In the data-models artifact, `records`, `capacity`, and `trace` are local parameters at L014; `added` and `message` at L029 exist only inside `run`. L010 checks that `score` is actually an `int` before use."
+          "vi": "Trong artifact data-models, `records`, `capacity` và `trace` là tham số cục bộ ở dòng L014; `added` và `message` ở L029 chỉ tồn tại trong `run`. Dòng L049 dùng kiểm tra kiểu chính xác để loại `bool`, vì Python coi Boolean là một lớp con của integer.",
+          "en": "In the data-models artifact, `records`, `capacity`, and `trace` are local parameters at L014; `added` and `message` at L029 exist only inside `run`. L049 uses an exact type check to reject `bool`, because Python treats Boolean as a subclass of integer."
         },
         "representation": {
           "vi": "Theo dõi mỗi tên bằng ba thuộc tính: kiểu dự kiến, giá trị hiện tại và phạm vi. Ví dụ `capacity: int`, `added: bool`, `message: str`.",
@@ -944,7 +944,7 @@
             "ac-9618-p4-2026-python.artifact.data-models.pilot-v1"
           ],
           "active_line_ids": [
-            "data-models.v1.L010",
+            "data-models.v1.L049",
             "data-models.v1.L014",
             "data-models.v1.L029"
           ],
@@ -952,12 +952,12 @@
         },
         "self_check": {
           "prompt": {
-            "vi": "Vì sao L010 kiểm tra `int` trước khi chèn record?",
-            "en": "Why does L010 check for `int` before inserting the record?"
+            "vi": "Vì sao L049 dùng `type(score) is int` thay vì `isinstance(score, int)`?",
+            "en": "Why does L049 use `type(score) is int` instead of `isinstance(score, int)`?"
           },
           "answer": {
-            "vi": "Để bảo vệ hợp đồng kiểu của trường `score` và ngăn dữ liệu sai đi vào cấu trúc.",
-            "en": "To protect the type contract of `score` and prevent invalid data entering the structure."
+            "vi": "Để bảo vệ hợp đồng integer và không nhận `True` hoặc `False` như điểm số.",
+            "en": "To protect the integer contract and avoid accepting `True` or `False` as a score."
           },
           "rationale": {
             "vi": "Nếu bỏ kiểm tra, lỗi có thể xuất hiện muộn ở phép tính khác và khó truy nguồn.",
@@ -987,238 +987,368 @@
         "text": "import json"
       },
       {
-        "line_id": "data-models.v1.L002",
+        "line_id": "data-models.v1.L048",
         "order": 2,
+        "text": "import random"
+      },
+      {
+        "line_id": "data-models.v1.L002",
+        "order": 3,
         "text": "import sys"
       },
       {
         "line_id": "data-models.v1.L003",
-        "order": 3,
-        "text": ""
-      },
-      {
-        "line_id": "data-models.v1.L004",
         "order": 4,
         "text": ""
       },
       {
-        "line_id": "data-models.v1.L005",
+        "line_id": "data-models.v1.L004",
         "order": 5,
+        "text": ""
+      },
+      {
+        "line_id": "data-models.v1.L005",
+        "order": 6,
         "text": "def valid_record(record):"
       },
       {
         "line_id": "data-models.v1.L006",
-        "order": 6,
+        "order": 7,
         "text": "    return ("
       },
       {
         "line_id": "data-models.v1.L007",
-        "order": 7,
+        "order": 8,
         "text": "        isinstance(record, dict)"
       },
       {
         "line_id": "data-models.v1.L008",
-        "order": 8,
+        "order": 9,
         "text": "        and isinstance(record.get(\"name\"), str)"
       },
       {
         "line_id": "data-models.v1.L009",
-        "order": 9,
+        "order": 10,
         "text": "        and record[\"name\"] != \"\""
       },
       {
-        "line_id": "data-models.v1.L010",
-        "order": 10,
-        "text": "        and isinstance(record.get(\"score\"), int)"
+        "line_id": "data-models.v1.L049",
+        "order": 11,
+        "text": "        and type(record.get(\"score\")) is int"
       },
       {
         "line_id": "data-models.v1.L011",
-        "order": 11,
+        "order": 12,
         "text": "    )"
       },
       {
         "line_id": "data-models.v1.L012",
-        "order": 12,
-        "text": ""
-      },
-      {
-        "line_id": "data-models.v1.L013",
         "order": 13,
         "text": ""
       },
       {
-        "line_id": "data-models.v1.L014",
+        "line_id": "data-models.v1.L013",
         "order": 14,
+        "text": ""
+      },
+      {
+        "line_id": "data-models.v1.L014",
+        "order": 15,
         "text": "def add_record(records, capacity, record, trace):"
       },
       {
         "line_id": "data-models.v1.L015",
-        "order": 15,
+        "order": 16,
         "text": "    trace.append({\"event\": \"check_record\", \"valid\": valid_record(record)})"
       },
       {
         "line_id": "data-models.v1.L016",
-        "order": 16,
+        "order": 17,
         "text": "    if not valid_record(record):"
       },
       {
         "line_id": "data-models.v1.L017",
-        "order": 17,
+        "order": 18,
         "text": "        return False, \"INVALID_RECORD\""
       },
       {
         "line_id": "data-models.v1.L018",
-        "order": 18,
+        "order": 19,
         "text": "    trace.append({\"event\": \"check_capacity\", \"count\": len(records), \"capacity\": capacity})"
       },
       {
         "line_id": "data-models.v1.L019",
-        "order": 19,
+        "order": 20,
         "text": "    if len(records) >= capacity:"
       },
       {
         "line_id": "data-models.v1.L020",
-        "order": 20,
+        "order": 21,
         "text": "        return False, \"FULL\""
       },
       {
         "line_id": "data-models.v1.L021",
-        "order": 21,
+        "order": 22,
         "text": "    records.append(record)"
       },
       {
         "line_id": "data-models.v1.L022",
-        "order": 22,
+        "order": 23,
         "text": "    trace.append({\"event\": \"append\", \"index\": len(records) - 1, \"record\": record})"
       },
       {
         "line_id": "data-models.v1.L023",
-        "order": 23,
+        "order": 24,
         "text": "    return True, \"ADDED\""
       },
       {
         "line_id": "data-models.v1.L024",
-        "order": 24,
-        "text": ""
-      },
-      {
-        "line_id": "data-models.v1.L025",
         "order": 25,
         "text": ""
       },
       {
-        "line_id": "data-models.v1.L026",
+        "line_id": "data-models.v1.L025",
         "order": 26,
-        "text": "def run(fixture):"
+        "text": ""
       },
       {
-        "line_id": "data-models.v1.L027",
+        "line_id": "data-models.v1.L050",
         "order": 27,
-        "text": "    records = [dict(record) for record in fixture[\"records\"]]"
+        "text": "def generate_random_array(count, lower, upper, seed, unique, trace):"
       },
       {
-        "line_id": "data-models.v1.L028",
+        "line_id": "data-models.v1.L051",
         "order": 28,
-        "text": "    trace = []"
+        "text": "    if count < 0 or lower > upper:"
       },
       {
-        "line_id": "data-models.v1.L029",
+        "line_id": "data-models.v1.L052",
         "order": 29,
-        "text": "    added, message = add_record(records, fixture[\"capacity\"], fixture[\"new_record\"], trace)"
+        "text": "        raise ValueError(\"invalid random array contract\")"
       },
       {
-        "line_id": "data-models.v1.L030",
+        "line_id": "data-models.v1.L053",
         "order": 30,
-        "text": "    random_values = fixture[\"random_values\"]"
+        "text": "    if unique and count > upper - lower + 1:"
       },
       {
-        "line_id": "data-models.v1.L031",
+        "line_id": "data-models.v1.L054",
         "order": 31,
-        "text": "    average = None"
+        "text": "        raise ValueError(\"random range is too small for unique values\")"
       },
       {
-        "line_id": "data-models.v1.L032",
+        "line_id": "data-models.v1.L055",
         "order": 32,
-        "text": "    if len(random_values) > 0:"
+        "text": "    generator = random.Random(seed)"
       },
       {
-        "line_id": "data-models.v1.L033",
+        "line_id": "data-models.v1.L056",
         "order": 33,
-        "text": "        average = sum(random_values) / len(random_values)"
+        "text": "    values = []"
       },
       {
-        "line_id": "data-models.v1.L034",
+        "line_id": "data-models.v1.L057",
         "order": 34,
-        "text": "    trace.append({\"event\": \"summarise_random_data\", \"count\": len(random_values), \"average\": average})"
+        "text": "    while len(values) < count:"
       },
       {
-        "line_id": "data-models.v1.L035",
+        "line_id": "data-models.v1.L058",
         "order": 35,
-        "text": "    return {"
+        "text": "        candidate = generator.randint(lower, upper)"
       },
       {
-        "line_id": "data-models.v1.L036",
+        "line_id": "data-models.v1.L059",
         "order": 36,
-        "text": "        \"status\": message,"
+        "text": "        accepted = not unique or candidate not in values"
       },
       {
-        "line_id": "data-models.v1.L037",
+        "line_id": "data-models.v1.L060",
         "order": 37,
-        "text": "        \"append_success\": added,"
+        "text": "        trace.append({\"event\": \"generate_random_value\", \"candidate\": candidate, \"accepted\": accepted})"
       },
       {
-        "line_id": "data-models.v1.L038",
+        "line_id": "data-models.v1.L061",
         "order": 38,
-        "text": "        \"records\": records,"
+        "text": "        if accepted:"
       },
       {
-        "line_id": "data-models.v1.L039",
+        "line_id": "data-models.v1.L062",
         "order": 39,
-        "text": "        \"random_average\": average,"
+        "text": "            values.append(candidate)"
       },
       {
-        "line_id": "data-models.v1.L040",
+        "line_id": "data-models.v1.L063",
         "order": 40,
-        "text": "        \"trace\": trace,"
+        "text": "    return values"
       },
       {
-        "line_id": "data-models.v1.L041",
+        "line_id": "data-models.v1.L064",
         "order": 41,
-        "text": "    }"
+        "text": ""
       },
       {
-        "line_id": "data-models.v1.L042",
+        "line_id": "data-models.v1.L065",
         "order": 42,
         "text": ""
       },
       {
-        "line_id": "data-models.v1.L043",
+        "line_id": "data-models.v1.L026",
         "order": 43,
+        "text": "def run(fixture):"
+      },
+      {
+        "line_id": "data-models.v1.L027",
+        "order": 44,
+        "text": "    records = [dict(record) for record in fixture[\"records\"]]"
+      },
+      {
+        "line_id": "data-models.v1.L028",
+        "order": 45,
+        "text": "    trace = []"
+      },
+      {
+        "line_id": "data-models.v1.L029",
+        "order": 46,
+        "text": "    added, message = add_record(records, fixture[\"capacity\"], fixture[\"new_record\"], trace)"
+      },
+      {
+        "line_id": "data-models.v1.L066",
+        "order": 47,
+        "text": "    random_contract = fixture[\"random_contract\"]"
+      },
+      {
+        "line_id": "data-models.v1.L067",
+        "order": 48,
+        "text": "    random_values = generate_random_array("
+      },
+      {
+        "line_id": "data-models.v1.L068",
+        "order": 49,
+        "text": "        random_contract[\"count\"],"
+      },
+      {
+        "line_id": "data-models.v1.L069",
+        "order": 50,
+        "text": "        random_contract[\"lower\"],"
+      },
+      {
+        "line_id": "data-models.v1.L070",
+        "order": 51,
+        "text": "        random_contract[\"upper\"],"
+      },
+      {
+        "line_id": "data-models.v1.L071",
+        "order": 52,
+        "text": "        random_contract[\"seed\"],"
+      },
+      {
+        "line_id": "data-models.v1.L072",
+        "order": 53,
+        "text": "        random_contract.get(\"unique\", False),"
+      },
+      {
+        "line_id": "data-models.v1.L073",
+        "order": 54,
+        "text": "        trace,"
+      },
+      {
+        "line_id": "data-models.v1.L074",
+        "order": 55,
+        "text": "    )"
+      },
+      {
+        "line_id": "data-models.v1.L031",
+        "order": 56,
+        "text": "    average = None"
+      },
+      {
+        "line_id": "data-models.v1.L032",
+        "order": 57,
+        "text": "    if len(random_values) > 0:"
+      },
+      {
+        "line_id": "data-models.v1.L033",
+        "order": 58,
+        "text": "        average = sum(random_values) / len(random_values)"
+      },
+      {
+        "line_id": "data-models.v1.L034",
+        "order": 59,
+        "text": "    trace.append({\"event\": \"summarise_random_data\", \"count\": len(random_values), \"average\": average})"
+      },
+      {
+        "line_id": "data-models.v1.L035",
+        "order": 60,
+        "text": "    return {"
+      },
+      {
+        "line_id": "data-models.v1.L036",
+        "order": 61,
+        "text": "        \"status\": message,"
+      },
+      {
+        "line_id": "data-models.v1.L037",
+        "order": 62,
+        "text": "        \"append_success\": added,"
+      },
+      {
+        "line_id": "data-models.v1.L038",
+        "order": 63,
+        "text": "        \"records\": records,"
+      },
+      {
+        "line_id": "data-models.v1.L075",
+        "order": 64,
+        "text": "        \"random_values\": random_values,"
+      },
+      {
+        "line_id": "data-models.v1.L039",
+        "order": 65,
+        "text": "        \"random_average\": average,"
+      },
+      {
+        "line_id": "data-models.v1.L040",
+        "order": 66,
+        "text": "        \"trace\": trace,"
+      },
+      {
+        "line_id": "data-models.v1.L041",
+        "order": 67,
+        "text": "    }"
+      },
+      {
+        "line_id": "data-models.v1.L042",
+        "order": 68,
+        "text": ""
+      },
+      {
+        "line_id": "data-models.v1.L043",
+        "order": 69,
         "text": ""
       },
       {
         "line_id": "data-models.v1.L044",
-        "order": 44,
+        "order": 70,
         "text": "if __name__ == \"__main__\":"
       },
       {
         "line_id": "data-models.v1.L045",
-        "order": 45,
+        "order": 71,
         "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
       },
       {
         "line_id": "data-models.v1.L046",
-        "order": 46,
+        "order": 72,
         "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
       },
       {
         "line_id": "data-models.v1.L047",
-        "order": 47,
+        "order": 73,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "f0d82991ca3ca9660af2c3a87c46830edd746f1e8a5d062d46af309e6027dfa2",
+    "code_sha256": "92c4c190af04e900991dd7180129e18620d8b3743e9ac23d968219b46c6a17a4",
     "caption": {
       "vi": "Bản ghi có kiểm tra kiểu, mảng có sức chứa và dữ liệu ngẫu nhiên xác định.",
       "en": "Typed records, a capacity-bounded array and deterministic random data."
@@ -1228,7 +1358,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r2.a3.data-models.pilot-v1.author-run",
       "independent_rerun_ref": "p4r2.a3.data-models.pilot-v1.independent-rerun",
-      "execution_log_sha256": "ae2890a001f6dcd78ee0a07ff96df501361692519cb1839c4bf8b582095872a7"
+      "execution_log_sha256": "d1d5486efa7390f54731a9c2651ed194a788441ea1a91ac8c5d0c6385e2cb64c"
     }
   },
   "tests": {
@@ -1242,10 +1372,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [
-            65,
-            90
-          ],
+          "random_contract": {
+            "count": 4,
+            "lower": 65,
+            "upper": 90,
+            "seed": 7,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1263,7 +1396,13 @@
             "name": "Binh",
             "score": 81
           },
-          "random_values": [],
+          "random_contract": {
+            "count": 0,
+            "lower": 1,
+            "upper": 1,
+            "seed": 0,
+            "unique": true
+          },
           "records": [
             {
               "name": "An",
@@ -1278,11 +1417,16 @@
         "input": {
           "capacity": 3,
           "new_record": {
-            "name": "Binh"
+            "name": "Binh",
+            "score": true
           },
-          "random_values": [
-            50
-          ],
+          "random_contract": {
+            "count": 1,
+            "lower": 50,
+            "upper": 50,
+            "seed": 0,
+            "unique": false
+          },
           "records": [
             {
               "name": "An",
@@ -1298,7 +1442,13 @@
         "fixture_ref": "data-models.normal",
         "value": {
           "append_success": true,
-          "random_average": 77.5,
+          "random_average": 76.5,
+          "random_values": [
+            75,
+            69,
+            77,
+            85
+          ],
           "records": [
             {
               "name": "An",
@@ -1329,8 +1479,28 @@
               }
             },
             {
-              "average": 77.5,
-              "count": 2,
+              "accepted": true,
+              "candidate": 75,
+              "event": "generate_random_value"
+            },
+            {
+              "accepted": true,
+              "candidate": 69,
+              "event": "generate_random_value"
+            },
+            {
+              "accepted": true,
+              "candidate": 77,
+              "event": "generate_random_value"
+            },
+            {
+              "accepted": true,
+              "candidate": 85,
+              "event": "generate_random_value"
+            },
+            {
+              "average": 76.5,
+              "count": 4,
               "event": "summarise_random_data"
             }
           ]
@@ -1342,6 +1512,7 @@
         "value": {
           "append_success": false,
           "random_average": null,
+          "random_values": [],
           "records": [
             {
               "name": "An",
@@ -1373,6 +1544,9 @@
         "value": {
           "append_success": false,
           "random_average": 50,
+          "random_values": [
+            50
+          ],
           "records": [
             {
               "name": "An",
@@ -1384,6 +1558,11 @@
             {
               "event": "check_record",
               "valid": false
+            },
+            {
+              "accepted": true,
+              "candidate": 50,
+              "event": "generate_random_value"
             },
             {
               "average": 50,
@@ -1401,7 +1580,7 @@
     },
     "author_run_ref": "p4r2.a3.data-models.pilot-v1.author-run",
     "independent_rerun_ref": "p4r2.a3.data-models.pilot-v1.independent-rerun",
-    "execution_log_sha256": "ae2890a001f6dcd78ee0a07ff96df501361692519cb1839c4bf8b582095872a7"
+    "execution_log_sha256": "d1d5486efa7390f54731a9c2651ed194a788441ea1a91ac8c5d0c6385e2cb64c"
   },
   "visual": {
     "owned_patterns": [
@@ -1410,36 +1589,36 @@
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.data-models",
         "owner_lesson_slug": "data-models",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
-        "trace_url": "/paper4-v2/traces/array-append.json?v=f0d82991ca3ca966",
+        "trace_url": "/paper4-v2/traces/array-append.json?v=92c4c190af04e900",
         "scenario_count": 3,
-        "event_count": 9
+        "event_count": 14
       },
       {
         "pattern_id": "DATA_RECORD",
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.data-models",
         "owner_lesson_slug": "data-models",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
-        "trace_url": "/paper4-v2/traces/data-record.json?v=f0d82991ca3ca966",
+        "trace_url": "/paper4-v2/traces/data-record.json?v=92c4c190af04e900",
         "scenario_count": 3,
-        "event_count": 9
+        "event_count": 14
       },
       {
         "pattern_id": "DATA_STORAGE",
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.data-models",
         "owner_lesson_slug": "data-models",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
-        "trace_url": "/paper4-v2/traces/data-storage.json?v=f0d82991ca3ca966",
+        "trace_url": "/paper4-v2/traces/data-storage.json?v=92c4c190af04e900",
         "scenario_count": 3,
-        "event_count": 9
+        "event_count": 14
       },
       {
         "pattern_id": "RANDOM_ARRAY",
         "owner_lesson_id": "ac-9618-p4-2026-python.lesson.data-models",
         "owner_lesson_slug": "data-models",
         "python_artifact_id": "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
-        "trace_url": "/paper4-v2/traces/random-array.json?v=f0d82991ca3ca966",
+        "trace_url": "/paper4-v2/traces/random-array.json?v=92c4c190af04e900",
         "scenario_count": 3,
-        "event_count": 9
+        "event_count": 14
       }
     ],
     "trace_backed_association_patterns": [],
@@ -1879,13 +2058,17 @@
           "ARRAY_APPEND"
         ],
         "assessment_requirement_ids": [
-          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-03"
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-03",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-9.2-02",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-02",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.2-01",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-11.1-01"
         ],
         "destination_id": "ac-9618-p4-2026-python.lesson.data-models.assessment.progression",
         "level": "faded",
         "prompt": {
-          "vi": "Hoàn thiện `add_record` để fixture boundary trả `FULL` mà không đổi physical array hoặc logical count. Nộp Python, trace guard-before-write và chỉ ra vì sao `len(list)` không tự động là logical count của fixed-capacity exam array.",
-          "en": "Complete `add_record` so the boundary fixture returns `FULL` without changing the physical array or logical count. Submit Python, a guard-before-write trace, and explain why `len(list)` is not automatically the logical count of a fixed-capacity exam array."
+          "en": "Complete `add_record` so the boundary fixture returns `FULL` without changing the physical array or logical count. Submit Python, a guard-before-write trace, and explain why `len(list)` is not automatically the logical count of a fixed-capacity exam array. Requirement evidence: [1] Write procedural code using variables. [2] Choose suitable identifiers and record their roles. [3] Define a record with differently typed fields. [4] Use indices and upper/lower bounds. [5] Declare and initialise constants and variables.",
+          "vi": "Hoàn thiện `add_record` để fixture boundary trả `FULL` mà không đổi physical array hoặc logical count. Nộp Python, trace guard-before-write và chỉ ra vì sao `len(list)` không tự động là logical count của fixed-capacity exam array. Bằng chứng theo yêu cầu: [1] Viết mã thủ tục sử dụng biến. [2] Chọn định danh phù hợp và ghi vai trò dữ liệu. [3] Định nghĩa bản ghi có các trường khác kiểu. [4] Sử dụng chỉ số và cận trên/dưới của mảng. [5] Khai báo và khởi tạo hằng/biến."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
@@ -1909,12 +2092,44 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "data-models.faded.rubric.requirement",
+              "criterion_id": "data-models.f1.rubric.requirement-01",
               "description": {
-                "vi": "Prompt được trả lời đủ cho ARRAY_APPEND và có bằng chứng riêng cho từng pattern.",
-                "en": "The prompt is fully answered for ARRAY_APPEND with distinct evidence for every pattern."
+                "vi": "Viết mã thủ tục sử dụng biến: Viết mã thủ tục sử dụng biến.",
+                "en": "Write procedural code using variables: Write procedural code using variables."
               },
-              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+              "evidence_required": "Types, scope and dimensions fit the data; Initial values are deliberate; Updates do not exceed bounds or leak unintended shared state"
+            },
+            {
+              "criterion_id": "data-models.f1.rubric.requirement-02",
+              "description": {
+                "vi": "Chọn định danh phù hợp và ghi vai trò dữ liệu: Chọn định danh phù hợp và ghi vai trò dữ liệu.",
+                "en": "Choose suitable identifiers and record their roles: Choose suitable identifiers and record their roles."
+              },
+              "evidence_required": "Identifiers distinguish different roles; Types and scope fit the values; Pointer/index names are not confused with the data they locate"
+            },
+            {
+              "criterion_id": "data-models.f1.rubric.requirement-03",
+              "description": {
+                "vi": "Định nghĩa bản ghi có các trường khác kiểu: Định nghĩa bản ghi có các trường khác kiểu.",
+                "en": "Define a record with differently typed fields: Define a record with differently typed fields."
+              },
+              "evidence_required": "Each named field has the required type/role; One record represents one entity; A Python class substitute is not automatically treated as a full OOP design"
+            },
+            {
+              "criterion_id": "data-models.f1.rubric.requirement-04",
+              "description": {
+                "vi": "Sử dụng chỉ số và cận trên/dưới của mảng: Sử dụng chỉ số và cận trên/dưới của mảng.",
+                "en": "Use indices and upper/lower bounds: Use indices and upper/lower bounds."
+              },
+              "evidence_required": "Translates stated bounds consistently to Python; Uses valid index ranges; Distinguishes an index from a stored value"
+            },
+            {
+              "criterion_id": "data-models.f1.rubric.requirement-05",
+              "description": {
+                "vi": "Khai báo và khởi tạo hằng/biến: Khai báo và khởi tạo hằng/biến.",
+                "en": "Declare and initialise constants and variables: Declare and initialise constants and variables."
+              },
+              "evidence_required": "Initial values fit the specification; Constant intent and variable updates are distinguished; Scope does not hide or overwrite required state"
             },
             {
               "criterion_id": "data-models.faded.rubric.execution",
@@ -1934,13 +2149,14 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
-            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+            "vi": "Đạt khi có bằng chứng cho đủ 7/7 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 7/7 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
-          }
+          },
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -1956,13 +2172,17 @@
         ],
         "assessment_requirement_ids": [
           "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-02",
-          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-03"
+          "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-03",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-01",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-03",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.2-02",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-11.1-02"
         ],
         "destination_id": "ac-9618-p4-2026-python.lesson.data-models.assessment.progression",
         "level": "guided",
         "prompt": {
-          "vi": "Với fixture normal, lập bảng physical capacity/logical count/valid-index interval cho `records`, kiểm tra record `{name, score}`, dự đoán `check_record → check_capacity → append`, rồi tính `random_average` chỉ trên vùng sống. Thêm một ví dụ địa chỉ row-column cho mảng 2D.",
-          "en": "Using the normal fixture, make a physical-capacity/logical-count/valid-index-interval table for `records`, validate the `{name, score}` record, predict `check_record → check_capacity → append`, then calculate `random_average` over the live region only. Add one row-column addressing example for a 2D array."
+          "en": "Using the normal fixture, make a physical-capacity/logical-count/valid-index-interval table for `records`, validate the `{name, score}` record, predict `check_record → check_capacity → append`, then calculate `random_average` over the live region only. Add one row-column addressing example for a 2D array. Requirement evidence: [1] Define a record with differently typed fields. [2] Write procedural code using variables. [3] Choose suitable scalar data types. [4] Read and update record fields. [5] Choose and process 1D/2D arrays. [6] Assign and evaluate arithmetic/logical expressions.",
+          "vi": "Với fixture normal, lập bảng physical capacity/logical count/valid-index interval cho `records`, kiểm tra record `{name, score}`, dự đoán `check_record → check_capacity → append`, rồi tính `random_average` chỉ trên vùng sống. Thêm một ví dụ địa chỉ row-column cho mảng 2D. Bằng chứng theo yêu cầu: [1] Định nghĩa bản ghi có các trường khác kiểu. [2] Viết mã thủ tục sử dụng biến. [3] Chọn kiểu dữ liệu đơn phù hợp. [4] Đọc và cập nhật trường của bản ghi. [5] Chọn và xử lý mảng một/hai chiều. [6] Gán và tính biểu thức số học/logic."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
@@ -1986,12 +2206,52 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "data-models.guided.rubric.requirement",
+              "criterion_id": "data-models.g1.rubric.requirement-01",
               "description": {
-                "vi": "Prompt được trả lời đủ cho DATA_RECORD, DATA_STORAGE và có bằng chứng riêng cho từng pattern.",
-                "en": "The prompt is fully answered for DATA_RECORD, DATA_STORAGE with distinct evidence for every pattern."
+                "vi": "Định nghĩa bản ghi có các trường khác kiểu: Định nghĩa bản ghi có các trường khác kiểu.",
+                "en": "Define a record with differently typed fields: Define a record with differently typed fields."
               },
-              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+              "evidence_required": "Each named field has the required type/role; One record represents one entity; A Python class substitute is not automatically treated as a full OOP design"
+            },
+            {
+              "criterion_id": "data-models.g1.rubric.requirement-02",
+              "description": {
+                "vi": "Viết mã thủ tục sử dụng biến: Viết mã thủ tục sử dụng biến.",
+                "en": "Write procedural code using variables: Write procedural code using variables."
+              },
+              "evidence_required": "Types, scope and dimensions fit the data; Initial values are deliberate; Updates do not exceed bounds or leak unintended shared state"
+            },
+            {
+              "criterion_id": "data-models.g1.rubric.requirement-03",
+              "description": {
+                "vi": "Chọn kiểu dữ liệu đơn phù hợp: Chọn kiểu dữ liệu đơn phù hợp.",
+                "en": "Choose suitable scalar data types: Choose suitable scalar data types."
+              },
+              "evidence_required": "Chosen types represent all allowed values; Operations are compatible with the types; Numeric-looking identifiers are not converted without justification"
+            },
+            {
+              "criterion_id": "data-models.g1.rubric.requirement-04",
+              "description": {
+                "vi": "Đọc và cập nhật trường của bản ghi: Đọc và cập nhật trường của bản ghi.",
+                "en": "Read and update record fields: Read and update record fields."
+              },
+              "evidence_required": "Accesses the correct record and field; New value satisfies the field contract; Unrelated fields retain their values"
+            },
+            {
+              "criterion_id": "data-models.g1.rubric.requirement-05",
+              "description": {
+                "vi": "Chọn và xử lý mảng một/hai chiều: Chọn và xử lý mảng một/hai chiều.",
+                "en": "Choose and process 1D/2D arrays: Choose and process 1D/2D arrays."
+              },
+              "evidence_required": "Dimensions match the data relationships; Nested indexing and iteration are correct; Updates target the intended cell without unintended row aliasing"
+            },
+            {
+              "criterion_id": "data-models.g1.rubric.requirement-06",
+              "description": {
+                "vi": "Gán và tính biểu thức số học/logic: Gán và tính biểu thức số học/logic.",
+                "en": "Assign and evaluate arithmetic/logical expressions: Assign and evaluate arithmetic/logical expressions."
+              },
+              "evidence_required": "Uses the required operator semantics; Assignment changes the correct target; Intermediate and final values follow evaluation order"
             },
             {
               "criterion_id": "data-models.guided.rubric.execution",
@@ -2011,13 +2271,14 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho toàn bộ 3/3 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
-            "en": "Pass only with evidence for all 3/3 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+            "vi": "Đạt khi có bằng chứng cho đủ 8/8 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 8/8 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
-          }
+          },
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -2035,13 +2296,20 @@
         ],
         "assessment_requirement_ids": [
           "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-03",
-          "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-02"
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-02",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-9.2-02",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-01",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.1-03",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.2-01",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-10.2-02",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-11.1-01",
+          "ac-9618-p4-2026-python.assessment-requirement.syl-11.1-02"
         ],
         "destination_id": "ac-9618-p4-2026-python.lesson.data-models.assessment.progression",
         "level": "independent",
         "prompt": {
-          "vi": "Viết và chạy mô-đun cho ba fixture với capacity, logical count và valid indices tường minh; xác thực record, bounded append và tính trung bình vùng sống. Nộp normal/boundary/failure outputs, non-mutation assertions và giải thích khác biệt giữa Python list tiện dụng với exam array contract.",
-          "en": "Write and run a module for three fixtures with explicit capacity, logical count, and valid indices; validate records, perform bounded append, and average the live region. Submit normal/boundary/failure outputs, non-mutation assertions, and explain the difference between Python-list convenience and the exam-array contract."
+          "en": "Write and run a module for three fixtures with explicit capacity, logical count, and valid indices; validate records, perform bounded append, and average the live region. Submit normal/boundary/failure outputs, non-mutation assertions, and explain the difference between Python-list convenience and the exam-array contract. Requirement evidence: [1] Write procedural code using variables. [2] Define a record with differently typed fields. [3] Choose suitable identifiers and record their roles. [4] Choose suitable scalar data types. [5] Read and update record fields. [6] Use indices and upper/lower bounds. [7] Choose and process 1D/2D arrays. [8] Declare and initialise constants and variables. [9] Assign and evaluate arithmetic/logical expressions.",
+          "vi": "Viết và chạy mô-đun cho ba fixture với capacity, logical count và valid indices tường minh; xác thực record, bounded append và tính trung bình vùng sống. Nộp normal/boundary/failure outputs, non-mutation assertions và giải thích khác biệt giữa Python list tiện dụng với exam array contract. Bằng chứng theo yêu cầu: [1] Viết mã thủ tục sử dụng biến. [2] Định nghĩa bản ghi có các trường khác kiểu. [3] Chọn định danh phù hợp và ghi vai trò dữ liệu. [4] Chọn kiểu dữ liệu đơn phù hợp. [5] Đọc và cập nhật trường của bản ghi. [6] Sử dụng chỉ số và cận trên/dưới của mảng. [7] Chọn và xử lý mảng một/hai chiều. [8] Khai báo và khởi tạo hằng/biến. [9] Gán và tính biểu thức số học/logic."
         },
         "shared_fixture_code_data_ids": [
           "ac-9618-p4-2026-python.artifact.data-models.pilot-v1",
@@ -2069,12 +2337,76 @@
           "official_marks": null,
           "criteria": [
             {
-              "criterion_id": "data-models.independent.rubric.requirement",
+              "criterion_id": "data-models.i1.rubric.requirement-01",
               "description": {
-                "vi": "Prompt được trả lời đủ cho ARRAY_APPEND, DATA_RECORD, DATA_STORAGE, RANDOM_ARRAY và có bằng chứng riêng cho từng pattern.",
-                "en": "The prompt is fully answered for ARRAY_APPEND, DATA_RECORD, DATA_STORAGE, RANDOM_ARRAY with distinct evidence for every pattern."
+                "vi": "Viết mã thủ tục sử dụng biến: Viết mã thủ tục sử dụng biến.",
+                "en": "Write procedural code using variables: Write procedural code using variables."
               },
-              "evidence_required": "Submitted code/trace explicitly labels every listed pattern and linked requirement."
+              "evidence_required": "Types, scope and dimensions fit the data; Initial values are deliberate; Updates do not exceed bounds or leak unintended shared state"
+            },
+            {
+              "criterion_id": "data-models.i1.rubric.requirement-02",
+              "description": {
+                "vi": "Định nghĩa bản ghi có các trường khác kiểu: Định nghĩa bản ghi có các trường khác kiểu.",
+                "en": "Define a record with differently typed fields: Define a record with differently typed fields."
+              },
+              "evidence_required": "Each named field has the required type/role; One record represents one entity; A Python class substitute is not automatically treated as a full OOP design"
+            },
+            {
+              "criterion_id": "data-models.i1.rubric.requirement-03",
+              "description": {
+                "vi": "Chọn định danh phù hợp và ghi vai trò dữ liệu: Chọn định danh phù hợp và ghi vai trò dữ liệu.",
+                "en": "Choose suitable identifiers and record their roles: Choose suitable identifiers and record their roles."
+              },
+              "evidence_required": "Identifiers distinguish different roles; Types and scope fit the values; Pointer/index names are not confused with the data they locate"
+            },
+            {
+              "criterion_id": "data-models.i1.rubric.requirement-04",
+              "description": {
+                "vi": "Chọn kiểu dữ liệu đơn phù hợp: Chọn kiểu dữ liệu đơn phù hợp.",
+                "en": "Choose suitable scalar data types: Choose suitable scalar data types."
+              },
+              "evidence_required": "Chosen types represent all allowed values; Operations are compatible with the types; Numeric-looking identifiers are not converted without justification"
+            },
+            {
+              "criterion_id": "data-models.i1.rubric.requirement-05",
+              "description": {
+                "vi": "Đọc và cập nhật trường của bản ghi: Đọc và cập nhật trường của bản ghi.",
+                "en": "Read and update record fields: Read and update record fields."
+              },
+              "evidence_required": "Accesses the correct record and field; New value satisfies the field contract; Unrelated fields retain their values"
+            },
+            {
+              "criterion_id": "data-models.i1.rubric.requirement-06",
+              "description": {
+                "vi": "Sử dụng chỉ số và cận trên/dưới của mảng: Sử dụng chỉ số và cận trên/dưới của mảng.",
+                "en": "Use indices and upper/lower bounds: Use indices and upper/lower bounds."
+              },
+              "evidence_required": "Translates stated bounds consistently to Python; Uses valid index ranges; Distinguishes an index from a stored value"
+            },
+            {
+              "criterion_id": "data-models.i1.rubric.requirement-07",
+              "description": {
+                "vi": "Chọn và xử lý mảng một/hai chiều: Chọn và xử lý mảng một/hai chiều.",
+                "en": "Choose and process 1D/2D arrays: Choose and process 1D/2D arrays."
+              },
+              "evidence_required": "Dimensions match the data relationships; Nested indexing and iteration are correct; Updates target the intended cell without unintended row aliasing"
+            },
+            {
+              "criterion_id": "data-models.i1.rubric.requirement-08",
+              "description": {
+                "vi": "Khai báo và khởi tạo hằng/biến: Khai báo và khởi tạo hằng/biến.",
+                "en": "Declare and initialise constants and variables: Declare and initialise constants and variables."
+              },
+              "evidence_required": "Initial values fit the specification; Constant intent and variable updates are distinguished; Scope does not hide or overwrite required state"
+            },
+            {
+              "criterion_id": "data-models.i1.rubric.requirement-09",
+              "description": {
+                "vi": "Gán và tính biểu thức số học/logic: Gán và tính biểu thức số học/logic.",
+                "en": "Assign and evaluate arithmetic/logical expressions: Assign and evaluate arithmetic/logical expressions."
+              },
+              "evidence_required": "Uses the required operator semantics; Assignment changes the correct target; Intermediate and final values follow evaluation order"
             },
             {
               "criterion_id": "data-models.independent.rubric.execution",
@@ -2102,13 +2434,14 @@
             }
           ],
           "pass_rule": {
-            "vi": "Đạt khi có bằng chứng cho toàn bộ 4/4 tiêu chí; output canonical phải khớp và không được bỏ qua tiêu chí requirement hoặc execution.",
-            "en": "Pass only with evidence for all 4/4 criteria; canonical output must match and neither the requirement nor execution criterion may be skipped."
+            "vi": "Đạt khi có bằng chứng cho đủ 12/12 tiêu chí áp dụng và mọi output canonical khớp.",
+            "en": "Pass only with evidence for all 12/12 applicable criteria and matching canonical outputs."
           },
           "retry_rule": {
             "vi": "Sửa event sai đầu tiên, chạy lại fixture liên quan rồi kiểm tra hồi quy các fixture trước.",
             "en": "Repair the first wrong event, rerun the affected fixture, then regression-check earlier fixtures."
-          }
+          },
+          "prompt_requirement_authority": "AlgoCore_teacher_prompt_level"
         },
         "disclosure_contract": {
           "answer_hidden_initially": true,
@@ -2357,30 +2690,30 @@
       {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.data-models.knowledge.random-data",
         "prompt": {
-          "vi": "Vì sao artifact này chưa xác nhận quy tắc cận của hàm random?",
-          "en": "Why does this artifact not establish the endpoint rules of a random function?"
+          "vi": "Điều gì bảo vệ cả miền giá trị và tính duy nhất?",
+          "en": "What protects both the value range and uniqueness?"
         },
         "answer": {
-          "vi": "Vì nó nhận dữ liệu từ fixture và không gọi hàm sinh ngẫu nhiên.",
-          "en": "Because it receives fixture data and never calls a random generator."
+          "vi": "`randint(lower, upper)` dùng miền bao gồm hai đầu; candidate chỉ được commit khi chưa có trong mảng nếu `unique=True`.",
+          "en": "`randint(lower, upper)` uses an inclusive domain; a candidate is committed only when absent from the array if `unique=True`."
         },
         "rationale": {
-          "vi": "Quy tắc API phải đến từ yêu cầu/đặc tả Python tương ứng.",
-          "en": "API rules must come from the applicable task or Python specification."
+          "vi": "Số phần tử chỉ tăng sau một lần commit, vì vậy candidate trùng không làm mảng bị thiếu vị trí.",
+          "en": "The item count advances only after a commit, so a duplicate candidate does not leave a missing position."
         },
         "answer_hidden_initially": true,
         "authority": "AlgoCore_authored_self_check",
         "response_contract": {
           "mode": "recall_then_trace",
           "prompt": {
-            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: data-models.v1.L030, data-models.v1.L032, data-models.v1.L033, data-models.v1.L034.",
-            "en": "Answer from memory, state the rule, and trace at least one line: data-models.v1.L030, data-models.v1.L032, data-models.v1.L033, data-models.v1.L034."
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: data-models.v1.L050, data-models.v1.L058, data-models.v1.L062, data-models.v1.L067.",
+            "en": "Answer from memory, state the rule, and trace at least one line: data-models.v1.L050, data-models.v1.L058, data-models.v1.L062, data-models.v1.L067."
           },
           "evidence_refs": [
-            "data-models.v1.L030",
-            "data-models.v1.L032",
-            "data-models.v1.L033",
-            "data-models.v1.L034"
+            "data-models.v1.L050",
+            "data-models.v1.L058",
+            "data-models.v1.L062",
+            "data-models.v1.L067"
           ],
           "submit_before_answer": true
         },
@@ -2451,12 +2784,12 @@
         "response_contract": {
           "mode": "recall_then_trace",
           "prompt": {
-            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: data-models.v1.L005, data-models.v1.L010, data-models.v1.L021.",
-            "en": "Answer from memory, state the rule, and trace at least one line: data-models.v1.L005, data-models.v1.L010, data-models.v1.L021."
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: data-models.v1.L005, data-models.v1.L049, data-models.v1.L021.",
+            "en": "Answer from memory, state the rule, and trace at least one line: data-models.v1.L005, data-models.v1.L049, data-models.v1.L021."
           },
           "evidence_refs": [
             "data-models.v1.L005",
-            "data-models.v1.L010",
+            "data-models.v1.L049",
             "data-models.v1.L021"
           ],
           "submit_before_answer": true
@@ -2512,12 +2845,12 @@
       {
         "knowledge_unit_id": "ac-9618-p4-2026-python.lesson.data-models.knowledge.scalars-types-scope",
         "prompt": {
-          "vi": "Vì sao L010 kiểm tra `int` trước khi chèn record?",
-          "en": "Why does L010 check for `int` before inserting the record?"
+          "vi": "Vì sao L049 dùng `type(score) is int` thay vì `isinstance(score, int)`?",
+          "en": "Why does L049 use `type(score) is int` instead of `isinstance(score, int)`?"
         },
         "answer": {
-          "vi": "Để bảo vệ hợp đồng kiểu của trường `score` và ngăn dữ liệu sai đi vào cấu trúc.",
-          "en": "To protect the type contract of `score` and prevent invalid data entering the structure."
+          "vi": "Để bảo vệ hợp đồng integer và không nhận `True` hoặc `False` như điểm số.",
+          "en": "To protect the integer contract and avoid accepting `True` or `False` as a score."
         },
         "rationale": {
           "vi": "Nếu bỏ kiểm tra, lỗi có thể xuất hiện muộn ở phép tính khác và khó truy nguồn.",
@@ -2528,11 +2861,11 @@
         "response_contract": {
           "mode": "recall_then_trace",
           "prompt": {
-            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: data-models.v1.L010, data-models.v1.L014, data-models.v1.L029.",
-            "en": "Answer from memory, state the rule, and trace at least one line: data-models.v1.L010, data-models.v1.L014, data-models.v1.L029."
+            "vi": "Trả lời từ trí nhớ, nêu quy tắc và đối chiếu ít nhất một dòng: data-models.v1.L049, data-models.v1.L014, data-models.v1.L029.",
+            "en": "Answer from memory, state the rule, and trace at least one line: data-models.v1.L049, data-models.v1.L014, data-models.v1.L029."
           },
           "evidence_refs": [
-            "data-models.v1.L010",
+            "data-models.v1.L049",
             "data-models.v1.L014",
             "data-models.v1.L029"
           ],

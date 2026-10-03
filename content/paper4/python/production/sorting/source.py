@@ -82,6 +82,26 @@ def insertion(values, trace):
     trace.append({"event": "insertion_complete", "values": list(output)})
     return output
 
+def ordered_insert(values, item, capacity, trace):
+    if len(values) >= capacity:
+        before = list(values)
+        trace.append({"event": "capacity_reject", "capacity": capacity, "before": before, "after": list(values)})
+        return False
+    position = 0
+    while position < len(values) and values[position] <= item:
+        trace.append({"event": "ordered_insert_compare", "index": position, "current": values[position], "item": item, "moves_right": True})
+        position += 1
+    if position < len(values):
+        trace.append({"event": "ordered_insert_compare", "index": position, "current": values[position], "item": item, "moves_right": False})
+    before = list(values)
+    values.append(None)
+    for index in range(len(values) - 1, position, -1):
+        values[index] = values[index - 1]
+        trace.append({"event": "ordered_insert_shift", "from_index": index - 1, "to_index": index, "value": values[index]})
+    values[position] = item
+    trace.append({"event": "ordered_insert", "position": position, "item": item, "before": before, "after": list(values)})
+    return True
+
 def run(fixture):
     values = fixture.get("values", [])
     trace = []
@@ -95,14 +115,8 @@ def run(fixture):
     ordered, comparisons, swaps = bubble(values, trace, fixture.get("reverse", False))
     insertion_ordered = insertion(values, trace)
     bounded = list(fixture.get("bounded", []))
-    if len(bounded) >= fixture["capacity"]:
-        before = list(bounded)
-        trace.append({
-            "event": "capacity_reject",
-            "capacity": fixture["capacity"],
-            "before": before,
-            "after": list(bounded),
-        })
+    item = fixture["insert"]
+    if not ordered_insert(bounded, item, fixture["capacity"], trace):
         return {
             "status": "FULL",
             "values": bounded,
@@ -110,30 +124,6 @@ def run(fixture):
             "insertion": insertion_ordered,
             "trace": trace,
         }
-    item = fixture["insert"]
-    position = 0
-    while position < len(bounded):
-        current = bounded[position]
-        moves_right = current <= item
-        trace.append({
-            "event": "ordered_insert_compare",
-            "index": position,
-            "current": current,
-            "item": item,
-            "moves_right": moves_right,
-        })
-        if not moves_right:
-            break
-        position += 1
-    before = list(bounded)
-    bounded.insert(position, item)
-    trace.append({
-        "event": "ordered_insert",
-        "position": position,
-        "item": item,
-        "before": before,
-        "after": list(bounded),
-    })
     return {
         "status": "OK",
         "bubble": ordered,

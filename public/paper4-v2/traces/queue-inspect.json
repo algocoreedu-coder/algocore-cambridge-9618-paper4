@@ -6,7 +6,7 @@
     "lesson_slug": "queue",
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
     "artifact_version": "pilot-v1",
-    "code_sha256": "70b10587cc66936da9dbbd65d3af17bba8842c95b18d39b23ca770877f13c52a"
+    "code_sha256": "226a5829331e7945a8f12cc28e27660dbf475ab39fd12a2cc67d014d77950ff7"
   },
   "python_artifact": {
     "python_artifact_id": "ac-9618-p4-2026-python.artifact.queue.pilot-v1",
@@ -252,178 +252,298 @@
         "text": ""
       },
       {
-        "line_id": "queue.v1.L047",
+        "line_id": "queue.v1.L081",
         "order": 47,
+        "text": "def reduce_numeric(queue, preserve, trace):"
+      },
+      {
+        "line_id": "queue.v1.L082",
+        "order": 48,
+        "text": "    original_count = queue.count"
+      },
+      {
+        "line_id": "queue.v1.L083",
+        "order": 49,
+        "text": "    total = 0"
+      },
+      {
+        "line_id": "queue.v1.L084",
+        "order": 50,
+        "text": "    for _ in range(original_count):"
+      },
+      {
+        "line_id": "queue.v1.L085",
+        "order": 51,
+        "text": "        item = queue.dequeue()"
+      },
+      {
+        "line_id": "queue.v1.L086",
+        "order": 52,
+        "text": "        if type(item) in (int, float):"
+      },
+      {
+        "line_id": "queue.v1.L087",
+        "order": 53,
+        "text": "            total += item"
+      },
+      {
+        "line_id": "queue.v1.L088",
+        "order": 54,
+        "text": "        trace.append({\"event\": \"reduce_item\", \"item\": item, \"total\": total})"
+      },
+      {
+        "line_id": "queue.v1.L089",
+        "order": 55,
+        "text": "        if preserve:"
+      },
+      {
+        "line_id": "queue.v1.L090",
+        "order": 56,
+        "text": "            queue.enqueue(item)"
+      },
+      {
+        "line_id": "queue.v1.L091",
+        "order": 57,
+        "text": "    trace.append({\"event\": \"reduce_complete\", \"mode\": \"preserve\" if preserve else \"consume\", \"total\": total})"
+      },
+      {
+        "line_id": "queue.v1.L092",
+        "order": 58,
+        "text": "    return total"
+      },
+      {
+        "line_id": "queue.v1.L093",
+        "order": 59,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L094",
+        "order": 60,
+        "text": ""
+      },
+      {
+        "line_id": "queue.v1.L047",
+        "order": 61,
         "text": "def run(fixture):"
       },
       {
         "line_id": "queue.v1.L048",
-        "order": 48,
+        "order": 62,
         "text": "    trace = []"
       },
       {
         "line_id": "queue.v1.L049",
-        "order": 49,
+        "order": 63,
         "text": "    try:"
       },
       {
         "line_id": "queue.v1.L050",
-        "order": 50,
+        "order": 64,
         "text": "        queue = CircularQueue(fixture[\"capacity\"], trace)"
       },
       {
         "line_id": "queue.v1.L051",
-        "order": 51,
+        "order": 65,
         "text": "    except ValueError as error:"
       },
       {
         "line_id": "queue.v1.L052",
-        "order": 52,
+        "order": 66,
         "text": "        return {\"status\": \"INVALID_CAPACITY\", \"message\": str(error), \"trace\": trace}"
       },
       {
         "line_id": "queue.v1.L053",
-        "order": 53,
+        "order": 67,
         "text": "    removed = []"
       },
       {
         "line_id": "queue.v1.L054",
-        "order": 54,
+        "order": 68,
         "text": "    operation_results = []"
       },
       {
         "line_id": "queue.v1.L055",
-        "order": 55,
+        "order": 69,
         "text": "    for operation in fixture[\"operations\"]:"
       },
       {
         "line_id": "queue.v1.L056",
-        "order": 56,
+        "order": 70,
         "text": "        if operation[0] == \"enqueue\":"
       },
       {
         "line_id": "queue.v1.L057",
-        "order": 57,
+        "order": 71,
         "text": "            operation_results.append(queue.enqueue(operation[1]))"
       },
       {
         "line_id": "queue.v1.L058",
-        "order": 58,
+        "order": 72,
         "text": "        elif operation[0] == \"dequeue\":"
       },
       {
         "line_id": "queue.v1.L059",
-        "order": 59,
+        "order": 73,
         "text": "            removed.append(queue.dequeue())"
       },
       {
         "line_id": "queue.v1.L060",
-        "order": 60,
+        "order": 74,
         "text": "        else:"
       },
       {
         "line_id": "queue.v1.L061",
-        "order": 61,
+        "order": 75,
         "text": "            return {\"status\": \"UNKNOWN_OPERATION\", \"operation\": operation[0], \"trace\": trace}"
       },
       {
         "line_id": "queue.v1.L062",
-        "order": 62,
+        "order": 76,
         "text": "    live = queue.live_items()"
       },
       {
-        "line_id": "queue.v1.L063",
-        "order": 63,
-        "text": "    numeric_total = sum(item for item in live if isinstance(item, (int, float)))"
+        "line_id": "queue.v1.L095",
+        "order": 77,
+        "text": "    reduce_trace = []"
+      },
+      {
+        "line_id": "queue.v1.L096",
+        "order": 78,
+        "text": "    reduce_values = fixture.get(\"reduce_values\", live)"
+      },
+      {
+        "line_id": "queue.v1.L106",
+        "order": 79,
+        "text": "    reduce_queue = CircularQueue(max(1, len(reduce_values)), [])"
+      },
+      {
+        "line_id": "queue.v1.L098",
+        "order": 80,
+        "text": "    for item in reduce_values:"
+      },
+      {
+        "line_id": "queue.v1.L099",
+        "order": 81,
+        "text": "        reduce_queue.enqueue(item)"
+      },
+      {
+        "line_id": "queue.v1.L100",
+        "order": 82,
+        "text": "    reduce_mode = fixture.get(\"reduce_mode\", \"consume\")"
+      },
+      {
+        "line_id": "queue.v1.L101",
+        "order": 83,
+        "text": "    numeric_total = reduce_numeric(reduce_queue, reduce_mode == \"preserve\", reduce_trace)"
+      },
+      {
+        "line_id": "queue.v1.L102",
+        "order": 84,
+        "text": "    reduce_live = reduce_queue.live_items()"
+      },
+      {
+        "line_id": "queue.v1.L103",
+        "order": 85,
+        "text": "    trace.extend(reduce_trace)"
       },
       {
         "line_id": "queue.v1.L064",
-        "order": 64,
+        "order": 86,
         "text": "    return {"
       },
       {
         "line_id": "queue.v1.L065",
-        "order": 65,
+        "order": 87,
         "text": "        \"status\": \"OK\","
       },
       {
         "line_id": "queue.v1.L066",
-        "order": 66,
+        "order": 88,
         "text": "        \"operation_results\": operation_results,"
       },
       {
         "line_id": "queue.v1.L067",
-        "order": 67,
+        "order": 89,
         "text": "        \"removed\": removed,"
       },
       {
         "line_id": "queue.v1.L068",
-        "order": 68,
+        "order": 90,
         "text": "        \"live\": live,"
       },
       {
         "line_id": "queue.v1.L069",
-        "order": 69,
+        "order": 91,
         "text": "        \"numeric_total\": numeric_total,"
       },
       {
+        "line_id": "queue.v1.L104",
+        "order": 92,
+        "text": "        \"reduce_mode\": reduce_mode,"
+      },
+      {
+        "line_id": "queue.v1.L105",
+        "order": 93,
+        "text": "        \"reduce_live\": reduce_live,"
+      },
+      {
         "line_id": "queue.v1.L070",
-        "order": 70,
+        "order": 94,
         "text": "        \"front\": queue.front,"
       },
       {
         "line_id": "queue.v1.L071",
-        "order": 71,
+        "order": 95,
         "text": "        \"rear\": queue.rear,"
       },
       {
         "line_id": "queue.v1.L072",
-        "order": 72,
+        "order": 96,
         "text": "        \"count\": queue.count,"
       },
       {
         "line_id": "queue.v1.L073",
-        "order": 73,
+        "order": 97,
         "text": "        \"trace\": trace,"
       },
       {
         "line_id": "queue.v1.L074",
-        "order": 74,
+        "order": 98,
         "text": "    }"
       },
       {
         "line_id": "queue.v1.L075",
-        "order": 75,
+        "order": 99,
         "text": ""
       },
       {
         "line_id": "queue.v1.L076",
-        "order": 76,
+        "order": 100,
         "text": ""
       },
       {
         "line_id": "queue.v1.L077",
-        "order": 77,
+        "order": 101,
         "text": "if __name__ == \"__main__\":"
       },
       {
         "line_id": "queue.v1.L078",
-        "order": 78,
+        "order": 102,
         "text": "    with open(sys.argv[1], \"r\", encoding=\"utf-8\") as fixture_file:"
       },
       {
         "line_id": "queue.v1.L079",
-        "order": 79,
+        "order": 103,
         "text": "        print(json.dumps(run(json.load(fixture_file)), ensure_ascii=False, sort_keys=True))"
       },
       {
         "line_id": "queue.v1.L080",
-        "order": 80,
+        "order": 104,
         "text": ""
       }
     ],
     "entry_point": "run(fixture)",
-    "code_sha256": "70b10587cc66936da9dbbd65d3af17bba8842c95b18d39b23ca770877f13c52a",
+    "code_sha256": "226a5829331e7945a8f12cc28e27660dbf475ab39fd12a2cc67d014d77950ff7",
     "caption": {
       "vi": "Hàng đợi vòng duy trì front, rear và count qua enqueue, dequeue, inspect và reduce.",
       "en": "A circular queue maintaining front, rear and count through enqueue, dequeue, inspect and reduce."
@@ -433,7 +553,7 @@
       "execution_status": "PASS",
       "author_run_ref": "p4r2.a3.queue.pilot-v1.author-run",
       "independent_rerun_ref": "p4r2.a3.queue.pilot-v1.independent-rerun",
-      "execution_log_sha256": "86163a0e755b9f768508381036a1e13ed715645c428bc19408de53a376917d5e"
+      "execution_log_sha256": "6db3236b49764108f2e5e258c6b1a562d7fe5fb0b84b489ca3e4b0e8e46ba128"
     }
   },
   "scenarios": [
@@ -463,7 +583,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 0,
         "last_event": null,
@@ -476,7 +601,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "event_ids": [
@@ -486,7 +613,10 @@
         "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-004",
         "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-005",
         "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-006",
-        "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-007"
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-007",
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-008",
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-009",
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-010"
       ],
       "expected_output_ref": "queue.boundary.expected-output",
       "fixture_ref": "queue.boundary"
@@ -501,7 +631,9 @@
         "fixture_ref": "queue.failure",
         "fixture_input": {
           "capacity": 0,
-          "operations": []
+          "operations": [],
+          "reduce_values": [],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 0,
         "last_event": null,
@@ -511,7 +643,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "event_ids": [
@@ -550,7 +684,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 0,
         "last_event": null,
@@ -564,7 +704,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "event_ids": [
@@ -578,7 +720,11 @@
         "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-008",
         "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-009",
         "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-010",
-        "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-011"
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-011",
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-012",
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-013",
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-014",
+        "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-015"
       ],
       "expected_output_ref": "queue.normal.expected-output",
       "fixture_ref": "queue.normal"
@@ -615,7 +761,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 0,
         "last_event": null,
@@ -628,7 +779,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "delta": {
@@ -658,7 +811,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 1,
         "last_event": "check_empty",
@@ -671,7 +829,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "output_delta": {
@@ -729,7 +889,8 @@
       "event_type": "compare",
       "active_line_ids": [
         "queue.v1.L017",
-        "queue.v1.L018"
+        "queue.v1.L018",
+        "queue.v1.L019"
       ],
       "before": {
         "fixture_ref": "queue.boundary",
@@ -751,7 +912,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 1,
         "last_event": "check_empty",
@@ -764,7 +930,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "delta": {
@@ -795,7 +963,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 2,
         "last_event": "check_full",
@@ -808,7 +981,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "output_delta": {
@@ -870,8 +1045,7 @@
         "queue.v1.L021",
         "queue.v1.L022",
         "queue.v1.L023",
-        "queue.v1.L024",
-        "queue.v1.L025"
+        "queue.v1.L024"
       ],
       "before": {
         "fixture_ref": "queue.boundary",
@@ -893,7 +1067,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 2,
         "last_event": "check_full",
@@ -906,7 +1085,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "delta": {
@@ -937,7 +1118,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 3,
         "last_event": "enqueue",
@@ -950,7 +1136,9 @@
           "front": 0,
           "rear": 1,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "output_delta": {
@@ -1009,7 +1197,8 @@
       "event_type": "compare",
       "active_line_ids": [
         "queue.v1.L017",
-        "queue.v1.L018"
+        "queue.v1.L018",
+        "queue.v1.L019"
       ],
       "before": {
         "fixture_ref": "queue.boundary",
@@ -1031,7 +1220,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 3,
         "last_event": "enqueue",
@@ -1044,7 +1238,9 @@
           "front": 0,
           "rear": 1,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "delta": {
@@ -1075,7 +1271,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 4,
         "last_event": "check_full",
@@ -1088,7 +1289,9 @@
           "front": 0,
           "rear": 1,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "output_delta": {
@@ -1150,8 +1353,7 @@
         "queue.v1.L021",
         "queue.v1.L022",
         "queue.v1.L023",
-        "queue.v1.L024",
-        "queue.v1.L025"
+        "queue.v1.L024"
       ],
       "before": {
         "fixture_ref": "queue.boundary",
@@ -1173,7 +1375,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 4,
         "last_event": "check_full",
@@ -1186,7 +1393,9 @@
           "front": 0,
           "rear": 1,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "delta": {
@@ -1217,7 +1426,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 5,
         "last_event": "enqueue",
@@ -1230,7 +1444,9 @@
           "front": 0,
           "rear": 0,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "output_delta": {
@@ -1312,7 +1528,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 5,
         "last_event": "enqueue",
@@ -1325,7 +1546,9 @@
           "front": 0,
           "rear": 0,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "delta": {
@@ -1356,7 +1579,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 6,
         "last_event": "check_full",
@@ -1369,7 +1597,9 @@
           "front": 0,
           "rear": 0,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "output_delta": {
@@ -1431,20 +1661,7 @@
         "queue.v1.L040",
         "queue.v1.L041",
         "queue.v1.L042",
-        "queue.v1.L043",
-        "queue.v1.L044",
-        "queue.v1.L062",
-        "queue.v1.L063",
-        "queue.v1.L064",
-        "queue.v1.L065",
-        "queue.v1.L066",
-        "queue.v1.L067",
-        "queue.v1.L068",
-        "queue.v1.L069",
-        "queue.v1.L070",
-        "queue.v1.L071",
-        "queue.v1.L072",
-        "queue.v1.L073"
+        "queue.v1.L043"
       ],
       "before": {
         "fixture_ref": "queue.boundary",
@@ -1466,7 +1683,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 6,
         "last_event": "check_full",
@@ -1479,7 +1701,9 @@
           "front": 0,
           "rear": 0,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "delta": {
@@ -1512,7 +1736,12 @@
               "enqueue",
               7
             ]
-          ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
         },
         "trace_cursor": 7,
         "last_event": "inspect",
@@ -1529,7 +1758,8 @@
             5,
             6
           ],
-          "status": "OK"
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
         }
       },
       "output_delta": {
@@ -1539,25 +1769,6 @@
             5,
             6
           ]
-        },
-        "final_result": {
-          "count": 2,
-          "front": 0,
-          "live": [
-            5,
-            6
-          ],
-          "numeric_total": 11,
-          "operation_results": [
-            true,
-            true,
-            false
-          ],
-          "rear": 0,
-          "removed": [
-            null
-          ],
-          "status": "OK"
         }
       },
       "invariant_or_criterion": {
@@ -1603,6 +1814,545 @@
       }
     },
     {
+      "event_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-008",
+      "trace_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1",
+      "sequence": 7,
+      "event_type": "advance",
+      "active_line_ids": [
+        "queue.v1.L081",
+        "queue.v1.L082",
+        "queue.v1.L083",
+        "queue.v1.L084",
+        "queue.v1.L085",
+        "queue.v1.L086",
+        "queue.v1.L087",
+        "queue.v1.L088",
+        "queue.v1.L089",
+        "queue.v1.L090"
+      ],
+      "before": {
+        "fixture_ref": "queue.boundary",
+        "fixture_input": {
+          "capacity": 2,
+          "operations": [
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              5
+            ],
+            [
+              "enqueue",
+              6
+            ],
+            [
+              "enqueue",
+              7
+            ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
+        },
+        "trace_cursor": 7,
+        "last_event": "inspect",
+        "domain": {
+          "capacity": 2,
+          "items": [
+            5,
+            6
+          ],
+          "front": 0,
+          "rear": 0,
+          "count": 2,
+          "live": [
+            5,
+            6
+          ],
+          "reduce_total": 0,
+          "reduce_mode": "preserve"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reduce_item",
+          "item": 5,
+          "total": 5
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "queue.boundary",
+        "fixture_input": {
+          "capacity": 2,
+          "operations": [
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              5
+            ],
+            [
+              "enqueue",
+              6
+            ],
+            [
+              "enqueue",
+              7
+            ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
+        },
+        "trace_cursor": 8,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 2,
+          "items": [
+            5,
+            6
+          ],
+          "front": 0,
+          "rear": 0,
+          "count": 2,
+          "live": [
+            5,
+            6
+          ],
+          "reduce_total": 5,
+          "reduce_mode": "preserve"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reduce_item",
+          "item": 5,
+          "total": 5
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "front, rear và count xác định vùng phần tử đang sống như thế nào? QUEUE_INSPECT: sự kiện reduce_item phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How do front, rear, and count define the live queue window? QUEUE_INSPECT: event reduce_item must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+        "en": "Which item is removed next, and how does the accumulator change?"
+      },
+      "feedback": {
+        "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+        "en": "The reduction processes one FIFO item and updates the total."
+      },
+      "visual_targets": [
+        "visual.dsa.queue-window",
+        "visual.queue.state",
+        "visual.queue.reduce_item"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 8: reduce_item",
+          "en": "Step 8: reduce_item"
+        },
+        "action_description": {
+          "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+          "en": "Which item is removed next, and how does the accumulator change?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-008.focus",
+        "focus_order": 7,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+            "en": "The reduction processes one FIFO item and updates the total."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-009",
+      "trace_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1",
+      "sequence": 8,
+      "event_type": "advance",
+      "active_line_ids": [
+        "queue.v1.L081",
+        "queue.v1.L082",
+        "queue.v1.L083",
+        "queue.v1.L084",
+        "queue.v1.L085",
+        "queue.v1.L086",
+        "queue.v1.L087",
+        "queue.v1.L088",
+        "queue.v1.L089",
+        "queue.v1.L090"
+      ],
+      "before": {
+        "fixture_ref": "queue.boundary",
+        "fixture_input": {
+          "capacity": 2,
+          "operations": [
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              5
+            ],
+            [
+              "enqueue",
+              6
+            ],
+            [
+              "enqueue",
+              7
+            ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
+        },
+        "trace_cursor": 8,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 2,
+          "items": [
+            5,
+            6
+          ],
+          "front": 0,
+          "rear": 0,
+          "count": 2,
+          "live": [
+            5,
+            6
+          ],
+          "reduce_total": 5,
+          "reduce_mode": "preserve"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reduce_item",
+          "item": 6,
+          "total": 11
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "queue.boundary",
+        "fixture_input": {
+          "capacity": 2,
+          "operations": [
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              5
+            ],
+            [
+              "enqueue",
+              6
+            ],
+            [
+              "enqueue",
+              7
+            ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
+        },
+        "trace_cursor": 9,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 2,
+          "items": [
+            5,
+            6
+          ],
+          "front": 0,
+          "rear": 0,
+          "count": 2,
+          "live": [
+            5,
+            6
+          ],
+          "reduce_total": 11,
+          "reduce_mode": "preserve"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reduce_item",
+          "item": 6,
+          "total": 11
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "front, rear và count xác định vùng phần tử đang sống như thế nào? QUEUE_INSPECT: sự kiện reduce_item phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How do front, rear, and count define the live queue window? QUEUE_INSPECT: event reduce_item must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+        "en": "Which item is removed next, and how does the accumulator change?"
+      },
+      "feedback": {
+        "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+        "en": "The reduction processes one FIFO item and updates the total."
+      },
+      "visual_targets": [
+        "visual.dsa.queue-window",
+        "visual.queue.state",
+        "visual.queue.reduce_item"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 9: reduce_item",
+          "en": "Step 9: reduce_item"
+        },
+        "action_description": {
+          "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+          "en": "Which item is removed next, and how does the accumulator change?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-009.focus",
+        "focus_order": 8,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+            "en": "The reduction processes one FIFO item and updates the total."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-010",
+      "trace_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1",
+      "sequence": 9,
+      "event_type": "emit",
+      "active_line_ids": [
+        "queue.v1.L091",
+        "queue.v1.L092",
+        "queue.v1.L051",
+        "queue.v1.L052",
+        "queue.v1.L062",
+        "queue.v1.L095",
+        "queue.v1.L096",
+        "queue.v1.L106",
+        "queue.v1.L098",
+        "queue.v1.L099",
+        "queue.v1.L100",
+        "queue.v1.L101",
+        "queue.v1.L102",
+        "queue.v1.L103",
+        "queue.v1.L064",
+        "queue.v1.L065",
+        "queue.v1.L066",
+        "queue.v1.L067",
+        "queue.v1.L068",
+        "queue.v1.L069",
+        "queue.v1.L104",
+        "queue.v1.L105",
+        "queue.v1.L070",
+        "queue.v1.L071",
+        "queue.v1.L072",
+        "queue.v1.L073"
+      ],
+      "before": {
+        "fixture_ref": "queue.boundary",
+        "fixture_input": {
+          "capacity": 2,
+          "operations": [
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              5
+            ],
+            [
+              "enqueue",
+              6
+            ],
+            [
+              "enqueue",
+              7
+            ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
+        },
+        "trace_cursor": 9,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 2,
+          "items": [
+            5,
+            6
+          ],
+          "front": 0,
+          "rear": 0,
+          "count": 2,
+          "live": [
+            5,
+            6
+          ],
+          "reduce_total": 11,
+          "reduce_mode": "preserve"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reduce_complete",
+          "mode": "preserve",
+          "total": 11
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "queue.boundary",
+        "fixture_input": {
+          "capacity": 2,
+          "operations": [
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              5
+            ],
+            [
+              "enqueue",
+              6
+            ],
+            [
+              "enqueue",
+              7
+            ]
+          ],
+          "reduce_values": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve"
+        },
+        "trace_cursor": 10,
+        "last_event": "reduce_complete",
+        "domain": {
+          "capacity": 2,
+          "items": [
+            5,
+            6
+          ],
+          "front": 0,
+          "rear": 0,
+          "count": 2,
+          "live": [
+            5,
+            6
+          ],
+          "reduce_total": 11,
+          "reduce_mode": "preserve",
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reduce_complete",
+          "mode": "preserve",
+          "total": 11
+        },
+        "final_result": {
+          "count": 2,
+          "front": 0,
+          "live": [
+            5,
+            6
+          ],
+          "numeric_total": 11,
+          "operation_results": [
+            true,
+            true,
+            false
+          ],
+          "rear": 0,
+          "reduce_live": [
+            5,
+            6
+          ],
+          "reduce_mode": "preserve",
+          "removed": [
+            null
+          ],
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "front, rear và count xác định vùng phần tử đang sống như thế nào? QUEUE_INSPECT: sự kiện reduce_complete phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How do front, rear, and count define the live queue window? QUEUE_INSPECT: event reduce_complete must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Queue phải rỗng hay được giữ nguyên sau reduce?",
+        "en": "Should the queue be empty or preserved after reduction?"
+      },
+      "feedback": {
+        "vi": "Hậu trạng thái được kiểm theo policy consume hoặc preserve.",
+        "en": "The post-state is checked against the consume or preserve policy."
+      },
+      "visual_targets": [
+        "visual.dsa.queue-window",
+        "visual.queue.state",
+        "visual.queue.reduce_complete"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 10: reduce_complete",
+          "en": "Step 10: reduce_complete"
+        },
+        "action_description": {
+          "vi": "Queue phải rỗng hay được giữ nguyên sau reduce?",
+          "en": "Should the queue be empty or preserved after reduction?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.queue.queue-inspect.boundary.pilot-v1.event-010.focus",
+        "focus_order": 9,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Hậu trạng thái được kiểm theo policy consume hoặc preserve.",
+            "en": "The post-state is checked against the consume or preserve policy."
+          }
+        }
+      }
+    },
+    {
       "event_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.failure.pilot-v1.event-001",
       "trace_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.failure.pilot-v1",
       "sequence": 0,
@@ -1611,16 +2361,38 @@
         "queue.v1.L007",
         "queue.v1.L008",
         "queue.v1.L009",
-        "queue.v1.L049",
-        "queue.v1.L050",
         "queue.v1.L051",
-        "queue.v1.L052"
+        "queue.v1.L052",
+        "queue.v1.L062",
+        "queue.v1.L095",
+        "queue.v1.L096",
+        "queue.v1.L106",
+        "queue.v1.L098",
+        "queue.v1.L099",
+        "queue.v1.L100",
+        "queue.v1.L101",
+        "queue.v1.L102",
+        "queue.v1.L103",
+        "queue.v1.L064",
+        "queue.v1.L065",
+        "queue.v1.L066",
+        "queue.v1.L067",
+        "queue.v1.L068",
+        "queue.v1.L069",
+        "queue.v1.L104",
+        "queue.v1.L105",
+        "queue.v1.L070",
+        "queue.v1.L071",
+        "queue.v1.L072",
+        "queue.v1.L073"
       ],
       "before": {
         "fixture_ref": "queue.failure",
         "fixture_input": {
           "capacity": 0,
-          "operations": []
+          "operations": [],
+          "reduce_values": [],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 0,
         "last_event": null,
@@ -1630,7 +2402,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -1644,7 +2418,9 @@
         "fixture_ref": "queue.failure",
         "fixture_input": {
           "capacity": 0,
-          "operations": []
+          "operations": [],
+          "reduce_values": [],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 1,
         "last_event": "reject_invalid_capacity",
@@ -1655,6 +2431,8 @@
           "rear": 0,
           "count": 0,
           "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume",
           "status": "INVALID_CAPACITY"
         }
       },
@@ -1717,7 +2495,8 @@
       "event_type": "compare",
       "active_line_ids": [
         "queue.v1.L017",
-        "queue.v1.L018"
+        "queue.v1.L018",
+        "queue.v1.L019"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -1743,7 +2522,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 0,
         "last_event": null,
@@ -1757,7 +2542,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -1792,7 +2579,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 1,
         "last_event": "check_full",
@@ -1806,7 +2599,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -1868,8 +2663,7 @@
         "queue.v1.L021",
         "queue.v1.L022",
         "queue.v1.L023",
-        "queue.v1.L024",
-        "queue.v1.L025"
+        "queue.v1.L024"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -1895,7 +2689,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 1,
         "last_event": "check_full",
@@ -1909,7 +2709,9 @@
           "front": 0,
           "rear": 0,
           "count": 0,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -1944,7 +2746,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 2,
         "last_event": "enqueue",
@@ -1958,7 +2766,9 @@
           "front": 0,
           "rear": 1,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -2017,7 +2827,8 @@
       "event_type": "compare",
       "active_line_ids": [
         "queue.v1.L017",
-        "queue.v1.L018"
+        "queue.v1.L018",
+        "queue.v1.L019"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -2043,7 +2854,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 2,
         "last_event": "enqueue",
@@ -2057,7 +2874,9 @@
           "front": 0,
           "rear": 1,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -2092,7 +2911,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 3,
         "last_event": "check_full",
@@ -2106,7 +2931,9 @@
           "front": 0,
           "rear": 1,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -2168,8 +2995,7 @@
         "queue.v1.L021",
         "queue.v1.L022",
         "queue.v1.L023",
-        "queue.v1.L024",
-        "queue.v1.L025"
+        "queue.v1.L024"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -2195,7 +3021,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 3,
         "last_event": "check_full",
@@ -2209,7 +3041,9 @@
           "front": 0,
           "rear": 1,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -2244,7 +3078,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 4,
         "last_event": "enqueue",
@@ -2258,7 +3098,9 @@
           "front": 0,
           "rear": 2,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -2317,7 +3159,8 @@
       "event_type": "compare",
       "active_line_ids": [
         "queue.v1.L028",
-        "queue.v1.L029"
+        "queue.v1.L029",
+        "queue.v1.L030"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -2343,7 +3186,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 4,
         "last_event": "enqueue",
@@ -2357,7 +3206,9 @@
           "front": 0,
           "rear": 2,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -2391,7 +3242,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 5,
         "last_event": "check_empty",
@@ -2405,7 +3262,9 @@
           "front": 0,
           "rear": 2,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -2467,8 +3326,7 @@
         "queue.v1.L033",
         "queue.v1.L034",
         "queue.v1.L035",
-        "queue.v1.L036",
-        "queue.v1.L037"
+        "queue.v1.L036"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -2494,7 +3352,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 5,
         "last_event": "check_empty",
@@ -2508,7 +3372,9 @@
           "front": 0,
           "rear": 2,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -2543,7 +3409,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 6,
         "last_event": "dequeue",
@@ -2557,7 +3429,9 @@
           "front": 1,
           "rear": 2,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -2616,7 +3490,8 @@
       "event_type": "compare",
       "active_line_ids": [
         "queue.v1.L017",
-        "queue.v1.L018"
+        "queue.v1.L018",
+        "queue.v1.L019"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -2642,7 +3517,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 6,
         "last_event": "dequeue",
@@ -2656,7 +3537,9 @@
           "front": 1,
           "rear": 2,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -2691,7 +3574,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 7,
         "last_event": "check_full",
@@ -2705,7 +3594,9 @@
           "front": 1,
           "rear": 2,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -2767,8 +3658,7 @@
         "queue.v1.L021",
         "queue.v1.L022",
         "queue.v1.L023",
-        "queue.v1.L024",
-        "queue.v1.L025"
+        "queue.v1.L024"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -2794,7 +3684,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 7,
         "last_event": "check_full",
@@ -2808,7 +3704,9 @@
           "front": 1,
           "rear": 2,
           "count": 1,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -2843,7 +3741,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 8,
         "last_event": "enqueue",
@@ -2857,7 +3761,9 @@
           "front": 1,
           "rear": 0,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -2916,7 +3822,8 @@
       "event_type": "compare",
       "active_line_ids": [
         "queue.v1.L017",
-        "queue.v1.L018"
+        "queue.v1.L018",
+        "queue.v1.L019"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -2942,7 +3849,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 8,
         "last_event": "enqueue",
@@ -2956,7 +3869,9 @@
           "front": 1,
           "rear": 0,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -2991,7 +3906,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 9,
         "last_event": "check_full",
@@ -3005,7 +3926,9 @@
           "front": 1,
           "rear": 0,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -3067,8 +3990,7 @@
         "queue.v1.L021",
         "queue.v1.L022",
         "queue.v1.L023",
-        "queue.v1.L024",
-        "queue.v1.L025"
+        "queue.v1.L024"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -3094,7 +4016,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 9,
         "last_event": "check_full",
@@ -3108,7 +4036,9 @@
           "front": 1,
           "rear": 0,
           "count": 2,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -3143,7 +4073,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 10,
         "last_event": "enqueue",
@@ -3157,7 +4093,9 @@
           "front": 1,
           "rear": 1,
           "count": 3,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -3219,20 +4157,7 @@
         "queue.v1.L040",
         "queue.v1.L041",
         "queue.v1.L042",
-        "queue.v1.L043",
-        "queue.v1.L044",
-        "queue.v1.L062",
-        "queue.v1.L063",
-        "queue.v1.L064",
-        "queue.v1.L065",
-        "queue.v1.L066",
-        "queue.v1.L067",
-        "queue.v1.L068",
-        "queue.v1.L069",
-        "queue.v1.L070",
-        "queue.v1.L071",
-        "queue.v1.L072",
-        "queue.v1.L073"
+        "queue.v1.L043"
       ],
       "before": {
         "fixture_ref": "queue.normal",
@@ -3258,7 +4183,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 10,
         "last_event": "enqueue",
@@ -3272,7 +4203,9 @@
           "front": 1,
           "rear": 1,
           "count": 3,
-          "live": []
+          "live": [],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "delta": {
@@ -3310,7 +4243,13 @@
               "enqueue",
               40
             ]
-          ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
         },
         "trace_cursor": 11,
         "last_event": "inspect",
@@ -3329,7 +4268,8 @@
             30,
             40
           ],
-          "status": "OK"
+          "reduce_total": 0,
+          "reduce_mode": "consume"
         }
       },
       "output_delta": {
@@ -3340,27 +4280,6 @@
             30,
             40
           ]
-        },
-        "final_result": {
-          "count": 3,
-          "front": 1,
-          "live": [
-            20,
-            30,
-            40
-          ],
-          "numeric_total": 90,
-          "operation_results": [
-            true,
-            true,
-            true,
-            true
-          ],
-          "rear": 1,
-          "removed": [
-            10
-          ],
-          "status": "OK"
         }
       },
       "invariant_or_criterion": {
@@ -3401,6 +4320,766 @@
           "message": {
             "vi": "Duyệt từ front khôi phục đúng thứ tự FIFO dù mảng đã quay vòng.",
             "en": "Walking from front reconstructs FIFO order after wraparound."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-012",
+      "trace_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1",
+      "sequence": 11,
+      "event_type": "advance",
+      "active_line_ids": [
+        "queue.v1.L081",
+        "queue.v1.L082",
+        "queue.v1.L083",
+        "queue.v1.L084",
+        "queue.v1.L085",
+        "queue.v1.L086",
+        "queue.v1.L087",
+        "queue.v1.L088",
+        "queue.v1.L089",
+        "queue.v1.L090"
+      ],
+      "before": {
+        "fixture_ref": "queue.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
+        },
+        "trace_cursor": 11,
+        "last_event": "inspect",
+        "domain": {
+          "capacity": 3,
+          "items": [
+            40,
+            20,
+            30
+          ],
+          "front": 1,
+          "rear": 1,
+          "count": 3,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "reduce_total": 0,
+          "reduce_mode": "consume"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reduce_item",
+          "item": 20,
+          "total": 20
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "queue.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
+        },
+        "trace_cursor": 12,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 3,
+          "items": [
+            40,
+            20,
+            30
+          ],
+          "front": 1,
+          "rear": 1,
+          "count": 3,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "reduce_total": 20,
+          "reduce_mode": "consume"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reduce_item",
+          "item": 20,
+          "total": 20
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "front, rear và count xác định vùng phần tử đang sống như thế nào? QUEUE_INSPECT: sự kiện reduce_item phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How do front, rear, and count define the live queue window? QUEUE_INSPECT: event reduce_item must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+        "en": "Which item is removed next, and how does the accumulator change?"
+      },
+      "feedback": {
+        "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+        "en": "The reduction processes one FIFO item and updates the total."
+      },
+      "visual_targets": [
+        "visual.dsa.queue-window",
+        "visual.queue.state",
+        "visual.queue.reduce_item"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 12: reduce_item",
+          "en": "Step 12: reduce_item"
+        },
+        "action_description": {
+          "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+          "en": "Which item is removed next, and how does the accumulator change?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-012.focus",
+        "focus_order": 11,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+            "en": "The reduction processes one FIFO item and updates the total."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-013",
+      "trace_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1",
+      "sequence": 12,
+      "event_type": "advance",
+      "active_line_ids": [
+        "queue.v1.L081",
+        "queue.v1.L082",
+        "queue.v1.L083",
+        "queue.v1.L084",
+        "queue.v1.L085",
+        "queue.v1.L086",
+        "queue.v1.L087",
+        "queue.v1.L088",
+        "queue.v1.L089",
+        "queue.v1.L090"
+      ],
+      "before": {
+        "fixture_ref": "queue.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
+        },
+        "trace_cursor": 12,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 3,
+          "items": [
+            40,
+            20,
+            30
+          ],
+          "front": 1,
+          "rear": 1,
+          "count": 3,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "reduce_total": 20,
+          "reduce_mode": "consume"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reduce_item",
+          "item": 30,
+          "total": 50
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "queue.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
+        },
+        "trace_cursor": 13,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 3,
+          "items": [
+            40,
+            20,
+            30
+          ],
+          "front": 1,
+          "rear": 1,
+          "count": 3,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "reduce_total": 50,
+          "reduce_mode": "consume"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reduce_item",
+          "item": 30,
+          "total": 50
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "front, rear và count xác định vùng phần tử đang sống như thế nào? QUEUE_INSPECT: sự kiện reduce_item phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How do front, rear, and count define the live queue window? QUEUE_INSPECT: event reduce_item must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+        "en": "Which item is removed next, and how does the accumulator change?"
+      },
+      "feedback": {
+        "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+        "en": "The reduction processes one FIFO item and updates the total."
+      },
+      "visual_targets": [
+        "visual.dsa.queue-window",
+        "visual.queue.state",
+        "visual.queue.reduce_item"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 13: reduce_item",
+          "en": "Step 13: reduce_item"
+        },
+        "action_description": {
+          "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+          "en": "Which item is removed next, and how does the accumulator change?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-013.focus",
+        "focus_order": 12,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+            "en": "The reduction processes one FIFO item and updates the total."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-014",
+      "trace_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1",
+      "sequence": 13,
+      "event_type": "advance",
+      "active_line_ids": [
+        "queue.v1.L081",
+        "queue.v1.L082",
+        "queue.v1.L083",
+        "queue.v1.L084",
+        "queue.v1.L085",
+        "queue.v1.L086",
+        "queue.v1.L087",
+        "queue.v1.L088",
+        "queue.v1.L089",
+        "queue.v1.L090"
+      ],
+      "before": {
+        "fixture_ref": "queue.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
+        },
+        "trace_cursor": 13,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 3,
+          "items": [
+            40,
+            20,
+            30
+          ],
+          "front": 1,
+          "rear": 1,
+          "count": 3,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "reduce_total": 50,
+          "reduce_mode": "consume"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reduce_item",
+          "item": 40,
+          "total": 90
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "queue.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
+        },
+        "trace_cursor": 14,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 3,
+          "items": [
+            40,
+            20,
+            30
+          ],
+          "front": 1,
+          "rear": 1,
+          "count": 3,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "reduce_total": 90,
+          "reduce_mode": "consume"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reduce_item",
+          "item": 40,
+          "total": 90
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "front, rear và count xác định vùng phần tử đang sống như thế nào? QUEUE_INSPECT: sự kiện reduce_item phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How do front, rear, and count define the live queue window? QUEUE_INSPECT: event reduce_item must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+        "en": "Which item is removed next, and how does the accumulator change?"
+      },
+      "feedback": {
+        "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+        "en": "The reduction processes one FIFO item and updates the total."
+      },
+      "visual_targets": [
+        "visual.dsa.queue-window",
+        "visual.queue.state",
+        "visual.queue.reduce_item"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 14: reduce_item",
+          "en": "Step 14: reduce_item"
+        },
+        "action_description": {
+          "vi": "Item nào được lấy tiếp và accumulator đổi ra sao?",
+          "en": "Which item is removed next, and how does the accumulator change?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-014.focus",
+        "focus_order": 13,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Reduce xử lý đúng một phần tử FIFO rồi cập nhật tổng.",
+            "en": "The reduction processes one FIFO item and updates the total."
+          }
+        }
+      }
+    },
+    {
+      "event_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-015",
+      "trace_id": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1",
+      "sequence": 14,
+      "event_type": "emit",
+      "active_line_ids": [
+        "queue.v1.L091",
+        "queue.v1.L092",
+        "queue.v1.L051",
+        "queue.v1.L052",
+        "queue.v1.L062",
+        "queue.v1.L095",
+        "queue.v1.L096",
+        "queue.v1.L106",
+        "queue.v1.L098",
+        "queue.v1.L099",
+        "queue.v1.L100",
+        "queue.v1.L101",
+        "queue.v1.L102",
+        "queue.v1.L103",
+        "queue.v1.L064",
+        "queue.v1.L065",
+        "queue.v1.L066",
+        "queue.v1.L067",
+        "queue.v1.L068",
+        "queue.v1.L069",
+        "queue.v1.L104",
+        "queue.v1.L105",
+        "queue.v1.L070",
+        "queue.v1.L071",
+        "queue.v1.L072",
+        "queue.v1.L073"
+      ],
+      "before": {
+        "fixture_ref": "queue.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
+        },
+        "trace_cursor": 14,
+        "last_event": "reduce_item",
+        "domain": {
+          "capacity": 3,
+          "items": [
+            40,
+            20,
+            30
+          ],
+          "front": 1,
+          "rear": 1,
+          "count": 3,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "reduce_total": 90,
+          "reduce_mode": "consume"
+        }
+      },
+      "delta": {
+        "execution_trace_event": {
+          "event": "reduce_complete",
+          "mode": "consume",
+          "total": 90
+        },
+        "pattern_focus": false
+      },
+      "after": {
+        "fixture_ref": "queue.normal",
+        "fixture_input": {
+          "capacity": 3,
+          "operations": [
+            [
+              "enqueue",
+              10
+            ],
+            [
+              "enqueue",
+              20
+            ],
+            [
+              "dequeue"
+            ],
+            [
+              "enqueue",
+              30
+            ],
+            [
+              "enqueue",
+              40
+            ]
+          ],
+          "reduce_values": [
+            20,
+            30,
+            40
+          ],
+          "reduce_mode": "consume"
+        },
+        "trace_cursor": 15,
+        "last_event": "reduce_complete",
+        "domain": {
+          "capacity": 3,
+          "items": [
+            40,
+            20,
+            30
+          ],
+          "front": 1,
+          "rear": 1,
+          "count": 3,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "reduce_total": 90,
+          "reduce_mode": "consume",
+          "status": "OK"
+        }
+      },
+      "output_delta": {
+        "emitted_trace_event": {
+          "event": "reduce_complete",
+          "mode": "consume",
+          "total": 90
+        },
+        "final_result": {
+          "count": 3,
+          "front": 1,
+          "live": [
+            20,
+            30,
+            40
+          ],
+          "numeric_total": 90,
+          "operation_results": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "rear": 1,
+          "reduce_live": [],
+          "reduce_mode": "consume",
+          "removed": [
+            10
+          ],
+          "status": "OK"
+        }
+      },
+      "invariant_or_criterion": {
+        "vi": "front, rear và count xác định vùng phần tử đang sống như thế nào? QUEUE_INSPECT: sự kiện reduce_complete phải khớp trace đã chạy lại độc lập và giữ đúng chuyển trạng thái đang hiển thị.",
+        "en": "How do front, rear, and count define the live queue window? QUEUE_INSPECT: event reduce_complete must match the independently rerun trace and preserve the displayed state transition."
+      },
+      "prediction": {
+        "vi": "Queue phải rỗng hay được giữ nguyên sau reduce?",
+        "en": "Should the queue be empty or preserved after reduction?"
+      },
+      "feedback": {
+        "vi": "Hậu trạng thái được kiểm theo policy consume hoặc preserve.",
+        "en": "The post-state is checked against the consume or preserve policy."
+      },
+      "visual_targets": [
+        "visual.dsa.queue-window",
+        "visual.queue.state",
+        "visual.queue.reduce_complete"
+      ],
+      "accessibility": {
+        "accessible_label": {
+          "vi": "Bước 15: reduce_complete",
+          "en": "Step 15: reduce_complete"
+        },
+        "action_description": {
+          "vi": "Queue phải rỗng hay được giữ nguyên sau reduce?",
+          "en": "Should the queue be empty or preserved after reduction?"
+        },
+        "interaction_role": "step",
+        "keyboard_instruction": {
+          "vi": "Dùng phím mũi tên trái và phải để chuyển bước; nhấn Enter để xem phản hồi của bước đang chọn.",
+          "en": "Use the left and right arrow keys to change step; press Enter to reveal feedback for the selected step."
+        },
+        "focus_target": "ac-9618-p4-2026-python.trace.queue.queue-inspect.normal.pilot-v1.event-015.focus",
+        "focus_order": 14,
+        "live_status": {
+          "mode": "polite",
+          "message": {
+            "vi": "Hậu trạng thái được kiểm theo policy consume hoặc preserve.",
+            "en": "The post-state is checked against the consume or preserve policy."
           }
         }
       }

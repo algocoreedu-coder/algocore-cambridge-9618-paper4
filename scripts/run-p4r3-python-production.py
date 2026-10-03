@@ -26,8 +26,8 @@ ROLE_MARKERS = {
     "testing": {"test-design":"def run_suite", "tracing-debugging":"first_divergence", "repair-enhance":"after = run_suite", "source-contract":"case[\"expected\"]", "capture-provenance":"failed_before_repair"},
     "text-processing": {"character-comparison":"def compare_text", "delimiter-tokenisation":"split(fixture", "typed-routing":"value = int", "run-length":"def run_length_encode"},
     "search-collections": {"linear-find":"if found == -1", "count-all":"sum(value ==", "filter-all":"filtered.append", "group-totals":"groups[record"},
-    "sorting": {"bubble-passes":"def bubble", "insertion-shifts":"def insertion", "ordered-insert":"bounded.insert", "comparator-variants":"wrong ="},
-    "stack": {"representation-conventions":"self.top = -1", "push":"def push", "pop":"def pop", "paired-restoration":"before =", "reduce-operands":"right, left"},
+    "sorting": {"bubble-passes":"def bubble", "insertion-shifts":"def insertion", "ordered-insert":"def ordered_insert", "comparator-variants":"wrong ="},
+    "stack": {"representation-conventions":"self.top = -1", "push":"def push", "pop":"def pop", "paired-restoration":"def pair_stacks", "reduce-operands":"def reduce_operands"},
     "linked-list": {"representation-free-list":"self.head = -1", "traversal":"def traverse", "search":"while node != -1:", "insert":"def insert_head", "remove-recycle":"def remove"},
     "binary-tree": {"representation":"class Node", "ordered-insert":"def insert", "search":"while current is not None", "traversals":"def traverse"},
     "dictionary": {"adt-interface":"class DictionaryADT", "find-insert":"def find", "delete":"def delete", "representation-choice":"self.entries = []", "other-adt-implementation":"frequency[token]"},
@@ -125,7 +125,7 @@ def freeze_lines(slug: str, source_bytes: bytes) -> list[dict]:
 
 
 def assert_p4r9_trace_contract(slug: str, case: dict) -> None:
-    if slug not in {"linked-list", "binary-tree", "sorting"}:
+    if slug not in {"linked-list", "binary-tree", "sorting", "stack"}:
         return
     case_kind = case["case_kind"]
     trace = case["result"]["trace"]
@@ -134,6 +134,7 @@ def assert_p4r9_trace_contract(slug: str, case: dict) -> None:
         "linked-list": {"insert_head", "remove_compare"},
         "binary-tree": {"tree_search_visit"},
         "sorting": {"bubble_complete", "insertion_complete"},
+        "stack": set(),
     }[slug]
     if slug == "linked-list":
         required.add("remove_recycle" if case_kind != "failure" else "insert_reject_full")
@@ -144,7 +145,9 @@ def assert_p4r9_trace_contract(slug: str, case: dict) -> None:
     if slug == "sorting":
         required.add("capacity_reject" if case_kind == "failure" else "ordered_insert")
         if case_kind == "normal":
-            required.update({"bubble_compare", "bubble_swap", "insertion_shift", "insertion_place_key"})
+            required.update({"bubble_compare", "bubble_swap", "insertion_shift", "insertion_place_key", "ordered_insert_shift"})
+    if slug == "stack":
+        required.add("pair_commit" if case_kind == "normal" else "pair_rollback")
     missing = required - event_names
     if missing:
         raise AssertionError(f"{slug}/{case_kind}: missing P4R-9 trace events {sorted(missing)}")

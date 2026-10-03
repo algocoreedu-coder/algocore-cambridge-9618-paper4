@@ -4,9 +4,9 @@
     "en": "An exam workflow from load through evidence-backed formatting.",
     "vi": "Luồng load, validate, process, format và bằng chứng thi."
   },
-  "code_sha256": "c1d8aacf9e6c8de677cde79c8a0c4689a855ccda874c39a6994244656cf35f39",
+  "code_sha256": "254844df1860ad580af50a66d161c466c10f0a3da6b9ea4a244434489333c11c",
   "entry_point": "run(fixture)",
-  "execution_log_sha256": "b06d7b9b552cad48e9b738995c6ed97332cf7432ab5477c0616947f97ca697a0",
+  "execution_log_sha256": "5c645864ecc9d80e62fc253b16775b2ad29ccb35747a0146687ab58d47c6def7",
   "execution_status": "PASS",
   "expected_outputs": [
     {
@@ -114,12 +114,16 @@
             "requirement": "load"
           },
           {
-            "actual": "invalid row",
-            "passed": false,
+            "passed": true,
             "requirement": "validate"
+          },
+          {
+            "actual": "'minimum'",
+            "passed": false,
+            "requirement": "process"
           }
         ],
-        "first_failed_stage": "validate",
+        "first_failed_stage": "process",
         "output": "",
         "selected": [],
         "status": "FAILED",
@@ -129,8 +133,11 @@
             "event": "load"
           },
           {
+            "event": "validate"
+          },
+          {
             "event": "block_downstream",
-            "failed": "validate"
+            "failed": "process"
           }
         ]
       }
@@ -167,11 +174,10 @@
       "case_kind": "failure",
       "fixture_id": "exam-workflow.failure",
       "input": {
-        "minimum": 60,
         "rows": [
           {
-            "name": "Bad",
-            "score": 101
+            "name": "Ada",
+            "score": 90
           }
         ]
       }
@@ -249,106 +255,121 @@
     {
       "line_id": "exam-workflow.production-v1.L014",
       "order": 14,
-      "text": "    try:"
+      "text": "    stage = \"load\""
     },
     {
       "line_id": "exam-workflow.production-v1.L015",
       "order": 15,
-      "text": "        rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})"
+      "text": "    try:"
     },
     {
       "line_id": "exam-workflow.production-v1.L016",
       "order": 16,
-      "text": "        validate(rows); trace.append({\"event\": \"validate\"}); evidence.append({\"requirement\": \"validate\", \"passed\": True})"
+      "text": "        rows = load(fixture[\"rows\"]); trace.append({\"event\": \"load\", \"count\": len(rows)}); evidence.append({\"requirement\": \"load\", \"passed\": True})"
     },
     {
       "line_id": "exam-workflow.production-v1.L017",
       "order": 17,
-      "text": "        selected = process(rows, fixture[\"minimum\"]); trace.append({\"event\": \"process\", \"count\": len(selected)}); evidence.append({\"requirement\": \"process\", \"passed\": True})"
+      "text": "        stage = \"validate\""
     },
     {
       "line_id": "exam-workflow.production-v1.L018",
       "order": 18,
-      "text": "        output = format_output(selected); trace.append({\"event\": \"format\", \"output\": output}); evidence.append({\"requirement\": \"format\", \"passed\": True})"
+      "text": "        validate(rows); trace.append({\"event\": \"validate\"}); evidence.append({\"requirement\": \"validate\", \"passed\": True})"
     },
     {
       "line_id": "exam-workflow.production-v1.L019",
       "order": 19,
-      "text": "        return {\"status\": \"OK\", \"output\": output, \"selected\": selected, \"evidence\": evidence, \"first_failed_stage\": None, \"trace\": trace}"
+      "text": "        stage = \"process\""
     },
     {
       "line_id": "exam-workflow.production-v1.L020",
       "order": 20,
-      "text": "    except (KeyError, TypeError, ValueError) as error:"
+      "text": "        selected = process(rows, fixture[\"minimum\"]); trace.append({\"event\": \"process\", \"count\": len(selected)}); evidence.append({\"requirement\": \"process\", \"passed\": True})"
     },
     {
       "line_id": "exam-workflow.production-v1.L021",
       "order": 21,
-      "text": "        failed = \"load\" if not trace else \"validate\""
+      "text": "        stage = \"format\""
     },
     {
       "line_id": "exam-workflow.production-v1.L022",
       "order": 22,
-      "text": "        evidence.append({\"requirement\": failed, \"passed\": False, \"actual\": str(error)})"
+      "text": "        output = format_output(selected); trace.append({\"event\": \"format\", \"output\": output}); evidence.append({\"requirement\": \"format\", \"passed\": True})"
     },
     {
       "line_id": "exam-workflow.production-v1.L023",
       "order": 23,
-      "text": "        trace.append({\"event\": \"block_downstream\", \"failed\": failed})"
+      "text": "        return {\"status\": \"OK\", \"output\": output, \"selected\": selected, \"evidence\": evidence, \"first_failed_stage\": None, \"trace\": trace}"
     },
     {
       "line_id": "exam-workflow.production-v1.L024",
       "order": 24,
-      "text": "        return {\"status\": \"FAILED\", \"output\": \"\", \"selected\": [], \"evidence\": evidence, \"first_failed_stage\": failed, \"trace\": trace}"
+      "text": "    except (KeyError, TypeError, ValueError) as error:"
     },
     {
       "line_id": "exam-workflow.production-v1.L025",
       "order": 25,
-      "text": ""
+      "text": "        evidence.append({\"requirement\": stage, \"passed\": False, \"actual\": str(error)})"
     },
     {
       "line_id": "exam-workflow.production-v1.L026",
       "order": 26,
-      "text": "if __name__ == \"__main__\":"
+      "text": "        trace.append({\"event\": \"block_downstream\", \"failed\": stage})"
     },
     {
       "line_id": "exam-workflow.production-v1.L027",
       "order": 27,
-      "text": "    import json"
+      "text": "        return {\"status\": \"FAILED\", \"output\": \"\", \"selected\": [], \"evidence\": evidence, \"first_failed_stage\": stage, \"trace\": trace}"
     },
     {
       "line_id": "exam-workflow.production-v1.L028",
       "order": 28,
-      "text": "    import sys"
+      "text": ""
     },
     {
       "line_id": "exam-workflow.production-v1.L029",
       "order": 29,
-      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
+      "text": "if __name__ == \"__main__\":"
     },
     {
       "line_id": "exam-workflow.production-v1.L030",
       "order": 30,
-      "text": "    result = run(fixture)"
+      "text": "    import json"
     },
     {
       "line_id": "exam-workflow.production-v1.L031",
       "order": 31,
-      "text": "    if not result[\"trace\"]:"
+      "text": "    import sys"
     },
     {
       "line_id": "exam-workflow.production-v1.L032",
       "order": 32,
-      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+      "text": "    fixture = json.loads(Path(sys.argv[1]).read_text(encoding=\"utf-8\"))"
     },
     {
       "line_id": "exam-workflow.production-v1.L033",
       "order": 33,
-      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+      "text": "    result = run(fixture)"
     },
     {
       "line_id": "exam-workflow.production-v1.L034",
       "order": 34,
+      "text": "    if not result[\"trace\"]:"
+    },
+    {
+      "line_id": "exam-workflow.production-v1.L035",
+      "order": 35,
+      "text": "        result[\"trace\"].append({\"event\": \"complete_no_steps\"})"
+    },
+    {
+      "line_id": "exam-workflow.production-v1.L036",
+      "order": 36,
+      "text": "    print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")))"
+    },
+    {
+      "line_id": "exam-workflow.production-v1.L037",
+      "order": 37,
       "text": ""
     }
   ],

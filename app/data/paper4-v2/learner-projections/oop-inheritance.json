@@ -1,0 +1,557 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Inheritance and method overriding",
+    "vi": "Kế thừa và ghi đè method"
+  },
+  "exam_family": {
+    "en": "Base classes, subclasses and dispatch",
+    "vi": "Base class, subclass và dispatch"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Read an inheritance relationship, initialise base and subclass state correctly, and accurately trace which overridden method runs for each constructed object.",
+    "vi": "Đọc quan hệ kế thừa, khởi tạo đúng state của base/subclass và trace chính xác method ghi đè nào chạy với từng object đã tạo."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Recognise this question family and extract its contract.",
+      "vi": "Nhận diện dạng câu hỏi và rút ra contract."
+    },
+    {
+      "en": "Explain the governing rule before attempting the task.",
+      "vi": "Giải thích quy tắc chính trước khi làm."
+    },
+    {
+      "en": "Trace a normal path and protect the relevant boundary or failure state.",
+      "vi": "Trace normal path và bảo vệ boundary hoặc failure state liên quan."
+    }
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What is this question asking me to preserve?",
+        "vi": "Câu hỏi yêu cầu tôi giữ điều gì?"
+      },
+      "intro": {
+        "en": "Read an inheritance relationship, initialise base and subclass state correctly, and accurately trace which overridden method runs for each constructed object.",
+        "vi": "Đọc quan hệ kế thừa, khởi tạo đúng state của base/subclass và trace chính xác method ghi đè nào chạy với từng object đã tạo."
+      },
+      "prompt_fragment": {
+        "en": "is-a, superclass, subclass, inherited attribute, override",
+        "vi": "is-a, superclass, subclass, inherited attribute, override"
+      },
+      "cues": [
+        {
+          "en": "is-a, superclass, subclass, inherited attribute, override",
+          "vi": "is-a, superclass, subclass, inherited attribute, override"
+        },
+        {
+          "en": "The subclass has a valid is-a relationship with the base class.",
+          "vi": "Subclass có quan hệ is-a hợp lệ với base class."
+        },
+        {
+          "en": "Construct the object and produce the result of the method selected for its runtime class.",
+          "vi": "Tạo object và cho kết quả method được chọn theo class thực tế của object."
+        }
+      ],
+      "precondition": {
+        "en": "The subclass has a valid is-a relationship with the base class.",
+        "vi": "Subclass có quan hệ is-a hợp lệ với base class."
+      },
+      "output_contract": {
+        "en": "Construct the object and produce the result of the method selected for its runtime class.",
+        "vi": "Tạo object và cho kết quả method được chọn theo class thực tế của object."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu quy tắc"
+      },
+      "student_question": {
+        "en": "What rule controls every correct step?",
+        "vi": "Quy tắc nào kiểm soát mọi bước đúng?"
+      },
+      "mental_model": {
+        "en": "A subclass reuses the base contract and may replace a method while keeping a compatible interface.",
+        "vi": "Subclass tái dùng base contract và có thể thay method nhưng vẫn giữ interface tương thích."
+      },
+      "rules": [
+        {
+          "en": "Initialise inherited state through the base constructor when required.",
+          "vi": "Khởi tạo inherited state qua base constructor khi cần."
+        },
+        {
+          "en": "Keep an overridden method's parameters and return meaning compatible.",
+          "vi": "Giữ parameter và ý nghĩa return của overridden method tương thích."
+        },
+        {
+          "en": "Select the method from the object's actual class.",
+          "vi": "Chọn method theo class thực tế của object."
+        }
+      ],
+      "invariant": {
+        "en": "Every constructed subclass object satisfies both base and subclass state requirements.",
+        "vi": "Mọi subclass object đã tạo thỏa yêu cầu state của cả base và subclass."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Focused exam recipe",
+          "vi": "Khung làm bài trọng tâm"
+        },
+        "lines": [
+          "class Ebook(Book):",
+          "    def __init__(self, title, size_mb):",
+          "        super().__init__(title)",
+          "        self.size_mb = size_mb",
+          "    def describe(self): return 'digital'"
+        ],
+        "contract_note": {
+          "en": "Use this as a small teaching excerpt; adapt names and exact behaviour to the question contract.",
+          "vi": "Dùng đây như đoạn hướng dẫn ngắn; điều chỉnh tên và hành vi theo đúng contract của đề."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "Which constructor sets each field, and which implementation is selected at runtime?",
+        "vi": "Constructor nào đặt từng field và implementation nào được chọn lúc runtime?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Construct Ebook then dispatch describe()",
+          "vi": "Construct Ebook rồi dispatch describe()"
+        },
+        "instruction": {
+          "en": "Predict base initialisation, subclass state and overridden result before reveal.",
+          "vi": "Dự đoán base initialisation, subclass state và overridden result trước khi mở."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "class Ebook(Book):",
+            "super().__init__(title)"
+          ],
+          "prediction": {
+            "en": "When Ebook('Trees', 4) is constructed, which assignment happens through super()?",
+            "vi": "Khi construct Ebook('Trees', 4), assignment nào xảy ra qua super()?"
+          },
+          "answer": {
+            "en": "Book.__init__ runs first and assigns the inherited title state to 'Trees'.",
+            "vi": "Book.__init__ chạy trước và gán state title kế thừa thành 'Trees'."
+          }
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "self.size_mb = size_mb"
+          ],
+          "prediction": {
+            "en": "What subclass-specific state is assigned after the base constructor?",
+            "vi": "State riêng của subclass nào được gán sau base constructor?"
+          },
+          "answer": {
+            "en": "Ebook.__init__ assigns size_mb = 4 on the same object.",
+            "vi": "Ebook.__init__ gán size_mb = 4 trên cùng object."
+          }
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "def describe(self): return 'digital'"
+          ],
+          "prediction": {
+            "en": "If a Book reference refers to this Ebook, which describe() result is returned?",
+            "vi": "Nếu Book reference trỏ tới Ebook này, describe() trả result nào?"
+          },
+          "answer": {
+            "en": "Dynamic dispatch selects Ebook.describe(), so the result is 'digital'.",
+            "vi": "Dynamic dispatch chọn Ebook.describe() nên result là 'digital'."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "Every constructed subclass object satisfies both base and subclass state requirements.",
+        "vi": "Mọi subclass object đã tạo thỏa yêu cầu state của cả base và subclass."
+      },
+      "variants": [
+        {
+          "kind": "normal_base_object",
+          "input": {
+            "class": "Book",
+            "title": "Trees"
+          },
+          "expected": {
+            "describe": "book"
+          },
+          "explanation": {
+            "en": "A Book instance uses the base implementation because it is not an Ebook.",
+            "vi": "Book instance dùng base implementation vì nó không phải Ebook."
+          },
+          "question": {
+            "en": "A plain Book object calls describe(). Which implementation runs?",
+            "vi": "Book object thường gọi describe(). Implementation nào chạy?"
+          },
+          "options": [
+            {
+              "id": "base-book",
+              "label": {
+                "en": "Book.describe returns 'book'",
+                "vi": "Book.describe trả 'book'"
+              }
+            },
+            {
+              "id": "ebook-digital",
+              "label": {
+                "en": "Ebook.describe returns 'digital'",
+                "vi": "Ebook.describe trả 'digital'"
+              }
+            }
+          ],
+          "correct_option_id": "base-book",
+          "retry_hint": {
+            "en": "Dispatch follows the runtime class of this object.",
+            "vi": "Dispatch theo runtime class của object này."
+          },
+          "correct_feedback": {
+            "en": "The runtime object is Book, so the base implementation returns 'book'.",
+            "vi": "Runtime object là Book nên base implementation trả 'book'."
+          },
+          "misconception_feedback": {
+            "en": "An override affects subclass instances; it does not replace behavior of existing base-class objects.",
+            "vi": "Override tác động subclass instance; không thay behavior của base-class object."
+          }
+        },
+        {
+          "kind": "design_not_is_a",
+          "input": {
+            "candidate": "Library inherits Book"
+          },
+          "expected": {
+            "valid": false,
+            "repair": "Library aggregates Book"
+          },
+          "explanation": {
+            "en": "Inheritance requires an is-a relationship; Library has Books instead.",
+            "vi": "Inheritance cần relationship is-a; Library có Books thay vì là Book."
+          },
+          "question": {
+            "en": "Which design matches 'a Library has many Books'?",
+            "vi": "Design nào khớp 'Library có nhiều Books'?"
+          },
+          "options": [
+            {
+              "id": "aggregate-books",
+              "label": {
+                "en": "Library contains/aggregates Book objects",
+                "vi": "Library contain/aggregate Book objects"
+              }
+            },
+            {
+              "id": "inherit-book",
+              "label": {
+                "en": "Library inherits from Book",
+                "vi": "Library kế thừa Book"
+              }
+            }
+          ],
+          "correct_option_id": "aggregate-books",
+          "retry_hint": {
+            "en": "Test the sentence 'Library is a Book' before choosing inheritance.",
+            "vi": "Thử câu 'Library là Book' trước khi chọn inheritance."
+          },
+          "correct_feedback": {
+            "en": "Library is not a kind of Book, so aggregation models the has-a relationship.",
+            "vi": "Library không phải một loại Book nên aggregation mô hình has-a relationship."
+          },
+          "misconception_feedback": {
+            "en": "Reusing attributes is not enough reason for inheritance; the semantic is-a relation must hold.",
+            "vi": "Tái dùng attribute không đủ để inheritance; semantic is-a phải đúng."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I solve the same contract with less support?",
+        "vi": "Tôi có thể giải cùng contract với ít hỗ trợ hơn không?"
+      },
+      "attempt_rule": {
+        "en": "Attempt the task before opening the hint or model answer.",
+        "vi": "Làm thử trước khi mở hint hoặc model answer."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Follow constructor order",
+            "vi": "Với Ebook('Trees', 4), liệt kê assignment của base và subclass theo thứ tự"
+          },
+          "prompt": {
+            "en": "For Ebook('Trees', 4), list the base and subclass assignments in order.",
+            "vi": "Với Ebook('Trees', 4), liệt kê assignment của base và subclass theo thứ tự."
+          },
+          "hint": {
+            "en": "Follow constructor calls in execution order: subclass entry, super(), then subclass assignment.",
+            "vi": "Theo constructor call theo execution order: vào subclass, super(), rồi subclass assignment."
+          },
+          "model_answer": {
+            "en": "The base constructor assigns title; then the subclass assigns size_mb.",
+            "vi": "Base constructor gán title; sau đó subclass gán size_mb."
+          },
+          "success_check": {
+            "en": "The base title assignment precedes the subclass size_mb assignment.",
+            "vi": "Base title assignment đứng trước subclass size_mb assignment."
+          }
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm hỗ trợ"
+          },
+          "title": {
+            "en": "Choose the overridden method",
+            "vi": "Book"
+          },
+          "prompt": {
+            "en": "Book.describe returns 'book'; Ebook.describe returns 'digital'. What does an Ebook object return?",
+            "vi": "Book.describe trả 'book'; Ebook.describe trả 'digital'. Object Ebook trả gì?"
+          },
+          "hint": {
+            "en": "Use the runtime object type, not the variable annotation, to choose the override.",
+            "vi": "Dùng runtime object type, không dùng variable annotation, để chọn override."
+          },
+          "model_answer": {
+            "en": "It returns 'digital' because dispatch uses the Ebook override.",
+            "vi": "Nó trả 'digital' vì dispatch dùng override của Ebook."
+          },
+          "success_check": {
+            "en": "The Ebook object returns 'digital' through the override.",
+            "vi": "Ebook object trả 'digital' qua override."
+          }
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Độc lập"
+          },
+          "title": {
+            "en": "Test the is-a claim",
+            "vi": "Quyết định Library nên kế thừa Book hay chứa các Book object, rồi giải thích"
+          },
+          "prompt": {
+            "en": "Decide whether Library should inherit from Book or contain Book objects, and justify the choice.",
+            "vi": "Quyết định Library nên kế thừa Book hay chứa các Book object, rồi giải thích."
+          },
+          "hint": {
+            "en": "Test the sentence 'Library is a Book'; if false, prefer containment.",
+            "vi": "Thử câu 'Library là Book'; nếu sai, chọn containment."
+          },
+          "model_answer": {
+            "en": "Library is not a kind of Book; it should contain or aggregate Book objects.",
+            "vi": "Library không phải một loại Book; nó nên chứa hoặc aggregate các Book object."
+          },
+          "success_check": {
+            "en": "The answer rejects inheritance and selects aggregation because the relationship is has-a.",
+            "vi": "Đáp án reject inheritance và chọn aggregation vì relationship là has-a."
+          }
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which mistake would break the contract first?",
+        "vi": "Lỗi nào phá contract đầu tiên?"
+      },
+      "before_code": [
+        {
+          "en": "The subclass has a valid is-a relationship with the base class.",
+          "vi": "Subclass có quan hệ is-a hợp lệ với base class."
+        },
+        {
+          "en": "Construct the object and produce the result of the method selected for its runtime class.",
+          "vi": "Tạo object và cho kết quả method được chọn theo class thực tế của object."
+        }
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Coding before fixing the input, output and stopping contract.",
+            "vi": "Viết code trước khi chốt input, output và stopping contract."
+          },
+          "consequence": {
+            "en": "A plausible algorithm can answer a different question.",
+            "vi": "Thuật toán nhìn hợp lý nhưng có thể trả lời câu hỏi khác."
+          },
+          "repair": {
+            "en": "Write the contract in one sentence before the first code line.",
+            "vi": "Viết contract thành một câu trước dòng code đầu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Changing state before checking the relevant boundary.",
+            "vi": "Đổi state trước khi kiểm tra boundary liên quan."
+          },
+          "consequence": {
+            "en": "Rejected input can corrupt a previously valid structure.",
+            "vi": "Input bị từ chối vẫn có thể làm hỏng structure đang hợp lệ."
+          },
+          "repair": {
+            "en": "Place the guard before mutation and trace the rejected path.",
+            "vi": "Đặt guard trước mutation và trace path bị từ chối."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Stopping after one normal example.",
+            "vi": "Dừng sau một ví dụ normal."
+          },
+          "consequence": {
+            "en": "A boundary or failure path remains untested.",
+            "vi": "Boundary hoặc failure path chưa được kiểm tra."
+          },
+          "repair": {
+            "en": "Check one normal, one boundary and one relevant failure case.",
+            "vi": "Kiểm tra một normal, một boundary và một failure phù hợp."
+          }
+        }
+      ],
+      "core_code_caption": {
+        "en": "Compact method reminder",
+        "vi": "Nhắc phương pháp ngắn"
+      },
+      "core_code": [
+        "class Ebook(Book):",
+        "    def __init__(self, title, size_mb):",
+        "        super().__init__(title)",
+        "        self.size_mb = size_mb",
+        "    def describe(self): return 'digital'"
+      ],
+      "boundary_trace": [
+        {
+          "en": "The subclass has a valid is-a relationship with the base class.",
+          "vi": "Subclass có quan hệ is-a hợp lệ với base class."
+        },
+        {
+          "en": "Every constructed subclass object satisfies both base and subclass state requirements.",
+          "vi": "Mọi subclass object đã tạo thỏa yêu cầu state của cả base và subclass."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Construct the object and produce the result of the method selected for its runtime class.",
+          "vi": "Tạo object và cho kết quả method được chọn theo class thực tế của object."
+        },
+        {
+          "en": "Every constructed subclass object satisfies both base and subclass state requirements.",
+          "vi": "Mọi subclass object đã tạo thỏa yêu cầu state của cả base và subclass."
+        }
+      ],
+      "authority_note": {
+        "en": "The worked method is AlgoCore teacher-authored guidance grounded in the course sources; follow the exact contract in each examination question.",
+        "vi": "Phương pháp là hướng dẫn do giáo viên AlgoCore biên soạn từ nguồn khóa học; luôn theo đúng contract của từng câu hỏi thi."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the method without the worked example?",
+        "vi": "Tôi có thể tự dựng lại phương pháp khi không nhìn ví dụ không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "State the precondition.",
+            "vi": "Nêu precondition."
+          },
+          "answer": {
+            "en": "The subclass has a valid is-a relationship with the base class.",
+            "vi": "Subclass có quan hệ is-a hợp lệ với base class."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the invariant or rule.",
+            "vi": "Nêu invariant hoặc rule."
+          },
+          "answer": {
+            "en": "Every constructed subclass object satisfies both base and subclass state requirements.",
+            "vi": "Mọi subclass object đã tạo thỏa yêu cầu state của cả base và subclass."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the required output.",
+            "vi": "Nêu output cần có."
+          },
+          "answer": {
+            "en": "Construct the object and produce the result of the method selected for its runtime class.",
+            "vi": "Tạo object và cho kết quả method được chọn theo class thực tế của object."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "Solve the independent task again from memory, then compare only after recording your result.",
+        "vi": "Làm lại independent task từ trí nhớ, rồi chỉ so đáp án sau khi đã ghi kết quả."
+      },
+      "next_step": {
+        "en": "Continue when you can explain the contract and trace the first boundary without help.",
+        "vi": "Học tiếp khi bạn có thể giải thích contract và trace boundary đầu tiên mà không cần trợ giúp."
+      }
+    }
+  },
+  "display_contract": {
+    "default_stage": "Recognise",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    },
+    "primary_code_limit": {
+      "en": "Show only the focused recipe or current lines.",
+      "vi": "Chỉ hiển thị khung code hoặc dòng đang tập trung."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ]
+}

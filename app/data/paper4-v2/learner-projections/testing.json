@@ -1,0 +1,250 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {"en": "Testing and evidence", "vi": "Kiểm thử và bằng chứng"},
+  "exam_family": {
+    "en": "Normal, boundary and invalid tests with expected-versus-actual evidence",
+    "vi": "Test normal, boundary và invalid bằng expected so với actual"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Choose tests from the specification, write expected results first, identify the first mismatch, and rerun the relevant suite after a repair.",
+    "vi": "Chọn test từ đặc tả, viết expected trước, xác định mismatch đầu tiên và chạy lại suite liên quan sau khi sửa."
+  },
+  "learner_outcomes": [
+    {"en": "Distinguish normal, exact-boundary and invalid test data.", "vi": "Phân biệt test data normal, exact-boundary và invalid."},
+    {"en": "Record input, expected, actual and pass/fail for each test.", "vi": "Ghi input, expected, actual và pass/fail cho mỗi test."},
+    {"en": "Use the first mismatch to identify a faulty decision.", "vi": "Dùng mismatch đầu tiên để xác định decision bị lỗi."},
+    {"en": "Rerun the same relevant cases and preserve separate evidence for required outcomes.", "vi": "Chạy lại cùng các case liên quan và giữ bằng chứng riêng cho các outcome bắt buộc."}
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one compact test table with one active row",
+    "trace_rule": "one row or repair decision and no more than three focused lines per step",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "evidence_rule": "show input, expected and actual together without audit metadata",
+    "reveal_policy": {"en": "Prediction or attempt comes before reveal.", "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."}
+  },
+  "stage_order": ["recognise", "understand", "trace", "practise", "protectMarks", "recallAndContinue"],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {"en": "Recognise", "vi": "Nhận diện"},
+      "student_question": {"en": "Which inputs are ordinary, at a decision boundary or invalid?", "vi": "Input nào là thông thường, ở decision boundary hoặc invalid?"},
+      "intro": {
+        "en": "Use this method when a question asks you to test a program, show successful and unsuccessful outcomes, find a fault or check a repair.",
+        "vi": "Dùng phương pháp này khi đề yêu cầu test chương trình, cho thấy outcome thành công và không thành công, tìm lỗi hoặc kiểm tra repair."
+      },
+      "prompt_fragment": {
+        "en": "A grade function returns INVALID outside 0 to 100, PASS from 40 to 100, and RETRY below 40. Test the function and record expected and actual results.",
+        "vi": "Một grade function trả INVALID ngoài 0 đến 100, PASS từ 40 đến 100 và RETRY dưới 40. Hãy test function và ghi expected cùng actual."
+      },
+      "cues": [
+        {"en": "The specification divides inputs into invalid, retry and pass partitions.", "vi": "Đặc tả chia input thành các partition invalid, retry và pass."},
+        {"en": "A boundary test sits on or immediately outside a change point.", "vi": "Boundary test nằm tại hoặc ngay ngoài một change point."},
+        {"en": "Expected output comes from the specification before code runs.", "vi": "Expected output đến từ đặc tả trước khi code chạy."},
+        {"en": "Evidence keeps the input and observed output together for each run.", "vi": "Bằng chứng giữ input và observed output cùng nhau cho mỗi lần chạy."}
+      ],
+      "precondition": {
+        "en": "The valid range and decision thresholds are known, and expected output is written before execution.",
+        "vi": "Khoảng hợp lệ và decision threshold đã biết, và expected output được viết trước khi chạy."
+      },
+      "output_contract": {
+        "en": "Each row records input, expected, actual and pass/fail; the suite passes only when every required row matches.",
+        "vi": "Mỗi row ghi input, expected, actual và pass/fail; suite chỉ pass khi mọi row bắt buộc đều khớp."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {"en": "Understand", "vi": "Hiểu mô hình"},
+      "student_question": {"en": "How does one test row expose a fault?", "vi": "Một test row làm lộ lỗi như thế nào?"},
+      "mental_model": {
+        "en": "Treat each row as a small contract: arrange an input, predict from the specification, run the code, then compare. A mismatch is evidence of a fault; do not rewrite expected to agree with faulty code.",
+        "vi": "Xem mỗi row như một hợp đồng nhỏ: chuẩn bị input, dự đoán từ đặc tả, chạy code rồi so sánh. Mismatch là bằng chứng có lỗi; không đổi expected để khớp code sai."
+      },
+      "rules": [
+        {"en": "Derive expected from the specification, not the current implementation.", "vi": "Suy ra expected từ đặc tả, không từ implementation hiện tại."},
+        {"en": "Include representative normal, exact-boundary and just-outside cases.", "vi": "Bao gồm case normal đại diện, exact-boundary và ngay ngoài khoảng."},
+        {"en": "Investigate the first expected-versus-actual mismatch.", "vi": "Điều tra mismatch expected so với actual đầu tiên."},
+        {"en": "After repair, rerun the same relevant suite before adding tests.", "vi": "Sau repair, chạy lại cùng suite liên quan trước khi thêm test."}
+      ],
+      "invariant": {
+        "en": "The input and expected result of an existing regression row stay fixed when the implementation changes.",
+        "vi": "Input và expected result của regression row hiện có giữ nguyên khi implementation thay đổi."
+      },
+      "python_recipe": {
+        "caption": {"en": "Teaching excerpt: classify and record one test", "vi": "Teaching excerpt: phân loại và ghi một test"},
+        "lines": [
+          "def grade(score):",
+          "    if score < 0 or score > 100:",
+          "        return \"INVALID\"",
+          "    if score >= 40:",
+          "        return \"PASS\"",
+          "    return \"RETRY\"",
+          "def check_case(score, expected):",
+          "    actual = grade(score)",
+          "    return actual, actual == expected"
+        ],
+        "contract_note": {
+          "en": "This AlgoCore excerpt shows the repaired threshold contract. The learner evidence view is a static test table, not a borrowed public trace.",
+          "vi": "AlgoCore excerpt này cho thấy threshold contract đã repair. Learner evidence view là test table tĩnh, không phải public trace được mượn."
+        }
+      },
+      "transfer_note": {
+        "label": {"en": "When a question prescribes evidence runs", "vi": "Khi đề chỉ định các evidence run"},
+        "content": {
+          "en": "Run every prescribed outcome and keep separate input/output evidence for each. Two prescribed cases do not by themselves prove a complete test plan.",
+          "vi": "Chạy mọi outcome được chỉ định và giữ bằng chứng input/output riêng cho từng case. Hai case được chỉ định không tự chứng minh một test plan đầy đủ."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {"en": "Trace", "vi": "Trace từng bước"},
+      "student_question": {"en": "Where is the first expected-versus-actual mismatch?", "vi": "Mismatch expected so với actual đầu tiên ở đâu?"},
+      "scenario": {
+        "label": {"en": "Test the exact pass threshold 40", "vi": "Test đúng pass threshold 40"},
+        "input": 40,
+        "expected": "PASS",
+        "defective_condition": "score > 40",
+        "instruction": {"en": "Predict expected from the specification, then trace the defective result and repair.", "vi": "Dự đoán expected từ đặc tả, rồi trace defective result và repair."}
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": ["expected = \"PASS\"", "actual = defective_grade(40)"],
+          "prediction": {"en": "What should the result be, and what does the defective code return?", "vi": "Kết quả phải là gì, và defective code trả gì?"},
+          "answer": {"en": "The specification says PASS, but score > 40 is False at 40, so the defective code returns RETRY. The row fails.", "vi": "Đặc tả nói PASS, nhưng score > 40 là False tại 40 nên defective code trả RETRY. Row này fail."}
+        },
+        {
+          "step": 2,
+          "code_focus": ["if score >= 40:", "    return \"PASS\""],
+          "prediction": {"en": "Which operator change matches the inclusive threshold?", "vi": "Đổi operator nào để khớp threshold tính cả 40?"},
+          "answer": {"en": "Use >= so 40 follows the PASS branch. Keep the outside-range guard before this decision.", "vi": "Dùng >= để 40 đi theo nhánh PASS. Giữ guard ngoài khoảng trước decision này."}
+        },
+        {
+          "step": 3,
+          "code_focus": ["actual = grade(40)", "passed = actual == expected"],
+          "prediction": {"en": "What happens when the unchanged boundary row is rerun?", "vi": "Điều gì xảy ra khi chạy lại boundary row không đổi?"},
+          "answer": {"en": "actual is PASS and matches expected. The row passes, then the remaining normal and invalid rows are rerun.", "vi": "actual là PASS và khớp expected. Row pass, sau đó các row normal và invalid còn lại được chạy lại."}
+        }
+      ],
+      "invariant_check": {
+        "en": "Input 40 and expected PASS stay fixed; only actual changes from RETRY to PASS after repair.",
+        "vi": "Input 40 và expected PASS giữ nguyên; chỉ actual đổi từ RETRY thành PASS sau repair."
+      },
+      "variants": [
+        {
+          "kind": "normal",
+          "input": {"rows": [{"input": 55, "expected": "PASS"}, {"input": 20, "expected": "RETRY"}]},
+          "expected": {"all_pass_after_repair": true},
+          "explanation": {"en": "Representative values inside both valid partitions pass.", "vi": "Các giá trị đại diện trong hai valid partition đều pass."}
+        },
+        {
+          "kind": "failure",
+          "input": {"rows": [{"input": -1, "expected": "INVALID"}, {"input": 101, "expected": "INVALID"}]},
+          "expected": {"all_pass_after_repair": true},
+          "explanation": {"en": "The repaired outside-range guard rejects values just below and above the valid range.", "vi": "Guard ngoài khoảng đã repair từ chối giá trị ngay dưới và trên khoảng hợp lệ."}
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {"en": "Practise", "vi": "Luyện tập"},
+      "student_question": {"en": "Can I design, read and preserve a compact test table?", "vi": "Tôi có thể thiết kế, đọc và giữ một test table gọn không?"},
+      "attempt_rule": {"en": "Write expected before opening actual, hint or model answer.", "vi": "Viết expected trước khi mở actual, hint hoặc model answer."},
+      "items": [
+        {
+          "level": {"en": "Guided", "vi": "Có hướng dẫn"},
+          "title": {"en": "Classify test data", "vi": "Phân loại test data"},
+          "prompt": {"en": "Classify 20, 40, 55, -1 and 101 as normal, exact boundary or invalid.", "vi": "Phân loại 20, 40, 55, -1 và 101 là normal, exact boundary hoặc invalid."},
+          "hint": {"en": "40 is the pass threshold; valid scores are 0 to 100.", "vi": "40 là pass threshold; score hợp lệ là 0 đến 100."},
+          "model_answer": {"en": "20 and 55 are normal; 40 is the exact category boundary; -1 and 101 are invalid just outside the range.", "vi": "20 và 55 là normal; 40 là exact category boundary; -1 và 101 invalid ngay ngoài khoảng."},
+          "success_check": {"en": "Every label comes from a partition in the specification.", "vi": "Mọi label đến từ partition trong đặc tả."}
+        },
+        {
+          "level": {"en": "Guided", "vi": "Có hướng dẫn"},
+          "title": {"en": "Find the first mismatch", "vi": "Tìm mismatch đầu tiên"},
+          "prompt": {"en": "For rows 40→PASS, 0→RETRY, 100→PASS, the defective actuals are RETRY, RETRY, PASS. Which row is investigated first?", "vi": "Với các row 40→PASS, 0→RETRY, 100→PASS, defective actual là RETRY, RETRY, PASS. Điều tra row nào trước?"},
+          "hint": {"en": "Compare in row order and stop at the first mismatch.", "vi": "So sánh theo thứ tự row và dừng tại mismatch đầu tiên."},
+          "model_answer": {"en": "Input 40: expected PASS but actual RETRY. It points to the inclusive pass threshold.", "vi": "Input 40: expected PASS nhưng actual RETRY. Nó chỉ tới pass threshold tính cả 40."},
+          "success_check": {"en": "The answer names input, expected, actual and the likely decision boundary.", "vi": "Câu trả lời nêu input, expected, actual và decision boundary có khả năng sai."}
+        },
+        {
+          "level": {"en": "Faded", "vi": "Giảm gợi ý"},
+          "title": {"en": "Preserve two required runs", "vi": "Giữ hai lần chạy bắt buộc"},
+          "prompt": {"en": "A question requires one found and one not-found search. What evidence should be kept for each run?", "vi": "Đề yêu cầu một search found và một search not-found. Cần giữ bằng chứng gì cho mỗi lần chạy?"},
+          "hint": {"en": "Keep the input and observed output together, and do not merge the outcomes.", "vi": "Giữ input và observed output cùng nhau, và không gộp các outcome."},
+          "model_answer": {"en": "Keep separate input/output evidence for the found run and separate input/output evidence for the not-found run.", "vi": "Giữ bằng chứng input/output riêng cho lần found và bằng chứng input/output riêng cho lần not-found."},
+          "success_check": {"en": "Both required outcomes are identifiable and reproducible.", "vi": "Cả hai outcome bắt buộc đều có thể nhận diện và chạy lại."}
+        },
+        {
+          "level": {"en": "Independent", "vi": "Tự làm"},
+          "title": {"en": "Write a compact regression suite", "vi": "Viết regression suite gọn"},
+          "prompt": {"en": "Choose five scores covering ordinary retry/pass, the 40 threshold and both outside-range sides. Write expected for each.", "vi": "Chọn năm score phủ retry/pass thông thường, threshold 40 và hai phía ngoài khoảng. Viết expected cho từng score."},
+          "hint": {"en": "Choose one below 40, 40, one above 40, -1 and 101.", "vi": "Chọn một giá trị dưới 40, 40, một giá trị trên 40, -1 và 101."},
+          "model_answer": {"en": "For example: 20→RETRY, 40→PASS, 55→PASS, -1→INVALID, 101→INVALID.", "vi": "Ví dụ: 20→RETRY, 40→PASS, 55→PASS, -1→INVALID, 101→INVALID."},
+          "success_check": {"en": "Every input has a reason and an expected result before execution.", "vi": "Mỗi input có lý do và expected result trước khi chạy."}
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {"en": "Protect your marks", "vi": "Tránh mất điểm"},
+      "student_question": {"en": "Which testing mistakes make evidence unreliable?", "vi": "Những lỗi testing nào làm bằng chứng không đáng tin?"},
+      "before_code": [{"en": "Write input, reason and expected output before running the code.", "vi": "Viết input, lý do và expected output trước khi chạy code."}],
+      "core_code_caption": {"en": "Three-line test checkpoint", "vi": "Checkpoint test ba dòng"},
+      "core_code": ["actual = grade(score)", "passed = actual == expected", "record(score, expected, actual, passed)"],
+      "mistakes": [
+        {
+          "mistake": {"en": "Choosing only easy middle values.", "vi": "Chỉ chọn các giá trị giữa dễ test."},
+          "consequence": {"en": "A wrong comparison at a boundary remains hidden.", "vi": "Phép so sánh sai ở boundary không bị phát hiện."},
+          "repair": {"en": "Include exact change points and just-outside invalid values.", "vi": "Bao gồm đúng change point và giá trị invalid ngay ngoài khoảng."}
+        },
+        {
+          "mistake": {"en": "Writing expected after seeing actual.", "vi": "Viết expected sau khi thấy actual."},
+          "consequence": {"en": "A faulty result can be accepted as correct.", "vi": "Kết quả sai có thể bị chấp nhận là đúng."},
+          "repair": {"en": "Record expected from the specification before execution.", "vi": "Ghi expected từ đặc tả trước khi chạy."}
+        },
+        {
+          "mistake": {"en": "Retesting only the row that originally failed.", "vi": "Chỉ retest row đã fail ban đầu."},
+          "consequence": {"en": "The repair may break behaviour that previously passed.", "vi": "Repair có thể làm hỏng hành vi đã pass trước đó."},
+          "repair": {"en": "Rerun the complete relevant suite and compare every row.", "vi": "Chạy lại toàn bộ suite liên quan và so sánh mọi row."}
+        },
+        {
+          "mistake": {"en": "Showing output without the input that produced it.", "vi": "Hiển thị output mà không có input tạo ra nó."},
+          "consequence": {"en": "The evidence cannot prove which case ran.", "vi": "Bằng chứng không chứng minh được case nào đã chạy."},
+          "repair": {"en": "Keep input and observed output together for each required run.", "vi": "Giữ input và observed output cùng nhau cho mỗi lần chạy bắt buộc."}
+        }
+      ],
+      "boundary_trace": [{"en": "At 40, expected PASS exposes > versus >=; -1 and 101 test both invalid sides; every relevant row is rerun.", "vi": "Tại 40, expected PASS làm lộ > so với >=; -1 và 101 test hai phía invalid; mọi row liên quan được chạy lại."}],
+      "final_check": [{"en": "Did I justify each input, write expected first, keep input/output evidence and rerun the relevant suite?", "vi": "Tôi đã giải thích từng input, viết expected trước, giữ bằng chứng input/output và chạy lại suite liên quan chưa?"}],
+      "authority_note": {
+        "en": "Follow the test cases and evidence format required by the question. A prescribed pair of runs does not automatically award credit for a complete test plan.",
+        "vi": "Làm theo test case và format bằng chứng mà đề yêu cầu. Một cặp run được chỉ định không tự tạo credit cho một test plan đầy đủ."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {"en": "Recall and continue", "vi": "Gợi nhớ và học tiếp"},
+      "student_question": {"en": "Can I reconstruct a trustworthy test table from the specification?", "vi": "Tôi có thể dựng lại test table đáng tin từ đặc tả không?"},
+      "recall_items": [
+        {"prompt": {"en": "Where does expected come from?", "vi": "Expected đến từ đâu?"}, "answer": {"en": "From the specification, written before the current code runs.", "vi": "Từ đặc tả, được viết trước khi code hiện tại chạy."}},
+        {"prompt": {"en": "Which input exposes the pass-threshold fault?", "vi": "Input nào làm lộ lỗi pass-threshold?"}, "answer": {"en": "40, because PASS begins inclusively at 40.", "vi": "40, vì PASS bắt đầu và tính cả 40."}},
+        {"prompt": {"en": "Why rerun rows that passed before repair?", "vi": "Vì sao chạy lại các row đã pass trước repair?"}, "answer": {"en": "To check that the change did not break earlier correct behaviour.", "vi": "Để kiểm tra thay đổi không làm hỏng hành vi đúng trước đó."}},
+        {"prompt": {"en": "What must one evidence row show?", "vi": "Một evidence row phải cho thấy gì?"}, "answer": {"en": "Input, expected, actual and whether expected matches actual.", "vi": "Input, expected, actual và việc expected có khớp actual hay không."}},
+        {"prompt": {"en": "What do -1 and 101 test?", "vi": "-1 và 101 test gì?"}, "answer": {"en": "The invalid partitions just below and above the valid range.", "vi": "Các invalid partition ngay dưới và trên khoảng hợp lệ."}}
+      ],
+      "exit_task": {
+        "en": "From memory, write a five-row suite, predict every result, identify the faulty > condition and state what must be rerun after changing it to >=.",
+        "vi": "Từ trí nhớ, viết suite năm row, dự đoán mọi result, xác định điều kiện > bị lỗi và nêu phần phải chạy lại sau khi đổi thành >=."
+      },
+      "next_step": {
+        "en": "Continue to exam workflow, where implementation, prescribed runs and captured evidence are organised for submission.",
+        "vi": "Học tiếp exam workflow, nơi implementation, các lần chạy được chỉ định và bằng chứng được tổ chức để nộp bài."
+      }
+    }
+  }
+}

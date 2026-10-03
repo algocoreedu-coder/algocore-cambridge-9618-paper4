@@ -41,7 +41,7 @@ LESSONS = {
             "en": "Typed records, a capacity-bounded array and deterministic random data.",
         },
         "checks": {
-            "normal": {"status": "ADDED", "append_success": True, "random_average": 77.5},
+            "normal": {"status": "ADDED", "append_success": True, "random_average": 76.5, "random_values": [75, 69, 77, 85]},
             "boundary": {"status": "FULL", "append_success": False, "random_average": None},
             "failure": {"status": "INVALID_RECORD", "append_success": False},
         },
@@ -108,7 +108,7 @@ LESSONS = {
         "checks": {
             "normal": {"status": "UPDATED", "found": {"type": "BOOK", "title": "Algorithms", "pages": 350}},
             "boundary": {"status": "NOT_FOUND", "books": [], "found": None},
-            "failure": {"status": "INVALID_UPDATE", "found": {"type": "BOOK", "title": "Algorithms", "pages": 320}},
+            "failure": {"status": "INVALID_PAGES_AT_LINE_1", "books": []},
         },
     },
 }
@@ -151,6 +151,26 @@ def assert_p4r9_trace_contract(slug: str, case_kind: str, result: dict) -> None:
         if step.get("event") in {"insert_reject_full", "reject_non_integer_key"}:
             if step.get("before") != step.get("after"):
                 raise AssertionError(f"{slug}/{case_kind}: rejected operation mutated valid state")
+
+
+def assert_remediation_trace_contract(slug: str, case_kind: str, result: dict) -> None:
+    events = [step.get("event") for step in result["trace"]]
+    if slug == "data-models":
+        if case_kind != "boundary" and "generate_random_value" not in events:
+            raise AssertionError(f"{slug}/{case_kind}: RANDOM_ARRAY must execute range-controlled generation")
+        values = result["random_values"]
+        if any(value < 1 for value in values):
+            raise AssertionError(f"{slug}/{case_kind}: generated value escaped its fixture contract")
+    if slug == "queue" and case_kind != "failure":
+        if not {"reduce_item", "reduce_complete"}.issubset(events):
+            raise AssertionError(f"{slug}/{case_kind}: QUEUE_REDUCE must consume or preserve via queue operations")
+        if case_kind == "normal" and result["reduce_live"]:
+            raise AssertionError("queue/normal: consuming reduce did not empty the reduction queue")
+        if case_kind == "boundary" and result["reduce_live"] != [5, 6]:
+            raise AssertionError("queue/boundary: preserving reduce changed queue order")
+    if slug == "object-files" and case_kind == "failure":
+        if "construct_object" in events or result["books"]:
+            raise AssertionError("object-files/failure: invalid pages constructed an object")
 
 
 def run_case(source: Path, fixture: Path) -> dict:
@@ -314,6 +334,7 @@ def execute(mode: str) -> None:
             case = run_case(source, source.parent / "fixtures" / f"{case_kind}.json")
             assert_subset(case["result"], meta["checks"][case_kind], f"{slug}/{case_kind}")
             assert_p4r9_trace_contract(slug, case_kind, case["result"])
+            assert_remediation_trace_contract(slug, case_kind, case["result"])
             cases.append(case)
         artifact_path = source.parent / "artifact.json"
         candidate = artifact_for(

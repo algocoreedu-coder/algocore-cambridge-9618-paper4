@@ -1,0 +1,561 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Creating objects from file records",
+    "vi": "Tạo object từ record trong file"
+  },
+  "exam_family": {
+    "en": "Parse, validate and construct objects",
+    "vi": "Parse, validate và tạo object"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Parse each complete file record, validate fields before construction, and build the correct object or subclass without accepting invalid state.",
+    "vi": "Parse từng record hoàn chỉnh, validate field trước khi tạo và dựng đúng object hoặc subclass mà không nhận state sai."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Recognise this question family and extract its contract.",
+      "vi": "Nhận diện dạng câu hỏi và rút ra contract."
+    },
+    {
+      "en": "Explain the governing rule before attempting the task.",
+      "vi": "Giải thích quy tắc chính trước khi làm."
+    },
+    {
+      "en": "Trace a normal path and protect the relevant boundary or failure state.",
+      "vi": "Trace normal path và bảo vệ boundary hoặc failure state liên quan."
+    }
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What is this question asking me to preserve?",
+        "vi": "Câu hỏi yêu cầu tôi giữ điều gì?"
+      },
+      "intro": {
+        "en": "Parse each complete file record, validate fields before construction, and build the correct object or subclass without accepting invalid state.",
+        "vi": "Parse từng record hoàn chỉnh, validate field trước khi tạo và dựng đúng object hoặc subclass mà không nhận state sai."
+      },
+      "prompt_fragment": {
+        "en": "record fields, object construction, subclass tag, lookup, update",
+        "vi": "record field, tạo object, subclass tag, lookup, update"
+      },
+      "cues": [
+        {
+          "en": "record fields, object construction, subclass tag, lookup, update",
+          "vi": "record field, tạo object, subclass tag, lookup, update"
+        },
+        {
+          "en": "The delimiter, field order, type rules and class tag values are known.",
+          "vi": "Đã biết delimiter, thứ tự field, type rule và class tag."
+        },
+        {
+          "en": "Create one valid object per accepted record and report or skip malformed records as specified.",
+          "vi": "Tạo một object hợp lệ cho mỗi record được nhận và báo hoặc bỏ record lỗi theo đề."
+        }
+      ],
+      "precondition": {
+        "en": "The delimiter, field order, type rules and class tag values are known.",
+        "vi": "Đã biết delimiter, thứ tự field, type rule và class tag."
+      },
+      "output_contract": {
+        "en": "Create one valid object per accepted record and report or skip malformed records as specified.",
+        "vi": "Tạo một object hợp lệ cho mỗi record được nhận và báo hoặc bỏ record lỗi theo đề."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu quy tắc"
+      },
+      "student_question": {
+        "en": "What rule controls every correct step?",
+        "vi": "Quy tắc nào kiểm soát mọi bước đúng?"
+      },
+      "mental_model": {
+        "en": "A file line is text until parsing and validation succeed; only then should it become an object.",
+        "vi": "Dòng file chỉ là text cho tới khi parse và validate thành công; sau đó mới tạo object."
+      },
+      "rules": [
+        {
+          "en": "Check field count before indexing fields.",
+          "vi": "Kiểm tra số field trước khi lấy theo index."
+        },
+        {
+          "en": "Convert and range-check numeric fields before calling the constructor.",
+          "vi": "Convert và range-check field số trước khi gọi constructor."
+        },
+        {
+          "en": "Use the type tag to select the correct class, then store the returned object.",
+          "vi": "Dùng type tag để chọn đúng class rồi lưu object được tạo."
+        }
+      ],
+      "invariant": {
+        "en": "Every object in the collection satisfies its constructor and domain rules.",
+        "vi": "Mọi object trong collection thỏa constructor và domain rule."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Focused exam recipe",
+          "vi": "Khung làm bài trọng tâm"
+        },
+        "lines": [
+          "fields = line.rstrip('\\n').split(',')",
+          "if len(fields) != 3:",
+          "    continue",
+          "title, kind, pages_text = fields",
+          "book = Ebook(title, int(pages_text)) if kind == 'E' else Book(title, int(pages_text))"
+        ],
+        "contract_note": {
+          "en": "Use this as a small teaching excerpt; adapt names and exact behaviour to the question contract.",
+          "vi": "Dùng đây như đoạn hướng dẫn ngắn; điều chỉnh tên và hành vi theo đúng contract của đề."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "Is the record valid, which class does its tag select, and is an object created?",
+        "vi": "Record có hợp lệ không, tag chọn class nào và có tạo object không?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Read Trees,E,180 and construct the correct object",
+          "vi": "Đọc Trees,E,180 và tạo object đúng"
+        },
+        "instruction": {
+          "en": "Predict parsed fields, validation result and constructed class before reveal.",
+          "vi": "Dự đoán parsed fields, validation result và class được tạo trước khi mở."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "fields = line.rstrip('\\n').split(',')",
+            "if len(fields) != 3:"
+          ],
+          "prediction": {
+            "en": "What fields result from 'Trees,E,180', and does the field-count guard reject them?",
+            "vi": "Field nào có từ 'Trees,E,180' và field-count guard có reject không?"
+          },
+          "answer": {
+            "en": "The fields are ['Trees','E','180']; length is 3, so processing continues.",
+            "vi": "Fields là ['Trees','E','180']; length bằng 3 nên tiếp tục."
+          }
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "title, kind, pages_text = fields",
+            "int(pages_text)"
+          ],
+          "prediction": {
+            "en": "Which value needs conversion and validation before construction?",
+            "vi": "Value nào cần conversion và validation trước khi construct?"
+          },
+          "answer": {
+            "en": "Convert pages_text '180' to integer 180 and confirm the allowed page range.",
+            "vi": "Convert pages_text '180' thành integer 180 và kiểm tra page range hợp lệ."
+          }
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "book = Ebook(title, int(pages_text)) if kind == 'E' else Book(title, int(pages_text))"
+          ],
+          "prediction": {
+            "en": "Which class is selected by kind 'E', and what state is stored?",
+            "vi": "Class nào được chọn bởi kind 'E' và state nào được lưu?"
+          },
+          "answer": {
+            "en": "Construct Ebook('Trees', 180); the object keeps Ebook behavior as well as inherited Book state.",
+            "vi": "Tạo Ebook('Trees', 180); object giữ behavior của Ebook cùng state kế thừa từ Book."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "Every object in the collection satisfies its constructor and domain rules.",
+        "vi": "Mọi object trong collection thỏa constructor và domain rule."
+      },
+      "variants": [
+        {
+          "kind": "failure_wrong_field_count",
+          "input": {
+            "line": "Trees,E"
+          },
+          "expected": {
+            "object_created": false,
+            "reason": "field_count"
+          },
+          "explanation": {
+            "en": "Reject before unpacking because the record has only two fields.",
+            "vi": "Reject trước unpack vì record chỉ có hai fields."
+          },
+          "question": {
+            "en": "The line 'Trees,E' splits into two fields. What happens before unpacking?",
+            "vi": "Line 'Trees,E' split thành hai fields. Điều gì xảy ra trước unpack?"
+          },
+          "options": [
+            {
+              "id": "reject-count",
+              "label": {
+                "en": "Reject the record; create no object",
+                "vi": "Reject record; không tạo object"
+              }
+            },
+            {
+              "id": "unpack-missing",
+              "label": {
+                "en": "Unpack it and invent a page value",
+                "vi": "Unpack rồi tự tạo page value"
+              }
+            }
+          ],
+          "correct_option_id": "reject-count",
+          "retry_hint": {
+            "en": "Compare len(fields) with the required count 3.",
+            "vi": "So len(fields) với required count 3."
+          },
+          "correct_feedback": {
+            "en": "The field-count guard rejects the line before unpacking or construction.",
+            "vi": "Field-count guard reject line trước unpack hoặc construct."
+          },
+          "misconception_feedback": {
+            "en": "Supplying a missing field silently changes the input contract and can create invalid objects.",
+            "vi": "Tự thêm missing field làm đổi input contract và có thể tạo object invalid."
+          }
+        },
+        {
+          "kind": "failure_invalid_pages",
+          "input": {
+            "line": "Trees,E,-5"
+          },
+          "expected": {
+            "object_created": false,
+            "reason": "page_range"
+          },
+          "explanation": {
+            "en": "Reject after conversion/range validation and leave the object collection unchanged.",
+            "vi": "Reject sau conversion/range validation và giữ object collection không đổi."
+          },
+          "question": {
+            "en": "'Trees,E,-5' has three fields but pages is -5. Is an Ebook created?",
+            "vi": "'Trees,E,-5' có ba fields nhưng pages là -5. Có tạo Ebook không?"
+          },
+          "options": [
+            {
+              "id": "reject-pages",
+              "label": {
+                "en": "No; reject before construction",
+                "vi": "Không; reject trước construct"
+              }
+            },
+            {
+              "id": "create-negative",
+              "label": {
+                "en": "Yes; construct Ebook with -5 pages",
+                "vi": "Có; tạo Ebook với -5 pages"
+              }
+            }
+          ],
+          "correct_option_id": "reject-pages",
+          "retry_hint": {
+            "en": "Field count passing does not replace numeric range validation.",
+            "vi": "Field count pass không thay numeric range validation."
+          },
+          "correct_feedback": {
+            "en": "The invalid page range is rejected and the object collection stays unchanged.",
+            "vi": "Page range invalid bị reject và object collection giữ nguyên."
+          },
+          "misconception_feedback": {
+            "en": "Selecting a class from the E tag before validating its state admits an invalid object.",
+            "vi": "Chọn class từ tag E trước khi validate state sẽ nhận object invalid."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I solve the same contract with less support?",
+        "vi": "Tôi có thể giải cùng contract với ít hỗ trợ hơn không?"
+      },
+      "attempt_rule": {
+        "en": "Attempt the task before opening the hint or model answer.",
+        "vi": "Làm thử trước khi mở hint hoặc model answer."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Parse before construction",
+            "vi": "Parse 'Trees,E,180' thành các field và chọn class"
+          },
+          "prompt": {
+            "en": "Parse 'Trees,E,180' into fields and choose the class.",
+            "vi": "Parse 'Trees,E,180' thành các field và chọn class."
+          },
+          "hint": {
+            "en": "Split, count fields, convert pages, then use the type tag; keep that order.",
+            "vi": "Split, đếm field, convert pages rồi dùng type tag; giữ đúng thứ tự."
+          },
+          "model_answer": {
+            "en": "Fields are Trees, E and 180; the E tag selects Ebook after 180 is converted and validated.",
+            "vi": "Field là Trees, E và 180; tag E chọn Ebook sau khi 180 được convert và validate."
+          },
+          "success_check": {
+            "en": "The answer names all three fields, converts 180 and selects Ebook from tag E.",
+            "vi": "Đáp án nêu đủ ba field, convert 180 và chọn Ebook từ tag E."
+          }
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm hỗ trợ"
+          },
+          "title": {
+            "en": "Reject invalid state",
+            "vi": "Record có pages -5"
+          },
+          "prompt": {
+            "en": "A record contains pages -5. State the first safe action and whether an object is created.",
+            "vi": "Record có pages -5. Nêu hành động an toàn đầu tiên và có tạo object không."
+          },
+          "hint": {
+            "en": "Validate the numeric range before calling any constructor.",
+            "vi": "Validate numeric range trước khi gọi constructor."
+          },
+          "model_answer": {
+            "en": "Reject the record after range validation; create no object.",
+            "vi": "Từ chối record sau range validation; không tạo object."
+          },
+          "success_check": {
+            "en": "No Book or Ebook object is created for pages -5.",
+            "vi": "Không tạo Book/Ebook object khi pages là -5."
+          }
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Độc lập"
+          },
+          "title": {
+            "en": "Preserve class behaviour",
+            "vi": "Đọc một record Book và một Ebook, tạo cả hai rồi giải thích vì sao dictionary thường không cho kết quả tương đương"
+          },
+          "prompt": {
+            "en": "Read one Book and one Ebook record, construct both and explain why a plain dictionary is not the same result.",
+            "vi": "Đọc một record Book và một Ebook, tạo cả hai rồi giải thích vì sao dictionary thường không cho kết quả tương đương."
+          },
+          "hint": {
+            "en": "Compare retained class behavior and dispatch, not only stored field names.",
+            "vi": "So sánh class behavior và dispatch được giữ lại, không chỉ field name."
+          },
+          "model_answer": {
+            "en": "The objects retain their class methods and dispatch; a plain dictionary only stores fields.",
+            "vi": "Object giữ class method và dispatch; dictionary thường chỉ lưu field."
+          },
+          "success_check": {
+            "en": "The answer explains that objects retain methods and polymorphic behavior unlike plain dictionaries.",
+            "vi": "Đáp án giải thích object giữ method và polymorphic behavior khác plain dictionary."
+          },
+          "assessment_requirement_ids": [
+            "ac-9618-p4-2026-python.assessment-requirement.syl-20.1-19"
+          ]
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which mistake would break the contract first?",
+        "vi": "Lỗi nào phá contract đầu tiên?"
+      },
+      "before_code": [
+        {
+          "en": "The delimiter, field order, type rules and class tag values are known.",
+          "vi": "Đã biết delimiter, thứ tự field, type rule và class tag."
+        },
+        {
+          "en": "Create one valid object per accepted record and report or skip malformed records as specified.",
+          "vi": "Tạo một object hợp lệ cho mỗi record được nhận và báo hoặc bỏ record lỗi theo đề."
+        }
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Coding before fixing the input, output and stopping contract.",
+            "vi": "Viết code trước khi chốt input, output và stopping contract."
+          },
+          "consequence": {
+            "en": "A plausible algorithm can answer a different question.",
+            "vi": "Thuật toán nhìn hợp lý nhưng có thể trả lời câu hỏi khác."
+          },
+          "repair": {
+            "en": "Write the contract in one sentence before the first code line.",
+            "vi": "Viết contract thành một câu trước dòng code đầu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Changing state before checking the relevant boundary.",
+            "vi": "Đổi state trước khi kiểm tra boundary liên quan."
+          },
+          "consequence": {
+            "en": "Rejected input can corrupt a previously valid structure.",
+            "vi": "Input bị từ chối vẫn có thể làm hỏng structure đang hợp lệ."
+          },
+          "repair": {
+            "en": "Place the guard before mutation and trace the rejected path.",
+            "vi": "Đặt guard trước mutation và trace path bị từ chối."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Stopping after one normal example.",
+            "vi": "Dừng sau một ví dụ normal."
+          },
+          "consequence": {
+            "en": "A boundary or failure path remains untested.",
+            "vi": "Boundary hoặc failure path chưa được kiểm tra."
+          },
+          "repair": {
+            "en": "Check one normal, one boundary and one relevant failure case.",
+            "vi": "Kiểm tra một normal, một boundary và một failure phù hợp."
+          }
+        }
+      ],
+      "core_code_caption": {
+        "en": "Compact method reminder",
+        "vi": "Nhắc phương pháp ngắn"
+      },
+      "core_code": [
+        "fields = line.rstrip('\\n').split(',')",
+        "if len(fields) != 3:",
+        "    continue",
+        "title, kind, pages_text = fields",
+        "book = Ebook(title, int(pages_text)) if kind == 'E' else Book(title, int(pages_text))"
+      ],
+      "boundary_trace": [
+        {
+          "en": "The delimiter, field order, type rules and class tag values are known.",
+          "vi": "Đã biết delimiter, thứ tự field, type rule và class tag."
+        },
+        {
+          "en": "Every object in the collection satisfies its constructor and domain rules.",
+          "vi": "Mọi object trong collection thỏa constructor và domain rule."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Create one valid object per accepted record and report or skip malformed records as specified.",
+          "vi": "Tạo một object hợp lệ cho mỗi record được nhận và báo hoặc bỏ record lỗi theo đề."
+        },
+        {
+          "en": "Every object in the collection satisfies its constructor and domain rules.",
+          "vi": "Mọi object trong collection thỏa constructor và domain rule."
+        }
+      ],
+      "authority_note": {
+        "en": "The worked method is AlgoCore teacher-authored guidance grounded in the course sources; follow the exact contract in each examination question.",
+        "vi": "Phương pháp là hướng dẫn do giáo viên AlgoCore biên soạn từ nguồn khóa học; luôn theo đúng contract của từng câu hỏi thi."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the method without the worked example?",
+        "vi": "Tôi có thể tự dựng lại phương pháp khi không nhìn ví dụ không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "State the precondition.",
+            "vi": "Nêu precondition."
+          },
+          "answer": {
+            "en": "The delimiter, field order, type rules and class tag values are known.",
+            "vi": "Đã biết delimiter, thứ tự field, type rule và class tag."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the invariant or rule.",
+            "vi": "Nêu invariant hoặc rule."
+          },
+          "answer": {
+            "en": "Every object in the collection satisfies its constructor and domain rules.",
+            "vi": "Mọi object trong collection thỏa constructor và domain rule."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the required output.",
+            "vi": "Nêu output cần có."
+          },
+          "answer": {
+            "en": "Create one valid object per accepted record and report or skip malformed records as specified.",
+            "vi": "Tạo một object hợp lệ cho mỗi record được nhận và báo hoặc bỏ record lỗi theo đề."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "Solve the independent task again from memory, then compare only after recording your result.",
+        "vi": "Làm lại independent task từ trí nhớ, rồi chỉ so đáp án sau khi đã ghi kết quả."
+      },
+      "next_step": {
+        "en": "Continue when you can explain the contract and trace the first boundary without help.",
+        "vi": "Học tiếp khi bạn có thể giải thích contract và trace boundary đầu tiên mà không cần trợ giúp."
+      }
+    }
+  },
+  "display_contract": {
+    "default_stage": "Recognise",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    },
+    "primary_code_limit": {
+      "en": "Show only the focused recipe or current lines.",
+      "vi": "Chỉ hiển thị khung code hoặc dòng đang tập trung."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ]
+}

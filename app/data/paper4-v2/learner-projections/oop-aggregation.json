@@ -1,0 +1,560 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Aggregation and capacity-bound collections",
+    "vi": "Aggregation và collection giới hạn dung lượng"
+  },
+  "exam_family": {
+    "en": "Has-a relationships and controlled add methods",
+    "vi": "Quan hệ has-a và add method có kiểm soát"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Model a has-a relationship, trace object references, and write a controlled add method that respects capacity without losing existing stored objects.",
+    "vi": "Mô hình hóa quan hệ has-a, trace object reference và viết add method có kiểm soát, tuân dung lượng mà không làm mất object đã lưu."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Recognise this question family and extract its contract.",
+      "vi": "Nhận diện dạng câu hỏi và rút ra contract."
+    },
+    {
+      "en": "Explain the governing rule before attempting the task.",
+      "vi": "Giải thích quy tắc chính trước khi làm."
+    },
+    {
+      "en": "Trace a normal path and protect the relevant boundary or failure state.",
+      "vi": "Trace normal path và bảo vệ boundary hoặc failure state liên quan."
+    }
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What is this question asking me to preserve?",
+        "vi": "Câu hỏi yêu cầu tôi giữ điều gì?"
+      },
+      "intro": {
+        "en": "Model a has-a relationship, trace object references, and write a controlled add method that respects capacity without losing existing stored objects.",
+        "vi": "Mô hình hóa quan hệ has-a, trace object reference và viết add method có kiểm soát, tuân dung lượng mà không làm mất object đã lưu."
+      },
+      "prompt_fragment": {
+        "en": "has-a, contains, collection attribute, capacity, add method",
+        "vi": "has-a, contains, collection attribute, capacity, add method"
+      },
+      "cues": [
+        {
+          "en": "has-a, contains, collection attribute, capacity, add method",
+          "vi": "has-a, contains, collection attribute, capacity, add method"
+        },
+        {
+          "en": "The contained object is valid and the owner collection has a stated capacity.",
+          "vi": "Object được chứa hợp lệ và collection của owner có capacity đã nêu."
+        },
+        {
+          "en": "Add exactly one reference on success or report full with unchanged state.",
+          "vi": "Thêm đúng một reference khi thành công hoặc báo full và giữ state."
+        }
+      ],
+      "precondition": {
+        "en": "The contained object is valid and the owner collection has a stated capacity.",
+        "vi": "Object được chứa hợp lệ và collection của owner có capacity đã nêu."
+      },
+      "output_contract": {
+        "en": "Add exactly one reference on success or report full with unchanged state.",
+        "vi": "Thêm đúng một reference khi thành công hoặc báo full và giữ state."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu quy tắc"
+      },
+      "student_question": {
+        "en": "What rule controls every correct step?",
+        "vi": "Quy tắc nào kiểm soát mọi bước đúng?"
+      },
+      "mental_model": {
+        "en": "Aggregation stores references to separate objects; the owner does not become a subclass of the contained type.",
+        "vi": "Aggregation lưu reference tới object riêng; owner không trở thành subclass của kiểu được chứa."
+      },
+      "rules": [
+        {
+          "en": "Check capacity before appending.",
+          "vi": "Kiểm tra capacity trước khi append."
+        },
+        {
+          "en": "Store the supplied object reference, not a duplicated partial record.",
+          "vi": "Lưu reference của object được cho, không tạo bản ghi thiếu."
+        },
+        {
+          "en": "A rejected add leaves count and collection unchanged.",
+          "vi": "Add bị từ chối giữ nguyên count và collection."
+        }
+      ],
+      "invariant": {
+        "en": "The stored count equals the number of contained objects and never exceeds capacity.",
+        "vi": "Count bằng số object được chứa và không vượt capacity."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Focused exam recipe",
+          "vi": "Khung làm bài trọng tâm"
+        },
+        "lines": [
+          "def add_book(self, book):",
+          "    if len(self.books) >= self.capacity:",
+          "        return False",
+          "    self.books.append(book)",
+          "    return True"
+        ],
+        "contract_note": {
+          "en": "Use this as a small teaching excerpt; adapt names and exact behaviour to the question contract.",
+          "vi": "Dùng đây như đoạn hướng dẫn ngắn; điều chỉnh tên và hành vi theo đúng contract của đề."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "Does the container have capacity, and which contained-object reference changes?",
+        "vi": "Container còn capacity không và reference của object chứa nào thay đổi?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Add a Book reference to a capacity-limited Library",
+          "vi": "Thêm Book reference vào Library giới hạn capacity"
+        },
+        "instruction": {
+          "en": "Predict the guard, collection state and return value before reveal.",
+          "vi": "Dự đoán guard, collection state và return value trước khi mở."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "if len(self.books) >= self.capacity:",
+            "return False"
+          ],
+          "prediction": {
+            "en": "Capacity is 3 and two Books are stored. Does the full guard return?",
+            "vi": "Capacity là 3 và đã lưu hai Book. Full guard có return không?"
+          },
+          "answer": {
+            "en": "2 >= 3 is False, so the method continues without changing state yet.",
+            "vi": "2 >= 3 là False nên method tiếp tục và chưa đổi state."
+          }
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "self.books.append(book)"
+          ],
+          "prediction": {
+            "en": "What does append add: a copy of Book fields or a reference to the Book object?",
+            "vi": "append thêm bản sao field của Book hay reference tới Book object?"
+          },
+          "answer": {
+            "en": "It appends the supplied Book object reference; the Library now contains three Book references.",
+            "vi": "Nó append reference tới Book object được truyền; Library giờ chứa ba Book references."
+          }
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "return True"
+          ],
+          "prediction": {
+            "en": "What proves the add succeeded, and what invariant must still hold?",
+            "vi": "Điều gì chứng minh add thành công và invariant nào vẫn phải đúng?"
+          },
+          "answer": {
+            "en": "Return True; len(books) is 3 and does not exceed capacity 3.",
+            "vi": "Trả True; len(books) là 3 và không vượt capacity 3."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "The stored count equals the number of contained objects and never exceeds capacity.",
+        "vi": "Count bằng số object được chứa và không vượt capacity."
+      },
+      "variants": [
+        {
+          "kind": "boundary_exact_capacity",
+          "input": {
+            "capacity": 3,
+            "count": 3
+          },
+          "expected": {
+            "result": false,
+            "count": 3,
+            "state_unchanged": true
+          },
+          "explanation": {
+            "en": "The guard rejects before append when count equals capacity.",
+            "vi": "Guard reject trước append khi count bằng capacity."
+          },
+          "question": {
+            "en": "A Library has capacity 3 and already stores 3 Book references. What does add_book do?",
+            "vi": "Library capacity 3 và đã lưu 3 Book references. add_book làm gì?"
+          },
+          "options": [
+            {
+              "id": "return-false",
+              "label": {
+                "en": "Return False before append; count stays 3",
+                "vi": "Trả False trước append; count vẫn 3"
+              }
+            },
+            {
+              "id": "append-fourth",
+              "label": {
+                "en": "Append a fourth reference then return False",
+                "vi": "Append reference thứ tư rồi trả False"
+              }
+            }
+          ],
+          "correct_option_id": "return-false",
+          "retry_hint": {
+            "en": "Evaluate len(books) >= capacity before mutation.",
+            "vi": "Tính len(books) >= capacity trước mutation."
+          },
+          "correct_feedback": {
+            "en": "The full guard returns False before append, preserving all three references.",
+            "vi": "Full guard trả False trước append và giữ ba references."
+          },
+          "misconception_feedback": {
+            "en": "Checking capacity after append briefly violates the invariant and corrupts state even if False is returned.",
+            "vi": "Check capacity sau append làm vi phạm invariant và hỏng state dù trả False."
+          }
+        },
+        {
+          "kind": "boundary_empty_container",
+          "input": {
+            "capacity": 2,
+            "count": 0
+          },
+          "expected": {
+            "result": true,
+            "count": 1
+          },
+          "explanation": {
+            "en": "The first valid reference is accepted and the contained object keeps its own identity.",
+            "vi": "Reference hợp lệ đầu tiên được nhận và contained object giữ identity riêng."
+          },
+          "question": {
+            "en": "An empty Library has capacity 2 and receives one valid Book object. What is stored?",
+            "vi": "Library rỗng capacity 2 nhận một Book object hợp lệ. Lưu gì?"
+          },
+          "options": [
+            {
+              "id": "one-reference",
+              "label": {
+                "en": "One reference to the same Book; return True",
+                "vi": "Một reference tới chính Book đó; trả True"
+              }
+            },
+            {
+              "id": "copied-fields",
+              "label": {
+                "en": "A copied dictionary of Book fields",
+                "vi": "Một dictionary copy các field Book"
+              }
+            }
+          ],
+          "correct_option_id": "one-reference",
+          "retry_hint": {
+            "en": "Aggregation stores a contained-object reference, not a flattened field copy.",
+            "vi": "Aggregation lưu contained-object reference, không flatten field copy."
+          },
+          "correct_feedback": {
+            "en": "The reference is appended, count becomes 1 and the Book keeps its identity.",
+            "vi": "Reference được append, count thành 1 và Book giữ identity."
+          },
+          "misconception_feedback": {
+            "en": "Copying fields loses object identity and method behavior.",
+            "vi": "Copy field làm mất object identity và method behavior."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I solve the same contract with less support?",
+        "vi": "Tôi có thể giải cùng contract với ít hỗ trợ hơn không?"
+      },
+      "attempt_rule": {
+        "en": "Attempt the task before opening the hint or model answer.",
+        "vi": "Làm thử trước khi mở hint hoặc model answer."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Draw the object graph",
+            "vi": "Library chứa hai Book object"
+          },
+          "prompt": {
+            "en": "A Library contains two Book objects. State the has-a direction and object count.",
+            "vi": "Library chứa hai Book object. Nêu hướng has-a và số object."
+          },
+          "hint": {
+            "en": "Use 'Library has Books'; count the container and contained objects separately.",
+            "vi": "Dùng 'Library has Books'; đếm container và contained objects riêng."
+          },
+          "model_answer": {
+            "en": "Library has Books; there is one Library and two separate Book objects.",
+            "vi": "Library has Books; có một Library và hai Book object riêng."
+          },
+          "success_check": {
+            "en": "The direction is Library has Book, with one Library and two distinct Books.",
+            "vi": "Chiều là Library has Book, gồm một Library và hai Book riêng."
+          }
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm hỗ trợ"
+          },
+          "title": {
+            "en": "Trace a successful add",
+            "vi": "Capacity là 3 và đang có hai sách"
+          },
+          "prompt": {
+            "en": "Capacity is 3 and two books are stored. Trace adding one valid Book.",
+            "vi": "Capacity là 3 và đang có hai sách. Trace việc thêm một Book hợp lệ."
+          },
+          "hint": {
+            "en": "Evaluate count >= capacity before append, then state count and return value.",
+            "vi": "Tính count >= capacity trước append rồi nêu count và return value."
+          },
+          "model_answer": {
+            "en": "The guard is false, one reference is appended, count becomes 3 and True is returned.",
+            "vi": "Guard false, thêm một reference, count thành 3 và trả True."
+          },
+          "success_check": {
+            "en": "The valid add produces count 3 and returns True without cloning the Book.",
+            "vi": "Valid add tạo count 3 và trả True mà không clone Book."
+          }
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Độc lập"
+          },
+          "title": {
+            "en": "Protect the full boundary",
+            "vi": "Thử add khi count bằng capacity và chứng minh state không đổi"
+          },
+          "prompt": {
+            "en": "Try another add when count equals capacity and prove that state is unchanged.",
+            "vi": "Thử add khi count bằng capacity và chứng minh state không đổi."
+          },
+          "hint": {
+            "en": "Show that the guard returns before append and list the references that remain.",
+            "vi": "Chỉ ra guard return trước append và liệt kê references vẫn còn."
+          },
+          "model_answer": {
+            "en": "Return False before append; count and all stored references remain unchanged.",
+            "vi": "Trả False trước append; count và mọi reference giữ nguyên."
+          },
+          "success_check": {
+            "en": "The full add returns False and every stored reference remains unchanged.",
+            "vi": "Full add trả False và mọi stored reference giữ nguyên."
+          }
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which mistake would break the contract first?",
+        "vi": "Lỗi nào phá contract đầu tiên?"
+      },
+      "before_code": [
+        {
+          "en": "The contained object is valid and the owner collection has a stated capacity.",
+          "vi": "Object được chứa hợp lệ và collection của owner có capacity đã nêu."
+        },
+        {
+          "en": "Add exactly one reference on success or report full with unchanged state.",
+          "vi": "Thêm đúng một reference khi thành công hoặc báo full và giữ state."
+        }
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Coding before fixing the input, output and stopping contract.",
+            "vi": "Viết code trước khi chốt input, output và stopping contract."
+          },
+          "consequence": {
+            "en": "A plausible algorithm can answer a different question.",
+            "vi": "Thuật toán nhìn hợp lý nhưng có thể trả lời câu hỏi khác."
+          },
+          "repair": {
+            "en": "Write the contract in one sentence before the first code line.",
+            "vi": "Viết contract thành một câu trước dòng code đầu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Changing state before checking the relevant boundary.",
+            "vi": "Đổi state trước khi kiểm tra boundary liên quan."
+          },
+          "consequence": {
+            "en": "Rejected input can corrupt a previously valid structure.",
+            "vi": "Input bị từ chối vẫn có thể làm hỏng structure đang hợp lệ."
+          },
+          "repair": {
+            "en": "Place the guard before mutation and trace the rejected path.",
+            "vi": "Đặt guard trước mutation và trace path bị từ chối."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Stopping after one normal example.",
+            "vi": "Dừng sau một ví dụ normal."
+          },
+          "consequence": {
+            "en": "A boundary or failure path remains untested.",
+            "vi": "Boundary hoặc failure path chưa được kiểm tra."
+          },
+          "repair": {
+            "en": "Check one normal, one boundary and one relevant failure case.",
+            "vi": "Kiểm tra một normal, một boundary và một failure phù hợp."
+          }
+        }
+      ],
+      "core_code_caption": {
+        "en": "Compact method reminder",
+        "vi": "Nhắc phương pháp ngắn"
+      },
+      "core_code": [
+        "def add_book(self, book):",
+        "    if len(self.books) >= self.capacity:",
+        "        return False",
+        "    self.books.append(book)",
+        "    return True"
+      ],
+      "boundary_trace": [
+        {
+          "en": "The contained object is valid and the owner collection has a stated capacity.",
+          "vi": "Object được chứa hợp lệ và collection của owner có capacity đã nêu."
+        },
+        {
+          "en": "The stored count equals the number of contained objects and never exceeds capacity.",
+          "vi": "Count bằng số object được chứa và không vượt capacity."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Add exactly one reference on success or report full with unchanged state.",
+          "vi": "Thêm đúng một reference khi thành công hoặc báo full và giữ state."
+        },
+        {
+          "en": "The stored count equals the number of contained objects and never exceeds capacity.",
+          "vi": "Count bằng số object được chứa và không vượt capacity."
+        }
+      ],
+      "authority_note": {
+        "en": "The worked method is AlgoCore teacher-authored guidance grounded in the course sources; follow the exact contract in each examination question.",
+        "vi": "Phương pháp là hướng dẫn do giáo viên AlgoCore biên soạn từ nguồn khóa học; luôn theo đúng contract của từng câu hỏi thi."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the method without the worked example?",
+        "vi": "Tôi có thể tự dựng lại phương pháp khi không nhìn ví dụ không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "State the precondition.",
+            "vi": "Nêu precondition."
+          },
+          "answer": {
+            "en": "The contained object is valid and the owner collection has a stated capacity.",
+            "vi": "Object được chứa hợp lệ và collection của owner có capacity đã nêu."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the invariant or rule.",
+            "vi": "Nêu invariant hoặc rule."
+          },
+          "answer": {
+            "en": "The stored count equals the number of contained objects and never exceeds capacity.",
+            "vi": "Count bằng số object được chứa và không vượt capacity."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the required output.",
+            "vi": "Nêu output cần có."
+          },
+          "answer": {
+            "en": "Add exactly one reference on success or report full with unchanged state.",
+            "vi": "Thêm đúng một reference khi thành công hoặc báo full và giữ state."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "Solve the independent task again from memory, then compare only after recording your result.",
+        "vi": "Làm lại independent task từ trí nhớ, rồi chỉ so đáp án sau khi đã ghi kết quả."
+      },
+      "next_step": {
+        "en": "Continue when you can explain the contract and trace the first boundary without help.",
+        "vi": "Học tiếp khi bạn có thể giải thích contract và trace boundary đầu tiên mà không cần trợ giúp."
+      }
+    }
+  },
+  "display_contract": {
+    "default_stage": "Recognise",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    },
+    "primary_code_limit": {
+      "en": "Show only the focused recipe or current lines.",
+      "vi": "Chỉ hiển thị khung code hoặc dòng đang tập trung."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ]
+}

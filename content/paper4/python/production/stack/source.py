@@ -20,6 +20,32 @@ class Stack:
     def live(self):
         return self.items[:self.top + 1]
 
+def stack_from(values):
+    stack = Stack(len(values))
+    for value in values:
+        stack.push(value)
+    return stack
+
+def pair_stacks(left_stack, right_stack, trace):
+    before = {"left": left_stack.live(), "right": right_stack.live()}
+    left_item = left_stack.pop()
+    right_item = right_stack.pop()
+    if left_item is None or right_item is None:
+        if left_item is not None:
+            left_stack.push(left_item)
+        if right_item is not None:
+            right_stack.push(right_item)
+        trace.append({"event": "pair_rollback", "before": before, "after": {"left": left_stack.live(), "right": right_stack.live()}})
+        return None
+    pair = [left_item, right_item]
+    trace.append({"event": "pair_commit", "pair": pair, "before": before, "after": {"left": left_stack.live(), "right": right_stack.live()}})
+    return pair
+
+def reduce_operands(values):
+    stack = stack_from(values)
+    right, left = stack.pop(), stack.pop()
+    return None if left is None or right is None else left - right
+
 def run(fixture):
     stack, trace, results = Stack(fixture["capacity"]), [], []
     for operation in fixture["operations"]:
@@ -30,11 +56,11 @@ def run(fixture):
             outcome = stack.pop()
         results.append(outcome)
         trace.append({"event": operation[0], "before": before, "after": {"top": stack.top, "live": stack.live()}, "outcome": outcome})
-    reduce_stack = Stack(max(2, len(fixture.get("operands", []))))
-    for value in fixture.get("operands", []): reduce_stack.push(value)
-    right, left = reduce_stack.pop(), reduce_stack.pop()
-    reduced = None if left is None or right is None else left - right
-    return {"status": "OK", "results": results, "live": stack.live(), "top": stack.top, "reduced": reduced, "trace": trace}
+    left_stack = stack_from(fixture.get("pair_left", []))
+    right_stack = stack_from(fixture.get("pair_right", []))
+    pair = pair_stacks(left_stack, right_stack, trace)
+    reduced = reduce_operands(fixture.get("operands", []))
+    return {"status": "OK", "results": results, "live": stack.live(), "top": stack.top, "pair": pair, "pair_left": left_stack.live(), "pair_right": right_stack.live(), "reduced": reduced, "trace": trace}
 
 if __name__ == "__main__":
     import json

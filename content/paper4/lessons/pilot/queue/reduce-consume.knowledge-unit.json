@@ -83,8 +83,8 @@
       "en": "A reduction folds many items into one result, such as a total; first decide whether the operation reads or consumes the queue. A consuming version terminates at empty, while a preserving version traverses live items without dequeuing. State whether the operation consumes the queue or only reads it; if reduction uses dequeue, the postcondition must describe the changed queue."
     },
     "python_connection": {
-      "vi": "Pilot chọn preserve: L062 gọi `live_items`, rồi L063 tính tổng số từ bản sao logical. Không dequeue trong bước reduce, nên queue vẫn giữ dữ liệu; artifact chưa triển khai biến thể recursive consuming.",
-      "en": "The pilot chooses preserve: L062 calls `live_items`, then L063 totals numeric values from the logical copy. It does not dequeue during reduction, so the queue is preserved; the artifact does not implement a recursive consuming variant."
+      "vi": "`reduce_numeric` chốt số phần tử ban đầu tại L082 rồi gọi `dequeue` đúng số lần đó ở L085. L087 cập nhật accumulator; L089 enqueue lại item chỉ khi policy là preserve. Vì vậy cùng một thuật toán thể hiện rõ hai hậu trạng thái consume và preserve.",
+      "en": "`reduce_numeric` freezes the initial item count at L082 and calls `dequeue` exactly that many times at L085. L087 updates the accumulator; L089 enqueues the item again only under the preserve policy. The same algorithm therefore makes the consume and preserve post-states explicit."
     },
     "representation": {
       "vi": "Ghi accumulator cùng item đang xử lý và đánh dấu rõ policy `preserve` hoặc `consume`; với recursion, mỗi frame giữ phần còn chờ cộng.",
@@ -128,21 +128,23 @@
         "ac-9618-p4-2026-python.artifact.queue.pilot-v1"
       ],
       "active_line_ids": [
-        "queue.v1.L062",
-        "queue.v1.L063",
-        "queue.v1.L027",
-        "queue.v1.L039"
+        "queue.v1.L081",
+        "queue.v1.L082",
+        "queue.v1.L085",
+        "queue.v1.L087",
+        "queue.v1.L089",
+        "queue.v1.L091"
       ],
       "authority": "AlgoCore_authored_teaching_example"
     },
     "self_check": {
       "prompt": {
-        "vi": "Artifact pilot đang dùng policy nào, và line nào chứng minh?",
-        "en": "Which policy does the pilot use, and which lines establish it?"
+        "vi": "Line nào phân biệt consume và preserve?",
+        "en": "Which line separates consume from preserve?"
       },
       "answer": {
-        "vi": "Preserve; L062 lấy bản sao từ `live_items` và L063 reduce bản sao, không gọi dequeue.",
-        "en": "Preserve; L062 obtains a copy from `live_items` and L063 reduces that copy without calling dequeue."
+        "vi": "L089 chỉ enqueue lại item khi `preserve=True`; nếu false, các lần dequeue làm queue rỗng.",
+        "en": "L089 enqueues the item again only when `preserve=True`; otherwise the dequeues empty the queue."
       },
       "rationale": {
         "vi": "Policy phải được đọc từ source contract trước khi chọn thuật toán.",

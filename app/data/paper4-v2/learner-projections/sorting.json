@@ -1,0 +1,764 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Sorting and ordered insertion",
+    "vi": "Sắp xếp và chèn có thứ tự"
+  },
+  "exam_family": {
+    "en": "Implement and trace a stated sorting contract",
+    "vi": "Cài đặt và trace hợp đồng sắp xếp được nêu"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Trace and write one clear Bubble Sort, reconstruct Insertion Sort from its key-shift-place invariant, and adapt comparison or ordered insertion only when the question requires it.",
+    "vi": "Trace và viết một Bubble Sort rõ ràng, dựng lại Insertion Sort từ invariant key-shift-place, và chỉ điều chỉnh phép so sánh hoặc ordered insertion khi đề yêu cầu."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Recognise Bubble Sort, Insertion Sort and one-item ordered insertion from the required state change.",
+      "vi": "Nhận diện Bubble Sort, Insertion Sort và chèn một phần tử có thứ tự từ thay đổi trạng thái được yêu cầu."
+    },
+    {
+      "en": "Trace adjacent comparisons, swaps, completed passes and the sorted suffix in Bubble Sort.",
+      "vi": "Trace phép so sánh kề nhau, swap, pass hoàn tất và sorted suffix trong Bubble Sort."
+    },
+    {
+      "en": "Write a Bubble Sort function for any list length without a built-in sort.",
+      "vi": "Viết function Bubble Sort cho list có độ dài bất kỳ mà không dùng built-in sort."
+    },
+    {
+      "en": "Preserve an Insertion Sort key while shifting larger predecessors, then place it in the gap.",
+      "vi": "Giữ key của Insertion Sort khi dịch các phần tử lớn hơn, rồi đặt key vào gap."
+    },
+    {
+      "en": "Apply the exact comparator, direction, whole-item movement and capacity contract stated by the question.",
+      "vi": "Áp dụng đúng comparator, hướng, di chuyển toàn item và hợp đồng capacity do đề nêu."
+    }
+  ],
+  "display_contract": {
+    "default_stage": "Recognise",
+    "primary_visual": "one indexed array with adjacent pair, pass, changed flag and sorted suffix",
+    "trace_rule": "one decision and no more than three focused code lines per step",
+    "protect_marks_rule": "show one mistake-consequence-repair check at a time",
+    "transfer_rule": "Insertion Sort is a complete attempt-gated static worked transfer; comparator and ordered insertion remain compact static transfers",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "Which method, direction and result does this question require?",
+        "vi": "Đề yêu cầu method, hướng và kết quả nào?"
+      },
+      "intro": {
+        "en": "Read the state change before choosing code. Bubble Sort compares adjacent items over passes; Insertion Sort saves one key and shifts a sorted prefix; ordered insertion adds one item to data that is already ordered.",
+        "vi": "Đọc thay đổi trạng thái trước khi chọn code. Bubble Sort so sánh các phần tử kề nhau qua nhiều pass; Insertion Sort giữ một key và dịch sorted prefix; ordered insertion thêm một item vào dữ liệu đã có thứ tự."
+      },
+      "prompt_fragment": {
+        "en": "For the primary example, sort a copied integer list into ascending order with Bubble Sort and return the copy.",
+        "vi": "Trong ví dụ chính, sắp xếp một bản sao của list integer theo thứ tự tăng dần bằng Bubble Sort và trả bản sao."
+      },
+      "cues": [
+        {
+          "en": "Bubble Sort: adjacent pair, swap, pass and no-change flag.",
+          "vi": "Bubble Sort: cặp kề nhau, swap, pass và cờ không thay đổi."
+        },
+        {
+          "en": "Insertion Sort: saved key, sorted prefix, shift and place.",
+          "vi": "Insertion Sort: key được giữ, sorted prefix, shift và place."
+        },
+        {
+          "en": "Ordered insertion: input is already ordered and only one new item is added.",
+          "vi": "Ordered insertion: input đã có thứ tự và chỉ thêm một item mới."
+        },
+        {
+          "en": "The question may replace numeric > with a supplied string, record or descending comparator.",
+          "vi": "Đề có thể thay phép > số bằng comparator string, record hoặc giảm dần được cung cấp."
+        }
+      ],
+      "precondition": {
+        "en": "values is a finite list of mutually comparable integers; this teaching function sorts a copy and leaves the input unchanged.",
+        "vi": "values là list hữu hạn gồm các integer có thể so sánh với nhau; teaching function này sắp xếp bản sao và giữ input không đổi."
+      },
+      "output_contract": {
+        "en": "Return the ascending sorted copy. A real task controls direction, comparator, mutation and return details.",
+        "vi": "Trả bản sao đã sắp tăng dần. Đề thực tế kiểm soát hướng, comparator, mutation và chi tiết return."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu mô hình"
+      },
+      "student_question": {
+        "en": "What becomes final after each Bubble pass?",
+        "vi": "Điều gì trở thành final sau mỗi Bubble pass?"
+      },
+      "mental_model": {
+        "en": "Move left to right through the unsorted range. Swap only a wrong-order adjacent pair. After the pass, the largest remaining value is in the sorted suffix. A pass with no swap proves the list is sorted.",
+        "vi": "Di chuyển từ trái sang phải trong vùng chưa sắp. Chỉ swap cặp kề nhau sai thứ tự. Sau pass, giá trị lớn nhất còn lại nằm trong sorted suffix. Một pass không swap chứng minh list đã sắp."
+      },
+      "rules": [
+        {
+          "en": "Reset changed to False at the start of every pass.",
+          "vi": "Reset changed thành False ở đầu mỗi pass."
+        },
+        {
+          "en": "Stop the inner loop before index + 1 leaves the unsorted range.",
+          "vi": "Dừng inner loop trước khi index + 1 ra ngoài vùng chưa sắp."
+        },
+        {
+          "en": "Swap both adjacent values, then set changed to True.",
+          "vi": "Swap cả hai giá trị kề nhau, rồi đặt changed thành True."
+        },
+        {
+          "en": "Shrink the unsorted range after each completed pass and stop after a no-change pass.",
+          "vi": "Thu hẹp vùng chưa sắp sau mỗi pass hoàn tất và dừng sau pass không thay đổi."
+        }
+      ],
+      "invariant": {
+        "en": "After a completed pass ending at end, every item to the right of end is already in its final ascending position.",
+        "vi": "Sau một pass kết thúc tại end, mọi item bên phải end đã ở vị trí tăng dần cuối cùng."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Teaching excerpt: ascending Bubble Sort on a copy",
+          "vi": "Teaching excerpt: Bubble Sort tăng dần trên bản sao"
+        },
+        "lines": [
+          "def bubble_sort(values):",
+          "    output = list(values)",
+          "    for end in range(len(output) - 1, 0, -1):",
+          "        changed = False",
+          "        for index in range(end):",
+          "            if output[index] > output[index + 1]:",
+          "                output[index], output[index + 1] = output[index + 1], output[index]",
+          "                changed = True",
+          "        if not changed:",
+          "            break",
+          "    return output"
+        ],
+        "contract_note": {
+          "en": "This verified AlgoCore excerpt uses a shrinking bound and early exit. Equivalent correct loop structures may be accepted when they meet the question contract.",
+          "vi": "Excerpt AlgoCore đã kiểm chứng này dùng bound thu hẹp và early exit. Cấu trúc loop đúng tương đương có thể được chấp nhận nếu đáp ứng hợp đồng đề."
+        }
+      },
+      "transfer_note": {
+        "label": {
+          "en": "Required second method: Insertion Sort",
+          "vi": "Method thứ hai bắt buộc: Insertion Sort"
+        },
+        "content": {
+          "en": "Insertion Sort does not swap adjacent items through passes. Save the key, shift every larger predecessor one cell right, then place the key in the remaining gap. Practise contains the complete verified loop and state sequence.",
+          "vi": "Insertion Sort không swap các item kề nhau qua các pass. Giữ key, dịch mọi phần tử đứng trước lớn hơn sang phải một ô, rồi đặt key vào gap còn lại. Phần Practise chứa loop đầy đủ đã kiểm chứng và state sequence."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "Swap or keep, and what is final after this decision?",
+        "vi": "Swap hay giữ, và điều gì đã final sau quyết định này?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Bubble-sort [4, 2, 3] ascending",
+          "vi": "Bubble-sort [4, 2, 3] tăng dần"
+        },
+        "values": [
+          4,
+          2,
+          3
+        ],
+        "direction": "ascending",
+        "instruction": {
+          "en": "Predict the pair decision, array and changed state before each reveal.",
+          "vi": "Dự đoán quyết định cho cặp, array và trạng thái changed trước mỗi lần mở."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "for index in range(end):",
+            "if output[index] > output[index + 1]:",
+            "output[index], output[index + 1] = output[index + 1], output[index]"
+          ],
+          "prediction": {
+            "en": "Compare 4 and 2. Does the pair swap, and what is the array?",
+            "vi": "So sánh 4 và 2. Cặp có swap không, và array là gì?"
+          },
+          "answer": {
+            "en": "4 > 2, so swap. The array becomes [2, 4, 3] and changed becomes True.",
+            "vi": "4 > 2 nên swap. Array trở thành [2, 4, 3] và changed trở thành True."
+          }
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "if output[index] > output[index + 1]:",
+            "output[index], output[index + 1] = output[index + 1], output[index]",
+            "changed = True"
+          ],
+          "prediction": {
+            "en": "Compare 4 and 3. Which value enters the sorted suffix after pass 1?",
+            "vi": "So sánh 4 và 3. Giá trị nào vào sorted suffix sau pass 1?"
+          },
+          "answer": {
+            "en": "4 > 3, so swap to [2, 3, 4]. Pass 1 ends with 4 in its final suffix position.",
+            "vi": "4 > 3 nên swap thành [2, 3, 4]. Pass 1 kết thúc với 4 ở vị trí suffix cuối cùng."
+          }
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "changed = False",
+            "if output[index] > output[index + 1]:",
+            "if not changed: break"
+          ],
+          "prediction": {
+            "en": "On pass 2, compare 2 and 3. Is another pass needed?",
+            "vi": "Trong pass 2, so sánh 2 và 3. Có cần pass khác không?"
+          },
+          "answer": {
+            "en": "2 > 3 is False, so no swap occurs. changed stays False; stop and return [2, 3, 4].",
+            "vi": "2 > 3 là False nên không swap. changed vẫn False; dừng và trả [2, 3, 4]."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "Each completed pass fixes one suffix value; a no-change pass proves every adjacent pair is already ordered.",
+        "vi": "Mỗi pass hoàn tất cố định một giá trị suffix; pass không thay đổi chứng minh mọi cặp kề nhau đã đúng thứ tự."
+      },
+      "variants": [
+        {
+          "kind": "boundary_already_sorted",
+          "input": {
+            "values": [
+              1,
+              2,
+              3
+            ]
+          },
+          "expected": {
+            "result": [
+              1,
+              2,
+              3
+            ],
+            "passes": 1,
+            "early_stop": true
+          },
+          "explanation": {
+            "en": "The first pass makes no swaps, so the function exits early with the same ordered copy.",
+            "vi": "Pass đầu không swap nên function dừng sớm với bản sao giữ nguyên thứ tự."
+          }
+        },
+        {
+          "kind": "boundary_single",
+          "input": {
+            "values": [
+              7
+            ]
+          },
+          "expected": {
+            "result": [
+              7
+            ],
+            "passes": 0
+          },
+          "explanation": {
+            "en": "There is no adjacent pair, so the outer loop does not run.",
+            "vi": "Không có cặp kề nhau nên outer loop không chạy."
+          }
+        },
+        {
+          "kind": "boundary_empty",
+          "input": {
+            "values": []
+          },
+          "expected": {
+            "result": [],
+            "passes": 0
+          },
+          "explanation": {
+            "en": "The empty copy is returned safely; this is a valid boundary, not a failure.",
+            "vi": "Bản sao rỗng được trả an toàn; đây là boundary hợp lệ, không phải failure."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I write the correct method for the stated contract?",
+        "vi": "Tôi có thể viết đúng method cho hợp đồng được nêu không?"
+      },
+      "attempt_rule": {
+        "en": "Write the next state or code before opening support. Complete one item at a time.",
+        "vi": "Viết state tiếp theo hoặc code trước khi mở hỗ trợ. Hoàn thành từng item một."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Reverse-order Bubble",
+            "vi": "Bubble với thứ tự ngược"
+          },
+          "prompt": {
+            "en": "Trace the first completed pass for [3, 2, 1].",
+            "vi": "Trace pass đầu hoàn tất cho [3, 2, 1]."
+          },
+          "hint": {
+            "en": "Compare adjacent pairs from left to right.",
+            "vi": "So sánh các cặp kề nhau từ trái sang phải."
+          },
+          "model_answer": {
+            "en": "Swap 3/2, then 3/1. The pass ends at [2, 1, 3] with 3 in the sorted suffix.",
+            "vi": "Swap 3/2, rồi 3/1. Pass kết thúc ở [2, 1, 3] với 3 trong sorted suffix."
+          },
+          "success_check": {
+            "en": "Both swaps and the final suffix are stated.",
+            "vi": "Nêu đủ cả hai swap và suffix cuối."
+          }
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm gợi ý"
+          },
+          "title": {
+            "en": "Keep equal values",
+            "vi": "Giữ các giá trị bằng nhau"
+          },
+          "prompt": {
+            "en": "Sort [2, 1, 2]. Should the equal pair 2 and 2 swap?",
+            "vi": "Sắp xếp [2, 1, 2]. Cặp bằng nhau 2 và 2 có swap không?"
+          },
+          "hint": {
+            "en": "The ascending condition is left > right.",
+            "vi": "Condition tăng dần là left > right."
+          },
+          "model_answer": {
+            "en": "The result is [1, 2, 2]. Equal values do not satisfy >, so that pair is kept.",
+            "vi": "Kết quả là [1, 2, 2]. Các giá trị bằng nhau không thỏa > nên cặp đó được giữ."
+          },
+          "success_check": {
+            "en": "The result preserves both duplicate values and uses the exact comparator.",
+            "vi": "Kết quả giữ cả hai giá trị lặp và dùng đúng comparator."
+          }
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Tự làm"
+          },
+          "title": {
+            "en": "Rebuild Bubble Sort",
+            "vi": "Dựng lại Bubble Sort"
+          },
+          "prompt": {
+            "en": "Write the loop bounds, adjacent comparison, swap, changed update, early stop and return.",
+            "vi": "Viết loop bounds, phép so sánh kề nhau, swap, cập nhật changed, early stop và return."
+          },
+          "hint": {
+            "en": "Start each pass with changed = False and compare only up to end - 1.",
+            "vi": "Bắt đầu mỗi pass với changed = False và chỉ so sánh đến end - 1."
+          },
+          "model_answer": {
+            "en": "def bubble_sort(values):\n    output = list(values)\n    for end in range(len(output) - 1, 0, -1):\n        changed = False\n        for index in range(end):\n            if output[index] > output[index + 1]:\n                output[index], output[index + 1] = output[index + 1], output[index]\n                changed = True\n        if not changed:\n            break\n    return output",
+            "vi": "def bubble_sort(values):\n    output = list(values)\n    for end in range(len(output) - 1, 0, -1):\n        changed = False\n        for index in range(end):\n            if output[index] > output[index + 1]:\n                output[index], output[index + 1] = output[index + 1], output[index]\n                changed = True\n        if not changed:\n            break\n    return output"
+          },
+          "success_check": {
+            "en": "The code works for empty, single, duplicate, sorted and reverse-order integer lists without a built-in sort.",
+            "vi": "Code chạy đúng với list integer rỗng, một phần tử, trùng, đã sắp và ngược mà không dùng built-in sort."
+          },
+          "code": [
+            "def bubble_sort(values):",
+            "    output = list(values)",
+            "    for end in range(len(output) - 1, 0, -1):",
+            "        changed = False",
+            "        for index in range(end):",
+            "            if output[index] > output[index + 1]:",
+            "                output[index], output[index + 1] = output[index + 1], output[index]",
+            "                changed = True",
+            "        if not changed:",
+            "            break",
+            "    return output"
+          ]
+        },
+        {
+          "level": {
+            "en": "Transfer",
+            "vi": "Vận dụng"
+          },
+          "title": {
+            "en": "Insertion key, shift and place",
+            "vi": "Insertion: key, shift và place"
+          },
+          "prompt": {
+            "en": "For [4, 2, 3], predict the saved key, each shift and each placement.",
+            "vi": "Với [4, 2, 3], dự đoán key được giữ, từng shift và từng placement."
+          },
+          "hint": {
+            "en": "Never overwrite the key; keep the prefix sorted.",
+            "vi": "Không ghi đè key; giữ prefix đã sắp."
+          },
+          "model_answer": {
+            "en": "Save 2, shift 4, place 2 → [2,4,3]. Save 3, shift 4, place 3 → [2,3,4].",
+            "vi": "Giữ 2, shift 4, place 2 → [2,4,3]. Giữ 3, shift 4, place 3 → [2,3,4]."
+          },
+          "success_check": {
+            "en": "The answer names the saved key, the temporary shift state and final placement.",
+            "vi": "Câu trả lời nêu key được giữ, trạng thái shift tạm thời và placement cuối."
+          },
+          "data_transfer_card": "insertion",
+          "code": [
+            "def insertion_sort(values):",
+            "    output = list(values)",
+            "    for index in range(1, len(output)):",
+            "        key = output[index]",
+            "        position = index",
+            "        while position > 0 and output[position - 1] > key:",
+            "            output[position] = output[position - 1]",
+            "            position -= 1",
+            "        output[position] = key",
+            "    return output"
+          ],
+          "state_sequence": [
+            {
+              "key": 2,
+              "before": [
+                4,
+                2,
+                3
+              ],
+              "after_shift": [
+                4,
+                4,
+                3
+              ],
+              "after_place": [
+                2,
+                4,
+                3
+              ]
+            },
+            {
+              "key": 3,
+              "before": [
+                2,
+                4,
+                3
+              ],
+              "after_shift": [
+                2,
+                4,
+                4
+              ],
+              "after_place": [
+                2,
+                3,
+                4
+              ]
+            }
+          ]
+        },
+        {
+          "level": {
+            "en": "Transfer",
+            "vi": "Vận dụng"
+          },
+          "title": {
+            "en": "Rebuild Insertion Sort",
+            "vi": "Dựng lại Insertion Sort"
+          },
+          "prompt": {
+            "en": "Write the complete key-shift-place loop from memory.",
+            "vi": "Viết loop key-shift-place đầy đủ từ trí nhớ."
+          },
+          "hint": {
+            "en": "The while guard needs both position > 0 and predecessor > key.",
+            "vi": "While guard cần cả position > 0 và predecessor > key."
+          },
+          "model_answer": {
+            "en": "def insertion_sort(values):\n    output = list(values)\n    for index in range(1, len(output)):\n        key = output[index]\n        position = index\n        while position > 0 and output[position - 1] > key:\n            output[position] = output[position - 1]\n            position -= 1\n        output[position] = key\n    return output",
+            "vi": "def insertion_sort(values):\n    output = list(values)\n    for index in range(1, len(output)):\n        key = output[index]\n        position = index\n        while position > 0 and output[position - 1] > key:\n            output[position] = output[position - 1]\n            position -= 1\n        output[position] = key\n    return output"
+          },
+          "success_check": {
+            "en": "The key is saved before shifts, position moves left, and the key is written once into the gap.",
+            "vi": "Key được giữ trước các shift, position di chuyển trái và key được ghi một lần vào gap."
+          },
+          "data_transfer_card": "insertion",
+          "code": [
+            "def insertion_sort(values):",
+            "    output = list(values)",
+            "    for index in range(1, len(output)):",
+            "        key = output[index]",
+            "        position = index",
+            "        while position > 0 and output[position - 1] > key:",
+            "            output[position] = output[position - 1]",
+            "            position -= 1",
+            "        output[position] = key",
+            "    return output"
+          ]
+        },
+        {
+          "level": {
+            "en": "Transfer",
+            "vi": "Vận dụng"
+          },
+          "title": {
+            "en": "Use the stated comparator",
+            "vi": "Dùng comparator được nêu"
+          },
+          "prompt": {
+            "en": "For descending numeric order, when should an adjacent pair swap? How would a supplied CompareStrings result control the same decision?",
+            "vi": "Với thứ tự số giảm dần, khi nào cặp kề nhau phải swap? Kết quả CompareStrings được cung cấp sẽ điều khiển cùng quyết định thế nào?"
+          },
+          "hint": {
+            "en": "Change the wrong-order test, not the pass structure.",
+            "vi": "Đổi phép kiểm tra sai thứ tự, không đổi cấu trúc pass."
+          },
+          "model_answer": {
+            "en": "Descending numbers swap when left < right. For strings, swap exactly when the supplied comparator says the left string belongs after the right string.",
+            "vi": "Số giảm dần swap khi left < right. Với string, swap đúng khi comparator được cung cấp nói string trái phải đứng sau string phải."
+          },
+          "success_check": {
+            "en": "The answer states the comparison contract and keeps the whole Bubble pass structure.",
+            "vi": "Câu trả lời nêu hợp đồng so sánh và giữ nguyên toàn bộ cấu trúc Bubble pass."
+          },
+          "data_transfer_card": "comparator"
+        },
+        {
+          "level": {
+            "en": "Transfer",
+            "vi": "Vận dụng"
+          },
+          "title": {
+            "en": "Insert into bounded ordered data",
+            "vi": "Chèn vào dữ liệu có thứ tự và capacity"
+          },
+          "prompt": {
+            "en": "Insert 4 into [1, 3, 7] with capacity 5. State position, shifts and result. Then state what happens when [1, 2] is already full at capacity 2.",
+            "vi": "Chèn 4 vào [1, 3, 7] với capacity 5. Nêu position, shifts và kết quả. Sau đó nêu điều gì xảy ra khi [1, 2] đã đầy ở capacity 2."
+          },
+          "hint": {
+            "en": "Check capacity before shifting; move the suffix without losing an item.",
+            "vi": "Kiểm tra capacity trước khi shift; di chuyển suffix mà không làm mất item."
+          },
+          "model_answer": {
+            "en": "Place 4 at index 2 after shifting 7 right: [1, 3, 4, 7]. The full [1, 2] case returns FULL and remains unchanged.",
+            "vi": "Đặt 4 tại index 2 sau khi shift 7 sang phải: [1, 3, 4, 7]. Trường hợp [1, 2] đầy trả FULL và giữ nguyên."
+          },
+          "success_check": {
+            "en": "Capacity is 5 in the normal fixture; FULL belongs to ordered insertion, not Bubble Sort.",
+            "vi": "Capacity là 5 trong normal fixture; FULL thuộc ordered insertion, không thuộc Bubble Sort."
+          },
+          "data_transfer_card": "ordered-insert"
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which small sorting error changes the result or loses data?",
+        "vi": "Lỗi sorting nhỏ nào làm đổi kết quả hoặc mất dữ liệu?"
+      },
+      "before_code": [
+        {
+          "en": "Write the direction, comparator, live range, mutation and return contract before coding.",
+          "vi": "Viết hướng, comparator, phạm vi sống, mutation và hợp đồng return trước khi code."
+        }
+      ],
+      "core_code_caption": {
+        "en": "Three-line Bubble checkpoint",
+        "vi": "Checkpoint Bubble ba dòng"
+      },
+      "core_code": [
+        "changed = False",
+        "if output[index] > output[index + 1]:",
+        "    output[index], output[index + 1] = output[index + 1], output[index]"
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Letting index + 1 leave the unsorted range.",
+            "vi": "Để index + 1 ra ngoài vùng chưa sắp."
+          },
+          "consequence": {
+            "en": "The code reads outside the list or compares a suffix item again.",
+            "vi": "Code đọc ngoài list hoặc so sánh lại item trong suffix."
+          },
+          "repair": {
+            "en": "Use range(end), where end is the last index in the unsorted range.",
+            "vi": "Dùng range(end), trong đó end là index cuối của vùng chưa sắp."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Not resetting changed before each pass.",
+            "vi": "Không reset changed trước mỗi pass."
+          },
+          "consequence": {
+            "en": "Early-stop logic can never prove that the newest pass made no swaps.",
+            "vi": "Logic early-stop không thể chứng minh pass mới nhất không swap."
+          },
+          "repair": {
+            "en": "Set changed = False at the start of every outer-loop pass.",
+            "vi": "Đặt changed = False ở đầu mỗi pass của outer loop."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Swapping only the compared field of a record.",
+            "vi": "Chỉ swap field được so sánh của record."
+          },
+          "consequence": {
+            "en": "Fields from different records become mixed.",
+            "vi": "Các field của record khác nhau bị trộn."
+          },
+          "repair": {
+            "en": "Move the whole item or whole record while using the stated comparator.",
+            "vi": "Di chuyển toàn item hoặc toàn record trong khi dùng comparator được nêu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Overwriting the Insertion key before shifts finish.",
+            "vi": "Ghi đè Insertion key trước khi shift xong."
+          },
+          "consequence": {
+            "en": "The original value is lost and cannot be placed into the gap.",
+            "vi": "Giá trị gốc bị mất và không thể đặt vào gap."
+          },
+          "repair": {
+            "en": "Save key first, shift predecessors, then write key once.",
+            "vi": "Giữ key trước, shift các predecessor, rồi ghi key một lần."
+          }
+        }
+      ],
+      "boundary_trace": [
+        {
+          "en": "Empty, single-item and already-sorted inputs are valid Bubble results. FULL is an ordered-insert result only.",
+          "vi": "Input rỗng, một item và đã sắp là các kết quả Bubble hợp lệ. FULL chỉ là kết quả ordered-insert."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Did I use the required comparator, safe pair bound, complete item movement, correct pass/key invariant and required return?",
+          "vi": "Tôi đã dùng đúng comparator, pair bound an toàn, di chuyển item đầy đủ, invariant pass/key đúng và return bắt buộc chưa?"
+        }
+      ],
+      "authority_note": {
+        "en": "Follow the method, comparator, direction, bounds and return contract stated by the question. Do not present one integrated trace as proof of three methods.",
+        "vi": "Làm theo method, comparator, hướng, bounds và hợp đồng return do đề nêu. Không trình bày một integrated trace làm bằng chứng cho ba method."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild both sorting methods and adapt the comparison?",
+        "vi": "Tôi có thể dựng lại cả hai sorting method và điều chỉnh phép so sánh không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "What does Bubble Sort compare and when does it swap?",
+            "vi": "Bubble Sort so sánh gì và khi nào swap?"
+          },
+          "answer": {
+            "en": "It compares adjacent items and swaps only when the pair is in the wrong order for the required comparator.",
+            "vi": "Nó so sánh các item kề nhau và chỉ swap khi cặp sai thứ tự theo comparator bắt buộc."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What becomes final after a completed ascending Bubble pass?",
+            "vi": "Điều gì trở thành final sau một Bubble pass tăng dần hoàn tất?"
+          },
+          "answer": {
+            "en": "The largest item in that unsorted range enters the sorted suffix.",
+            "vi": "Item lớn nhất trong vùng chưa sắp đó đi vào sorted suffix."
+          }
+        },
+        {
+          "prompt": {
+            "en": "Why can a no-change pass stop?",
+            "vi": "Vì sao pass không thay đổi có thể dừng?"
+          },
+          "answer": {
+            "en": "Every adjacent pair inspected was already ordered, so the whole remaining range is ordered.",
+            "vi": "Mọi cặp kề nhau đã kiểm tra đều đúng thứ tự, nên toàn bộ vùng còn lại đã có thứ tự."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What is the Insertion Sort invariant?",
+            "vi": "Invariant của Insertion Sort là gì?"
+          },
+          "answer": {
+            "en": "The prefix before the current key is sorted; save the key, shift larger predecessors, then place it in the gap.",
+            "vi": "Prefix trước key hiện tại đã sắp; giữ key, shift các predecessor lớn hơn, rồi đặt nó vào gap."
+          }
+        },
+        {
+          "prompt": {
+            "en": "What changes for descending, strings or records?",
+            "vi": "Điều gì thay đổi với giảm dần, strings hoặc records?"
+          },
+          "answer": {
+            "en": "The comparison contract changes; the algorithm structure stays, and whole records must move together.",
+            "vi": "Hợp đồng so sánh thay đổi; cấu trúc thuật toán giữ nguyên và toàn record phải di chuyển cùng nhau."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "From memory, write Bubble Sort and Insertion Sort, trace [4,2,3] with each method, then adapt one comparator without using a built-in sort.",
+        "vi": "Từ trí nhớ, viết Bubble Sort và Insertion Sort, trace [4,2,3] với từng method, rồi điều chỉnh một comparator mà không dùng built-in sort."
+      },
+      "next_step": {
+        "en": "Continue to performance to compare how initial order and input size affect sorting work.",
+        "vi": "Học tiếp performance để so sánh cách thứ tự ban đầu và kích thước input ảnh hưởng lượng công việc sorting."
+      }
+    }
+  }
+}

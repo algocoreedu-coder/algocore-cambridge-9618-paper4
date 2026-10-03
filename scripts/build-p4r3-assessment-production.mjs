@@ -225,6 +225,47 @@ function assessmentRubric(slug, level, patterns, requirements, refs, representat
   };
 }
 
+const graphScopeCopy = {
+  "graphs.g1": {
+    prompt: bilingual("Dùng scenario fixture normal được cung cấp: mạng tuyến đường có town, đường một chiều và journey time. Xác định vertex, edge rồi phân loại direction và weight. Không yêu cầu code graph structure.", "Use the supplied normal scenario fixture: a route network contains towns, one-way roads and journey times. Identify vertices and edges, then classify direction and weight. No graph-structure code is required."),
+    expected: bilingual("Mô hình tình huống có nhãn, nêu vertex, edge, direction, weight và ý nghĩa của từng lựa chọn.", "A labelled scenario model naming vertices, edges, direction, weights and the meaning of each choice."),
+  },
+  "graphs.f1": {
+    prompt: bilingual("Dùng scenario fixture boundary để so sánh adjacency list và adjacency matrix cho mạng tuyến đường sparse. Chọn một representation và giải thích; không cài đặt.", "Use the supplied boundary scenario fixture to compare an adjacency list and adjacency matrix for a sparse route network. Choose one representation and justify it; do not implement it."),
+    expected: bilingual("Lựa chọn representation có giải thích theo tình huống và một hạn chế.", "A representation choice with a scenario-based justification and one limitation."),
+  },
+  "graphs.i1": {
+    prompt: bilingual("Coi fixture normal, boundary và failure là ba scenario case. Xác định vertex, edge, quyết định direction và weight có ý nghĩa không, rồi giải thích graph. Không yêu cầu cài đặt Python.", "Treat the normal, boundary and failure fixtures as three scenario cases. Define vertices and edges, decide whether direction and weight are meaningful, and justify the graph. No Python implementation is required."),
+    expected: bilingual("Bản phân loại và giải thích graph độc lập, bám theo tình huống giao hàng.", "An independent graph classification and justification grounded in the delivery scenario."),
+  },
+};
+
+function applyGraphScopeBoundary(record) {
+  const copy = graphScopeCopy[record.assessment_item_id];
+  if (!copy) return;
+  record.prompt = copy.prompt;
+  record.expected_artifact = copy.expected;
+  record.hint = bilingual("Nối từng lựa chọn mô hình với một dữ kiện trong tình huống: entity, relationship, direction hoặc measurable cost.", "Link each modelling choice to a fact in the scenario: entity, relationship, direction or measurable cost.");
+  record.feedback = bilingual("Nếu mô hình chưa rõ, quay lại tình huống và sửa vertex, edge, direction hoặc weight đầu tiên chưa có ý nghĩa được chứng minh.", "If the model is unclear, return to the scenario and correct the first vertex, edge, direction or weight whose meaning is unsupported.");
+  for (const criterion of record.self_rubric.criteria) {
+    if (criterion.criterion_id.endsWith(".requirement")) {
+      criterion.description = bilingual("Câu trả lời đáp ứng graph feature và giải thích mà không đòi code graph structure; nhãn workflow không phải phân bổ điểm Cambridge.", "The response addresses linked graph features and justification without requiring graph-structure code; workflow labels are not Cambridge mark allocations.");
+      criterion.evidence_required = "A written scenario model identifying vertices, edges and every justified feature.";
+    } else if (criterion.criterion_id.endsWith(".execution")) {
+      criterion.description = bilingual("Phân loại khớp các dữ kiện đã nêu trong tình huống.", "The classification matches the stated scenario facts.");
+      criterion.evidence_required = "A written mapping from scenario facts to graph features.";
+    } else if (criterion.criterion_id.endsWith(".trace")) {
+      criterion.description = bilingual("Lập luận xác định entity, relationship và mọi graph feature đã chọn.", "The reasoning identifies entities, relationships and every selected graph feature.");
+      criterion.evidence_required = "A concise entity-to-vertex and relationship-to-edge explanation.";
+    } else if (criterion.criterion_id.endsWith(".transfer")) {
+      criterion.description = bilingual("Lựa chọn được chuyển sang tình huống mới mà không thêm graph feature thiếu căn cứ.", "The choice is transferred to a new scenario without adding unsupported graph features.");
+      criterion.evidence_required = "An independent classification and justification for the new scenario.";
+    }
+  }
+  record.self_rubric.pass_rule = bilingual("Đạt khi mọi graph feature đều đúng và được giải thích từ tình huống.", "Pass when every graph feature is correct and justified from the scenario.");
+  record.self_rubric.retry_rule = bilingual("Sửa lựa chọn mô hình đầu tiên thiếu căn cứ rồi kiểm lại toàn bộ giải thích.", "Repair the first modelling choice that lacks support, then re-check the complete explanation.");
+}
+
 const markingPath = join(contentRoot, "mappings", "marking-disposition.json");
 const assessmentPath = join(contentRoot, "mappings", "assessment-item-map.json");
 const [markingText, assessmentText] = await Promise.all([readFile(markingPath, "utf8"), readFile(assessmentPath, "utf8")]);
@@ -309,6 +350,7 @@ for (const slug of productionSlugs) {
     });
   }
 }
+for (const envelope of assessmentEnvelopes) applyGraphScopeBoundary(envelope.record);
 
 const capstoneSource = sourceItems.find((item) => item.assessment_item_id === p4r9CapstoneId);
 if (!capstoneSource) throw new Error(`Missing source assessment ${p4r9CapstoneId}`);

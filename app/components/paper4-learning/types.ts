@@ -199,7 +199,7 @@ export type CourseManifest = Readonly<{
   counts: Readonly<{
     packages: 13; lessons: 26; patterns: 58; sections_per_lesson: 10;
     knowledge_units: 108; python_artifacts: 26; visual_scenario_traces: 174;
-    visual_event_bindings: 870; marking_chains: 58; assessment_items: 79; lesson_release_records: 26;
+    visual_event_bindings: 945; marking_chains: 58; assessment_items: 79; lesson_release_records: 26;
   }>;
   canonical_sections: readonly Readonly<{ section_id: string; kind: LearningBlockKind; order: number }>[];
   packages: readonly Readonly<{ package_id: string; label: string; title: Localized; lesson_slugs: readonly string[] }>[];

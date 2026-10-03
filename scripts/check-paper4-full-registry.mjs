@@ -16,6 +16,7 @@ import {
 } from "./build-paper4-full-registry.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const PROJECT_ROOT = path.resolve(ROOT, "..");
 const CONTENT_ROOT = path.join(ROOT, "content", "paper4");
 const RECORD_ROOT = path.join(CONTENT_ROOT, "records", "full");
 const PLANNING_ROOT = path.resolve(ROOT, "..", "planning", "paper4", "next-phase");
@@ -26,6 +27,8 @@ const RESOLVER_FILES = [
 ];
 const GAP_LESSON_SLUGS = ["testing", "dictionary", "performance", "graphs", "random-files", "exceptions"];
 const GAP_LESSON_IDS = new Set(GAP_LESSON_SLUGS.map((slug) => `ac-9618-p4-2026-python.lesson.${slug}`));
+const RELEASE_STATUS_FIELDS = ["locale_parity", "academic_review", "execution_review", "ux_review", "lead_gate"];
+const RELEASE_STATUSES = new Set(["PASS", "FAIL", "PENDING"]);
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const readJson = async (filename) => JSON.parse(await readFile(filename, "utf8"));
@@ -43,13 +46,72 @@ function indexDocuments(documents) {
   };
 }
 
-function fullCrossErrors(documents, sourceMap, evidenceRecords) {
+function releaseDecisionErrors(manifest, sourceMap) {
+  const errors = [];
+  const lessons = Array.isArray(manifest?.lessons) ? manifest.lessons : [];
+  const catalog = manifest?.evidence_catalog && typeof manifest.evidence_catalog === "object" ? manifest.evidence_catalog : {};
+  const expectedById = new Map(sourceMap.lessons.map((lesson) => [lesson.lesson_id, lesson]));
+  const actualIds = lessons.map((lesson) => lesson.lesson_id);
+  const uniqueIds = new Set(actualIds);
+  if (manifest?.schema_version !== "paper4-release-decision-v1") fail(errors, "RELEASE_DECISION_SCHEMA", "Expected paper4-release-decision-v1.");
+  if (lessons.length !== expectedById.size || uniqueIds.size !== expectedById.size || [...expectedById.keys()].some((id) => !uniqueIds.has(id))) {
+    fail(errors, "RELEASE_DECISION_EXACT_SET", `Decision manifest must contain each of the ${expectedById.size} source-mapped lessons exactly once.`);
+  }
+  if (JSON.stringify(manifest?.policy?.required_pass_fields) !== JSON.stringify(RELEASE_STATUS_FIELDS)) {
+    fail(errors, "RELEASE_DECISION_POLICY_DRIFT", "required_pass_fields differs from the five release gates.");
+  }
+  for (const [evidenceId, evidence] of Object.entries(catalog)) {
+    if (!evidenceId || typeof evidence?.path !== "string" || !/^[a-f0-9]{64}$/.test(evidence?.sha256 ?? "")) fail(errors, "RELEASE_EVIDENCE_CATALOG_INVALID", evidenceId || "<empty>");
+    if (!RELEASE_STATUS_FIELDS.includes(evidence?.review_dimension) || !RELEASE_STATUSES.has(evidence?.asserted_status)) fail(errors, "RELEASE_EVIDENCE_CATALOG_INVALID", evidenceId);
+  }
+  for (const decision of lessons) {
+    const expected = expectedById.get(decision.lesson_id);
+    if (!expected || decision.slug !== expected.slug || decision.package_id !== expected.package_id) fail(errors, "RELEASE_DECISION_IDENTITY_DRIFT", `${decision.lesson_id}: slug/package source mismatch.`);
+    for (const field of RELEASE_STATUS_FIELDS) {
+      if (!RELEASE_STATUSES.has(decision[field])) fail(errors, "RELEASE_DECISION_STATUS_INVALID", `${decision.lesson_id}/${field}: ${decision[field]}`);
+      const refs = decision.evidence_refs?.[field];
+      if (!Array.isArray(refs) || refs.length === 0) {
+        fail(errors, "RELEASE_EVIDENCE_REF_MISSING", `${decision.lesson_id}/${field}`);
+        continue;
+      }
+      for (const evidenceId of refs) {
+        const evidence = catalog[evidenceId];
+        if (!evidence) fail(errors, "RELEASE_EVIDENCE_REF_UNRESOLVED", `${decision.lesson_id}/${field}: ${evidenceId}`);
+        else if (evidence.review_dimension !== field) fail(errors, "RELEASE_EVIDENCE_DIMENSION_MISMATCH", `${decision.lesson_id}/${field}: ${evidenceId}`);
+        else if (evidence.asserted_status !== decision[field]) fail(errors, "RELEASE_EVIDENCE_STATUS_MISMATCH", `${decision.lesson_id}/${field}: decision ${decision[field]}, evidence ${evidence.asserted_status}`);
+      }
+    }
+    const expectedAllowed = RELEASE_STATUS_FIELDS.every((field) => decision[field] === "PASS");
+    if (decision.release_allowed !== expectedAllowed) fail(errors, "RELEASE_ALLOWED_STATUS_MISMATCH", `${decision.lesson_id}: expected release_allowed=${expectedAllowed}.`);
+  }
+  return errors;
+}
+
+async function releaseEvidenceFileErrors(manifest) {
+  const errors = [];
+  for (const [evidenceId, evidence] of Object.entries(manifest.evidence_catalog ?? {})) {
+    if (typeof evidence?.path !== "string") continue;
+    const evidencePath = path.resolve(ROOT, evidence.path);
+    if (!(evidencePath === PROJECT_ROOT || evidencePath.startsWith(`${PROJECT_ROOT}${path.sep}`))) {
+      fail(errors, "RELEASE_EVIDENCE_PATH_ESCAPE", `${evidenceId}: ${evidence.path}`);
+    } else if (!existsSync(evidencePath)) {
+      fail(errors, "RELEASE_EVIDENCE_FILE_UNRESOLVED", `${evidenceId}: ${evidence.path}`);
+    } else if (sha256(await readFile(evidencePath)) !== evidence.sha256) {
+      fail(errors, "RELEASE_EVIDENCE_FILE_HASH_DRIFT", evidenceId);
+    }
+  }
+  return errors;
+}
+
+function fullCrossErrors(documents, sourceMap, evidenceRecords, releaseDecisionManifest) {
   const errors = [];
   const idx = indexDocuments(documents);
   const expectedLessons = new Set(sourceMap.lessons.map((lesson) => lesson.lesson_id));
   const sourceByLesson = new Map(sourceMap.lessons.map((lesson) => [lesson.lesson_id, lesson]));
   const releaseByLesson = new Map(idx.records.LessonReleaseRecord.map((record) => [record.lesson_id, record]));
   const evidenceById = new Map(evidenceRecords.map((record) => [record.evidence_id, record]));
+  errors.push(...releaseDecisionErrors(releaseDecisionManifest, sourceMap));
+  const decisionByLesson = new Map((releaseDecisionManifest.lessons ?? []).map((decision) => [decision.lesson_id, decision]));
 
   for (const type of RECORD_TYPES) {
     if (idx.records[type].length !== EXPECTED_COUNTS[type]) fail(errors, "EXACT_COUNT", `${type}: expected ${EXPECTED_COUNTS[type]}, found ${idx.records[type].length}.`);
@@ -81,8 +143,12 @@ function fullCrossErrors(documents, sourceMap, evidenceRecords) {
   for (const release of idx.records.LessonReleaseRecord) {
     const sourceLesson = sourceByLesson.get(release.lesson_id);
     if (!sourceLesson || release.package_id !== sourceLesson.package_id || release.slug !== sourceLesson.slug) fail(errors, "RELEASE_IDENTITY_DRIFT", `${release.lesson_id} package/slug differs from source map.`);
-    if (release.lead_gate !== "PENDING") fail(errors, "PREMATURE_LEAD_GATE", `${release.lesson_id} lead_gate must remain PENDING.`);
-    if (release.release_allowed !== false) fail(errors, "PREMATURE_RELEASE_ALLOWED", `${release.lesson_id} release_allowed must remain false.`);
+    const decision = decisionByLesson.get(release.lesson_id);
+    if (!decision) fail(errors, "RELEASE_DECISION_RECORD_MISSING", release.lesson_id);
+    else {
+      for (const field of RELEASE_STATUS_FIELDS) if (release[field] !== decision[field]) fail(errors, "RELEASE_DECISION_RECORD_DRIFT", `${release.lesson_id}/${field}`);
+      if (release.release_allowed !== decision.release_allowed) fail(errors, "RELEASE_DECISION_RECORD_DRIFT", `${release.lesson_id}/release_allowed`);
+    }
     if (JSON.stringify(release.canonical_section_ids) !== JSON.stringify(SECTION_IDS)) fail(errors, "SECTION_CONTRACT_DRIFT", `${release.lesson_id} does not use the ten canonical sections in canonical order.`);
 
     const lessonArtifacts = idx.records.PythonArtifact.filter((record) => record.lesson_id === release.lesson_id);
@@ -176,19 +242,20 @@ async function filesystemEvidenceErrors(documents, evidenceRecords) {
   return errors;
 }
 
-function validationCodes(documents, sourceMap, evidenceRecords) {
+function validationCodes(documents, sourceMap, evidenceRecords, releaseDecisionManifest) {
   return [
     ...validateRegistry(documents).map((error) => error.code),
-    ...fullCrossErrors(documents, sourceMap, evidenceRecords).map((error) => error.code),
+    ...fullCrossErrors(documents, sourceMap, evidenceRecords, releaseDecisionManifest).map((error) => error.code),
   ];
 }
 
-function mutationResults(documents, sourceMap, evidenceRecords) {
+function mutationResults(documents, sourceMap, evidenceRecords, releaseDecisionManifest) {
   const tests = [];
   const run = (id, mutate, expectedCode) => {
     const candidate = clone(documents);
-    mutate(candidate);
-    const codes = new Set(validationCodes(candidate, sourceMap, evidenceRecords));
+    const decisions = clone(releaseDecisionManifest);
+    mutate(candidate, decisions);
+    const codes = new Set(validationCodes(candidate, sourceMap, evidenceRecords, decisions));
     tests.push({ mutation_id: id, expected_code: expectedCode, rejected: codes.has(expectedCode), actual_codes: [...codes].sort() });
   };
   run("unknown-active-line", (items) => { items.find((item) => item.artifact_type === "VisualEventBinding").record.active_line_ids = ["unknown.v1.L999"]; }, "LINE_BINDING_INVALID");
@@ -199,7 +266,24 @@ function mutationResults(documents, sourceMap, evidenceRecords) {
   }, "RELEASE_KNOWLEDGE_JOIN_INVALID");
   run("unknown-execution-evidence", (items) => { items.find((item) => item.artifact_type === "VisualScenarioTrace").record.execution_evidence_ref = "unknown.execution-evidence"; }, "EXECUTION_EVIDENCE_UNRESOLVED");
   run("source-locator-removed", (items) => { items.find((item) => item.artifact_type === "LessonReleaseRecord").record.source_refs[0].locator = { source_id: "syllabus_2026_v2" }; }, "SOURCE_LOCATOR_UNRESOLVED");
-  run("premature-release", (items) => { items.find((item) => item.artifact_type === "LessonReleaseRecord").record.release_allowed = true; }, "PREMATURE_RELEASE_ALLOWED");
+  run("premature-release", (items) => {
+    const record = items.find((item) => item.artifact_type === "LessonReleaseRecord").record;
+    record.lead_gate = "PENDING";
+    record.release_allowed = true;
+  }, "PREMATURE_RELEASE_ALLOWED");
+  run("release-decision-missing-lesson", (_items, decisions) => { decisions.lessons.pop(); }, "RELEASE_DECISION_EXACT_SET");
+  run("release-decision-unknown-evidence", (_items, decisions) => { decisions.lessons[0].evidence_refs.lead_gate = ["unknown.release-evidence"]; }, "RELEASE_EVIDENCE_REF_UNRESOLVED");
+  run("release-decision-record-drift", (items) => {
+    const record = items.find((item) => item.artifact_type === "LessonReleaseRecord").record;
+    record.ux_review = record.ux_review === "PASS" ? "PENDING" : "PASS";
+  }, "RELEASE_DECISION_RECORD_DRIFT");
+  run("release-evidence-status-drift", (items, decisions) => {
+    const targetDecision = decisions.lessons[0];
+    const targetRecord = items.find((item) => item.artifact_type === "LessonReleaseRecord" && item.record.lesson_id === targetDecision.lesson_id).record;
+    targetDecision.lead_gate = targetRecord.lead_gate = targetDecision.lead_gate === "PASS" ? "PENDING" : "PASS";
+    const releaseAllowed = RELEASE_STATUS_FIELDS.every((field) => targetDecision[field] === "PASS");
+    targetDecision.release_allowed = targetRecord.release_allowed = releaseAllowed;
+  }, "RELEASE_EVIDENCE_STATUS_MISMATCH");
   run("gap-official-marks", (items) => {
     const item = items.find((entry) => entry.artifact_type === "AssessmentItem" && entry.record.self_rubric?.pattern_authority === "AlgoCore_representational_workflow_only");
     item.record.self_rubric.official_marks = 1;
@@ -224,8 +308,9 @@ async function main() {
   const resolvers = await Promise.all(RESOLVER_FILES.map(readJson));
   const evidenceRecords = resolvers.flatMap((resolver) => resolver.records);
   const errors = validateRegistry(documents).map((error) => ({ code: `REGISTRY_${error.code}`, detail: JSON.stringify(error) }));
-  errors.push(...fullCrossErrors(documents, first.sourceMap, evidenceRecords));
+  errors.push(...fullCrossErrors(documents, first.sourceMap, evidenceRecords, first.releaseDecisionManifest));
   errors.push(...await filesystemEvidenceErrors(documents, evidenceRecords));
+  errors.push(...await releaseEvidenceFileErrors(first.releaseDecisionManifest));
   if (JSON.stringify(expectedFiles) !== JSON.stringify(secondFiles)) fail(errors, "NONDETERMINISTIC_COMPILE", "Two in-memory rebuilds were not byte-identical.");
 
   const expectedNames = new Set([...Object.values(TYPE_FILES), "SHA256SUMS.txt"]);
@@ -238,7 +323,7 @@ async function main() {
   const actualManifest = existsSync(path.join(RECORD_ROOT, "SHA256SUMS.txt")) ? await readFile(path.join(RECORD_ROOT, "SHA256SUMS.txt"), "utf8") : "";
   if (actualManifest !== hashManifest(expectedDigest)) fail(errors, "HASH_MANIFEST_DRIFT", "SHA256SUMS.txt differs from deterministic build.");
 
-  const mutations = mutationResults(documents, first.sourceMap, evidenceRecords);
+  const mutations = mutationResults(documents, first.sourceMap, evidenceRecords, first.releaseDecisionManifest);
   for (const mutation of mutations) if (!mutation.rejected) fail(errors, "NEGATIVE_MUTATION_NOT_REJECTED", `${mutation.mutation_id}: expected ${mutation.expected_code}.`);
   const after = await snapshotGenerated();
   if (JSON.stringify([...before]) !== JSON.stringify([...after])) fail(errors, "READ_ONLY_CHECK_MUTATED_OUTPUT", "Checker changed generated registry files.");
@@ -260,6 +345,9 @@ async function main() {
       events: records.VisualEventBinding.length,
       gap_assessments: records.AssessmentItem.filter((record) => record.self_rubric?.pattern_authority === "AlgoCore_representational_workflow_only").length,
       pending_lead_gates: records.LessonReleaseRecord.filter((record) => record.lead_gate === "PENDING").length,
+      pending_academic_reviews: records.LessonReleaseRecord.filter((record) => record.academic_review === "PENDING").length,
+      pending_execution_reviews: records.LessonReleaseRecord.filter((record) => record.execution_review === "PENDING").length,
+      pending_ux_reviews: records.LessonReleaseRecord.filter((record) => record.ux_review === "PENDING").length,
       release_allowed_true: records.LessonReleaseRecord.filter((record) => record.release_allowed === true).length,
     },
     resolution_counts: {

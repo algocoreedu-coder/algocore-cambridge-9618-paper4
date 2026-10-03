@@ -13,7 +13,7 @@ class Book:
         return {"type": "BOOK", "title": self.Title, "pages": self.Pages}
 
     def set_pages(self, pages):
-        if not isinstance(pages, int) or pages <= 0:
+        if type(pages) is not int or pages <= 0:
             return False
         self.Pages = pages
         return True
@@ -42,6 +42,9 @@ def read_books(csv_path, trace):
             try:
                 pages = int(fields[2])
             except ValueError:
+                return None, f"INVALID_PAGES_AT_LINE_{line_number}"
+            if pages <= 0:
+                trace.append({"event": "reject_record", "line": line_number, "reason": "pages_must_be_positive"})
                 return None, f"INVALID_PAGES_AT_LINE_{line_number}"
             record_type = fields[0]
             if record_type == "BOOK" and len(fields) == 3:

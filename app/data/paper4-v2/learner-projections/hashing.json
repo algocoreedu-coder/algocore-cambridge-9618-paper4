@@ -1,0 +1,569 @@
+{
+  "status": "teacher-approved-for-implementation",
+  "lesson_title": {
+    "en": "Hashing as supporting technique",
+    "vi": "Hashing như một kỹ thuật hỗ trợ"
+  },
+  "exam_family": {
+    "en": "Hash function, collision policy and search",
+    "vi": "Hash function, xử lý collision và tìm kiếm"
+  },
+  "language_policy": {
+    "en": "English is the canonical teaching version.",
+    "vi": "Tiếng Việt là bản tham khảo có cùng cấu trúc học tập."
+  },
+  "learner_promise": {
+    "en": "Apply only the hash function and collision rule supplied by a question, then trace probes without treating one policy as universal.",
+    "vi": "Chỉ áp dụng hash function và collision rule đề cho, rồi trace các probe mà không coi một policy là quy tắc chung."
+  },
+  "learner_outcomes": [
+    {
+      "en": "Recognise this question family and extract its contract.",
+      "vi": "Nhận diện dạng câu hỏi và rút ra contract."
+    },
+    {
+      "en": "Explain the governing rule before attempting the task.",
+      "vi": "Giải thích quy tắc chính trước khi làm."
+    },
+    {
+      "en": "Trace a normal path and protect the relevant boundary or failure state.",
+      "vi": "Trace normal path và bảo vệ boundary hoặc failure state liên quan."
+    }
+  ],
+  "stages": {
+    "recognise": {
+      "order": 1,
+      "name": {
+        "en": "Recognise",
+        "vi": "Nhận diện"
+      },
+      "student_question": {
+        "en": "What is this question asking me to preserve?",
+        "vi": "Câu hỏi yêu cầu tôi giữ điều gì?"
+      },
+      "intro": {
+        "en": "Apply only the hash function and collision rule supplied by a question, then trace probes without treating one policy as universal.",
+        "vi": "Chỉ áp dụng hash function và collision rule đề cho, rồi trace các probe mà không coi một policy là quy tắc chung."
+      },
+      "prompt_fragment": {
+        "en": "hash function, address, slot, collision, linear probing, overflow",
+        "vi": "hash function, address, slot, collision, linear probing, overflow"
+      },
+      "cues": [
+        {
+          "en": "hash function, address, slot, collision, linear probing, overflow",
+          "vi": "hash function, address, slot, collision, linear probing, overflow"
+        },
+        {
+          "en": "The table size, hash function, empty marker and collision rule are stated.",
+          "vi": "Kích thước bảng, hash function, empty marker và collision rule đã được nêu."
+        },
+        {
+          "en": "Give the visited addresses and final found, inserted or full result.",
+          "vi": "Nêu các address đã xét và kết quả found, inserted hoặc full."
+        }
+      ],
+      "precondition": {
+        "en": "The table size, hash function, empty marker and collision rule are stated.",
+        "vi": "Kích thước bảng, hash function, empty marker và collision rule đã được nêu."
+      },
+      "output_contract": {
+        "en": "Give the visited addresses and final found, inserted or full result.",
+        "vi": "Nêu các address đã xét và kết quả found, inserted hoặc full."
+      }
+    },
+    "understand": {
+      "order": 2,
+      "name": {
+        "en": "Understand",
+        "vi": "Hiểu quy tắc"
+      },
+      "student_question": {
+        "en": "What rule controls every correct step?",
+        "vi": "Quy tắc nào kiểm soát mọi bước đúng?"
+      },
+      "mental_model": {
+        "en": "The hash function proposes an address. A collision rule decides where to look next; that rule belongs to the current question.",
+        "vi": "Hash function đề xuất một address. Collision rule quyết định nơi xét tiếp; quy tắc đó thuộc câu hỏi hiện tại."
+      },
+      "rules": [
+        {
+          "en": "Normalise the key exactly as instructed before calculating the address.",
+          "vi": "Chuẩn hóa key đúng như đề trước khi tính address."
+        },
+        {
+          "en": "On collision, follow the supplied probe sequence and stop after at most one full table cycle.",
+          "vi": "Khi collision, theo đúng probe sequence và dừng sau tối đa một vòng bảng."
+        },
+        {
+          "en": "Search and insertion must use the same collision policy.",
+          "vi": "Search và insertion phải dùng cùng collision policy."
+        }
+      ],
+      "invariant": {
+        "en": "No occupied slot is overwritten and every probe stays within table bounds.",
+        "vi": "Không ghi đè slot đã dùng và mọi probe nằm trong giới hạn bảng."
+      },
+      "python_recipe": {
+        "caption": {
+          "en": "Focused exam recipe",
+          "vi": "Khung làm bài trọng tâm"
+        },
+        "lines": [
+          "address = key % len(table)",
+          "start = address",
+          "while table[address] is not None:",
+          "    address = (address + 1) % len(table)",
+          "    if address == start: return False"
+        ],
+        "contract_note": {
+          "en": "Use this as a small teaching excerpt; adapt names and exact behaviour to the question contract.",
+          "vi": "Dùng đây như đoạn hướng dẫn ngắn; điều chỉnh tên và hành vi theo đúng contract của đề."
+        }
+      }
+    },
+    "trace": {
+      "order": 3,
+      "name": {
+        "en": "Trace",
+        "vi": "Trace từng bước"
+      },
+      "student_question": {
+        "en": "What is the home address, and how does the collision rule choose the next slot?",
+        "vi": "Home address là gì và collision rule chọn slot tiếp theo thế nào?"
+      },
+      "scenario": {
+        "label": {
+          "en": "Insert key 24 into a size-7 table with linear probing",
+          "vi": "Insert key 24 vào table size 7 bằng linear probing"
+        },
+        "instruction": {
+          "en": "Predict address, inspected slot and stopping condition before reveal.",
+          "vi": "Dự đoán address, slot được kiểm tra và stopping condition trước khi mở."
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "code_focus": [
+            "address = key % len(table)",
+            "start = address"
+          ],
+          "prediction": {
+            "en": "For key 24 and table length 7, what is the home address?",
+            "vi": "Với key 24 và table length 7, home address là bao nhiêu?"
+          },
+          "answer": {
+            "en": "24 MOD 7 = 3, so address and start are both 3.",
+            "vi": "24 MOD 7 = 3 nên address và start đều là 3."
+          }
+        },
+        {
+          "step": 2,
+          "code_focus": [
+            "while table[address] is not None:",
+            "address = (address + 1) % len(table)"
+          ],
+          "prediction": {
+            "en": "Slots 3 and 4 are occupied. Which addresses are inspected next?",
+            "vi": "Slot 3 và 4 đã dùng. Address nào được kiểm tra tiếp?"
+          },
+          "answer": {
+            "en": "Linear probing checks 3, then 4, then 5; modulo would wrap after slot 6.",
+            "vi": "Linear probing kiểm tra 3, rồi 4, rồi 5; modulo sẽ wrap sau slot 6."
+          }
+        },
+        {
+          "step": 3,
+          "code_focus": [
+            "if address == start: return False"
+          ],
+          "prediction": {
+            "en": "If every slot is occupied and probing returns to 3, what happens?",
+            "vi": "Nếu mọi slot đã dùng và probing quay lại 3, điều gì xảy ra?"
+          },
+          "answer": {
+            "en": "Return False because a full cycle found no empty slot; do not overwrite an existing key.",
+            "vi": "Trả False vì đã đi đủ vòng mà không có slot rỗng; không overwrite key hiện có."
+          }
+        }
+      ],
+      "invariant_check": {
+        "en": "No occupied slot is overwritten and every probe stays within table bounds.",
+        "vi": "Không ghi đè slot đã dùng và mọi probe nằm trong giới hạn bảng."
+      },
+      "variants": [
+        {
+          "kind": "normal_no_collision",
+          "input": {
+            "key": 10,
+            "size": 7,
+            "occupied": []
+          },
+          "expected": {
+            "address": 3,
+            "probes": 1
+          },
+          "explanation": {
+            "en": "The empty home slot accepts the key immediately.",
+            "vi": "Home slot rỗng nhận key ngay."
+          },
+          "question": {
+            "en": "For key 10 in a size-7 table, slot 3 is empty. Where is the key placed?",
+            "vi": "Với key 10 trong table size 7, slot 3 rỗng. Key đặt ở đâu?"
+          },
+          "options": [
+            {
+              "id": "place-three",
+              "label": {
+                "en": "Place it at home address 3 after one probe",
+                "vi": "Đặt tại home address 3 sau một probe"
+              }
+            },
+            {
+              "id": "probe-four",
+              "label": {
+                "en": "Skip to slot 4",
+                "vi": "Bỏ qua tới slot 4"
+              }
+            }
+          ],
+          "correct_option_id": "place-three",
+          "retry_hint": {
+            "en": "Calculate 10 MOD 7, then inspect that slot before probing onward.",
+            "vi": "Tính 10 MOD 7 rồi kiểm tra slot đó trước khi probe tiếp."
+          },
+          "correct_feedback": {
+            "en": "10 MOD 7 = 3 and slot 3 is empty, so insertion stops there.",
+            "vi": "10 MOD 7 = 3 và slot 3 rỗng nên insertion dừng tại đó."
+          },
+          "misconception_feedback": {
+            "en": "Linear probing advances only after a collision at the current address.",
+            "vi": "Linear probing chỉ tiến sau collision tại current address."
+          }
+        },
+        {
+          "kind": "boundary_wrap",
+          "input": {
+            "key": 6,
+            "size": 7,
+            "occupied": [
+              6,
+              0
+            ]
+          },
+          "expected": {
+            "address": 1,
+            "path": [
+              6,
+              0,
+              1
+            ]
+          },
+          "explanation": {
+            "en": "Modulo wraps probing from the final slot to slot 0.",
+            "vi": "Modulo wrap probing từ slot cuối về slot 0."
+          },
+          "question": {
+            "en": "Home slot 6 and slot 0 are occupied in a size-7 table. Which path reaches the first free slot 1?",
+            "vi": "Home slot 6 và slot 0 đã dùng trong table size 7. Path nào tới free slot 1?"
+          },
+          "options": [
+            {
+              "id": "wrap-path",
+              "label": {
+                "en": "6 → 0 → 1",
+                "vi": "6 → 0 → 1"
+              }
+            },
+            {
+              "id": "overflow-seven",
+              "label": {
+                "en": "6 → 7 → 8",
+                "vi": "6 → 7 → 8"
+              }
+            }
+          ],
+          "correct_option_id": "wrap-path",
+          "retry_hint": {
+            "en": "Apply (address + 1) MOD 7 after every occupied slot.",
+            "vi": "Áp dụng (address + 1) MOD 7 sau mỗi occupied slot."
+          },
+          "correct_feedback": {
+            "en": "Modulo wraps 6 to 0, then probing reaches free slot 1.",
+            "vi": "Modulo wrap 6 về 0 rồi probing tới free slot 1."
+          },
+          "misconception_feedback": {
+            "en": "Array indexes 7 and 8 are outside a size-7 table.",
+            "vi": "Index 7 và 8 nằm ngoài table size 7."
+          }
+        }
+      ]
+    },
+    "practise": {
+      "order": 4,
+      "name": {
+        "en": "Practise",
+        "vi": "Luyện tập"
+      },
+      "student_question": {
+        "en": "Can I solve the same contract with less support?",
+        "vi": "Tôi có thể giải cùng contract với ít hỗ trợ hơn không?"
+      },
+      "attempt_rule": {
+        "en": "Attempt the task before opening the hint or model answer.",
+        "vi": "Làm thử trước khi mở hint hoặc model answer."
+      },
+      "items": [
+        {
+          "level": {
+            "en": "Guided",
+            "vi": "Có hướng dẫn"
+          },
+          "title": {
+            "en": "Calculate the first address",
+            "vi": "Với bảng kích thước 7 và key 24, tính key MOD 7"
+          },
+          "prompt": {
+            "en": "For table size 7 and key 24, calculate key MOD 7.",
+            "vi": "Với bảng kích thước 7 và key 24, tính key MOD 7."
+          },
+          "hint": {
+            "en": "Calculate key MOD table size before considering collisions.",
+            "vi": "Tính key MOD table size trước khi xét collision."
+          },
+          "model_answer": {
+            "en": "The first address is 3.",
+            "vi": "Address đầu là 3."
+          },
+          "success_check": {
+            "en": "The home address is 3 and the calculation is shown.",
+            "vi": "Home address là 3 và có phép tính."
+          }
+        },
+        {
+          "level": {
+            "en": "Faded",
+            "vi": "Giảm hỗ trợ"
+          },
+          "title": {
+            "en": "Trace a collision",
+            "vi": "Slot 3 và 4 đã dùng"
+          },
+          "prompt": {
+            "en": "Slots 3 and 4 are occupied. Using linear probing, state the next tested slot and stopping condition.",
+            "vi": "Slot 3 và 4 đã dùng. Với linear probing, nêu slot xét tiếp và điều kiện dừng."
+          },
+          "hint": {
+            "en": "Advance one slot at a time with modulo and name the first legal stopping condition.",
+            "vi": "Tiến từng slot bằng modulo và nêu stopping condition hợp lệ đầu tiên."
+          },
+          "model_answer": {
+            "en": "Test slot 5; stop at an empty slot, a matching key, or after returning to the start.",
+            "vi": "Xét slot 5; dừng ở slot rỗng, key khớp hoặc khi quay lại vị trí đầu."
+          },
+          "success_check": {
+            "en": "The answer tests slot 5 next and states empty/match/full-cycle stopping.",
+            "vi": "Đáp án kiểm tra slot 5 tiếp và nêu dừng khi empty/match/full cycle."
+          }
+        },
+        {
+          "level": {
+            "en": "Independent",
+            "vi": "Độc lập"
+          },
+          "title": {
+            "en": "Respect the supplied policy",
+            "vi": "Câu hỏi mới dùng overflow area riêng"
+          },
+          "prompt": {
+            "en": "A new question uses a separate overflow area. Explain why the previous linear-probing trace cannot be reused unchanged.",
+            "vi": "Câu hỏi mới dùng overflow area riêng. Giải thích vì sao không thể dùng nguyên trace linear probing trước đó."
+          },
+          "hint": {
+            "en": "Use only the collision rule supplied in the new question; do not assume linear probing.",
+            "vi": "Chỉ dùng collision rule đề mới cung cấp; không tự giả định linear probing."
+          },
+          "model_answer": {
+            "en": "The collision rule changes the next address and stopping path, so the trace must follow the supplied overflow rule.",
+            "vi": "Collision rule làm đổi address tiếp theo và đường dừng nên trace phải theo overflow rule được cho."
+          },
+          "success_check": {
+            "en": "The answer explains that a different collision rule changes both next address and stop path.",
+            "vi": "Đáp án giải thích collision rule khác làm đổi next address và stop path."
+          }
+        }
+      ]
+    },
+    "protectMarks": {
+      "order": 5,
+      "name": {
+        "en": "Protect your marks",
+        "vi": "Tránh mất điểm"
+      },
+      "student_question": {
+        "en": "Which mistake would break the contract first?",
+        "vi": "Lỗi nào phá contract đầu tiên?"
+      },
+      "before_code": [
+        {
+          "en": "The table size, hash function, empty marker and collision rule are stated.",
+          "vi": "Kích thước bảng, hash function, empty marker và collision rule đã được nêu."
+        },
+        {
+          "en": "Give the visited addresses and final found, inserted or full result.",
+          "vi": "Nêu các address đã xét và kết quả found, inserted hoặc full."
+        }
+      ],
+      "mistakes": [
+        {
+          "mistake": {
+            "en": "Coding before fixing the input, output and stopping contract.",
+            "vi": "Viết code trước khi chốt input, output và stopping contract."
+          },
+          "consequence": {
+            "en": "A plausible algorithm can answer a different question.",
+            "vi": "Thuật toán nhìn hợp lý nhưng có thể trả lời câu hỏi khác."
+          },
+          "repair": {
+            "en": "Write the contract in one sentence before the first code line.",
+            "vi": "Viết contract thành một câu trước dòng code đầu."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Changing state before checking the relevant boundary.",
+            "vi": "Đổi state trước khi kiểm tra boundary liên quan."
+          },
+          "consequence": {
+            "en": "Rejected input can corrupt a previously valid structure.",
+            "vi": "Input bị từ chối vẫn có thể làm hỏng structure đang hợp lệ."
+          },
+          "repair": {
+            "en": "Place the guard before mutation and trace the rejected path.",
+            "vi": "Đặt guard trước mutation và trace path bị từ chối."
+          }
+        },
+        {
+          "mistake": {
+            "en": "Stopping after one normal example.",
+            "vi": "Dừng sau một ví dụ normal."
+          },
+          "consequence": {
+            "en": "A boundary or failure path remains untested.",
+            "vi": "Boundary hoặc failure path chưa được kiểm tra."
+          },
+          "repair": {
+            "en": "Check one normal, one boundary and one relevant failure case.",
+            "vi": "Kiểm tra một normal, một boundary và một failure phù hợp."
+          }
+        }
+      ],
+      "core_code_caption": {
+        "en": "Compact method reminder",
+        "vi": "Nhắc phương pháp ngắn"
+      },
+      "core_code": [
+        "address = key % len(table)",
+        "start = address",
+        "while table[address] is not None:",
+        "    address = (address + 1) % len(table)",
+        "    if address == start: return False"
+      ],
+      "boundary_trace": [
+        {
+          "en": "The table size, hash function, empty marker and collision rule are stated.",
+          "vi": "Kích thước bảng, hash function, empty marker và collision rule đã được nêu."
+        },
+        {
+          "en": "No occupied slot is overwritten and every probe stays within table bounds.",
+          "vi": "Không ghi đè slot đã dùng và mọi probe nằm trong giới hạn bảng."
+        }
+      ],
+      "final_check": [
+        {
+          "en": "Give the visited addresses and final found, inserted or full result.",
+          "vi": "Nêu các address đã xét và kết quả found, inserted hoặc full."
+        },
+        {
+          "en": "No occupied slot is overwritten and every probe stays within table bounds.",
+          "vi": "Không ghi đè slot đã dùng và mọi probe nằm trong giới hạn bảng."
+        }
+      ],
+      "authority_note": {
+        "en": "The worked method is AlgoCore teacher-authored guidance grounded in the course sources; follow the exact contract in each examination question.",
+        "vi": "Phương pháp là hướng dẫn do giáo viên AlgoCore biên soạn từ nguồn khóa học; luôn theo đúng contract của từng câu hỏi thi."
+      }
+    },
+    "recallAndContinue": {
+      "order": 6,
+      "name": {
+        "en": "Recall and continue",
+        "vi": "Gợi nhớ và học tiếp"
+      },
+      "student_question": {
+        "en": "Can I rebuild the method without the worked example?",
+        "vi": "Tôi có thể tự dựng lại phương pháp khi không nhìn ví dụ không?"
+      },
+      "recall_items": [
+        {
+          "prompt": {
+            "en": "State the precondition.",
+            "vi": "Nêu precondition."
+          },
+          "answer": {
+            "en": "The table size, hash function, empty marker and collision rule are stated.",
+            "vi": "Kích thước bảng, hash function, empty marker và collision rule đã được nêu."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the invariant or rule.",
+            "vi": "Nêu invariant hoặc rule."
+          },
+          "answer": {
+            "en": "No occupied slot is overwritten and every probe stays within table bounds.",
+            "vi": "Không ghi đè slot đã dùng và mọi probe nằm trong giới hạn bảng."
+          }
+        },
+        {
+          "prompt": {
+            "en": "State the required output.",
+            "vi": "Nêu output cần có."
+          },
+          "answer": {
+            "en": "Give the visited addresses and final found, inserted or full result.",
+            "vi": "Nêu các address đã xét và kết quả found, inserted hoặc full."
+          }
+        }
+      ],
+      "exit_task": {
+        "en": "Solve the independent task again from memory, then compare only after recording your result.",
+        "vi": "Làm lại independent task từ trí nhớ, rồi chỉ so đáp án sau khi đã ghi kết quả."
+      },
+      "next_step": {
+        "en": "Continue when you can explain the contract and trace the first boundary without help.",
+        "vi": "Học tiếp khi bạn có thể giải thích contract và trace boundary đầu tiên mà không cần trợ giúp."
+      }
+    }
+  },
+  "display_contract": {
+    "default_stage": "Recognise",
+    "reveal_policy": {
+      "en": "Prediction or attempt comes before reveal.",
+      "vi": "Dự đoán hoặc làm thử trước khi mở đáp án."
+    },
+    "primary_code_limit": {
+      "en": "Show only the focused recipe or current lines.",
+      "vi": "Chỉ hiển thị khung code hoặc dòng đang tập trung."
+    }
+  },
+  "stage_order": [
+    "recognise",
+    "understand",
+    "trace",
+    "practise",
+    "protectMarks",
+    "recallAndContinue"
+  ]
+}
