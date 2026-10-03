@@ -179,7 +179,6 @@ async function runHttpChecks() {
   const authenticatedRoutes = [
     ["AUTH-H09", "/paper-4?lang=en"],
     ["AUTH-H10", "/paper-4/lessons/recursion?lang=vi"],
-    ["AUTH-H10D", "/docs"],
     ...(!PAPER4_ONLY ? [
       ["AUTH-H10P", "/paper-3?lang=en"],
       ["AUTH-P2-ACCESS", "/paper-2?lang=vi"],
@@ -191,6 +190,14 @@ async function runHttpChecks() {
     record(id, response.status === 200 && !response.headers.has("location") && hasNoStore(response),
       `Valid session grants ${pathname} and the route is not cached`, {
         status: response.status, cacheControl: response.headers.get("cache-control"),
+      });
+  }
+
+  if (PAPER4_ONLY) {
+    const legacyDocs = await request("/docs", { headers: { cookie: studentCookie } });
+    record("AUTH-H10D", legacyDocs.status === 307 && locationPath(legacyDocs) === "/paper-4",
+      "Legacy docs entry redirects an authenticated learner to the Paper 4 hub", {
+        status: legacyDocs.status, location: locationPath(legacyDocs),
       });
   }
 
