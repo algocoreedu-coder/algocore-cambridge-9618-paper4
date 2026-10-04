@@ -135,6 +135,7 @@ type RuntimeCommonProps = Readonly<{
   initialPatternId?: string; locale?: Locale; initialLocale?: Locale;
   autoplayDelayMs?: number; headingLevel?: 2 | 3; className?: string;
   audience?: "learner" | "audit";
+  learnerPythonArtifact?: PythonArtifactDto;
   onLearnerProgress?: (progress: Readonly<{ hasRecordedPrediction: boolean }>) => void;
 }>;
 export type Paper4VisualRuntimeProps = RuntimeCommonProps & (

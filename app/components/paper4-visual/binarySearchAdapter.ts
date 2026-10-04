@@ -192,14 +192,18 @@ function outsideIndices(length: number, low: number, high: number) {
   return Array.from({ length }, (_, index) => index).filter((index) => index < low || index > high);
 }
 
-function focusLines(name: SearchEventName, value: string | number | null, target: string | number, active: readonly string[]) {
+function focusLines(name: SearchEventName, value: string | number | null, target: string | number, active: readonly string[], available?: readonly string[]) {
   let desired: readonly string[];
   if (name === "search_exhausted") desired = ["binary-search.v1.L030", "binary-search.v1.L031"];
   else if (name === "reject_unsorted_input") desired = ["binary-search.v1.L037", "binary-search.v1.L038", "binary-search.v1.L039"];
   else if (value === target) desired = ["binary-search.v1.L016", "binary-search.v1.L024", "binary-search.v1.L025"];
   else if (typeof value === typeof target && value! > target) desired = ["binary-search.v1.L016", "binary-search.v1.L026", "binary-search.v1.L027"];
   else desired = ["binary-search.v1.L016", "binary-search.v1.L026", "binary-search.v1.L029"];
-  return desired.filter((lineId) => active.includes(lineId));
+  const focused = desired.filter((lineId) => active.includes(lineId) && (!available || available.includes(lineId)));
+  if (focused.length === 0 && name === "reject_unsorted_input" && available?.includes("binary-search.v1.L012")) {
+    return ["binary-search.v1.L012"];
+  }
+  return focused;
 }
 
 function choice(key: string, en: string, vi: string, misconception?: PredictionChoice["misconception"]): PredictionChoice {
@@ -257,7 +261,7 @@ function finalResult(event: TraceEvent, name: SearchEventName, status: SearchSta
   return null;
 }
 
-export function adaptBinarySearchEvent(event: TraceEvent, phase: SearchStepPhase): BinarySearchSceneModel | null {
+export function adaptBinarySearchEvent(event: TraceEvent, phase: SearchStepPhase, availableLineIds?: readonly string[]): BinarySearchSceneModel | null {
   const name = eventName(event);
   const beforeDomain = recordAt(event.before, "domain");
   const afterDomain = recordAt(event.after, "domain");
@@ -296,7 +300,7 @@ export function adaptBinarySearchEvent(event: TraceEvent, phase: SearchStepPhase
 
   const probe = { low: probeLow, middle, high: probeHigh };
   const retained = { low: afterLow, middle, high: afterHigh };
-  const focusedLines = focusLines(name, middleValue, target, event.active_line_ids);
+  const focusedLines = focusLines(name, middleValue, target, event.active_line_ids, availableLineIds);
   if (focusedLines.length === 0 || focusedLines.length > 3) return null;
 
   let prediction: BinarySearchSceneModel["prediction"];

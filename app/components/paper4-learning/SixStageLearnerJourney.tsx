@@ -35,6 +35,7 @@ import { RECURSION_PROGRESS_KEY, RECURSION_PROTECT_KEY } from "./recursionProjec
 import { DECISION_RAIL_LESSONS, DecisionRailTrace } from "./DecisionRailTrace";
 import { PatternRuntimeSupplement } from "./PatternRuntimeSupplement";
 import { bindLessonPatternCheckpoints } from "./patternCheckpointBindings";
+import { createLearnerPythonArtifact } from "./learnerPythonArtifact";
 import { CanonicalAssessmentPractice } from "./CanonicalAssessmentPractice";
 import { CanonicalKnowledgeReference } from "./CanonicalLessonJourney";
 import { Paper4LessonShell, type Paper4StageItem } from "./Paper4LessonShell";
@@ -140,6 +141,12 @@ function StageContent({ stageId, lessonSlug, projection, locale, patterns, pytho
     const stage = projection.stages.trace;
     const patternContract = bindLessonPatternCheckpoints(lessonSlug, patterns, projection);
     const traceInstruction = lessonSlug === "performance" ? (projection as unknown as PerformanceLearnerProjection).stages.trace.scenario.metric : lessonSlug === "stack" ? (projection as unknown as StackLearnerProjection).stages.trace.student_question : lessonSlug === "queue" ? (projection as unknown as QueueLearnerProjection).stages.trace.student_question : lessonSlug === "linked-list" ? (projection as unknown as LinkedListLearnerProjection).stages.trace.student_question : lessonSlug === "recursion" ? (projection as unknown as RecursionLearnerProjection).stages.trace.student_question : stage.scenario.instruction;
+    const learnerPythonArtifact = lessonSlug === "binary-search" ? createLearnerPythonArtifact(
+      pythonArtifact,
+      lessonSlug,
+      projection.stages.understand.python_recipe.lines,
+      projection.stages.understand.python_recipe.caption,
+    ) : undefined;
     return <div className={styles.stageStack}>
       <div className={styles.traceIntro} data-trace-prompt><strong>{learnerText(stage.scenario.label, locale)}</strong><p>{learnerText(traceInstruction, locale)}</p></div>
       {lessonSlug === "data-models"
@@ -170,7 +177,7 @@ function StageContent({ stageId, lessonSlug, projection, locale, patterns, pytho
           ? <RecursionTrace projection={projection as unknown as RecursionLearnerProjection} locale={locale} onLearnerProgress={onTraceProgress} />
         : patterns.length === 0
           ? <ReasoningTraceFallback projection={projection} locale={locale} onProgress={onTraceProgress} />
-          : <Paper4VisualRuntime patterns={patterns} pythonArtifact={pythonArtifact} initialPatternId={patterns[0]?.pattern_id} initialLocale={locale} locale={locale} autoplayDelayMs={1800} headingLevel={3} audience="learner" onLearnerProgress={(progress) => onTraceProgress(progress.hasRecordedPrediction)} />}
+          : <Paper4VisualRuntime patterns={patterns} pythonArtifact={pythonArtifact} learnerPythonArtifact={learnerPythonArtifact} initialPatternId={patterns[0]?.pattern_id} initialLocale={locale} locale={locale} autoplayDelayMs={1800} headingLevel={3} audience="learner" onLearnerProgress={(progress) => onTraceProgress(progress.hasRecordedPrediction)} />}
       <PatternRuntimeSupplement patterns={patternContract.runtimeSupplementPatterns} pythonArtifact={pythonArtifact} locale={locale} />
       <p className={styles.invariantCard}>{learnerText(stage.invariant_check, locale)}</p>
     </div>;

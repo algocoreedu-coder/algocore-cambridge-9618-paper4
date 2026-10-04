@@ -160,7 +160,7 @@ function BinaryPrediction({ model, locale, draft, status, onDraft, onSubmit, com
 }
 
 function V2Runtime(props: V2Props) {
-  const { patterns, pythonArtifact: preloadArtifact, initialPatternId, locale, initialLocale = "vi", autoplayDelayMs = 1800, headingLevel = 2, className, audience = "audit", onLearnerProgress } = props;
+  const { patterns, pythonArtifact: preloadArtifact, learnerPythonArtifact, initialPatternId, locale, initialLocale = "vi", autoplayDelayMs = 1800, headingLevel = 2, className, audience = "audit", onLearnerProgress } = props;
   const learnerMode = audience === "learner";
   const requestedLocale = locale ?? initialLocale;
   const firstPattern = patterns.find((item) => item.pattern_id === initialPatternId) ?? patterns[0];
@@ -224,13 +224,14 @@ function V2Runtime(props: V2Props) {
     try { return selectScenarioEvents(loadState.chunk, state.scenarioId); } catch { return []; }
   }, [loadState.chunk, state.scenarioId]);
   const projectedEvents = useMemo(() => projectLearningEvents(pattern?.pattern_id ?? "", rawScenarioEvents), [pattern?.pattern_id, rawScenarioEvents]);
-  const binaryProjectionReady = pattern?.pattern_id === "BINARY_SEARCH" && projectedEvents.length > 0 && projectedEvents.every((item) => adaptBinarySearchEvent(item, "predict") !== null);
+  const learnerBinaryLineIds = learnerMode && learnerPythonArtifact ? learnerPythonArtifact.lines.map((line) => line.line_id) : undefined;
+  const binaryProjectionReady = pattern?.pattern_id === "BINARY_SEARCH" && projectedEvents.length > 0 && projectedEvents.every((item) => adaptBinarySearchEvent(item, "predict", learnerBinaryLineIds) !== null);
   const scenarioEvents = binaryProjectionReady ? projectedEvents : rawScenarioEvents;
   const eventIndex = Math.min(state.eventIndex, Math.max(0, scenarioEvents.length - 1));
   const event = scenarioEvents[eventIndex];
   const nextEvent = scenarioEvents[eventIndex + 1];
   const activeScenario = loadState.chunk?.scenarios.find((item) => item.scenario_id === state.scenarioId);
-  const sceneModel = binaryProjectionReady && event ? adaptBinarySearchEvent(event, state.stepPhase) : null;
+  const sceneModel = binaryProjectionReady && event ? adaptBinarySearchEvent(event, state.stepPhase, learnerBinaryLineIds) : null;
 
   useEffect(() => {
     if (!binaryProjectionReady || !loadState.chunk || !event || state.patternId !== "BINARY_SEARCH") return;
@@ -286,7 +287,7 @@ function V2Runtime(props: V2Props) {
   if (loadState.status === "loading") return <section className={`${styles.runtime} ${className ?? ""}`} data-runtime-version="paper4-v2-loading" data-testid="paper4-visual-lab" role="status" aria-live="polite"><p className={styles.empty}>{t.loading}</p>{preloadArtifact && !learnerMode && <article className={`${styles.panel} ${styles.codePanel}`} data-panel="code"><PythonArtifact artifact={preloadArtifact} locale={state.locale} headingLevel={4} /></article>}</section>;
   if (loadState.status === "error" || !loadState.chunk || !event) return <section className={`${styles.empty} ${className ?? ""}`} role="alert"><p>{t.loadError}</p>{!learnerMode && <p className={styles.errorDetail}>{loadState.message}</p>}<button type="button" onClick={() => setLoadRevision((value) => value + 1)}>{t.retry}</button></section>;
 
-  const pythonArtifact = loadState.chunk.python_artifact;
+  const pythonArtifact = learnerMode && learnerPythonArtifact ? learnerPythonArtifact : loadState.chunk.python_artifact;
   const rawEventName = event.accessibility.accessible_label[state.locale];
   const eventName = learnerMode ? learnerSafeText(rawEventName, state.locale) : rawEventName;
   const progress = ((eventIndex + 1) / scenarioEvents.length) * 100;
