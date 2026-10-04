@@ -128,6 +128,49 @@ const searchCollectionPatterns: readonly ExamPattern[] = [
   },
 ] as const;
 
+const stackPatterns: readonly ExamPattern[] = [
+  {
+    patternId: "STACK_PAIR",
+    title: bi("Pop one item from each stack", "Lấy một phần tử từ mỗi stack"),
+    caption: bi("Example: left [3, 7], right [4, 9]", "Ví dụ: left [3, 7], right [4, 9]"),
+    rule: bi("Check both stacks before changing either one. Then pop once from each stack.", "Kiểm tra cả hai stack trước khi thay đổi stack nào. Sau đó pop đúng một lần từ mỗi stack."),
+    code: [
+      "def pop_pair(left_stack, right_stack):",
+      "    if left_stack.top == -1 or right_stack.top == -1:",
+      "        return None",
+      "    left_item = left_stack.pop()",
+      "    right_item = right_stack.pop()",
+      "    return [left_item, right_item]",
+    ],
+    steps: [
+      { active: [2, 3], facts: [fact("left top", "top bên trái", 1), fact("right top", "top bên phải", 1), fact("empty stack", "stack rỗng", "False", "Sai")], explanation: bi("Both stacks contain an item, so the operation may continue.", "Cả hai stack đều có phần tử, nên thao tác có thể tiếp tục.") },
+      { active: [4], facts: [fact("left item", "phần tử bên trái", 7), fact("left stack", "stack bên trái", "[3]")], explanation: bi("Pop 7 from the top of the left stack.", "Pop 7 khỏi đỉnh stack bên trái.") },
+      { active: [5], facts: [fact("right item", "phần tử bên phải", 9), fact("right stack", "stack bên phải", "[4]")], explanation: bi("Pop 9 from the top of the right stack.", "Pop 9 khỏi đỉnh stack bên phải.") },
+      { active: [6], facts: [fact("returned pair", "cặp trả về", "[7, 9]"), fact("left stack", "stack bên trái", "[3]"), fact("right stack", "stack bên phải", "[4]")], explanation: bi("Return the two popped items in the order requested.", "Trả hai phần tử đã pop theo thứ tự đề yêu cầu.") },
+    ],
+  },
+  {
+    patternId: "STACK_REDUCE",
+    title: bi("Use the correct operand order", "Dùng đúng thứ tự toán hạng"),
+    caption: bi("Example: stack [12, 5] represents 12 - 5", "Ví dụ: stack [12, 5] biểu diễn 12 - 5"),
+    rule: bi("For subtraction or division, the first pop is the right operand and the second pop is the left operand.", "Với phép trừ hoặc chia, lần pop đầu là toán hạng phải và lần pop thứ hai là toán hạng trái."),
+    code: [
+      "def subtract_top_two(stack):",
+      "    if stack.top < 1:",
+      "        return None",
+      "    right = stack.pop()",
+      "    left = stack.pop()",
+      "    return left - right",
+    ],
+    steps: [
+      { active: [2, 3], facts: [fact("top", "top", 1), fact("items available", "số phần tử có sẵn", 2)], explanation: bi("Two operands are available, so subtraction is valid.", "Có đủ hai toán hạng, nên phép trừ hợp lệ.") },
+      { active: [4], facts: [fact("first pop", "lần pop đầu", 5), fact("role", "vai trò", "right operand", "toán hạng phải")], explanation: bi("The top item is popped first and saved as the right operand.", "Phần tử trên đỉnh được pop trước và lưu làm toán hạng phải.") },
+      { active: [5], facts: [fact("second pop", "lần pop thứ hai", 12), fact("role", "vai trò", "left operand", "toán hạng trái")], explanation: bi("The next item is the left operand.", "Phần tử tiếp theo là toán hạng trái.") },
+      { active: [6], facts: [fact("calculation", "phép tính", "12 - 5"), fact("returned", "giá trị trả về", 7)], explanation: bi("Evaluate left minus right. Reversing the pops would give the wrong answer.", "Tính toán hạng trái trừ toán hạng phải. Đảo thứ tự sẽ cho đáp án sai.") },
+    ],
+  },
+] as const;
+
 function local(value: LocalizedText | number, locale: LearningLocale) {
   return typeof value === "number" ? value : value[locale];
 }
@@ -137,11 +180,16 @@ function friendlyPatternLabel(patternId: string, locale: LearningLocale) {
   return text.replace(/^\p{L}/u, (letter) => letter.toLocaleUpperCase(locale === "vi" ? "vi-VN" : "en-US"));
 }
 
-function SearchCollectionsExamSupplement({ patterns, locale }: Readonly<{ patterns: readonly PatternMetadata[]; locale: LearningLocale }>) {
+function ExamPatternSupplement({ patterns, locale, catalog, surfaceId }: Readonly<{
+  patterns: readonly PatternMetadata[];
+  locale: LearningLocale;
+  catalog: readonly ExamPattern[];
+  surfaceId: string;
+}>) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [stepIndex, setStepIndex] = useState(0);
   const labelId = useId();
-  const available = useMemo(() => patterns.map((pattern) => searchCollectionPatterns.find((item) => item.patternId === pattern.pattern_id)).filter((item): item is ExamPattern => Boolean(item)), [patterns]);
+  const available = useMemo(() => patterns.map((pattern) => catalog.find((item) => item.patternId === pattern.pattern_id)).filter((item): item is ExamPattern => Boolean(item)), [catalog, patterns]);
   const selected = available[Math.min(selectedIndex, available.length - 1)];
   const t = copy[locale];
 
@@ -150,7 +198,7 @@ function SearchCollectionsExamSupplement({ patterns, locale }: Readonly<{ patter
   if (!selected) return null;
   const step = selected.steps[Math.min(stepIndex, selected.steps.length - 1)];
 
-  return <section className={styles.examSupplement} data-exam-code-supplement="search-collections" aria-labelledby={labelId}>
+  return <section className={styles.examSupplement} data-exam-code-supplement={surfaceId} aria-labelledby={labelId}>
     <header className={styles.intro}><h3 id={labelId}>{t.title}</h3><p>{t.help}</p></header>
     <Select id={`${labelId}-pattern`} label={t.choose} value={selectedIndex} onChange={(event) => setSelectedIndex(Number(event.currentTarget.value))}>
       {available.map((item, index) => <option key={item.patternId} value={index}>{item.title[locale]}</option>)}
@@ -183,7 +231,8 @@ export function PatternRuntimeSupplement({ patterns, pythonArtifact, locale }: R
   const labelId = useId();
   useEffect(() => setSelectedIndex(0), [patterns]);
   if (patterns.length === 0) return null;
-  if (pythonArtifact.lesson_id.endsWith(".lesson.search-collections")) return <SearchCollectionsExamSupplement patterns={patterns} locale={locale} />;
+  if (pythonArtifact.lesson_id.endsWith(".lesson.search-collections")) return <ExamPatternSupplement patterns={patterns} locale={locale} catalog={searchCollectionPatterns} surfaceId="search-collections" />;
+  if (pythonArtifact.lesson_id.endsWith(".lesson.stack")) return <ExamPatternSupplement patterns={patterns} locale={locale} catalog={stackPatterns} surfaceId="stack" />;
   const selected = patterns[Math.min(selectedIndex, patterns.length - 1)];
   const t = copy[locale];
   return <section aria-labelledby={labelId}>
