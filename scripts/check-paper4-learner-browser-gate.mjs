@@ -6,12 +6,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const PAPER4_PLANNING_ROOT = process.env.PAPER4_PLANNING_ROOT
+  ? path.resolve(process.env.PAPER4_PLANNING_ROOT)
+  : path.resolve(ROOT, "../planning/paper4");
 try { process.loadEnvFile(path.join(ROOT, ".env.local")); } catch { /* CI may inject credentials. */ }
 const BASE_URL = (process.env.PAPER4_BASE_URL ?? "http://127.0.0.1:3018").replace(/\/$/, "");
 const ROUTE = "/paper-4/lessons/binary-search";
 const username = process.env.STUDENT_LOGIN_USERNAME ?? process.env.ALGOCORE_STUDENT_USERNAME;
 const password = process.env.STUDENT_LOGIN_PASSWORD ?? process.env.ALGOCORE_STUDENT_PASSWORD;
-const EVIDENCE_DIR = path.resolve(ROOT, "../planning/paper4/student-friendly-audit/learner-gate-evidence");
+const EVIDENCE_DIR = path.join(PAPER4_PLANNING_ROOT, "student-friendly-audit/learner-gate-evidence");
 const CHROME_CANDIDATES = [
   process.env.CHROME_PATH,
   "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
@@ -231,9 +234,17 @@ try {
   record("LG-B04", h1s.length === 1 && radioNames.length >= 2, "Accessibility tree has one lesson h1 and named prediction choices", { h1s, radioNames });
 
   await submitPredictionWithKeyboard(cdp);
-  const revealed = await evaluate(cdp, `(() => { const stage = document.querySelector('[data-learner-stage="trace"]'); const scene = stage.querySelector('[data-scene="binary-search-window"]'); const lines = [...stage.querySelectorAll('[data-panel="code"] pre code > span:not([data-code-gap])')]; return { phase: scene.dataset.phase, focus: document.activeElement?.id ?? '', sceneHeading: scene.getAttribute('aria-labelledby'), lines: lines.length, activeLines: lines.filter((line) => line.getAttribute('aria-current') === 'step').length, nextDisabled: stage.querySelector('[data-action="next"]')?.disabled, exitDisabled: stage.querySelector('[data-exit-gate="prediction"]')?.disabled, feedback: stage.querySelector('[role="status"]')?.textContent.trim() }; })()`);
+  const revealed = await evaluate(cdp, `(() => { const stage = document.querySelector('[data-learner-stage="trace"]'); const scene = stage.querySelector('[data-scene="binary-search-window"]'); const source = stage.querySelector('[data-scrollable-code="true"]'); const lines = [...(source?.querySelectorAll('code > span') ?? [])]; const jump = stage.querySelector('[data-code-action="jump-active"]'); return { phase: scene.dataset.phase, focus: document.activeElement?.id ?? '', sceneHeading: scene.getAttribute('aria-labelledby'), lines: lines.length, totalLines: Number(source?.dataset.totalLines ?? 0), activeLines: lines.filter((line) => line.getAttribute('aria-current') === 'step').length, gaps: lines.filter((line) => line.hasAttribute('data-code-gap')).length, scrollable: source ? source.scrollHeight > source.clientHeight : false, tabIndex: source?.tabIndex, describedBy: source?.getAttribute('aria-describedby'), jumpHeight: jump?.getBoundingClientRect().height ?? 0, copyLabel: stage.querySelector('[data-code-action="copy-full-source"]')?.textContent.trim(), nextDisabled: stage.querySelector('[data-action="next"]')?.disabled, exitDisabled: stage.querySelector('[data-exit-gate="prediction"]')?.disabled, feedback: stage.querySelector('[role="status"]')?.textContent.trim() }; })()`);
   record("LG-B03", revealed.focus === revealed.sceneHeading && !revealed.nextDisabled && !revealed.exitDisabled, "Prediction reveal moves focus to checkpoint and unlocks Next/Trace exit", revealed);
-  record("LG-B03", revealed.lines >= 4 && revealed.lines <= 8 && revealed.activeLines <= 3, "Revealed Trace code respects 4–8/≤3 line budget", revealed);
+  record("LG-B03", revealed.lines === revealed.totalLines && revealed.lines > 8 && revealed.activeLines <= 3 && revealed.gaps === 0 && revealed.scrollable && revealed.tabIndex === 0 && Boolean(revealed.describedBy) && revealed.jumpHeight >= 44 && /full source|toàn bộ mã/i.test(revealed.copyLabel ?? ""), "Revealed Trace exposes complete, keyboard-focusable Python source with full-copy and active-line controls", revealed);
+  const manualScroll = await evaluate(cdp, `(() => { const source=document.querySelector('[data-learner-stage="trace"] [data-scrollable-code="true"]'); const active=source?.querySelector('[aria-current="step"]'); if (!source || !active) return null; const maxScroll=Math.max(0,source.scrollHeight-source.clientHeight); source.scrollTop=source.scrollTop < maxScroll/2 ? maxScroll : 0; const sourceRect=source.getBoundingClientRect(), activeRect=active.getBoundingClientRect(); return {scrollTop:source.scrollTop,maxScroll,activeVisible:activeRect.top>=sourceRect.top&&activeRect.bottom<=sourceRect.bottom}; })()`);
+  await delay(100);
+  const manualPosition = await evaluate(cdp, `document.querySelector('[data-learner-stage="trace"] [data-scrollable-code="true"]')?.scrollTop ?? -1`);
+  record("LG-B03", Boolean(manualScroll) && !manualScroll.activeVisible && manualPosition === manualScroll.scrollTop, "Manual code review keeps its selected scroll position until the learner requests a jump", { manualScroll, manualPosition });
+  await evaluate(cdp, `document.querySelector('[data-learner-stage="trace"] [data-code-action="jump-active"]')?.click(); true`);
+  await delay(50);
+  const located = await evaluate(cdp, `(() => { const source=document.querySelector('[data-learner-stage="trace"] [data-scrollable-code="true"]'); const active=source?.querySelector('[aria-current="step"]'); if (!source || !active) return false; const sourceRect=source.getBoundingClientRect(); const activeRect=active.getBoundingClientRect(); return activeRect.top>=sourceRect.top&&activeRect.bottom<=sourceRect.bottom; })()`);
+  record("LG-B03", located, "Jump to active line returns the highlighted line to the visible code viewport", { located });
   record("LG-B04", Boolean(revealed.feedback), "Prediction feedback is exposed through a status region", { feedback: revealed.feedback });
 
   await evaluate(cdp, `document.querySelector('[data-learner-stage="trace"] [data-action="next"]').focus(); true`);

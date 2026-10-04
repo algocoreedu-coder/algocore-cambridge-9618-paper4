@@ -3,6 +3,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const PAPER4_PLANNING_ROOT = process.env.PAPER4_PLANNING_ROOT
+  ? path.resolve(process.env.PAPER4_PLANNING_ROOT)
+  : path.resolve(ROOT, "../planning/paper4");
 const BASE_URL = (process.env.PAPER4_BASE_URL ?? "http://127.0.0.1:3018").replace(/\/$/, "");
 const STATIC_ONLY = process.argv.includes("--static-only");
 const LESSON_SLUG = "binary-search";
@@ -152,16 +155,23 @@ function checkLearnerSurface(root, route) {
     record("LG-A07", primaryPanels <= 2 && stateFields <= 5 && controls <= 4, `${route}: Trace stays within default density budget`, { primary_panels: primaryPanels, state_fields: stateFields, enabled_controls: controls });
   }
 
-  for (const codeBlock of exposedElements(root, '[data-python-artifact-id] pre, [data-code-excerpt]')) {
+  for (const codeBlock of exposedElements(root, '[data-code-excerpt]')) {
     const lines = [...codeBlock.querySelectorAll('[data-line-id]')];
     const active = lines.filter((line) => line.getAttribute("aria-current") === "step");
     record("LG-A06", lines.length >= 4 && lines.length <= 8 && active.length <= 3, `${route}: exposed Python chunk respects 4–8/≤3 budget`, { lines: lines.length, active_lines: active.length });
+  }
+
+  for (const codeBlock of exposedElements(root, '[data-scrollable-code="true"]')) {
+    const lines = [...codeBlock.querySelectorAll('code > span')];
+    const active = lines.filter((line) => line.getAttribute("aria-current") === "step");
+    const gaps = lines.filter((line) => line.hasAttribute("data-code-gap"));
+    record("LG-A06", lines.length > 0 && gaps.length === 0 && active.length <= 3, `${route}: Python source remains complete while active focus stays within three lines`, { lines: lines.length, active_lines: active.length, gaps: gaps.length });
   }
 }
 
 async function checkStaticContract() {
   const appProjectionBytes = await readFile(path.join(ROOT, "app/data/paper4-v2/learner-projections/binary-search.json"));
-  const approvedProjectionBytes = await readFile(path.join(ROOT, "../planning/paper4/student-friendly-audit/BINARY_SEARCH_LEARNER_PROJECTION.json"));
+  const approvedProjectionBytes = await readFile(path.join(PAPER4_PLANNING_ROOT, "student-friendly-audit/BINARY_SEARCH_LEARNER_PROJECTION.json"));
   const appProjection = JSON.parse(appProjectionBytes.toString("utf8"));
   const approvedProjection = JSON.parse(approvedProjectionBytes.toString("utf8"));
   const stripTraceabilityMetadata = (value) => {
@@ -179,6 +189,8 @@ async function checkStaticContract() {
     interactions: await readFile(path.join(ROOT, "app/components/paper4-learning/LearnerInteractions.tsx"), "utf8"),
     projection: await readFile(path.join(ROOT, "app/components/paper4-learning/learnerProjection.ts"), "utf8"),
     runtime: await readFile(path.join(ROOT, "app/components/paper4-visual/Paper4VisualRuntime.tsx"), "utf8"),
+    pythonArtifact: await readFile(path.join(ROOT, "app/components/paper4-learning/PythonArtifact.tsx"), "utf8"),
+    pythonArtifactCss: await readFile(path.join(ROOT, "app/components/paper4-learning/PythonArtifact.module.css"), "utf8"),
     search: await readFile(path.join(ROOT, "app/components/paper4-visual/SearchWindow.tsx"), "utf8"),
     css: await readFile(path.join(ROOT, "app/components/paper4-learning/LessonLearningPage.module.css"), "utf8"),
   };
@@ -192,10 +204,14 @@ async function checkStaticContract() {
   record("LG-A03", /assertLearnerProjectionSafe/.test(files.projection) && /forbiddenLearnerTokens/.test(files.projection), "Shared learner projection sanitizer rejects governance tokens");
   record("LG-A04", !/(?:expected_outputs|disclosure_contract|function\s+JsonBlock\b)/.test(learnerSource), "Six-stage learner components do not serialize canonical expected output or raw contracts");
   record("LG-A05", /data-phase=\{model\.phase\}/.test(files.search) && /disabled=\{!nextEvent \|\| state\.stepPhase === "predict"\}/.test(files.runtime), "Binary Search source keeps phase marker and blocks Next during predict");
-  const binarySearchShortCode = /maxVisibleLines=\{8\}/.test(files.runtime)
-    && /activeLineIds=\{learnerMode\s*\?\s*sceneModel\.focusLineIds\.slice\(0,\s*3\)\s*:\s*sceneModel\.focusLineIds\}/.test(files.runtime)
-    && /visibleLineIds=\{learnerMode\s*\?\s*sceneModel\.focusLineIds\.slice\(0,\s*8\)\s*:\s*sceneModel\.focusLineIds\}/.test(files.runtime);
-  record("LG-A06", binarySearchShortCode, "Binary Search learner reveal limits the excerpt to eight lines and the active focus to three lines");
+  const fullScrollableSource = /activeLineIds=\{learnerMode\s*\?\s*sceneModel\.focusLineIds\.slice\(0,\s*3\)\s*:\s*sceneModel\.focusLineIds\}/.test(files.runtime)
+    && !/visibleLineIds=/.test(files.runtime)
+    && /data-scrollable-code="true"/.test(files.pythonArtifact)
+    && /navigator\.clipboard\.writeText\(artifactSource\(artifact\)\)/.test(files.pythonArtifact)
+    && /max-height:\s*clamp\(/.test(files.pythonArtifactCss)
+    && /overflow:\s*auto/.test(files.pythonArtifactCss)
+    && /scrollbar-gutter:\s*stable/.test(files.pythonArtifactCss);
+  record("LG-A06", fullScrollableSource, "Trace keeps the complete Python source in a bounded scroll region while active focus remains within three lines");
   const hasSmallScreenRule = /@media[^\{]*(?:max-width\s*:\s*(?:3[2-9]\d|[45]\d\d|5\d\d|6[0-4]\d)px)/i.test(files.css);
   const hasReflow = /grid-template-columns\s*:\s*1fr/i.test(files.css);
   record("LG-A10", hasSmallScreenRule && hasReflow, "Learner stylesheet includes small-screen single-column reflow hooks", { has_small_screen_rule: hasSmallScreenRule, has_single_column_reflow: hasReflow });
