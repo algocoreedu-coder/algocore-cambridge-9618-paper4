@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.11.3.1",
+  "sectionId": "11.3",
+  "scenario": {
+    "label": {
+      "en": "SHARED SCENARIO",
+      "vi": "TÌNH HUỐNG XUYÊN SUỐT"
+    },
+    "title": {
+      "en": "Refactor a monolithic results program",
+      "vi": "Refactor chương trình kết quả nguyên khối"
+    },
+    "context": {
+      "en": "One long program validates marks, calculates grades, updates statistics and prints reports. It must become reusable modules without changing valid outputs.",
+      "vi": "Một chương trình dài validate mark, tính grade, update statistic và in report. Nó phải thành module reuse mà không đổi output hợp lệ."
+    },
+    "bigQuestion": {
+      "en": "How can interfaces, parameters, returns and scope prevent unintended changes?",
+      "vi": "Interface, parameter, return và scope ngăn thay đổi ngoài ý muốn thế nào?"
+    }
+  },
+  "prerequisiteGuidance": [
+    {
+      "topicId": "T20",
+      "slug": "procedures-functions",
+      "title": {
+        "en": "Procedures and functions",
+        "vi": "Procedure và function"
+      },
+      "reason": {
+        "en": "Learn this decision first because its output becomes evidence for the next topic.",
+        "vi": "Học quyết định này trước vì output của nó trở thành bằng chứng cho topic tiếp theo."
+      }
+    },
+    {
+      "topicId": "T21",
+      "slug": "parameters-byval-byref",
+      "title": {
+        "en": "Parameters, BYVAL and BYREF",
+        "vi": "Tham số, BYVAL và BYREF"
+      },
+      "reason": {
+        "en": "Learn this decision first because its output becomes evidence for the next topic.",
+        "vi": "Học quyết định này trước vì output của nó trở thành bằng chứng cho topic tiếp theo."
+      }
+    },
+    {
+      "topicId": "T22",
+      "slug": "scope-reuse",
+      "title": {
+        "en": "Local/global scope and reuse",
+        "vi": "Phạm vi local/global và tái sử dụng"
+      },
+      "reason": {
+        "en": "Use this topic to integrate and verify the section’s complete answer.",
+        "vi": "Dùng topic này để tích hợp và kiểm đáp án hoàn chỉnh của section."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "procedure",
+      "meaning": {
+        "en": "A named module performing an action without a function return.",
+        "vi": "Module có tên thực hiện action mà không có function return."
+      }
+    },
+    {
+      "term": "function",
+      "meaning": {
+        "en": "A named module returning one typed value.",
+        "vi": "Module có tên return một value có kiểu."
+      }
+    },
+    {
+      "term": "BYVAL / BYREF",
+      "meaning": {
+        "en": "A copy versus caller-visible parameter mutation.",
+        "vi": "Bản sao so với mutation parameter caller thấy."
+      }
+    },
+    {
+      "term": "scope",
+      "meaning": {
+        "en": "The region where a name denotes one declaration.",
+        "vi": "Vùng name chỉ một declaration."
+      }
+    }
+  ],
+  "topicRelationship": {
+    "title": {
+      "en": "One system, connected decisions",
+      "vi": "Một hệ thống, các quyết định liên kết"
+    },
+    "introduction": {
+      "en": "Work through the topics in order, then combine their checks in an extended problem.",
+      "vi": "Học các topic theo thứ tự rồi phối hợp các phép kiểm trong bài tổng hợp."
+    },
+    "items": [
+      {
+        "topicId": "T20",
+        "slug": "procedures-functions",
+        "question": {
+          "en": "What single job does each module own?",
+          "vi": "Mỗi module sở hữu một việc gì?"
+        },
+        "result": {
+          "en": "A correct procedure/function contract, header, call and return/output distinction.",
+          "vi": "Contract, header, call procedure/function đúng và phân biệt return/output."
+        }
+      },
+      {
+        "topicId": "T21",
+        "slug": "parameters-byval-byref",
+        "question": {
+          "en": "May the caller state change?",
+          "vi": "State caller có được đổi không?"
+        },
+        "result": {
+          "en": "Parameters with justified type, order and BYVAL/BYREF mode.",
+          "vi": "Parameter có type, order và mode BYVAL/BYREF được giải thích."
+        }
+      },
+      {
+        "topicId": "T22",
+        "slug": "scope-reuse",
+        "question": {
+          "en": "Which declaration does each name denote?",
+          "vi": "Mỗi name chỉ declaration nào?"
+        },
+        "result": {
+          "en": "Local state by default and controlled dependencies for reuse.",
+          "vi": "State local mặc định và dependency được kiểm soát để reuse."
+        }
+      }
+    ],
+    "connection": {
+      "en": "Responsibility selects a module, its interface exposes required data, parameter mode controls mutation and scope controls hidden dependencies.",
+      "vi": "Trách nhiệm chọn module, interface mở data cần, mode parameter kiểm mutation và scope kiểm dependency ẩn."
+    }
+  },
+  "visual": {
+    "assetId": "S11.3",
+    "anchorId": "section-11-3-concept-map",
+    "title": {
+      "en": "Follow one call across the interface",
+      "vi": "Theo một call qua interface"
+    },
+    "introduction": {
+      "en": "Watch caller and callee frames, BYVAL copies, BYREF aliases, returned values and local lifetimes.",
+      "vi": "Quan sát frame caller/callee, bản sao BYVAL, alias BYREF, return value và vòng đời local."
+    },
+    "task": {
+      "en": "Predict which caller values change before advancing the trace.",
+      "vi": "Dự đoán value caller nào đổi trước khi chạy trace."
+    }
+  },
+  "workedChapter": {
+    "title": {
+      "en": "Worked chapter: refactor a monolithic results program",
+      "vi": "Bài giải xuyên chương: refactor chương trình kết quả nguyên khối"
+    },
+    "prompt": {
+      "en": "One long program validates marks, calculates grades, updates statistics and prints reports. It must become reusable modules without changing valid outputs.",
+      "vi": "Một chương trình dài validate mark, tính grade, update statistic và in report. Nó phải thành module reuse mà không đổi output hợp lệ."
+    },
+    "fieldTable": {
+      "ariaLabel": {
+        "en": "11.3 worked comparison",
+        "vi": "Bảng so sánh bài giải 11.3"
+      },
+      "firstColumn": {
+        "en": "Element / value",
+        "vi": "Thành phần / giá trị"
+      },
+      "secondColumn": {
+        "en": "Decision / working",
+        "vi": "Quyết định / cách làm"
+      },
+      "thirdColumn": {
+        "en": "Evidence / check",
+        "vi": "Bằng chứng / tự kiểm"
+      }
+    },
+    "fields": [
+      {
+        "field": "Mark",
+        "value": "73",
+        "assignment": {
+          "en": "Pass BYVAL because it is read only.",
+          "vi": "Truyền BYVAL vì chỉ đọc."
+        },
+        "report": {
+          "en": "Caller Mark stays 73.",
+          "vi": "Mark của caller vẫn 73."
+        }
+      },
+      {
+        "field": "Grade",
+        "value": "—",
+        "assignment": {
+          "en": "Receive the function return.",
+          "vi": "Nhận function return."
+        },
+        "report": {
+          "en": "Do not confuse RETURN with OUTPUT.",
+          "vi": "Không nhầm RETURN với OUTPUT."
+        }
+      },
+      {
+        "field": "ValidCount",
+        "value": "12",
+        "assignment": {
+          "en": "Use BYREF only for intended mutation.",
+          "vi": "Chỉ dùng BYREF cho mutation có chủ đích."
+        },
+        "report": {
+          "en": "Caller-visible change is documented.",
+          "vi": "Thay đổi caller thấy được ghi rõ."
+        }
+      },
+      {
+        "field": "Threshold",
+        "value": "50",
+        "assignment": {
+          "en": "Prefer a constant or parameter over hidden global state.",
+          "vi": "Ưu tiên constant hoặc parameter hơn global state ẩn."
+        },
+        "report": {
+          "en": "Tests can supply a different value.",
+          "vi": "Test có thể truyền value khác."
+        }
+      }
+    ],
+    "moduleTable": {
+      "ariaLabel": {
+        "en": "11.3 process and responsibility table",
+        "vi": "Bảng quy trình và trách nhiệm 11.3"
+      },
+      "firstColumn": {
+        "en": "Stage / responsibility",
+        "vi": "Giai đoạn / trách nhiệm"
+      },
+      "inputColumn": {
+        "en": "Input",
+        "vi": "Input"
+      },
+      "outputColumn": {
+        "en": "Output",
+        "vi": "Output"
+      },
+      "boundaryColumn": {
+        "en": "Boundary",
+        "vi": "Ranh giới"
+      }
+    },
+    "modules": [
+      {
+        "name": "ValidateMark",
+        "input": "Mark BYVAL",
+        "output": "BOOLEAN",
+        "boundary": {
+          "en": "Checks only; no report or statistics side effect.",
+          "vi": "Chỉ check; không side effect report hoặc statistic."
+        }
+      },
+      {
+        "name": "CalculateGrade",
+        "input": "Mark BYVAL",
+        "output": "CHAR Grade",
+        "boundary": {
+          "en": "The function returns exactly one grade.",
+          "vi": "Function return đúng một grade."
+        }
+      },
+      {
+        "name": "UpdateStatistics",
+        "input": "Mark BYVAL, counters BYREF",
+        "output": "Updated counters",
+        "boundary": {
+          "en": "Mutation is limited to named BYREF values.",
+          "vi": "Mutation giới hạn ở value BYREF được nêu."
+        }
+      },
+      {
+        "name": "PrintReport",
+        "input": "Results BYVAL",
+        "output": "Formatted output",
+        "boundary": {
+          "en": "Presentation does not recalculate grades.",
+          "vi": "Presentation không tính lại grade."
+        }
+      }
+    ],
+    "fullAnswer": {
+      "en": "Split responsibilities and write each module contract: name, parameter types/order/mode, return or side effect and errors. Use a function for one value in an expression and a procedure for an action or explicit mutations. Prefer BYVAL and local variables unless caller-visible change is required. Replace the monolith incrementally and run normal and boundary regression cases before removing duplicated or global logic.",
+      "vi": "Tách trách nhiệm và viết contract từng module: name, parameter type/order/mode, return hoặc side effect và error. Dùng function cho một value trong expression, procedure cho action hoặc mutation rõ. Ưu tiên BYVAL và variable local trừ khi cần thay đổi caller thấy. Thay monolith từng bước và chạy regression case thường, biên trước khi bỏ logic trùng hoặc global."
+    },
+    "checks": [
+      {
+        "en": "Headers, calls, arguments and returns agree.",
+        "vi": "Header, call, argument và return khớp."
+      },
+      {
+        "en": "Every caller-visible mutation is intentional BYREF.",
+        "vi": "Mọi mutation caller thấy là BYREF có chủ đích."
+      },
+      {
+        "en": "Regression cases preserve valid behaviour.",
+        "vi": "Regression case giữ behavior hợp lệ."
+      }
+    ],
+    "nextStep": {
+      "slug": "procedures-functions",
+      "anchor": "practise",
+      "label": {
+        "en": "Next: derive headers and calls from module contracts",
+        "vi": "Tiếp theo: suy header và call từ contract module"
+      }
+    }
+  },
+  "patternIds": [
+    "F11"
+  ]
+}

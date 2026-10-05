@@ -1,0 +1,843 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.2-T02",
+  "slug": "call-stacks-and-unwinding",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Call stacks and unwinding",
+    "vi": "Call stack và unwinding"
+  },
+  "question": {
+    "en": "What must the compiler/runtime preserve for every recursive call, and how is it restored?",
+    "vi": "Compiler/runtime phải giữ gì cho mỗi recursive call và khôi phục thế nào?"
+  },
+  "opening": {
+    "en": "Each Factorial invocation needs its own argument, local result and resume point while a child call runs.",
+    "vi": "Mỗi invocation Factorial cần argument, local result và resume point riêng khi child call chạy."
+  },
+  "objectives": [
+    {
+      "en": "Model one frame per invocation.",
+      "vi": "Mô hình một frame mỗi invocation."
+    },
+    {
+      "en": "Trace push order to the zero base.",
+      "vi": "Trace push order tới base zero."
+    },
+    {
+      "en": "Trace LIFO pop and returned-value flow.",
+      "vi": "Trace pop LIFO và luồng return value."
+    },
+    {
+      "en": "Distinguish runtime frames from a program stack ADT.",
+      "vi": "Phân biệt runtime frame với stack ADT trong chương trình."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Trace Factorial(4) with base zero.",
+      "vi": "Trace Factorial(4) với base zero."
+    },
+    {
+      "en": "Understand LIFO stack behavior.",
+      "vi": "Hiểu behavior stack LIFO."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "call frame",
+      "meaning": {
+        "en": "Per-invocation stored arguments, locals and resume point.",
+        "vi": "Argument, local và resume point lưu riêng cho mỗi invocation."
+      }
+    },
+    {
+      "term": "return address",
+      "meaning": {
+        "en": "Where the caller resumes after the child returns.",
+        "vi": "Nơi caller resume sau khi child return."
+      }
+    },
+    {
+      "term": "winding",
+      "meaning": {
+        "en": "Push frames while calls deepen.",
+        "vi": "Push frame khi call sâu dần."
+      }
+    },
+    {
+      "term": "unwinding",
+      "meaning": {
+        "en": "Pop frames as results return.",
+        "vi": "Pop frame khi result return."
+      }
+    },
+    {
+      "term": "stack overflow",
+      "meaning": {
+        "en": "Failure when call depth exceeds available stack capacity.",
+        "vi": "Failure khi call depth vượt capacity stack có sẵn."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "separate-frames",
+      "title": {
+        "en": "Every invocation has separate state",
+        "vi": "Mỗi invocation có state riêng"
+      },
+      "paragraphs": [
+        {
+          "en": "Arguments and locals are not shared rows. Each frame also preserves a resume point/return address for its caller.",
+          "vi": "Argument và local không dùng chung row. Mỗi frame còn giữ resume point/return address cho caller."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "push",
+      "title": {
+        "en": "Calls push in winding order",
+        "vi": "Call push theo winding order"
+      },
+      "paragraphs": [
+        {
+          "en": "Factorial(4) pushes frames 4,3,2,1,0. The base-zero contract therefore reaches maximum depth five.",
+          "vi": "Factorial(4) push frame 4,3,2,1,0. Contract base-zero vì vậy đạt depth tối đa năm."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "pop",
+      "title": {
+        "en": "Returns pop in LIFO order",
+        "vi": "Return pop theo LIFO"
+      },
+      "paragraphs": [
+        {
+          "en": "Frame 0 returns 1 first. Frames 1,2,3,4 resume, combine the child result and pop in that order.",
+          "vi": "Frame 0 trả 1 trước. Frame 1,2,3,4 resume, combine child result và pop theo order đó."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "boundary",
+      "title": {
+        "en": "Syllabus-level abstraction",
+        "vi": "Abstraction mức syllabus"
+      },
+      "paragraphs": [
+        {
+          "en": "The workbench shows compiler/runtime state conceptually, not a universal ABI or physical memory layout. A manual Stack array is a different program object.",
+          "vi": "Workbench hiển thị state compiler/runtime theo concept, không phải ABI phổ quát hoặc layout memory vật lý. Mảng Stack thủ công là object chương trình khác."
+        }
+      ],
+      "code": "FUNCTION Factorial(Number : INTEGER) RETURNS INTEGER\n  IF Number = 0 THEN\n    RETURN 1\n  ENDIF\n  RETURN Number * Factorial(Number - 1)\nENDFUNCTION",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "call-stack-unwinding",
+    "title": {
+      "en": "Frame-stack unwinding workbench",
+      "vi": "Bàn unwinding frame-stack"
+    },
+    "introduction": {
+      "en": "Frames show argument, locals, resume point and returned child value at every push/pop.",
+      "vi": "Frame hiển thị argument, local, resume point và child value trả về ở mỗi push/pop."
+    },
+    "task": {
+      "en": "Wind Factorial(4) through frame 0, then predict each LIFO return.",
+      "vi": "Wind Factorial(4) tới frame 0, rồi dự đoán mỗi return LIFO."
+    },
+    "conventions": [
+      {
+        "en": "Canonical base Number=0.",
+        "vi": "Base chuẩn Number=0."
+      },
+      {
+        "en": "Push order 4,3,2,1,0; max depth 5.",
+        "vi": "Push order 4,3,2,1,0; max depth 5."
+      },
+      {
+        "en": "Pop/resume order 0,1,2,3,4.",
+        "vi": "Pop/resume order 0,1,2,3,4."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Wind and unwind Factorial(4)",
+      "vi": "Wind và unwind Factorial(4)"
+    },
+    "prompt": {
+      "en": "Track argument, resume expression and returned value in every frame.",
+      "vi": "Theo dõi argument, resume expression và return value trong mọi frame."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "push-4",
+        "action": {
+          "en": "Push frame F4 with Number=4.",
+          "vi": "Push frame F4 với Number=4."
+        },
+        "why": {
+          "en": "The caller must resume after Factorial(3).",
+          "vi": "Caller phải resume sau Factorial(3)."
+        },
+        "result": {
+          "en": "Resume expression is 4×child.",
+          "vi": "Resume expression là 4×child."
+        },
+        "check": {
+          "en": "Check that resume expression is 4×child.",
+          "vi": "Kiểm tra rằng resume expression là 4×child."
+        }
+      },
+      {
+        "id": "push-3",
+        "action": {
+          "en": "Push F3 above F4.",
+          "vi": "Push F3 trên F4."
+        },
+        "why": {
+          "en": "F4 remains suspended with its own state.",
+          "vi": "F4 vẫn suspended với state riêng."
+        },
+        "result": {
+          "en": "F3 stores 3×child; depth 2.",
+          "vi": "F3 lưu 3×child; depth 2."
+        },
+        "check": {
+          "en": "Check that f3 stores 3×child; depth 2.",
+          "vi": "Kiểm tra rằng f3 lưu 3×child; depth 2."
+        }
+      },
+      {
+        "id": "push-2-1",
+        "action": {
+          "en": "Push F2 then F1.",
+          "vi": "Push F2 rồi F1."
+        },
+        "why": {
+          "en": "Each recursive call gets a new frame.",
+          "vi": "Mỗi recursive call có frame mới."
+        },
+        "result": {
+          "en": "Stack bottom→top F4,F3,F2,F1.",
+          "vi": "Stack bottom→top F4,F3,F2,F1."
+        },
+        "check": {
+          "en": "Check that stack bottom→top f4,f3,f2,f1.",
+          "vi": "Kiểm tra rằng stack bottom→top f4,f3,f2,f1."
+        }
+      },
+      {
+        "id": "push-base",
+        "action": {
+          "en": "Push F0 and return base value 1.",
+          "vi": "Push F0 và trả base value 1."
+        },
+        "why": {
+          "en": "Number=0 makes no child call.",
+          "vi": "Number=0 không gọi child."
+        },
+        "result": {
+          "en": "Maximum depth 5; pop F0 with result 1.",
+          "vi": "Depth tối đa 5; pop F0 với result 1."
+        },
+        "check": {
+          "en": "Check that maximum depth 5; pop f0 with result 1.",
+          "vi": "Kiểm tra rằng depth tối đa 5; pop f0 với result 1."
+        }
+      },
+      {
+        "id": "unwind-1-2",
+        "action": {
+          "en": "Resume F1:1×1=1; pop. Resume F2:2×1=2; pop.",
+          "vi": "Resume F1:1×1=1; pop. Resume F2:2×1=2; pop."
+        },
+        "why": {
+          "en": "LIFO returns to the immediate caller.",
+          "vi": "LIFO return tới immediate caller."
+        },
+        "result": {
+          "en": "Child result entering F3 is 2.",
+          "vi": "Child result đi vào F3 là 2."
+        },
+        "check": {
+          "en": "Check that child result entering f3 is 2.",
+          "vi": "Kiểm tra rằng child result đi vào f3 là 2."
+        }
+      },
+      {
+        "id": "unwind-3-4",
+        "action": {
+          "en": "Resume F3:3×2=6; then F4:4×6=24.",
+          "vi": "Resume F3:3×2=6; rồi F4:4×6=24."
+        },
+        "why": {
+          "en": "Each frame combines then leaves the stack.",
+          "vi": "Mỗi frame combine rồi rời stack."
+        },
+        "result": {
+          "en": "Stack empty after final return; result 24.",
+          "vi": "Stack empty sau final return; result 24."
+        },
+        "check": {
+          "en": "Check that stack empty after final return; result 24.",
+          "vi": "Kiểm tra rằng stack empty sau final return; result 24."
+        }
+      }
+    ],
+    "result": {
+      "en": "Five separate frames wind 4→0 and unwind 0→4 to return 24.",
+      "vi": "Năm frame riêng wind 4→0 và unwind 0→4 để trả 24."
+    },
+    "selfCheck": {
+      "en": "Is frame F0 present, and does every returned value go first to its immediate caller?",
+      "vi": "Frame F0 có hiện diện và mỗi return value có đi trước tới immediate caller không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "compiler/runtime stack",
+        "vi": "stack compiler/runtime"
+      },
+      {
+        "en": "return address/local variables",
+        "vi": "return address/local variable"
+      },
+      {
+        "en": "winding/unwinding",
+        "vi": "winding/unwinding"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: the manual stack lesson stores application values; the call stack stores invocation frames created by runtime execution.",
+      "vi": "Dễ nhầm: bài stack thủ công lưu application value; call stack lưu invocation frame do runtime execution tạo."
+    },
+    "method": [
+      {
+        "en": "List call arguments.",
+        "vi": "Liệt kê call argument."
+      },
+      {
+        "en": "Create one frame per invocation.",
+        "vi": "Tạo một frame mỗi invocation."
+      },
+      {
+        "en": "Record resume point and locals.",
+        "vi": "Ghi resume point và local."
+      },
+      {
+        "en": "Push to the base frame.",
+        "vi": "Push tới base frame."
+      },
+      {
+        "en": "Pop in reverse and pass results to callers.",
+        "vi": "Pop theo thứ tự ngược và truyền result tới caller."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Call stacks and unwinding: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho Call stack và unwinding: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Call stacks and unwinding; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của Call stack và unwinding; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Call stacks and unwinding to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của Call stack và unwinding với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Call stacks and unwinding with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh Call stack và unwinding với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Call stacks and unwinding, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của Call stack và unwinding, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "All calls share one Number variable.",
+        "vi": "Mọi call dùng chung một variable Number."
+      },
+      "correction": {
+        "en": "Each invocation has its own argument/local frame.",
+        "vi": "Mỗi invocation có frame argument/local riêng."
+      },
+      "selfCheck": {
+        "en": "Which frame owns this Number?",
+        "vi": "Frame nào sở hữu Number này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Omit the zero frame.",
+        "vi": "Bỏ frame zero."
+      },
+      "correction": {
+        "en": "The canonical base is Number=0, so F0 must be pushed.",
+        "vi": "Base chuẩn là Number=0 nên F0 phải được push."
+      },
+      "selfCheck": {
+        "en": "Where is base tested true?",
+        "vi": "Base đúng ở đâu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Pop in call order.",
+        "vi": "Pop theo call order."
+      },
+      "correction": {
+        "en": "LIFO pops the most recent frame first.",
+        "vi": "LIFO pop frame mới nhất trước."
+      },
+      "selfCheck": {
+        "en": "Which frame is currently on top?",
+        "vi": "Frame nào hiện ở top?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "The diagram is a universal physical layout.",
+        "vi": "Sơ đồ là layout vật lý phổ quát."
+      },
+      "correction": {
+        "en": "Treat it as a syllabus-level runtime abstraction.",
+        "vi": "Coi đây là abstraction runtime mức syllabus."
+      },
+      "selfCheck": {
+        "en": "Which details depend on language/ABI?",
+        "vi": "Detail nào phụ thuộc language/ABI?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What does one call frame preserve?",
+        "vi": "Một call frame giữ gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Arguments, locals and resume point",
+            "vi": "Argument, local và resume point"
+          },
+          "feedback": {
+            "en": "Correct: each invocation needs separate suspended state",
+            "vi": "Đúng: mỗi invocation cần state suspended riêng"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Only final output",
+            "vi": "Chỉ final output"
+          },
+          "feedback": {
+            "en": "Only final output conflicts with the rule: each invocation needs separate suspended state",
+            "vi": "Chỉ final output trái với quy tắc: mỗi invocation cần state suspended riêng"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Every program array",
+            "vi": "Mọi array chương trình"
+          },
+          "feedback": {
+            "en": "Every program array conflicts with the rule: each invocation needs separate suspended state",
+            "vi": "Mọi array chương trình trái với quy tắc: mỗi invocation cần state suspended riêng"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "each invocation needs separate suspended state",
+        "vi": "mỗi invocation cần state suspended riêng"
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which wording identifies call-stack behavior?",
+        "vi": "Wording nào nhận diện call-stack?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "push return addresses and locals; unwind LIFO",
+            "vi": "push return address và local; unwind LIFO"
+          },
+          "feedback": {
+            "en": "Correct: compiler recursion preserves frames",
+            "vi": "Đúng: compiler recursion giữ frame"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "enqueue at rear",
+            "vi": "enqueue tại rear"
+          },
+          "feedback": {
+            "en": "enqueue at rear conflicts with the rule: compiler recursion preserves frames",
+            "vi": "enqueue tại rear trái với quy tắc: compiler recursion giữ frame"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "lookup by key",
+            "vi": "lookup bằng key"
+          },
+          "feedback": {
+            "en": "lookup by key conflicts with the rule: compiler recursion preserves frames",
+            "vi": "lookup bằng key trái với quy tắc: compiler recursion giữ frame"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "compiler recursion preserves frames",
+        "vi": "compiler recursion giữ frame"
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "Frames F4,F3,F2 are active; next recursive argument?",
+        "vi": "Frame F4,F3,F2 active; argument recursive tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Correct: Number decreases from 2 to 1",
+            "vi": "Đúng: Number giảm từ 2 xuống 1"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "3",
+            "vi": "3"
+          },
+          "feedback": {
+            "en": "3 conflicts with the rule: Number decreases from 2 to 1",
+            "vi": "3 trái với quy tắc: Number giảm từ 2 xuống 1"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "0 immediately",
+            "vi": "0 ngay"
+          },
+          "feedback": {
+            "en": "0 immediately conflicts with the rule: Number decreases from 2 to 1",
+            "vi": "0 ngay trái với quy tắc: Number giảm từ 2 xuống 1"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Number decreases from 2 to 1",
+        "vi": "Number giảm từ 2 xuống 1"
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "What is max depth for Factorial(4) with base 0?",
+        "vi": "Max depth của Factorial(4) với base 0?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "5",
+            "vi": "5"
+          },
+          "feedback": {
+            "en": "Correct: frames are 4,3,2,1,0",
+            "vi": "Đúng: frame là 4,3,2,1,0"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "4 conflicts with the rule: frames are 4,3,2,1,0",
+            "vi": "4 trái với quy tắc: frame là 4,3,2,1,0"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "24",
+            "vi": "24"
+          },
+          "feedback": {
+            "en": "24 conflicts with the rule: frames are 4,3,2,1,0",
+            "vi": "24 trái với quy tắc: frame là 4,3,2,1,0"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "frames are 4,3,2,1,0",
+        "vi": "frame là 4,3,2,1,0"
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Which unwind order is correct?",
+        "vi": "Unwind order nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "F0,F1,F2,F3,F4",
+            "vi": "F0,F1,F2,F3,F4"
+          },
+          "feedback": {
+            "en": "Correct: LIFO returns in reverse call order",
+            "vi": "Đúng: LIFO return theo call order ngược"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "F4,F3,F2,F1,F0",
+            "vi": "F4,F3,F2,F1,F0"
+          },
+          "feedback": {
+            "en": "F4,F3,F2,F1,F0 conflicts with the rule: LIFO returns in reverse call order",
+            "vi": "F4,F3,F2,F1,F0 trái với quy tắc: LIFO return theo call order ngược"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "F0,F4,F1,F3,F2",
+            "vi": "F0,F4,F1,F3,F2"
+          },
+          "feedback": {
+            "en": "F0,F4,F1,F3,F2 conflicts with the rule: LIFO returns in reverse call order",
+            "vi": "F0,F4,F1,F3,F2 trái với quy tắc: LIFO return theo call order ngược"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "LIFO returns in reverse call order",
+        "vi": "LIFO return theo call order ngược"
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "Recursive calls do not progress and keep pushing. Main risk?",
+        "vi": "Recursive call không progress và tiếp tục push. Rủi ro chính?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Stack overflow",
+            "vi": "Stack overflow"
+          },
+          "feedback": {
+            "en": "Correct: unbounded call depth exhausts stack capacity",
+            "vi": "Đúng: call depth không giới hạn làm cạn capacity stack"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Queue underflow",
+            "vi": "Queue underflow"
+          },
+          "feedback": {
+            "en": "Queue underflow conflicts with the rule: unbounded call depth exhausts stack capacity",
+            "vi": "Queue underflow trái với quy tắc: call depth không giới hạn làm cạn capacity stack"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Dictionary duplicate",
+            "vi": "Dictionary duplicate"
+          },
+          "feedback": {
+            "en": "Dictionary duplicate conflicts with the rule: unbounded call depth exhausts stack capacity",
+            "vi": "Dictionary duplicate trái với quy tắc: call depth không giới hạn làm cạn capacity stack"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "unbounded call depth exhausts stack capacity",
+        "vi": "call depth không giới hạn làm cạn capacity stack"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain compiler/runtime support for Factorial(4).",
+      "vi": "Giải thích hỗ trợ compiler/runtime cho Factorial(4)."
+    },
+    "answerPoints": [
+      {
+        "en": "Push separate frames 4,3,2,1,0.",
+        "vi": "Push frame riêng 4,3,2,1,0."
+      },
+      {
+        "en": "Base F0 returns 1.",
+        "vi": "Base F0 trả 1."
+      },
+      {
+        "en": "Pop 0,1,2,3,4 and resume each multiplication.",
+        "vi": "Pop 0,1,2,3,4 và resume mỗi multiplication."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Every invocation has separate state.",
+      "vi": "Mỗi invocation có state riêng."
+    },
+    {
+      "en": "Base zero gives five frames for Factorial(4).",
+      "vi": "Base zero tạo năm frame cho Factorial(4)."
+    },
+    {
+      "en": "Unwinding is LIFO.",
+      "vi": "Unwinding là LIFO."
+    }
+  ],
+  "relatedSlugs": [
+    "designing-and-tracing-recursion",
+    "stack"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp491 and 494 / PDF pp507 and 510: factorial base-zero trace and compiler stack",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "w23-32-qp",
+      "title": "Cambridge 9618/32 — October/November 2023 question paper",
+      "locator": "Question 9(c), p9",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w23-32-ms",
+      "title": "Cambridge 9618/32 — October/November 2023 mark scheme",
+      "locator": "Question 9(c), p7",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "w25-32-qp",
+      "title": "Cambridge 9618/32 — October/November 2025 question paper",
+      "locator": "Question 12(b), p12",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w25-32-ms",
+      "title": "Cambridge 9618/32 — October/November 2025 mark scheme",
+      "locator": "Question 12(b), p17",
+      "kind": "mark-scheme"
+    }
+  ]
+}

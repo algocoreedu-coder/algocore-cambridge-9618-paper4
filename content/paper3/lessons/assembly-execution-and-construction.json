@@ -1,0 +1,844 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.20.1",
+  "topicId": "P3-20.1-T03",
+  "slug": "assembly-execution-and-construction",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Assembly execution and construction",
+    "vi": "Thực thi và xây dựng assembly"
+  },
+  "question": {
+    "en": "How does each supplied instruction change machine state?",
+    "vi": "Mỗi lệnh được cung cấp thay đổi machine state thế nào?"
+  },
+  "opening": {
+    "en": "A short program loads, compares, branches and stores using only its displayed instruction table.",
+    "vi": "Chương trình ngắn load, compare, branch và store chỉ bằng bảng lệnh hiển thị."
+  },
+  "objectives": [
+    {
+      "en": "Explain assembly execution and construction accurately.",
+      "vi": "Giải thích chính xác thực thi và xây dựng assembly."
+    },
+    {
+      "en": "Trace every visible state change.",
+      "vi": "Trace mọi thay đổi state nhìn thấy."
+    },
+    {
+      "en": "Use the declared convention.",
+      "vi": "Dùng convention đã khai báo."
+    },
+    {
+      "en": "Handle boundary and error cases.",
+      "vi": "Xử lý boundary và error case."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read tables and simple code.",
+      "vi": "Đọc bảng và code đơn giản."
+    },
+    {
+      "en": "Distinguish a value from its location.",
+      "vi": "Phân biệt giá trị với vị trí của nó."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Instruction",
+      "meaning": {
+        "en": "Opcode effects come only from the displayed table; unsupported instructions are invalid.",
+        "vi": "Effect opcode chỉ đến từ bảng hiển thị; lệnh không hỗ trợ là invalid."
+      }
+    },
+    {
+      "term": "state",
+      "meaning": {
+        "en": "Values relevant at one execution point.",
+        "vi": "Các giá trị liên quan tại một thời điểm thực thi."
+      }
+    },
+    {
+      "term": "trace",
+      "meaning": {
+        "en": "Ordered record of state changes.",
+        "vi": "Bản ghi có thứ tự của thay đổi state."
+      }
+    },
+    {
+      "term": "fixture",
+      "meaning": {
+        "en": "Declared teaching example with fixed assumptions.",
+        "vi": "Ví dụ dạy học có giả định cố định."
+      }
+    },
+    {
+      "term": "convention",
+      "meaning": {
+        "en": "Rule that fixes notation or interpretation.",
+        "vi": "Quy tắc khóa notation hoặc cách hiểu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "instruction-contract",
+      "title": {
+        "en": "Instruction set is the contract",
+        "vi": "Instruction set là contract"
+      },
+      "paragraphs": [
+        {
+          "en": "Opcode effects come only from the displayed table; unsupported instructions are invalid.",
+          "vi": "Effect opcode chỉ đến từ bảng hiển thị; lệnh không hỗ trợ là invalid."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "fetch-resolve",
+      "title": {
+        "en": "Fetch then resolve",
+        "vi": "Fetch rồi phân giải"
+      },
+      "paragraphs": [
+        {
+          "en": "Read the instruction at PC, resolve its operand, then apply the declared state change.",
+          "vi": "Đọc lệnh tại PC, phân giải operand rồi áp dụng thay đổi state."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "compare-branch",
+      "title": {
+        "en": "Compare and branch",
+        "vi": "Compare và branch"
+      },
+      "paragraphs": [
+        {
+          "en": "CMP records the comparison without changing ACC; JPE/JPN choose the next PC from that state.",
+          "vi": "CMP ghi comparison mà không đổi ACC; JPE/JPN chọn next PC từ state đó."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "trace-program",
+      "title": {
+        "en": "Construct from effects",
+        "vi": "Xây dựng từ effect"
+      },
+      "paragraphs": [
+        {
+          "en": "Translate each requested effect into an available instruction and allocate labels/data away from code.",
+          "vi": "Dịch từng effect thành lệnh có sẵn và đặt label/data tách code."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ],
+      "code": "LDM #7\nSTO Total\nLDD Value\nADD Total\nCMP #12\nJPE Done\nDone: END\nValue: #5\nTotal: #0"
+    }
+  ],
+  "visual": {
+    "kind": "assembly-workbench",
+    "title": {
+      "en": "Assembly trace workbench",
+      "vi": "Bàn trace assembly"
+    },
+    "introduction": {
+      "en": "Execute one instruction at a time with PC, ACC, IX, comparison state and memory before/after.",
+      "vi": "Thực thi từng lệnh với PC, ACC, IX, comparison state và memory before/after."
+    },
+    "task": {
+      "en": "Trace supplied code or select the next legal instruction for a stated effect.",
+      "vi": "Trace code hoặc chọn lệnh hợp lệ tiếp theo cho effect đã nêu."
+    },
+    "conventions": [
+      {
+        "en": "S20-ASM-COURSEBOOK-1; all values denary.",
+        "vi": "S20-ASM-COURSEBOOK-1; mọi value là denary."
+      },
+      {
+        "en": "Comparison latch only; no invented processor flags.",
+        "vi": "Chỉ comparison latch; không tự tạo processor flag."
+      },
+      {
+        "en": "AlgoCore teaching fixture; no official marks.",
+        "vi": "Fixture AlgoCore; không có điểm chính thức."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Trace load, add and branch",
+      "vi": "Trace load, add và branch"
+    },
+    "prompt": {
+      "en": "Execute the displayed fixture from PC=100 with Value=5.",
+      "vi": "Thực thi fixture từ PC=100 với Value=5."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "step-1",
+        "action": {
+          "en": "Fetch LDM #7 at 100.",
+          "vi": "Fetch LDM #7 tại 100."
+        },
+        "why": {
+          "en": "PC identifies the current instruction.",
+          "vi": "PC xác định lệnh hiện tại."
+        },
+        "result": {
+          "en": "ACC=7; next PC=101.",
+          "vi": "ACC=7; next PC=101."
+        },
+        "check": {
+          "en": "Check: ACC=7; next PC=101.",
+          "vi": "Tự kiểm tra: ACC=7; next PC=101."
+        }
+      },
+      {
+        "id": "step-2",
+        "action": {
+          "en": "Execute STO Total.",
+          "vi": "Thực thi STO Total."
+        },
+        "why": {
+          "en": "STO changes memory, not ACC.",
+          "vi": "STO đổi memory, không đổi ACC."
+        },
+        "result": {
+          "en": "Total=7; ACC=7; PC=102.",
+          "vi": "Total=7; ACC=7; PC=102."
+        },
+        "check": {
+          "en": "Check: Total=7; ACC=7; PC=102.",
+          "vi": "Tự kiểm tra: Total=7; ACC=7; PC=102."
+        }
+      },
+      {
+        "id": "step-3",
+        "action": {
+          "en": "Execute LDD Value.",
+          "vi": "Thực thi LDD Value."
+        },
+        "why": {
+          "en": "Direct addressing reads the labelled cell.",
+          "vi": "Direct đọc ô có label."
+        },
+        "result": {
+          "en": "ACC=5; PC=103.",
+          "vi": "ACC=5; PC=103."
+        },
+        "check": {
+          "en": "Check: ACC=5; PC=103.",
+          "vi": "Tự kiểm tra: ACC=5; PC=103."
+        }
+      },
+      {
+        "id": "step-4",
+        "action": {
+          "en": "Execute ADD Total.",
+          "vi": "Thực thi ADD Total."
+        },
+        "why": {
+          "en": "The memory value is added to ACC.",
+          "vi": "Giá trị memory được cộng vào ACC."
+        },
+        "result": {
+          "en": "ACC=12; PC=104.",
+          "vi": "ACC=12; PC=104."
+        },
+        "check": {
+          "en": "Check: ACC=12; PC=104.",
+          "vi": "Tự kiểm tra: ACC=12; PC=104."
+        }
+      },
+      {
+        "id": "step-5",
+        "action": {
+          "en": "Execute CMP #12 then JPE Done.",
+          "vi": "Thực thi CMP #12 rồi JPE Done."
+        },
+        "why": {
+          "en": "Equality is true; CMP leaves ACC unchanged.",
+          "vi": "Equality true; CMP không đổi ACC."
+        },
+        "result": {
+          "en": "ACC=12; next PC=Done.",
+          "vi": "ACC=12; next PC=Done."
+        },
+        "check": {
+          "en": "Check: ACC=12; next PC=Done.",
+          "vi": "Tự kiểm tra: ACC=12; next PC=Done."
+        }
+      },
+      {
+        "id": "step-6",
+        "action": {
+          "en": "Execute END.",
+          "vi": "Thực thi END."
+        },
+        "why": {
+          "en": "END terminates the declared fixture.",
+          "vi": "END kết thúc fixture."
+        },
+        "result": {
+          "en": "Halted; no later instruction executes.",
+          "vi": "Halted; không lệnh sau nào chạy."
+        },
+        "check": {
+          "en": "Check: Halted; no later instruction executes.",
+          "vi": "Tự kiểm tra: Halted; không lệnh sau nào chạy."
+        }
+      }
+    ],
+    "result": {
+      "en": "Total=7, ACC=12, equality true and the program halts at Done.",
+      "vi": "Total=7, ACC=12, equality true và chương trình dừng ở Done."
+    },
+    "selfCheck": {
+      "en": "Did each row show before, instruction, resolution, after and next PC?",
+      "vi": "Mỗi row đã có before, instruction, resolution, after và next PC chưa?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "supplied opcode table",
+        "vi": "bảng opcode được cung cấp"
+      },
+      {
+        "en": "trace table with registers/memory",
+        "vi": "trace table có register/memory"
+      },
+      {
+        "en": "write code using only these instructions",
+        "vi": "viết code chỉ dùng các lệnh này"
+      },
+      {
+        "en": "branch if comparison is true/false",
+        "vi": "branch nếu comparison true/false"
+      }
+    ],
+    "distinguish": {
+      "en": "Do not import flags or opcodes from another processor; the question's table is complete for the task.",
+      "vi": "Không nhập flag/opcode từ processor khác; bảng của đề là contract."
+    },
+    "method": [
+      {
+        "en": "Copy the instruction table.",
+        "vi": "Chép instruction table."
+      },
+      {
+        "en": "Write initial PC/register/memory.",
+        "vi": "Ghi PC/register/memory đầu."
+      },
+      {
+        "en": "Resolve then apply one instruction per row.",
+        "vi": "Phân giải rồi áp dụng một lệnh mỗi row."
+      },
+      {
+        "en": "Check branch target and termination.",
+        "vi": "Kiểm tra branch target và termination."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "State the convention, then produce syntactically consistent code or notation.",
+          "vi": "Nêu convention rồi viết code/ký hiệu nhất quán cú pháp."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record every relevant state change in execution order.",
+          "vi": "Ghi mọi thay đổi trạng thái liên quan theo thứ tự thực thi."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link a cause or rule to its consequence; do not only name it.",
+          "vi": "Nối nguyên nhân hoặc quy tắc với hệ quả; không chỉ nêu tên."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use the same criterion for both alternatives.",
+          "vi": "Dùng cùng một tiêu chí cho cả hai phương án."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Select a method and connect its feature to the scenario requirement.",
+          "vi": "Chọn phương pháp và nối đặc điểm của nó với yêu cầu tình huống."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "CMP subtracts from ACC.",
+        "vi": "CMP trừ ACC."
+      },
+      "correction": {
+        "en": "This fixture records comparison only.",
+        "vi": "Fixture chỉ ghi comparison."
+      },
+      "selfCheck": {
+        "en": "Does ACC change in the table?",
+        "vi": "ACC có đổi trong bảng không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "STO loads memory.",
+        "vi": "STO load memory."
+      },
+      "correction": {
+        "en": "STO writes ACC to memory.",
+        "vi": "STO ghi ACC vào memory."
+      },
+      "selfCheck": {
+        "en": "Which side changes?",
+        "vi": "Bên nào thay đổi?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "PC always increments.",
+        "vi": "PC luôn tăng."
+      },
+      "correction": {
+        "en": "A taken branch replaces the sequential next PC.",
+        "vi": "Branch taken thay next PC tuần tự."
+      },
+      "selfCheck": {
+        "en": "Was the condition true?",
+        "vi": "Điều kiện true không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Any mnemonic may be used.",
+        "vi": "Có thể dùng mọi mnemonic."
+      },
+      "correction": {
+        "en": "Only supplied opcodes receive semantics.",
+        "vi": "Chỉ opcode được cung cấp có semantics."
+      },
+      "selfCheck": {
+        "en": "Is it in the table?",
+        "vi": "Nó có trong bảng không?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "cp-assembly-recall",
+      "prompt": {
+        "en": "Which response begins an accurate answer about assembly execution and construction?",
+        "vi": "Phản hồi nào bắt đầu câu trả lời chính xác về thực thi và xây dựng assembly?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "State the meaning and declared convention for assembly execution and construction.",
+            "vi": "Nêu ý nghĩa và convention đã khai báo cho thực thi và xây dựng assembly."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-assembly-recognition",
+      "prompt": {
+        "en": "Which evidence should identify the required method?",
+        "vi": "Bằng chứng nào xác định phương pháp cần dùng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Use the supplied terms, state and required output.",
+            "vi": "Dùng term, state và output được cung cấp."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-assembly-next-state",
+      "prompt": {
+        "en": "What must be read before predicting the next state?",
+        "vi": "Cần đọc gì trước khi dự đoán state tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Read the current state and exact operation rule.",
+            "vi": "Đọc current state và operation rule chính xác."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-assembly-trace",
+      "prompt": {
+        "en": "What makes a trace row complete?",
+        "vi": "Điều gì làm trace row đầy đủ?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Show before state, applied rule, calculation and after state.",
+            "vi": "Cho before state, rule áp dụng, phép tính và after state."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-assembly-write",
+      "prompt": {
+        "en": "How should code or notation be written?",
+        "vi": "Code hoặc notation nên được viết thế nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Declare one convention and keep all syntax consistent.",
+            "vi": "Khai báo một convention và giữ cú pháp nhất quán."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-assembly-transfer",
+      "prompt": {
+        "en": "A new question changes a convention. What should you do?",
+        "vi": "Đề mới đổi convention. Bạn nên làm gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Restate the new convention and recompute from that state.",
+            "vi": "Nêu lại convention mới và tính lại từ state đó."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Trace and construct with a supplied instruction set.",
+      "vi": "Trace và xây dựng với supplied instruction set."
+    },
+    "answerPoints": [
+      {
+        "en": "State initial PC/register/memory.",
+        "vi": "Nêu PC/register/memory đầu."
+      },
+      {
+        "en": "Resolve each operand.",
+        "vi": "Phân giải từng operand."
+      },
+      {
+        "en": "Record every after-state and branch.",
+        "vi": "Ghi mọi after-state và branch."
+      },
+      {
+        "en": "Use only supplied instructions and show data labels.",
+        "vi": "Chỉ dùng lệnh cung cấp và cho data label."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "The instruction table is the semantic contract.",
+      "vi": "Instruction table là semantic contract."
+    },
+    {
+      "en": "Resolve before applying effects.",
+      "vi": "Phân giải trước khi áp effect."
+    },
+    {
+      "en": "CMP and branches affect different state.",
+      "vi": "CMP và branch tác động state khác nhau."
+    },
+    {
+      "en": "END and invalid opcode are explicit outcomes.",
+      "vi": "END và invalid opcode là outcome rõ."
+    }
+  ],
+  "relatedSlugs": [
+    "five-addressing-modes",
+    "paradigms-and-procedural-design"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Section 20, printed/PDF p.38",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 20 pp.498–500; Chapter 4 pp.123–129",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "Relevant convention on pp.22–29",
+      "kind": "guide"
+    },
+    {
+      "id": "qp",
+      "title": "Cambridge 9618/31 October/November 2025 question paper",
+      "locator": "Q11, PDF p.11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms",
+      "title": "Cambridge 9618/31 October/November 2025 mark scheme",
+      "locator": "Q11, PDF p.15",
+      "kind": "mark-scheme"
+    }
+  ]
+}

@@ -1,0 +1,824 @@
+{
+  "schemaVersion": 1,
+  "version": "T12-academic-r3-gap-closure",
+  "topicId": "T12",
+  "sectionId": "10.4",
+  "slug": "queue",
+  "learningMode": "diagram",
+  "estimatedMinutes": 70,
+  "title": {
+    "en": "Queues",
+    "vi": "Hàng đợi"
+  },
+  "question": {
+    "en": "How does a queue preserve first-in-first-out order across different representations?",
+    "vi": "Queue giữ thứ tự vào trước-ra trước qua các biểu diễn thế nào?"
+  },
+  "opening": {
+    "en": "Trace ENQUEUE/DEQUEUE with the given Front/Rear convention; do not assume wrap-around unless stated.",
+    "vi": "Trace ENQUEUE/DEQUEUE theo quy ước Front/Rear được cho; không mặc định quay vòng nếu chưa nêu."
+  },
+  "objectives": [
+    {
+      "en": "Explain FIFO.",
+      "vi": "Giải thích FIFO."
+    },
+    {
+      "en": "Trace Front/Rear in a supplied representation.",
+      "vi": "Trace Front/Rear trong biểu diễn được cho."
+    },
+    {
+      "en": "Justify a queue for a waiting situation.",
+      "vi": "Giải thích chọn queue cho tình huống chờ."
+    },
+    {
+      "en": "Trace circular-queue wrap-around under an explicit front/rear convention and diagnose full/empty off-by-one faults.",
+      "vi": "Trace wrap-around của circular queue theo quy ước front/rear rõ ràng và chẩn đoán lỗi off-by-one khi đầy/rỗng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Arrays and ADTs",
+        "vi": "Array và ADT"
+      },
+      "reason": {
+        "en": "A supplied queue may use array indices and defined operations.",
+        "vi": "Queue được cho có thể dùng chỉ số array và thao tác xác định."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "queue",
+      "meaning": {
+        "en": "FIFO ADT",
+        "vi": "ADT FIFO"
+      }
+    },
+    {
+      "term": "ENQUEUE",
+      "meaning": {
+        "en": "add at rear",
+        "vi": "thêm ở rear"
+      }
+    },
+    {
+      "term": "DEQUEUE",
+      "meaning": {
+        "en": "remove/return at front",
+        "vi": "lấy/trả ở front"
+      }
+    },
+    {
+      "term": "Front",
+      "meaning": {
+        "en": "position of next item to leave",
+        "vi": "vị trí mục tiếp theo rời"
+      }
+    },
+    {
+      "term": "Rear",
+      "meaning": {
+        "en": "representation-specific insertion/end marker",
+        "vi": "dấu chèn/cuối tùy biểu diễn"
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "First arrival is served first.",
+        "vi": "Đến trước được phục vụ trước."
+      },
+      {
+        "en": "ENQUEUE, DEQUEUE, Front or Rear appears.",
+        "vi": "Có ENQUEUE, DEQUEUE, Front hoặc Rear."
+      },
+      {
+        "en": "Front or Rear moves past the last physical index but the logical queue continues.",
+        "vi": "Front hoặc Rear đi qua index vật lý cuối nhưng queue logic vẫn tiếp tục."
+      },
+      {
+        "en": "The question gives a faulty full/empty test or asks which slot is used next.",
+        "vi": "Đề cho phép kiểm đầy/rỗng bị lỗi hoặc hỏi slot nào được dùng tiếp."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "All queues wrap around.",
+        "vi": "Mọi queue đều quay vòng."
+      },
+      {
+        "en": "Rear always points to the next free cell.",
+        "vi": "Rear luôn chỉ ô trống tiếp theo."
+      },
+      {
+        "en": "Rear always stores the last item under every circular-queue convention.",
+        "vi": "Rear luôn lưu item cuối theo mọi quy ước circular queue."
+      },
+      {
+        "en": "Front=Rear always proves that the queue is empty.",
+        "vi": "Front=Rear luôn chứng minh queue rỗng."
+      }
+    ],
+    "answerProduct": {
+      "en": "A FIFO trace following the provided Front/Rear and empty/full conventions.",
+      "vi": "Trace FIFO theo quy ước Front/Rear và rỗng/đầy được cho."
+    },
+    "method": [
+      {
+        "en": "State the representation and its conventions.",
+        "vi": "Nêu biểu diễn và quy ước."
+      },
+      {
+        "en": "Trace the state in the stated order.",
+        "vi": "Trace trạng thái theo thứ tự đã nêu."
+      },
+      {
+        "en": "Check the boundary or empty case.",
+        "vi": "Kiểm trường hợp biên hoặc rỗng."
+      },
+      {
+        "en": "Return exactly the requested product.",
+        "vi": "Trả đúng sản phẩm được yêu cầu."
+      },
+      {
+        "en": "Write the convention first: what Front, Rear and any Count represent.",
+        "vi": "Viết quy ước trước: Front, Rear và Count đại diện gì."
+      },
+      {
+        "en": "Advance a pointer with `(pointer + 1) MOD capacity`.",
+        "vi": "Tiến pointer bằng `(pointer + 1) MOD capacity`."
+      },
+      {
+        "en": "Use the stated full/empty rule before changing the array or pointers.",
+        "vi": "Dùng quy tắc đầy/rỗng đã nêu trước khi đổi array hoặc pointer."
+      },
+      {
+        "en": "After every operation check logical order, pointer ranges and Count.",
+        "vi": "Sau mỗi thao tác, kiểm thứ tự logic, miền pointer và Count."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t12-model",
+      "title": {
+        "en": "FIFO is logical order",
+        "vi": "FIFO là thứ tự logic"
+      },
+      "paragraphs": [
+        {
+          "en": "ENQUEUE adds at the rear and DEQUEUE removes the oldest remaining item at the front.",
+          "vi": "ENQUEUE thêm ở rear và DEQUEUE lấy mục còn lại lâu nhất ở front."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Write Front/Rear meanings.",
+          "vi": "Viết nghĩa Front/Rear."
+        },
+        {
+          "en": "Apply one operation at a time.",
+          "vi": "Áp từng thao tác."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "book-t12",
+        "teacher-t12",
+        "qp-t12-s25-23-q2c"
+      ]
+    },
+    {
+      "id": "t12-operations",
+      "title": {
+        "en": "Physical indices need a contract",
+        "vi": "Chỉ số vật lý cần hợp đồng"
+      },
+      "paragraphs": [
+        {
+          "en": "A linear queue may exhaust its upper end; a circular queue can wrap only when the representation explicitly defines wrap-around and full/empty tests.",
+          "vi": "Queue tuyến tính có thể hết phía cận trên; queue vòng chỉ quay khi biểu diễn nêu rõ quay vòng và phép kiểm đầy/rỗng."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "DEQUEUE the oldest remaining item.",
+          "vi": "DEQUEUE mục còn lại cũ nhất."
+        },
+        {
+          "en": "Wrap only under an explicit circular contract.",
+          "vi": "Chỉ quay vòng khi hợp đồng vòng rõ."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "teacher-t12"
+      ]
+    },
+    {
+      "id": "t12-wrap-faults",
+      "title": {
+        "en": "Convention first, modulo second",
+        "vi": "Quy ước trước, modulo sau"
+      },
+      "paragraphs": [
+        {
+          "en": "This lesson's gap-closure examples use Front for the next item to remove, Rear for the next free slot and Count for occupancy. Empty means Count=0 and full means Count=capacity. Other valid conventions exist, so an answer must never mix their tests.",
+          "vi": "Các ví dụ đóng gap của lesson này dùng Front cho item tiếp theo bị lấy ra, Rear cho slot trống tiếp theo và Count cho số item. Rỗng nghĩa là Count=0 và đầy nghĩa là Count=capacity. Có các quy ước hợp lệ khác nên câu trả lời không được trộn phép kiểm của chúng."
+        },
+        {
+          "en": "Wrap-around changes physical index, not logical order. Modulo keeps pointers in 0..capacity-1; Count distinguishes empty from full when Front and Rear happen to be equal.",
+          "vi": "Wrap-around đổi index vật lý, không đổi thứ tự logic. Modulo giữ pointer trong 0..capacity-1; Count phân biệt rỗng với đầy khi Front và Rear tình cờ bằng nhau."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "book-t12",
+        "teacher-t12"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T12",
+      "T12-X01"
+    ],
+    "title": {
+      "en": "Front, Rear and wrap-around",
+      "vi": "Front, Rear và quay vòng"
+    },
+    "introduction": {
+      "en": "The base visual is linear FIFO; the extension labels a separate circular representation.",
+      "vi": "Visual nền là FIFO tuyến tính; extension ghi riêng biểu diễn vòng."
+    },
+    "task": {
+      "en": "Use Previous/Next to predict each before/action/after state, then explain it without relying on colour.",
+      "vi": "Dùng Previous/Next để dự đoán từng trạng thái trước/hành động/sau rồi giải thích không dựa vào màu."
+    },
+    "conventions": [
+      {
+        "en": "Write Front/Rear meanings.",
+        "vi": "Viết nghĩa Front/Rear."
+      },
+      {
+        "en": "Apply one operation at a time.",
+        "vi": "Áp từng thao tác."
+      },
+      {
+        "en": "DEQUEUE the oldest remaining item.",
+        "vi": "DEQUEUE mục còn lại cũ nhất."
+      },
+      {
+        "en": "Wrap only under an explicit circular contract.",
+        "vi": "Chỉ quay vòng khi hợp đồng vòng rõ."
+      }
+    ],
+    "sourceIds": [
+      "s26",
+      "book-t12",
+      "teacher-t12"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T12-W1",
+      "title": {
+        "en": "Trace a linear queue",
+        "vi": "Trace queue tuyến tính"
+      },
+      "prompt": {
+        "en": "Empty; ENQUEUE A,B,C; DEQUEUE; ENQUEUE D; DEQUEUE twice. Give outputs/final queue.",
+        "vi": "Rỗng; ENQUEUE A,B,C; DEQUEUE; ENQUEUE D; DEQUEUE hai lần. Nêu output/queue cuối."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "1",
+          "action": {
+            "en": "Add A,B,C",
+            "vi": "Thêm A,B,C"
+          },
+          "why": {
+            "en": "Arrival order defines FIFO.",
+            "vi": "Thứ tự đến xác định FIFO."
+          },
+          "result": {
+            "en": "Front→rear A,B,C.",
+            "vi": "Front→rear A,B,C."
+          }
+        },
+        {
+          "id": "2",
+          "action": {
+            "en": "DEQUEUE then add D",
+            "vi": "DEQUEUE rồi thêm D"
+          },
+          "why": {
+            "en": "A is oldest; D joins rear.",
+            "vi": "A cũ nhất; D vào rear."
+          },
+          "result": {
+            "en": "Output A; queue B,C,D.",
+            "vi": "Output A; queue B,C,D."
+          }
+        },
+        {
+          "id": "3",
+          "action": {
+            "en": "DEQUEUE twice",
+            "vi": "DEQUEUE hai lần"
+          },
+          "why": {
+            "en": "Continue FIFO.",
+            "vi": "Tiếp tục FIFO."
+          },
+          "result": {
+            "en": "Outputs B,C; final queue D.",
+            "vi": "Output B,C; queue cuối D."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Outputs A,B,C; final queue contains D.",
+        "vi": "Output A,B,C; queue cuối chứa D."
+      },
+      "selfCheck": {
+        "en": "The next DEQUEUE must output D.",
+        "vi": "DEQUEUE tiếp theo phải xuất D."
+      },
+      "sourceIds": [
+        "teacher-t12",
+        "book-t12"
+      ]
+    },
+    {
+      "id": "T12-W2",
+      "title": {
+        "en": "Trace wrap-around and a dequeue",
+        "vi": "Trace wrap-around và một dequeue"
+      },
+      "prompt": {
+        "en": "Capacity is 5. Front is next to remove; Rear is next free; Count is occupancy. Initially Front=3, Rear=1, Count=3 and logical items A,B,C occupy indices 3,4,0. Enqueue D, then dequeue once.",
+        "vi": "Capacity là 5. Front là vị trí lấy ra tiếp; Rear là slot trống tiếp; Count là số item. Ban đầu Front=3, Rear=1, Count=3 và item logic A,B,C nằm ở index 3,4,0. Enqueue D rồi dequeue một lần."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "check",
+          "action": {
+            "en": "Check not full",
+            "vi": "Kiểm chưa đầy"
+          },
+          "why": {
+            "en": "Mutation is forbidden when Count=capacity.",
+            "vi": "Không được mutation khi Count=capacity."
+          },
+          "result": {
+            "en": "3<5, so enqueue is allowed at Rear=1.",
+            "vi": "3<5 nên enqueue được phép tại Rear=1."
+          }
+        },
+        {
+          "id": "enqueue",
+          "action": {
+            "en": "Write D and advance Rear",
+            "vi": "Ghi D và tiến Rear"
+          },
+          "why": {
+            "en": "Rear names the next free slot.",
+            "vi": "Rear chỉ slot trống tiếp theo."
+          },
+          "result": {
+            "en": "Data[1]=D; Rear=(1+1) MOD 5=2; Count=4.",
+            "vi": "Data[1]=D; Rear=(1+1) MOD 5=2; Count=4."
+          }
+        },
+        {
+          "id": "dequeue",
+          "action": {
+            "en": "Read A and advance Front",
+            "vi": "Đọc A và tiến Front"
+          },
+          "why": {
+            "en": "Front names the oldest logical item.",
+            "vi": "Front chỉ item logic cũ nhất."
+          },
+          "result": {
+            "en": "Return Data[3]=A; Front=(3+1) MOD 5=4; Count=3.",
+            "vi": "Trả Data[3]=A; Front=(3+1) MOD 5=4; Count=3."
+          }
+        },
+        {
+          "id": "order",
+          "action": {
+            "en": "Rebuild logical order",
+            "vi": "Dựng lại thứ tự logic"
+          },
+          "why": {
+            "en": "Physical index order is not queue order after wrap-around.",
+            "vi": "Thứ tự index vật lý không phải thứ tự queue sau wrap-around."
+          },
+          "result": {
+            "en": "Starting at Front=4 for Count=3 gives B,C,D at indices 4,0,1.",
+            "vi": "Bắt đầu từ Front=4 với Count=3 cho B,C,D tại index 4,0,1."
+          },
+          "check": {
+            "en": "All pointers remain in 0..4 and Rear=2 is the next free slot.",
+            "vi": "Mọi pointer vẫn trong 0..4 và Rear=2 là slot trống tiếp theo."
+          }
+        }
+      ],
+      "answer": {
+        "en": "After enqueue: indices 3,4,0,1 contain A,B,C,D; Front=3, Rear=2, Count=4. Dequeue returns A. Final logical queue is B,C,D at indices 4,0,1 with Front=4, Rear=2, Count=3.",
+        "vi": "Sau enqueue: index 3,4,0,1 chứa A,B,C,D; Front=3, Rear=2, Count=4. Dequeue trả A. Queue logic cuối là B,C,D tại index 4,0,1 với Front=4, Rear=2, Count=3."
+      },
+      "selfCheck": {
+        "en": "Can you list the queue from Front for exactly Count positions without sorting physical indices?",
+        "vi": "Bạn có liệt kê queue từ Front đúng Count vị trí mà không sort index vật lý không?"
+      },
+      "sourceIds": [
+        "book-t12",
+        "teacher-t12"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T12-P1",
+      "title": {
+        "en": "Choose a queue",
+        "vi": "Chọn queue"
+      },
+      "prompt": {
+        "en": "Explain why printer jobs normally use a queue.",
+        "vi": "Giải thích vì sao job máy in thường dùng queue."
+      },
+      "working": [
+        {
+          "en": "Map arrivals to ENQUEUE.",
+          "vi": "Ánh xạ job đến vào ENQUEUE."
+        },
+        {
+          "en": "Map service to DEQUEUE.",
+          "vi": "Ánh xạ phục vụ vào DEQUEUE."
+        }
+      ],
+      "answer": {
+        "en": "Jobs join Rear and the oldest waiting job at Front prints first: FIFO.",
+        "vi": "Job vào Rear và job chờ lâu nhất ở Front in trước: FIFO."
+      },
+      "markGuidance": [
+        {
+          "en": "States FIFO.",
+          "vi": "Nêu FIFO."
+        },
+        {
+          "en": "Correct operations.",
+          "vi": "Đúng thao tác."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "LIFO would favour newest job.",
+          "vi": "LIFO ưu tiên job mới."
+        },
+        {
+          "en": "Priority scheduling is a different stated rule.",
+          "vi": "Ưu tiên là quy tắc khác phải được nêu."
+        }
+      ],
+      "selfCheck": {
+        "en": "What if a priority rule is explicitly added?",
+        "vi": "Nếu thêm quy tắc ưu tiên rõ thì sao?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t12",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T12-P2",
+      "title": {
+        "en": "Circular trace",
+        "vi": "Trace queue vòng"
+      },
+      "prompt": {
+        "en": "Size 5, Front=3, Rear=4 holds X at 3,Y at 4; convention Rear is last item. ENQUEUE Z with wrap, then DEQUEUE.",
+        "vi": "Size 5, Front=3, Rear=4 chứa X ở 3,Y ở 4; Rear là mục cuối. ENQUEUE Z có quay vòng rồi DEQUEUE."
+      },
+      "working": [
+        {
+          "en": "Compute next Rear modulo bounds.",
+          "vi": "Tính Rear tiếp theo theo cận vòng."
+        },
+        {
+          "en": "Remove at current Front.",
+          "vi": "Lấy ở Front hiện tại."
+        }
+      ],
+      "answer": {
+        "en": "Rear wraps to 0 and stores Z; DEQUEUE outputs X and Front becomes 4; logical order Y,Z.",
+        "vi": "Rear quay về 0 và lưu Z; DEQUEUE xuất X và Front thành 4; thứ tự logic Y,Z."
+      },
+      "markGuidance": [
+        {
+          "en": "Correct wrap.",
+          "vi": "Quay đúng."
+        },
+        {
+          "en": "FIFO order Y,Z.",
+          "vi": "Thứ tự FIFO Y,Z."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Moving all elements is unnecessary.",
+          "vi": "Không cần di chuyển mọi phần tử."
+        },
+        {
+          "en": "This wrap rule cannot be assumed for a linear queue.",
+          "vi": "Không được mặc định quy tắc quay cho queue tuyến tính."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which physical indices hold logical order Y,Z?",
+        "vi": "Chỉ số vật lý nào chứa thứ tự logic Y,Z?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t12",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T12-P3",
+      "title": {
+        "en": "Trace two wrapped enqueues",
+        "vi": "Trace hai enqueue có wrap"
+      },
+      "prompt": {
+        "en": "Capacity 4 uses the same convention. Front=2, Rear=0, Count=2; X,Y are at indices 2,3. Enqueue Z then W. Give every state and explain the next enqueue result.",
+        "vi": "Capacity 4 dùng cùng quy ước. Front=2, Rear=0, Count=2; X,Y ở index 2,3. Enqueue Z rồi W. Nêu mọi trạng thái và giải thích kết quả enqueue tiếp theo."
+      },
+      "working": [
+        {
+          "en": "Check Count before each write.",
+          "vi": "Kiểm Count trước mỗi lần ghi."
+        },
+        {
+          "en": "Advance Rear with MOD 4.",
+          "vi": "Tiến Rear bằng MOD 4."
+        },
+        {
+          "en": "Rebuild logical order from Front.",
+          "vi": "Dựng thứ tự logic từ Front."
+        }
+      ],
+      "answer": {
+        "en": "Write Z at index0: Rear=1, Count=3. Write W at index1: Rear=2, Count=4. Logical order from Front=2 is X,Y,Z,W. The next enqueue is rejected because Count=capacity; although Front=Rear=2, Count proves full rather than empty.",
+        "vi": "Ghi Z tại index0: Rear=1, Count=3. Ghi W tại index1: Rear=2, Count=4. Thứ tự logic từ Front=2 là X,Y,Z,W. Enqueue tiếp theo bị từ chối vì Count=capacity; dù Front=Rear=2, Count chứng minh queue đầy chứ không rỗng."
+      },
+      "markGuidance": [
+        {
+          "en": "Both state transitions and the full rule are correct.",
+          "vi": "Cả hai chuyển trạng thái và quy tắc đầy đều đúng."
+        },
+        {
+          "en": "Front=Rear is interpreted with Count.",
+          "vi": "Front=Rear được diễn giải cùng Count."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Treating Rear=0 as an empty queue.",
+          "vi": "Coi Rear=0 là queue rỗng."
+        },
+        {
+          "en": "Overwriting X when Count already equals capacity.",
+          "vi": "Ghi đè X khi Count đã bằng capacity."
+        }
+      ],
+      "selfCheck": {
+        "en": "Why is Front=Rear ambiguous without Count under this convention?",
+        "vi": "Vì sao Front=Rear mơ hồ nếu thiếu Count trong quy ước này?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t12",
+        "book-t12"
+      ]
+    },
+    {
+      "id": "T12-P4",
+      "title": {
+        "en": "Repair an off-by-one implementation",
+        "vi": "Sửa implementation off-by-one"
+      },
+      "prompt": {
+        "en": "A capacity-6 queue uses Rear←Rear+1 after enqueue and tests full with Count=5. Identify both faults and give the corrections.",
+        "vi": "Queue capacity 6 dùng Rear←Rear+1 sau enqueue và kiểm đầy bằng Count=5. Xác định hai lỗi và nêu cách sửa."
+      },
+      "working": [
+        {
+          "en": "Test the transition from Rear=5.",
+          "vi": "Kiểm chuyển từ Rear=5."
+        },
+        {
+          "en": "Compare the full threshold with capacity.",
+          "vi": "So ngưỡng đầy với capacity."
+        },
+        {
+          "en": "State the consequence of each fault.",
+          "vi": "Nêu hậu quả của từng lỗi."
+        }
+      ],
+      "answer": {
+        "en": "Rear←Rear+1 can produce invalid index 6; correct it to Rear←(Rear+1) MOD 6. Full at Count=5 wastes one slot under the stated Count convention; correct full to Count=6. Test full before writing and increment Count only after a successful enqueue.",
+        "vi": "Rear←Rear+1 có thể tạo index 6 không hợp lệ; sửa thành Rear←(Rear+1) MOD 6. Đầy tại Count=5 làm phí một slot theo quy ước Count đã nêu; sửa đầy thành Count=6. Kiểm đầy trước khi ghi và chỉ tăng Count sau enqueue thành công."
+      },
+      "markGuidance": [
+        {
+          "en": "Both faults, consequences and corrected expressions are given.",
+          "vi": "Nêu đủ hai lỗi, hậu quả và biểu thức đã sửa."
+        },
+        {
+          "en": "The correction is consistent with this lesson's convention.",
+          "vi": "Sửa đổi nhất quán với quy ước của lesson này."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Changing only the array size hides neither fault.",
+          "vi": "Chỉ đổi kích thước array không che được lỗi nào."
+        },
+        {
+          "en": "Using MOD without correcting the full test still loses capacity.",
+          "vi": "Dùng MOD mà không sửa phép kiểm đầy vẫn làm mất capacity."
+        }
+      ],
+      "selfCheck": {
+        "en": "What values can Rear take after the correction?",
+        "vi": "Rear có thể nhận các giá trị nào sau khi sửa?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t12",
+        "book-t12"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Queue is LIFO.",
+        "vi": "Queue là LIFO."
+      },
+      "correction": {
+        "en": "Queue is FIFO.",
+        "vi": "Queue là FIFO."
+      },
+      "selfCheck": {
+        "en": "Which item arrived first?",
+        "vi": "Mục nào đến trước?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "All queues are circular.",
+        "vi": "Mọi queue đều vòng."
+      },
+      "correction": {
+        "en": "Use circular behaviour only when defined.",
+        "vi": "Chỉ dùng hành vi vòng khi được định nghĩa."
+      },
+      "selfCheck": {
+        "en": "Is wrap stated?",
+        "vi": "Có nêu quay vòng không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Front/Rear conventions are universal.",
+        "vi": "Quy ước Front/Rear là chung."
+      },
+      "correction": {
+        "en": "Read whether pointers mark items or free slots.",
+        "vi": "Đọc xem pointer chỉ mục hay ô trống."
+      },
+      "selfCheck": {
+        "en": "What does Rear mean here?",
+        "vi": "Rear nghĩa gì ở đây?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Rebuild the method from memory.",
+      "vi": "Dựng lại phương pháp từ trí nhớ."
+    },
+    "answerPoints": [
+      {
+        "en": "Write Front/Rear meanings.",
+        "vi": "Viết nghĩa Front/Rear."
+      },
+      {
+        "en": "Apply one operation at a time.",
+        "vi": "Áp từng thao tác."
+      },
+      {
+        "en": "DEQUEUE the oldest remaining item.",
+        "vi": "DEQUEUE mục còn lại cũ nhất."
+      },
+      {
+        "en": "Wrap only under an explicit circular contract.",
+        "vi": "Chỉ quay vòng khi hợp đồng vòng rõ."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Queue behaviour is FIFO.",
+      "vi": "Queue có hành vi FIFO."
+    },
+    {
+      "en": "Physical position differs from logical order.",
+      "vi": "Vị trí vật lý khác thứ tự logic."
+    },
+    {
+      "en": "Circular rules are representation-specific.",
+      "vi": "Quy tắc vòng tùy biểu diễn."
+    },
+    {
+      "en": "State the circular-queue convention before tracing pointers.",
+      "vi": "Nêu quy ước circular queue trước khi trace pointer."
+    },
+    {
+      "en": "Modulo handles wrap-around; a consistent occupancy rule handles full and empty.",
+      "vi": "Modulo xử lý wrap-around; quy tắc số item nhất quán xử lý đầy và rỗng."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F08",
+      "role": "related",
+      "title": {
+        "en": "ADT state and pointer",
+        "vi": "Trạng thái và con trỏ ADT"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "adt-stack",
+    "arrays",
+    "linked-list"
+  ],
+  "sources": [
+    {
+      "id": "s26",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "Subject content pp27–29, §§9.2–10.4.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "guide-2026",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, examinations in 2026",
+      "locator": "Relevant notation in §§1–9; local extracted copy checked 2026-10-02.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t12",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "Printed pp250–259; PDF pp266–275, including circular queue representation.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-t12",
+      "title": "9618/21 May/June 2025 Question 5",
+      "locator": "QP pp10–11: queue source mapping. Used as topic/adaptation evidence; no official mark allocation reproduced.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t12",
+      "title": "AlgoCore teacher-created T12 lesson set",
+      "locator": "T12-academic-r2, 2026-10-02; original fixtures and provisional mark guidance.",
+      "kind": "teacher-authored"
+    },
+    {
+      "id": "qp-t12-s25-23-q2c",
+      "title": "9618/23 May/June 2025 Question 2(c)",
+      "locator": "QP p6 and published MS p8: identify FIFO behaviour, two queue pointers and enqueue/dequeue operations.",
+      "kind": "question-paper"
+    }
+  ]
+}

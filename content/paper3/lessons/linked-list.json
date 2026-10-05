@@ -1,0 +1,831 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.1-T07",
+  "slug": "linked-list",
+  "estimatedMinutes": 45,
+  "title": {
+    "en": "Linked list",
+    "vi": "Danh sách liên kết"
+  },
+  "question": {
+    "en": "How can pointer updates find, insert or delete a node without losing the rest of the list?",
+    "vi": "Cập nhật pointer thế nào để find, insert hoặc delete node mà không mất phần còn lại của list?"
+  },
+  "opening": {
+    "en": "Array addresses store records, but logical order comes only from Head and Next links.",
+    "vi": "Address mảng lưu record, nhưng thứ tự logic chỉ đến từ link Head và Next."
+  },
+  "objectives": [
+    {
+      "en": "Trace an unordered record-array list.",
+      "vi": "Trace list record-array không ordered."
+    },
+    {
+      "en": "Find/delete the first reachable match.",
+      "vi": "Find/delete match reachable đầu tiên."
+    },
+    {
+      "en": "Allocate the lowest free address.",
+      "vi": "Cấp phát address free thấp nhất."
+    },
+    {
+      "en": "Relink safely and preserve reachability.",
+      "vi": "Relink an toàn và giữ reachability."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read record fields and array addresses.",
+      "vi": "Đọc field record và address mảng."
+    },
+    {
+      "en": "Distinguish physical from logical order.",
+      "vi": "Phân biệt thứ tự vật lý với logic."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Head",
+      "meaning": {
+        "en": "Address of the first live node; −1 when empty.",
+        "vi": "Address node sống đầu; −1 khi empty."
+      }
+    },
+    {
+      "term": "Next",
+      "meaning": {
+        "en": "Address of the next logical node.",
+        "vi": "Address node logic tiếp theo."
+      }
+    },
+    {
+      "term": "Null",
+      "meaning": {
+        "en": "Sentinel −1 meaning no next node.",
+        "vi": "Sentinel −1 nghĩa không có node tiếp."
+      }
+    },
+    {
+      "term": "reachable",
+      "meaning": {
+        "en": "Can be visited by following Next from Head.",
+        "vi": "Có thể tới bằng cách theo Next từ Head."
+      }
+    },
+    {
+      "term": "allocator",
+      "meaning": {
+        "en": "Chooses the lowest free address in this fixture.",
+        "vi": "Chọn address free thấp nhất trong fixture."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "representation",
+      "title": {
+        "en": "Record-array representation",
+        "vi": "Representation record-array"
+      },
+      "paragraphs": [
+        {
+          "en": "Each allocated node has Data and Next. Addresses are 0-based and Null=−1. Physical neighbouring cells need not be logical neighbours.",
+          "vi": "Mỗi node allocated có Data và Next. Address zero-based và Null=−1. Ô vật lý kề nhau không nhất thiết là node logic kề nhau."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "traversal",
+      "title": {
+        "en": "Follow links, not indices",
+        "vi": "Theo link, không theo index"
+      },
+      "paragraphs": [
+        {
+          "en": "The core list is unordered. FIND starts at Head and follows Next until the first equality or Null.",
+          "vi": "List core không ordered. FIND bắt đầu tại Head và theo Next tới equality đầu tiên hoặc Null."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "insert",
+      "title": {
+        "en": "Save the successor before insertion",
+        "vi": "Lưu successor trước insertion"
+      },
+      "paragraphs": [
+        {
+          "en": "Allocate the lowest free address, write the new node linked to the saved successor, then redirect Head or Anchor.Next.",
+          "vi": "Cấp phát address free thấp nhất, ghi node mới link tới successor đã lưu, rồi đổi Head hoặc Anchor.Next."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "delete",
+      "title": {
+        "en": "Bypass before clearing",
+        "vi": "Bypass trước khi clear"
+      },
+      "paragraphs": [
+        {
+          "en": "DELETE saves Current.Next, relinks Head or Previous.Next, then clears the removed record. Missing leaves state unchanged.",
+          "vi": "DELETE lưu Current.Next, relink Head hoặc Previous.Next, rồi clear record đã loại. Missing giữ state không đổi."
+        }
+      ],
+      "code": "Current ← Head\nPrevious ← -1\nWHILE Current <> -1\n  IF Node[Current].Data = Target THEN\n    RETURN Current\n  ENDIF\n  Previous ← Current\n  Current ← Node[Current].Next\nENDWHILE\nRETURN -1",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "linked-list",
+    "title": {
+      "en": "Pointer-and-reachability workbench",
+      "vi": "Bàn trace pointer và reachability"
+    },
+    "introduction": {
+      "en": "The record table and arrow diagram expose the same addresses and links.",
+      "vi": "Bảng record và sơ đồ mũi tên hiển thị cùng address và link."
+    },
+    "task": {
+      "en": "Trace first-match find, then insert/delete while checking every live node remains reachable.",
+      "vi": "Trace find match đầu, rồi insert/delete trong khi kiểm tra mọi node sống vẫn reachable."
+    },
+    "conventions": [
+      {
+        "en": "Addresses 0..Capacity−1; Null=−1.",
+        "vi": "Address 0..Capacity−1; Null=−1."
+      },
+      {
+        "en": "Unordered; first reachable match.",
+        "vi": "Unordered; match reachable đầu tiên."
+      },
+      {
+        "en": "Lowest-free allocator; errors do not mutate.",
+        "vi": "Allocator lowest-free; lỗi không mutate."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Insert and delete without losing the chain",
+      "vi": "Insert và delete mà không mất chain"
+    },
+    "prompt": {
+      "en": "Head=2; nodes 2:A→5, 5:C→1, 1:D→−1; address 0 is lowest free.",
+      "vi": "Head=2; node 2:A→5, 5:C→1, 1:D→−1; address 0 là free thấp nhất."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "draw",
+        "action": {
+          "en": "Draw 2→5→1→−1.",
+          "vi": "Vẽ 2→5→1→−1."
+        },
+        "why": {
+          "en": "Logical order comes from links.",
+          "vi": "Thứ tự logic đến từ link."
+        },
+        "result": {
+          "en": "Reachable data order A,C,D.",
+          "vi": "Thứ tự data reachable A,C,D."
+        },
+        "check": {
+          "en": "Check that reachable data order a,c,d.",
+          "vi": "Kiểm tra rằng thứ tự data reachable a,c,d."
+        }
+      },
+      {
+        "id": "find-anchor",
+        "action": {
+          "en": "Traverse to anchor address 5.",
+          "vi": "Traverse tới anchor address 5."
+        },
+        "why": {
+          "en": "Follow Next from Head; do not increment address.",
+          "vi": "Theo Next từ Head; không tăng address."
+        },
+        "result": {
+          "en": "Anchor data C; saved successor=1.",
+          "vi": "Anchor data C; successor đã lưu=1."
+        },
+        "check": {
+          "en": "Check that anchor data c; saved successor=1.",
+          "vi": "Kiểm tra rằng anchor data c; successor đã lưu=1."
+        }
+      },
+      {
+        "id": "allocate",
+        "action": {
+          "en": "Choose NewAddress=0.",
+          "vi": "Chọn NewAddress=0."
+        },
+        "why": {
+          "en": "The fixture uses the lowest free address.",
+          "vi": "Fixture dùng address free thấp nhất."
+        },
+        "result": {
+          "en": "Address 0 is reserved for new B.",
+          "vi": "Address 0 được dành cho B mới."
+        },
+        "check": {
+          "en": "Check that address 0 is reserved for new b.",
+          "vi": "Kiểm tra rằng address 0 được dành cho b mới."
+        }
+      },
+      {
+        "id": "write-new",
+        "action": {
+          "en": "Write node 0:B→1.",
+          "vi": "Ghi node 0:B→1."
+        },
+        "why": {
+          "en": "The successor must be preserved before redirecting the anchor.",
+          "vi": "Successor phải được giữ trước khi đổi anchor."
+        },
+        "result": {
+          "en": "New node already reaches the old suffix.",
+          "vi": "Node mới đã tới suffix cũ."
+        },
+        "check": {
+          "en": "Check that new node already reaches the old suffix.",
+          "vi": "Kiểm tra rằng node mới đã tới suffix cũ."
+        }
+      },
+      {
+        "id": "link-anchor",
+        "action": {
+          "en": "Set Node[5].Next←0.",
+          "vi": "Đặt Node[5].Next←0."
+        },
+        "why": {
+          "en": "This places B after C.",
+          "vi": "Điều này đặt B sau C."
+        },
+        "result": {
+          "en": "Chain 2→5→0→1→−1; A,C,B,D.",
+          "vi": "Chain 2→5→0→1→−1; A,C,B,D."
+        },
+        "check": {
+          "en": "Check that chain 2→5→0→1→−1; a,c,b,d.",
+          "vi": "Kiểm tra rằng chain 2→5→0→1→−1; a,c,b,d."
+        }
+      },
+      {
+        "id": "delete-first",
+        "action": {
+          "en": "Delete first D match at address 1 by bypassing then clearing.",
+          "vi": "Delete match D đầu tại address 1 bằng bypass rồi clear."
+        },
+        "why": {
+          "en": "Previous address 0 must point to successor −1 before record 1 is cleared.",
+          "vi": "Previous address 0 phải trỏ successor −1 trước khi record 1 được clear."
+        },
+        "result": {
+          "en": "Node[0].Next=−1; address 1 free; chain remains 2→5→0→−1.",
+          "vi": "Node[0].Next=−1; address 1 free; chain vẫn 2→5→0→−1."
+        },
+        "check": {
+          "en": "Check that node[0].next=−1; address 1 free; chain remains 2→5→0→−1.",
+          "vi": "Kiểm tra rằng node[0].next=−1; address 1 free; chain vẫn 2→5→0→−1."
+        }
+      }
+    ],
+    "result": {
+      "en": "All remaining live nodes are reachable and the chain ends at Null.",
+      "vi": "Mọi node sống còn lại reachable và chain kết thúc tại Null."
+    },
+    "selfCheck": {
+      "en": "Did insertion save the successor and deletion relink before clearing?",
+      "vi": "Insertion có lưu successor và deletion có relink trước khi clear không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "node/data/next",
+        "vi": "node/data/next"
+      },
+      {
+        "en": "head/start pointer",
+        "vi": "head/start pointer"
+      },
+      {
+        "en": "null/free pointer",
+        "vi": "null/free pointer"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: array position order is not linked-list order; only Head and Next define traversal.",
+      "vi": "Dễ nhầm: thứ tự vị trí mảng không phải thứ tự linked list; chỉ Head và Next định nghĩa traversal."
+    },
+    "method": [
+      {
+        "en": "Record Head and Null.",
+        "vi": "Ghi Head và Null."
+      },
+      {
+        "en": "Draw address-labelled links.",
+        "vi": "Vẽ link có nhãn address."
+      },
+      {
+        "en": "Follow Next to first match/anchor.",
+        "vi": "Theo Next tới match/anchor đầu."
+      },
+      {
+        "en": "Save successor before relinking.",
+        "vi": "Lưu successor trước relink."
+      },
+      {
+        "en": "Verify reachability and Null termination.",
+        "vi": "Kiểm tra reachability và kết thúc Null."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Linked list: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho Danh sách liên kết: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Linked list; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của Danh sách liên kết; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Linked list to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của Danh sách liên kết với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Linked list with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh Danh sách liên kết với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Linked list, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của Danh sách liên kết, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Increment Current as an array scan.",
+        "vi": "Tăng Current như quét mảng."
+      },
+      "correction": {
+        "en": "Set Current←Node[Current].Next.",
+        "vi": "Đặt Current←Node[Current].Next."
+      },
+      "selfCheck": {
+        "en": "Which field contains the logical successor?",
+        "vi": "Field nào chứa successor logic?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Change Anchor.Next before saving it.",
+        "vi": "Đổi Anchor.Next trước khi lưu."
+      },
+      "correction": {
+        "en": "Save the old successor first.",
+        "vi": "Lưu successor cũ trước."
+      },
+      "selfCheck": {
+        "en": "Can the suffix still be reached?",
+        "vi": "Suffix còn reachable không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Clear a deleted node before bypassing.",
+        "vi": "Clear node bị delete trước bypass."
+      },
+      "correction": {
+        "en": "Relink Head/Previous before clearing.",
+        "vi": "Relink Head/Previous trước clearing."
+      },
+      "selfCheck": {
+        "en": "Where is the successor stored?",
+        "vi": "Successor được lưu ở đâu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Choose any free address silently.",
+        "vi": "Âm thầm chọn address free bất kỳ."
+      },
+      "correction": {
+        "en": "Use the declared lowest-free allocator.",
+        "vi": "Dùng allocator lowest-free đã công bố."
+      },
+      "selfCheck": {
+        "en": "Which free address is smallest?",
+        "vi": "Address free nào nhỏ nhất?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What does Null=−1 mean?",
+        "vi": "Null=−1 nghĩa gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No next node",
+            "vi": "Không có node tiếp"
+          },
+          "feedback": {
+            "en": "Correct: −1 terminates a link in this fixture",
+            "vi": "Đúng: −1 kết thúc link trong fixture"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Address zero",
+            "vi": "Address zero"
+          },
+          "feedback": {
+            "en": "Address zero conflicts with the rule: −1 terminates a link in this fixture",
+            "vi": "Address zero trái với quy tắc: −1 kết thúc link trong fixture"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Delete Head",
+            "vi": "Delete Head"
+          },
+          "feedback": {
+            "en": "Delete Head conflicts with the rule: −1 terminates a link in this fixture",
+            "vi": "Delete Head trái với quy tắc: −1 kết thúc link trong fixture"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "−1 terminates a link in this fixture",
+        "vi": "−1 kết thúc link trong fixture"
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which clue identifies a linked list?",
+        "vi": "Dấu hiệu nào nhận diện linked list?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Head and Next fields",
+            "vi": "Field Head và Next"
+          },
+          "feedback": {
+            "en": "Correct: linked traversal follows Next from Head",
+            "vi": "Đúng: linked traversal theo Next từ Head"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Low/High/Mid",
+            "vi": "Low/High/Mid"
+          },
+          "feedback": {
+            "en": "Low/High/Mid conflicts with the rule: linked traversal follows Next from Head",
+            "vi": "Low/High/Mid trái với quy tắc: linked traversal theo Next từ Head"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Front/Rear/Count",
+            "vi": "Front/Rear/Count"
+          },
+          "feedback": {
+            "en": "Front/Rear/Count conflicts with the rule: linked traversal follows Next from Head",
+            "vi": "Front/Rear/Count trái với quy tắc: linked traversal theo Next từ Head"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "linked traversal follows Next from Head",
+        "vi": "linked traversal theo Next từ Head"
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "Current=5 and Node[5].Next=1. Next Current?",
+        "vi": "Current=5 và Node[5].Next=1. Current tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Correct: traversal follows the stored Next address",
+            "vi": "Đúng: traversal theo address Next đã lưu"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "6",
+            "vi": "6"
+          },
+          "feedback": {
+            "en": "6 conflicts with the rule: traversal follows the stored Next address",
+            "vi": "6 trái với quy tắc: traversal theo address Next đã lưu"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "−1",
+            "vi": "−1"
+          },
+          "feedback": {
+            "en": "−1 conflicts with the rule: traversal follows the stored Next address",
+            "vi": "−1 trái với quy tắc: traversal theo address Next đã lưu"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "traversal follows the stored Next address",
+        "vi": "traversal theo address Next đã lưu"
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "After inserting address 0 after node 5, what is Node[5].Next?",
+        "vi": "Sau khi chèn address 0 sau node 5, Node[5].Next là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "Correct: the anchor must point to the new node",
+            "vi": "Đúng: anchor phải trỏ node mới"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "1 conflicts with the rule: the anchor must point to the new node",
+            "vi": "1 trái với quy tắc: anchor phải trỏ node mới"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "5",
+            "vi": "5"
+          },
+          "feedback": {
+            "en": "5 conflicts with the rule: the anchor must point to the new node",
+            "vi": "5 trái với quy tắc: anchor phải trỏ node mới"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the anchor must point to the new node",
+        "vi": "anchor phải trỏ node mới"
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Which insertion order preserves the suffix?",
+        "vi": "Thứ tự insertion nào giữ suffix?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "save successor → write new.Next → redirect anchor",
+            "vi": "lưu successor → ghi new.Next → đổi anchor"
+          },
+          "feedback": {
+            "en": "Correct: save the old link before overwriting it",
+            "vi": "Đúng: lưu link cũ trước khi ghi đè"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "redirect anchor → guess successor",
+            "vi": "đổi anchor → đoán successor"
+          },
+          "feedback": {
+            "en": "redirect anchor → guess successor conflicts with the rule: save the old link before overwriting it",
+            "vi": "đổi anchor → đoán successor trái với quy tắc: lưu link cũ trước khi ghi đè"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "clear anchor → allocate",
+            "vi": "clear anchor → allocate"
+          },
+          "feedback": {
+            "en": "clear anchor → allocate conflicts with the rule: save the old link before overwriting it",
+            "vi": "clear anchor → allocate trái với quy tắc: lưu link cũ trước khi ghi đè"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "save the old link before overwriting it",
+        "vi": "lưu link cũ trước khi ghi đè"
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "Target is missing. What mutation occurs?",
+        "vi": "Target missing. Mutation nào xảy ra?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "None",
+            "vi": "Không có"
+          },
+          "feedback": {
+            "en": "Correct: a failed delete/find preserves valid state",
+            "vi": "Đúng: delete/find thất bại giữ state hợp lệ"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Clear Head",
+            "vi": "Clear Head"
+          },
+          "feedback": {
+            "en": "Clear Head conflicts with the rule: a failed delete/find preserves valid state",
+            "vi": "Clear Head trái với quy tắc: delete/find thất bại giữ state hợp lệ"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Allocate a node",
+            "vi": "Allocate node"
+          },
+          "feedback": {
+            "en": "Allocate a node conflicts with the rule: a failed delete/find preserves valid state",
+            "vi": "Allocate node trái với quy tắc: delete/find thất bại giữ state hợp lệ"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "a failed delete/find preserves valid state",
+        "vi": "delete/find thất bại giữ state hợp lệ"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Give the safe pointer-update rules for linked-list insertion and deletion.",
+      "vi": "Nêu quy tắc pointer update an toàn cho insertion và deletion linked list."
+    },
+    "answerPoints": [
+      {
+        "en": "Traverse by Next from Head.",
+        "vi": "Traverse bằng Next từ Head."
+      },
+      {
+        "en": "Save successor before insertion relink.",
+        "vi": "Lưu successor trước insertion relink."
+      },
+      {
+        "en": "Bypass before clearing deletion record.",
+        "vi": "Bypass trước khi clear record deletion."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Logical order follows links.",
+      "vi": "Thứ tự logic theo link."
+    },
+    {
+      "en": "Save links before overwriting.",
+      "vi": "Lưu link trước khi ghi đè."
+    },
+    {
+      "en": "Verify reachability after mutation.",
+      "vi": "Kiểm tra reachability sau mutation."
+    }
+  ],
+  "relatedSlugs": [
+    "binary-tree",
+    "implementing-one-adt-with-another"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp469–481 / PDF pp485–497: linked-list find, insert and delete",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "w22-32-qp",
+      "title": "Cambridge 9618/32 — October/November 2022 question paper",
+      "locator": "Question 11, pp10–11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w22-32-ms",
+      "title": "Cambridge 9618/32 — October/November 2022 mark scheme",
+      "locator": "Question 11, pp15–16",
+      "kind": "mark-scheme"
+    }
+  ]
+}

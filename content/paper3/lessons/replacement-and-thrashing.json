@@ -1,0 +1,701 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.1-T05",
+  "slug": "replacement-and-thrashing",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Replacement and thrashing",
+    "vi": "Thay thế trang và thrashing"
+  },
+  "question": {
+    "en": "Which page should leave RAM, and when does moving pages become the main work?",
+    "vi": "Trang nào nên rời RAM, và khi nào việc chuyển trang trở thành công việc chính?"
+  },
+  "opening": {
+    "en": "A page-reference trace separates a hit from a fault and a fault from an eviction. FIFO and LRU remember different histories, so the same reference string can choose different victims. Thrashing is the performance consequence of excessive paging, not merely the presence of one fault.",
+    "vi": "Trace tham chiếu trang phân biệt hit với lỗi trang và lỗi trang với loại trang. FIFO và LRU nhớ những lịch sử khác nhau nên cùng chuỗi tham chiếu có thể chọn nạn nhân khác. Thrashing là hệ quả hiệu năng của chuyển trang quá mức, không chỉ là có một lỗi trang."
+  },
+  "objectives": [
+    {
+      "en": "Trace FIFO and LRU using explicit frame contents and policy history.",
+      "vi": "Trace FIFO và LRU với nội dung khung và lịch sử chính sách rõ ràng."
+    },
+    {
+      "en": "Count faults/hits without treating every fault as an eviction.",
+      "vi": "Đếm lỗi/hit mà không coi mọi lỗi là loại trang."
+    },
+    {
+      "en": "Explain thrashing using locality, active memory demand and the cost of paging.",
+      "vi": "Giải thích thrashing qua tính cục bộ, nhu cầu bộ nhớ đang dùng và chi phí chuyển trang."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Understand page tables, RAM frames and a recoverable page fault.",
+      "vi": "Hiểu bảng trang, khung RAM và lỗi trang có thể khôi phục."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "FIFO",
+      "meaning": {
+        "en": "Evict the resident page that entered memory earliest.",
+        "vi": "Loại trang đang ở RAM được nạp vào sớm nhất."
+      }
+    },
+    {
+      "term": "LRU",
+      "meaning": {
+        "en": "Evict the resident page whose latest reference is oldest.",
+        "vi": "Loại trang đang ở RAM có lần truy cập gần nhất xa nhất."
+      }
+    },
+    {
+      "term": "Working set",
+      "meaning": {
+        "en": "The pages actively needed over a recent phase of execution.",
+        "vi": "Các trang đang cần trong một giai đoạn thực thi gần đây."
+      }
+    },
+    {
+      "term": "Thrashing",
+      "meaning": {
+        "en": "Excessive paging leaves too little useful execution progress.",
+        "vi": "Chuyển trang quá mức khiến có quá ít tiến triển thực thi hữu ích."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "hit-fault-victim",
+      "title": {
+        "en": "Decide whether replacement is needed",
+        "vi": "Quyết định có cần thay thế không"
+      },
+      "paragraphs": [
+        {
+          "en": "For each reference, check whether the page is already resident. A hit uses its existing frame. A miss causes a page fault; use an empty frame if one exists. Only with all allowed frames occupied does the policy choose a victim. The trace counts a cold load as a fault even though nothing was evicted.",
+          "vi": "Với mỗi tham chiếu, kiểm tra trang đã ở RAM chưa. Hit dùng khung hiện tại. Miss gây lỗi trang; dùng khung trống nếu có. Chỉ khi mọi khung được cấp đều đầy, chính sách mới chọn nạn nhân. Trace tính lần nạp ban đầu là lỗi trang dù chưa loại trang nào."
+        },
+        {
+          "en": "After a replacement, the incoming page occupies the victim’s frame. Other frame positions do not magically reorder just because a recency list changes. The example assumes clean victims: a dirty page would require writing back before its frame could safely be reused. Frame contents and policy history are separate records.",
+          "vi": "Sau thay thế, trang mới chiếm khung của nạn nhân. Vị trí các khung khác không tự đổi chỉ vì danh sách gần đây thay đổi. Ví dụ giả định nạn nhân sạch: trang bẩn cần ghi lại trước khi tái sử dụng khung an toàn. Nội dung khung và lịch sử chính sách là hai bản ghi khác nhau."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "fifo-history",
+      "title": {
+        "en": "FIFO records loading order",
+        "vi": "FIFO ghi thứ tự nạp"
+      },
+      "paragraphs": [
+        {
+          "en": "Maintain the order in which resident pages were loaded. When a new page needs a full set of frames, remove the oldest loaded resident page and append the new page. A hit does not reload the page and therefore does not refresh its FIFO position. This makes the policy simple, but a frequently used old page may still be selected.",
+          "vi": "Giữ thứ tự nạp các trang đang ở RAM. Khi trang mới cần chỗ trong bộ khung đầy, loại trang được nạp lâu nhất và thêm trang mới vào cuối. Hit không nạp lại trang nên không làm mới vị trí FIFO. Chính sách đơn giản nhưng trang cũ được dùng thường xuyên vẫn có thể bị chọn."
+        },
+        {
+          "en": "With three frames and references 1,2,3,1,4, the hit on 1 leaves FIFO order [1,2,3]. Loading 4 evicts 1, leaving frame contents [4,2,3] and load order [2,3,4]. Do not confuse the displayed physical frame order with the queue used to select a victim.",
+          "vi": "Với ba khung và chuỗi 1,2,3,1,4, hit trang 1 giữ thứ tự FIFO [1,2,3]. Nạp 4 loại 1, để lại nội dung khung [4,2,3] và thứ tự nạp [2,3,4]. Không nhầm thứ tự khung vật lý hiển thị với hàng dùng chọn nạn nhân."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "lru-history",
+      "title": {
+        "en": "LRU records use, including hits",
+        "vi": "LRU ghi việc sử dụng, kể cả hit"
+      },
+      "paragraphs": [
+        {
+          "en": "LRU updates recency on every reference. With the same prefix 1,2,3,1, its least-to-most-recent list becomes [2,3,1]. Page 4 therefore replaces 2, not 1. On a hit, frame contents stay the same while recency changes. The policy approximates the idea that recently used pages may be needed again, but no history-based rule predicts every future workload perfectly.",
+          "vi": "LRU cập nhật độ gần đây sau mọi tham chiếu. Với cùng tiền tố 1,2,3,1, danh sách từ lâu nhất đến mới nhất thành [2,3,1]. Vì vậy trang 4 thay 2, không phải 1. Khi hit, nội dung khung giữ nguyên nhưng độ gần đây thay đổi. Chính sách dựa vào ý tưởng trang vừa dùng có thể sắp cần lại, nhưng không quy tắc dựa lịch sử nào dự đoán hoàn hảo mọi tải tương lai."
+        },
+        {
+          "en": "For the complete string 1,2,3,1,4,2,5, FIFO has 5 faults and LRU has 6. This particular result does not prove FIFO is universally better. Compare the same inputs, initial contents and frame count, then explain the observed difference through each policy’s actual victim choices.",
+          "vi": "Với cả chuỗi 1,2,3,1,4,2,5, FIFO có 5 lỗi và LRU có 6. Kết quả riêng này không chứng minh FIFO luôn tốt hơn. So sánh cùng đầu vào, nội dung ban đầu và số khung rồi giải thích khác biệt qua lựa chọn nạn nhân thực tế."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "working-set-thrashing",
+      "title": {
+        "en": "Connect repeated faults to useful progress",
+        "vi": "Nối lỗi lặp lại với tiến triển hữu ích"
+      },
+      "paragraphs": [
+        {
+          "en": "If active processes collectively need more pages than their available frames can hold, pages may be evicted just before they are needed again. Transfers and fault handling can dominate execution time, so useful CPU progress falls: this is thrashing. One startup fault or a high fault count without timing/context is not enough to establish a universal threshold.",
+          "vi": "Nếu các tiến trình đang hoạt động cần tổng số trang lớn hơn số khung sẵn có chứa được, trang có thể bị loại ngay trước khi cần lại. Chuyển trang và xử lý lỗi có thể chiếm phần lớn thời gian khiến tiến triển CPU hữu ích giảm: đó là thrashing. Một lỗi lúc khởi động hoặc số lỗi cao thiếu bối cảnh/thời gian không đủ để đặt ngưỡng phổ quát."
+        },
+        {
+          "en": "For references 1,2,3 repeated three times, LRU with two frames faults on all nine references; with three frames only the initial three loads fault. This demonstrates the effect of fitting the active set, not a measured speed ratio. Remedies can include more available physical memory or reducing concurrent memory demand; simply enlarging backing storage does not ensure the active pages fit in RAM.",
+          "vi": "Với chuỗi 1,2,3 lặp ba lần, LRU hai khung lỗi ở cả chín tham chiếu; với ba khung chỉ ba lần nạp đầu gây lỗi. Điều này minh họa tác động của chứa đủ tập trang đang dùng, không phải tỷ lệ tốc độ đo được. Biện pháp có thể gồm thêm RAM khả dụng hoặc giảm nhu cầu bộ nhớ đồng thời; chỉ tăng bộ nhớ hỗ trợ không bảo đảm các trang đang dùng vừa RAM."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "w24-31-ms",
+        "w23-32-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "page-replacement",
+    "title": {
+      "en": "Trace frames and policy memory separately",
+      "vi": "Trace riêng khung và lịch sử chính sách"
+    },
+    "introduction": {
+      "en": "Each reference has a check state and a resolution state. Frame contents, victim, hit/fault count and policy order explain the same event.",
+      "vi": "Mỗi tham chiếu có trạng thái kiểm tra và trạng thái xử lý. Nội dung khung, nạn nhân, số hit/lỗi và thứ tự chính sách cùng giải thích một sự kiện."
+    },
+    "task": {
+      "en": "Predict the victim for page 4 after 1,2,3,1 under both policies; then compare the two- and three-frame locality traces.",
+      "vi": "Dự đoán nạn nhân khi truy cập 4 sau 1,2,3,1 ở cả hai chính sách; rồi so trace tính cục bộ với hai và ba khung."
+    },
+    "conventions": [
+      {
+        "en": "Frames start empty; FIFO hits do not refresh loading order, while LRU hits refresh recency.",
+        "vi": "Khung ban đầu trống; hit FIFO không làm mới thứ tự nạp, còn hit LRU làm mới độ gần đây."
+      },
+      {
+        "en": "All victims are clean in this trace. Counts are not measured time or a universal thrashing threshold.",
+        "vi": "Mọi nạn nhân trong trace đều sạch. Số đếm không phải thời gian đo được hay ngưỡng thrashing phổ quát."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "FIFO on 1,2,3,1,4,2,5",
+      "vi": "FIFO với 1,2,3,1,4,2,5"
+    },
+    "prompt": {
+      "en": "Use three initially empty frames. Record each resolution, preserving the physical frame slots.",
+      "vi": "Dùng ba khung ban đầu trống. Ghi từng lần xử lý, giữ nguyên vị trí các khung."
+    },
+    "steps": [
+      {
+        "id": "reference-0-fault",
+        "action": {
+          "en": "Load page 1 into the first empty frame.",
+          "vi": "Nạp trang 1 vào khung trống đầu tiên."
+        },
+        "why": {
+          "en": "A non-resident reference faults even when there is free space.",
+          "vi": "Tham chiếu trang chưa ở RAM gây lỗi dù còn chỗ trống."
+        },
+        "result": {
+          "en": "Frames [1,–,–]; faults=1; no victim.",
+          "vi": "Khung [1,–,–]; lỗi=1; không có nạn nhân."
+        }
+      },
+      {
+        "id": "reference-1-fault",
+        "action": {
+          "en": "Load page 2 into the next empty frame.",
+          "vi": "Nạp trang 2 vào khung trống tiếp theo."
+        },
+        "why": {
+          "en": "No replacement is required while a frame is free.",
+          "vi": "Không cần thay thế khi còn khung trống."
+        },
+        "result": {
+          "en": "Frames [1,2,–]; faults=2.",
+          "vi": "Khung [1,2,–]; lỗi=2."
+        }
+      },
+      {
+        "id": "reference-2-fault",
+        "action": {
+          "en": "Load page 3.",
+          "vi": "Nạp trang 3."
+        },
+        "why": {
+          "en": "The final empty frame is available.",
+          "vi": "Khung trống cuối còn sẵn."
+        },
+        "result": {
+          "en": "Frames [1,2,3]; faults=3; FIFO order [1,2,3].",
+          "vi": "Khung [1,2,3]; lỗi=3; thứ tự FIFO [1,2,3]."
+        }
+      },
+      {
+        "id": "reference-3-hit",
+        "action": {
+          "en": "Reference resident page 1.",
+          "vi": "Tham chiếu trang 1 đang ở RAM."
+        },
+        "why": {
+          "en": "A hit does not change FIFO loading order.",
+          "vi": "Hit không đổi thứ tự nạp FIFO."
+        },
+        "result": {
+          "en": "Frames [1,2,3]; hits=1; page 1 is still the oldest loaded.",
+          "vi": "Khung [1,2,3]; hit=1; trang 1 vẫn được nạp lâu nhất."
+        }
+      },
+      {
+        "id": "reference-4-fault",
+        "action": {
+          "en": "Replace page 1 with page 4.",
+          "vi": "Thay trang 1 bằng trang 4."
+        },
+        "why": {
+          "en": "All frames are full, and 1 is the FIFO victim.",
+          "vi": "Mọi khung đầy và 1 là nạn nhân FIFO."
+        },
+        "result": {
+          "en": "Frames [4,2,3]; faults=4; FIFO order [2,3,4].",
+          "vi": "Khung [4,2,3]; lỗi=4; thứ tự FIFO [2,3,4]."
+        }
+      },
+      {
+        "id": "reference-5-hit",
+        "action": {
+          "en": "Reference page 2 without moving it.",
+          "vi": "Tham chiếu trang 2 mà không chuyển nó."
+        },
+        "why": {
+          "en": "It is still resident; the hit leaves FIFO order unchanged.",
+          "vi": "Trang vẫn ở RAM; hit giữ nguyên thứ tự FIFO."
+        },
+        "result": {
+          "en": "Frames [4,2,3]; hits=2.",
+          "vi": "Khung [4,2,3]; hit=2."
+        }
+      },
+      {
+        "id": "reference-6-fault",
+        "action": {
+          "en": "Replace oldest-loaded page 2 with 5.",
+          "vi": "Thay trang 2 được nạp lâu nhất bằng 5."
+        },
+        "why": {
+          "en": "FIFO order, not numerical page value, selects the victim.",
+          "vi": "Thứ tự FIFO, không phải giá trị số trang, chọn nạn nhân."
+        },
+        "result": {
+          "en": "Frames [4,5,3]; faults=5 and hits=2.",
+          "vi": "Khung [4,5,3]; lỗi=5 và hit=2."
+        },
+        "check": {
+          "en": "Five faults plus two hits equals seven references.",
+          "vi": "Năm lỗi cộng hai hit bằng bảy tham chiếu."
+        }
+      }
+    ],
+    "result": {
+      "en": "FIFO has 5 faults; the same input under LRU has 6 because the hit on 1 changes the later victim.",
+      "vi": "FIFO có 5 lỗi; cùng đầu vào với LRU có 6 vì hit trang 1 làm đổi nạn nhân về sau."
+    },
+    "selfCheck": {
+      "en": "Trace LRU until page 4 enters and explain why the next reference to page 2 now faults.",
+      "vi": "Trace LRU đến khi trang 4 vào và giải thích vì sao tham chiếu trang 2 tiếp theo nay gây lỗi."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A reference string and a fixed number of frames ask for a replacement trace.",
+        "vi": "Chuỗi tham chiếu và số khung cố định yêu cầu trace thay thế."
+      },
+      {
+        "en": "Low useful CPU progress with frequent transfers suggests a thrashing explanation.",
+        "vi": "Tiến triển CPU hữu ích thấp cùng chuyển trang thường xuyên gợi ý giải thích thrashing."
+      }
+    ],
+    "distinguish": {
+      "en": "FIFO remembers loads; LRU remembers references. Thrashing describes excessive paging costs rather than naming a replacement algorithm.",
+      "vi": "FIFO nhớ lần nạp; LRU nhớ lần tham chiếu. Thrashing mô tả chi phí chuyển trang quá mức, không phải tên thuật toán thay thế."
+    },
+    "method": [
+      {
+        "en": "Mark each hit/fault and use free frames before selecting a victim.",
+        "vi": "Đánh dấu mỗi hit/lỗi và dùng khung trống trước khi chọn nạn nhân."
+      },
+      {
+        "en": "Keep the policy’s history separate from physical frame slots.",
+        "vi": "Giữ riêng lịch sử chính sách với vị trí khung vật lý."
+      },
+      {
+        "en": "Check hits+faults=references, then relate any performance claim to the stated workload.",
+        "vi": "Kiểm hit+lỗi=tham chiếu rồi gắn nhận định hiệu năng với tải đã nêu."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A hit refreshes FIFO position.",
+        "vi": "Hit làm mới vị trí FIFO."
+      },
+      "correction": {
+        "en": "Only a new load changes FIFO residency order; LRU updates on hits.",
+        "vi": "Chỉ lần nạp mới đổi thứ tự FIFO; LRU cập nhật khi hit."
+      }
+    },
+    {
+      "mistake": {
+        "en": "LRU always produces fewer faults than FIFO.",
+        "vi": "LRU luôn có ít lỗi hơn FIFO."
+      },
+      "correction": {
+        "en": "The result depends on the reference string and capacity; this example is a counterexample.",
+        "vi": "Kết quả tùy chuỗi và dung lượng; ví dụ này là phản ví dụ."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Thrashing is any single page fault.",
+        "vi": "Thrashing là bất kỳ lỗi trang đơn lẻ nào."
+      },
+      "correction": {
+        "en": "It is excessive paging that severely limits useful progress.",
+        "vi": "Đó là chuyển trang quá mức làm hạn chế nghiêm trọng tiến triển hữu ích."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "fifo-victim",
+      "prompt": {
+        "en": "After 1,2,3,1 with three frames, FIFO receives 4. Which page leaves?",
+        "vi": "Sau 1,2,3,1 với ba khung, FIFO nhận 4. Trang nào rời?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Correct: the hit did not reload page 1.",
+            "vi": "Đúng: hit không nạp lại trang 1."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "2",
+            "vi": "2"
+          },
+          "feedback": {
+            "en": "That is the LRU victim, because page 1 was recently used.",
+            "vi": "Đó là nạn nhân LRU vì trang 1 vừa được dùng."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "3",
+            "vi": "3"
+          },
+          "feedback": {
+            "en": "The newest loaded page is not the FIFO victim.",
+            "vi": "Trang được nạp mới nhất không phải nạn nhân FIFO."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Track loading order, not use order, for FIFO.",
+        "vi": "Với FIFO, theo thứ tự nạp chứ không phải thứ tự dùng."
+      }
+    },
+    {
+      "id": "lru-victim",
+      "prompt": {
+        "en": "For the same prefix, which page does LRU replace?",
+        "vi": "Với cùng tiền tố, LRU thay trang nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "2",
+            "vi": "2"
+          },
+          "feedback": {
+            "en": "Correct: recency order is [2,3,1].",
+            "vi": "Đúng: thứ tự gần đây là [2,3,1]."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Page 1 was just referenced, so it is most recent.",
+            "vi": "Trang 1 vừa được tham chiếu nên mới nhất."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The numerically smallest page every time.",
+            "vi": "Luôn là trang có số nhỏ nhất."
+          },
+          "feedback": {
+            "en": "LRU uses reference history, not numeric sorting.",
+            "vi": "LRU dùng lịch sử truy cập, không sắp số trang."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A hit changes LRU history even though frames are unchanged.",
+        "vi": "Hit đổi lịch sử LRU dù khung không đổi."
+      }
+    },
+    {
+      "id": "counts",
+      "prompt": {
+        "en": "The seven-reference FIFO trace has 2 hits. How many faults?",
+        "vi": "Trace FIFO bảy tham chiếu có 2 hit. Có bao nhiêu lỗi?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "5",
+            "vi": "5"
+          },
+          "feedback": {
+            "en": "Correct: 7−2=5, including the first three loads.",
+            "vi": "Đúng: 7−2=5, gồm ba lần nạp đầu."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "2",
+            "vi": "2"
+          },
+          "feedback": {
+            "en": "Two is the eviction count here, not the total fault count.",
+            "vi": "Hai là số lần loại trang ở đây, không phải tổng lỗi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "7",
+            "vi": "7"
+          },
+          "feedback": {
+            "en": "That incorrectly counts the two resident-page hits as faults.",
+            "vi": "Bạn đã tính nhầm hai hit trang hiện diện thành lỗi."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Cold loads are faults without victims.",
+        "vi": "Lần nạp ban đầu là lỗi mà không có nạn nhân."
+      }
+    },
+    {
+      "id": "locality-transfer",
+      "prompt": {
+        "en": "LRU repeatedly needs pages 1,2,3 but has two frames. Which change directly helps fit this active set?",
+        "vi": "LRU liên tục cần trang 1,2,3 nhưng có hai khung. Thay đổi nào trực tiếp giúp chứa tập đang dùng?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Provide three available frames for these pages.",
+            "vi": "Cấp ba khung sẵn có cho các trang này."
+          },
+          "feedback": {
+            "en": "Correct: after the three initial loads, this fixed repetition can hit.",
+            "vi": "Đúng: sau ba lần nạp đầu, chuỗi lặp cố định này có thể hit."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Rename page 3 to page 9.",
+            "vi": "Đổi tên trang 3 thành 9."
+          },
+          "feedback": {
+            "en": "A name change does not reduce the number of distinct pages.",
+            "vi": "Đổi tên không giảm số trang khác nhau."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Increase backing storage while keeping the same two frames.",
+            "vi": "Tăng bộ nhớ hỗ trợ nhưng vẫn giữ hai khung."
+          },
+          "feedback": {
+            "en": "That does not make the three active pages resident together.",
+            "vi": "Điều đó không làm ba trang đang dùng cùng ở RAM."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Match available RAM to active demand; do not confuse storage capacity with residency.",
+        "vi": "Khớp RAM khả dụng với nhu cầu hoạt động; không nhầm dung lượng lưu trữ với hiện diện."
+      }
+    },
+    {
+      "id": "thrashing-transfer",
+      "prompt": {
+        "en": "A system spends most time moving pages and little time executing useful work. Which explanation is strongest?",
+        "vi": "Hệ thống chủ yếu chuyển trang và ít thực thi hữu ích. Giải thích nào vững nhất?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Active memory demand exceeds available frames, causing repeated costly faults.",
+            "vi": "Nhu cầu bộ nhớ đang dùng vượt khung khả dụng, gây lỗi lặp lại tốn kém."
+          },
+          "feedback": {
+            "en": "Correct: it connects pressure, transfers and lost progress.",
+            "vi": "Đúng: nối áp lực, chuyển dữ liệu và mất tiến triển."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every fault proves a syntax error.",
+            "vi": "Mọi lỗi trang chứng minh lỗi cú pháp."
+          },
+          "feedback": {
+            "en": "Page residency and programming-language syntax are unrelated checks.",
+            "vi": "Hiện diện trang và cú pháp ngôn ngữ là hai kiểm tra khác nhau."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The CPU must have no registers.",
+            "vi": "CPU chắc chắn không có thanh ghi."
+          },
+          "feedback": {
+            "en": "Register existence does not explain the paging workload.",
+            "vi": "Sự tồn tại thanh ghi không giải thích tải chuyển trang."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use a causal explanation of thrashing, not a fault-count threshold invented without evidence.",
+        "vi": "Dùng giải thích nhân quả về thrashing, không đặt ngưỡng số lỗi thiếu bằng chứng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain how FIFO and LRU differ on a hit, then explain thrashing.",
+      "vi": "Giải thích FIFO và LRU khác nhau thế nào khi hit, rồi giải thích thrashing."
+    },
+    "answerPoints": [
+      {
+        "en": "FIFO keeps load order; LRU moves the referenced page to most recent.",
+        "vi": "FIFO giữ thứ tự nạp; LRU đưa trang vừa truy cập thành mới nhất."
+      },
+      {
+        "en": "Use free frames first and count cold loads as faults.",
+        "vi": "Dùng khung trống trước và tính lần nạp đầu là lỗi."
+      },
+      {
+        "en": "Excessive transfers can dominate useful execution when active pages do not fit available memory.",
+        "vi": "Chuyển trang quá mức có thể lấn át thực thi hữu ích khi trang đang dùng không vừa bộ nhớ sẵn có."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "A policy list is not the physical frame layout.",
+      "vi": "Danh sách chính sách không phải bố trí khung vật lý."
+    },
+    {
+      "en": "Compare policies with identical input and capacity.",
+      "vi": "So chính sách với cùng đầu vào và dung lượng."
+    },
+    {
+      "en": "Explain remedies through reduced memory pressure or more available RAM.",
+      "vi": "Giải thích biện pháp qua giảm áp lực bộ nhớ hoặc tăng RAM khả dụng."
+    }
+  ],
+  "relatedSlugs": [
+    "paging-segmentation-and-virtual-memory",
+    "resources-processes-and-states"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed pp385–389 / PDF pp401–405, page replacement and thrashing",
+      "kind": "book"
+    },
+    {
+      "id": "w24-31-qp",
+      "title": "Cambridge 9618 w24 Paper 31 Question Paper",
+      "locator": "PDF p8 Q8(b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w24-31-ms",
+      "title": "Cambridge 9618 w24 Paper 31 Mark Scheme",
+      "locator": "PDF p11 Q8(b)",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "w23-32-qp",
+      "title": "Cambridge 9618 w23 Paper 32 Question Paper",
+      "locator": "PDF p4 Q5(b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w23-32-ms",
+      "title": "Cambridge 9618 w23 Paper 32 Mark Scheme",
+      "locator": "PDF p4 Q5(b)",
+      "kind": "mark-scheme"
+    }
+  ]
+}

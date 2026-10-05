@@ -1,0 +1,785 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.18.1",
+  "topicId": "P3-18.1-T01",
+  "slug": "graphs-and-dijkstra",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Graphs and Dijkstra",
+    "vi": "Đồ thị và Dijkstra"
+  },
+  "question": {
+    "en": "How can an AI search a weighted network and prove which route has the lowest total cost?",
+    "vi": "Hệ thống AI tìm trên mạng có trọng số và chứng minh đường nào có tổng chi phí nhỏ nhất bằng cách nào?"
+  },
+  "opening": {
+    "en": "A response vehicle must travel from S to G. Each edge shows a travel cost, so the route with fewer edges is not automatically the cheapest.",
+    "vi": "Một xe phản ứng nhanh phải đi từ S đến G. Mỗi cạnh cho biết chi phí di chuyển, nên tuyến có ít cạnh hơn chưa chắc rẻ nhất."
+  },
+  "objectives": [
+    {
+      "en": "Identify nodes, edges, weights and paths in an AI problem graph.",
+      "vi": "Nhận diện nút, cạnh, trọng số và đường đi trong đồ thị bài toán AI."
+    },
+    {
+      "en": "Trace tentative distances, frontier, current node, settled nodes and predecessors.",
+      "vi": "Trace khoảng cách tạm thời, frontier, nút hiện tại, nút đã chốt và predecessor."
+    },
+    {
+      "en": "Apply strict-lower relaxation and the declared tie rule.",
+      "vi": "Áp dụng cập nhật khi thấp hơn nghiêm ngặt và quy tắc phá hòa đã công bố."
+    },
+    {
+      "en": "Reconstruct the shortest path and justify its total cost.",
+      "vi": "Dựng lại đường đi ngắn nhất và giải thích tổng chi phí."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Add small positive integers.",
+      "vi": "Cộng các số nguyên dương nhỏ."
+    },
+    {
+      "en": "Distinguish one edge weight from a complete path cost.",
+      "vi": "Phân biệt trọng số một cạnh với chi phí toàn đường đi."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "node / vertex",
+      "meaning": {
+        "en": "An entity or state represented as a point in a graph.",
+        "vi": "Một thực thể hoặc trạng thái được biểu diễn thành điểm trong đồ thị."
+      }
+    },
+    {
+      "term": "edge / arc",
+      "meaning": {
+        "en": "An allowed relationship or move between two nodes.",
+        "vi": "Một quan hệ hoặc bước di chuyển được phép giữa hai nút."
+      }
+    },
+    {
+      "term": "weight",
+      "meaning": {
+        "en": "The declared numeric cost of an edge, such as distance or time.",
+        "vi": "Chi phí số đã công bố của một cạnh, chẳng hạn khoảng cách hoặc thời gian."
+      }
+    },
+    {
+      "term": "tentative distance",
+      "meaning": {
+        "en": "The lowest cumulative start-to-node cost known so far.",
+        "vi": "Chi phí tích lũy thấp nhất từ nút bắt đầu đang biết."
+      }
+    },
+    {
+      "term": "predecessor",
+      "meaning": {
+        "en": "The previous node on the best route currently known.",
+        "vi": "Nút liền trước trên tuyến tốt nhất đang biết."
+      }
+    },
+    {
+      "term": "settled",
+      "meaning": {
+        "en": "Selected at the smallest known cumulative distance in this non-negative fixture.",
+        "vi": "Được chọn với khoảng cách tích lũy nhỏ nhất đã biết trong fixture không âm này."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "graph-problem-model",
+      "title": {
+        "en": "A graph models choices",
+        "vi": "Đồ thị mô hình hóa lựa chọn"
+      },
+      "paragraphs": [
+        {
+          "en": "Nodes represent places or states, edges represent possible moves and weights represent the cost defined by the problem. AI can search this structure when it must choose a route through many alternatives.",
+          "vi": "Nút biểu diễn địa điểm hoặc trạng thái, cạnh biểu diễn bước đi có thể thực hiện và trọng số biểu diễn chi phí của bài toán. AI có thể tìm trên cấu trúc này khi phải chọn tuyến giữa nhiều phương án."
+        },
+        {
+          "en": "Path cost is the sum of its edge weights. Counting edges alone can choose the wrong route.",
+          "vi": "Chi phí đường đi là tổng trọng số các cạnh. Chỉ đếm số cạnh có thể chọn sai tuyến."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "known-best-distance",
+      "title": {
+        "en": "Select the lowest known cumulative distance",
+        "vi": "Chọn khoảng cách tích lũy nhỏ nhất đã biết"
+      },
+      "paragraphs": [
+        {
+          "en": "Set the start distance to 0 and every other distance to unset. The frontier contains discovered but unsettled nodes. Select the frontier node with the smallest tentative distance; equal values use ascending node ID in this fixture.",
+          "vi": "Đặt khoảng cách nút bắt đầu bằng 0 và mọi nút khác là chưa xác định. Frontier chứa nút đã phát hiện nhưng chưa chốt. Chọn nút frontier có khoảng cách tạm thời nhỏ nhất; nếu bằng nhau dùng ID nút tăng dần trong fixture này."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "relaxation-predecessor",
+      "title": {
+        "en": "Relax an edge and store its predecessor",
+        "vi": "Thử cập nhật cạnh và lưu predecessor"
+      },
+      "paragraphs": [
+        {
+          "en": "Candidate cost equals distance to the current node plus the edge weight. Replace the neighbour's distance and predecessor only when the candidate is strictly lower. An equal candidate is rejected so the earlier predecessor remains.",
+          "vi": "Chi phí ứng viên bằng khoảng cách tới nút hiện tại cộng trọng số cạnh. Chỉ thay khoảng cách và predecessor của nút kề khi ứng viên thấp hơn nghiêm ngặt. Ứng viên bằng nhau bị từ chối nên predecessor trước đó được giữ."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "settle-reconstruct",
+      "title": {
+        "en": "Settle, stop and reconstruct",
+        "vi": "Chốt, dừng và dựng lại đường"
+      },
+      "paragraphs": [
+        {
+          "en": "With non-negative weights, the selected smallest distance becomes final in this model. When G is selected, follow predecessors from G back to S and reverse the chain. Verify the reported cost by summing the path's edges.",
+          "vi": "Với trọng số không âm, khoảng cách nhỏ nhất được chọn trở thành final trong mô hình này. Khi G được chọn, theo predecessor từ G về S rồi đảo chuỗi. Kiểm tra chi phí bằng tổng trọng số các cạnh trên đường."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "dijkstra-search",
+    "title": {
+      "en": "Dijkstra graph-search workbench",
+      "vi": "Bàn trace tìm kiếm Dijkstra"
+    },
+    "introduction": {
+      "en": "Move through every selection, edge test and accepted or rejected update. The graph and table share one deterministic state.",
+      "vi": "Đi qua từng lần chọn, xét cạnh và cập nhật được chấp nhận hoặc từ chối. Đồ thị và bảng dùng chung một trạng thái xác định."
+    },
+    "task": {
+      "en": "Complete the primary trace, then use the tie and unreachable fixtures to explain the declared rules.",
+      "vi": "Hoàn tất trace chính, rồi dùng fixture hòa và không tới được để giải thích các quy tắc đã công bố."
+    },
+    "conventions": [
+      {
+        "en": "Positive finite weights; ties use ascending node ID.",
+        "vi": "Trọng số hữu hạn dương; hòa dùng ID nút tăng dần."
+      },
+      {
+        "en": "Only a strictly lower candidate replaces distance and predecessor.",
+        "vi": "Chỉ ứng viên thấp hơn nghiêm ngặt mới thay khoảng cách và predecessor."
+      },
+      {
+        "en": "Trace the AlgoCore teaching fixture; you do not need to implement the graph-search algorithm.",
+        "vi": "Trace fixture dạy học AlgoCore; bạn không cần cài đặt thuật toán tìm kiếm đồ thị."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Trace S to G",
+      "vi": "Trace từ S đến G"
+    },
+    "prompt": {
+      "en": "Use the displayed weighted graph. State every tie, accepted update and predecessor, then give the path and cost.",
+      "vi": "Dùng đồ thị trọng số đang hiển thị. Nêu mọi trường hợp hòa, cập nhật được chấp nhận và predecessor, rồi cho đường đi và chi phí."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "initialise",
+        "action": {
+          "en": "Set d(S)=0; all others unset.",
+          "vi": "Đặt d(S)=0; các nút khác chưa xác định."
+        },
+        "why": {
+          "en": "Only the start has a known zero-length path.",
+          "vi": "Chỉ nút bắt đầu có đường độ dài 0 đã biết."
+        },
+        "result": {
+          "en": "Frontier contains S; predecessors are unset.",
+          "vi": "Frontier chứa S; predecessor chưa được gán."
+        }
+      },
+      {
+        "id": "select-s",
+        "action": {
+          "en": "Select S and relax S–A and S–B.",
+          "vi": "Chọn S rồi cập nhật S–A và S–B."
+        },
+        "why": {
+          "en": "Both candidates are 0+2.",
+          "vi": "Cả hai ứng viên đều là 0+2."
+        },
+        "result": {
+          "en": "A=2←S and B=2←S; settle S.",
+          "vi": "A=2←S và B=2←S; chốt S."
+        }
+      },
+      {
+        "id": "tie-a",
+        "action": {
+          "en": "Use the tie rule to select A before B.",
+          "vi": "Dùng quy tắc hòa để chọn A trước B."
+        },
+        "why": {
+          "en": "A and B both cost 2; A has the lower node ID.",
+          "vi": "A và B cùng chi phí 2; A có ID nhỏ hơn."
+        },
+        "result": {
+          "en": "C=4←A and D=7←A; settle A.",
+          "vi": "C=4←A và D=7←A; chốt A."
+        }
+      },
+      {
+        "id": "improve-d",
+        "action": {
+          "en": "Select B and test B–D.",
+          "vi": "Chọn B và xét B–D."
+        },
+        "why": {
+          "en": "2+2=4 is strictly lower than D's current 7.",
+          "vi": "2+2=4 thấp hơn nghiêm ngặt so với 7 hiện tại của D."
+        },
+        "result": {
+          "en": "Replace D with 4←B; settle B.",
+          "vi": "Thay D thành 4←B; chốt B."
+        }
+      },
+      {
+        "id": "tie-c",
+        "action": {
+          "en": "Select C before D and discover G at 14.",
+          "vi": "Chọn C trước D và phát hiện G với 14."
+        },
+        "why": {
+          "en": "C and D both cost 4; C wins the declared tie.",
+          "vi": "C và D cùng chi phí 4; C thắng theo quy tắc hòa."
+        },
+        "result": {
+          "en": "G=14←C; settle C.",
+          "vi": "G=14←C; chốt C."
+        }
+      },
+      {
+        "id": "improve-g",
+        "action": {
+          "en": "Select D and test D–G.",
+          "vi": "Chọn D và xét D–G."
+        },
+        "why": {
+          "en": "4+3=7 is lower than 14.",
+          "vi": "4+3=7 thấp hơn 14."
+        },
+        "result": {
+          "en": "Replace G with 7←D; settle D.",
+          "vi": "Thay G thành 7←D; chốt D."
+        }
+      },
+      {
+        "id": "select-goal",
+        "action": {
+          "en": "Select G at 7 and stop.",
+          "vi": "Chọn G với 7 và dừng."
+        },
+        "why": {
+          "en": "G is now the smallest frontier node, not merely newly discovered.",
+          "vi": "G hiện là nút frontier nhỏ nhất, không chỉ vừa được phát hiện."
+        },
+        "result": {
+          "en": "Selected order: S,A,B,C,D,G.",
+          "vi": "Thứ tự chọn: S,A,B,C,D,G."
+        }
+      },
+      {
+        "id": "reconstruct",
+        "action": {
+          "en": "Follow G←D←B←S and reverse it.",
+          "vi": "Theo G←D←B←S rồi đảo lại."
+        },
+        "why": {
+          "en": "The predecessor chain records accepted best routes.",
+          "vi": "Chuỗi predecessor ghi các tuyến tốt nhất đã được chấp nhận."
+        },
+        "result": {
+          "en": "S→B→D→G; total cost 2+2+3=7.",
+          "vi": "S→B→D→G; tổng chi phí 2+2+3=7."
+        }
+      }
+    ],
+    "result": {
+      "en": "Shortest path S→B→D→G, cost 7 under the displayed fixture and rules.",
+      "vi": "Đường ngắn nhất S→B→D→G, chi phí 7 theo fixture và quy tắc đang hiển thị."
+    },
+    "selfCheck": {
+      "en": "Does every predecessor edge exist, and do its weights sum to 7?",
+      "vi": "Mỗi cạnh predecessor có tồn tại và tổng trọng số có bằng 7 không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "weighted graph and shortest/minimum path",
+        "vi": "đồ thị trọng số và đường ngắn nhất/nhỏ nhất"
+      },
+      {
+        "en": "cumulative or tentative distance",
+        "vi": "khoảng cách tích lũy hoặc tạm thời"
+      },
+      {
+        "en": "trace/show working",
+        "vi": "trace/trình bày bước làm"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: A* requires heuristic estimates. A Dijkstra prompt supplies weights and cumulative path cost without h values.",
+      "vi": "Dễ nhầm: A* cần ước lượng heuristic. Đề Dijkstra cung cấp trọng số và chi phí đường tích lũy mà không có giá trị h."
+    },
+    "method": [
+      {
+        "en": "Write 0 at the start and unset elsewhere.",
+        "vi": "Ghi 0 tại nút đầu và chưa xác định ở nơi khác."
+      },
+      {
+        "en": "Declare the tie rule.",
+        "vi": "Công bố quy tắc phá hòa."
+      },
+      {
+        "en": "Select the smallest unsettled cumulative distance.",
+        "vi": "Chọn khoảng cách tích lũy chưa chốt nhỏ nhất."
+      },
+      {
+        "en": "Show candidate sums and predecessor updates.",
+        "vi": "Trình bày phép cộng ứng viên và cập nhật predecessor."
+      },
+      {
+        "en": "Reconstruct and verify the path cost.",
+        "vi": "Dựng lại và kiểm tra chi phí đường đi."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "describe",
+        "guidance": {
+          "en": "State the graph elements and the current frontier, settled set, distance and predecessor values.",
+          "vi": "Nêu các phần tử của đồ thị cùng frontier, tập settled, khoảng cách và predecessor hiện tại."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the smallest cumulative-distance rule to the accepted or rejected update and its consequence.",
+          "vi": "Liên hệ quy tắc khoảng cách tích lũy nhỏ nhất với cập nhật được chấp nhận hoặc từ chối và hệ quả."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record every selected node, candidate sum, distance and predecessor change in order.",
+          "vi": "Ghi theo thứ tự từng nút được chọn, phép cộng ứng viên, thay đổi khoảng cách và predecessor."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use cumulative path cost for Dijkstra and contrast it with A* using g+h.",
+          "vi": "Dùng chi phí đường tích lũy cho Dijkstra và đối chiếu với A* dùng g+h."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Cite the candidate sum, current best value and declared tie-break for the decision.",
+          "vi": "Dẫn phép cộng ứng viên, giá trị tốt nhất hiện tại và quy tắc phá hòa đã công bố để biện minh."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Choose the smallest outgoing edge.",
+        "vi": "Chọn cạnh đi ra nhỏ nhất."
+      },
+      "correction": {
+        "en": "Compare cumulative route costs, not isolated edges.",
+        "vi": "So sánh chi phí tuyến tích lũy, không so riêng từng cạnh."
+      },
+      "selfCheck": {
+        "en": "Which value must be compared: one edge weight or the whole cumulative route cost?",
+        "vi": "Cần so sánh giá trị nào: một trọng số cạnh hay toàn bộ chi phí tuyến tích lũy?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "A discovered distance is final.",
+        "vi": "Khoảng cách vừa phát hiện là final."
+      },
+      "correction": {
+        "en": "It remains tentative until the node is settled.",
+        "vi": "Nó vẫn tạm thời cho đến khi nút được chốt."
+      },
+      "selfCheck": {
+        "en": "Has the node been settled, or is its distance still tentative?",
+        "vi": "Nút đã được chốt hay khoảng cách vẫn chỉ là tạm thời?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Stop when G is first discovered.",
+        "vi": "Dừng khi G lần đầu được phát hiện."
+      },
+      "correction": {
+        "en": "Stop when G is selected as the smallest frontier node.",
+        "vi": "Dừng khi G được chọn là nút frontier nhỏ nhất."
+      },
+      "selfCheck": {
+        "en": "Was the goal selected as the smallest frontier value, or merely discovered?",
+        "vi": "Đích đã được chọn là giá trị frontier nhỏ nhất hay chỉ mới được phát hiện?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Replace the predecessor on an equal candidate.",
+        "vi": "Thay predecessor khi ứng viên bằng nhau."
+      },
+      "correction": {
+        "en": "This fixture rejects equal candidates and keeps the earlier predecessor.",
+        "vi": "Fixture này từ chối ứng viên bằng nhau và giữ predecessor trước."
+      },
+      "selfCheck": {
+        "en": "For an equal candidate, does this fixture keep the earlier predecessor?",
+        "vi": "Với ứng viên bằng nhau, fixture này có giữ predecessor trước không?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "Which statement correctly identifies graph structure?",
+        "vi": "Phát biểu nào nhận diện đúng cấu trúc đồ thị?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Nodes are states; edges are allowed moves; weights are declared costs",
+            "vi": "Nút là trạng thái; cạnh là bước đi; trọng số là chi phí đã công bố"
+          },
+          "feedback": {
+            "en": "Correct: each graph part has a distinct role.",
+            "vi": "Đúng: mỗi phần đồ thị có vai trò riêng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every node is a total path cost",
+            "vi": "Mỗi nút là tổng chi phí đường"
+          },
+          "feedback": {
+            "en": "A node represents an entity/state, not automatically a cost.",
+            "vi": "Nút biểu diễn thực thể/trạng thái, không tự động là chi phí."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Weights count only the number of edges",
+            "vi": "Trọng số chỉ đếm số cạnh"
+          },
+          "feedback": {
+            "en": "Weights carry the problem's numeric cost.",
+            "vi": "Trọng số mang chi phí số của bài toán."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Name node, edge and weight before tracing.",
+        "vi": "Gọi đúng nút, cạnh và trọng số trước khi trace."
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "A prompt gives a positive weighted graph and asks for a shortest path; no heuristic is supplied. Which method fits?",
+        "vi": "Đề cho đồ thị trọng số dương và yêu cầu đường ngắn nhất; không có heuristic. Phương pháp nào phù hợp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Dijkstra",
+            "vi": "Dijkstra"
+          },
+          "feedback": {
+            "en": "Correct: cumulative distance is the selection score.",
+            "vi": "Đúng: khoảng cách tích lũy là điểm chọn."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A* using h only",
+            "vi": "A* chỉ dùng h"
+          },
+          "feedback": {
+            "en": "A* needs a declared heuristic and still keeps g.",
+            "vi": "A* cần heuristic đã công bố và vẫn giữ g."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Unsupervised learning",
+            "vi": "Học không giám sát"
+          },
+          "feedback": {
+            "en": "This is graph search, not learning-category selection.",
+            "vi": "Đây là tìm kiếm đồ thị, không phải chọn hình thức học."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Identify the supplied state and required output.",
+        "vi": "Nhận diện trạng thái được cho và đầu ra cần tìm."
+      }
+    },
+    {
+      "id": "ordering",
+      "prompt": {
+        "en": "Which trace order is correct?",
+        "vi": "Thứ tự trace nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Initialise → select smallest → relax edges → settle → repeat → reconstruct",
+            "vi": "Khởi tạo → chọn nhỏ nhất → thử cập nhật cạnh → chốt → lặp → dựng lại"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reconstruct → guess goal cost → initialise",
+            "vi": "Dựng lại → đoán chi phí đích → khởi tạo"
+          },
+          "feedback": {
+            "en": "A predecessor chain does not exist before the trace.",
+            "vi": "Chuỗi predecessor chưa tồn tại trước khi trace."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Select largest edge → delete frontier",
+            "vi": "Chọn cạnh lớn nhất → xóa frontier"
+          },
+          "feedback": {
+            "en": "Dijkstra selects the smallest cumulative distance.",
+            "vi": "Dijkstra chọn khoảng cách tích lũy nhỏ nhất."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Keep state transitions in causal order.",
+        "vi": "Giữ chuyển trạng thái theo thứ tự nguyên nhân."
+      }
+    },
+    {
+      "id": "trace-d",
+      "prompt": {
+        "en": "After S, A and B are processed in the primary fixture, what is D?",
+        "vi": "Sau khi xử lý S, A và B trong fixture chính, D là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "4 with predecessor B",
+            "vi": "4 với predecessor B"
+          },
+          "feedback": {
+            "en": "Correct: 2+2 improves the old 7.",
+            "vi": "Đúng: 2+2 cải thiện giá trị 7 cũ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "7 with predecessor A",
+            "vi": "7 với predecessor A"
+          },
+          "feedback": {
+            "en": "That is the stale route before B–D is relaxed.",
+            "vi": "Đó là tuyến cũ trước khi cập nhật B–D."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "2 with predecessor S",
+            "vi": "2 với predecessor S"
+          },
+          "feedback": {
+            "en": "There is no direct S–D edge.",
+            "vi": "Không có cạnh trực tiếp S–D."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Show candidate 2+2=4<7 and replace both value and predecessor.",
+        "vi": "Trình bày ứng viên 2+2=4<7 và thay cả giá trị lẫn predecessor."
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "Route X has two edges costing 6+6; route Y has three edges costing 2+3+4. Which is cheaper?",
+        "vi": "Tuyến X có hai cạnh 6+6; tuyến Y có ba cạnh 2+3+4. Tuyến nào rẻ hơn?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Y, cost 9",
+            "vi": "Y, chi phí 9"
+          },
+          "feedback": {
+            "en": "Correct: sum weights rather than count edges.",
+            "vi": "Đúng: cộng trọng số thay vì đếm cạnh."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "X because it has fewer edges",
+            "vi": "X vì có ít cạnh hơn"
+          },
+          "feedback": {
+            "en": "Fewest edges is not the stated cost rule.",
+            "vi": "Ít cạnh nhất không phải quy tắc chi phí đã nêu."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "They tie",
+            "vi": "Hai tuyến hòa"
+          },
+          "feedback": {
+            "en": "12 and 9 are different cumulative costs.",
+            "vi": "12 và 9 là hai chi phí tích lũy khác nhau."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "The path with total weight 9 is cheaper even though it has more edges.",
+        "vi": "Đường có tổng trọng số 9 rẻ hơn dù có nhiều cạnh hơn."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Write the Dijkstra trace rule in one causal chain.",
+      "vi": "Viết quy tắc trace Dijkstra thành một chuỗi nhân quả."
+    },
+    "answerPoints": [
+      {
+        "en": "Initialise start 0; others unset.",
+        "vi": "Khởi tạo nút đầu 0; nút khác chưa xác định."
+      },
+      {
+        "en": "Select smallest cumulative distance; relax strictly lower candidates and store predecessors.",
+        "vi": "Chọn khoảng cách tích lũy nhỏ nhất; cập nhật ứng viên thấp hơn nghiêm ngặt và lưu predecessor."
+      },
+      {
+        "en": "Settle, repeat, then reconstruct and sum the path.",
+        "vi": "Chốt, lặp, rồi dựng lại và cộng chi phí đường."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Dijkstra uses cumulative cost, not a heuristic.",
+      "vi": "Dijkstra dùng chi phí tích lũy, không dùng heuristic."
+    },
+    {
+      "en": "Frontier and settled are different states.",
+      "vi": "Frontier và settled là hai trạng thái khác nhau."
+    },
+    {
+      "en": "A path claim needs both predecessor chain and total cost.",
+      "vi": "Tuyên bố đường đi cần cả chuỗi predecessor và tổng chi phí."
+    }
+  ],
+  "relatedSlugs": [
+    "a-star-and-heuristic-search",
+    "learning-categories"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p36, §18.1 Artificial Intelligence (AI)",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Chapter 18.1.1, printed pp425–429 / PDF pp441–445: graph purpose and Dijkstra trace",
+      "kind": "book"
+    },
+    {
+      "id": "s21-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2021 question paper",
+      "locator": "Question 5(a)–(b), pp7–8",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s21-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2021 mark scheme",
+      "locator": "Question 5(a)–(b), pp6–7",
+      "kind": "mark-scheme"
+    }
+  ]
+}

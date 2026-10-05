@@ -40,6 +40,9 @@ function isRedirectPayload(value: unknown): value is { redirectTo: string } {
     redirectTo === "/docs" ||
     redirectTo.startsWith("/docs?") ||
     redirectTo.startsWith("/docs/") ||
+    redirectTo === "/paper-2" ||
+    redirectTo.startsWith("/paper-2?") ||
+    redirectTo.startsWith("/paper-2/") ||
     redirectTo === "/paper-3" ||
     redirectTo.startsWith("/paper-3?") ||
     redirectTo.startsWith("/paper-3/") ||

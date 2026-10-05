@@ -1,0 +1,628 @@
+{
+  "schemaVersion": 1,
+  "version": "T19-academic-r2",
+  "topicId": "T19",
+  "sectionId": "11.2",
+  "slug": "iteration",
+  "learningMode": "procedural",
+  "estimatedMinutes": 65,
+  "title": {
+    "en": "Iteration",
+    "vi": "Vòng lặp"
+  },
+  "question": {
+    "en": "Which loop contract matches the count or stopping rule, and what guarantees that repetition terminates?",
+    "vi": "Hợp đồng vòng lặp nào khớp số lượt hoặc quy tắc dừng, và điều gì bảo đảm việc lặp kết thúc?"
+  },
+  "opening": {
+    "en": "Choose a loop from its contract: known integer count, pre-test condition or post-test condition. Name the state that changes toward termination, then trace zero, one and multiple body executions where the loop permits them.",
+    "vi": "Chọn vòng lặp từ hợp đồng của nó: số lượt nguyên đã biết, điều kiện kiểm trước hoặc điều kiện kiểm sau. Nêu trạng thái thay đổi hướng tới kết thúc rồi trace không, một và nhiều lần chạy thân khi vòng lặp cho phép."
+  },
+  "objectives": [
+    {
+      "en": "Choose and justify FOR, WHILE or REPEAT–UNTIL.",
+      "vi": "Chọn và giải thích FOR, WHILE hoặc REPEAT–UNTIL."
+    },
+    {
+      "en": "Trace zero, one and N body executions where valid.",
+      "vi": "Trace 0, 1 và N lần chạy thân khi hợp lệ."
+    },
+    {
+      "en": "Process a sentinel without accidentally storing or aggregating it.",
+      "vi": "Xử lý sentinel mà không vô tình lưu hoặc cộng nó."
+    },
+    {
+      "en": "Trace nested loops and protect an average when Count=0.",
+      "vi": "Trace vòng lặp lồng và bảo vệ phép tính trung bình khi Count=0."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Expressions and operators",
+        "vi": "Biểu thức và toán tử"
+      },
+      "reason": {
+        "en": "Loop conditions and updates must have the correct Boolean or INTEGER meaning.",
+        "vi": "Điều kiện và cập nhật vòng lặp phải có ý nghĩa Boolean hoặc INTEGER đúng."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "count-controlled loop",
+      "meaning": {
+        "en": "A FOR loop over a stated integer sequence.",
+        "vi": "Vòng FOR qua dãy số nguyên được nêu."
+      }
+    },
+    {
+      "term": "pre-condition",
+      "meaning": {
+        "en": "A condition tested before each body execution; WHILE may run zero times.",
+        "vi": "Điều kiện kiểm trước mỗi lần chạy thân; WHILE có thể chạy 0 lần."
+      }
+    },
+    {
+      "term": "post-condition",
+      "meaning": {
+        "en": "A condition tested after the body; REPEAT runs at least once.",
+        "vi": "Điều kiện kiểm sau thân; REPEAT chạy ít nhất một lần."
+      }
+    },
+    {
+      "term": "sentinel",
+      "meaning": {
+        "en": "A special input that causes termination and is normally excluded from data processing.",
+        "vi": "Input đặc biệt gây kết thúc và thường bị loại khỏi xử lý dữ liệu."
+      }
+    },
+    {
+      "term": "termination",
+      "meaning": {
+        "en": "Reaching a state that makes repetition stop.",
+        "vi": "Đạt trạng thái làm việc lặp dừng."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "Exactly N or each index in a fixed range suggests FOR.",
+        "vi": "Đúng N lượt hoặc mỗi chỉ số trong khoảng cố định gợi ý FOR."
+      },
+      {
+        "en": "At most N, while valid, until full or a sentinel suggests a conditional loop.",
+        "vi": "Tối đa N, khi còn hợp lệ, tới khi đầy hoặc gặp sentinel gợi ý vòng lặp điều kiện."
+      },
+      {
+        "en": "Rows and columns or every pair of items suggests nested loops.",
+        "vi": "Hàng và cột hoặc mọi cặp phần tử gợi ý vòng lặp lồng."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "REPEAT always executes its body once; it cannot represent a genuine zero-body case without an outer guard.",
+        "vi": "REPEAT luôn chạy thân một lần; không thể biểu diễn case thật sự 0 lần chạy thân nếu không có guard ngoài."
+      },
+      {
+        "en": "UNTIL states the condition for stopping when TRUE, not the condition for continuing.",
+        "vi": "UNTIL nêu điều kiện dừng khi TRUE, không phải điều kiện tiếp tục."
+      },
+      {
+        "en": "A sentinel is not ordinary data unless the contract explicitly says to process it.",
+        "vi": "Sentinel không phải dữ liệu thường trừ khi hợp đồng nói rõ phải xử lý."
+      },
+      {
+        "en": "Average requires Count>0 before Total/Count.",
+        "vi": "Trung bình yêu cầu Count>0 trước Total/Count."
+      }
+    ],
+    "answerProduct": {
+      "en": "A loop contract, pseudocode and trace showing test position, updates, body count, final state and reason for termination.",
+      "vi": "Hợp đồng vòng lặp, pseudocode và trace thể hiện vị trí test, cập nhật, số lượt thân, trạng thái cuối và lý do dừng."
+    },
+    "method": [
+      {
+        "en": "State known count, maximum count and stop event.",
+        "vi": "Nêu số lượt đã biết, số lượt tối đa và sự kiện dừng."
+      },
+      {
+        "en": "Choose the test position from whether zero executions are allowed.",
+        "vi": "Chọn vị trí test dựa trên việc có cho phép 0 lần chạy không."
+      },
+      {
+        "en": "Initialise state before the test and update it on every continuing path.",
+        "vi": "Khởi tạo trạng thái trước test và cập nhật trên mọi đường tiếp tục."
+      },
+      {
+        "en": "Keep sentinel handling before store/count/total.",
+        "vi": "Xử lý sentinel trước lưu/đếm/tổng."
+      },
+      {
+        "en": "Trace 0, 1 and N cases and guard Count=0.",
+        "vi": "Trace case 0, 1, N và guard Count=0."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t19-contracts",
+      "title": {
+        "en": "FOR, WHILE and REPEAT have different test contracts",
+        "vi": "FOR, WHILE và REPEAT có hợp đồng test khác nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "FOR assigns each INTEGER counter value from the start to end inclusive, using STEP when stated. If start=end the body runs once; with a positive step and start>end it runs zero times.",
+          "vi": "FOR gán từng giá trị INTEGER cho counter từ đầu tới cuối bao gồm hai cận, dùng STEP khi được nêu. Nếu start=end thì thân chạy một lần; với bước dương và start>end thì chạy 0 lần."
+        },
+        {
+          "en": "WHILE tests before the body and may run zero times. REPEAT tests UNTIL after the body and therefore runs at least once. In both conditional loops, identify a body update or new input that can make the stopping state reachable.",
+          "vi": "WHILE kiểm trước thân và có thể chạy 0 lần. REPEAT kiểm UNTIL sau thân nên chạy ít nhất một lần. Với cả hai vòng điều kiện, xác định cập nhật hoặc input mới trong thân có thể đưa tới trạng thái dừng."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "book-t19"
+      ]
+    },
+    {
+      "id": "t19-sentinel",
+      "title": {
+        "en": "Sentinel, aggregation and nesting",
+        "vi": "Sentinel, tổng hợp và lặp lồng"
+      },
+      "paragraphs": [
+        {
+          "en": "For 'at most N or until sentinel', a pre-test arrangement can stop before storing the sentinel. Initialise Count and Total, obtain a candidate input, test both Count<N and Value<>Sentinel, then process and obtain the next candidate.",
+          "vi": "Với 'tối đa N hoặc tới sentinel', bố trí kiểm trước có thể dừng trước khi lưu sentinel. Khởi tạo Count và Total, nhận input ứng viên, kiểm cả Count<N và Value<>Sentinel, rồi xử lý và nhận ứng viên tiếp theo."
+        },
+        {
+          "en": "Nested loops reset the inner-loop state for every outer iteration. For an average, divide only when Count>0; otherwise report no data rather than causing division by zero or inventing an average.",
+          "vi": "Vòng lặp lồng đặt lại trạng thái vòng trong cho mỗi lượt vòng ngoài. Với trung bình, chỉ chia khi Count>0; nếu không, báo không có dữ liệu thay vì gây chia 0 hoặc bịa trung bình."
+        }
+      ],
+      "sourceIds": [
+        "book-t19",
+        "qp-w25-22-q2",
+        "ms-w25-22-q2",
+        "qp-w25-22-q4",
+        "teacher-t19"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T19"
+    ],
+    "title": {
+      "en": "Test position and body-count explorer",
+      "vi": "Trình khám phá vị trí test và số lượt thân"
+    },
+    "introduction": {
+      "en": "The same starting state is passed through FOR, WHILE and REPEAT timelines so the first test and loop-back are visible.",
+      "vi": "Cùng trạng thái đầu đi qua timeline FOR, WHILE và REPEAT để thấy rõ test đầu và đường quay lại."
+    },
+    "task": {
+      "en": "Predict zero, one or multiple body executions and identify the exact update or input that causes termination.",
+      "vi": "Dự đoán 0, 1 hoặc nhiều lần chạy thân và xác định cập nhật hoặc input chính xác gây kết thúc."
+    },
+    "conventions": [
+      {
+        "en": "A condition badge is evaluated where it appears, before or after the body.",
+        "vi": "Huy hiệu điều kiện được tính tại đúng vị trí, trước hoặc sau thân."
+      },
+      {
+        "en": "The sentinel follows the stop path before storage.",
+        "vi": "Sentinel đi theo đường dừng trước khi lưu."
+      },
+      {
+        "en": "Nested traces label outer and inner counters separately.",
+        "vi": "Trace lồng gắn nhãn counter ngoài và trong riêng."
+      }
+    ],
+    "sourceIds": [
+      "g26-core",
+      "teacher-t19"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T19-W1",
+      "title": {
+        "en": "Enter at most five scores or stop at −1",
+        "vi": "Nhập tối đa năm điểm hoặc dừng tại −1"
+      },
+      "prompt": {
+        "en": "Scores are INTEGER 0..100. −1 is a sentinel and is not included. Input at most five valid scores, then output the average, or \"No scores\" if the sentinel is first. Explain zero, one and five-score cases.",
+        "vi": "Score là INTEGER 0..100. −1 là sentinel và không được tính. Nhập tối đa năm điểm hợp lệ, rồi xuất trung bình hoặc \"No scores\" nếu sentinel đứng đầu. Giải thích case 0, 1 và năm điểm."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "state",
+          "action": {
+            "en": "Initialise Count←0 and Total←0",
+            "vi": "Khởi tạo Count←0 và Total←0"
+          },
+          "why": {
+            "en": "Both aggregators need known values before the loop.",
+            "vi": "Cả hai biến tổng hợp cần giá trị xác định trước vòng lặp."
+          },
+          "result": {
+            "en": "Count=0, Total=0.",
+            "vi": "Count=0, Total=0."
+          }
+        },
+        {
+          "id": "candidate",
+          "action": {
+            "en": "INPUT Score before the WHILE test",
+            "vi": "INPUT Score trước test WHILE"
+          },
+          "why": {
+            "en": "The candidate must exist so the sentinel can stop zero-body execution.",
+            "vi": "Ứng viên phải tồn tại để sentinel có thể dừng với 0 lần chạy thân."
+          },
+          "result": {
+            "en": "WHILE (Count < 5) AND (Score <> -1).",
+            "vi": "WHILE (Count < 5) AND (Score <> -1)."
+          }
+        },
+        {
+          "id": "process",
+          "action": {
+            "en": "Validate, then add and count a valid score",
+            "vi": "Validate rồi cộng và đếm score hợp lệ"
+          },
+          "why": {
+            "en": "Sentinel has already been excluded; invalid ordinary values should be rejected or handled by the stated validation policy.",
+            "vi": "Sentinel đã bị loại; giá trị thường không hợp lệ phải bị từ chối hoặc xử lý theo policy validation."
+          },
+          "result": {
+            "en": "For valid 0..100: Total←Total+Score; Count←Count+1.",
+            "vi": "Với 0..100 hợp lệ: Total←Total+Score; Count←Count+1."
+          }
+        },
+        {
+          "id": "next",
+          "action": {
+            "en": "Input the next candidate only if another slot remains",
+            "vi": "Chỉ nhập ứng viên tiếp nếu còn chỗ"
+          },
+          "why": {
+            "en": "This avoids a redundant sixth input after Count becomes 5.",
+            "vi": "Cách này tránh input thứ sáu không cần thiết sau khi Count thành 5."
+          },
+          "result": {
+            "en": "IF Count < 5 THEN INPUT Score ENDIF; then loop back.",
+            "vi": "IF Count < 5 THEN INPUT Score ENDIF; rồi quay lại."
+          }
+        },
+        {
+          "id": "finish",
+          "action": {
+            "en": "Guard the average",
+            "vi": "Guard phép tính trung bình"
+          },
+          "why": {
+            "en": "The sentinel-first case leaves Count=0, so division is invalid.",
+            "vi": "Case sentinel đầu để Count=0 nên phép chia không hợp lệ."
+          },
+          "result": {
+            "en": "IF Count>0 THEN OUTPUT Total/Count ELSE OUTPUT \"No scores\".",
+            "vi": "IF Count>0 THEN OUTPUT Total/Count ELSE OUTPUT \"No scores\"."
+          },
+          "check": {
+            "en": "−1 first→0 bodies; 80,−1→1 body and 80.0; five scores→5 bodies and stop by Count.",
+            "vi": "−1 đầu→0 lượt thân; 80,−1→1 lượt và 80.0; năm score→5 lượt và dừng do Count."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Use a pre-test WHILE so an initial −1 produces zero stored scores. Exclude the sentinel before aggregation, update Count and Total, stop at Count=5 or sentinel, and divide only when Count>0.",
+        "vi": "Dùng WHILE kiểm trước để −1 ban đầu tạo 0 score được lưu. Loại sentinel trước tổng hợp, cập nhật Count và Total, dừng tại Count=5 hoặc sentinel, và chỉ chia khi Count>0."
+      },
+      "selfCheck": {
+        "en": "For each stop case, can you name which condition became FALSE and show that −1 was never counted?",
+        "vi": "Với mỗi case dừng, bạn có thể nêu điều kiện nào thành FALSE và cho thấy −1 chưa bao giờ được đếm không?"
+      },
+      "sourceIds": [
+        "g26-core",
+        "qp-w25-22-q2",
+        "ms-w25-22-q2",
+        "teacher-t19"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T19-P1",
+      "title": {
+        "en": "Choose and justify the loop",
+        "vi": "Chọn và giải thích vòng lặp"
+      },
+      "prompt": {
+        "en": "Choose FOR, WHILE or REPEAT–UNTIL for: (a) output positions 1..12; (b) process records while more remain, possibly none; (c) repeatedly request a password until correct, where one request is always required. Give one reason and termination rule for each.",
+        "vi": "Chọn FOR, WHILE hoặc REPEAT–UNTIL cho: (a) xuất vị trí 1..12; (b) xử lý record khi còn record, có thể không có record nào; (c) liên tục yêu cầu password tới khi đúng, luôn phải hỏi ít nhất một lần. Nêu một lý do và quy tắc dừng cho mỗi trường hợp."
+      },
+      "working": [
+        {
+          "en": "Identify known count and whether zero body executions are possible.",
+          "vi": "Xác định số lượt đã biết và có thể 0 lần chạy thân không."
+        },
+        {
+          "en": "Place the condition before or after the body accordingly.",
+          "vi": "Đặt điều kiện trước hoặc sau thân tương ứng."
+        }
+      ],
+      "answer": {
+        "en": "(a) FOR Index←1 TO 12: fixed inclusive count, stops after Index=12. (b) WHILE MoreRecords: pre-test permits zero records, stops when MoreRecords becomes FALSE. (c) REPEAT request/input UNTIL Password=Stored: body must run once, stops when equality is TRUE.",
+        "vi": "(a) FOR Index←1 TO 12: số lượt đóng cố định, dừng sau Index=12. (b) WHILE MoreRecords: kiểm trước cho phép 0 record, dừng khi MoreRecords thành FALSE. (c) REPEAT yêu cầu/input UNTIL Password=Stored: thân phải chạy một lần, dừng khi phép bằng TRUE."
+      },
+      "markGuidance": [
+        {
+          "en": "All loop choices match count and test position.",
+          "vi": "Mọi lựa chọn khớp số lượt và vị trí test."
+        },
+        {
+          "en": "Each reason states zero/one/fixed execution implications.",
+          "vi": "Mỗi lý do nêu hệ quả 0/1/số lượt cố định."
+        },
+        {
+          "en": "Each termination rule is explicit.",
+          "vi": "Mỗi quy tắc dừng rõ ràng."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Choosing REPEAT for a source that can initially be empty.",
+          "vi": "Chọn REPEAT cho nguồn có thể rỗng ngay từ đầu."
+        },
+        {
+          "en": "Writing UNTIL with a continue condition instead of a stop condition.",
+          "vi": "Viết UNTIL bằng điều kiện tiếp tục thay vì điều kiện dừng."
+        }
+      ],
+      "selfCheck": {
+        "en": "Does your test position match the required zero-body behaviour?",
+        "vi": "Vị trí test có khớp hành vi 0 lần chạy thân cần thiết không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "s26-11",
+        "g26-core"
+      ]
+    },
+    {
+      "id": "T19-P2",
+      "title": {
+        "en": "Nested count, total and average",
+        "vi": "Đếm, tổng và trung bình bằng vòng lặp lồng"
+      },
+      "prompt": {
+        "en": "A 2D array Mark[1:2,1:3] contains [[4,0,6],[0,0,0]]. For each row, use nested FOR loops to count positive marks, total them and output the average; output \"No positive marks\" when Count=0. Trace both rows.",
+        "vi": "Mảng 2D Mark[1:2,1:3] chứa [[4,0,6],[0,0,0]]. Với mỗi hàng, dùng FOR lồng để đếm điểm dương, tính tổng và xuất trung bình; xuất \"No positive marks\" khi Count=0. Trace cả hai hàng."
+      },
+      "working": [
+        {
+          "en": "Outer loop selects a row; reset Count and Total inside it.",
+          "vi": "Vòng ngoài chọn hàng; reset Count và Total bên trong."
+        },
+        {
+          "en": "Inner loop visits columns 1..3 and aggregates only values >0.",
+          "vi": "Vòng trong đi cột 1..3 và chỉ tổng hợp giá trị >0."
+        },
+        {
+          "en": "After the inner loop, guard Count before division.",
+          "vi": "Sau vòng trong, guard Count trước phép chia."
+        }
+      ],
+      "answer": {
+        "en": "Row 1: positive values 4 and 6, Count=2, Total=10, Average=5.0. Row 2: Count=0, Total=0, so output \"No positive marks\" and do not divide. Count/Total must reset for row 2.",
+        "vi": "Hàng 1: giá trị dương 4 và 6, Count=2, Total=10, Average=5.0. Hàng 2: Count=0, Total=0 nên xuất \"No positive marks\" và không chia. Count/Total phải reset cho hàng 2."
+      },
+      "markGuidance": [
+        {
+          "en": "Nested bounds cover exactly six cells.",
+          "vi": "Cận lồng bao phủ đúng sáu ô."
+        },
+        {
+          "en": "Aggregators reset for each row and update only for positives.",
+          "vi": "Biến tổng hợp reset cho từng hàng và chỉ cập nhật với số dương."
+        },
+        {
+          "en": "The zero-count row avoids division.",
+          "vi": "Hàng count bằng 0 tránh phép chia."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Initialising Count outside the outer loop and carrying row 1 into row 2.",
+          "vi": "Khởi tạo Count ngoài vòng ngoài và mang hàng 1 sang hàng 2."
+        },
+        {
+          "en": "Dividing Total by 3 instead of positive Count.",
+          "vi": "Chia Total cho 3 thay vì Count dương."
+        },
+        {
+          "en": "Calculating 0/0 for row 2.",
+          "vi": "Tính 0/0 cho hàng 2."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can you show the reset point and the exact cells that increase Count?",
+        "vi": "Bạn có thể chỉ điểm reset và đúng các ô làm Count tăng không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "g26-core",
+        "teacher-t19"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "REPEAT continues when UNTIL becomes TRUE.",
+        "vi": "REPEAT tiếp tục khi UNTIL thành TRUE."
+      },
+      "correction": {
+        "en": "UNTIL TRUE terminates the loop; FALSE repeats it.",
+        "vi": "UNTIL TRUE kết thúc vòng lặp; FALSE làm lặp lại."
+      },
+      "selfCheck": {
+        "en": "Is the condition written as the stop state?",
+        "vi": "Điều kiện có được viết như trạng thái dừng không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "A sentinel should be added before checking it.",
+        "vi": "Sentinel nên được cộng trước khi kiểm."
+      },
+      "correction": {
+        "en": "Test the sentinel before store, count or total unless the contract explicitly includes it.",
+        "vi": "Kiểm sentinel trước lưu, đếm hoặc tổng trừ khi hợp đồng yêu cầu tính nó."
+      },
+      "selfCheck": {
+        "en": "Does the sentinel appear in the data result?",
+        "vi": "Sentinel có xuất hiện trong kết quả dữ liệu không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Average is Total/Count even when Count is zero.",
+        "vi": "Trung bình là Total/Count ngay cả khi Count bằng 0."
+      },
+      "correction": {
+        "en": "Branch on Count>0 and provide a no-data result otherwise.",
+        "vi": "Rẽ nhánh theo Count>0 và cung cấp kết quả không dữ liệu nếu không."
+      },
+      "selfCheck": {
+        "en": "What operation would division by zero attempt?",
+        "vi": "Chia 0 sẽ cố thực hiện thao tác gì?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What five questions choose and verify a loop?",
+      "vi": "Năm câu hỏi nào giúp chọn và kiểm vòng lặp?"
+    },
+    "answerPoints": [
+      {
+        "en": "Is the count known?",
+        "vi": "Số lượt đã biết không?"
+      },
+      {
+        "en": "May the body run zero times?",
+        "vi": "Thân có thể chạy 0 lần không?"
+      },
+      {
+        "en": "What state or input changes each iteration?",
+        "vi": "Trạng thái hoặc input nào đổi mỗi lượt?"
+      },
+      {
+        "en": "What exact TRUE/FALSE condition stops it?",
+        "vi": "Điều kiện TRUE/FALSE chính xác nào làm dừng?"
+      },
+      {
+        "en": "Do sentinel and Count=0 paths avoid invalid processing?",
+        "vi": "Đường sentinel và Count=0 có tránh xử lý không hợp lệ không?"
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "FOR is for a known integer sequence; WHILE pre-tests; REPEAT post-tests.",
+      "vi": "FOR dùng cho dãy số nguyên đã biết; WHILE kiểm trước; REPEAT kiểm sau."
+    },
+    {
+      "en": "Termination needs a reachable stop state and a body update or new input.",
+      "vi": "Kết thúc cần trạng thái dừng có thể đạt và cập nhật hoặc input mới trong thân."
+    },
+    {
+      "en": "Sentinels are excluded before aggregation and averages require Count>0.",
+      "vi": "Sentinel bị loại trước tổng hợp và trung bình yêu cầu Count>0."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F10",
+      "role": "owner",
+      "title": {
+        "en": "Sentinel, validation and loops",
+        "vi": "Sentinel, validation và vòng lặp"
+      }
+    },
+    {
+      "id": "F05",
+      "role": "owner",
+      "title": {
+        "en": "Count, all matches and aggregate",
+        "vi": "Đếm, mọi kết quả khớp và tổng hợp"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "expressions-operators",
+    "selection",
+    "arrays"
+  ],
+  "sources": [
+    {
+      "id": "s26-11",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§11.1–11.3, printed/PDF pp29–30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "g26-core",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for 2026",
+      "locator": "§2 pp7–9; §5 pp15–18; §6–8 pp18–24, as cited by each lesson.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t19",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp274–275; PDF pp290–291. Do not copy the printed p274 REPEAT validation condition; guide 2026 defines UNTIL TRUE as termination.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-s25-23-q3",
+      "title": "9618/23 May/June 2025 Question 3",
+      "locator": "QP p7; counted dice rolls, random generation, total and average.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "qp-w25-22-q2",
+      "title": "9618/22 October/November 2025 Question 2",
+      "locator": "QP p3 / published MS pp6–7; at most 20 values or sentinel 99.9 without storing sentinel.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-w25-22-q2",
+      "title": "9618/22 October/November 2025 published mark scheme, Question 2",
+      "locator": "MS pp6–7; termination value and array-full paths. Lesson guidance has no official mark allocation.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "qp-w25-22-q4",
+      "title": "9618/22 October/November 2025 Question 4",
+      "locator": "QP pp6–7; nested loop steps and derived totals.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t19",
+      "title": "AlgoCore teacher-authored T19 loop fixtures and guidance",
+      "locator": "T19-academic-r2, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

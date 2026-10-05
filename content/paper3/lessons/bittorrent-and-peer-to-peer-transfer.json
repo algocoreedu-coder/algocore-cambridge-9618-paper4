@@ -1,0 +1,828 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.1",
+  "topicId": "P3-14.1-T03",
+  "slug": "bittorrent-and-peer-to-peer-transfer",
+  "title": {
+    "en": "BitTorrent and peer-to-peer transfer",
+    "vi": "BitTorrent và truyền tệp peer-to-peer"
+  },
+  "question": {
+    "en": "How can an incomplete peer already help another peer finish a file?",
+    "vi": "Vì sao peer chưa đủ tệp đã có thể giúp peer khác hoàn tất?"
+  },
+  "opening": {
+    "en": "L wants a file split into four pieces. A seed holds all four, but other peers already hold some. Follow the pieces, not a single download arrow: after L receives a useful piece, L can become a source for someone else before its own file is complete.",
+    "vi": "L cần một tệp chia thành bốn phần. Một seed giữ đủ bốn phần nhưng các peer khác cũng đã có một số phần. Hãy theo dõi từng phần thay vì một mũi tên tải xuống duy nhất: sau khi nhận một phần hữu ích, L có thể thành nguồn cho người khác trước khi tệp của mình hoàn chỉnh."
+  },
+  "objectives": [
+    {
+      "en": "Explain the separate roles of metadata, tracker, peers, pieces, swarm and seed.",
+      "vi": "Giải thích vai trò riêng của metadata, tracker, peer, các phần, swarm và seed."
+    },
+    {
+      "en": "Trace piece availability through downloads and uploads without removing the source copy.",
+      "vi": "Theo dõi phần tệp có sẵn qua tải xuống/lên mà không xóa bản ở nguồn."
+    },
+    {
+      "en": "Decide whether completion remains possible after a source leaves.",
+      "vi": "Xác định còn khả năng hoàn tất hay không sau khi một nguồn rời mạng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Recognise a protocol and distinguish a central file server from peer-to-peer sharing.",
+      "vi": "Nhận biết giao thức và phân biệt file server trung tâm với chia sẻ peer-to-peer."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Piece",
+      "meaning": {
+        "en": "An identified part of the shared file that can be transferred and checked independently.",
+        "vi": "Phần có định danh của tệp được chia sẻ, có thể truyền và kiểm tra riêng."
+      }
+    },
+    {
+      "term": "Peer / swarm",
+      "meaning": {
+        "en": "A participating client / the group of peers sharing the same torrent content.",
+        "vi": "Một ứng dụng tham gia / nhóm peer chia sẻ cùng nội dung torrent."
+      }
+    },
+    {
+      "term": "Seed",
+      "meaning": {
+        "en": "A peer with the complete file that makes it available to other peers.",
+        "vi": "Peer có toàn bộ tệp và cung cấp nó cho các peer khác."
+      }
+    },
+    {
+      "term": "Metadata / tracker",
+      "meaning": {
+        "en": "Data describing the shared content / a service that helps clients discover peers.",
+        "vi": "Dữ liệu mô tả nội dung được chia sẻ / dịch vụ giúp ứng dụng tìm các peer."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "pieces-peers-seed",
+      "title": {
+        "en": "Distribute the payload among peers",
+        "vi": "Phân bố payload giữa các peer"
+      },
+      "paragraphs": [
+        {
+          "en": "BitTorrent is an Application-layer protocol for peer-to-peer file sharing. The file is divided into identified pieces. A peer can download missing pieces from several other peers instead of relying on one central file server for every byte. Each transfer copies data: uploading A to another peer does not remove A from the sender.",
+          "vi": "BitTorrent là giao thức tầng Application dùng chia sẻ tệp peer-to-peer. Tệp được chia thành các phần có định danh. Peer có thể tải phần còn thiếu từ nhiều peer khác thay vì phụ thuộc một file server trung tâm cho mọi byte. Mỗi lần truyền là sao chép dữ liệu: tải A lên peer khác không xóa A khỏi bên gửi."
+        },
+        {
+          "en": "A seed has the complete file and offers it to others. A partial peer is not yet a seed, but can still supply any verified piece it already owns. The swarm is the group sharing the same content. The worked example begins with seed S and two partial peers; this is one declared starting condition, not a rule that every current swarm must always contain an online seed.",
+          "vi": "Seed có toàn bộ tệp và cung cấp cho bên khác. Peer mới có một phần chưa là seed nhưng vẫn cung cấp được phần đã kiểm tra mà nó đang giữ. Swarm là nhóm chia sẻ cùng nội dung. Ví dụ bắt đầu với seed S và hai peer chưa đủ tệp; đây là điều kiện ban đầu được nêu rõ, không phải quy tắc mọi swarm luôn phải có seed online."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-bittorrent",
+        "w25-ms32"
+      ]
+    },
+    {
+      "id": "metadata-tracker",
+      "title": {
+        "en": "Find the content and find the peers",
+        "vi": "Xác định nội dung và tìm peer"
+      },
+      "paragraphs": [
+        {
+          "en": "In the tracker-based model studied here, the downloader obtains a small torrent descriptor containing metadata about the shared content. It describes information such as file details, piece organisation and data used to verify pieces. The descriptor is not the entire video, archive or dataset. Knowing what must be downloaded does not mean owning its payload.",
+          "vi": "Trong mô hình dùng tracker ở bài này, bên tải lấy một tệp mô tả torrent nhỏ chứa metadata về nội dung chia sẻ. Nó mô tả thông tin như chi tiết tệp, tổ chức các phần và dữ liệu dùng kiểm tra các phần. Tệp mô tả không phải toàn bộ video, tệp nén hay bộ dữ liệu. Biết cần tải gì không có nghĩa đang giữ payload đó."
+        },
+        {
+          "en": "The client contacts the tracker to discover peers participating in that torrent. It then contacts peers for actual piece transfers. The tracker helps introductions; it is not the source of every piece and does not manufacture a missing piece. Other discovery mechanisms exist, but this visual deliberately follows the specified tracker-based model.",
+          "vi": "Ứng dụng liên hệ tracker để tìm các peer tham gia torrent đó. Sau đó nó liên hệ peer để truyền phần tệp thực tế. Tracker hỗ trợ tìm nhau; nó không phải nguồn của mọi phần và không tạo ra phần còn thiếu. Có cơ chế tìm peer khác, nhưng visual này chủ động dùng mô hình tracker đã nêu."
+        }
+      ],
+      "sourceIds": [
+        "book-bittorrent",
+        "w25-ms32",
+        "bittorrent-spec"
+      ]
+    },
+    {
+      "id": "transfer-and-availability",
+      "title": {
+        "en": "A transfer needs an eligible source",
+        "vi": "Một lần truyền cần nguồn phù hợp"
+      },
+      "paragraphs": [
+        {
+          "en": "For a proposed transfer, check three facts: the source is online, the source already has the requested piece, and the destination still needs it. After a successful verified transfer, add that piece to the destination’s inventory while retaining it at the source. Other peers’ inventories do not change merely because one transfer occurred.",
+          "vi": "Với lần truyền dự kiến, kiểm tra ba điều: nguồn đang online, nguồn đã có phần được yêu cầu và đích còn thiếu phần đó. Sau lần truyền thành công đã kiểm tra, thêm phần vào tập của đích và giữ nguyên ở nguồn. Tập phần của peer khác không đổi chỉ vì xảy ra một lần truyền."
+        },
+        {
+          "en": "The example represents complete pieces and assumes their integrity checks pass. Real implementations exchange data in smaller blocks and check piece data; the display is not a packet trace or a hash calculation. It uses a stated schedule so that you can audit every inventory change, not because BitTorrent always requests B before A.",
+          "vi": "Ví dụ biểu diễn phần hoàn chỉnh và giả sử kiểm tra tính toàn vẹn đạt. Triển khai thực tế trao đổi dữ liệu bằng block nhỏ hơn và kiểm tra dữ liệu phần; màn hình không phải hành trình packet hay phép tính hash. Bài dùng lịch đã nêu để kiểm tra từng thay đổi tập phần, không phải vì BitTorrent luôn yêu cầu B trước A."
+        }
+      ],
+      "sourceIds": [
+        "book-bittorrent",
+        "w25-ms32",
+        "bittorrent-spec"
+      ]
+    },
+    {
+      "id": "completion-and-order",
+      "title": {
+        "en": "Finish only when every required piece is present",
+        "vi": "Chỉ hoàn tất khi có đủ mọi phần cần thiết"
+      },
+      "paragraphs": [
+        {
+          "en": "Pieces need not arrive in file order. L can receive B, A, C, D and reconstruct the file as A, B, C, D using their identities. Receiving four transfers is not itself proof of completeness: repeated copies of the same piece would not replace a missing D. Check the set of required identities, their verified contents and the intended order.",
+          "vi": "Các phần không nhất thiết đến theo thứ tự tệp. L có thể nhận B, A, C, D rồi dùng định danh để khôi phục tệp theo A, B, C, D. Có bốn lần truyền chưa chứng minh đã đủ: nhiều bản cùng một phần không thay được D đang thiếu. Cần kiểm tra tập định danh bắt buộc, nội dung đã kiểm tra và thứ tự dự kiến."
+        },
+        {
+          "en": "If the complete file is available and the peer continues sharing, it can act as a seed. Earlier, after just A and B, L could upload A to Q but was still incomplete. “Can upload” and “is a seed” are therefore different claims. Explain both the change in payload inventory and the role that follows from it.",
+          "vi": "Nếu đã có toàn bộ tệp và tiếp tục chia sẻ, peer có thể làm seed. Trước đó, khi chỉ có A, B, L đã tải A lên Q nhưng vẫn chưa hoàn chỉnh. Vì vậy “có thể tải lên” và “là seed” là hai khẳng định khác nhau. Hãy giải thích cả thay đổi tập payload lẫn vai trò được suy ra."
+        }
+      ],
+      "sourceIds": [
+        "book-bittorrent",
+        "w25-ms32"
+      ]
+    },
+    {
+      "id": "missing-source",
+      "title": {
+        "en": "Availability can matter more than the number of peers",
+        "vi": "Tính sẵn có có thể quan trọng hơn số peer"
+      },
+      "paragraphs": [
+        {
+          "en": "In the unavailable-piece variant, S leaves after L obtains A, B and C. S was the only holder of D; all online inventories together now lack D. The download must wait for a source with D. A tracker entry, another copy of A or more peers without D cannot fill the gap.",
+          "vi": "Ở nhánh thiếu nguồn, S rời mạng sau khi L lấy A, B, C. S là bên duy nhất giữ D; tổng hợp các tập phần online lúc này không có D. Việc tải phải chờ nguồn có D. Một mục tracker, thêm bản A hoặc thêm nhiều peer không có D đều không lấp được chỗ thiếu."
+        },
+        {
+          "en": "Conversely, the original seed can leave without blocking completion if the online peers collectively still hold every piece and can transfer them. More peers may add sources and upload capacity, but do not guarantee faster completion: missing pieces, slow links and unavailable peers still matter. Use the actual inventories rather than a slogan about peer count.",
+          "vi": "Ngược lại, seed ban đầu có thể rời mạng mà không chặn việc hoàn tất nếu các peer online cộng lại vẫn giữ đủ mọi phần và có thể truyền chúng. Thêm peer có thể thêm nguồn và năng lực tải lên nhưng không bảo đảm hoàn tất nhanh hơn: phần thiếu, liên kết chậm và peer không sẵn sàng vẫn ảnh hưởng. Hãy dùng tập phần thực tế thay vì khẩu hiệu về số peer."
+        }
+      ],
+      "sourceIds": [
+        "book-bittorrent",
+        "w25-ms32"
+      ]
+    },
+    {
+      "id": "describe-sharing",
+      "title": {
+        "en": "Explain the mechanism as a causal chain",
+        "vi": "Giải thích cơ chế bằng chuỗi nguyên nhân"
+      },
+      "paragraphs": [
+        {
+          "en": "For “describe how files are shared”, connect metadata to discovery, discovery to peer connections, connections to piece exchange, and complete verified pieces to reconstruction. Include that receiving a piece makes that peer a possible source for it. A list of definitions alone leaves the process unexplained.",
+          "vi": "Với yêu cầu “mô tả cách chia sẻ tệp”, nối metadata với tìm peer, tìm peer với kết nối, kết nối với trao đổi các phần, rồi đủ phần đã kiểm tra với khôi phục tệp. Nêu rằng nhận một phần giúp peer trở thành nguồn có thể cung cấp phần đó. Chỉ liệt kê định nghĩa thì chưa giải thích quá trình."
+        },
+        {
+          "en": "October/November 2025 Paper 32 question 3(b) is a verified example of a BitTorrent process question. The four-piece schedule here is teacher-created and carries no official mark allocation. Describe this specific schedule when tracing it; use the general mechanism when the prompt is not tied to an inventory table.",
+          "vi": "October/November 2025 Paper 32 câu 3(b) là ví dụ đã xác minh về câu hỏi quá trình BitTorrent. Lịch bốn phần ở đây do giáo viên tạo, không có phân bổ điểm chính thức. Mô tả lịch cụ thể khi truy vết; dùng cơ chế tổng quát nếu đề không gắn với bảng các phần đang có."
+        }
+      ],
+      "sourceIds": [
+        "w25-qp32",
+        "w25-ms32"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "bittorrent",
+    "title": {
+      "en": "Track who owns each piece",
+      "vi": "Theo dõi ai đang giữ từng phần"
+    },
+    "introduction": {
+      "en": "S starts with A–D, P with A and C, Q with B, and L with none. Watch one copy move while the source keeps its copy.",
+      "vi": "S bắt đầu có A–D, P có A và C, Q có B, L chưa có phần nào. Quan sát một bản sao được truyền trong khi nguồn vẫn giữ bản của mình."
+    },
+    "task": {
+      "en": "Before each step, name an eligible source and predict the destination inventory. Then try the variant where S leaves before D is copied.",
+      "vi": "Trước mỗi bước, nêu nguồn phù hợp và dự đoán tập phần của đích. Sau đó thử nhánh S rời mạng trước khi D được sao chép."
+    },
+    "conventions": [
+      {
+        "en": "A–D are four complete, verified pieces. Their sizes and transfer times are not measured.",
+        "vi": "A–D là bốn phần hoàn chỉnh đã kiểm tra. Không đo kích thước hay thời gian truyền."
+      },
+      {
+        "en": "The tracker supplies peer-contact information, never a payload piece. Metadata and discovery leave inventories unchanged.",
+        "vi": "Tracker cung cấp thông tin liên hệ peer, không cung cấp phần payload. Metadata và tìm peer không thay đổi tập phần."
+      },
+      {
+        "en": "Transfers are copies from an online holder to a peer that lacks the piece. No duplicate, corrupt or partial-block transfers are simulated.",
+        "vi": "Mỗi lần truyền sao chép từ bên online đang có phần sang peer còn thiếu. Không mô phỏng truyền lặp, hỏng hay block chưa đầy đủ."
+      },
+      {
+        "en": "The fixed schedule illustrates valid choices, not BitTorrent’s universal scheduling algorithm. An unavailable source stops completion rather than inventing data.",
+        "vi": "Lịch cố định minh họa lựa chọn hợp lệ, không phải thuật toán lịch phổ quát của BitTorrent. Thiếu nguồn sẽ dừng hoàn tất, không tạo dữ liệu giả."
+      }
+    ],
+    "sourceIds": [
+      "book-bittorrent",
+      "w25-ms32",
+      "bittorrent-spec"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "L downloads and becomes a source",
+      "vi": "L tải xuống rồi trở thành nguồn"
+    },
+    "prompt": {
+      "en": "Trace the complete scenario from metadata to reconstruction. Initially S={A,B,C,D}, P={A,C}, Q={B}, L={}. L receives B then A, shares A with Q, then obtains C and D.",
+      "vi": "Theo dõi nhánh hoàn tất từ metadata đến khôi phục. Ban đầu S={A,B,C,D}, P={A,C}, Q={B}, L={}. L nhận B rồi A, chia sẻ A với Q, sau đó lấy C và D."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "metadata",
+        "action": {
+          "en": "L obtains metadata describing pieces A–D.",
+          "vi": "L nhận metadata mô tả các phần A–D."
+        },
+        "why": {
+          "en": "The descriptor identifies what is shared; it is not the four payload pieces.",
+          "vi": "Tệp mô tả xác định thứ được chia sẻ; nó không phải bốn phần payload."
+        },
+        "result": {
+          "en": "L knows the required pieces but still owns none.",
+          "vi": "L biết các phần cần có nhưng chưa giữ phần nào."
+        }
+      },
+      {
+        "id": "discover-peers",
+        "action": {
+          "en": "L contacts the tracker and discovers S, P and Q.",
+          "vi": "L liên hệ tracker và tìm thấy S, P, Q."
+        },
+        "why": {
+          "en": "The tracker provides peer-contact information; file pieces will come from peers.",
+          "vi": "Tracker cung cấp thông tin liên hệ peer; các phần tệp sẽ đến từ peer."
+        },
+        "result": {
+          "en": "Piece inventories are unchanged; peer connections can be made.",
+          "vi": "Tập phần đang có không đổi; có thể thiết lập kết nối giữa peer."
+        }
+      },
+      {
+        "id": "receive-b",
+        "action": {
+          "en": "S sends a valid copy of piece B to L.",
+          "vi": "S gửi bản sao hợp lệ của phần B cho L."
+        },
+        "why": {
+          "en": "S is online and already owns B; L still needs it.",
+          "vi": "S đang online và đã có B; L còn cần phần này."
+        },
+        "result": {
+          "en": "L now holds B; S keeps its own copy.",
+          "vi": "L hiện có B; S vẫn giữ bản của mình."
+        }
+      },
+      {
+        "id": "receive-a",
+        "action": {
+          "en": "P sends a valid copy of piece A to L.",
+          "vi": "P gửi bản sao hợp lệ của phần A cho L."
+        },
+        "why": {
+          "en": "P is online and already owns A; L still needs it.",
+          "vi": "P đang online và đã có A; L còn cần phần này."
+        },
+        "result": {
+          "en": "L now holds A, B; P keeps its own copy.",
+          "vi": "L hiện có A, B; P vẫn giữ bản của mình."
+        }
+      },
+      {
+        "id": "share-a",
+        "action": {
+          "en": "L sends a valid copy of piece A to Q.",
+          "vi": "L gửi bản sao hợp lệ của phần A cho Q."
+        },
+        "why": {
+          "en": "A peer may upload a verified piece before it owns the whole file.",
+          "vi": "Peer có thể tải lên phần đã kiểm tra trước khi có toàn bộ tệp."
+        },
+        "result": {
+          "en": "Q now holds A, B; L keeps its own copy.",
+          "vi": "Q hiện có A, B; L vẫn giữ bản của mình."
+        }
+      },
+      {
+        "id": "receive-c",
+        "action": {
+          "en": "P sends a valid copy of piece C to L.",
+          "vi": "P gửi bản sao hợp lệ của phần C cho L."
+        },
+        "why": {
+          "en": "P is online and already owns C; L still needs it.",
+          "vi": "P đang online và đã có C; L còn cần phần này."
+        },
+        "result": {
+          "en": "L now holds A, B, C; P keeps its own copy.",
+          "vi": "L hiện có A, B, C; P vẫn giữ bản của mình."
+        }
+      },
+      {
+        "id": "receive-d",
+        "action": {
+          "en": "S sends a valid copy of piece D to L.",
+          "vi": "S gửi bản sao hợp lệ của phần D cho L."
+        },
+        "why": {
+          "en": "S is online and already owns D; L still needs it.",
+          "vi": "S đang online và đã có D; L còn cần phần này."
+        },
+        "result": {
+          "en": "L now holds A, B, C, D; S keeps its own copy.",
+          "vi": "L hiện có A, B, C, D; S vẫn giữ bản của mình."
+        }
+      },
+      {
+        "id": "assemble",
+        "action": {
+          "en": "L places its verified A, B, C and D pieces in file order.",
+          "vi": "L xếp các phần A, B, C, D đã kiểm tra theo thứ tự tệp."
+        },
+        "why": {
+          "en": "Arrival order B, A, C, D is not the required file order.",
+          "vi": "Thứ tự nhận B, A, C, D không phải thứ tự tệp."
+        },
+        "result": {
+          "en": "L has the complete file and, while sharing, is now a seed.",
+          "vi": "L có tệp hoàn chỉnh và khi tiếp tục chia sẻ sẽ là seed."
+        }
+      }
+    ],
+    "result": {
+      "en": "L reconstructs A–B–C–D and can seed while sharing. Q gained A without waiting for L to complete the file.",
+      "vi": "L khôi phục A–B–C–D và có thể làm seed khi chia sẻ. Q nhận A mà không phải chờ L đủ tệp."
+    },
+    "selfCheck": {
+      "en": "Every received piece must have an online source that held it beforehand. Inventories grow by copying, and L’s final set must equal {A,B,C,D}.",
+      "vi": "Mọi phần nhận phải có nguồn online đã giữ phần đó từ trước. Tập phần tăng bằng sao chép và tập cuối của L phải bằng {A,B,C,D}."
+    },
+    "sourceIds": [
+      "book-bittorrent",
+      "w25-ms32"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "“Swarm”, “tracker”, “torrent metadata”, “seed” and exchanging pieces identify BitTorrent.",
+        "vi": "“Swarm”, “tracker”, “metadata torrent”, “seed” và trao đổi các phần nhận diện BitTorrent."
+      },
+      {
+        "en": "An inventory or departure scenario requires checking available piece identities.",
+        "vi": "Tình huống bảng phần đang có hoặc peer rời mạng đòi hỏi kiểm tra định danh phần còn sẵn."
+      },
+      {
+        "en": "“Describe how” asks for the sharing process, not just expansion of the protocol name.",
+        "vi": "“Mô tả cách” yêu cầu quá trình chia sẻ, không chỉ giải nghĩa tên giao thức."
+      }
+    ],
+    "distinguish": {
+      "en": "A BitTorrent piece is an application-level part of a file; it is not the same abstraction as an IP packet or a Link frame. A tracker discovers peers rather than choosing router next hops.",
+      "vi": "Phần BitTorrent là phần tệp ở cấp ứng dụng; không cùng mức trừu tượng với IP packet hay Link frame. Tracker tìm peer, không chọn next hop của router."
+    },
+    "method": [
+      {
+        "en": "Separate metadata/discovery from payload transfer.",
+        "vi": "Tách metadata/tìm peer khỏi truyền payload."
+      },
+      {
+        "en": "For each transfer, verify online source, existing piece and missing destination piece.",
+        "vi": "Mỗi lần truyền kiểm tra nguồn online, phần đã có và phần đích còn thiếu."
+      },
+      {
+        "en": "Update only the receiving inventory; retain the source copy.",
+        "vi": "Chỉ cập nhật tập phần bên nhận; giữ bản ở nguồn."
+      },
+      {
+        "en": "Check all required pieces before reconstruction or seed status.",
+        "vi": "Kiểm tra đủ mọi phần cần thiết trước khi khôi phục hay gọi là seed."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "The torrent descriptor contains the whole shared file.",
+        "vi": "Tệp mô tả torrent chứa toàn bộ tệp chia sẻ."
+      },
+      "correction": {
+        "en": "It contains metadata; peers supply the payload pieces.",
+        "vi": "Nó chứa metadata; peer cung cấp các phần payload."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A peer must finish the whole file before uploading anything.",
+        "vi": "Peer phải đủ tệp trước khi tải lên bất kỳ thứ gì."
+      },
+      "correction": {
+        "en": "A partial peer can upload a verified piece it already owns.",
+        "vi": "Peer chưa đủ tệp có thể tải lên phần đã kiểm tra mà nó đang có."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Uploading transfers ownership and removes the source copy.",
+        "vi": "Tải lên chuyển quyền giữ và xóa bản ở nguồn."
+      },
+      "correction": {
+        "en": "It copies the data; source and destination both retain the piece.",
+        "vi": "Đó là sao chép; nguồn và đích đều giữ phần đó."
+      }
+    },
+    {
+      "mistake": {
+        "en": "The original seed leaving always makes completion impossible.",
+        "vi": "Seed ban đầu rời mạng luôn khiến không thể hoàn tất."
+      },
+      "correction": {
+        "en": "Check the union of online inventories: completion can remain possible if all pieces are available.",
+        "vi": "Kiểm tra hợp các tập phần online: vẫn có thể hoàn tất nếu đủ mọi phần."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "tracker-role",
+      "prompt": {
+        "en": "Which event changes L’s payload inventory?",
+        "vi": "Sự kiện nào thay đổi tập payload của L?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Receiving tracker peer-contact information",
+            "vi": "Nhận thông tin liên hệ peer từ tracker"
+          },
+          "feedback": {
+            "en": "Discovery supplies contacts, not a payload piece.",
+            "vi": "Tìm peer cung cấp liên hệ, không phải phần payload."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Receiving a verified B from an online peer",
+            "vi": "Nhận B đã kiểm tra từ peer online"
+          },
+          "feedback": {
+            "en": "Correct: L gains piece B.",
+            "vi": "Đúng: L có thêm phần B."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Reading the descriptor’s file name",
+            "vi": "Đọc tên tệp trong mô tả"
+          },
+          "feedback": {
+            "en": "The file name describes content but is not its payload.",
+            "vi": "Tên tệp mô tả nội dung nhưng không phải payload."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Keep information about the file separate from the file’s data.",
+        "vi": "Phân biệt thông tin về tệp với dữ liệu của tệp."
+      }
+    },
+    {
+      "id": "partial-peer-upload",
+      "prompt": {
+        "en": "L owns only A and B; Q needs A. May L upload A, and is L a seed?",
+        "vi": "L chỉ có A và B; Q cần A. L có thể tải A lên không, và L có là seed không?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, and L is already a seed",
+            "vi": "Có, và L đã là seed"
+          },
+          "feedback": {
+            "en": "Upload is possible, but L still lacks C and D.",
+            "vi": "Có thể tải lên nhưng L vẫn thiếu C và D."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes, but L is not yet a seed",
+            "vi": "Có, nhưng L chưa là seed"
+          },
+          "feedback": {
+            "en": "Correct: having one needed piece permits upload; seed requires the complete file.",
+            "vi": "Đúng: có phần cần thiết cho phép tải lên; seed cần toàn bộ tệp."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No, all uploads require a complete file",
+            "vi": "Không, mọi lần tải lên cần đủ tệp"
+          },
+          "feedback": {
+            "en": "This would miss the central benefit of partial-piece sharing.",
+            "vi": "Điều này bỏ qua lợi ích chính của chia sẻ khi mới có một phần."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Separate ability to supply a piece from completeness of the file.",
+        "vi": "Tách khả năng cung cấp một phần khỏi tính đầy đủ của tệp."
+      }
+    },
+    {
+      "id": "copy-invariant",
+      "prompt": {
+        "en": "P={A,C} sends C to L={A,B}. What is the valid result?",
+        "vi": "P={A,C} gửi C cho L={A,B}. Kết quả nào hợp lệ?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "P={A}; L={A,B,C}",
+            "vi": "P={A}; L={A,B,C}"
+          },
+          "feedback": {
+            "en": "Sending copies C rather than removing it from P.",
+            "vi": "Gửi là sao chép C, không xóa nó khỏi P."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "P={A,C}; L={A,B,C}",
+            "vi": "P={A,C}; L={A,B,C}"
+          },
+          "feedback": {
+            "en": "Correct: only the destination gains a piece.",
+            "vi": "Đúng: chỉ bên nhận có thêm một phần."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "P={A,C}; L={A,B,C,D}",
+            "vi": "P={A,C}; L={A,B,C,D}"
+          },
+          "feedback": {
+            "en": "No source sent D, so it cannot appear.",
+            "vi": "Không nguồn nào gửi D nên D không thể xuất hiện."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Check both source retention and exactly one new destination piece.",
+        "vi": "Kiểm tra nguồn giữ nguyên và đích có đúng một phần mới."
+      }
+    },
+    {
+      "id": "departure-transfer",
+      "prompt": {
+        "en": "The seed leaves, but online peers hold {A,C} and {B,D}. Is completion necessarily blocked?",
+        "vi": "Seed rời mạng nhưng các peer online giữ {A,C} và {B,D}. Việc hoàn tất có chắc chắn bị chặn không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes: only seeds can upload",
+            "vi": "Có: chỉ seed mới tải lên được"
+          },
+          "feedback": {
+            "en": "Partial peers can supply their existing pieces.",
+            "vi": "Peer chưa đủ tệp cung cấp được phần đang có."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No: together they hold all pieces and may exchange them",
+            "vi": "Không: cộng lại có đủ các phần và có thể trao đổi"
+          },
+          "feedback": {
+            "en": "Correct, assuming the stated peers remain reachable and willing to transfer.",
+            "vi": "Đúng, với giả định các peer đã nêu vẫn truy cập được và sẵn sàng truyền."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No: the tracker can generate any missing piece",
+            "vi": "Không: tracker tạo được phần còn thiếu"
+          },
+          "feedback": {
+            "en": "The tracker supplies peer information, not invented payload.",
+            "vi": "Tracker cung cấp thông tin peer, không tạo payload."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Use collective availability, not the continued presence of the original seed.",
+        "vi": "Dùng tính sẵn có tổng hợp, không dựa vào seed ban đầu còn hiện diện."
+      }
+    },
+    {
+      "id": "missing-d",
+      "prompt": {
+        "en": "S was the only D holder and is now offline. L has A,B,C. What should a truthful trace show?",
+        "vi": "S là bên duy nhất giữ D và hiện offline. L có A,B,C. Hành trình đúng phải thể hiện gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Complete because three transfers is enough",
+            "vi": "Hoàn tất vì ba lần truyền là đủ"
+          },
+          "feedback": {
+            "en": "The required set includes D, regardless of transfer count.",
+            "vi": "Tập bắt buộc có D, bất kể số lần truyền."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Wait for a usable source for D; remain incomplete",
+            "vi": "Chờ nguồn D dùng được; vẫn chưa hoàn chỉnh"
+          },
+          "feedback": {
+            "en": "Correct: no current online inventory supplies the missing data.",
+            "vi": "Đúng: không tập online hiện tại nào cung cấp dữ liệu thiếu."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Duplicate C and rename it D",
+            "vi": "Sao chép C rồi đổi tên thành D"
+          },
+          "feedback": {
+            "en": "Different piece identities correspond to different required data.",
+            "vi": "Định danh phần khác nhau tương ứng dữ liệu bắt buộc khác nhau."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "A valid model must expose the missing-source condition instead of fabricating completion.",
+        "vi": "Mô hình đúng phải thể hiện thiếu nguồn thay vì tạo kết quả hoàn tất giả."
+      }
+    },
+    {
+      "id": "piece-order",
+      "prompt": {
+        "en": "Pieces arrive B,A,C,D. Which reconstruction is correct?",
+        "vi": "Các phần đến B,A,C,D. Khôi phục nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "B,A,C,D because arrival order defines the file",
+            "vi": "B,A,C,D vì thứ tự đến quy định tệp"
+          },
+          "feedback": {
+            "en": "Arrival order can differ from file order.",
+            "vi": "Thứ tự đến có thể khác thứ tự tệp."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A,B,C,D using piece identities",
+            "vi": "A,B,C,D dựa vào định danh phần"
+          },
+          "feedback": {
+            "en": "Correct: use the intended file order after completeness checks.",
+            "vi": "Đúng: dùng thứ tự tệp dự kiến sau kiểm tra đầy đủ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Any order if there are four pieces",
+            "vi": "Thứ tự nào cũng được nếu có bốn phần"
+          },
+          "feedback": {
+            "en": "Order affects the reconstructed file contents.",
+            "vi": "Thứ tự ảnh hưởng nội dung tệp khôi phục."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "The number of pieces, their identities and their order all matter.",
+        "vi": "Số phần, định danh và thứ tự đều quan trọng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain a tracker-based download from descriptor to seed, including what happens if a needed piece has no online source.",
+      "vi": "Giải thích việc tải dùng tracker từ tệp mô tả đến seed, gồm trường hợp một phần cần thiết không có nguồn online."
+    },
+    "answerPoints": [
+      {
+        "en": "Obtain metadata and discover peers through the tracker.",
+        "vi": "Lấy metadata và tìm peer qua tracker."
+      },
+      {
+        "en": "Download valid missing pieces from online holders and upload pieces already received.",
+        "vi": "Tải phần hợp lệ còn thiếu từ bên online đang có và tải lên phần đã nhận."
+      },
+      {
+        "en": "Retain source copies; reconstruct only after all required pieces are present in correct file order.",
+        "vi": "Giữ bản nguồn; chỉ khôi phục khi đủ mọi phần theo thứ tự tệp đúng."
+      },
+      {
+        "en": "An unavailable necessary piece blocks completion; a complete sharing peer is a seed.",
+        "vi": "Phần bắt buộc không sẵn có chặn hoàn tất; peer có đủ tệp và chia sẻ là seed."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Metadata describes, tracker locates, peers transfer payload.",
+      "vi": "Metadata mô tả, tracker tìm peer, peer truyền payload."
+    },
+    {
+      "en": "Partial peers can already help; upload does not consume a piece.",
+      "vi": "Peer chưa đủ tệp đã có thể hỗ trợ; tải lên không làm mất phần."
+    },
+    {
+      "en": "Completion depends on all required pieces, not merely more peers or more transfers.",
+      "vi": "Hoàn tất phụ thuộc đủ mọi phần cần thiết, không chỉ thêm peer hay lần truyền."
+    }
+  ],
+  "relatedSlugs": [
+    "application-protocol-selection",
+    "packet-journey-and-routers"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 33, section 14.1 Protocols",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-bittorrent",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed pages 335–337 (PDF pages 351–353): metadata, pieces, tracker, swarm and sharing",
+      "kind": "book"
+    },
+    {
+      "id": "w25-qp32",
+      "title": "Cambridge 9618/32 — October/November 2025 question paper",
+      "locator": "Question 3(b), page 4",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w25-ms32",
+      "title": "Cambridge 9618/32 — October/November 2025 mark scheme",
+      "locator": "Question 3(b), page 8",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "bittorrent-spec",
+      "title": "BitTorrent BEP 3 — The BitTorrent Protocol Specification",
+      "locator": "Metainfo files, trackers and peer protocol: metadata, discovery and verified pieces; technical clarification",
+      "kind": "guide",
+      "url": "https://www.bittorrent.org/beps/bep_0003.html"
+    }
+  ]
+}

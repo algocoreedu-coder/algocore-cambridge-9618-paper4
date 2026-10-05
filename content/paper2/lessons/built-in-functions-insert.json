@@ -1,0 +1,1007 @@
+{
+  "schemaVersion": 1,
+  "version": "T16-academic-r5-reviewed",
+  "topicId": "T16",
+  "sectionId": "11.1",
+  "slug": "built-in-functions-insert",
+  "learningMode": "procedural",
+  "estimatedMinutes": 70,
+  "title": {
+    "en": "Built-in functions and the insert",
+    "vi": "Hàm dựng sẵn và tài liệu insert"
+  },
+  "question": {
+    "en": "How do a supplied signature, return type and range control a correct function call?",
+    "vi": "Chữ ký, kiểu trả về và miền được cung cấp kiểm soát lời gọi hàm đúng như thế nào?"
+  },
+  "opening": {
+    "en": "Do not import rules from Python, VB or Java. Read the insert as a contract: function name, argument order and types, return type, range and stated error conditions.",
+    "vi": "Không đưa quy tắc từ Python, VB hoặc Java vào. Đọc insert như hợp đồng: tên hàm, thứ tự và kiểu đối số, kiểu trả về, miền và điều kiện lỗi đã nêu."
+  },
+  "objectives": [
+    {
+      "en": "Read and apply a function signature without guessing its behaviour.",
+      "vi": "Đọc và áp dụng chữ ký hàm mà không đoán hành vi."
+    },
+    {
+      "en": "Derive inclusive integer ranges from RAND and INT expressions.",
+      "vi": "Suy miền số nguyên có lấy cận từ biểu thức RAND và INT."
+    },
+    {
+      "en": "Use DATE functions with the supplied DD/MM/YYYY, weekday and return-type conventions.",
+      "vi": "Dùng hàm DATE với quy ước DD/MM/YYYY, thứ trong tuần và kiểu trả về được cung cấp."
+    },
+    {
+      "en": "Trace a DATE update from the old caller state before BYREF writes the new date.",
+      "vi": "Trace cập nhật DATE từ trạng thái caller cũ trước khi BYREF ghi ngày mới."
+    },
+    {
+      "en": "Read an unseen routine contract and use its signature, parameter types, return type, precondition and side effects correctly.",
+      "vi": "Đọc contract của routine chưa gặp và dùng đúng signature, kiểu parameter, kiểu return, precondition và side effect."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Data types",
+        "vi": "Kiểu dữ liệu"
+      },
+      "reason": {
+        "en": "Arguments and returned values must have the types required by the signature.",
+        "vi": "Đối số và giá trị trả về phải có kiểu mà chữ ký yêu cầu."
+      }
+    },
+    {
+      "title": {
+        "en": "Expressions and operators",
+        "vi": "Biểu thức và toán tử"
+      },
+      "reason": {
+        "en": "Range transforms and Boolean date rules combine function results with arithmetic and comparison operators.",
+        "vi": "Phép biến đổi miền và quy tắc ngày Boolean kết hợp kết quả hàm với toán tử số học, so sánh."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "signature",
+      "meaning": {
+        "en": "A function's name, parameter order and types, and return type.",
+        "vi": "Tên hàm, thứ tự và kiểu tham số, cùng kiểu trả về."
+      }
+    },
+    {
+      "term": "domain",
+      "meaning": {
+        "en": "The permitted inputs to a routine.",
+        "vi": "Các đầu vào được phép của routine."
+      }
+    },
+    {
+      "term": "range",
+      "meaning": {
+        "en": "The set of values a routine may return.",
+        "vi": "Tập giá trị routine có thể trả."
+      }
+    },
+    {
+      "term": "DATE",
+      "meaning": {
+        "en": "A valid calendar date, normally displayed DD/MM/YYYY when stated by the insert.",
+        "vi": "Ngày lịch hợp lệ, thường hiển thị DD/MM/YYYY khi insert quy định."
+      }
+    },
+    {
+      "term": "DAYINDEX",
+      "meaning": {
+        "en": "The weekday index where the supplied insert defines Sunday=1, Monday=2, and so on.",
+        "vi": "Chỉ số thứ trong tuần mà insert quy định Sunday=1, Monday=2, v.v."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The question tells you to refer to an insert or supplies a routine definition.",
+        "vi": "Đề yêu cầu tham khảo insert hoặc cung cấp định nghĩa routine."
+      },
+      {
+        "en": "The result needs a random integer in a stated inclusive interval.",
+        "vi": "Kết quả cần số nguyên ngẫu nhiên trong khoảng đóng đã nêu."
+      },
+      {
+        "en": "A date, month, year, weekday index or current date is read or updated.",
+        "vi": "Ngày, tháng, năm, chỉ số thứ hoặc ngày hiện tại được đọc hay cập nhật."
+      },
+      {
+        "en": "The question supplies an insert or documentation box for a routine not memorised in the lesson.",
+        "vi": "Đề cung cấp insert hoặc hộp tài liệu cho routine chưa học thuộc trong lesson."
+      },
+      {
+        "en": "A call must be diagnosed for wrong argument order, type, return use or precondition.",
+        "vi": "Một lời gọi cần được chẩn đoán vì sai thứ tự argument, kiểu, cách dùng return hoặc precondition."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "RAND(x) returns REAL from 0 inclusive to x exclusive; it is not Python randint.",
+        "vi": "RAND(x) trả REAL từ 0 có lấy cận tới x không lấy cận; đây không phải randint của Python."
+      },
+      {
+        "en": "DAY is day-of-month while DAYINDEX is weekday; their INTEGER meanings differ.",
+        "vi": "DAY là ngày trong tháng còn DAYINDEX là thứ trong tuần; ý nghĩa INTEGER của chúng khác nhau."
+      },
+      {
+        "en": "The base source rule compares month numbers only; same month and year is a different amended contract.",
+        "vi": "Quy tắc nguồn cơ sở chỉ so số tháng; cùng tháng và năm là hợp đồng sửa đổi khác."
+      },
+      {
+        "en": "TODAY() is frozen in a teaching fixture so the answer does not change with device time.",
+        "vi": "TODAY() được cố định trong fixture học tập để đáp án không đổi theo thời gian thiết bị."
+      },
+      {
+        "en": "A familiar routine name is enough to infer its contract.",
+        "vi": "Tên routine quen thuộc là đủ để suy contract."
+      },
+      {
+        "en": "A function that returns a value always changes its argument as a side effect.",
+        "vi": "Function trả giá trị luôn đổi argument như side effect."
+      }
+    ],
+    "answerProduct": {
+      "en": "A source-grounded call or expression annotated with argument types, result type, range and deterministic trace.",
+      "vi": "Lời gọi hoặc biểu thức bám nguồn có chú thích kiểu đối số, kiểu kết quả, miền và trace xác định."
+    },
+    "method": [
+      {
+        "en": "Copy the exact signature before writing the call.",
+        "vi": "Chép đúng chữ ký trước khi viết lời gọi."
+      },
+      {
+        "en": "Check argument order, types and validity.",
+        "vi": "Kiểm thứ tự, kiểu và tính hợp lệ của đối số."
+      },
+      {
+        "en": "Propagate the returned type and range through later operators.",
+        "vi": "Truyền kiểu và miền trả về qua các toán tử tiếp theo."
+      },
+      {
+        "en": "For DATE updates, save the old state, evaluate every condition, then perform BYREF assignments.",
+        "vi": "Với cập nhật DATE, giữ trạng thái cũ, tính mọi điều kiện rồi mới thực hiện các phép gán BYREF."
+      },
+      {
+        "en": "Copy the routine name, ordered parameter list and return type from the insert.",
+        "vi": "Chép tên routine, danh sách parameter theo thứ tự và kiểu return từ insert."
+      },
+      {
+        "en": "Check each actual argument against its parameter type and precondition.",
+        "vi": "Kiểm từng argument thực với kiểu parameter và precondition."
+      },
+      {
+        "en": "Store or use a returned value; do not invent a return for a procedure.",
+        "vi": "Lưu hoặc dùng giá trị trả về; không bịa return cho procedure."
+      },
+      {
+        "en": "Trace postcondition and side effects, then test a boundary or invalid call.",
+        "vi": "Trace postcondition và side effect rồi thử một call biên hoặc không hợp lệ."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t16-contract",
+      "title": {
+        "en": "A function signature is an executable contract",
+        "vi": "Chữ ký hàm là hợp đồng có thể thực thi"
+      },
+      "paragraphs": [
+        {
+          "en": "The 2026 guide gives INT(x : REAL) RETURNS INTEGER and RAND(x : INTEGER) RETURNS REAL, with RAND's range 0 <= result < x. The May/June 2025 insert supplies further string, numeric and date routines and states that malformed calls or incorrect argument types/values generate an error.",
+          "vi": "Guide 2026 cho INT(x : REAL) RETURNS INTEGER và RAND(x : INTEGER) RETURNS REAL, với miền RAND là 0 <= kết quả < x. Insert tháng 5/6 năm 2025 cung cấp thêm routine chuỗi, số và ngày, đồng thời nêu lời gọi sai cấu trúc hoặc đối số sai kiểu/giá trị sẽ tạo lỗi."
+        },
+        {
+          "en": "For INT(RAND(6))+1, RAND gives [0,6), INT gives integers 0..5, then +1 gives 1..6 inclusive. Establish endpoints at each stage rather than memorising a dice formula.",
+          "vi": "Với INT(RAND(6))+1, RAND cho [0,6), INT cho các số nguyên 0..5, rồi +1 cho 1..6 bao gồm hai cận. Xác lập đầu mút tại từng bước thay vì học thuộc công thức xúc xắc."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "insert-s25-23",
+        "qp-s25-22-q3"
+      ]
+    },
+    {
+      "id": "t16-date",
+      "title": {
+        "en": "DATE values, components and weekday indexes",
+        "vi": "Giá trị DATE, thành phần và chỉ số thứ"
+      },
+      "paragraphs": [
+        {
+          "en": "The supplied insert defines DAY, MONTH, YEAR and DAYINDEX as DATE→INTEGER functions; SETDATE(Day, Month, Year) returns DATE; TODAY() returns DATE. DAYINDEX uses Sunday=1 and Monday=2. DD/MM/YYYY is a DATE representation, not a division expression.",
+          "vi": "Insert đã cung cấp định nghĩa DAY, MONTH, YEAR và DAYINDEX là các hàm DATE→INTEGER; SETDATE(Day, Month, Year) trả DATE; TODAY() trả DATE. DAYINDEX dùng Sunday=1 và Monday=2. DD/MM/YYYY là cách biểu diễn DATE, không phải biểu thức chia."
+        },
+        {
+          "en": "The six project fixtures freeze TodayDate and were independently calculated in the completion spec. They cover same/different month, same/different weekday, same month number across different years, a year boundary and a valid leap day. Invalid SETDATE inputs are not assigned invented behaviour because the insert does not specify it.",
+          "vi": "Sáu fixture dự án cố định TodayDate và đã được tính độc lập trong completion spec. Chúng bao phủ cùng/khác tháng, cùng/khác thứ, cùng số tháng ở năm khác, giao năm và ngày nhuận hợp lệ. Không tự gán hành vi cho đầu vào SETDATE không hợp lệ vì insert không quy định."
+        }
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Fixture: LastVisit / TodayDate",
+            "vi": "Fixture: LastVisit / TodayDate"
+          },
+          {
+            "en": "DAYINDEX old / today",
+            "vi": "DAYINDEX cũ / hôm nay"
+          },
+          {
+            "en": "Base points / amended points",
+            "vi": "Điểm cơ sở / điểm sửa đổi"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "08/10/2026 / 15/10/2026",
+              "vi": "08/10/2026 / 15/10/2026"
+            },
+            {
+              "en": "5 / 5",
+              "vi": "5 / 5"
+            },
+            {
+              "en": "14 / 16",
+              "vi": "14 / 16"
+            }
+          ],
+          [
+            {
+              "en": "14/10/2026 / 15/10/2026",
+              "vi": "14/10/2026 / 15/10/2026"
+            },
+            {
+              "en": "4 / 5",
+              "vi": "4 / 5"
+            },
+            {
+              "en": "14 / 14",
+              "vi": "14 / 14"
+            }
+          ],
+          [
+            {
+              "en": "24/09/2026 / 15/10/2026",
+              "vi": "24/09/2026 / 15/10/2026"
+            },
+            {
+              "en": "5 / 5",
+              "vi": "5 / 5"
+            },
+            {
+              "en": "11 / 13",
+              "vi": "11 / 13"
+            }
+          ],
+          [
+            {
+              "en": "15/10/2025 / 15/10/2026",
+              "vi": "15/10/2025 / 15/10/2026"
+            },
+            {
+              "en": "4 / 5",
+              "vi": "4 / 5"
+            },
+            {
+              "en": "14 / 14",
+              "vi": "14 / 14"
+            }
+          ],
+          [
+            {
+              "en": "31/12/2026 / 01/01/2027",
+              "vi": "31/12/2026 / 01/01/2027"
+            },
+            {
+              "en": "5 / 6",
+              "vi": "5 / 6"
+            },
+            {
+              "en": "11 / 11",
+              "vi": "11 / 11"
+            }
+          ],
+          [
+            {
+              "en": "29/02/2024 / 01/03/2024",
+              "vi": "29/02/2024 / 01/03/2024"
+            },
+            {
+              "en": "5 / 6",
+              "vi": "5 / 6"
+            },
+            {
+              "en": "11 / 11",
+              "vi": "11 / 11"
+            }
+          ]
+        ]
+      },
+      "sourceIds": [
+        "s26-11",
+        "insert-s25-23",
+        "qp-s25-23-q7a",
+        "ms-s25-23-q7a",
+        "teacher-t16"
+      ]
+    },
+    {
+      "id": "t16-unseen-contract",
+      "title": {
+        "en": "Treat every insert as the authority for that routine",
+        "vi": "Coi insert là nguồn thẩm quyền cho routine đó"
+      },
+      "paragraphs": [
+        {
+          "en": "For an unseen routine, the supplied contract overrides guesses from another language or library. Read direction and type of every parameter, return type, valid input range, postcondition and stated side effects before writing a call.",
+          "vi": "Với routine chưa gặp, contract được cung cấp ưu tiên hơn suy đoán từ ngôn ngữ hoặc thư viện khác. Đọc hướng và kiểu của mọi parameter, kiểu return, miền input hợp lệ, postcondition và side effect trước khi viết lời gọi."
+        },
+        {
+          "en": "A correct call can still be misused if its result is ignored, assigned to an incompatible variable or called outside its precondition. A diagnose-and-repair answer should name the violated contract clause and show the corrected call.",
+          "vi": "Lời gọi đúng vẫn có thể bị dùng sai nếu bỏ qua kết quả, gán vào biến không tương thích hoặc gọi ngoài precondition. Câu trả lời chẩn đoán-sửa phải nêu điều khoản contract bị vi phạm và chỉ ra lời gọi đúng."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "teacher-t16"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T16",
+      "T16-D01"
+    ],
+    "title": {
+      "en": "From function signature to result range",
+      "vi": "Từ chữ ký hàm tới miền kết quả"
+    },
+    "introduction": {
+      "en": "Use T16 to trace RAND→INT→offset, then use T16-D01 to read the DATE contracts and trace all six frozen UpdateVisit fixtures. The DATE visual reads the old LastVisit before the final BYREF update and shows the BYVAL contrast.",
+      "vi": "Dùng T16 để trace RAND→INT→dịch miền, rồi dùng T16-D01 để đọc hợp đồng DATE và trace đủ sáu fixture UpdateVisit cố định. Visual DATE đọc LastVisit cũ trước lần cập nhật BYREF cuối và thể hiện đối chứng BYVAL."
+    },
+    "task": {
+      "en": "In T16, identify argument type, returned type and endpoints at each function. In T16-D01, predict each comparison from the old LastVisit, then verify the base points, weekday amendment and final BYREF caller state.",
+      "vi": "Trong T16, xác định kiểu đối số, kiểu trả về và các đầu mút tại mỗi hàm. Trong T16-D01, dự đoán từng phép so sánh từ LastVisit cũ, rồi kiểm tra điểm cơ sở, sửa đổi theo thứ và trạng thái caller BYREF cuối."
+    },
+    "conventions": [
+      {
+        "en": "RAND's upper endpoint is open; the final dice interval is closed.",
+        "vi": "Cận trên RAND là cận mở; khoảng xúc xắc cuối là khoảng đóng."
+      },
+      {
+        "en": "Function cards reproduce the supplied signature rather than a language-specific guess.",
+        "vi": "Thẻ hàm tái hiện chữ ký được cung cấp thay vì đoán theo ngôn ngữ."
+      },
+      {
+        "en": "DATE traces use the frozen fixture value stated in the task.",
+        "vi": "Trace DATE dùng giá trị fixture cố định nêu trong bài."
+      },
+      {
+        "en": "DATE controls are deterministic: Sunday=1, SETDATE arguments are Day, Month, Year, and the source month-number rule is shown separately from the changed month-and-year contract.",
+        "vi": "Điều khiển DATE có tính xác định: Chủ nhật=1, đối số SETDATE theo Day, Month, Year, và quy tắc nguồn theo số tháng được tách khỏi hợp đồng đổi theo tháng-và-năm."
+      }
+    ],
+    "sourceIds": [
+      "g26-core",
+      "insert-s25-23",
+      "teacher-t16"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T16-W1",
+      "title": {
+        "en": "Refresh a review date using the old state",
+        "vi": "Cập nhật ngày review bằng state cũ"
+      },
+      "prompt": {
+        "en": "Teacher-created routine: `RefreshReview(BYREF LastReviewDate : DATE, BYREF ReviewCount : INTEGER, CurrentDate : DATE)`. If the old and current MONTH values match, add 2 to ReviewCount; otherwise set ReviewCount to 1. Then assign LastReviewDate ← CurrentDate. Trace caller values LastReviewDate=14/10/2026, ReviewCount=5 and CurrentDate=15/10/2026.",
+        "vi": "Routine tự biên soạn: `RefreshReview(BYREF LastReviewDate : DATE, BYREF ReviewCount : INTEGER, CurrentDate : DATE)`. Nếu MONTH của ngày cũ và ngày hiện tại bằng nhau, cộng 2 vào ReviewCount; nếu không, đặt ReviewCount thành 1. Sau đó gán LastReviewDate ← CurrentDate. Trace các giá trị caller LastReviewDate=14/10/2026, ReviewCount=5 và CurrentDate=15/10/2026."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "contract",
+          "action": {
+            "en": "Read the exact date contracts",
+            "vi": "Đọc đúng hợp đồng hàm ngày"
+          },
+          "why": {
+          "en": "MONTH returns INTEGER; CurrentDate is DATE; both BYREF caller variables retain changes after the call.",
+          "vi": "MONTH trả INTEGER; CurrentDate là DATE; cả hai biến caller BYREF giữ thay đổi sau lời gọi."
+          },
+          "result": {
+            "en": "MONTH(14/10/2026)=10 and MONTH(15/10/2026)=10.",
+            "vi": "MONTH(14/10/2026)=10 và MONTH(15/10/2026)=10."
+          }
+        },
+        {
+          "id": "old-state",
+          "action": {
+          "en": "Keep the old LastReviewDate for the comparison",
+          "vi": "Giữ LastReviewDate cũ để so sánh"
+          },
+          "why": {
+            "en": "Overwriting it first would make the comparison meaningless.",
+            "vi": "Ghi đè trước sẽ làm phép so sánh mất ý nghĩa."
+          },
+          "result": {
+          "en": "The month equality is TRUE using 14/10/2026 and 15/10/2026.",
+          "vi": "Phép bằng tháng là TRUE khi dùng 14/10/2026 và 15/10/2026."
+          }
+        },
+        {
+          "id": "points",
+          "action": {
+          "en": "Apply the same-month branch",
+          "vi": "Áp dụng nhánh cùng tháng"
+          },
+          "why": {
+          "en": "The supplied teacher-created contract compares month number only.",
+          "vi": "Contract tự biên soạn được cung cấp chỉ so số tháng."
+          },
+          "result": {
+          "en": "ReviewCount ← 5+2 = 7.",
+          "vi": "ReviewCount ← 5+2 = 7."
+          }
+        },
+        {
+          "id": "date-write",
+          "action": {
+            "en": "Assign the new date last",
+            "vi": "Gán ngày mới cuối cùng"
+          },
+          "why": {
+            "en": "All rules that need the old date have now been evaluated.",
+            "vi": "Mọi quy tắc cần ngày cũ đã được tính."
+          },
+          "result": {
+          "en": "LastReviewDate ← 15/10/2026.",
+          "vi": "LastReviewDate ← 15/10/2026."
+          }
+        },
+        {
+          "id": "caller",
+          "action": {
+            "en": "Project BYREF changes back to the caller",
+            "vi": "Phản chiếu thay đổi BYREF về caller"
+          },
+          "why": {
+            "en": "Reference parameters share the caller variables for this call.",
+            "vi": "Tham số tham chiếu dùng chung biến caller trong lời gọi này."
+          },
+          "result": {
+          "en": "Caller ends with ReviewCount=7 and LastReviewDate=15/10/2026; CurrentDate is unchanged because it is passed by value.",
+          "vi": "Caller kết thúc với ReviewCount=7 và LastReviewDate=15/10/2026; CurrentDate không đổi vì được truyền theo giá trị."
+          },
+          "check": {
+          "en": "The comparison must happen before LastReviewDate is overwritten.",
+          "vi": "Phép so sánh phải xảy ra trước khi LastReviewDate bị ghi đè."
+          }
+        }
+      ],
+      "answer": {
+        "en": "The old and current dates both have month 10, so ReviewCount becomes 7. LastReviewDate is then updated to 15/10/2026. Both changes reach the caller through BYREF; CurrentDate remains unchanged.",
+        "vi": "Ngày cũ và ngày hiện tại đều có tháng 10 nên ReviewCount thành 7. Sau đó LastReviewDate được cập nhật thành 15/10/2026. Cả hai thay đổi tới caller qua BYREF; CurrentDate không đổi."
+      },
+      "selfCheck": {
+        "en": "Did the condition read the old LastReviewDate before the final assignment, and did both BYREF results reach the caller?",
+        "vi": "Điều kiện đã đọc LastReviewDate cũ trước phép gán cuối và cả hai kết quả BYREF đã tới caller chưa?"
+      },
+      "sourceIds": [
+        "insert-s25-23",
+        "teacher-t16"
+      ]
+    },
+    {
+      "id": "T16-W2",
+      "title": {
+        "en": "Use an unfamiliar rounding insert",
+        "vi": "Dùng insert làm tròn chưa gặp"
+      },
+      "prompt": {
+        "en": "Teacher-created insert: `ROUND_TO(Value : REAL, Places : INTEGER) RETURNS REAL`. Precondition: 0<=Places<=4. It returns Value rounded to Places decimal places and does not modify arguments. Store the price 12.376 rounded to two places and diagnose `ROUND_TO(2, 12.376)`.",
+        "vi": "Insert tự biên soạn: `ROUND_TO(Value : REAL, Places : INTEGER) RETURNS REAL`. Precondition: 0<=Places<=4. Routine trả Value được làm tròn tới Places chữ số thập phân và không đổi argument. Lưu giá 12.376 làm tròn hai chữ số và chẩn đoán `ROUND_TO(2, 12.376)`."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "signature",
+          "action": {
+            "en": "Map arguments by position",
+            "vi": "Map argument theo vị trí"
+          },
+          "why": {
+            "en": "The first parameter is REAL data; the second is INTEGER precision.",
+            "vi": "Parameter đầu là dữ liệu REAL; parameter hai là độ chính xác INTEGER."
+          },
+          "result": {
+            "en": "Correct mapping is Value=12.376, Places=2.",
+            "vi": "Map đúng là Value=12.376, Places=2."
+          }
+        },
+        {
+          "id": "precondition",
+          "action": {
+            "en": "Check the precondition",
+            "vi": "Kiểm precondition"
+          },
+          "why": {
+            "en": "Even type-correct calls can be invalid.",
+            "vi": "Lời gọi đúng kiểu vẫn có thể không hợp lệ."
+          },
+          "result": {
+            "en": "2 is within 0..4.",
+            "vi": "2 nằm trong 0..4."
+          }
+        },
+        {
+          "id": "return",
+          "action": {
+            "en": "Store the REAL return",
+            "vi": "Lưu return REAL"
+          },
+          "why": {
+            "en": "The function does not change Price automatically.",
+            "vi": "Function không tự đổi Price."
+          },
+          "result": {
+            "en": "RoundedPrice ← ROUND_TO(12.376, 2), so RoundedPrice=12.38.",
+            "vi": "RoundedPrice ← ROUND_TO(12.376, 2), nên RoundedPrice=12.38."
+          }
+        },
+        {
+          "id": "diagnose",
+          "action": {
+            "en": "Repair the reversed call",
+            "vi": "Sửa lời gọi đảo argument"
+          },
+          "why": {
+            "en": "Argument 2 is passed to Value and 12.376 to INTEGER Places.",
+            "vi": "Argument 2 được truyền cho Value và 12.376 cho Places kiểu INTEGER."
+          },
+          "result": {
+            "en": "Use ROUND_TO(12.376, 2).",
+            "vi": "Dùng ROUND_TO(12.376, 2)."
+          },
+          "check": {
+            "en": "Neither argument is modified because the contract states no side effects.",
+            "vi": "Không argument nào bị đổi vì contract nêu không có side effect."
+          }
+        }
+      ],
+      "answer": {
+        "en": "DECLARE RoundedPrice : REAL\nRoundedPrice ← ROUND_TO(12.376, 2)\nThe reversed call violates ordered parameter types: 12.376 cannot be Places:INTEGER. The corrected result is 12.38; the original arguments remain unchanged.",
+        "vi": "DECLARE RoundedPrice : REAL\nRoundedPrice ← ROUND_TO(12.376, 2)\nLời gọi đảo vi phạm kiểu parameter theo thứ tự: 12.376 không thể là Places:INTEGER. Kết quả đúng là 12.38; argument gốc không đổi."
+      },
+      "selfCheck": {
+        "en": "Did you check signature, precondition, return use and side effects separately?",
+        "vi": "Bạn đã kiểm riêng signature, precondition, cách dùng return và side effect chưa?"
+      },
+      "sourceIds": [
+        "teacher-t16",
+        "g26-core"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T16-P1",
+      "title": {
+        "en": "Map RAND to −7..13",
+        "vi": "Ánh xạ RAND sang −7..13"
+      },
+      "prompt": {
+        "en": "Using only RAND and INT as defined in the guide, write an expression that can produce every INTEGER from −7 to 13 inclusive and no other integer. Prove the endpoints.",
+        "vi": "Chỉ dùng RAND và INT theo định nghĩa trong guide, viết biểu thức có thể tạo mọi INTEGER từ −7 tới 13 bao gồm hai cận và không tạo số nguyên khác. Chứng minh các đầu mút."
+      },
+      "working": [
+        {
+          "en": "The target contains 21 consecutive integers.",
+          "vi": "Miền đích có 21 số nguyên liên tiếp."
+        },
+        {
+          "en": "Start with RAND(21), apply INT, then shift the interval by −7.",
+          "vi": "Bắt đầu với RAND(21), áp dụng INT rồi dịch khoảng đi −7."
+        },
+        {
+          "en": "Trace the lowest possible value and values immediately below the excluded upper endpoint.",
+          "vi": "Trace giá trị thấp nhất có thể và các giá trị ngay dưới cận trên bị loại."
+        }
+      ],
+      "answer": {
+        "en": "INT(RAND(21)) - 7. RAND(21) gives 0 <= r < 21; INT(r) gives 0..20; subtracting 7 gives −7..13 inclusive.",
+        "vi": "INT(RAND(21)) - 7. RAND(21) cho 0 <= r < 21; INT(r) cho 0..20; trừ 7 cho −7..13 bao gồm hai cận."
+      },
+      "markGuidance": [
+        {
+          "en": "The expression uses the supplied signatures correctly.",
+          "vi": "Biểu thức dùng đúng chữ ký được cung cấp."
+        },
+        {
+          "en": "The proof includes the open upper RAND endpoint and final inclusive endpoints.",
+          "vi": "Chứng minh gồm cận trên mở của RAND và hai cận đóng cuối."
+        },
+        {
+          "en": "No value −8 or 14 can be produced.",
+          "vi": "Không thể sinh −8 hoặc 14."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Using RAND(20), which has only 20 integer buckets after INT.",
+          "vi": "Dùng RAND(20), chỉ có 20 ngăn số nguyên sau INT."
+        },
+        {
+          "en": "Assuming RAND returns an integer or can equal its argument.",
+          "vi": "Giả sử RAND trả số nguyên hoặc có thể bằng đối số."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can you state the interval after every operation?",
+        "vi": "Bạn có thể nêu khoảng sau từng phép toán không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "g26-core",
+        "qp-s25-22-q3"
+      ]
+    },
+    {
+      "id": "T16-P2",
+      "title": {
+        "en": "Apply the six DATE fixtures",
+        "vi": "Áp dụng sáu fixture DATE"
+      },
+      "prompt": {
+        "en": "For each fixture in the lesson table, start Points=10. Apply the base rule +4 for equal MONTH values, otherwise +1; then an amended rule adds a further +2 when DAYINDEX values match. Finally set LastVisit to TodayDate. State both point totals and the final date. Also explain the different result if the base contract changes to same month and same year.",
+        "vi": "Với mỗi fixture trong bảng bài học, bắt đầu Points=10. Áp dụng quy tắc cơ sở +4 khi hai MONTH bằng nhau, nếu không +1; sau đó quy tắc sửa đổi cộng thêm +2 khi hai DAYINDEX bằng nhau. Cuối cùng đặt LastVisit bằng TodayDate. Nêu cả hai tổng điểm và ngày cuối. Đồng thời giải thích kết quả khác nếu hợp đồng cơ sở đổi thành cùng tháng và cùng năm."
+      },
+      "working": [
+        {
+          "en": "Read MONTH and DAYINDEX from the old LastVisit and frozen TodayDate.",
+          "vi": "Đọc MONTH và DAYINDEX từ LastVisit cũ và TodayDate cố định."
+        },
+        {
+          "en": "Apply the base branch, then the separate weekday amendment, then update the date.",
+          "vi": "Áp dụng nhánh cơ sở, rồi sửa đổi theo thứ, rồi cập nhật ngày."
+        },
+        {
+          "en": "For the cross-year October row, distinguish month number from month-and-year.",
+          "vi": "Với dòng tháng 10 khác năm, phân biệt số tháng với tháng-và-năm."
+        }
+      ],
+      "answer": {
+        "en": "Base/amended points by row are 14/16, 14/14, 11/13, 14/14, 11/11 and 11/11. Caller LastVisit becomes the TodayDate in every row. If the base rule requires both month and year, the 15/10/2025→15/10/2026 row has base 11, not 14; its weekday indices differ, so amended remains 11.",
+        "vi": "Điểm cơ sở/sửa đổi theo từng dòng là 14/16, 14/14, 11/13, 14/14, 11/11 và 11/11. LastVisit của caller trở thành TodayDate trong mọi dòng. Nếu quy tắc cơ sở yêu cầu cả tháng và năm, dòng 15/10/2025→15/10/2026 có điểm cơ sở 11, không phải 14; hai DAYINDEX khác nhau nên điểm sửa đổi vẫn 11."
+      },
+      "markGuidance": [
+        {
+          "en": "All six pairs match the published project fixtures.",
+          "vi": "Cả sáu cặp khớp fixture dự án đã công bố."
+        },
+        {
+          "en": "Conditions use the old date and the date is written last.",
+          "vi": "Điều kiện dùng ngày cũ và ngày được ghi cuối."
+        },
+        {
+          "en": "The cross-year contract change is handled explicitly.",
+          "vi": "Thay đổi hợp đồng qua năm được xử lý rõ."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Reading DAY as weekday instead of DAYINDEX.",
+          "vi": "Đọc DAY là thứ thay vì DAYINDEX."
+        },
+        {
+          "en": "Overwriting LastVisit before comparing it.",
+          "vi": "Ghi đè LastVisit trước khi so sánh."
+        },
+        {
+          "en": "Treating equal month numbers as automatically the same month and year.",
+          "vi": "Coi cùng số tháng tự động là cùng tháng và năm."
+        }
+      ],
+      "selfCheck": {
+        "en": "For each row, can you point to the old date value used by both conditions?",
+        "vi": "Với mỗi dòng, bạn có thể chỉ ngày cũ mà cả hai điều kiện sử dụng không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "insert-s25-23",
+        "teacher-t16"
+      ]
+    },
+    {
+      "id": "T16-P3",
+      "title": {
+        "en": "Call an unseen safe division procedure",
+        "vi": "Gọi procedure chia an toàn chưa gặp"
+      },
+      "prompt": {
+        "en": "Teacher-created insert: `PROCEDURE SAFE_DIVIDE(Numerator : REAL, Denominator : REAL, BYREF Result : REAL, BYREF Success : BOOLEAN)`. If Denominator=0 it sets Result=0.0 and Success=FALSE; otherwise it sets the quotient and TRUE. Write a correct call for 15/3 and one for 7/0, then state all results.",
+        "vi": "Insert tự biên soạn: `PROCEDURE SAFE_DIVIDE(Numerator : REAL, Denominator : REAL, BYREF Result : REAL, BYREF Success : BOOLEAN)`. Nếu Denominator=0, procedure đặt Result=0.0 và Success=FALSE; nếu không, đặt thương và TRUE. Viết lời gọi đúng cho 15/3 và 7/0 rồi nêu mọi kết quả."
+      },
+      "working": [
+        {
+          "en": "Declare REAL result and BOOLEAN success variables.",
+          "vi": "Khai báo biến result REAL và success BOOLEAN."
+        },
+        {
+          "en": "Pass Result and Success as variables because both are BYREF.",
+          "vi": "Truyền Result và Success dưới dạng biến vì cả hai là BYREF."
+        },
+        {
+          "en": "Use CALL because the insert defines a procedure, not a function.",
+          "vi": "Dùng CALL vì insert định nghĩa procedure, không phải function."
+        }
+      ],
+      "answer": {
+        "en": "DECLARE Result : REAL\nDECLARE Success : BOOLEAN\nCALL SAFE_DIVIDE(15.0, 3.0, Result, Success) gives Result=5.0 and Success=TRUE. CALL SAFE_DIVIDE(7.0, 0.0, Result, Success) gives Result=0.0 and Success=FALSE. Literals are unsuitable for Result or Success because the procedure must update both BYREF variables.",
+        "vi": "DECLARE Result : REAL\nDECLARE Success : BOOLEAN\nCALL SAFE_DIVIDE(15.0, 3.0, Result, Success) cho Result=5.0 và Success=TRUE. CALL SAFE_DIVIDE(7.0, 0.0, Result, Success) cho Result=0.0 và Success=FALSE. Literal không phù hợp cho Result hoặc Success vì procedure phải cập nhật cả hai biến BYREF."
+      },
+      "markGuidance": [
+        {
+          "en": "The procedure call and both BYREF outputs are captured.",
+          "vi": "Lời gọi procedure và cả hai output BYREF được nhận."
+        },
+        {
+          "en": "Zero-denominator behaviour follows the supplied contract.",
+          "vi": "Hành vi mẫu số 0 theo contract được cung cấp."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Calling a procedure as part of an expression.",
+          "vi": "Gọi procedure như một phần biểu thức."
+        },
+        {
+          "en": "Passing a literal to a BYREF parameter.",
+          "vi": "Truyền literal cho parameter BYREF."
+        }
+      ],
+      "selfCheck": {
+        "en": "Why does this insert require CALL and two variables for its outputs?",
+        "vi": "Vì sao insert này cần CALL và hai biến cho output?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t16",
+        "g26-core"
+      ]
+    },
+    {
+      "id": "T16-P4",
+      "title": {
+        "en": "Diagnose a substring contract mismatch",
+        "vi": "Chẩn đoán mismatch contract substring"
+      },
+      "prompt": {
+        "en": "Teacher-created insert: `SLICE(Text:STRING, Start:INTEGER, Length:INTEGER) RETURNS STRING`; Start is 1-based, Length>=0, and Start must be within 1..LENGTH(Text)+1. Diagnose `Part ← SLICE(4, \"ALGORITHM\", 3)` and `Part ← SLICE(\"ALGORITHM\", 0, 3)`, then repair both to return `GOR`.",
+        "vi": "Insert tự biên soạn: `SLICE(Text:STRING, Start:INTEGER, Length:INTEGER) RETURNS STRING`; Start đánh số từ 1, Length>=0 và Start phải trong 1..LENGTH(Text)+1. Chẩn đoán `Part ← SLICE(4, \"ALGORITHM\", 3)` và `Part ← SLICE(\"ALGORITHM\", 0, 3)`, rồi sửa cả hai để trả `GOR`."
+      },
+      "working": [
+        {
+          "en": "Match each argument to the ordered parameter and type.",
+          "vi": "Match từng argument với parameter theo thứ tự và kiểu."
+        },
+        {
+          "en": "Apply the 1-based precondition.",
+          "vi": "Áp dụng precondition đánh số từ 1."
+        },
+        {
+          "en": "Trace positions in ALGORITHM.",
+          "vi": "Trace vị trí trong ALGORITHM."
+        }
+      ],
+      "answer": {
+        "en": "The first call swaps Text and Start, so both ordered types are wrong. The second call has correct types but violates Start>=1. In `ALGORITHM`, G is position 3, so the repaired call is `Part ← SLICE(\"ALGORITHM\", 3, 3)`, returning `GOR`.",
+        "vi": "Lời gọi đầu đảo Text và Start nên cả hai kiểu theo thứ tự đều sai. Lời gọi hai đúng kiểu nhưng vi phạm Start>=1. Trong `ALGORITHM`, G ở vị trí 3 nên lời gọi sửa là `Part ← SLICE(\"ALGORITHM\", 3, 3)`, trả `GOR`."
+      },
+      "markGuidance": [
+        {
+          "en": "Type mismatch and precondition mismatch are distinguished.",
+          "vi": "Phân biệt mismatch kiểu và mismatch precondition."
+        },
+        {
+          "en": "The repair uses the insert's 1-based convention.",
+          "vi": "Sửa đổi dùng quy ước 1-based của insert."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Assuming a 0-based library from another language.",
+          "vi": "Giả định thư viện 0-based từ ngôn ngữ khác."
+        },
+        {
+          "en": "Reporting only that the calls are wrong without naming the contract clauses.",
+          "vi": "Chỉ nói lời gọi sai mà không nêu điều khoản contract."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which exact clause rejects each original call?",
+        "vi": "Điều khoản chính xác nào loại mỗi lời gọi gốc?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t16",
+        "g26-core"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "RAND(6) returns an integer from 1 to 6.",
+        "vi": "RAND(6) trả số nguyên từ 1 tới 6."
+      },
+      "correction": {
+        "en": "It returns REAL in [0,6); INT and +1 create the dice integer interval.",
+        "vi": "Nó trả REAL trong [0,6); INT và +1 tạo khoảng số nguyên xúc xắc."
+      },
+      "selfCheck": {
+        "en": "What are the type and endpoints immediately after RAND?",
+        "vi": "Kiểu và đầu mút ngay sau RAND là gì?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "DAY and DAYINDEX both return the day of the month.",
+        "vi": "DAY và DAYINDEX đều trả ngày trong tháng."
+      },
+      "correction": {
+        "en": "DAY returns day-of-month; DAYINDEX returns weekday index under the insert convention.",
+        "vi": "DAY trả ngày trong tháng; DAYINDEX trả chỉ số thứ theo quy ước insert."
+      },
+      "selfCheck": {
+        "en": "Would 15/10/2026 give 15 or 5 for this function?",
+        "vi": "15/10/2026 cho 15 hay 5 với hàm này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Update LastVisit first, then compare it with TODAY.",
+        "vi": "Cập nhật LastVisit trước rồi mới so với TODAY."
+      },
+      "correction": {
+        "en": "Evaluate every rule that needs the old visit date before assigning the new date.",
+        "vi": "Tính mọi quy tắc cần ngày ghé cũ trước khi gán ngày mới."
+      },
+      "selfCheck": {
+        "en": "Does your comparison still contain any old-state information?",
+        "vi": "Phép so sánh của bạn còn thông tin trạng thái cũ không?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What must be copied from an insert before a function is used?",
+      "vi": "Phải chép gì từ insert trước khi dùng một hàm?"
+    },
+    "answerPoints": [
+      {
+        "en": "Exact function name and argument order.",
+        "vi": "Đúng tên hàm và thứ tự đối số."
+      },
+      {
+        "en": "Argument types and valid domain.",
+        "vi": "Kiểu đối số và miền hợp lệ."
+      },
+      {
+        "en": "Return type and range.",
+        "vi": "Kiểu và miền trả về."
+      },
+      {
+        "en": "Stated error and indexing/date conventions.",
+        "vi": "Điều kiện lỗi và quy ước chỉ số/ngày được nêu."
+      },
+      {
+        "en": "Any frozen fixture used to make the trace deterministic.",
+        "vi": "Fixture cố định dùng để trace có tính xác định."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "The insert, not another programming language, defines the function contract.",
+      "vi": "Insert, không phải ngôn ngữ lập trình khác, định nghĩa hợp đồng hàm."
+    },
+    {
+      "en": "Track range and type after every nested call or operator.",
+      "vi": "Theo dõi miền và kiểu sau mỗi lời gọi lồng hoặc toán tử."
+    },
+    {
+      "en": "DATE rules read old state before BYREF writes and use a frozen TODAY fixture for stable learning answers.",
+      "vi": "Quy tắc DATE đọc trạng thái cũ trước khi BYREF ghi và dùng fixture TODAY cố định để đáp án học tập ổn định."
+    },
+    {
+      "en": "For an unseen routine, the supplied insert defines the truth.",
+      "vi": "Với routine chưa gặp, insert được cung cấp định nghĩa sự thật."
+    },
+    {
+      "en": "Check ordered types, preconditions, return use and side effects as separate obligations.",
+      "vi": "Kiểm riêng kiểu theo thứ tự, precondition, cách dùng return và side effect."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F09",
+      "role": "owner",
+      "title": {
+        "en": "Built-in, string, date and random routines",
+        "vi": "Routine dựng sẵn, chuỗi, ngày và ngẫu nhiên"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "data-types",
+    "expressions-operators",
+    "string-processing",
+    "parameters-byval-byref"
+  ],
+  "sources": [
+    {
+      "id": "s26-11",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§11.1–11.3, printed/PDF pp29–30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "g26-core",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for 2026",
+      "locator": "§2 pp7–9; §5 pp15–18; §6–8 pp18–24, as cited by each lesson.",
+      "kind": "guide"
+    },
+    {
+      "id": "insert-s25-23",
+      "title": "9618/23 May/June 2025 Insert",
+      "locator": "Insert pp2–4; string/numeric/date signatures, errors, operators and comparison conventions.",
+      "kind": "guide"
+    },
+    {
+      "id": "qp-s25-22-q3",
+      "title": "9618/22 May/June 2025 Question 3",
+      "locator": "QP p6; generate unique random integers in inclusive negative/positive intervals.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "qp-s25-23-q7a",
+      "title": "9618/23 May/June 2025 Question 7(a)",
+      "locator": "QP pp14–15; UpdateVisit DATE and BYREF task; refer to the supplied insert.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-s25-23-q7a",
+      "title": "9618/23 May/June 2025 published mark scheme, Question 7(a)",
+      "locator": "MS p12; TODAY, MONTH, BYREF updates and DAYINDEX expression. Marks are not reproduced as lesson allocation.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "teacher-t16",
+      "title": "AlgoCore teacher-created T16 DATE fixtures and random-range guidance",
+      "locator": "T16-academic-r1 and CURRICULUM_COMPLETION_SPEC §6, 2026-10-02; six datetime-checked fixtures; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

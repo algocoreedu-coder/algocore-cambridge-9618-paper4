@@ -1,0 +1,983 @@
+{
+  "schemaVersion": 1,
+  "version": "T24-academic-r3-reviewed",
+  "topicId": "T24",
+  "sectionId": "12.2",
+  "slug": "structure-charts",
+  "learningMode": "diagram",
+  "estimatedMinutes": 85,
+  "title": {
+    "en": "Structure charts",
+    "vi": "Sơ đồ cấu trúc module"
+  },
+  "question": {
+    "en": "How does a structure chart show module responsibility, call hierarchy and data exchange without becoming a control-flow chart?",
+    "vi": "Structure chart thể hiện trách nhiệm module, phân cấp lời gọi và dữ liệu trao đổi như thế nào mà không biến thành flowchart?"
+  },
+  "opening": {
+    "en": "Read a structure chart in three passes: responsibilities and hierarchy; interface names and directions; then selection and repetition. Its links organise modules rather than show every execution step.",
+    "vi": "Hãy đọc structure chart theo ba lượt: trách nhiệm và phân cấp; tên cùng hướng giao diện; rồi lựa chọn và lặp. Các đường nối tổ chức module, không biểu diễn mọi bước chạy."
+  },
+  "objectives": [
+    {
+      "en": "Explain the purpose of a structure chart and distinguish it from a flowchart.",
+      "vi": "Giải thích mục đích của structure chart và phân biệt với flowchart."
+    },
+    {
+      "en": "Read module hierarchy, hollow data couples and filled Boolean/control couples with correct direction.",
+      "vi": "Đọc đúng phân cấp module, data couple vòng tròn rỗng và Boolean/control couple vòng tròn đặc cùng hướng truyền."
+    },
+    {
+      "en": "Interpret selection and repetition without inventing an execution order.",
+      "vi": "Diễn giải lựa chọn và lặp mà không tự suy ra thứ tự chạy."
+    },
+    {
+      "en": "Derive consistent headers, calls and returns, then construct a complete chart.",
+      "vi": "Suy ra header, lời gọi và giá trị trả về nhất quán, rồi dựng một sơ đồ hoàn chỉnh."
+    },
+    {
+      "en": "Translate a complete structure chart into module headers, parameter/control couples, calls, returns and coherent pseudocode.",
+      "vi": "Chuyển structure chart hoàn chỉnh thành header module, parameter/control couple, lời gọi, return và pseudocode nhất quán."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Decomposition",
+        "vi": "Phân rã"
+      },
+      "reason": {
+        "en": "Each module needs a distinct responsibility, with no missing or duplicated work.",
+        "vi": "Mỗi module cần một trách nhiệm riêng, không thiếu hoặc trùng công việc."
+      }
+    },
+    {
+      "title": {
+        "en": "Parameters, BYVAL and BYREF",
+        "vi": "Tham số, BYVAL và BYREF"
+      },
+      "reason": {
+        "en": "Arrow directions must agree with the module interface and caller effect.",
+        "vi": "Hướng mũi tên phải nhất quán với giao diện module và tác động tại nơi gọi."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "module hierarchy",
+      "meaning": {
+        "en": "The parent/child organisation of modules and calls.",
+        "vi": "Cách tổ chức module và lời gọi theo quan hệ cha/con."
+      }
+    },
+    {
+      "term": "data couple",
+      "meaning": {
+        "en": "A named data item carried through an interface, shown with a hollow sending circle in the official source chart.",
+        "vi": "Mục dữ liệu có tên truyền qua giao diện, dùng vòng tròn gửi rỗng trong sơ đồ đề thi chính thức."
+      }
+    },
+    {
+      "term": "control couple",
+      "meaning": {
+        "en": "Boolean/control information used to choose behaviour, shown with a filled sending circle in the official source chart.",
+        "vi": "Thông tin Boolean/điều khiển dùng để chọn hành vi, dùng vòng tròn gửi đặc trong sơ đồ đề thi chính thức."
+      }
+    },
+    {
+      "term": "selection",
+      "meaning": {
+        "en": "A diamond indicating that one subordinate is called at run time.",
+        "vi": "Hình thoi cho biết một module con được gọi tại thời điểm chạy."
+      }
+    },
+    {
+      "term": "repetition",
+      "meaning": {
+        "en": "A semicircular mark indicating a repeated module or group of modules.",
+        "vi": "Ký hiệu bán nguyệt cho biết một module hoặc nhóm module được lặp."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "Named modules appear in parent/child levels with parameter or return arrows.",
+        "vi": "Các module có tên xuất hiện theo tầng cha/con cùng mũi tên tham số hoặc giá trị trả về."
+      },
+      {
+        "en": "Program notes say one module calls another, calls either one of two modules, or repeatedly calls a group.",
+        "vi": "Mô tả chương trình cho biết module gọi module khác, gọi một trong hai module hoặc lặp gọi một nhóm."
+      },
+      {
+        "en": "The task asks for module headers or equivalent pseudocode from a chart.",
+        "vi": "Đề yêu cầu suy header module hoặc pseudocode tương đương từ sơ đồ."
+      },
+      {
+        "en": "The diagram shows module hierarchy, data couples, control couples, selection or repetition around a call.",
+        "vi": "Sơ đồ cho hierarchy module, data couple, control couple, selection hoặc repetition quanh lời gọi."
+      },
+      {
+        "en": "The task asks for complete program structure or to repair inconsistent interfaces.",
+        "vi": "Bài yêu cầu cấu trúc chương trình hoàn chỉnh hoặc sửa interface không nhất quán."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "A left-to-right arrangement does not guarantee chronological order.",
+        "vi": "Cách xếp từ trái sang phải không bảo đảm thứ tự thời gian."
+      },
+      {
+        "en": "A diamond is not enough to make the diagram a flowchart; inspect whether nodes are modules or operations.",
+        "vi": "Chỉ có hình thoi chưa đủ biến sơ đồ thành flowchart; hãy xem các node là module hay thao tác."
+      },
+      {
+        "en": "RETURN sends a value to the caller; it does not mean screen OUTPUT.",
+        "vi": "RETURN gửi giá trị về nơi gọi; không có nghĩa là OUTPUT ra màn hình."
+      },
+      {
+        "en": "The vertical position of boxes gives the exact execution order.",
+        "vi": "Vị trí dọc của box cho thứ tự chạy chính xác."
+      },
+      {
+        "en": "A data couple can be omitted from code because the child module can read any parent variable.",
+        "vi": "Data couple có thể bỏ khỏi code vì module con có thể đọc bất kỳ biến của parent."
+      }
+    ],
+    "answerProduct": {
+      "en": "An interpretation or chart with correct responsibilities, hierarchy, couple type/direction, selection/repetition scope and matching headers/calls.",
+      "vi": "Phần diễn giải hoặc sơ đồ có đúng trách nhiệm, phân cấp, loại/hướng couple, phạm vi lựa chọn/lặp và header/lời gọi khớp nhau."
+    },
+    "method": [
+      {
+        "en": "Name the parent task and distinct child responsibilities.",
+        "vi": "Đặt tên tác vụ cha và các trách nhiệm con riêng biệt."
+      },
+      {
+        "en": "Trace each interface from sender to receiver and label its data type.",
+        "vi": "Theo từng giao diện từ nơi gửi tới nơi nhận và ghi kiểu dữ liệu."
+      },
+      {
+        "en": "Mark the exact alternatives and repeated group.",
+        "vi": "Đánh dấu chính xác các nhánh thay thế và nhóm được lặp."
+      },
+      {
+        "en": "Derive headers and calls, then check every arrow against them.",
+        "vi": "Suy header và lời gọi, rồi kiểm mọi mũi tên với chúng."
+      },
+      {
+        "en": "List every module and assign one header before writing bodies.",
+        "vi": "Liệt kê mọi module và gán một header trước khi viết body."
+      },
+      {
+        "en": "Map incoming/outgoing data couples to typed parameters or returns and control couples to decisions/status values.",
+        "vi": "Map data couple vào/ra thành parameter có kiểu hoặc return và control couple thành decision/status."
+      },
+      {
+        "en": "Place calls in parent modules, then implement selection/repetition shown around calls.",
+        "vi": "Đặt lời gọi trong module parent rồi cài selection/repetition được chỉ quanh lời gọi."
+      },
+      {
+        "en": "Trace one complete call path and verify every actual argument, return and status agrees with the chart.",
+        "vi": "Trace một đường gọi hoàn chỉnh và kiểm mọi argument thực, return và status khớp chart."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t24-purpose-notation",
+      "title": {
+        "en": "Read notation as modular design",
+        "vi": "Đọc ký hiệu như thiết kế module"
+      },
+      "paragraphs": [
+        {
+          "en": "A rectangle names a module. A plain line documents a parent/child call relationship. The official May/June 2025 QP shows hollow sending circles for data couples and filled sending circles for Boolean/control couples.",
+          "vi": "Hình chữ nhật đặt tên module. Đường thường mô tả quan hệ lời gọi cha/con. Đề thi chính thức May/June 2025 dùng vòng tròn gửi rỗng cho data couple và vòng tròn gửi đặc cho Boolean/control couple."
+        },
+        {
+          "en": "Selection and repetition annotate the affected subordinates. They do not turn the chart into a step-by-step control-flow trace.",
+          "vi": "Lựa chọn và lặp chú thích các module con bị tác động. Chúng không biến sơ đồ thành trace luồng điều khiển từng bước."
+        }
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Feature",
+            "vi": "Đặc điểm"
+          },
+          {
+            "en": "Meaning",
+            "vi": "Ý nghĩa"
+          },
+          {
+            "en": "Required evidence",
+            "vi": "Bằng chứng cần nêu"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "Hollow circle and arrow",
+              "vi": "Vòng tròn rỗng và mũi tên"
+            },
+            {
+              "en": "data couple",
+              "vi": "data couple"
+            },
+            {
+              "en": "sender, receiver, name, direction",
+              "vi": "nơi gửi, nơi nhận, tên, hướng"
+            }
+          ],
+          [
+            {
+              "en": "Filled circle and arrow",
+              "vi": "Vòng tròn đặc và mũi tên"
+            },
+            {
+              "en": "Boolean/control couple",
+              "vi": "Boolean/control couple"
+            },
+            {
+              "en": "decision value and selected child",
+              "vi": "giá trị quyết định và module con được chọn"
+            }
+          ],
+          [
+            {
+              "en": "Diamond",
+              "vi": "Hình thoi"
+            },
+            {
+              "en": "selection",
+              "vi": "lựa chọn"
+            },
+            {
+              "en": "exact alternatives",
+              "vi": "các nhánh thay thế chính xác"
+            }
+          ],
+          [
+            {
+              "en": "Semicircular mark",
+              "vi": "Ký hiệu bán nguyệt"
+            },
+            {
+              "en": "repetition",
+              "vi": "lặp"
+            },
+            {
+              "en": "complete repeated group and condition",
+              "vi": "toàn bộ nhóm lặp và điều kiện"
+            }
+          ]
+        ]
+      },
+      "sourceIds": [
+        "s26-12.2",
+        "book-12.2",
+        "qp-s25-23-q6",
+        "ms-s25-23-q6"
+      ]
+    },
+    {
+      "id": "t24-transfer",
+      "title": {
+        "en": "Transfer between chart and pseudocode",
+        "vi": "Chuyển đổi giữa sơ đồ và pseudocode"
+      },
+      "paragraphs": [
+        {
+          "en": "A value sent into a module becomes a parameter. A value returned by a function appears in its RETURNS type and in an assignment at the caller. A procedure may expose a changed value through BYREF.",
+          "vi": "Giá trị gửi vào module trở thành tham số. Giá trị function trả về xuất hiện ở kiểu RETURNS và phép gán tại nơi gọi. Procedure có thể đưa giá trị đã đổi ra ngoài qua BYREF."
+        },
+        {
+          "en": "Choose one interface model and keep chart, header and call consistent; do not add INPUT or OUTPUT inside a module merely to avoid an interface.",
+          "vi": "Chọn một mô hình giao diện và giữ sơ đồ, header, lời gọi nhất quán; không tự thêm INPUT hoặc OUTPUT trong module để né giao diện."
+        }
+      ],
+      "sourceIds": [
+        "s26-12.2",
+        "book-12.2",
+        "guide-modules",
+        "qp-w25-23-q7b",
+        "ms-w25-23-q7b"
+      ]
+    },
+    {
+      "id": "t24-chart-to-code",
+      "title": {
+        "en": "Synchronise hierarchy, interfaces and control",
+        "vi": "Đồng bộ hierarchy, interface và control"
+      },
+      "paragraphs": [
+        {
+        "en": "A structure chart explains decomposition and interfaces. Parent-child links become calls, data couples become parameters or return values, and control couples become Boolean/status parameters or return values whose direction follows the arrow. The receiving module uses that control value for selection or repetition. Box position alone is not a timeline.",
+        "vi": "Structure chart giải thích decomposition và interface. Link parent-child thành lời gọi, data couple thành parameter hoặc return, còn control couple thành parameter hoặc return Boolean/status theo hướng mũi tên. Module nhận dùng giá trị điều khiển đó cho selection hoặc repetition. Vị trí box không tự là timeline."
+        },
+        {
+          "en": "An end-to-end translation first locks headers, then writes parent orchestration and child bodies. Every chart couple must have a code counterpart, and every code argument/return that crosses a module boundary must be justified by the chart or an explicit design decision.",
+          "vi": "Bản dịch end-to-end chốt header trước, rồi viết điều phối parent và body child. Mỗi couple trong chart phải có đối tác trong code và mọi argument/return qua ranh giới module phải được chart hoặc quyết định thiết kế rõ giải thích."
+        }
+      ],
+      "sourceIds": [
+        "s26-12.2",
+        "guide-modules",
+        "book-12.2",
+        "teacher-t24"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T24",
+      "T24-S01",
+      "T24-S02",
+      "T24-S03",
+      "T24-S04",
+      "T24-S05"
+    ],
+    "title": {
+      "en": "Notation atlas, interface tracing, selection, repetition and construction",
+      "vi": "Bảng ký hiệu, trace giao diện, lựa chọn, lặp và dựng sơ đồ"
+    },
+    "introduction": {
+      "en": "Use S01 to identify the notation, S02 to follow data in both directions, S03 for selection, S04 for a repeated group and S05 to construct and trace the complete report system.",
+      "vi": "Dùng S01 để nhận diện ký hiệu, S02 để theo dữ liệu hai hướng, S03 cho lựa chọn, S04 cho nhóm lặp và S05 để dựng, trace hệ thống báo cáo hoàn chỉnh."
+    },
+    "task": {
+      "en": "At each frame, name the module relationship, couple type, sender, receiver and the matching header or call.",
+      "vi": "Ở mỗi frame, nêu quan hệ module, loại couple, nơi gửi, nơi nhận và header hoặc lời gọi tương ứng."
+    },
+    "conventions": [
+      {
+        "en": "○ is a data couple; ● is a Boolean/control couple in the official source notation.",
+        "vi": "○ là data couple; ● là Boolean/control couple theo ký hiệu nguồn chính thức."
+      },
+      {
+        "en": "◆ selects one subordinate; ↶ marks the repeated group.",
+        "vi": "◆ chọn một module con; ↶ đánh dấu nhóm được lặp."
+      },
+      {
+        "en": "A hierarchy link is not a timeline arrow.",
+        "vi": "Đường phân cấp không phải mũi tên thời gian."
+      }
+    ],
+    "sourceIds": [
+      "qp-s25-23-q6",
+      "ms-s25-23-q6",
+      "book-12.2",
+      "teacher-t24"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T24-W1",
+      "title": {
+        "en": "Construct and trace two measurement reports",
+        "vi": "Dựng và trace hai báo cáo đo"
+      },
+      "prompt": {
+        "en": "MeasurementReports produces two rectangle reports. Each report reads Width, Height and AreaMode; selects area or perimeter; displays Answer; and increments Completed. Construct the module design and trace inputs (6,4,TRUE) and (5,2,FALSE).",
+        "vi": "MeasurementReports tạo hai báo cáo hình chữ nhật. Mỗi báo cáo đọc Width, Height và AreaMode; chọn diện tích hoặc chu vi; hiển thị Answer; rồi tăng Completed. Hãy dựng thiết kế module và trace đầu vào (6,4,TRUE), (5,2,FALSE)."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "responsibilities",
+          "action": {
+            "en": "Split distinct responsibilities",
+            "vi": "Chia các trách nhiệm riêng"
+          },
+          "why": {
+            "en": "Each module should have one clear purpose.",
+            "vi": "Mỗi module cần một mục đích rõ."
+          },
+          "result": {
+            "en": "Parent MeasurementReports calls ReadMeasurements, CalculateResult and DisplayResult; CalculateResult owns the two calculation children.",
+            "vi": "MeasurementReports gọi ReadMeasurements, CalculateResult và DisplayResult; CalculateResult quản lý hai module tính toán con."
+          }
+        },
+        {
+          "id": "interfaces",
+          "action": {
+            "en": "Add couples and headers",
+            "vi": "Thêm couple và header"
+          },
+          "why": {
+            "en": "The chart and code must agree on every value crossing a module boundary.",
+            "vi": "Sơ đồ và code phải khớp ở mọi giá trị đi qua ranh giới module."
+          },
+          "result": {
+            "en": "ReadMeasurements supplies Width, Height and AreaMode; CalculateResult returns Answer; DisplayResult receives Answer.",
+            "vi": "ReadMeasurements cung cấp Width, Height và AreaMode; CalculateResult trả Answer; DisplayResult nhận Answer."
+          }
+        },
+        {
+          "id": "selection",
+          "action": {
+            "en": "Mark selection inside CalculateResult",
+            "vi": "Đánh dấu lựa chọn trong CalculateResult"
+          },
+          "why": {
+            "en": "AreaMode chooses exactly one subordinate at run time.",
+            "vi": "AreaMode chọn đúng một module con tại thời điểm chạy."
+          },
+          "result": {
+            "en": "TRUE calls CalculateArea; FALSE calls CalculatePerimeter.",
+            "vi": "TRUE gọi CalculateArea; FALSE gọi CalculatePerimeter."
+          }
+        },
+        {
+          "id": "repetition",
+          "action": {
+            "en": "Mark the repeated group",
+            "vi": "Đánh dấu nhóm được lặp"
+          },
+          "why": {
+            "en": "Both reports repeat read, calculate and display.",
+            "vi": "Cả hai báo cáo lặp việc đọc, tính và hiển thị."
+          },
+          "result": {
+            "en": "The repetition mark covers all three top-level calls until Completed=2.",
+            "vi": "Ký hiệu lặp phủ cả ba lời gọi cấp trên tới khi Completed=2."
+          }
+        },
+        {
+          "id": "trace",
+          "action": {
+            "en": "Trace selected functions and returns",
+            "vi": "Trace function được chọn và giá trị trả về"
+          },
+          "why": {
+            "en": "The trace verifies interfaces and terminal values.",
+            "vi": "Trace kiểm tra giao diện và giá trị cuối."
+          },
+          "result": {
+            "en": "Report 1 returns 24; report 2 returns 14; final outputs are 24,14 and Completed=2.",
+            "vi": "Báo cáo 1 trả 24; báo cáo 2 trả 14; đầu ra cuối là 24,14 và Completed=2."
+          },
+          "check": {
+            "en": "The unselected calculation is not called in each report.",
+            "vi": "Phép tính không được chọn không bị gọi trong mỗi báo cáo."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Use parent MeasurementReports; children ReadMeasurements, CalculateResult and DisplayResult; grandchildren CalculateArea and CalculatePerimeter below CalculateResult. Hollow couples carry Width, Height and Answer. The filled AreaMode control couple selects one calculation. Repeat the read–calculate–display group until Completed=2. The trace outputs 24 then 14.",
+        "vi": "Dùng module cha MeasurementReports; các module con ReadMeasurements, CalculateResult, DisplayResult; hai module CalculateArea và CalculatePerimeter nằm dưới CalculateResult. Couple rỗng truyền Width, Height, Answer. Couple điều khiển đặc AreaMode chọn một phép tính. Lặp nhóm đọc–tính–hiển thị tới Completed=2. Trace cho đầu ra 24 rồi 14."
+      },
+      "selfCheck": {
+        "en": "Can every arrow be matched to a typed header and can every module be justified by one responsibility?",
+        "vi": "Mọi mũi tên có khớp một header có kiểu và mọi module có đúng một trách nhiệm không?"
+      },
+      "sourceIds": [
+        "teacher-t24",
+        "book-12.2",
+        "guide-modules"
+      ]
+    },
+    {
+      "id": "T24-W2",
+      "title": {
+        "en": "Translate an order chart into a complete program",
+        "vi": "Chuyển chart đơn hàng thành chương trình hoàn chỉnh"
+      },
+      "prompt": {
+      "en": "Chart: ProcessOrders repeatedly calls ReadOrder returning Order and HasOrder. If HasOrder, it calls IsValid(Order) returning Valid; if Valid, it calls Total(Order) returning Amount and then Save(Order,Amount). The data design supplies the record type TOrder. Translate headers and coherent pseudocode. End when HasOrder=FALSE.",
+      "vi": "Chart: ProcessOrders lặp gọi ReadOrder trả Order và HasOrder. Nếu HasOrder, nó gọi IsValid(Order) trả Valid; nếu Valid, gọi Total(Order) trả Amount rồi Save(Order,Amount). Thiết kế dữ liệu đã cung cấp record type TOrder. Chuyển header và pseudocode nhất quán. Kết thúc khi HasOrder=FALSE."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "headers",
+          "action": {
+            "en": "Lock module interfaces",
+            "vi": "Chốt interface module"
+          },
+          "why": {
+            "en": "Couples must become typed data/status flow.",
+            "vi": "Couple phải thành luồng dữ liệu/status có kiểu."
+          },
+          "result": {
+            "en": "ReadOrder returns Order plus HasOrder; IsValid returns BOOLEAN; Total returns REAL; Save accepts Order and Amount.",
+            "vi": "ReadOrder trả Order cùng HasOrder; IsValid trả BOOLEAN; Total trả REAL; Save nhận Order và Amount."
+          }
+        },
+        {
+          "id": "orchestrate",
+          "action": {
+            "en": "Write parent repetition",
+            "vi": "Viết vòng lặp parent"
+          },
+          "why": {
+            "en": "The chart's repeated ReadOrder call controls termination.",
+            "vi": "Lời gọi ReadOrder lặp trong chart điều khiển kết thúc."
+          },
+          "result": {
+            "en": "Call ReadOrder once, then WHILE HasOrder process and call it again.",
+            "vi": "Gọi ReadOrder một lần rồi WHILE HasOrder xử lý và gọi lại."
+          }
+        },
+        {
+          "id": "selection",
+          "action": {
+            "en": "Translate nested selection",
+            "vi": "Chuyển selection lồng"
+          },
+          "why": {
+            "en": "Save is reachable only for a valid real order.",
+            "vi": "Save chỉ được gọi cho đơn có thật và hợp lệ."
+          },
+          "result": {
+            "en": "Inside HasOrder loop, call IsValid; call Total and Save only if Valid.",
+            "vi": "Trong vòng HasOrder, gọi IsValid; chỉ gọi Total và Save nếu Valid."
+          }
+        },
+        {
+          "id": "trace",
+          "action": {
+            "en": "Check couples through a path",
+            "vi": "Kiểm couple theo một đường"
+          },
+          "why": {
+            "en": "Each crossing value must have a producer and consumer.",
+            "vi": "Mỗi giá trị qua ranh giới phải có nơi tạo và nơi dùng."
+          },
+          "result": {
+            "en": "Order flows ReadOrder→IsValid/Total/Save; Valid controls selection; Amount flows Total→Save; HasOrder controls repetition.",
+            "vi": "Order đi ReadOrder→IsValid/Total/Save; Valid điều khiển selection; Amount đi Total→Save; HasOrder điều khiển lặp."
+          },
+          "check": {
+            "en": "The chart expresses call hierarchy; the parent pseudocode establishes actual order.",
+            "vi": "Chart biểu diễn hierarchy gọi; pseudocode parent xác lập thứ tự thực."
+          }
+        }
+      ],
+      "answer": {
+        "en": "PROCEDURE ProcessOrders()\n  DECLARE Order : TOrder\n  DECLARE HasOrder, Valid : BOOLEAN\n  DECLARE Amount : REAL\n  CALL ReadOrder(Order, HasOrder)\n  WHILE HasOrder\n    Valid ← IsValid(Order)\n    IF Valid THEN\n      Amount ← Total(Order)\n      CALL Save(Order, Amount)\n    ENDIF\n    CALL ReadOrder(Order, HasOrder)\n  ENDWHILE\nENDPROCEDURE\nSupporting headers: `PROCEDURE ReadOrder(BYREF Order : TOrder, BYREF HasOrder : BOOLEAN)`; `FUNCTION IsValid(Order:TOrder) RETURNS BOOLEAN`; `FUNCTION Total(Order:TOrder) RETURNS REAL`; `PROCEDURE Save(Order:TOrder, Amount:REAL)`.",
+        "vi": "PROCEDURE ProcessOrders()\n  DECLARE Order : TOrder\n  DECLARE HasOrder, Valid : BOOLEAN\n  DECLARE Amount : REAL\n  CALL ReadOrder(Order, HasOrder)\n  WHILE HasOrder\n    Valid ← IsValid(Order)\n    IF Valid THEN\n      Amount ← Total(Order)\n      CALL Save(Order, Amount)\n    ENDIF\n    CALL ReadOrder(Order, HasOrder)\n  ENDWHILE\nENDPROCEDURE\nHeader hỗ trợ: `PROCEDURE ReadOrder(BYREF Order : TOrder, BYREF HasOrder : BOOLEAN)`; `FUNCTION IsValid(Order:TOrder) RETURNS BOOLEAN`; `FUNCTION Total(Order:TOrder) RETURNS REAL`; `PROCEDURE Save(Order:TOrder, Amount:REAL)`."
+      },
+      "selfCheck": {
+        "en": "Can every chart couple be followed through a matching parameter, return or control decision?",
+        "vi": "Mọi couple trong chart có theo được qua parameter, return hoặc control decision tương ứng không?"
+      },
+      "sourceIds": [
+        "s26-12.2",
+        "guide-modules",
+        "book-12.2",
+        "teacher-t24"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T24-P1",
+      "title": {
+        "en": "Infer headers from a ticket-cost chart",
+        "vi": "Suy header từ sơ đồ tính giá vé"
+      },
+      "prompt": {
+        "en": "TicketCost calls ReadCount, CalculateCost and DisplayCost. Count returns from ReadCount; Count and UnitPrice enter CalculateCost; Cost returns and enters DisplayCost. Derive valid headers and calls, then evaluate Count=3, UnitPrice=7.",
+        "vi": "TicketCost gọi ReadCount, CalculateCost và DisplayCost. Count trở về từ ReadCount; Count và UnitPrice đi vào CalculateCost; Cost trở về rồi đi vào DisplayCost. Hãy suy header, lời gọi hợp lệ và tính với Count=3, UnitPrice=7."
+      },
+      "working": [
+        {
+          "en": "Choose BYREF Count for ReadCount or a returning function, and keep the chart consistent.",
+          "vi": "Chọn BYREF Count cho ReadCount hoặc function trả về, rồi giữ sơ đồ nhất quán."
+        },
+        {
+          "en": "Make CalculateCost return INTEGER Cost from two INTEGER inputs.",
+          "vi": "Cho CalculateCost trả INTEGER Cost từ hai đầu vào INTEGER."
+        },
+        {
+          "en": "Pass Cost into DisplayCost and calculate 3×7.",
+          "vi": "Truyền Cost vào DisplayCost và tính 3×7."
+        }
+      ],
+      "answer": {
+        "en": "One valid set is PROCEDURE ReadCount(BYREF Count:INTEGER), FUNCTION CalculateCost(Count:INTEGER, UnitPrice:INTEGER) RETURNS INTEGER, PROCEDURE DisplayCost(Cost:INTEGER); calls are CALL ReadCount(Count), Cost <- CalculateCost(Count, UnitPrice), CALL DisplayCost(Cost). Cost=21.",
+        "vi": "Một bộ hợp lệ là PROCEDURE ReadCount(BYREF Count:INTEGER), FUNCTION CalculateCost(Count:INTEGER, UnitPrice:INTEGER) RETURNS INTEGER, PROCEDURE DisplayCost(Cost:INTEGER); lời gọi là CALL ReadCount(Count), Cost <- CalculateCost(Count, UnitPrice), CALL DisplayCost(Cost). Cost=21."
+      },
+      "markGuidance": [
+        {
+          "en": "Headers contain correct parameter names, types and direction/return.",
+          "vi": "Header có đúng tên, kiểu và hướng/giá trị trả về."
+        },
+        {
+          "en": "Calls match the headers and Cost is assigned before display.",
+          "vi": "Lời gọi khớp header và Cost được gán trước khi hiển thị."
+        },
+        {
+          "en": "Terminal Cost is 21.",
+          "vi": "Cost cuối là 21."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Using OUTPUT instead of returning Cost to the caller.",
+          "vi": "Dùng OUTPUT thay cho trả Cost về nơi gọi."
+        },
+        {
+          "en": "Reversing Count or Cost arrow direction.",
+          "vi": "Đảo hướng mũi tên Count hoặc Cost."
+        }
+      ],
+      "selfCheck": {
+        "en": "Point from every chart couple to the exact formal parameter or returned value.",
+        "vi": "Nối mỗi couple trên sơ đồ với đúng tham số hình thức hoặc giá trị trả về."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t24",
+        "book-12.2",
+        "guide-modules"
+      ]
+    },
+    {
+      "id": "T24-P2",
+      "title": {
+        "en": "Construct a five-module booking chart",
+        "vi": "Dựng sơ đồ đặt chỗ gồm năm module"
+      },
+      "prompt": {
+        "en": "ProcessBookings repeatedly calls ReadBooking, then selects CancelBooking or ConfirmBooking, then calls DisplayResult. ReadBooking supplies booking data and Boolean IsCancel; the selected action returns Boolean Success. Draw the five-module structure chart with all interfaces.",
+        "vi": "ProcessBookings lặp gọi ReadBooking, sau đó chọn CancelBooking hoặc ConfirmBooking, rồi gọi DisplayResult. ReadBooking cung cấp dữ liệu đặt chỗ và Boolean IsCancel; thao tác được chọn trả Boolean Success. Hãy vẽ structure chart năm module với đủ giao diện."
+      },
+      "working": [
+        {
+          "en": "Place ProcessBookings as parent with four children, counting exactly five modules.",
+          "vi": "Đặt ProcessBookings làm cha với bốn module con, tổng đúng năm module."
+        },
+        {
+          "en": "Put the diamond over CancelBooking and ConfirmBooking; use filled IsCancel as the control couple.",
+          "vi": "Đặt hình thoi trên CancelBooking và ConfirmBooking; dùng IsCancel đặc làm control couple."
+        },
+        {
+          "en": "Use hollow couples for non-Boolean booking data and filled couples for Boolean IsCancel and Success; mark the whole read–selected action–display group as repeated.",
+          "vi": "Dùng couple rỗng cho dữ liệu đặt chỗ không phải Boolean và couple đặc cho Boolean IsCancel cùng Success; đánh dấu lặp cho toàn nhóm đọc–hành động được chọn–hiển thị."
+        }
+      ],
+      "answer": {
+        "en": "Parent ProcessBookings has children ReadBooking, CancelBooking, ConfirmBooking and DisplayResult. The repetition mark covers ReadBooking → selected Cancel/Confirm → DisplayResult. The diamond selects CancelBooking or ConfirmBooking using filled Boolean IsCancel. Hollow data couples carry the non-Boolean booking data; filled Boolean/control couples carry IsCancel and Success, including Success back to the parent and then to DisplayResult.",
+        "vi": "Module cha ProcessBookings có các con ReadBooking, CancelBooking, ConfirmBooking và DisplayResult. Ký hiệu lặp phủ ReadBooking → Cancel/Confirm được chọn → DisplayResult. Hình thoi chọn CancelBooking hoặc ConfirmBooking bằng Boolean IsCancel dạng đặc. Couple dữ liệu rỗng truyền dữ liệu đặt chỗ không phải Boolean; Boolean/control couple đặc truyền IsCancel và Success, gồm Success trở về cha rồi đến DisplayResult."
+      },
+      "markGuidance": [
+        {
+          "en": "All five modules have correct labels and hierarchy.",
+          "vi": "Đủ năm module có nhãn và phân cấp đúng."
+        },
+        {
+          "en": "Selection and repetition symbols affect the correct modules.",
+          "vi": "Ký hiệu lựa chọn và lặp tác động đúng module."
+        },
+        {
+          "en": "IsCancel and Success use filled Boolean/control couples with explicit sender, receiver and direction.",
+          "vi": "IsCancel và Success dùng Boolean/control couple đặc với nơi gửi, nơi nhận và hướng rõ ràng."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Drawing CancelBooking and ConfirmBooking as a sequence.",
+          "vi": "Vẽ CancelBooking và ConfirmBooking như một chuỗi."
+        },
+        {
+          "en": "Repeating only DisplayResult rather than the complete group.",
+          "vi": "Chỉ lặp DisplayResult thay vì cả nhóm."
+        },
+        {
+          "en": "Counting the selection diamond as a sixth module.",
+          "vi": "Tính hình thoi lựa chọn thành module thứ sáu."
+        }
+      ],
+      "selfCheck": {
+        "en": "Count five module rectangles, two alternatives and one complete repeated group.",
+        "vi": "Đếm năm hình chữ nhật module, hai nhánh thay thế và một nhóm lặp hoàn chỉnh."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t24",
+        "qp-w25-23-q7b",
+        "ms-w25-23-q7b"
+      ]
+    },
+    {
+      "id": "T24-P3",
+      "title": {
+        "en": "Translate a complete results chart",
+        "vi": "Chuyển chart kết quả hoàn chỉnh"
+      },
+      "prompt": {
+        "en": "Chart: ProduceReport calls LoadMarks returning Marks and Count; repeatedly calls Classify(Mark) returning Grade for each occupied mark; then calls OutputSummary(Counts). Write headers and parent pseudocode, including Count=0.",
+        "vi": "Chart: ProduceReport gọi LoadMarks trả Marks và Count; lặp gọi Classify(Mark) trả Grade cho mỗi điểm đang dùng; sau đó gọi OutputSummary(Counts). Viết header và pseudocode parent, gồm Count=0."
+      },
+      "working": [
+        {
+          "en": "Map arrays/counts and return values.",
+          "vi": "Map array/count và return value."
+        },
+        {
+          "en": "Initialise Counts before repetition.",
+          "vi": "Khởi tạo Counts trước lặp."
+        },
+        {
+          "en": "Use occupied range only and still call OutputSummary when Count=0.",
+          "vi": "Chỉ dùng miền đang dùng và vẫn gọi OutputSummary khi Count=0."
+        }
+      ],
+      "answer": {
+      "en": "TYPE TGradeCounts\n  DECLARE ACount, BCount, OtherCount : INTEGER\nENDTYPE\nPROCEDURE LoadMarks(BYREF Marks : ARRAY[0:99] OF INTEGER, BYREF Count : INTEGER)\nFUNCTION Classify(Mark : INTEGER) RETURNS STRING\nPROCEDURE OutputSummary(Counts : TGradeCounts)\nPROCEDURE ProduceReport()\n  DECLARE Marks : ARRAY[0:99] OF INTEGER\n  DECLARE Count, Index : INTEGER\n  DECLARE Grade : STRING\n  DECLARE Counts : TGradeCounts\n  CALL LoadMarks(Marks, Count)\n  Counts.ACount ← 0\n  Counts.BCount ← 0\n  Counts.OtherCount ← 0\n  FOR Index ← 0 TO Count - 1\n    Grade ← Classify(Marks[Index])\n    CASE OF Grade\n      \"A\" : Counts.ACount ← Counts.ACount + 1\n      \"B\" : Counts.BCount ← Counts.BCount + 1\n      OTHERWISE : Counts.OtherCount ← Counts.OtherCount + 1\n    ENDCASE\n  NEXT Index\n  CALL OutputSummary(Counts)\nENDPROCEDURE\nWith Count=0, the FOR loop executes zero times and OutputSummary receives a zero record.",
+      "vi": "TYPE TGradeCounts\n  DECLARE ACount, BCount, OtherCount : INTEGER\nENDTYPE\nPROCEDURE LoadMarks(BYREF Marks : ARRAY[0:99] OF INTEGER, BYREF Count : INTEGER)\nFUNCTION Classify(Mark : INTEGER) RETURNS STRING\nPROCEDURE OutputSummary(Counts : TGradeCounts)\nPROCEDURE ProduceReport()\n  DECLARE Marks : ARRAY[0:99] OF INTEGER\n  DECLARE Count, Index : INTEGER\n  DECLARE Grade : STRING\n  DECLARE Counts : TGradeCounts\n  CALL LoadMarks(Marks, Count)\n  Counts.ACount ← 0\n  Counts.BCount ← 0\n  Counts.OtherCount ← 0\n  FOR Index ← 0 TO Count - 1\n    Grade ← Classify(Marks[Index])\n    CASE OF Grade\n      \"A\" : Counts.ACount ← Counts.ACount + 1\n      \"B\" : Counts.BCount ← Counts.BCount + 1\n      OTHERWISE : Counts.OtherCount ← Counts.OtherCount + 1\n    ENDCASE\n  NEXT Index\n  CALL OutputSummary(Counts)\nENDPROCEDURE\nVới Count=0, vòng FOR chạy 0 lần và OutputSummary nhận record toàn 0."
+      },
+      "markGuidance": [
+        {
+          "en": "Every chart module and couple has a matching header/call.",
+          "vi": "Mọi module và couple trong chart có header/lời gọi tương ứng."
+        },
+        {
+          "en": "Repetition and empty input are coherent.",
+          "vi": "Vòng lặp và input rỗng nhất quán."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Looping over full allocation rather than Count.",
+          "vi": "Lặp toàn bộ capacity thay vì Count."
+        },
+        {
+          "en": "Placing OutputSummary inside the repetition.",
+          "vi": "Đặt OutputSummary trong vòng lặp."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which chart element justifies the Classify call being repeated?",
+        "vi": "Phần tử chart nào giải thích lời gọi Classify được lặp?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "guide-modules",
+        "teacher-t24"
+      ]
+    },
+    {
+      "id": "T24-P4",
+      "title": {
+        "en": "Repair inconsistent interfaces",
+        "vi": "Sửa interface không nhất quán"
+      },
+      "prompt": {
+        "en": "A chart sends CustomerID to FindCustomer and receives CustomerRecord plus Found. Code declares `FUNCTION FindCustomer() RETURNS BOOLEAN` and then reads a global CustomerRecord. Identify every mismatch and propose a consistent interface and call.",
+        "vi": "Chart gửi CustomerID tới FindCustomer và nhận CustomerRecord cùng Found. Code khai báo `FUNCTION FindCustomer() RETURNS BOOLEAN` rồi đọc global CustomerRecord. Xác định mọi mismatch và đề xuất interface cùng lời gọi nhất quán."
+      },
+      "working": [
+        {
+          "en": "List incoming and outgoing couples from the chart.",
+          "vi": "Liệt kê couple vào và ra từ chart."
+        },
+        {
+          "en": "Check the header contains every crossing value.",
+          "vi": "Kiểm header chứa mọi giá trị qua ranh giới."
+        },
+        {
+          "en": "Remove hidden global flow.",
+          "vi": "Loại luồng global ẩn."
+        }
+      ],
+      "answer": {
+      "en": "Mismatch 1: CustomerID input couple is missing. Mismatch 2: CustomerRecord output couple is hidden in a global rather than the interface. A consistent procedure is `PROCEDURE FindCustomer(CustomerID : STRING, BYREF CustomerRecord : TCustomer, BYREF Found : BOOLEAN)` called with `CALL FindCustomer(CustomerID, CustomerRecord, Found)`. A function alternative would need to return one defined composite result containing both CustomerRecord and Found, because a function should not use BYREF parameters. Either design must preserve both output couples.",
+      "vi": "Mismatch 1: thiếu couple input CustomerID. Mismatch 2: couple output CustomerRecord bị ẩn trong global thay vì interface. Procedure nhất quán là `PROCEDURE FindCustomer(CustomerID : STRING, BYREF CustomerRecord : TCustomer, BYREF Found : BOOLEAN)` gọi bằng `CALL FindCustomer(CustomerID, CustomerRecord, Found)`. Nếu dùng function, cần return một composite result đã định nghĩa chứa cả CustomerRecord và Found vì function không nên dùng parameter BYREF. Mọi thiết kế phải giữ cả hai couple output."
+      },
+      "markGuidance": [
+        {
+          "en": "All incoming/outgoing couples appear explicitly.",
+          "vi": "Mọi couple vào/ra xuất hiện rõ."
+        },
+        {
+          "en": "The repair removes the undeclared global dependency.",
+          "vi": "Sửa đổi loại phụ thuộc global không khai báo."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Adding CustomerID but leaving CustomerRecord global fixes only one mismatch.",
+          "vi": "Thêm CustomerID nhưng để CustomerRecord global chỉ sửa một mismatch."
+        },
+        {
+          "en": "Ignoring Found loses the chart's control couple.",
+          "vi": "Bỏ Found làm mất control couple của chart."
+        }
+      ],
+      "selfCheck": {
+        "en": "Where can the parent see both the record and success status after the call?",
+        "vi": "Parent thấy cả record và trạng thái thành công ở đâu sau lời gọi?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "s26-12.2",
+        "teacher-t24"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Read left-to-right children as a guaranteed running order.",
+        "vi": "Đọc các module con trái sang phải như thứ tự chạy bắt buộc."
+      },
+      "correction": {
+        "en": "The hierarchy states modular calls; use pseudocode/trace for detailed order.",
+        "vi": "Phân cấp nêu lời gọi module; dùng pseudocode/trace cho thứ tự chi tiết."
+      },
+      "selfCheck": {
+        "en": "Does the link encode a call relationship or a control-flow transition?",
+        "vi": "Đường nối biểu diễn quan hệ gọi hay chuyển luồng điều khiển?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Treat hollow and filled circles as decorative.",
+        "vi": "Coi vòng tròn rỗng/đặc là trang trí."
+      },
+      "correction": {
+        "en": "The official QP uses hollow for data couples and filled for Boolean/control couples.",
+        "vi": "Đề thi chính thức dùng vòng tròn rỗng cho data couple và đặc cho Boolean/control couple."
+      },
+      "selfCheck": {
+        "en": "Which value controls the selection, and is its mark filled?",
+        "vi": "Giá trị nào điều khiển lựa chọn và ký hiệu của nó có đặc không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Make chart arrows and module headers disagree.",
+        "vi": "Để mũi tên sơ đồ và header module mâu thuẫn."
+      },
+      "correction": {
+        "en": "Audit every crossing value against a parameter, BYREF effect or return.",
+        "vi": "Kiểm mọi giá trị qua ranh giới với tham số, hiệu ứng BYREF hoặc return."
+      },
+      "selfCheck": {
+        "en": "Where is each returned value received at the caller?",
+        "vi": "Mỗi giá trị trả về được nhận ở đâu tại nơi gọi?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What is the reliable order for reading or constructing a structure chart?",
+      "vi": "Thứ tự đáng tin cậy để đọc hoặc dựng structure chart là gì?"
+    },
+    "answerPoints": [
+      {
+        "en": "Responsibilities and hierarchy.",
+        "vi": "Trách nhiệm và phân cấp."
+      },
+      {
+        "en": "Interface name, type, sender, receiver and direction.",
+        "vi": "Tên, kiểu, nơi gửi, nơi nhận và hướng giao diện."
+      },
+      {
+        "en": "Selection alternatives and repetition scope.",
+        "vi": "Các nhánh lựa chọn và phạm vi lặp."
+      },
+      {
+        "en": "Matching headers, calls and return handling.",
+        "vi": "Header, lời gọi và cách nhận return khớp nhau."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "A structure chart documents modular organisation and interfaces, not step-by-step control flow.",
+      "vi": "Structure chart mô tả tổ chức module và giao diện, không phải luồng điều khiển từng bước."
+    },
+    {
+      "en": "Hollow data and filled Boolean/control couples must retain their shape distinction.",
+      "vi": "Data couple rỗng và Boolean/control couple đặc phải giữ phân biệt hình dạng."
+    },
+    {
+      "en": "A complete answer keeps chart, parameter direction, headers, calls and returns consistent.",
+      "vi": "Đáp án hoàn chỉnh giữ sơ đồ, hướng tham số, header, lời gọi và return nhất quán."
+    },
+    {
+      "en": "Chart couples become explicit parameters, returns or status/control decisions.",
+      "vi": "Couple trong chart thành parameter, return hoặc quyết định status/control rõ."
+    },
+    {
+      "en": "A structure chart defines organisation; parent pseudocode defines actual call order.",
+      "vi": "Structure chart định nghĩa tổ chức; pseudocode parent định nghĩa thứ tự gọi thực tế."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F11",
+      "role": "related",
+      "title": {
+        "en": "Module, interface and structure-chart transfer",
+        "vi": "Chuyển đổi module, giao diện và structure chart"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "decomposition",
+    "procedures-functions",
+    "parameters-byval-byref"
+  ],
+  "sources": [
+    {
+      "id": "s26-12.2",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§12.2, printed/PDF p30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-12.2",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp287–293; PDF pp303–309.",
+      "kind": "book"
+    },
+    {
+      "id": "guide-modules",
+      "title": "Cambridge 9618 pseudocode guide for 2026",
+      "locator": "Procedure/function definitions, parameters and returns, pp22–24.",
+      "kind": "guide"
+    },
+    {
+      "id": "qp-s25-23-q6",
+      "title": "9618/23 May/June 2025 Question 6",
+      "locator": "QP pp12–13; official chart with hollow data couples, filled Boolean/control couples, selection and repetition.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-s25-23-q6",
+      "title": "9618/23 May/June 2025 published mark scheme, Question 6",
+      "locator": "MS p11; headers plus selection/repetition interpretation.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "qp-w25-23-q7b",
+      "title": "9618/23 October/November 2025 Question 7(b)",
+      "locator": "QP p17; construct a five-module chart with parameters, returns, selection and repetition.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-w25-23-q7b",
+      "title": "9618/23 October/November 2025 published mark scheme, Question 7(b)",
+      "locator": "MS p15; hierarchy, interfaces, diamond and loop symbol.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "teacher-t24",
+      "title": "AlgoCore teacher-created T24 examples and guidance",
+      "locator": "T24-academic-r1, 2026-10-01; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

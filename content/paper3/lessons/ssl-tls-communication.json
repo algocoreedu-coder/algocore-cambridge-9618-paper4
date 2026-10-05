@@ -1,0 +1,667 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.17.1",
+  "topicId": "P3-17.1-T03",
+  "slug": "ssl-tls-communication",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "SSL/TLS communication",
+    "vi": "Truyền thông SSL/TLS"
+  },
+  "question": {
+    "en": "When does a client–server session become protected, and what does TLS actually guarantee?",
+    "vi": "Khi nào phiên client–server được bảo vệ, và TLS thực sự bảo đảm điều gì?"
+  },
+  "opening": {
+    "en": "Before a learner sends a password or payment detail, the browser and server establish a protected session. The sequence matters: application data is protected only after the required checks and key establishment in this simplified model.",
+    "vi": "Trước khi học sinh gửi mật khẩu hoặc thông tin thanh toán, trình duyệt và máy chủ thiết lập phiên được bảo vệ. Trình tự rất quan trọng: dữ liệu ứng dụng chỉ được bảo vệ sau các kiểm tra và thiết lập khóa cần thiết trong mô hình giản lược này."
+  },
+  "objectives": [
+    {
+      "en": "State the purpose of SSL/TLS in client–server communication.",
+      "vi": "Nêu mục đích SSL/TLS trong truyền thông client–server."
+    },
+    {
+      "en": "Trace a simplified certificate check and session setup.",
+      "vi": "Theo dõi kiểm tra chứng chỉ và thiết lập phiên giản lược."
+    },
+    {
+      "en": "Identify appropriate situations for TLS.",
+      "vi": "Xác định tình huống phù hợp dùng TLS."
+    },
+    {
+      "en": "Explain what TLS does and does not guarantee.",
+      "vi": "Giải thích TLS bảo đảm và không bảo đảm điều gì."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Public/private key ownership and symmetric encryption.",
+      "vi": "Quyền sở hữu khóa công khai/riêng tư và mã hóa đối xứng."
+    },
+    {
+      "en": "Client and server roles in a network service.",
+      "vi": "Vai trò client và server trong dịch vụ mạng."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "TLS",
+      "meaning": {
+        "en": "Transport Layer Security, the modern protocol used to protect a communication session.",
+        "vi": "Transport Layer Security, giao thức hiện đại dùng để bảo vệ phiên truyền thông."
+      }
+    },
+    {
+      "term": "SSL",
+      "meaning": {
+        "en": "Secure Sockets Layer, an older predecessor named in the syllabus and coursebook.",
+        "vi": "Secure Sockets Layer, tiền thân cũ hơn được nêu trong syllabus và sách."
+      }
+    },
+    {
+      "term": "handshake",
+      "meaning": {
+        "en": "The setup exchange that agrees parameters and establishes session protection.",
+        "vi": "Trao đổi thiết lập để thỏa thuận tham số và tạo bảo vệ phiên."
+      }
+    },
+    {
+      "term": "session key",
+      "meaning": {
+        "en": "Symmetric key material used for protected application data in the simplified hybrid model.",
+        "vi": "Vật liệu khóa đối xứng dùng cho dữ liệu ứng dụng được bảo vệ trong mô hình lai giản lược."
+      }
+    },
+    {
+      "term": "certificate check",
+      "meaning": {
+        "en": "Validation of issuer trust, name and validity information before trusting the server identity binding.",
+        "vi": "Kiểm tra độ tin cậy của bên cấp, tên và thông tin hiệu lực trước khi tin liên kết danh tính máy chủ."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "purpose-and-situations",
+      "title": {
+        "en": "Purpose and appropriate situations",
+        "vi": "Mục đích và tình huống phù hợp"
+      },
+      "paragraphs": [
+        {
+          "en": "TLS protects data moving between a client and server against unauthorised reading or undetected alteration within the protocol model. It also supports checking the server identity using a certificate.",
+          "vi": "TLS bảo vệ dữ liệu truyền giữa client và server khỏi bị đọc trái phép hoặc thay đổi không bị phát hiện trong mô hình giao thức. Nó cũng hỗ trợ kiểm tra danh tính máy chủ bằng chứng chỉ."
+        },
+        {
+          "en": "Use it when credentials, payment information, personal data or other sensitive content crosses an untrusted network. A padlock does not prove that the site’s claims are honest or that its software is free from malware.",
+          "vi": "Dùng khi thông tin đăng nhập, thanh toán, dữ liệu cá nhân hoặc nội dung nhạy cảm khác đi qua mạng không tin cậy. Biểu tượng ổ khóa không chứng minh tuyên bố của trang là trung thực hay phần mềm không có mã độc."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "simplified-session",
+      "title": {
+        "en": "A simplified syllabus session",
+        "vi": "Một phiên syllabus giản lược"
+      },
+      "paragraphs": [
+        {
+          "en": "The client requests a secure connection. The server returns certificate information and handshake parameters. The client checks the trusted issuer, domain name and validity period, then the parties establish shared session key material using the reviewed hybrid model.",
+          "vi": "Client yêu cầu kết nối an toàn. Server trả thông tin chứng chỉ và tham số bắt tay. Client kiểm tra bên cấp tin cậy, tên miền và thời hạn hiệu lực, rồi hai bên thiết lập vật liệu khóa phiên dùng chung theo mô hình lai đã duyệt."
+        },
+        {
+          "en": "After both sides reach the established state, symmetric protection is used for application records because it is practical for the larger data transfer. The visual is a teaching sequence, not a byte-accurate trace of every TLS version.",
+          "vi": "Sau khi hai bên đạt trạng thái đã thiết lập, bảo vệ đối xứng được dùng cho bản ghi ứng dụng vì thực tế hơn cho lượng dữ liệu lớn. Minh họa là trình tự dạy học, không phải trace từng byte của mọi phiên bản TLS."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "bounded-guarantees",
+      "title": {
+        "en": "State bounded guarantees",
+        "vi": "Nêu bảo đảm có giới hạn"
+      },
+      "paragraphs": [
+        {
+          "en": "TLS can provide confidentiality and integrity for data in transit and certificate-based server authentication in the model. Application login/authorisation remains a separate decision.",
+          "vi": "TLS có thể cung cấp tính bí mật và toàn vẹn cho dữ liệu đang truyền và xác thực server dựa trên chứng chỉ trong mô hình. Đăng nhập/phân quyền ứng dụng vẫn là quyết định riêng."
+        },
+        {
+          "en": "If a certificate check fails, the protected-session claim must not advance. If the site is malicious but owns a valid certificate for its domain, TLS can still protect the connection to that malicious site; it does not judge the site’s business practice.",
+          "vi": "Nếu kiểm tra chứng chỉ thất bại, không được chuyển sang trạng thái phiên được bảo vệ. Nếu trang độc hại nhưng có chứng chỉ hợp lệ cho tên miền của nó, TLS vẫn có thể bảo vệ kết nối đến trang đó; nó không đánh giá hoạt động kinh doanh của trang."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "tls-session",
+    "title": {
+      "en": "SSL/TLS client–server session journey",
+      "vi": "Hành trình phiên SSL/TLS client–server"
+    },
+    "introduction": {
+      "en": "Move through request, certificate check, session establishment and protected application data. Change the scenario and certificate result to see which state is allowed.",
+      "vi": "Di chuyển qua yêu cầu, kiểm tra chứng chỉ, thiết lập phiên và dữ liệu ứng dụng được bảo vệ. Đổi kịch bản và kết quả chứng chỉ để xem trạng thái nào được phép."
+    },
+    "task": {
+      "en": "Reach a protected login/payment transfer, then force a certificate failure and explain why application data must not be sent as protected.",
+      "vi": "Đạt đến truyền đăng nhập/thanh toán được bảo vệ, rồi tạo lỗi chứng chỉ và giải thích vì sao không được gửi dữ liệu ứng dụng như đã được bảo vệ."
+    },
+    "conventions": [
+      {
+        "en": "This is a simplified syllabus model, not a wire-accurate TLS transcript.",
+        "vi": "Đây là mô hình syllabus giản lược, không phải bản ghi TLS chính xác từng byte."
+      },
+      {
+        "en": "Green means a passed state; warning means stop before protected application data.",
+        "vi": "Màu xanh là trạng thái đạt; cảnh báo nghĩa là dừng trước dữ liệu ứng dụng được bảo vệ."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Protect a college login",
+      "vi": "Bảo vệ đăng nhập trường học"
+    },
+    "prompt": {
+      "en": "A learner opens https://portal.example and plans to submit a password. Trace the simplified setup before the password may be sent.",
+      "vi": "Học sinh mở https://portal.example và định gửi mật khẩu. Theo dõi thiết lập giản lược trước khi mật khẩu có thể được gửi."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "request",
+        "action": {
+          "en": "Client requests a protected session.",
+          "vi": "Client yêu cầu phiên được bảo vệ."
+        },
+        "why": {
+          "en": "The password has not been sent yet; protection must be established first.",
+          "vi": "Mật khẩu chưa được gửi; phải thiết lập bảo vệ trước."
+        },
+        "result": {
+          "en": "Server receives the client setup request.",
+          "vi": "Server nhận yêu cầu thiết lập của client."
+        }
+      },
+      {
+        "id": "certificate",
+        "action": {
+          "en": "Server sends its certificate and setup information.",
+          "vi": "Server gửi chứng chỉ và thông tin thiết lập."
+        },
+        "why": {
+          "en": "The client needs a public-key identity binding and agreed setup context.",
+          "vi": "Client cần liên kết danh tính–khóa công khai và ngữ cảnh thiết lập đã thỏa thuận."
+        },
+        "result": {
+          "en": "The artefact moves server → client; no protected application data yet.",
+          "vi": "Tạo phẩm đi server → client; chưa có dữ liệu ứng dụng được bảo vệ."
+        }
+      },
+      {
+        "id": "validate",
+        "action": {
+          "en": "Client checks issuer trust, domain match and validity.",
+          "vi": "Client kiểm tra bên cấp tin cậy, tên miền khớp và hiệu lực."
+        },
+        "why": {
+          "en": "A failed identity binding must stop this model from claiming a trusted session.",
+          "vi": "Liên kết danh tính thất bại phải ngăn mô hình tuyên bố phiên tin cậy."
+        },
+        "result": {
+          "en": "The certificate for portal.example passes the three checks.",
+          "vi": "Chứng chỉ cho portal.example vượt qua ba kiểm tra."
+        }
+      },
+      {
+        "id": "establish",
+        "action": {
+          "en": "Client and server establish shared session protection.",
+          "vi": "Client và server thiết lập bảo vệ phiên dùng chung."
+        },
+        "why": {
+          "en": "The hybrid model uses asymmetric work during setup and symmetric protection for application records.",
+          "vi": "Mô hình lai dùng thao tác bất đối xứng khi thiết lập và bảo vệ đối xứng cho bản ghi ứng dụng."
+        },
+        "result": {
+          "en": "Session state becomes established.",
+          "vi": "Trạng thái phiên trở thành đã thiết lập."
+        }
+      },
+      {
+        "id": "send",
+        "action": {
+          "en": "Send the password inside a protected application record.",
+          "vi": "Gửi mật khẩu trong bản ghi ứng dụng được bảo vệ."
+        },
+        "why": {
+          "en": "This state is permitted only after certificate validation and key establishment.",
+          "vi": "Trạng thái này chỉ được phép sau xác thực chứng chỉ và thiết lập khóa."
+        },
+        "result": {
+          "en": "The connection protects data in transit; the server still decides login authorisation.",
+          "vi": "Kết nối bảo vệ dữ liệu đang truyền; server vẫn quyết định phân quyền đăng nhập."
+        }
+      }
+    ],
+    "result": {
+      "en": "The password is sent only after the simplified session reaches established.",
+      "vi": "Mật khẩu chỉ được gửi sau khi phiên giản lược đạt trạng thái đã thiết lập."
+    },
+    "selfCheck": {
+      "en": "Can you name the check that would stop the sequence and one property TLS does not guarantee?",
+      "vi": "Bạn có thể nêu kiểm tra sẽ dừng trình tự và một thuộc tính TLS không bảo đảm không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "client–server, HTTPS or padlock",
+        "vi": "client–server, HTTPS hoặc ổ khóa"
+      },
+      {
+        "en": "login, payment or personal data",
+        "vi": "đăng nhập, thanh toán hoặc dữ liệu cá nhân"
+      },
+      {
+        "en": "certificate, trusted issuer or domain match",
+        "vi": "chứng chỉ, bên cấp tin cậy hoặc tên miền khớp"
+      },
+      {
+        "en": "purpose or appropriate situation",
+        "vi": "mục đích hoặc tình huống phù hợp"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: TLS can protect the connection to a correctly named site; it cannot prove that every claim or download from that site is safe.",
+      "vi": "Dễ nhầm: TLS có thể bảo vệ kết nối đến trang đúng tên; nó không chứng minh mọi tuyên bố hay tệp tải từ trang đó đều an toàn."
+    },
+    "method": [
+      {
+        "en": "Name the sensitive data and client/server actors.",
+        "vi": "Ghi dữ liệu nhạy cảm và tác nhân client/server."
+      },
+      {
+        "en": "Trace certificate validation before session establishment.",
+        "vi": "Theo dõi xác thực chứng chỉ trước thiết lập phiên."
+      },
+      {
+        "en": "State when application data becomes protected.",
+        "vi": "Nêu khi nào dữ liệu ứng dụng được bảo vệ."
+      },
+      {
+        "en": "Give the protected property and one non-guarantee.",
+        "vi": "Nêu thuộc tính được bảo vệ và một điều không được bảo đảm."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "HTTPS proves a website is honest.",
+        "vi": "HTTPS chứng minh website trung thực."
+      },
+      "correction": {
+        "en": "It supports a protected connection and identity binding; it does not judge the site’s content or conduct.",
+        "vi": "Nó hỗ trợ kết nối được bảo vệ và liên kết danh tính; không đánh giá nội dung hay hành vi của trang."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Application data is protected before setup completes.",
+        "vi": "Dữ liệu ứng dụng được bảo vệ trước khi thiết lập hoàn tất."
+      },
+      "correction": {
+        "en": "The model marks it protected only after certificate checks and session establishment.",
+        "vi": "Mô hình chỉ đánh dấu được bảo vệ sau kiểm tra chứng chỉ và thiết lập phiên."
+      }
+    },
+    {
+      "mistake": {
+        "en": "TLS removes the need for login authorisation.",
+        "vi": "TLS loại bỏ nhu cầu phân quyền đăng nhập."
+      },
+      "correction": {
+        "en": "Transport protection and application authorisation are separate controls.",
+        "vi": "Bảo vệ truyền tải và phân quyền ứng dụng là các kiểm soát riêng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "SSL and modern TLS are identical wire protocols.",
+        "vi": "SSL và TLS hiện đại là giao thức dây giống hệt."
+      },
+      "correction": {
+        "en": "TLS is the modern successor; this lesson uses a labelled simplified model.",
+        "vi": "TLS là kế nhiệm hiện đại; bài học dùng mô hình giản lược có nhãn."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "appropriate",
+      "prompt": {
+        "en": "Which situation most clearly requires TLS?",
+        "vi": "Tình huống nào rõ ràng cần TLS nhất?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Submitting a password and payment details",
+            "vi": "Gửi mật khẩu và thông tin thanh toán"
+          },
+          "feedback": {
+            "en": "Correct: sensitive data crosses a network.",
+            "vi": "Đúng: dữ liệu nhạy cảm đi qua mạng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reading an offline calculator result",
+            "vi": "Đọc kết quả máy tính ngoại tuyến"
+          },
+          "feedback": {
+            "en": "There is no client–server network transfer here.",
+            "vi": "Không có truyền mạng client–server ở đây."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Choosing a desktop wallpaper",
+            "vi": "Chọn hình nền máy tính"
+          },
+          "feedback": {
+            "en": "This does not identify sensitive client–server data.",
+            "vi": "Không có dữ liệu client–server nhạy cảm được xác định."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Link the situation to sensitive data in transit.",
+        "vi": "Liên hệ tình huống với dữ liệu nhạy cảm đang truyền."
+      }
+    },
+    {
+      "id": "failed-cert",
+      "prompt": {
+        "en": "The certificate domain does not match. What should the model do?",
+        "vi": "Tên miền chứng chỉ không khớp. Mô hình nên làm gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Stop before protected application data",
+            "vi": "Dừng trước dữ liệu ứng dụng được bảo vệ"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Mark the session trusted anyway",
+            "vi": "Vẫn đánh dấu phiên tin cậy"
+          },
+          "feedback": {
+            "en": "That ignores the identity-check failure.",
+            "vi": "Điều đó bỏ qua lỗi kiểm tra danh tính."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Send the password first, then check",
+            "vi": "Gửi mật khẩu trước rồi kiểm tra"
+          },
+          "feedback": {
+            "en": "Sensitive data must wait for establishment.",
+            "vi": "Dữ liệu nhạy cảm phải chờ thiết lập."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A failed prerequisite cannot advance the state machine.",
+        "vi": "Điều kiện tiên quyết thất bại không thể cho máy trạng thái tiến tiếp."
+      }
+    },
+    {
+      "id": "hybrid",
+      "prompt": {
+        "en": "Why use symmetric protection after setup in this model?",
+        "vi": "Vì sao dùng bảo vệ đối xứng sau thiết lập trong mô hình?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "It is practical for the larger application-data transfer",
+            "vi": "Nó thực tế cho lượng dữ liệu ứng dụng lớn"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The server’s private key becomes public",
+            "vi": "Khóa riêng server trở thành công khai"
+          },
+          "feedback": {
+            "en": "Private keys remain protected.",
+            "vi": "Khóa riêng vẫn được bảo vệ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Certificates are no longer relevant to identity",
+            "vi": "Chứng chỉ không còn liên quan danh tính"
+          },
+          "feedback": {
+            "en": "The certificate check supported the establishment decision.",
+            "vi": "Kiểm tra chứng chỉ hỗ trợ quyết định thiết lập."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Explain the role of each mechanism in the hybrid model.",
+        "vi": "Giải thích vai trò từng cơ chế trong mô hình lai."
+      }
+    },
+    {
+      "id": "non-guarantee",
+      "prompt": {
+        "en": "What does the padlock not prove?",
+        "vi": "Ổ khóa không chứng minh điều gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "That the site’s content and business practice are trustworthy",
+            "vi": "Nội dung và hoạt động kinh doanh của trang đáng tin"
+          },
+          "feedback": {
+            "en": "Correct: TLS does not judge content.",
+            "vi": "Đúng: TLS không đánh giá nội dung."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "That a protected connection was negotiated",
+            "vi": "Kết nối được bảo vệ đã được thỏa thuận"
+          },
+          "feedback": {
+            "en": "That is the connection property being signalled in the model.",
+            "vi": "Đó là thuộc tính kết nối được báo trong mô hình."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "That the browser checked certificate information",
+            "vi": "Trình duyệt đã kiểm tra thông tin chứng chỉ"
+          },
+          "feedback": {
+            "en": "Certificate checking is part of the model.",
+            "vi": "Kiểm tra chứng chỉ là một phần của mô hình."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use precise, bounded claims.",
+        "vi": "Dùng tuyên bố chính xác và có giới hạn."
+      }
+    },
+    {
+      "id": "order-tls",
+      "prompt": {
+        "en": "Which sequence places the password in the correct state?",
+        "vi": "Trình tự nào đặt mật khẩu vào đúng trạng thái?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Request → server certificate/setup → validate → establish session → protected password",
+            "vi": "Yêu cầu → chứng thư/thiết lập server → xác thực → lập phiên → mật khẩu được bảo vệ"
+          },
+          "feedback": {
+            "en": "Correct: application data waits until establishment.",
+            "vi": "Đúng: dữ liệu ứng dụng chờ đến khi thiết lập."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Send password → inspect certificate → request TLS",
+            "vi": "Gửi mật khẩu → xem chứng thư → yêu cầu TLS"
+          },
+          "feedback": {
+            "en": "The sensitive data is sent too early.",
+            "vi": "Dữ liệu nhạy cảm bị gửi quá sớm."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Padlock → skip identity check → assume authorisation",
+            "vi": "Ổ khóa → bỏ kiểm tra danh tính → giả định phân quyền"
+          },
+          "feedback": {
+            "en": "This skips required checks and confuses transport with application authorisation.",
+            "vi": "Cách này bỏ kiểm tra và nhầm truyền tải với phân quyền ứng dụng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Order prerequisites before protected application data.",
+        "vi": "Sắp xếp điều kiện tiên quyết trước dữ liệu ứng dụng được bảo vệ."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Write the five-state simplified TLS journey.",
+      "vi": "Viết hành trình TLS giản lược gồm năm trạng thái."
+    },
+    "answerPoints": [
+      {
+        "en": "Client request → server certificate/setup information.",
+        "vi": "Yêu cầu client → thông tin chứng chỉ/thiết lập server."
+      },
+      {
+        "en": "Client validates issuer, domain and validity → parties establish session protection.",
+        "vi": "Client xác thực bên cấp, tên miền và hiệu lực → các bên thiết lập bảo vệ phiên."
+      },
+      {
+        "en": "Only then send protected application data; TLS does not guarantee site honesty or application authorisation.",
+        "vi": "Chỉ sau đó mới gửi dữ liệu ứng dụng được bảo vệ; TLS không bảo đảm trang trung thực hay phân quyền ứng dụng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "TLS protects a communication session and supports server authentication.",
+      "vi": "TLS bảo vệ phiên truyền thông và hỗ trợ xác thực server."
+    },
+    {
+      "en": "Certificate validation precedes protected application data.",
+      "vi": "Xác thực chứng chỉ diễn ra trước dữ liệu ứng dụng được bảo vệ."
+    },
+    {
+      "en": "State both the guarantee and its limit.",
+      "vi": "Nêu cả bảo đảm và giới hạn."
+    }
+  ],
+  "relatedSlugs": [
+    "certificates-and-signatures",
+    "confidentiality-and-key-choice"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p36, §17.1 Security",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Chapter 17.3, printed pp416–418 / PDF pp432–434: SSL/TLS purpose, client–server use and simplified establishment sequence",
+      "kind": "book"
+    },
+    {
+      "id": "s25-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2025 question paper",
+      "locator": "Question 9(a–b), p10: SSL/TLS functions and appropriate situations",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2025 mark scheme",
+      "locator": "Question 9(a–b), p13",
+      "kind": "mark-scheme"
+    }
+  ]
+}

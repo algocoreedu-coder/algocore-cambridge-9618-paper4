@@ -1,0 +1,722 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.17.1",
+  "topicId": "P3-17.1-T01",
+  "slug": "confidentiality-and-key-choice",
+  "estimatedMinutes": 45,
+  "title": {
+    "en": "Confidentiality and key choice",
+    "vi": "Tính bí mật và lựa chọn khóa"
+  },
+  "question": {
+    "en": "Which key operation matches the security goal, and who performs it?",
+    "vi": "Thao tác khóa nào phù hợp mục tiêu bảo mật, và ai thực hiện?"
+  },
+  "opening": {
+    "en": "A college must accept confidential applications and also publish notices that anyone can verify. The two jobs need different key operations.",
+    "vi": "Một trường cần nhận hồ sơ bí mật và cũng công bố thông báo mà ai cũng có thể kiểm chứng. Hai nhiệm vụ cần các thao tác khóa khác nhau."
+  },
+  "objectives": [
+    {
+      "en": "Distinguish plaintext, ciphertext, encryption and decryption.",
+      "vi": "Phân biệt bản rõ, bản mã, mã hóa và giải mã."
+    },
+    {
+      "en": "Compare symmetric and asymmetric key ownership.",
+      "vi": "So sánh quyền sở hữu khóa đối xứng và bất đối xứng."
+    },
+    {
+      "en": "Choose the correct key for a confidential or verified message.",
+      "vi": "Chọn đúng khóa cho thông điệp bí mật hoặc được xác minh."
+    },
+    {
+      "en": "Explain the result as actor → key → operation → security outcome.",
+      "vi": "Giải thích kết quả theo tác nhân → khóa → thao tác → kết quả bảo mật."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "The idea that an algorithm transforms input into output.",
+      "vi": "Ý tưởng thuật toán biến đổi đầu vào thành đầu ra."
+    },
+    {
+      "en": "Sender, recipient and public verifier roles.",
+      "vi": "Vai trò người gửi, người nhận và người kiểm chứng công khai."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "plaintext",
+      "meaning": {
+        "en": "Readable original data before encryption.",
+        "vi": "Dữ liệu gốc có thể đọc trước khi mã hóa."
+      }
+    },
+    {
+      "term": "ciphertext",
+      "meaning": {
+        "en": "The unreadable output produced by encryption.",
+        "vi": "Đầu ra khó đọc do mã hóa tạo ra."
+      }
+    },
+    {
+      "term": "encryption",
+      "meaning": {
+        "en": "Transforming plaintext into ciphertext with an algorithm and key.",
+        "vi": "Biến bản rõ thành bản mã bằng thuật toán và khóa."
+      }
+    },
+    {
+      "term": "decryption",
+      "meaning": {
+        "en": "Recovering plaintext from ciphertext with the required key.",
+        "vi": "Khôi phục bản rõ từ bản mã bằng khóa cần thiết."
+      }
+    },
+    {
+      "term": "symmetric key",
+      "meaning": {
+        "en": "A shared secret used for both encryption and decryption in this model.",
+        "vi": "Bí mật dùng chung cho cả mã hóa và giải mã trong mô hình này."
+      }
+    },
+    {
+      "term": "key pair",
+      "meaning": {
+        "en": "Related public and private keys owned by one entity.",
+        "vi": "Cặp khóa công khai và riêng tư có liên hệ, thuộc một chủ thể."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "security-goal-first",
+      "title": {
+        "en": "Start with the security goal",
+        "vi": "Bắt đầu từ mục tiêu bảo mật"
+      },
+      "paragraphs": [
+        {
+          "en": "Confidentiality asks who may read the message. Authenticity asks whether the claimed sender can be trusted, while integrity asks whether the message changed. A key operation must be chosen from the goal, not from a memorised word.",
+          "vi": "Tính bí mật hỏi ai được đọc thông điệp. Tính xác thực hỏi có thể tin người gửi được khai báo không, còn tính toàn vẹn hỏi thông điệp có bị thay đổi không. Phải chọn thao tác khóa từ mục tiêu, không từ một từ khóa học thuộc."
+        },
+        {
+          "en": "Encryption produces ciphertext. A digital-signature operation produces evidence for verification; it does not automatically hide the message.",
+          "vi": "Mã hóa tạo bản mã. Thao tác chữ ký số tạo bằng chứng để kiểm chứng; nó không tự động che nội dung thông điệp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "symmetric-asymmetric",
+      "title": {
+        "en": "Two key arrangements",
+        "vi": "Hai cách tổ chức khóa"
+      },
+      "paragraphs": [
+        {
+          "en": "Symmetric cryptography uses the same shared secret for encryption and decryption. It can be efficient, but the parties need a secure way to share and protect that secret.",
+          "vi": "Mật mã đối xứng dùng cùng một bí mật dùng chung để mã hóa và giải mã. Cách này có thể hiệu quả, nhưng các bên cần phương thức an toàn để chia sẻ và bảo vệ bí mật đó."
+        },
+        {
+          "en": "Asymmetric cryptography gives an owner a public key that may be distributed and a private key that the owner keeps secret. The paired operation reverses or verifies the first operation according to the selected model.",
+          "vi": "Mật mã bất đối xứng cho chủ sở hữu một khóa công khai có thể phân phối và một khóa riêng tư phải giữ kín. Thao tác với khóa cặp sẽ đảo ngược hoặc kiểm chứng thao tác đầu theo mô hình đã chọn."
+        }
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Goal",
+            "vi": "Mục tiêu"
+          },
+          {
+            "en": "First operation",
+            "vi": "Thao tác đầu"
+          },
+          {
+            "en": "Matching operation",
+            "vi": "Thao tác cặp"
+          },
+          {
+            "en": "Outcome",
+            "vi": "Kết quả"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "Private message to Kai",
+              "vi": "Thông điệp bí mật cho Kai"
+            },
+            {
+              "en": "Sender encrypts with Kai’s public key",
+              "vi": "Người gửi mã hóa bằng khóa công khai của Kai"
+            },
+            {
+              "en": "Kai decrypts with Kai’s private key",
+              "vi": "Kai giải mã bằng khóa riêng của Kai"
+            },
+            {
+              "en": "Confidentiality",
+              "vi": "Tính bí mật"
+            }
+          ],
+          [
+            {
+              "en": "Verified notice from Mina",
+              "vi": "Thông báo được xác minh từ Mina"
+            },
+            {
+              "en": "Mina signs with Mina’s private key",
+              "vi": "Mina ký bằng khóa riêng của Mina"
+            },
+            {
+              "en": "Public verifies with Mina’s public key",
+              "vi": "Công chúng kiểm chứng bằng khóa công khai của Mina"
+            },
+            {
+              "en": "Authenticity and integrity evidence",
+              "vi": "Bằng chứng xác thực và toàn vẹn"
+            }
+          ]
+        ]
+      },
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "actor-key-operation-outcome",
+      "title": {
+        "en": "Write the complete causal chain",
+        "vi": "Viết đủ chuỗi nguyên nhân"
+      },
+      "paragraphs": [
+        {
+          "en": "Name the actor and key owner before the operation. For confidentiality: the sender encrypts using the recipient’s public key, then only the recipient’s matching private key can decrypt in this model.",
+          "vi": "Ghi tác nhân và chủ khóa trước thao tác. Với tính bí mật: người gửi mã hóa bằng khóa công khai của người nhận, rồi chỉ khóa riêng tương ứng của người nhận mới giải mã được trong mô hình này."
+        },
+        {
+          "en": "For a verified public message: the sender signs using the sender’s private key and a verifier uses the sender’s certified public key. Because the public key is public, verification does not make the message secret.",
+          "vi": "Với thông điệp công khai được xác minh: người gửi ký bằng khóa riêng của mình và người kiểm chứng dùng khóa công khai đã được chứng nhận của người gửi. Vì khóa công khai là công khai, việc kiểm chứng không làm thông điệp trở nên bí mật."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "key-ownership",
+    "title": {
+      "en": "Key ownership and security-goal explorer",
+      "vi": "Khám phá chủ khóa và mục tiêu bảo mật"
+    },
+    "introduction": {
+      "en": "Choose a goal and test a key operation. The lanes show who acts, who owns each key and what the operation actually guarantees.",
+      "vi": "Chọn mục tiêu và thử thao tác khóa. Các làn cho biết ai hành động, ai sở hữu từng khóa và thao tác thực sự bảo đảm điều gì."
+    },
+    "task": {
+      "en": "Complete both the private-message and verified-message scenarios, then explain why the near-miss key is wrong.",
+      "vi": "Hoàn thành cả kịch bản thông điệp bí mật và thông điệp được xác minh, rồi giải thích vì sao khóa gần đúng lại sai."
+    },
+    "conventions": [
+      {
+        "en": "Open key = public; filled key = private; linked keys belong to one owner.",
+        "vi": "Khóa rỗng = công khai; khóa đặc = riêng tư; khóa nối cặp thuộc cùng chủ."
+      },
+      {
+        "en": "The visual is a concept-aligned AlgoCore redraw, not production cryptography.",
+        "vi": "Minh họa là bản vẽ lại theo khái niệm của AlgoCore, không phải mật mã dùng trong sản xuất."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Choose keys for an application portal",
+      "vi": "Chọn khóa cho cổng nộp hồ sơ"
+    },
+    "prompt": {
+      "en": "A student sends a private application to North College. Later the college publishes a notice that the public must verify.",
+      "vi": "Một học sinh gửi hồ sơ riêng tư đến North College. Sau đó trường công bố thông báo mà công chúng cần kiểm chứng."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "goal-private",
+        "action": {
+          "en": "State the first goal: confidentiality.",
+          "vi": "Nêu mục tiêu đầu: tính bí mật."
+        },
+        "why": {
+          "en": "The application must be readable only by the intended college.",
+          "vi": "Hồ sơ chỉ được người nhận là trường đọc."
+        },
+        "result": {
+          "en": "Actor: student; recipient/key owner: North College.",
+          "vi": "Tác nhân: học sinh; người nhận/chủ khóa: North College."
+        },
+        "check": {
+          "en": "Do not choose a key until its owner is named.",
+          "vi": "Chưa chọn khóa khi chưa ghi chủ khóa."
+        }
+      },
+      {
+        "id": "encrypt-recipient-public",
+        "action": {
+          "en": "Encrypt with North College’s public key.",
+          "vi": "Mã hóa bằng khóa công khai của North College."
+        },
+        "why": {
+          "en": "Only North College holds the matching private key in this model.",
+          "vi": "Chỉ North College giữ khóa riêng tương ứng trong mô hình này."
+        },
+        "result": {
+          "en": "Plaintext application becomes ciphertext for transfer.",
+          "vi": "Hồ sơ bản rõ trở thành bản mã để truyền."
+        }
+      },
+      {
+        "id": "decrypt-recipient-private",
+        "action": {
+          "en": "North College decrypts with its private key.",
+          "vi": "North College giải mã bằng khóa riêng của mình."
+        },
+        "why": {
+          "en": "The paired private key reverses the recipient-public-key encryption.",
+          "vi": "Khóa riêng cùng cặp đảo ngược mã hóa bằng khóa công khai của người nhận."
+        },
+        "result": {
+          "en": "North College recovers the plaintext; the private key never leaves its owner.",
+          "vi": "North College khôi phục bản rõ; khóa riêng không rời chủ sở hữu."
+        }
+      },
+      {
+        "id": "sign-public-notice",
+        "action": {
+          "en": "The college signs the notice with the college private key.",
+          "vi": "Trường ký thông báo bằng khóa riêng của trường."
+        },
+        "why": {
+          "en": "The public must verify the claimed sender, not keep the notice secret.",
+          "vi": "Công chúng cần xác minh người gửi được khai báo, không cần giữ bí mật thông báo."
+        },
+        "result": {
+          "en": "Anyone can use the certified college public key to verify authenticity/integrity evidence.",
+          "vi": "Ai cũng có thể dùng khóa công khai đã được chứng nhận của trường để kiểm chứng bằng chứng xác thực/toàn vẹn."
+        }
+      }
+    ],
+    "result": {
+      "en": "The private application uses recipient-public → recipient-private; the public notice uses sender-private → sender-public verification.",
+      "vi": "Hồ sơ bí mật dùng khóa công khai người nhận → khóa riêng người nhận; thông báo công khai dùng khóa riêng người gửi → kiểm chứng bằng khóa công khai người gửi."
+    },
+    "selfCheck": {
+      "en": "For each operation, say whose key it is and whether the outcome is confidentiality or verification.",
+      "vi": "Với mỗi thao tác, nêu khóa của ai và kết quả là bí mật hay kiểm chứng."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "‘private/confidential message to an organisation’",
+        "vi": "‘thông điệp riêng tư/bí mật đến tổ chức’"
+      },
+      {
+        "en": "‘verified message to the public’",
+        "vi": "‘thông điệp được xác minh gửi công chúng’"
+      },
+      {
+        "en": "‘same/shared secret key’",
+        "vi": "‘cùng/bí mật dùng chung’"
+      },
+      {
+        "en": "describe, compare, justify or choose the key",
+        "vi": "mô tả, so sánh, biện minh hoặc chọn khóa"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: using the sender’s private key on readable text supports verification in the teaching model; it does not give confidentiality because the sender’s public key is public.",
+      "vi": "Dễ nhầm: dùng khóa riêng của người gửi trên nội dung có thể đọc hỗ trợ kiểm chứng trong mô hình dạy học; nó không tạo tính bí mật vì khóa công khai của người gửi là công khai."
+    },
+    "method": [
+      {
+        "en": "Underline the required security goal.",
+        "vi": "Gạch dưới mục tiêu bảo mật cần có."
+      },
+      {
+        "en": "Name every actor and key owner.",
+        "vi": "Ghi mọi tác nhân và chủ khóa."
+      },
+      {
+        "en": "Choose the first and matching operation.",
+        "vi": "Chọn thao tác đầu và thao tác cặp."
+      },
+      {
+        "en": "State who can read or verify and why.",
+        "vi": "Nêu ai có thể đọc hoặc kiểm chứng và vì sao."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A public key must be kept secret.",
+        "vi": "Khóa công khai phải được giữ bí mật."
+      },
+      "correction": {
+        "en": "It is designed for distribution; the matching private key is protected.",
+        "vi": "Nó được thiết kế để phân phối; khóa riêng tương ứng mới được bảo vệ."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Using any private key makes a message confidential.",
+        "vi": "Dùng bất kỳ khóa riêng nào cũng làm thông điệp bí mật."
+      },
+      "correction": {
+        "en": "Key ownership and the security goal determine the operation; public verification does not hide content.",
+        "vi": "Chủ khóa và mục tiêu bảo mật quyết định thao tác; kiểm chứng công khai không che nội dung."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Ciphertext and a signature are the same artefact.",
+        "vi": "Bản mã và chữ ký là cùng một tạo phẩm."
+      },
+      "correction": {
+        "en": "Ciphertext hides readable content; a signature supports verification.",
+        "vi": "Bản mã che nội dung có thể đọc; chữ ký hỗ trợ kiểm chứng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Symmetric encryption needs no key exchange problem to be solved.",
+        "vi": "Mã hóa đối xứng không cần giải quyết vấn đề trao đổi khóa."
+      },
+      "correction": {
+        "en": "Both intended parties need the same secret and must obtain it securely.",
+        "vi": "Hai bên dự định cần cùng bí mật và phải nhận nó một cách an toàn."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "private-key-choice",
+      "prompt": {
+        "en": "Lea sends a confidential file to Omar. Which first operation fits?",
+        "vi": "Lea gửi tệp bí mật cho Omar. Thao tác đầu nào phù hợp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Encrypt with Omar’s public key",
+            "vi": "Mã hóa bằng khóa công khai của Omar"
+          },
+          "feedback": {
+            "en": "Correct: Omar alone holds the matching private key.",
+            "vi": "Đúng: chỉ Omar giữ khóa riêng tương ứng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Encrypt with Lea’s public key",
+            "vi": "Mã hóa bằng khóa công khai của Lea"
+          },
+          "feedback": {
+            "en": "That pair belongs to the sender, not the intended reader.",
+            "vi": "Cặp khóa đó thuộc người gửi, không phải người đọc dự định."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Sign with Omar’s private key",
+            "vi": "Ký bằng khóa riêng của Omar"
+          },
+          "feedback": {
+            "en": "Lea should not possess Omar’s private key, and signing is not the confidentiality operation.",
+            "vi": "Lea không được có khóa riêng của Omar, và ký không phải thao tác tạo bí mật."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Goal → recipient → recipient public key → recipient private decryption.",
+        "vi": "Mục tiêu → người nhận → khóa công khai người nhận → giải mã bằng khóa riêng người nhận."
+      }
+    },
+    {
+      "id": "verified-key-choice",
+      "prompt": {
+        "en": "Which operation lets the public verify a notice from Priya?",
+        "vi": "Thao tác nào cho công chúng kiểm chứng thông báo từ Priya?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Priya signs with Priya’s private key",
+            "vi": "Priya ký bằng khóa riêng của Priya"
+          },
+          "feedback": {
+            "en": "Correct: verifiers use Priya’s public key.",
+            "vi": "Đúng: người kiểm chứng dùng khóa công khai của Priya."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Priya encrypts with every reader’s private key",
+            "vi": "Priya mã hóa bằng khóa riêng của mọi người đọc"
+          },
+          "feedback": {
+            "en": "Priya must never possess those private keys.",
+            "vi": "Priya không bao giờ được sở hữu các khóa riêng đó."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Priya hides the public key",
+            "vi": "Priya giấu khóa công khai"
+          },
+          "feedback": {
+            "en": "A public key must be available to verifiers.",
+            "vi": "Khóa công khai phải sẵn có cho người kiểm chứng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Verification uses the claimed sender’s key pair and does not require secrecy.",
+        "vi": "Kiểm chứng dùng cặp khóa của người gửi được khai báo và không đòi hỏi bí mật."
+      }
+    },
+    {
+      "id": "shared-secret",
+      "prompt": {
+        "en": "What must be true for a symmetric exchange?",
+        "vi": "Điều gì phải đúng với trao đổi đối xứng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Both intended parties possess the same protected secret",
+            "vi": "Hai bên dự định cùng có một bí mật được bảo vệ"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every member of the public has the secret",
+            "vi": "Mọi người đều có bí mật"
+          },
+          "feedback": {
+            "en": "Then it is not a protected shared secret.",
+            "vi": "Khi đó nó không còn là bí mật dùng chung được bảo vệ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No key is used",
+            "vi": "Không dùng khóa"
+          },
+          "feedback": {
+            "en": "Symmetric cryptography uses a key for both directions.",
+            "vi": "Mật mã đối xứng dùng khóa cho cả hai chiều."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "The sharing and protection of the secret is part of the security problem.",
+        "vi": "Việc chia sẻ và bảo vệ bí mật là một phần của bài toán bảo mật."
+      }
+    },
+    {
+      "id": "transfer-goal",
+      "prompt": {
+        "en": "A readable announcement carries a signature. What can the signature support?",
+        "vi": "Một thông báo có thể đọc đi kèm chữ ký. Chữ ký có thể hỗ trợ điều gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Authenticity and integrity evidence",
+            "vi": "Bằng chứng xác thực và toàn vẹn"
+          },
+          "feedback": {
+            "en": "Correct: the content remains readable.",
+            "vi": "Đúng: nội dung vẫn có thể đọc."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Confidentiality by itself",
+            "vi": "Tự nó tạo tính bí mật"
+          },
+          "feedback": {
+            "en": "A signature alone does not hide the announcement.",
+            "vi": "Chữ ký đơn lẻ không che thông báo."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Guaranteed truthful content",
+            "vi": "Bảo đảm nội dung đúng sự thật"
+          },
+          "feedback": {
+            "en": "Verification identifies the signer and change status, not the truth of every claim.",
+            "vi": "Kiểm chứng nhận diện người ký và trạng thái thay đổi, không bảo đảm mọi tuyên bố là đúng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Name the precise property supported rather than saying ‘secure’.",
+        "vi": "Nêu chính xác thuộc tính được hỗ trợ thay vì chỉ nói ‘an toàn’."
+      }
+    },
+    {
+      "id": "order-private-message",
+      "prompt": {
+        "en": "Which sequence correctly protects a new confidential message for Omar?",
+        "vi": "Trình tự nào bảo vệ đúng thông điệp bí mật mới cho Omar?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Sender uses Omar’s public key → ciphertext travels → Omar uses Omar’s private key",
+            "vi": "Người gửi dùng khóa công khai Omar → truyền bản mã → Omar dùng khóa riêng Omar"
+          },
+          "feedback": {
+            "en": "Correct: owner and operation are correct at both ends.",
+            "vi": "Đúng: chủ khóa và thao tác đúng ở cả hai đầu."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Omar publishes his private key → sender decrypts → plaintext travels",
+            "vi": "Omar công bố khóa riêng → người gửi giải mã → truyền bản rõ"
+          },
+          "feedback": {
+            "en": "This exposes the private key and never protects the message.",
+            "vi": "Cách này làm lộ khóa riêng và không bảo vệ thông điệp."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Sender signs with a private key → everyone decrypts for confidentiality",
+            "vi": "Người gửi ký bằng khóa riêng → mọi người giải mã để tạo bí mật"
+          },
+          "feedback": {
+            "en": "Public verification does not create confidentiality.",
+            "vi": "Kiểm chứng công khai không tạo tính bí mật."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Order the actor, owned key, artefact and matching operation.",
+        "vi": "Sắp xếp tác nhân, khóa thuộc sở hữu, tạo phẩm và thao tác cặp."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Complete two chains: confidential to B; verified from A.",
+      "vi": "Hoàn thành hai chuỗi: bí mật gửi B; được xác minh từ A."
+    },
+    "answerPoints": [
+      {
+        "en": "Confidential: A encrypts with B’s public key; B decrypts with B’s private key.",
+        "vi": "Bí mật: A mã hóa bằng khóa công khai của B; B giải mã bằng khóa riêng của B."
+      },
+      {
+        "en": "Verified: A signs with A’s private key; the public verifies with A’s public key.",
+        "vi": "Xác minh: A ký bằng khóa riêng của A; công chúng kiểm chứng bằng khóa công khai của A."
+      },
+      {
+        "en": "A signature does not itself provide confidentiality.",
+        "vi": "Chữ ký tự nó không tạo tính bí mật."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Choose the security goal before the mechanism.",
+      "vi": "Chọn mục tiêu bảo mật trước cơ chế."
+    },
+    {
+      "en": "Always name the owner of a public or private key.",
+      "vi": "Luôn ghi chủ sở hữu khóa công khai hoặc riêng tư."
+    },
+    {
+      "en": "Confidentiality, authenticity and integrity are different outcomes.",
+      "vi": "Tính bí mật, xác thực và toàn vẹn là các kết quả khác nhau."
+    }
+  ],
+  "relatedSlugs": [
+    "certificates-and-signatures",
+    "ssl-tls-communication"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p36, §17.1 Security",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Chapter 17.1, printed pp410–413 / PDF pp426–429: plaintext/ciphertext, symmetric and asymmetric encryption",
+      "kind": "book"
+    },
+    {
+      "id": "s24-32-qp",
+      "title": "Cambridge 9618/32 — May/June 2024 question paper",
+      "locator": "Question 4, p5: recipient public key, ciphertext and recipient private key",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s24-32-ms",
+      "title": "Cambridge 9618/32 — May/June 2024 mark scheme",
+      "locator": "Question 4, p5",
+      "kind": "mark-scheme"
+    }
+  ]
+}

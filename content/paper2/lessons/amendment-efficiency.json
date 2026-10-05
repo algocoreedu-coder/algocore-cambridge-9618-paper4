@@ -1,0 +1,585 @@
+{
+  "schemaVersion": 1,
+  "version": "T32-academic-r2",
+  "topicId": "T32",
+  "sectionId": "12.3",
+  "slug": "amendment-efficiency",
+  "learningMode": "testing",
+  "estimatedMinutes": 55,
+  "title": {
+    "en": "Amendment and efficiency",
+    "vi": "Sửa đổi và hiệu quả"
+  },
+  "question": {
+    "en": "How can you change an existing solution to satisfy a new contract while preserving old behaviour and avoiding unnecessary work?",
+    "vi": "Làm thế nào sửa lời giải hiện có để đáp ứng contract mới, giữ hành vi cũ và tránh công việc không cần thiết?"
+  },
+  "opening": {
+    "en": "Compare the old and new contracts before editing code. Make the smallest meaningful change, then test old, new and boundary cases. Explain efficiency using concrete avoided operations; Big-O or unmeasured timing is not required by this topic.",
+    "vi": "So contract cũ và mới trước khi sửa code. Thực hiện thay đổi có ý nghĩa nhỏ nhất rồi test case cũ, mới và biên. Giải thích hiệu quả bằng thao tác cụ thể được tránh; topic này không bắt buộc Big-O hay thời gian chưa đo."
+  },
+  "objectives": [
+    {
+      "en": "Identify changed and unchanged requirements.",
+      "vi": "Xác định requirement đổi và không đổi."
+    },
+    {
+      "en": "Amend pseudocode while preserving required behaviour.",
+      "vi": "Sửa pseudocode và giữ hành vi bắt buộc."
+    },
+    {
+      "en": "Design old/new/boundary regression cases and justify reduced work conditionally.",
+      "vi": "Thiết kế regression case cũ/mới/biên và giải thích công việc giảm có điều kiện."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Procedures and functions",
+        "vi": "Procedure và function"
+      },
+      "reason": {
+        "en": "A localised module contract makes a change easier to isolate.",
+        "vi": "Contract module được khoanh vùng giúp cô lập thay đổi."
+      }
+    },
+    {
+      "title": {
+        "en": "Errors and test plans",
+        "vi": "Lỗi và test plan"
+      },
+      "reason": {
+        "en": "Amendments require evidence that new and retained behaviour is correct.",
+        "vi": "Sửa đổi cần bằng chứng hành vi mới và được giữ đều đúng."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "amendment",
+      "meaning": {
+        "en": "A controlled change to an existing solution in response to a revised requirement.",
+        "vi": "Thay đổi có kiểm soát với lời giải hiện có để đáp ứng yêu cầu sửa đổi."
+      }
+    },
+    {
+      "term": "regression",
+      "meaning": {
+        "en": "A previously correct behaviour broken by the amendment.",
+        "vi": "Hành vi từng đúng bị hỏng do sửa đổi."
+      }
+    },
+    {
+      "term": "contract",
+      "meaning": {
+        "en": "The required inputs, outputs, effects and error behaviour of a component.",
+        "vi": "Inputs, outputs, effects và hành vi lỗi bắt buộc của component."
+      }
+    },
+    {
+      "term": "efficiency",
+      "meaning": {
+        "en": "Completing the required work while avoiding demonstrably unnecessary operations or storage.",
+        "vi": "Hoàn thành công việc yêu cầu và tránh thao tác hoặc lưu trữ thừa có thể chứng minh."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The question says amend, modify, extend, new requirement, improve efficiency or avoid repeated work.",
+        "vi": "Đề nói amend, modify, extend, yêu cầu mới, improve efficiency hoặc tránh công việc lặp."
+      },
+      {
+        "en": "Existing pseudocode must be changed rather than written without context.",
+        "vi": "Pseudocode hiện có cần được sửa thay vì viết không có bối cảnh."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "Debugging repairs a fault against the old contract; amendment may change the contract itself.",
+        "vi": "Debugging sửa lỗi theo contract cũ; amendment có thể đổi chính contract."
+      },
+      {
+        "en": "Shorter code is not automatically more efficient or correct.",
+        "vi": "Code ngắn hơn không tự động hiệu quả hơn hoặc đúng."
+      }
+    ],
+    "answerProduct": {
+      "en": "An old/new contract comparison, focused change, regression set and conditional explanation of avoided work.",
+      "vi": "So sánh contract cũ/mới, thay đổi tập trung, bộ regression và giải thích có điều kiện về công việc được tránh."
+    },
+    "method": [
+      {
+        "en": "Write what must change and what must remain invariant.",
+        "vi": "Viết phần phải đổi và phần phải giữ bất biến."
+      },
+      {
+        "en": "Locate the smallest module/condition/data structure responsible.",
+        "vi": "Định vị module/điều kiện/cấu trúc dữ liệu nhỏ nhất chịu trách nhiệm."
+      },
+      {
+        "en": "Apply the meaningful diff and trace representative states.",
+        "vi": "Áp dụng diff có ý nghĩa và trace state đại diện."
+      },
+      {
+        "en": "Test old, new, boundary and failure cases; count avoided operations only under stated assumptions.",
+        "vi": "Test case cũ, mới, biên và lỗi; chỉ đếm thao tác tránh được dưới giả thiết đã nêu."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "T32-U1",
+      "title": {
+        "en": "Old contract, new contract, invariant",
+        "vi": "Contract cũ, contract mới, invariant"
+      },
+      "paragraphs": [
+        {
+          "en": "An amendment answer starts by stating the difference between requirements. Everything not changed remains part of the regression contract.",
+          "vi": "Câu trả lời amendment bắt đầu bằng việc nêu khác biệt requirement. Mọi phần không đổi vẫn thuộc regression contract."
+        },
+        {
+          "en": "A focused change reduces risk: edit the module or condition that owns the behaviour rather than duplicating logic elsewhere.",
+          "vi": "Thay đổi tập trung giảm rủi ro: sửa module hoặc điều kiện sở hữu hành vi thay vì nhân đôi logic nơi khác."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Changed requirement",
+          "vi": "Requirement thay đổi"
+        },
+        {
+          "en": "Unchanged behaviour",
+          "vi": "Hành vi không đổi"
+        },
+        {
+          "en": "Affected state/data/interface",
+          "vi": "State/data/interface bị ảnh hưởng"
+        },
+        {
+          "en": "Meaningful diff",
+          "vi": "Diff có ý nghĩa"
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book"
+      ]
+    },
+    {
+      "id": "T32-U2",
+      "title": {
+        "en": "Regression and conditional efficiency",
+        "vi": "Regression và hiệu quả có điều kiện"
+      },
+      "paragraphs": [
+        {
+          "en": "Use tests from the old contract plus new and boundary cases. A correct new case does not prove old behaviour survived.",
+          "vi": "Dùng test từ contract cũ cộng case mới và biên. Một case mới đúng không chứng minh hành vi cũ còn nguyên."
+        },
+        {
+          "en": "An efficiency claim names the repeated work removed and the condition under which it is saved. Do not claim measured speed or complexity without evidence.",
+          "vi": "Nhận định hiệu quả nêu công việc lặp được loại và điều kiện tiết kiệm. Không tuyên bố tốc độ đo được hay độ phức tạp khi không có bằng chứng."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Old valid and invalid cases",
+          "vi": "Case cũ hợp lệ và không hợp lệ"
+        },
+        {
+          "en": "New requirement cases",
+          "vi": "Case requirement mới"
+        },
+        {
+          "en": "Shared boundaries",
+          "vi": "Biên chung"
+        },
+        {
+          "en": "Concrete operation count/avoidance",
+          "vi": "Số thao tác/việc tránh cụ thể"
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T32"
+    ],
+    "title": {
+      "en": "Before/after contract and regression timeline",
+      "vi": "Contract trước/sau và timeline regression"
+    },
+    "introduction": {
+      "en": "The visual keeps unchanged behaviour beside the new branch and marks which tests protect each part.",
+      "vi": "Visual đặt hành vi không đổi cạnh nhánh mới và đánh dấu test bảo vệ từng phần."
+    },
+    "task": {
+      "en": "Select a change, predict affected tests and identify which repeated operation can be removed safely.",
+      "vi": "Chọn thay đổi, dự đoán test bị ảnh hưởng và xác định thao tác lặp có thể bỏ an toàn."
+    },
+    "conventions": [
+      {
+        "en": "Green invariant blocks must produce the same result before and after.",
+        "vi": "Khối invariant xanh phải cho cùng kết quả trước và sau."
+      },
+      {
+        "en": "New branches require new expected results.",
+        "vi": "Nhánh mới cần expected result mới."
+      },
+      {
+        "en": "Efficiency labels count work; they do not claim Big-O or benchmark results.",
+        "vi": "Nhãn efficiency đếm công việc; không tuyên bố Big-O hay benchmark."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "teacher-t32"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T32-W1",
+      "title": {
+        "en": "Amend a single-discount contract",
+        "vi": "Sửa contract giảm giá đơn"
+      },
+      "prompt": {
+        "en": "Old: ApplyDiscount(Total, IsMember) gives members 10% off. New: first apply the member rule; then, when the original Total is over 200, apply a further 5% to the already-discounted Result. Amend the function and plan regression.",
+        "vi": "Cũ: ApplyDiscount(Total, IsMember) giảm 10% cho thành viên. Mới: trước hết áp dụng quy tắc thành viên; sau đó, khi Total ban đầu lớn hơn 200, giảm thêm 5% trên Result đã giảm. Sửa function và lập regression."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "T32-W1-S1",
+          "action": {
+            "en": "State the invariant and new rule.",
+            "vi": "Nêu invariant và quy tắc mới."
+          },
+          "why": {
+            "en": "Member discount must remain, while a second conditional discount is added.",
+            "vi": "Giảm member phải được giữ, đồng thời thêm giảm có điều kiện thứ hai."
+          },
+          "result": {
+            "en": "Old member/non-member behaviour remains when original Total<=200; when original Total>200, apply 5% to Result after the member calculation.",
+            "vi": "Hành vi member/non-member cũ giữ khi Total ban đầu<=200; khi Total ban đầu>200, giảm 5% trên Result sau phép tính member."
+          },
+          "check": {
+            "en": "Order of percentage operations is explicit.",
+            "vi": "Thứ tự phép tính phần trăm được nêu rõ."
+          }
+        },
+        {
+          "id": "T32-W1-S2",
+          "action": {
+            "en": "Use Result←Total, then member IF, then IF Total>200.",
+            "vi": "Dùng Result←Total, rồi IF member, rồi IF Total>200."
+          },
+          "why": {
+            "en": "A single result variable avoids duplicate return branches and makes order traceable.",
+            "vi": "Một biến result tránh nhánh return trùng và giúp trace thứ tự."
+          },
+          "result": {
+            "en": "Return Result after both independent conditions.",
+            "vi": "Return Result sau hai điều kiện độc lập."
+          },
+          "check": {
+            "en": "Independent IFs are intentional because both discounts may apply.",
+            "vi": "Hai IF độc lập là có chủ ý vì cả hai giảm có thể cùng áp dụng."
+          }
+        },
+        {
+          "id": "T32-W1-S3",
+          "action": {
+            "en": "Test old, new and boundary cases.",
+            "vi": "Test case cũ, mới và biên."
+          },
+          "why": {
+            "en": "The amendment could regress old membership behaviour or mishandle the 200 threshold.",
+            "vi": "Sửa đổi có thể làm hỏng hành vi member cũ hoặc xử lý sai ngưỡng 200."
+          },
+          "result": {
+            "en": "Total 190: non-member 190.00, member 171.00. Total 200: non-member 200.00, member 180.00. Total 210: non-member 199.50, member 179.55.",
+            "vi": "Total 190: non-member 190.00, member 171.00. Total 200: non-member 200.00, member 180.00. Total 210: non-member 199.50, member 179.55."
+          },
+          "check": {
+            "en": "Every case has independently calculated expected money values.",
+            "vi": "Mỗi case có expected money được tính độc lập."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Result←Total; IF IsMember THEN Result←Result*0.90 ENDIF; IF Total>200 THEN Result←Result*0.95 ENDIF; RETURN Result. Regression: (190,FALSE)→190.00, (190,TRUE)→171.00, (200,FALSE)→200.00, (200,TRUE)→180.00, (210,FALSE)→199.50, (210,TRUE)→179.55. The member case at 210 proves that the threshold uses original Total, not post-member Result=189.00.",
+        "vi": "Result←Total; IF IsMember THEN Result←Result*0.90 ENDIF; IF Total>200 THEN Result←Result*0.95 ENDIF; RETURN Result. Regression: (190,FALSE)→190.00, (190,TRUE)→171.00, (200,FALSE)→200.00, (200,TRUE)→180.00, (210,FALSE)→199.50, (210,TRUE)→179.55. Case member tại 210 chứng minh ngưỡng dùng Total ban đầu, không dùng Result sau giảm member=189.00."
+      },
+      "selfCheck": {
+        "en": "Does every threshold decision test original Total while the second 5% calculation multiplies the already-discounted Result?",
+        "vi": "Mọi quyết định ngưỡng có kiểm Total ban đầu trong khi phép giảm 5% thứ hai nhân Result đã giảm không?"
+      },
+      "sourceIds": [
+        "teacher-t32"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T32-P1",
+      "title": {
+        "en": "Handle an empty file",
+        "vi": "Xử lý file rỗng"
+      },
+      "prompt": {
+        "en": "Existing code reads the first record before checking EOF. New requirement: an existing empty file must output \"No records\" without a read error. Describe the focused amendment and regression.",
+        "vi": "Code hiện đọc record đầu trước khi kiểm EOF. Yêu cầu mới: file rỗng tồn tại phải output \"No records\" mà không lỗi đọc. Mô tả sửa đổi tập trung và regression."
+      },
+      "working": [
+        {
+          "en": "Compare old assumption 'at least one record' with the new empty-file contract.",
+          "vi": "So giả thiết cũ 'ít nhất một record' với contract file rỗng mới."
+        },
+        {
+          "en": "Move/introduce EOF check before READFILE and preserve non-empty loop behaviour.",
+          "vi": "Đưa/thêm kiểm EOF trước READFILE và giữ hành vi loop file không rỗng."
+        },
+        {
+          "en": "Test empty, one-record and multi-record files.",
+          "vi": "Test file rỗng, một record và nhiều record."
+        }
+      ],
+      "answer": {
+        "en": "After OPENFILE, test EOF before the first READFILE. If EOF, output \"No records\"; otherwise enter the existing read/process loop. Regression: empty file has no read, one and many records are processed once each, missing-file handling remains per its separate contract.",
+        "vi": "Sau OPENFILE, kiểm EOF trước READFILE đầu. Nếu EOF, output \"No records\"; nếu không vào loop đọc/xử lý hiện có. Regression: file rỗng không đọc, file một/nhiều record xử lý mỗi record một lần, xử lý file không tồn tại giữ theo contract riêng."
+      },
+      "markGuidance": [
+        {
+          "en": "Pre-read EOF guard.",
+          "vi": "Guard EOF trước khi đọc."
+        },
+        {
+          "en": "Old non-empty behaviour preserved.",
+          "vi": "Giữ hành vi file không rỗng."
+        },
+        {
+          "en": "Empty/one/many regression cases.",
+          "vi": "Regression rỗng/một/nhiều."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Use a post-read EOF test that still reads empty file.",
+          "vi": "Dùng kiểm EOF sau đọc nên vẫn đọc file rỗng."
+        },
+        {
+          "en": "Treat missing file as the same as existing empty file.",
+          "vi": "Coi file không tồn tại giống file rỗng tồn tại."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can any path call READFILE when EOF is already TRUE?",
+        "vi": "Có đường nào gọi READFILE khi EOF đã TRUE không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t32"
+      ]
+    },
+    {
+      "id": "T32-P2",
+      "title": {
+        "en": "Avoid a repeated full scan",
+        "vi": "Tránh quét toàn bộ lặp lại"
+      },
+      "prompt": {
+        "en": "A loop calculates the total of the same array twice: once to display it and again to compare with a limit. Amend without changing results and explain the efficiency condition.",
+        "vi": "Loop tính tổng cùng một mảng hai lần: một lần để hiển thị và lần nữa để so với limit. Sửa mà không đổi kết quả và giải thích điều kiện hiệu quả."
+      },
+      "working": [
+        {
+          "en": "Confirm the array cannot change between the two scans.",
+          "vi": "Xác nhận mảng không đổi giữa hai lần quét."
+        },
+        {
+          "en": "Store Total from the first scan and reuse it.",
+          "vi": "Lưu Total từ lần quét đầu và dùng lại."
+        },
+        {
+          "en": "Regression-test empty, one-item and normal arrays.",
+          "vi": "Regression-test mảng rỗng, một phần tử và bình thường."
+        }
+      ],
+      "answer": {
+        "en": "Compute Total once, output it and compare the stored Total with Limit. This avoids one full pass only when array values do not change between uses; results remain identical for empty, one-item and normal arrays.",
+        "vi": "Tính Total một lần, output và so Total đã lưu với Limit. Cách này tránh một lượt quét toàn bộ chỉ khi giá trị mảng không đổi giữa hai lần dùng; kết quả giữ nguyên cho mảng rỗng, một phần tử và bình thường."
+      },
+      "markGuidance": [
+        {
+          "en": "Single stored Total reused.",
+          "vi": "Dùng lại một Total đã lưu."
+        },
+        {
+          "en": "Condition of unchanged data stated.",
+          "vi": "Nêu điều kiện dữ liệu không đổi."
+        },
+        {
+          "en": "Old/boundary regression cases.",
+          "vi": "Case regression cũ/biên."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Claim faster without saying what work is removed.",
+          "vi": "Tuyên bố nhanh hơn mà không nêu công việc bị loại."
+        },
+        {
+          "en": "Reuse a total after the array changes.",
+          "vi": "Dùng lại total sau khi mảng đã đổi."
+        }
+      ],
+      "selfCheck": {
+        "en": "What exact operations are avoided and under what invariant?",
+        "vi": "Thao tác cụ thể nào được tránh và dưới invariant nào?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t32"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Rewrite the whole program for a local requirement change.",
+        "vi": "Viết lại toàn bộ chương trình cho thay đổi cục bộ."
+      },
+      "correction": {
+        "en": "Find the owning module/condition and make a focused meaningful diff.",
+        "vi": "Tìm module/điều kiện sở hữu và thực hiện diff có ý nghĩa tập trung."
+      },
+      "selfCheck": {
+        "en": "Which unchanged behaviours would a rewrite risk?",
+        "vi": "Viết lại có thể gây rủi ro cho hành vi không đổi nào?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Claim shorter code is more efficient.",
+        "vi": "Tuyên bố code ngắn hơn là hiệu quả hơn."
+      },
+      "correction": {
+        "en": "Name concrete avoided operations/storage and the assumptions that make reuse safe.",
+        "vi": "Nêu thao tác/storage cụ thể được tránh và giả thiết làm việc reuse an toàn."
+      },
+      "selfCheck": {
+        "en": "Can you count or identify the removed work?",
+        "vi": "Bạn có thể đếm hoặc xác định công việc bị loại không?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What five parts make an amendment answer complete?",
+      "vi": "Năm phần nào làm câu trả lời amendment đầy đủ?"
+    },
+    "answerPoints": [
+      {
+        "en": "Old/new contract difference.",
+        "vi": "Khác biệt contract cũ/mới."
+      },
+      {
+        "en": "Unchanged invariant.",
+        "vi": "Invariant không đổi."
+      },
+      {
+        "en": "Focused meaningful diff.",
+        "vi": "Diff tập trung có ý nghĩa."
+      },
+      {
+        "en": "Old/new/boundary regression.",
+        "vi": "Regression cũ/mới/biên."
+      },
+      {
+        "en": "Conditional evidence for reduced work.",
+        "vi": "Bằng chứng có điều kiện cho công việc giảm."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Compare contracts before code.",
+      "vi": "So contract trước code."
+    },
+    {
+      "en": "A new case does not replace old regression cases.",
+      "vi": "Case mới không thay regression case cũ."
+    },
+    {
+      "en": "Efficiency claims must identify real avoided work and assumptions.",
+      "vi": "Nhận định hiệu quả phải nêu công việc thực sự được tránh và giả thiết."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F16",
+      "role": "owner",
+      "title": {
+        "en": "Amendment and efficiency",
+        "vi": "Sửa đổi và hiệu quả"
+      }
+    },
+    {
+      "id": "F12",
+      "role": "related",
+      "title": {
+        "en": "Trace and debug",
+        "vi": "Trace và gỡ lỗi"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "procedures-functions",
+    "errors-debugging",
+    "test-strategy-test-plan",
+    "maintenance"
+  ],
+  "sources": [
+    {
+      "id": "syl",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§12.3, printed/PDF p31.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp275–280 and 293–300; PDF pp291–296 and 309–316.",
+      "kind": "book"
+    },
+    {
+      "id": "qp1",
+      "title": "9618/21 May/June 2025 Question 7(b)(ii)",
+      "locator": "QP p18; amendment calibration.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "qp2",
+      "title": "9618/23 Oct/Nov 2025 Question 5(b)",
+      "locator": "QP p12; efficiency/amendment calibration.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t32",
+      "title": "AlgoCore teacher-created T32 worked examples, practice and marking guidance",
+      "locator": "T32-academic-r2, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

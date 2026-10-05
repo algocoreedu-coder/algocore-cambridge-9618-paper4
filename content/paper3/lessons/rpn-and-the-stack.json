@@ -1,0 +1,680 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.2-T04",
+  "slug": "rpn-and-the-stack",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "RPN and the stack",
+    "vi": "RPN và ngăn xếp"
+  },
+  "question": {
+    "en": "How does a stack preserve the meaning of an expression without brackets?",
+    "vi": "Ngăn xếp giữ ý nghĩa biểu thức không có ngoặc bằng cách nào?"
+  },
+  "opening": {
+    "en": "In Reverse Polish Notation, each operator follows its operands. The stack records completed sub-expressions until the next operator needs them. Correct operand order matters even when addition examples seem forgiving: subtraction and division reveal a reversed pop immediately.",
+    "vi": "Trong Reverse Polish Notation, mỗi toán tử đứng sau các toán hạng. Ngăn xếp lưu kết quả biểu thức con cho đến khi toán tử tiếp theo cần dùng. Thứ tự toán hạng rất quan trọng dù các ví dụ cộng dễ che giấu lỗi: trừ và chia sẽ bộc lộ ngay việc lấy sai thứ tự."
+  },
+  "objectives": [
+    {
+      "en": "Convert between bracketed infix and postfix while preserving precedence.",
+      "vi": "Đổi giữa infix có ngoặc và postfix mà giữ đúng độ ưu tiên."
+    },
+    {
+      "en": "Trace every push, ordered pop, operation and result push.",
+      "vi": "Trace từng lần đẩy, lấy đúng thứ tự, tính và đẩy kết quả."
+    },
+    {
+      "en": "Diagnose invalid expressions without inventing a numerical answer.",
+      "vi": "Chẩn đoán biểu thức sai mà không tạo đáp án số giả."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Understand LIFO, binary arithmetic operators and fraction arithmetic.",
+      "vi": "Hiểu LIFO, toán tử số học hai ngôi và phép tính phân số."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Infix",
+      "meaning": {
+        "en": "The operator is between operands, for example 8 − 3.",
+        "vi": "Toán tử ở giữa toán hạng, ví dụ 8 − 3."
+      }
+    },
+    {
+      "term": "Postfix / RPN",
+      "meaning": {
+        "en": "The operator follows both operands, for example 8 3 −.",
+        "vi": "Toán tử theo sau cả hai toán hạng, ví dụ 8 3 −."
+      }
+    },
+    {
+      "term": "Stack top",
+      "meaning": {
+        "en": "The most recently pushed item, removed by the next pop.",
+        "vi": "Phần tử vừa được đẩy gần nhất, được lấy ra trong lần pop tiếp theo."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "expression-structure",
+      "title": {
+        "en": "Convert structure, not just symbols",
+        "vi": "Chuyển cấu trúc, không chỉ đổi vị trí ký hiệu"
+      },
+      "paragraphs": [
+        {
+          "en": "Infix uses precedence and brackets to express which operation is performed first. For (9−4)×(6+2), the two bracketed results are operands of multiplication. Write each sub-expression in postfix first: 9 4 − and 6 2 +. Then append ×, giving 9 4 − 6 2 + ×. Appending 5 / divides that whole result by 5.",
+          "vi": "Infix dùng độ ưu tiên và ngoặc để chỉ phép toán làm trước. Với (9−4)×(6+2), hai kết quả trong ngoặc là toán hạng của phép nhân. Viết postfix từng biểu thức con trước: 9 4 − và 6 2 +. Sau đó thêm × thành 9 4 − 6 2 + ×. Thêm 5 / sẽ chia toàn bộ kết quả đó cho 5."
+        },
+        {
+          "en": "Postfix needs no precedence rule during evaluation: position already specifies the operation order. When converting from infix, however, preserve brackets and the higher precedence of × and / over + and −. Equal-precedence operators associate left to right in this bounded grammar: 8−3−2 means (8−3)−2, not 8−(3−2).",
+          "vi": "Khi tính postfix không cần xét độ ưu tiên: vị trí đã quy định thứ tự phép toán. Tuy nhiên khi đổi từ infix phải giữ phạm vi ngoặc và ưu tiên ×, / cao hơn +, −. Trong ngữ pháp giới hạn này, toán tử cùng mức kết hợp từ trái sang phải: 8−3−2 nghĩa là (8−3)−2, không phải 8−(3−2)."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "stack-algorithm",
+      "title": {
+        "en": "Apply one binary operator safely",
+        "vi": "Áp dụng an toàn một toán tử hai ngôi"
+      },
+      "paragraphs": [
+        {
+          "en": "Read tokens from left to right. Push an operand. For an operator, first ensure at least two operands are available. Pop the right operand, then the left operand; calculate left operator right; push the result. The stack is shown bottom to top. With 8 3 −, the top is 3, so the operation is 8−3=5, not 3−8.",
+          "vi": "Đọc token từ trái sang phải. Gặp toán hạng thì đẩy vào. Gặp toán tử, trước hết kiểm có ít nhất hai toán hạng. Lấy toán hạng phải, rồi toán hạng trái; tính trái toán tử phải; đẩy kết quả. Ngăn xếp được trình bày từ đáy đến đỉnh. Với 8 3 −, đỉnh là 3 nên phép tính là 8−3=5, không phải 3−8."
+        },
+        {
+          "en": "A push increases depth by one; a valid binary operation replaces two values with one, reducing depth by one. These checks help find a missing token or an incorrect trace. Once all tokens are consumed, exactly one value must remain. An intermediate stack containing two values is normal; two values after the final token indicate an incomplete expression.",
+          "vi": "Đẩy làm độ sâu tăng một; phép toán hai ngôi hợp lệ thay hai giá trị bằng một, giảm độ sâu một. Các kiểm tra này giúp tìm token thiếu hoặc trace sai. Sau khi dùng hết token, phải còn đúng một giá trị. Ngăn xếp có hai giá trị giữa quá trình là bình thường; còn hai giá trị sau token cuối nghĩa là biểu thức chưa đầy đủ."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "reverse-conversion",
+      "title": {
+        "en": "Reconstruct infix using an expression stack",
+        "vi": "Dựng lại infix bằng ngăn xếp biểu thức"
+      },
+      "paragraphs": [
+        {
+          "en": "To convert postfix back to infix, store expression strings instead of calculating values. Push each operand; for an operator pop right then left and push (left operator right). Keep brackets until the entire structure is visible. The postfix 9 4 − 6 2 + × 5 / becomes (((9−4)×(6+2))/5). Removing brackets carelessly can change the meaning.",
+          "vi": "Để đổi postfix về infix, lưu chuỗi biểu thức thay vì tính giá trị. Đẩy mỗi toán hạng; với toán tử, lấy phải rồi trái và đẩy (trái toán tử phải). Giữ ngoặc đến khi thấy toàn bộ cấu trúc. Postfix 9 4 − 6 2 + × 5 / trở thành (((9−4)×(6+2))/5). Bỏ ngoặc thiếu cẩn thận có thể đổi ý nghĩa."
+        },
+        {
+          "en": "The same method works with variables: A B − C × becomes (A−B)×C. If values are later supplied, substitute them consistently into operands before evaluating. A variable name is one token, not a command to search an unrelated memory location.",
+          "vi": "Cách làm cũng áp dụng cho biến: A B − C × thành (A−B)×C. Nếu sau đó đề cho giá trị, thay nhất quán vào toán hạng trước khi tính. Tên biến là một token, không phải lệnh tìm một địa chỉ bộ nhớ không liên quan."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "exact-values-and-errors",
+      "title": {
+        "en": "Separate values from diagnostics",
+        "vi": "Phân biệt giá trị với chẩn đoán lỗi"
+      },
+      "paragraphs": [
+        {
+          "en": "Here / means real division: 5 2 / produces 5/2, not 2. Exact fractions avoid a rounded decimal hiding an arithmetic discrepancy. A signed integer such as −3 is one postfix operand token; a subtraction operator is a separate token between spaces. Negative intermediate results are allowed. The infix conversion tool uses binary operators and does not interpret unary minus.",
+          "vi": "Ở đây / là chia thực: 5 2 / cho 5/2, không phải 2. Phân số chính xác tránh việc số thập phân làm tròn che mất sai lệch số học. Số nguyên có dấu như −3 là một token toán hạng postfix; toán tử trừ là token riêng cách bởi dấu cách. Kết quả trung gian âm được phép. Công cụ đổi infix dùng toán tử hai ngôi và không diễn giải dấu trừ một ngôi."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "diagnostic-boundaries",
+      "title": {
+        "en": "Stop at the first invalid operation",
+        "vi": "Dừng tại phép toán sai đầu tiên"
+      },
+      "paragraphs": [
+        {
+          "en": "An unknown token has no defined action. An operator with fewer than two values causes stack underflow. Division by zero is rejected before changing the stack. Empty input has no expression, while leftover operands after the last token mean too few operators. This visual preserves the before-stack on failure so the learner can see exactly what made the next step impossible.",
+          "vi": "Token lạ không có thao tác xác định. Toán tử gặp ít hơn hai giá trị gây thiếu toán hạng ngăn xếp. Chia cho 0 bị từ chối trước khi đổi ngăn xếp. Đầu vào rỗng không có biểu thức; còn thừa toán hạng sau token cuối nghĩa là thiếu toán tử. Visual giữ ngăn xếp trước lỗi để người học thấy chính xác điều gì khiến bước kế tiếp không thể thực hiện."
+        },
+        {
+          "en": "In an exam trace, show the stack after each token and enough working for non-commutative operations. For a conversion question, show grouping or intermediate postfix sub-expressions. A final number alone cannot demonstrate that the required stack method or expression structure was correct.",
+          "vi": "Trong bài trace thi, trình bày ngăn xếp sau từng token và đủ bước tính cho phép toán không giao hoán. Với câu đổi ký pháp, thể hiện nhóm hoặc postfix của biểu thức con. Một số cuối cùng không chứng minh được phương pháp ngăn xếp hay cấu trúc biểu thức đã đúng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "s24-31-qp",
+        "s24-31-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "rpn-stack",
+    "title": {
+      "en": "Watch operands become sub-expressions",
+      "vi": "Quan sát toán hạng tạo thành biểu thức con"
+    },
+    "introduction": {
+      "en": "The token cursor, ordered operand slots and stack all describe the same operation. Before/after values remain available in the fallback.",
+      "vi": "Con trỏ token, ô toán hạng có thứ tự và ngăn xếp cùng mô tả một phép toán. Giá trị trước/sau vẫn có trong bảng thay thế."
+    },
+    "task": {
+      "en": "Before each operator, predict right, left and the new top. Then try a fractional result and one invalid expression.",
+      "vi": "Trước mỗi toán tử, dự đoán phải, trái và đỉnh mới. Sau đó thử kết quả phân số và một biểu thức sai."
+    },
+    "conventions": [
+      {
+        "en": "Stack order is bottom to top; the first pop is the right operand.",
+        "vi": "Thứ tự ngăn xếp là đáy đến đỉnh; lần pop đầu lấy toán hạng phải."
+      },
+      {
+        "en": "Postfix accepts signed integer operands; the infix converter supports binary +, −, ×, / and brackets, without unary minus.",
+        "vi": "Postfix nhận toán hạng nguyên có dấu; bộ đổi infix hỗ trợ +, −, ×, / hai ngôi và ngoặc, không có dấu trừ một ngôi."
+      },
+      {
+        "en": "Arithmetic uses exact fractions; failure never displays an invented numerical result.",
+        "vi": "Số học dùng phân số chính xác; lỗi không bao giờ hiển thị kết quả số giả."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "Evaluate 9 4 − 6 2 + × 5 /",
+      "vi": "Tính 9 4 − 6 2 + × 5 /"
+    },
+    "prompt": {
+      "en": "Convert ((9−4)×(6+2))/5 to postfix, then trace its evaluation. Stack lists below run from bottom to top.",
+      "vi": "Đổi ((9−4)×(6+2))/5 sang postfix rồi trace phép tính. Danh sách ngăn xếp dưới đây đi từ đáy lên đỉnh."
+    },
+    "steps": [
+      {
+        "id": "token-1-push",
+        "action": {
+          "en": "Read 9 and 4, pushing each operand.",
+          "vi": "Đọc 9 và 4, đẩy từng toán hạng."
+        },
+        "why": {
+          "en": "Operands wait until their following operator is read.",
+          "vi": "Toán hạng chờ đến khi đọc toán tử theo sau."
+        },
+        "result": {
+          "en": "Stack [9,4], with 4 at the top.",
+          "vi": "Ngăn xếp [9,4], đỉnh là 4."
+        }
+      },
+      {
+        "id": "token-2-push-result",
+        "action": {
+          "en": "Read −; pop right=4, then left=9.",
+          "vi": "Đọc −; lấy phải=4 rồi trái=9."
+        },
+        "why": {
+          "en": "The last pushed operand is the right operand, not the left.",
+          "vi": "Toán hạng đẩy sau cùng là bên phải, không phải bên trái."
+        },
+        "result": {
+          "en": "Calculate 9−4=5 and push it: [5].",
+          "vi": "Tính 9−4=5 rồi đẩy vào: [5]."
+        }
+      },
+      {
+        "id": "token-5-push-result",
+        "action": {
+          "en": "Push 6 and 2; apply +.",
+          "vi": "Đẩy 6 và 2; áp dụng +."
+        },
+        "why": {
+          "en": "The second bracketed sub-expression must finish before multiplication.",
+          "vi": "Biểu thức con trong ngoặc thứ hai phải xong trước phép nhân."
+        },
+        "result": {
+          "en": "[5,6,2] becomes [5,8].",
+          "vi": "[5,6,2] trở thành [5,8]."
+        }
+      },
+      {
+        "id": "token-6-push-result",
+        "action": {
+          "en": "Pop right=8 and left=5; multiply.",
+          "vi": "Lấy phải=8 và trái=5; nhân."
+        },
+        "why": {
+          "en": "The two stack values represent the two completed bracketed results.",
+          "vi": "Hai giá trị ngăn xếp đại diện cho hai kết quả trong ngoặc đã hoàn tất."
+        },
+        "result": {
+          "en": "5×8=40; push gives [40].",
+          "vi": "5×8=40; đẩy vào được [40]."
+        }
+      },
+      {
+        "id": "token-8-push-result",
+        "action": {
+          "en": "Push 5, then divide left=40 by right=5.",
+          "vi": "Đẩy 5, rồi chia trái=40 cho phải=5."
+        },
+        "why": {
+          "en": "Division order follows the original expression’s numerator and denominator.",
+          "vi": "Thứ tự chia theo tử và mẫu của biểu thức gốc."
+        },
+        "result": {
+          "en": "40/5=8; the final stack is [8].",
+          "vi": "40/5=8; ngăn xếp cuối là [8]."
+        },
+        "check": {
+          "en": "Nine tokens: five operands and four binary operators leave one value.",
+          "vi": "Chín token: năm toán hạng và bốn toán tử hai ngôi để lại một giá trị."
+        }
+      }
+    ],
+    "result": {
+      "en": "The postfix expression evaluates to 8 and reconstructs to the original bracketed structure.",
+      "vi": "Biểu thức postfix có giá trị 8 và dựng lại đúng cấu trúc ngoặc ban đầu."
+    },
+    "selfCheck": {
+      "en": "Change the first pair to 4 9 −. Predict the signed intermediate result and final answer before tracing.",
+      "vi": "Đổi cặp đầu thành 4 9 −. Dự đoán kết quả trung gian có dấu và đáp án cuối trước khi trace."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A postfix token stream or a request to evaluate using a stack points to RPN.",
+        "vi": "Dãy token postfix hoặc yêu cầu tính bằng ngăn xếp chỉ đến RPN."
+      },
+      {
+        "en": "A request for an equivalent expression asks you to preserve grouping, not sort tokens.",
+        "vi": "Yêu cầu biểu thức tương đương đòi giữ nhóm, không phải sắp xếp token."
+      }
+    ],
+    "distinguish": {
+      "en": "BNF describes which token sequences are grammatical; RPN evaluation applies arithmetic to an already specified expression.",
+      "vi": "BNF mô tả dãy token nào hợp ngữ pháp; tính RPN áp dụng số học lên biểu thức đã cho."
+    },
+    "method": [
+      {
+        "en": "Identify tokens and operator arity; mark stack top.",
+        "vi": "Xác định token và số toán hạng của toán tử; đánh dấu đỉnh."
+      },
+      {
+        "en": "For each operator record right, left, calculation and the resulting stack.",
+        "vi": "Với mỗi toán tử, ghi phải, trái, phép tính và ngăn xếp kết quả."
+      },
+      {
+        "en": "Check first-failure conditions and final depth exactly one; reconstruct brackets to verify meaning.",
+        "vi": "Kiểm điều kiện lỗi đầu tiên và độ sâu cuối đúng một; dựng lại ngoặc để kiểm ý nghĩa."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "First pop is always the left operand.",
+        "vi": "Lần pop đầu luôn lấy bên trái."
+      },
+      "correction": {
+        "en": "First pop is right; subtraction and division must use left operator right.",
+        "vi": "Lần pop đầu lấy bên phải; trừ và chia phải tính trái toán tử phải."
+      }
+    },
+    {
+      "mistake": {
+        "en": "5 2 / uses integer division.",
+        "vi": "5 2 / dùng chia nguyên."
+      },
+      "correction": {
+        "en": "/ is real division, so the exact result is 5/2; DIV would be a different operation.",
+        "vi": "/ là chia thực nên kết quả chính xác là 5/2; DIV là phép khác."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Any nonempty final stack is a result.",
+        "vi": "Ngăn xếp cuối không rỗng là có kết quả."
+      },
+      "correction": {
+        "en": "Exactly one item is required; extra items mean the entire expression was not combined.",
+        "vi": "Phải có đúng một phần tử; phần tử thừa nghĩa là chưa kết hợp toàn biểu thức."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "operand-order",
+      "prompt": {
+        "en": "What does 8 3 − evaluate to?",
+        "vi": "8 3 − có giá trị bao nhiêu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "5",
+            "vi": "5"
+          },
+          "feedback": {
+            "en": "Correct: right=3, left=8, so 8−3=5.",
+            "vi": "Đúng: phải=3, trái=8 nên 8−3=5."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "−5",
+            "vi": "−5"
+          },
+          "feedback": {
+            "en": "You reversed the operand roles after popping.",
+            "vi": "Bạn đã đảo vai trò toán hạng sau khi pop."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "11",
+            "vi": "11"
+          },
+          "feedback": {
+            "en": "The token is subtraction, not addition.",
+            "vi": "Token là phép trừ, không phải cộng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Stack order determines operand roles; an operator does not reverse its mathematical definition.",
+        "vi": "Thứ tự ngăn xếp quyết định vai trò toán hạng; toán tử không đổi định nghĩa toán học."
+      }
+    },
+    {
+      "id": "fractional-division",
+      "prompt": {
+        "en": "What is the exact result of 5 2 /?",
+        "vi": "Kết quả chính xác của 5 2 / là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "5/2",
+            "vi": "5/2"
+          },
+          "feedback": {
+            "en": "Correct: / is real division.",
+            "vi": "Đúng: / là chia thực."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "2",
+            "vi": "2"
+          },
+          "feedback": {
+            "en": "That truncates a real result as if the operator were DIV.",
+            "vi": "Đây là cắt phần thực như thể toán tử là DIV."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "2/5",
+            "vi": "2/5"
+          },
+          "feedback": {
+            "en": "This swaps the numerator and denominator.",
+            "vi": "Đây là đổi tử với mẫu."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Keep exact fractions until a question explicitly asks for decimal rounding.",
+        "vi": "Giữ phân số chính xác đến khi đề yêu cầu làm tròn thập phân."
+      }
+    },
+    {
+      "id": "underflow",
+      "prompt": {
+        "en": "The current stack is [4] and the next token is +. What should happen?",
+        "vi": "Ngăn xếp hiện là [4], token tiếp theo là +. Cần làm gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Report missing operands and preserve [4].",
+            "vi": "Báo thiếu toán hạng và giữ [4]."
+          },
+          "feedback": {
+            "en": "Correct: a binary operator needs two values before it can execute.",
+            "vi": "Đúng: toán tử hai ngôi cần hai giá trị trước khi chạy."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Use 0 as the missing operand.",
+            "vi": "Dùng 0 làm toán hạng thiếu."
+          },
+          "feedback": {
+            "en": "The expression did not supply 0; inventing it changes the problem.",
+            "vi": "Biểu thức không cho 0; tự thêm sẽ đổi bài toán."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Return 4 as the final answer.",
+            "vi": "Trả 4 làm đáp án cuối."
+          },
+          "feedback": {
+            "en": "The remaining operator has not been validly applied.",
+            "vi": "Toán tử còn lại chưa được áp dụng hợp lệ."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Underflow is a structural error, not an invitation to guess a value.",
+        "vi": "Thiếu toán hạng là lỗi cấu trúc, không phải lời mời đoán giá trị."
+      }
+    },
+    {
+      "id": "infix-transfer",
+      "prompt": {
+        "en": "Which postfix represents 8−3×2?",
+        "vi": "Postfix nào biểu diễn 8−3×2?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "8 3 2 × −",
+            "vi": "8 3 2 × −"
+          },
+          "feedback": {
+            "en": "Correct: multiplication forms the right operand of subtraction.",
+            "vi": "Đúng: phép nhân tạo toán hạng phải của phép trừ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "8 3 − 2 ×",
+            "vi": "8 3 − 2 ×"
+          },
+          "feedback": {
+            "en": "That represents (8−3)×2, changing precedence.",
+            "vi": "Nó biểu diễn (8−3)×2, đổi độ ưu tiên."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "8 3 2 − ×",
+            "vi": "8 3 2 − ×"
+          },
+          "feedback": {
+            "en": "That represents 8×(3−2).",
+            "vi": "Nó biểu diễn 8×(3−2)."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Build postfix for the higher-precedence sub-expression 3×2 first, then append subtraction.",
+        "vi": "Dựng postfix cho biểu thức con ưu tiên cao 3×2 trước, rồi thêm phép trừ."
+      }
+    },
+    {
+      "id": "failure-transfer",
+      "prompt": {
+        "en": "After reading 8 0, the next token is /. Which outcome is valid?",
+        "vi": "Sau khi đọc 8 0, token tiếp theo là /. Kết quả nào hợp lệ?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Division-by-zero error; before-stack [8,0] remains visible.",
+            "vi": "Lỗi chia cho 0; vẫn thấy ngăn xếp trước [8,0]."
+          },
+          "feedback": {
+            "en": "Correct: there is no defined finite quotient to push.",
+            "vi": "Đúng: không có thương hữu hạn xác định để đẩy."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Push zero.",
+            "vi": "Đẩy 0."
+          },
+          "feedback": {
+            "en": "Eight divided by zero is not zero.",
+            "vi": "Tám chia không không bằng không."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Reverse to 0/8 so evaluation can finish.",
+            "vi": "Đảo thành 0/8 để tính xong."
+          },
+          "feedback": {
+            "en": "Changing operand order changes the expression rather than handling the error.",
+            "vi": "Đổi thứ tự toán hạng làm đổi biểu thức, không phải xử lý lỗi."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Validate the intended operation before changing stack state; never repair meaning silently.",
+        "vi": "Kiểm phép toán dự định trước khi đổi trạng thái ngăn xếp; không âm thầm sửa ý nghĩa."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain RPN evaluation and reconstruct 8 3 − 2 × as infix.",
+      "vi": "Giải thích cách tính RPN và dựng infix của 8 3 − 2 ×."
+    },
+    "answerPoints": [
+      {
+        "en": "Push operands; for an operator pop right then left and push left operator right.",
+        "vi": "Đẩy toán hạng; gặp toán tử lấy phải rồi trái và đẩy kết quả trái toán tử phải."
+      },
+      {
+        "en": "The expression is (8−3)×2; brackets preserve the completed first sub-expression.",
+        "vi": "Biểu thức là (8−3)×2; ngoặc giữ biểu thức con đầu đã hoàn tất."
+      },
+      {
+        "en": "A valid final stack has exactly one value; invalid tokens or arithmetic stop the trace.",
+        "vi": "Ngăn xếp cuối hợp lệ có đúng một giá trị; token hoặc số học sai làm trace dừng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Postfix encodes the operation order, while infix conversion must respect precedence.",
+      "vi": "Postfix mã hóa thứ tự phép toán; chuyển từ infix phải tôn trọng độ ưu tiên."
+    },
+    {
+      "en": "Pop right before left, especially for subtraction and division.",
+      "vi": "Lấy phải trước trái, đặc biệt với trừ và chia."
+    },
+    {
+      "en": "The complete stack trace is stronger evidence than a final number alone.",
+      "vi": "Trace ngăn xếp đầy đủ là bằng chứng tốt hơn chỉ một số cuối."
+    }
+  ],
+  "relatedSlugs": [
+    "bnf-and-syntax-diagrams",
+    "compilation-stages"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed pp400–401 / PDF pp416–417, §16.3.4 Reverse Polish notation",
+      "kind": "book"
+    },
+    {
+      "id": "guide-2026",
+      "title": "Cambridge 9618 Pseudocode Guide for examinations in 2026, Version 1",
+      "locator": "PDF p15, arithmetic operators / and DIV; precedence",
+      "kind": "guide"
+    },
+    {
+      "id": "s24-31-qp",
+      "title": "Cambridge 9618 s24 Paper 31 Question Paper",
+      "locator": "PDF p5 Q5(a–c)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s24-31-ms",
+      "title": "Cambridge 9618 s24 Paper 31 Mark Scheme",
+      "locator": "PDF p7 Q5(a–b), p8 Q5(c)",
+      "kind": "mark-scheme"
+    }
+  ]
+}

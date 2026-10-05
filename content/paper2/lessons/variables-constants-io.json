@@ -1,0 +1,938 @@
+{
+  "schemaVersion": 1,
+  "version": "T14-academic-r3-reviewed",
+  "topicId": "T14",
+  "sectionId": "11.1",
+  "slug": "variables-constants-io",
+  "learningMode": "procedural",
+  "estimatedMinutes": 80,
+  "title": {
+    "en": "Variables, constants, input and output",
+    "vi": "Biến, hằng, nhập và xuất"
+  },
+  "question": {
+    "en": "How does each declaration, input and assignment establish or change program state before output is produced?",
+    "vi": "Mỗi khai báo, lệnh nhập và phép gán thiết lập hoặc thay đổi trạng thái chương trình trước khi xuất kết quả như thế nào?"
+  },
+  "opening": {
+    "en": "Read pseudocode as a timeline of named storage. A declaration creates a typed name; initialisation gives its first value; assignment replaces a variable's value; INPUT writes a supplied value; OUTPUT reads values without changing them.",
+    "vi": "Đọc pseudocode như dòng thời gian của vùng lưu trữ có tên. Khai báo tạo tên có kiểu; khởi tạo cho giá trị đầu; phép gán thay giá trị biến; INPUT ghi giá trị được cung cấp; OUTPUT đọc giá trị mà không làm thay đổi nó."
+  },
+  "objectives": [
+    {
+      "en": "Declare variables and literal-valued constants using the 2026 pseudocode conventions.",
+      "vi": "Khai báo biến và hằng nhận literal theo quy ước pseudocode 2026."
+    },
+    {
+      "en": "Distinguish declaration, initialisation, assignment, equality, input and output.",
+      "vi": "Phân biệt khai báo, khởi tạo, phép gán, phép so sánh bằng, nhập và xuất."
+    },
+    {
+      "en": "Trace every stored value and avoid reading a variable before it has a value.",
+      "vi": "Trace mọi giá trị được lưu và tránh đọc biến trước khi biến có giá trị."
+    },
+    {
+      "en": "Translate a complete requirement or structured-English design into coherent modular pseudocode with declarations, validation, termination and output.",
+      "vi": "Chuyển yêu cầu hoặc thiết kế structured-English hoàn chỉnh thành pseudocode module nhất quán có khai báo, validation, kết thúc và output."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Data types and identifiers",
+        "vi": "Kiểu dữ liệu và identifier"
+      },
+      "reason": {
+        "en": "Every declaration and assignment must use a compatible type and a valid, meaningful identifier.",
+        "vi": "Mỗi khai báo và phép gán phải dùng kiểu tương thích cùng identifier hợp lệ, có ý nghĩa."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "declaration",
+      "meaning": {
+        "en": "A statement that introduces an identifier and its data type.",
+        "vi": "Câu lệnh giới thiệu identifier và kiểu dữ liệu của nó."
+      }
+    },
+    {
+      "term": "initialisation",
+      "meaning": {
+        "en": "The first assignment of a value to a variable.",
+        "vi": "Phép gán giá trị đầu tiên cho biến."
+      }
+    },
+    {
+      "term": "assignment",
+      "meaning": {
+        "en": "Replacing a variable's stored value using ←.",
+        "vi": "Thay giá trị đang lưu của biến bằng ký hiệu ←."
+      }
+    },
+    {
+      "term": "constant",
+      "meaning": {
+        "en": "A named literal value that cannot change during execution.",
+        "vi": "Literal có tên và không thể đổi trong khi chạy."
+      }
+    },
+    {
+      "term": "program state",
+      "meaning": {
+        "en": "The current values of all declared variables at one point in execution.",
+        "vi": "Các giá trị hiện tại của mọi biến đã khai báo tại một thời điểm chạy."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The task asks for declarations, identifier types, INPUT/OUTPUT or a trace of assignments.",
+        "vi": "Đề yêu cầu khai báo, kiểu identifier, INPUT/OUTPUT hoặc trace các phép gán."
+      },
+      {
+        "en": "A design or flowchart must be converted into pseudocode statements.",
+        "vi": "Một thiết kế hoặc flowchart phải được chuyển thành các câu lệnh pseudocode."
+      },
+      {
+        "en": "A value is fixed for all runs or may change while the program runs.",
+        "vi": "Một giá trị cố định cho mọi lần chạy hoặc có thể đổi trong khi chương trình chạy."
+      },
+      {
+        "en": "A long prompt starts with a requirement or design and expects one complete program rather than isolated statements.",
+        "vi": "Đề dài bắt đầu bằng yêu cầu hoặc thiết kế và đòi một chương trình hoàn chỉnh thay vì các statement rời."
+      },
+      {
+        "en": "The solution must combine declarations, input validation, control flow, modules and final output.",
+        "vi": "Lời giải phải kết hợp khai báo, validation input, control flow, module và output cuối."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "The symbol = compares values in expressions; Cambridge assignment uses ←.",
+        "vi": "Ký hiệu = so sánh giá trị trong biểu thức; phép gán Cambridge dùng ←."
+      },
+      {
+        "en": "Declaring a variable does not automatically give it a usable starting value.",
+        "vi": "Khai báo biến không tự động cung cấp giá trị đầu có thể dùng."
+      },
+      {
+        "en": "CONSTANT uses a literal value in the 2026 guide; do not copy an older book's assignment arrow into the declaration.",
+        "vi": "CONSTANT dùng literal theo guide 2026; không sao chép mũi tên gán trong sách cũ vào khai báo."
+      },
+      {
+        "en": "Correct fragments can be placed in any order and still form a correct program.",
+        "vi": "Các fragment đúng có thể đặt theo bất kỳ thứ tự nào mà vẫn thành chương trình đúng."
+      },
+      {
+        "en": "A program is complete once every variable name appears somewhere.",
+        "vi": "Chương trình hoàn chỉnh khi mọi tên biến xuất hiện ở đâu đó."
+      }
+    ],
+    "answerProduct": {
+      "en": "Typed declarations and an ordered input–process–output trace showing each value after every write.",
+      "vi": "Các khai báo có kiểu và trace nhập–xử lý–xuất theo thứ tự, thể hiện từng giá trị sau mỗi lần ghi."
+    },
+    "method": [
+      {
+        "en": "List every identifier, role and type.",
+        "vi": "Liệt kê từng identifier, vai trò và kiểu."
+      },
+      {
+        "en": "Declare variables and literal constants before use.",
+        "vi": "Khai báo biến và hằng literal trước khi dùng."
+      },
+      {
+        "en": "Walk through INPUT and ← from top to bottom, recording each new value.",
+        "vi": "Đi qua INPUT và ← từ trên xuống, ghi mỗi giá trị mới."
+      },
+      {
+        "en": "Evaluate OUTPUT from the state that exists on that line.",
+        "vi": "Tính OUTPUT từ trạng thái tồn tại tại dòng đó."
+      },
+      {
+        "en": "Extract an IPO and identifier table from the requirement.",
+        "vi": "Rút IPO và bảng identifier từ yêu cầu."
+      },
+      {
+        "en": "Write module contracts before bodies and keep shared state minimal.",
+        "vi": "Viết contract module trước body và giữ shared state tối thiểu."
+      },
+      {
+        "en": "Implement initialisation, validation, main processing and termination in the design's order.",
+        "vi": "Cài đặt khởi tạo, validation, xử lý chính và kết thúc theo thứ tự của thiết kế."
+      },
+      {
+        "en": "Trace behavioural tests for normal, boundary, invalid and immediate-termination cases.",
+        "vi": "Trace test hành vi cho ca thường, biên, không hợp lệ và kết thúc ngay."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t14-storage",
+      "title": {
+        "en": "Create names, then give variables values",
+        "vi": "Tạo tên rồi mới cho biến giá trị"
+      },
+      "paragraphs": [
+        {
+          "en": "Use DECLARE Name : TYPE for a variable and CONSTANT Name = literal for a constant. A constant's value is fixed; a variable can receive a new compatible value through INPUT or ←.",
+          "vi": "Dùng DECLARE Name : TYPE cho biến và CONSTANT Name = literal cho hằng. Giá trị hằng cố định; biến có thể nhận giá trị tương thích mới qua INPUT hoặc ←."
+        },
+        {
+          "en": "Initialisation is the first assignment, for example Count ← 0. Later assignments replace the stored value. The equality operator = asks a Boolean question and does not store a value.",
+          "vi": "Khởi tạo là phép gán đầu tiên, ví dụ Count ← 0. Các phép gán sau thay giá trị đang lưu. Toán tử bằng = đặt câu hỏi Boolean và không lưu giá trị."
+        }
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Statement",
+            "vi": "Câu lệnh"
+          },
+          {
+            "en": "Effect",
+            "vi": "Tác động"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "DECLARE Score : INTEGER",
+              "vi": "DECLARE Score : INTEGER"
+            },
+            {
+              "en": "Creates a typed name; no score value is yet available.",
+              "vi": "Tạo tên có kiểu; chưa có giá trị điểm để dùng."
+            }
+          ],
+          [
+            {
+              "en": "Score ← 0",
+              "vi": "Score ← 0"
+            },
+            {
+              "en": "Initialises Score to 0.",
+              "vi": "Khởi tạo Score bằng 0."
+            }
+          ],
+          [
+            {
+              "en": "INPUT Score",
+              "vi": "INPUT Score"
+            },
+            {
+              "en": "Replaces Score with the entered INTEGER.",
+              "vi": "Thay Score bằng INTEGER được nhập."
+            }
+          ],
+          [
+            {
+              "en": "Score = 0",
+              "vi": "Score = 0"
+            },
+            {
+              "en": "Produces BOOLEAN; does not change Score.",
+              "vi": "Tạo BOOLEAN; không đổi Score."
+            }
+          ]
+        ]
+      },
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "book-t14",
+        "qp-s25-21-q2b"
+      ]
+    },
+    {
+      "id": "t14-trace",
+      "title": {
+        "en": "A calculation does not stay linked to its inputs",
+        "vi": "Kết quả tính không tiếp tục liên kết với đầu vào"
+      },
+      "paragraphs": [
+        {
+          "en": "When Total ← Quantity * Price runs, the current operand values are evaluated and the result is stored. If Price changes later, Total stays unchanged until another assignment recalculates it.",
+          "vi": "Khi Total ← Quantity * Price chạy, giá trị hiện tại của các toán hạng được tính và kết quả được lưu. Nếu Price đổi sau đó, Total vẫn giữ nguyên tới khi có phép gán khác tính lại."
+        },
+        {
+          "en": "OUTPUT reads its expressions at that moment. It does not initialise an unread variable and it does not make a constant or variable change.",
+          "vi": "OUTPUT đọc các biểu thức tại thời điểm đó. Nó không khởi tạo biến chưa có giá trị và không làm hằng hay biến thay đổi."
+        }
+      ],
+      "sourceIds": [
+        "book-t14",
+        "g26-core",
+        "teacher-t14"
+      ]
+    },
+    {
+      "id": "t14-design-to-program",
+      "title": {
+        "en": "A coherent program preserves the whole design",
+        "vi": "Chương trình nhất quán giữ toàn bộ thiết kế"
+      },
+      "paragraphs": [
+        {
+          "en": "Start from the requirement, not from syntax. Derive data types and identifiers, separate validation from processing, identify repeated responsibilities as modules, and make every loop's termination and every output explicit.",
+          "vi": "Bắt đầu từ yêu cầu, không từ syntax. Suy kiểu dữ liệu và identifier, tách validation khỏi xử lý, xác định trách nhiệm lặp thành module và làm rõ kết thúc của mọi vòng lặp cùng mọi output."
+        },
+        {
+          "en": "Completeness is behavioural: normal, boundary, invalid and immediate-stop inputs must follow the specified paths. Declarations alone do not repair a missing update, an unhandled invalid value or a module call with the wrong interface.",
+          "vi": "Tính đầy đủ là hành vi: input thường, biên, không hợp lệ và dừng ngay phải đi đúng đường. Chỉ khai báo không sửa được cập nhật thiếu, giá trị không hợp lệ chưa xử lý hoặc lời gọi module sai interface."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "book-t14",
+        "teacher-t14"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T14"
+    ],
+    "title": {
+      "en": "Value timeline: input, assignment and output",
+      "vi": "Dòng thời gian giá trị: nhập, gán và xuất"
+    },
+    "introduction": {
+      "en": "The visual separates the variable boxes from the statements that write or read them.",
+      "vi": "Visual tách các hộp biến khỏi câu lệnh ghi hoặc đọc chúng."
+    },
+    "task": {
+      "en": "After every highlighted statement, say which stored values changed and predict the next output.",
+      "vi": "Sau mỗi câu lệnh được tô, hãy nêu giá trị lưu nào đã đổi và dự đoán output tiếp theo."
+    },
+    "conventions": [
+      {
+        "en": "A write arrow changes one variable; a read line leaves state unchanged.",
+        "vi": "Mũi tên ghi thay đổi một biến; dòng đọc không đổi trạng thái."
+      },
+      {
+        "en": "An empty box means not initialised, not zero.",
+        "vi": "Hộp trống nghĩa là chưa khởi tạo, không phải 0."
+      },
+      {
+        "en": "Constants are shown separately because assignments cannot replace them.",
+        "vi": "Hằng được hiển thị riêng vì phép gán không thể thay chúng."
+      }
+    ],
+    "sourceIds": [
+      "s26-11",
+      "g26-core",
+      "teacher-t14"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T14-W1",
+      "title": {
+        "en": "Trace a delivery total",
+        "vi": "Trace tổng phí giao hàng"
+      },
+      "prompt": {
+        "en": "A program uses CONSTANT ServiceFee = 2.50. It inputs Quantity = 3 and UnitPrice = 4.00, assigns Subtotal ← Quantity * UnitPrice and Total ← Subtotal + ServiceFee, then changes UnitPrice to 5.00 and outputs Total.",
+        "vi": "Chương trình dùng CONSTANT ServiceFee = 2.50. Chương trình nhập Quantity = 3 và UnitPrice = 4.00, gán Subtotal ← Quantity * UnitPrice và Total ← Subtotal + ServiceFee, rồi đổi UnitPrice thành 5.00 và xuất Total."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "declare",
+          "action": {
+            "en": "Declare typed storage and the literal constant",
+            "vi": "Khai báo vùng lưu có kiểu và hằng literal"
+          },
+          "why": {
+            "en": "Each name must exist before it is used, and the fee must not change.",
+            "vi": "Mỗi tên phải tồn tại trước khi dùng và phí không được đổi."
+          },
+          "result": {
+            "en": "Quantity : INTEGER; UnitPrice, Subtotal, Total : REAL; ServiceFee = 2.50.",
+            "vi": "Quantity : INTEGER; UnitPrice, Subtotal, Total : REAL; ServiceFee = 2.50."
+          }
+        },
+        {
+          "id": "input",
+          "action": {
+            "en": "Apply the two inputs",
+            "vi": "Thực hiện hai lệnh nhập"
+          },
+          "why": {
+            "en": "INPUT writes the entered values to the variables.",
+            "vi": "INPUT ghi giá trị được nhập vào biến."
+          },
+          "result": {
+            "en": "Quantity = 3; UnitPrice = 4.00.",
+            "vi": "Quantity = 3; UnitPrice = 4.00."
+          }
+        },
+        {
+          "id": "calculate",
+          "action": {
+            "en": "Run both assignments in order",
+            "vi": "Chạy hai phép gán theo thứ tự"
+          },
+          "why": {
+            "en": "The second expression needs the Subtotal produced by the first.",
+            "vi": "Biểu thức thứ hai cần Subtotal do biểu thức thứ nhất tạo."
+          },
+          "result": {
+            "en": "Subtotal = 12.00; Total = 14.50.",
+            "vi": "Subtotal = 12.00; Total = 14.50."
+          }
+        },
+        {
+          "id": "change",
+          "action": {
+            "en": "Assign UnitPrice ← 5.00",
+            "vi": "Gán UnitPrice ← 5.00"
+          },
+          "why": {
+            "en": "Assignment changes only its target; Total is not automatically recalculated.",
+            "vi": "Phép gán chỉ đổi đích của nó; Total không tự động được tính lại."
+          },
+          "result": {
+            "en": "UnitPrice = 5.00; Subtotal = 12.00; Total = 14.50.",
+            "vi": "UnitPrice = 5.00; Subtotal = 12.00; Total = 14.50."
+          }
+        },
+        {
+          "id": "output",
+          "action": {
+            "en": "Read Total for OUTPUT",
+            "vi": "Đọc Total cho OUTPUT"
+          },
+          "why": {
+            "en": "OUTPUT uses the current stored Total.",
+            "vi": "OUTPUT dùng Total đang được lưu."
+          },
+          "result": {
+            "en": "The program outputs 14.50.",
+            "vi": "Chương trình xuất 14.50."
+          },
+          "check": {
+            "en": "To output 17.50, Subtotal and Total would need new assignments after UnitPrice changes.",
+            "vi": "Muốn xuất 17.50, cần gán lại Subtotal và Total sau khi UnitPrice đổi."
+          }
+        }
+      ],
+      "answer": {
+        "en": "14.50, because Total stores the earlier calculation; changing UnitPrice alone does not recalculate it.",
+        "vi": "14.50, vì Total lưu kết quả tính trước đó; chỉ đổi UnitPrice không làm Total được tính lại."
+      },
+      "selfCheck": {
+        "en": "Which exact statement last wrote each value used by OUTPUT?",
+        "vi": "Câu lệnh chính xác nào ghi lần cuối mỗi giá trị mà OUTPUT sử dụng?"
+      },
+      "sourceIds": [
+        "g26-core",
+        "teacher-t14"
+      ]
+    },
+    {
+      "id": "T14-W2",
+      "title": {
+        "en": "Build one complete validated sales program",
+        "vi": "Dựng một chương trình bán hàng có validation hoàn chỉnh"
+      },
+      "prompt": {
+        "en": "A design inputs item prices until -1. Prices 0..1000 are valid; other values are rejected. A valid price gets a 10% discount when at least 200. Output valid count and final total. Implement a function FinalPrice and the complete main program.",
+        "vi": "Thiết kế nhập giá item tới -1. Giá 0..1000 hợp lệ; giá khác bị từ chối. Giá hợp lệ được giảm 10% khi ít nhất 200. Xuất số item hợp lệ và tổng cuối. Cài function FinalPrice và chương trình chính đầy đủ."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "ipo",
+          "action": {
+            "en": "Derive IPO and identifiers",
+            "vi": "Suy IPO và identifier"
+          },
+          "why": {
+            "en": "This fixes types and outputs before syntax.",
+            "vi": "Việc này chốt kiểu và output trước syntax."
+          },
+          "result": {
+            "en": "Input Price:REAL; processing validate/discount/accumulate; outputs ValidCount:INTEGER and Total:REAL.",
+            "vi": "Input Price:REAL; xử lý validate/discount/accumulate; output ValidCount:INTEGER và Total:REAL."
+          }
+        },
+        {
+          "id": "contract",
+          "action": {
+            "en": "Define FinalPrice contract",
+            "vi": "Định nghĩa contract FinalPrice"
+          },
+          "why": {
+            "en": "The discount responsibility should be testable independently.",
+            "vi": "Trách nhiệm giảm giá cần test độc lập."
+          },
+          "result": {
+            "en": "FUNCTION FinalPrice(Price:REAL) RETURNS REAL; precondition 0<=Price<=1000.",
+            "vi": "FUNCTION FinalPrice(Price:REAL) RETURNS REAL; precondition 0<=Price<=1000."
+          }
+        },
+        {
+          "id": "main",
+          "action": {
+            "en": "Order sentinel, validation and processing",
+            "vi": "Sắp sentinel, validation và xử lý"
+          },
+          "why": {
+            "en": "-1 must stop without being rejected or counted.",
+            "vi": "-1 phải dừng mà không bị từ chối hoặc đếm."
+          },
+          "result": {
+            "en": "Initialise, input, loop until -1, validate range, call function only for valid price, update count/total, then input again.",
+            "vi": "Khởi tạo, input, lặp tới -1, validation miền, chỉ gọi function cho giá hợp lệ, cập nhật count/total rồi input lại."
+          }
+        },
+        {
+          "id": "test",
+          "action": {
+            "en": "Trace four behaviours",
+            "vi": "Trace bốn hành vi"
+          },
+          "why": {
+            "en": "A coherent solution must preserve every branch and boundary.",
+            "vi": "Lời giải nhất quán phải giữ mọi nhánh và biên."
+          },
+          "result": {
+            "en": "-1 stops; 0 counts with 0; 199.99 no discount; 200 gets 180; 1001 is rejected.",
+            "vi": "-1 dừng; 0 được đếm với 0; 199.99 không giảm; 200 còn 180; 1001 bị từ chối."
+          },
+          "check": {
+            "en": "No invalid input changes Total or ValidCount.",
+            "vi": "Không input không hợp lệ nào đổi Total hoặc ValidCount."
+          }
+        }
+      ],
+      "answer": {
+        "en": "FUNCTION FinalPrice(Price : REAL) RETURNS REAL\n  IF Price >= 200.0 THEN\n    RETURN Price * 0.90\n  ENDIF\n  RETURN Price\nENDFUNCTION\nDECLARE Price, Total : REAL\nDECLARE ValidCount : INTEGER\nTotal ← 0.0\nValidCount ← 0\nINPUT Price\nWHILE Price <> -1.0\n  IF Price >= 0.0 AND Price <= 1000.0 THEN\n    Total ← Total + FinalPrice(Price)\n    ValidCount ← ValidCount + 1\n  ELSE\n    OUTPUT \"INVALID PRICE\"\n  ENDIF\n  INPUT Price\nENDWHILE\nOUTPUT ValidCount, Total",
+        "vi": "FUNCTION FinalPrice(Price : REAL) RETURNS REAL\n  IF Price >= 200.0 THEN\n    RETURN Price * 0.90\n  ENDIF\n  RETURN Price\nENDFUNCTION\nDECLARE Price, Total : REAL\nDECLARE ValidCount : INTEGER\nTotal ← 0.0\nValidCount ← 0\nINPUT Price\nWHILE Price <> -1.0\n  IF Price >= 0.0 AND Price <= 1000.0 THEN\n    Total ← Total + FinalPrice(Price)\n    ValidCount ← ValidCount + 1\n  ELSE\n    OUTPUT \"INVALID PRICE\"\n  ENDIF\n  INPUT Price\nENDWHILE\nOUTPUT ValidCount, Total"
+      },
+      "selfCheck": {
+        "en": "Do the identifiers, module contract, validation, updates, termination and outputs all trace back to the requirement?",
+        "vi": "Identifier, contract module, validation, cập nhật, kết thúc và output có đều trace về yêu cầu không?"
+      },
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "book-t14",
+        "teacher-t14"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T14-P1",
+      "title": {
+        "en": "Write a constant-based fee calculation",
+        "vi": "Viết phép tính phí dùng hằng"
+      },
+      "prompt": {
+        "en": "Declare a REAL constant Rate = 1.25, input INTEGER Hours, calculate REAL Charge = Hours * Rate and output a labelled result. Use Hours = 6 for the trace.",
+        "vi": "Khai báo hằng REAL Rate = 1.25, nhập INTEGER Hours, tính REAL Charge = Hours * Rate và xuất kết quả có nhãn. Dùng Hours = 6 để trace."
+      },
+      "working": [
+        {
+          "en": "List Rate, Hours and Charge with their roles and types.",
+          "vi": "Liệt kê Rate, Hours và Charge cùng vai trò, kiểu."
+        },
+        {
+          "en": "Declare before INPUT or assignment, then trace the given input.",
+          "vi": "Khai báo trước INPUT hoặc phép gán rồi trace đầu vào đã cho."
+        }
+      ],
+      "answer": {
+        "en": "CONSTANT Rate = 1.25; DECLARE Hours : INTEGER; DECLARE Charge : REAL; INPUT Hours; Charge ← Hours * Rate; OUTPUT \"Charge: \" , Charge. For Hours = 6, Charge and output are 7.50.",
+        "vi": "CONSTANT Rate = 1.25; DECLARE Hours : INTEGER; DECLARE Charge : REAL; INPUT Hours; Charge ← Hours * Rate; OUTPUT \"Charge: \" , Charge. Với Hours = 6, Charge và output là 7.50."
+      },
+      "markGuidance": [
+        {
+          "en": "The constant uses = and a literal; variables have declared compatible types.",
+          "vi": "Hằng dùng = và literal; biến có kiểu tương thích đã khai báo."
+        },
+        {
+          "en": "INPUT precedes the calculation and the labelled OUTPUT follows it.",
+          "vi": "INPUT đứng trước phép tính và OUTPUT có nhãn đứng sau."
+        },
+        {
+          "en": "The trace gives 7.50.",
+          "vi": "Trace cho 7.50."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Writing Rate ← 1.25 as if it were a variable declaration.",
+          "vi": "Viết Rate ← 1.25 như thể đó là khai báo biến."
+        },
+        {
+          "en": "Using Charge before assigning it.",
+          "vi": "Dùng Charge trước khi gán."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can every expression be evaluated from values already available on that line?",
+        "vi": "Mọi biểu thức có thể được tính từ các giá trị đã có tại dòng đó không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "teacher-t14"
+      ]
+    },
+    {
+      "id": "T14-P2",
+      "title": {
+        "en": "Trace overwrite and output",
+        "vi": "Trace ghi đè và output"
+      },
+      "prompt": {
+        "en": "Trace: A ← 4; B ← A + 3; A ← 10; OUTPUT A, B; B ← A; OUTPUT B. State both outputs and explain why.",
+        "vi": "Trace: A ← 4; B ← A + 3; A ← 10; OUTPUT A, B; B ← A; OUTPUT B. Nêu cả hai output và giải thích."
+      },
+      "working": [
+        {
+          "en": "Record A and B after each assignment.",
+          "vi": "Ghi A và B sau mỗi phép gán."
+        },
+        {
+          "en": "Do not retroactively recalculate B when A changes.",
+          "vi": "Không tính lại B ngược thời gian khi A đổi."
+        }
+      ],
+      "answer": {
+        "en": "States: (A=4, B=uninitialised) → (4,7) → (10,7). First OUTPUT is 10, 7. Then B ← A gives (10,10), so the second OUTPUT is 10.",
+        "vi": "Các trạng thái: (A=4, B=chưa khởi tạo) → (4,7) → (10,7). OUTPUT đầu là 10, 7. Sau đó B ← A tạo (10,10), nên OUTPUT thứ hai là 10."
+      },
+      "markGuidance": [
+        {
+          "en": "Both outputs are correct and ordered.",
+          "vi": "Cả hai output đúng và theo thứ tự."
+        },
+        {
+          "en": "The explanation identifies assignment as a snapshot of the current expression value.",
+          "vi": "Giải thích xác định phép gán là ảnh chụp giá trị biểu thức hiện tại."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Changing B to 13 when A becomes 10 without executing B ← A + 3 again.",
+          "vi": "Đổi B thành 13 khi A thành 10 dù không chạy lại B ← A + 3."
+        },
+        {
+          "en": "Treating ← as an equality that remains permanently true.",
+          "vi": "Coi ← là đẳng thức luôn đúng."
+        }
+      ],
+      "selfCheck": {
+        "en": "After each arrow, did you change exactly one target variable?",
+        "vi": "Sau mỗi mũi tên, bạn có đổi đúng một biến đích không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "book-t14",
+        "teacher-t14"
+      ]
+    },
+    {
+      "id": "T14-P3",
+      "title": {
+        "en": "Translate a complete attendance design",
+        "vi": "Chuyển thiết kế điểm danh hoàn chỉnh"
+      },
+      "prompt": {
+        "en": "A design requires `IsValidPresentCount(Value:INTEGER) RETURNS BOOLEAN`. Input PresentCount for seven days. Each value must be 0..40 and must be re-entered until valid. Output weekly total and number of days below 30. Implement the function and complete main pseudocode.",
+        "vi": "Thiết kế yêu cầu `IsValidPresentCount(Value:INTEGER) RETURNS BOOLEAN`. Nhập PresentCount cho bảy ngày. Mỗi giá trị phải 0..40 và phải nhập lại tới khi hợp lệ. Xuất tổng tuần và số ngày dưới 30. Cài function và hoàn thiện pseudocode chính."
+      },
+      "working": [
+        {
+          "en": "Derive identifiers/types and write the exact BOOLEAN function interface.",
+          "vi": "Suy identifier/kiểu và viết đúng interface function BOOLEAN."
+        },
+        {
+          "en": "Initialise accumulators once.",
+          "vi": "Khởi tạo accumulator một lần."
+        },
+        {
+          "en": "Nest a validation loop inside the seven-day loop.",
+          "vi": "Lồng vòng validation trong vòng bảy ngày."
+        },
+        {
+          "en": "Update each result exactly once per valid day.",
+          "vi": "Cập nhật mỗi kết quả đúng một lần cho mỗi ngày hợp lệ."
+        }
+      ],
+      "answer": {
+        "en": "FUNCTION IsValidPresentCount(Value : INTEGER) RETURNS BOOLEAN\n  RETURN Value >= 0 AND Value <= 40\nENDFUNCTION\nDECLARE Day, PresentCount, WeeklyTotal, LowDays : INTEGER\nWeeklyTotal ← 0\nLowDays ← 0\nFOR Day ← 1 TO 7\n  REPEAT\n    INPUT PresentCount\n  UNTIL IsValidPresentCount(PresentCount)\n  WeeklyTotal ← WeeklyTotal + PresentCount\n  IF PresentCount < 30 THEN\n    LowDays ← LowDays + 1\n  ENDIF\nNEXT Day\nOUTPUT WeeklyTotal, LowDays",
+        "vi": "FUNCTION IsValidPresentCount(Value : INTEGER) RETURNS BOOLEAN\n  RETURN Value >= 0 AND Value <= 40\nENDFUNCTION\nDECLARE Day, PresentCount, WeeklyTotal, LowDays : INTEGER\nWeeklyTotal ← 0\nLowDays ← 0\nFOR Day ← 1 TO 7\n  REPEAT\n    INPUT PresentCount\n  UNTIL IsValidPresentCount(PresentCount)\n  WeeklyTotal ← WeeklyTotal + PresentCount\n  IF PresentCount < 30 THEN\n    LowDays ← LowDays + 1\n  ENDIF\nNEXT Day\nOUTPUT WeeklyTotal, LowDays"
+      },
+      "markGuidance": [
+        {
+          "en": "Analysis: identifiers, INTEGER types, inputs, processing and both outputs are complete.",
+          "vi": "Analysis: identifier, kiểu INTEGER, input, xử lý và cả hai output đầy đủ."
+        },
+        {
+          "en": "Constructs: the seven-day loop, nested re-entry loop and conditional update are correctly placed.",
+          "vi": "Construct: vòng bảy ngày, vòng nhập lại lồng và cập nhật có điều kiện được đặt đúng."
+        },
+        {
+          "en": "Interface: the BOOLEAN function header, return expression and function call match the design.",
+          "vi": "Interface: header function BOOLEAN, biểu thức return và lời gọi khớp thiết kế."
+        },
+        {
+          "en": "Correctness: 0 and 40 are accepted, invalid attempts consume no day, and both outputs update once per valid day.",
+          "vi": "Correctness: 0 và 40 được nhận, lần nhập sai không làm mất ngày và cả hai output cập nhật đúng một lần mỗi ngày hợp lệ."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Placing FOR inside validation can count invalid attempts as days.",
+          "vi": "Đặt FOR trong validation có thể đếm lần nhập sai thành ngày."
+        },
+        {
+          "en": "Initialising WeeklyTotal inside FOR erases earlier days.",
+          "vi": "Khởi tạo WeeklyTotal trong FOR làm mất ngày trước."
+        }
+      ],
+      "selfCheck": {
+        "en": "What happens to Day after an invalid value?",
+        "vi": "Day thay đổi thế nào sau một giá trị không hợp lệ?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "g26-core",
+        "teacher-t14"
+      ]
+    },
+    {
+      "id": "T14-P4",
+      "title": {
+        "en": "Repair a supposedly complete program",
+        "vi": "Sửa chương trình được cho là hoàn chỉnh"
+      },
+      "prompt": {
+        "en": "A program for T14-P3 initialises WeeklyTotal inside the FOR loop, accepts PresentCount<40, and increments LowDays before validation. Identify the three behavioural faults and give corrected locations/conditions.",
+        "vi": "Một chương trình cho T14-P3 khởi tạo WeeklyTotal trong vòng FOR, nhận PresentCount<40 và tăng LowDays trước validation. Xác định ba lỗi hành vi và nêu vị trí/điều kiện sửa."
+      },
+      "working": [
+        {
+          "en": "Trace day 2 to expose lost accumulation.",
+          "vi": "Trace ngày 2 để thấy tổng bị mất."
+        },
+        {
+          "en": "Test both boundaries 0 and 40.",
+          "vi": "Thử cả hai biên 0 và 40."
+        },
+        {
+          "en": "Test an invalid value below 30.",
+          "vi": "Thử một giá trị không hợp lệ dưới 30."
+        }
+      ],
+      "answer": {
+        "en": "Move WeeklyTotal←0 before the FOR loop so prior days persist. Accept the inclusive condition PresentCount>=0 AND PresentCount<=40, so 40 is valid. Place the LowDays test after the validation loop so an invalid attempt such as -5 cannot increment it. Then update WeeklyTotal and LowDays once per valid day.",
+        "vi": "Chuyển WeeklyTotal←0 ra trước vòng FOR để giữ ngày trước. Nhận điều kiện gồm biên PresentCount>=0 AND PresentCount<=40 để 40 hợp lệ. Đặt phép kiểm LowDays sau vòng validation để lần nhập sai như -5 không tăng nó. Sau đó cập nhật WeeklyTotal và LowDays đúng một lần cho mỗi ngày hợp lệ."
+      },
+      "markGuidance": [
+        {
+          "en": "Each fault is linked to a failing behavioural test.",
+          "vi": "Mỗi lỗi được nối với một test hành vi thất bại."
+        },
+        {
+          "en": "The corrections restore initialisation, validation and processing order.",
+          "vi": "Các sửa đổi khôi phục thứ tự khởi tạo, validation và xử lý."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Fixing syntax without moving statements leaves the behaviour wrong.",
+          "vi": "Sửa syntax mà không chuyển statement vẫn để hành vi sai."
+        },
+        {
+          "en": "Changing <40 to <=40 without checking the lower bound.",
+          "vi": "Đổi <40 thành <=40 mà không kiểm cận dưới."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can -5 or 40 change LowDays after the repair, and why?",
+        "vi": "-5 hoặc 40 có thể đổi LowDays sau khi sửa không, và vì sao?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t14",
+        "g26-core"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A declared numeric variable starts at zero.",
+        "vi": "Biến số đã khai báo bắt đầu bằng 0."
+      },
+      "correction": {
+        "en": "Declaration supplies a name and type; assign or input a value before reading it.",
+        "vi": "Khai báo cung cấp tên và kiểu; phải gán hoặc nhập trước khi đọc."
+      },
+      "selfCheck": {
+        "en": "Which earlier line wrote this variable?",
+        "vi": "Dòng nào trước đó đã ghi biến này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "← and = mean the same thing.",
+        "vi": "← và = có cùng nghĩa."
+      },
+      "correction": {
+        "en": "← stores a value; = compares two values and returns BOOLEAN.",
+        "vi": "← lưu giá trị; = so sánh hai giá trị và trả BOOLEAN."
+      },
+      "selfCheck": {
+        "en": "Does the statement change state or ask a question?",
+        "vi": "Câu lệnh thay đổi trạng thái hay đặt câu hỏi?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Changing an input variable updates all earlier results.",
+        "vi": "Đổi biến đầu vào sẽ cập nhật mọi kết quả trước đó."
+      },
+      "correction": {
+        "en": "Stored results change only when another statement assigns them.",
+        "vi": "Kết quả đã lưu chỉ đổi khi câu lệnh khác gán lại."
+      },
+      "selfCheck": {
+        "en": "Was the result variable assigned again?",
+        "vi": "Biến kết quả đã được gán lại chưa?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What six checks make a basic input–process–output trace reliable?",
+      "vi": "Sáu kiểm tra nào giúp trace nhập–xử lý–xuất đáng tin cậy?"
+    },
+    "answerPoints": [
+      {
+        "en": "Names and types are declared before use.",
+        "vi": "Tên và kiểu được khai báo trước khi dùng."
+      },
+      {
+        "en": "Constants use a literal and cannot be assigned again.",
+        "vi": "Hằng dùng literal và không thể bị gán lại."
+      },
+      {
+        "en": "Variables receive a first value before being read.",
+        "vi": "Biến nhận giá trị đầu trước khi được đọc."
+      },
+      {
+        "en": "Each INPUT or ← updates only its target.",
+        "vi": "Mỗi INPUT hoặc ← chỉ cập nhật đích của nó."
+      },
+      {
+        "en": "= compares while ← assigns.",
+        "vi": "= so sánh còn ← gán."
+      },
+      {
+        "en": "OUTPUT uses the state on its own line.",
+        "vi": "OUTPUT dùng trạng thái tại chính dòng của nó."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Declare and initialise before reading a value.",
+      "vi": "Khai báo và khởi tạo trước khi đọc giá trị."
+    },
+    {
+      "en": "Assignment changes one target; equality returns BOOLEAN.",
+      "vi": "Phép gán đổi một đích; phép bằng trả BOOLEAN."
+    },
+    {
+      "en": "Trace state line by line because stored results do not update themselves.",
+      "vi": "Trace trạng thái từng dòng vì kết quả đã lưu không tự cập nhật."
+    },
+    {
+      "en": "Complete programming answers preserve the requirement from IPO through tests.",
+      "vi": "Câu trả lời chương trình hoàn chỉnh giữ yêu cầu từ IPO tới test."
+    },
+    {
+      "en": "Validation must protect processing rather than merely display an error.",
+      "vi": "Validation phải bảo vệ xử lý chứ không chỉ hiển thị lỗi."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F02",
+      "role": "related",
+      "title": {
+        "en": "Refine or convert an algorithm",
+        "vi": "Tinh chỉnh hoặc chuyển đổi thuật toán"
+      }
+    },
+    {
+      "id": "F03",
+      "role": "related",
+      "title": {
+        "en": "Choose types and structures",
+        "vi": "Chọn kiểu và cấu trúc"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "data-types",
+    "expressions-operators"
+  ],
+  "sources": [
+    {
+      "id": "s26-11",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§11.1–11.3, printed/PDF pp29–30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "g26-core",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for 2026",
+      "locator": "§2 pp7–9; §5 pp15–18; §6–8 pp18–24, as cited by each lesson.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t14",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp264–271; PDF pp280–287. The 2026 guide overrides older constant/loop notation.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-s25-21-q1b",
+      "title": "9618/21 May/June 2025 Question 1(b)",
+      "locator": "QP p2; identify assignment, selection and iteration in pseudocode extracts.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "qp-s25-21-q2b",
+      "title": "9618/21 May/June 2025 Question 2(b)",
+      "locator": "QP p5; constants and library routines in error reduction.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t14",
+      "title": "AlgoCore teacher-authored T14 examples and guidance",
+      "locator": "T14-academic-r1, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

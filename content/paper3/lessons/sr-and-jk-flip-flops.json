@@ -1,0 +1,825 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.15.1",
+  "topicId": "P3-15.2-T03",
+  "slug": "sr-and-jk-flip-flops",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "SR and JK flip-flops",
+    "vi": "Flip-flop SR và JK"
+  },
+  "question": {
+    "en": "How can a circuit remember a bit after its inputs change?",
+    "vi": "Mạch nhớ một bit sau khi đầu vào đổi bằng cách nào?"
+  },
+  "opening": {
+    "en": "A storage circuit has a previous state. Declare the gate and clock convention first, then follow feedback and the next state; the same input pair can mean different things under another convention.",
+    "vi": "Mạch lưu trữ có trạng thái trước đó. Nêu quy ước cổng và clock trước, rồi theo feedback và trạng thái sau; cùng cặp đầu vào có thể mang ý nghĩa khác dưới quy ước khác."
+  },
+  "objectives": [
+    {
+      "en": "Draw and reason about the declared cross-coupled NOR SR circuit.",
+      "vi": "Vẽ và suy luận mạch SR NOR mắc hồi tiếp chéo đã nêu."
+    },
+    {
+      "en": "Derive hold, set, reset, invalid and JK toggle cases using previous Q.",
+      "vi": "Suy ra giữ, set, reset, invalid và toggle JK từ Q trước."
+    },
+    {
+      "en": "Explain one-bit storage and why a clock/event convention matters.",
+      "vi": "Giải thích lưu một bit và ý nghĩa quy ước clock/sự kiện."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know NOR/NAND/NOT and distinguish current input from stored state.",
+      "vi": "Biết NOR/NAND/NOT và phân biệt đầu vào hiện tại với trạng thái lưu."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Cross-coupling",
+      "meaning": {
+        "en": "Each gate output feeds an input of the other gate.",
+        "vi": "Đầu ra mỗi cổng nối vào đầu vào cổng kia."
+      }
+    },
+    {
+      "term": "Hold",
+      "meaning": {
+        "en": "Retain the known previous state rather than force a fixed0 or1.",
+        "vi": "Giữ trạng thái trước đã biết thay vì ép cố định0 hoặc1."
+      }
+    },
+    {
+      "term": "Toggle",
+      "meaning": {
+        "en": "Replace the stored bit by its complement at the specified active clock event.",
+        "vi": "Đổi bit lưu thành phần bù tại sự kiện clock kích hoạt đã nêu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "storage-and-feedback",
+      "title": {
+        "en": "Why previous state is needed",
+        "vi": "Vì sao cần trạng thái trước"
+      },
+      "paragraphs": [
+        {
+          "en": "Combinational outputs depend on current inputs. A sequential storage circuit also depends on its previous state. Cross-coupling feeds outputs back as inputs, allowing two stable states to persist when the external controls are inactive. One such bistable element stores one bit, represented by Q.",
+          "vi": "Đầu ra tổ hợp phụ thuộc đầu vào hiện tại. Mạch lưu trữ tuần tự còn phụ thuộc trạng thái trước. Hồi tiếp chéo đưa đầu ra về đầu vào, cho phép hai trạng thái ổn định tồn tại khi điều khiển ngoài không kích hoạt. Một phần tử hai trạng thái như vậy lưu một bit, biểu diễn bởi Q."
+        },
+        {
+          "en": "In a valid complementary state, Qbar=NOT Q. Writing only an input pair is insufficient for a hold case: you must also know the previous stored bit. A row saying “unchanged” means preserve that bit, not set it to zero.",
+          "vi": "Ở trạng thái bù hợp lệ, Qbar=NOT Q. Chỉ ghi cặp đầu vào chưa đủ cho trường hợp hold: cần biết bit lưu trước đó. Hàng ghi “không đổi” nghĩa giữ bit ấy, không phải đặt về0."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "nor-sr-circuit",
+      "title": {
+        "en": "Declare the active-high NOR circuit",
+        "vi": "Nêu mạch NOR kích hoạt mức cao"
+      },
+      "paragraphs": [
+        {
+          "en": "Use two NOR gates. The upper gate outputs Q and takes R plus Qbar; the lower outputs Qbar and takes S plus Q. Thus Q=NOT(R OR Qbar) and Qbar=NOT(S OR Q). Draw both cross-coupled wires and label S,R,Q,Qbar. These equations fix which input sets or resets Q.",
+          "vi": "Dùng hai cổng NOR. Cổng trên xuất Q, nhận R và Qbar; cổng dưới xuất Qbar, nhận S và Q. Vì thế Q=NOT(R OR Qbar), Qbar=NOT(S OR Q). Vẽ cả hai dây hồi tiếp chéo và ghi S,R,Q,Qbar. Hai phương trình xác định đầu vào nào set/reset Q."
+        },
+        {
+          "en": "S=1,R=0 forces Qbar=0 and therefore Q=1: set. S=0,R=1 forces Q=0 and Qbar=1: reset. With S=R=0, either known complementary state is self-consistent and is retained. A NAND active-low SR arrangement has a different control table; do not transfer this NOR table without changing the convention.",
+          "vi": "S=1,R=0 ép Qbar=0 nên Q=1: set. S=0,R=1 ép Q=0 và Qbar=1: reset. Khi S=R=0, cả hai trạng thái bù đã biết đều tự nhất quán và được giữ. SR NAND kích hoạt mức thấp có bảng điều khiển khác; không bê nguyên bảng NOR mà bỏ qua quy ước."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "sr-invalid-release",
+      "title": {
+        "en": "Treat invalid and release honestly",
+        "vi": "Xử lý invalid và nhả đầu vào đúng bản chất"
+      },
+      "paragraphs": [
+        {
+          "en": "For this NOR SR circuit, S=R=1 forces both outputs0. The outputs are then not complements, so this is invalid as the normal one-bit storage state. This is not an ordinary reset state, which has Q=0,Qbar=1.",
+          "vi": "Với SR NOR này, S=R=1 ép cả hai đầu ra0. Chúng không còn bù nhau nên đây là trạng thái không hợp lệ của lưu trữ một bit thông thường. Nó không phải reset bình thường, vốn có Q=0,Qbar=1."
+        },
+        {
+          "en": "If both controls are released to0 together after invalid11, the eventual stored bit is not determined by the ideal truth table alone. The visual records an indeterminate state rather than inventing a remembered0 or1. Applying a definite set or reset control can establish a known state again. No propagation delay or metastability duration is simulated.",
+          "vi": "Nếu nhả đồng thời hai điều khiển về0 sau invalid11, bảng lý tưởng không đủ xác định bit cuối. Visual ghi trạng thái chưa xác định thay vì bịa bit0 hoặc1 được nhớ. Áp điều khiển set/reset rõ ràng có thể tạo lại trạng thái biết trước. Không mô phỏng độ trễ truyền hay thời lượng metastability."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "jk-clocked-table",
+      "title": {
+        "en": "Use the active clock event for JK",
+        "vi": "Dùng sự kiện clock kích hoạt của JK"
+      },
+      "paragraphs": [
+        {
+          "en": "The JK model here is a positive-edge-triggered functional abstraction. At the active edge: J,K=00 holds Q;10 sets Q=1;01 resets Q=0;11 toggles to NOT previous Q. With no active edge, Q holds even if J or K changes. The table must include previous Q when the outcome depends on it.",
+          "vi": "Mô hình JK ở đây là trừu tượng chức năng kích cạnh lên. Tại cạnh kích hoạt: J,K=00 giữ Q;10 set Q=1;01 reset Q=0;11 đổi thành NOT Q trước. Không có cạnh kích hoạt thì Q giữ nguyên dù J/K đổi. Bảng phải có Q trước khi kết quả phụ thuộc nó."
+        },
+        {
+          "en": "The feedback view can use oldQ and its complement to explain the set/reset control decision, while an edge-storage element commits one next state. It is not a claim that an unclocked cross-coupled gate circuit will toggle once merely by setting both inputs high. The chosen clock abstraction avoids making an unsupported physical timing claim.",
+          "vi": "Hình feedback có thể dùng oldQ và phần bù để giải thích quyết định điều khiển set/reset, còn phần tử lưu theo cạnh ghi một trạng thái mới. Không khẳng định mạch cổng hồi tiếp không clock sẽ tự toggle đúng một lần chỉ vì hai đầu vào cao. Trừu tượng clock được chọn tránh khẳng định thời gian vật lý thiếu cơ sở."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "J,K",
+            "vi": "J,K"
+          },
+          {
+            "en": "At active edge",
+            "vi": "Tại cạnh kích hoạt"
+          },
+          {
+            "en": "No active edge",
+            "vi": "Không có cạnh kích hoạt"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "0,0",
+              "vi": "0,0"
+            },
+            {
+              "en": "Qnext=Qprev",
+              "vi": "Qnext=Qprev"
+            },
+            {
+              "en": "Hold",
+              "vi": "Giữ"
+            }
+          ],
+          [
+            {
+              "en": "1,0",
+              "vi": "1,0"
+            },
+            {
+              "en": "Qnext=1",
+              "vi": "Qnext=1"
+            },
+            {
+              "en": "Hold",
+              "vi": "Giữ"
+            }
+          ],
+          [
+            {
+              "en": "0,1",
+              "vi": "0,1"
+            },
+            {
+              "en": "Qnext=0",
+              "vi": "Qnext=0"
+            },
+            {
+              "en": "Hold",
+              "vi": "Giữ"
+            }
+          ],
+          [
+            {
+              "en": "1,1",
+              "vi": "1,1"
+            },
+            {
+              "en": "Qnext=NOT Qprev",
+              "vi": "Qnext=NOT Qprev"
+            },
+            {
+              "en": "Hold",
+              "vi": "Giữ"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sequence-and-storage",
+      "title": {
+        "en": "Trace state through a sequence",
+        "vi": "Theo trạng thái qua chuỗi sự kiện"
+      },
+      "paragraphs": [
+        {
+          "en": "Start from a declared Q, process one event, then use its result as the next event’s previous Q. For JK beginning at0, a set edge gives1; a hold edge keeps1; two successive toggle edges give0 then1. If reset inputs arrive without the active edge, Q remains1 until the reset edge occurs.",
+          "vi": "Bắt đầu từ Q đã nêu, xử lý một sự kiện rồi dùng kết quả làm Q trước của sự kiện tiếp. JK bắt đầu0: cạnh set cho1; cạnh hold giữ1; hai cạnh toggle liên tiếp cho0 rồi1. Nếu đầu vào reset đến mà chưa có cạnh kích hoạt, Q vẫn1 đến khi có cạnh reset."
+        },
+        {
+          "en": "Flip-flops are building blocks for registers and counters. A register needs multiple one-bit storage elements; toggle behaviour can support counting when circuits are connected with an appropriate clock design. A single flip-flop does not store an arbitrary-length number or a whole program.",
+          "vi": "Flip-flop là thành phần xây dựng thanh ghi và bộ đếm. Thanh ghi cần nhiều phần tử lưu một bit; toggle hỗ trợ đếm khi các mạch được nối với thiết kế clock phù hợp. Một flip-flop không lưu số dài tùy ý hoặc cả chương trình."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "draw-and-derive",
+      "title": {
+        "en": "Match the drawing to the table",
+        "vi": "Làm bảng khớp với hình"
+      },
+      "paragraphs": [
+        {
+          "en": "For an SR drawing question, show two gates of the declared type, two inputs to each, both cross-coupled connections and correct input labels. Derive at least set, reset and hold using the gate truth rule rather than memorising unlabeled0/1 rows. For JK, declare the clock event and use Qprev/Qnext.",
+          "vi": "Khi vẽ SR, thể hiện hai cổng đúng loại đã nêu, hai đầu vào mỗi cổng, cả hai kết nối hồi tiếp chéo và nhãn vào đúng. Suy ít nhất set/reset/hold bằng quy tắc cổng thay vì học hàng0/1 không nhãn. Với JK, nêu sự kiện clock và dùng Qprev/Qnext."
+        },
+        {
+          "en": "October/November2022 Paper32 question8(a,b) is a verified SR circuit drawing and storage-purpose example. The wording and tables here are derived from the actual NOR circuit: they do not repeat the misplaced set/reset prose in the textbook.",
+          "vi": "October/November2022 Paper32 câu8(a,b) là ví dụ đã kiểm về vẽ mạch SR và mục đích lưu trữ. Nội dung và bảng ở đây suy từ mạch NOR thực: không lặp lại đoạn văn set/reset đặt nhầm trong sách."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "past-qp",
+        "past-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "sr-jk-flip-flops",
+    "title": {
+      "en": "Follow feedback and stored state",
+      "vi": "Theo feedback và trạng thái lưu"
+    },
+    "introduction": {
+      "en": "Compare the active-high NOR SR event sequence with an edge-triggered JK sequence.",
+      "vi": "So chuỗi sự kiện SR NOR kích hoạt mức cao với chuỗi JK theo cạnh."
+    },
+    "task": {
+      "en": "Predict Qnext from the controls, previous Q and any active edge; then explain a hold or invalid case.",
+      "vi": "Dự đoán Qnext từ điều khiển, Q trước và cạnh kích hoạt; sau đó giải thích hold hoặc invalid."
+    },
+    "conventions": [
+      {
+        "en": "SR uses two NOR gates with S,R active high and no clock.",
+        "vi": "SR dùng hai NOR, S/R kích hoạt mức cao và không clock."
+      },
+      {
+        "en": "After invalid SR11 is released, Q is indeterminate until a definite set/reset establishes it.",
+        "vi": "Sau nhả SR11 invalid, Q chưa xác định đến khi set/reset rõ ràng tạo lại."
+      },
+      {
+        "en": "JK is a positive-edge functional model; no edge means hold.",
+        "vi": "JK là mô hình chức năng cạnh lên; không cạnh thì giữ."
+      },
+      {
+        "en": "Step order represents events, not a gate-delay simulation.",
+        "vi": "Thứ tự bước biểu diễn sự kiện, không mô phỏng trễ cổng."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "syllabus-2026"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Set, hold, reset and recover an SR bit",
+      "vi": "Set, giữ, reset và khôi phục bit SR"
+    },
+    "prompt": {
+      "en": "Use the active-high NOR circuit, starting with Q=0,Qbar=1. Explain every event, including invalid release.",
+      "vi": "Dùng mạch NOR kích hoạt mức cao, bắt đầu Q=0,Qbar=1. Giải thích mọi sự kiện, kể cả nhả invalid."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "initial",
+        "action": {
+          "en": "Begin with S=R=0 and known Q=0,Qbar=1.",
+          "vi": "Bắt đầu S=R=0 và biết Q=0,Qbar=1."
+        },
+        "why": {
+          "en": "A hold case needs a known previous state.",
+          "vi": "Trường hợp hold cần trạng thái trước đã biết."
+        },
+        "result": {
+          "en": "The stored bit is0.",
+          "vi": "Bit lưu là0."
+        }
+      },
+      {
+        "id": "set",
+        "action": {
+          "en": "Apply S=1,R=0.",
+          "vi": "Đặt S=1,R=0."
+        },
+        "why": {
+          "en": "S forces the lower NOR output Qbar to0.",
+          "vi": "S ép đầu ra NOR dưới Qbar về0."
+        },
+        "result": {
+          "en": "Q=1,Qbar=0.",
+          "vi": "Q=1,Qbar=0."
+        }
+      },
+      {
+        "id": "hold-set",
+        "action": {
+          "en": "Release S to0 while R remains0.",
+          "vi": "Nhả S về0 khi R vẫn0."
+        },
+        "why": {
+          "en": "Cross-coupling sustains the complementary state.",
+          "vi": "Hồi tiếp chéo duy trì trạng thái bù."
+        },
+        "result": {
+          "en": "Q remains1.",
+          "vi": "Q giữ1."
+        }
+      },
+      {
+        "id": "reset",
+        "action": {
+          "en": "Apply S=0,R=1.",
+          "vi": "Đặt S=0,R=1."
+        },
+        "why": {
+          "en": "R forces the upper NOR output Q to0.",
+          "vi": "R ép đầu ra NOR trên Q về0."
+        },
+        "result": {
+          "en": "Q=0,Qbar=1.",
+          "vi": "Q=0,Qbar=1."
+        }
+      },
+      {
+        "id": "hold-reset",
+        "action": {
+          "en": "Return both controls to0.",
+          "vi": "Đưa cả hai điều khiển về0."
+        },
+        "why": {
+          "en": "Inactive controls preserve the known reset state.",
+          "vi": "Điều khiển không kích hoạt giữ trạng thái reset đã biết."
+        },
+        "result": {
+          "en": "Q remains0.",
+          "vi": "Q giữ0."
+        }
+      },
+      {
+        "id": "invalid",
+        "action": {
+          "en": "Apply S=R=1.",
+          "vi": "Đặt S=R=1."
+        },
+        "why": {
+          "en": "Each NOR has a high external input and therefore outputs0.",
+          "vi": "Mỗi NOR có đầu vào ngoài cao nên xuất0."
+        },
+        "result": {
+          "en": "Q=Qbar=0: invalid complementary storage.",
+          "vi": "Q=Qbar=0: lưu trữ bù không hợp lệ."
+        }
+      },
+      {
+        "id": "release-invalid",
+        "action": {
+          "en": "Release both controls to0 together.",
+          "vi": "Nhả đồng thời hai điều khiển về0."
+        },
+        "why": {
+          "en": "The previous outputs were not a valid stored complementary pair.",
+          "vi": "Đầu ra trước không phải cặp bù lưu hợp lệ."
+        },
+        "result": {
+          "en": "The ideal model cannot determine the final bit; Q/Qbar are marked indeterminate.",
+          "vi": "Mô hình lý tưởng không xác định được bit cuối; Q/Qbar được đánh dấu chưa xác định."
+        }
+      },
+      {
+        "id": "recover-set",
+        "action": {
+          "en": "Apply a definite S=1,R=0.",
+          "vi": "Đặt rõ S=1,R=0."
+        },
+        "why": {
+          "en": "A definite control re-establishes a known stable state.",
+          "vi": "Điều khiển rõ ràng tạo lại trạng thái ổn định biết trước."
+        },
+        "result": {
+          "en": "Q=1,Qbar=0 again.",
+          "vi": "Q=1,Qbar=0 trở lại."
+        }
+      }
+    ],
+    "result": {
+      "en": "Storage, invalid output forcing and recovery are distinct cases.",
+      "vi": "Lưu trữ, ép đầu ra invalid và khôi phục là các trường hợp riêng."
+    },
+    "selfCheck": {
+      "en": "Why is SR11 different from JK11 at an active edge?",
+      "vi": "Vì sao SR11 khác JK11 tại cạnh kích hoạt?"
+    },
+    "sourceIds": [
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Cross-coupled gates and Q/Qbar identify storage feedback.",
+        "vi": "Cổng hồi tiếp chéo và Q/Qbar chỉ ra feedback lưu trữ."
+      },
+      {
+        "en": "A clock pulse, previous Q or toggle instruction calls for a sequential trace.",
+        "vi": "Clock pulse, Q trước hoặc toggle yêu cầu trace tuần tự."
+      }
+    ],
+    "distinguish": {
+      "en": "SR truth rules depend on NOR/NAND and active levels. JK also depends on the declared clock event; do not treat it as the same unclocked two-input table.",
+      "vi": "Quy tắc SR phụ thuộc NOR/NAND và mức kích hoạt. JK còn phụ thuộc sự kiện clock; không coi là cùng bảng hai đầu vào không clock."
+    },
+    "method": [
+      {
+        "en": "Name the gate/input/clock convention.",
+        "vi": "Nêu quy ước cổng/đầu vào/clock."
+      },
+      {
+        "en": "Record previous Q before each event.",
+        "vi": "Ghi Q trước mỗi sự kiện."
+      },
+      {
+        "en": "Derive next state from the gate or transition rule.",
+        "vi": "Suy trạng thái sau từ quy tắc cổng hoặc chuyển trạng thái."
+      },
+      {
+        "en": "Check complement validity and handle unknown states explicitly.",
+        "vi": "Kiểm tính bù hợp lệ và nêu rõ trạng thái chưa xác định."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "SR00 always resets the bit.",
+        "vi": "SR00 luôn reset bit."
+      },
+      "correction": {
+        "en": "In this NOR convention it holds the known previous state.",
+        "vi": "Trong quy ước NOR này nó giữ trạng thái trước đã biết."
+      }
+    },
+    {
+      "mistake": {
+        "en": "SR11 is just another way to store0.",
+        "vi": "SR11 là cách khác để lưu0."
+      },
+      "correction": {
+        "en": "Both outputs0 violate the complementary storage condition.",
+        "vi": "Cả hai đầu ra0 vi phạm điều kiện lưu bù."
+      }
+    },
+    {
+      "mistake": {
+        "en": "JK11 always produces1.",
+        "vi": "JK11 luôn cho1."
+      },
+      "correction": {
+        "en": "At the active edge it complements previous Q.",
+        "vi": "Tại cạnh kích hoạt nó đảo Q trước."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Changing J/K always changes Q immediately.",
+        "vi": "Đổi J/K luôn làm Q đổi ngay."
+      },
+      "correction": {
+        "en": "In the declared edge-triggered model, no active edge means hold.",
+        "vi": "Trong mô hình theo cạnh đã nêu, không có cạnh kích hoạt thì giữ."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "sr-hold",
+      "prompt": {
+        "en": "NOR SR has known Q=1 and S=R=0. What is Qnext?",
+        "vi": "SR NOR biết Q=1 và S=R=0. Qnext là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Correct: inactive controls hold the known bit.",
+            "vi": "Đúng: điều khiển không kích hoạt giữ bit biết trước."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "00 is hold, not reset, for this convention.",
+            "vi": "00 là hold, không phải reset trong quy ước này."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Always indeterminate",
+            "vi": "Luôn chưa xác định"
+          },
+          "feedback": {
+            "en": "The starting state is explicitly valid and known.",
+            "vi": "Trạng thái đầu được nêu rõ hợp lệ và đã biết."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A hold row preserves previous Q.",
+        "vi": "Hàng hold giữ Q trước."
+      }
+    },
+    {
+      "id": "sr-invalid",
+      "prompt": {
+        "en": "Why is S=R=1 invalid for the active-high NOR pair?",
+        "vi": "Vì sao S=R=1 invalid với cặp NOR kích hoạt mức cao?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Both outputs are forced0",
+            "vi": "Cả hai đầu ra bị ép0"
+          },
+          "feedback": {
+            "en": "Correct: Qbar is then not the complement of Q.",
+            "vi": "Đúng: Qbar không còn là phần bù Q."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Both outputs must toggle",
+            "vi": "Cả hai phải toggle"
+          },
+          "feedback": {
+            "en": "Toggle is the JK active-edge case, not this SR rule.",
+            "vi": "Toggle là trường hợp JK theo cạnh, không phải quy tắc SR này."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "It stores two bits instead of one",
+            "vi": "Nó lưu hai bit thay vì một"
+          },
+          "feedback": {
+            "en": "Invalid outputs do not create extra storage.",
+            "vi": "Đầu ra invalid không tạo thêm khả năng lưu."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Derive both NOR outputs, then check complement validity.",
+        "vi": "Suy hai đầu ra NOR rồi kiểm tính bù."
+      }
+    },
+    {
+      "id": "jk-toggle",
+      "prompt": {
+        "en": "JK starts Q=1 and receives two active edges with J=K=1. Final Q?",
+        "vi": "JK bắt đầu Q=1, nhận hai cạnh kích hoạt với J=K=1. Q cuối?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "That is the result after the first edge only.",
+            "vi": "Đó là kết quả sau cạnh thứ nhất."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Correct:1→0→1.",
+            "vi": "Đúng:1→0→1."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Invalid",
+            "vi": "Invalid"
+          },
+          "feedback": {
+            "en": "The declared JK transition uses toggle for11.",
+            "vi": "Chuyển trạng thái JK đã nêu dùng toggle cho11."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Use each result as the next previous state.",
+        "vi": "Dùng mỗi kết quả làm trạng thái trước tiếp theo."
+      }
+    },
+    {
+      "id": "no-edge-transfer",
+      "prompt": {
+        "en": "A JK with Q=1 receives J=0,K=1 but no active edge. What happens?",
+        "vi": "JK đang Q=1 nhận J=0,K=1 nhưng không có cạnh kích hoạt. Điều gì xảy ra?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Q becomes0 immediately",
+            "vi": "Q về0 ngay"
+          },
+          "feedback": {
+            "en": "Reset is committed at the active edge in this model.",
+            "vi": "Reset được ghi tại cạnh kích hoạt trong mô hình này."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Q remains1",
+            "vi": "Q giữ1"
+          },
+          "feedback": {
+            "en": "Correct: no active event means no stored-state update.",
+            "vi": "Đúng: không có sự kiện kích hoạt thì trạng thái lưu không cập nhật."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The host OS decides Q",
+            "vi": "Host OS quyết định Q"
+          },
+          "feedback": {
+            "en": "This is a logic-storage transition, unrelated to an OS decision.",
+            "vi": "Đây là chuyển trạng thái lưu logic, không liên quan quyết định OS."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Read the clock convention as part of the question.",
+        "vi": "Đọc quy ước clock như một phần dữ kiện."
+      }
+    },
+    {
+      "id": "invalid-release-transfer",
+      "prompt": {
+        "en": "After NOR SR11, both inputs return to0 simultaneously. Can the ideal table guarantee Q=0?",
+        "vi": "Sau SR NOR11, hai đầu vào đồng thời về0. Bảng lý tưởng bảo đảm Q=0 được không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, because00 always means0",
+            "vi": "Có, vì00 luôn nghĩa0"
+          },
+          "feedback": {
+            "en": "00 holds only a valid known previous state;11 did not leave one.",
+            "vi": "00 chỉ giữ trạng thái trước hợp lệ đã biết;11 không để lại trạng thái đó."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No; establish a known state with a definite set/reset",
+            "vi": "Không; tạo trạng thái biết trước bằng set/reset rõ ràng"
+          },
+          "feedback": {
+            "en": "Correct: the released invalid condition does not determine the bit.",
+            "vi": "Đúng: nhả điều kiện invalid không xác định được bit."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes, because a NOR cannot output1",
+            "vi": "Có, vì NOR không thể cho1"
+          },
+          "feedback": {
+            "en": "NOR outputs1 when both its inputs are0.",
+            "vi": "NOR cho1 khi cả hai đầu vào0."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Do not invent deterministic recovery from an invalid state.",
+        "vi": "Không tự đặt khôi phục xác định từ trạng thái invalid."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain how feedback stores one bit and how JK toggle differs from invalid SR11.",
+      "vi": "Giải thích feedback lưu một bit và toggle JK khác SR11 invalid ra sao."
+    },
+    "answerPoints": [
+      {
+        "en": "SR behaviour follows the declared gate and active-input convention.",
+        "vi": "Hành vi SR theo loại cổng và mức kích hoạt đã nêu."
+      },
+      {
+        "en": "Hold depends on a previous state; invalid release may not determine it.",
+        "vi": "Hold phụ thuộc trạng thái trước; nhả invalid có thể chưa xác định được nó."
+      },
+      {
+        "en": "JK11 toggles at the active edge, while no edge holds Q.",
+        "vi": "JK11 toggle tại cạnh kích hoạt; không cạnh thì giữ Q."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "State tables need both input convention and previous state.",
+      "vi": "Bảng trạng thái cần quy ước đầu vào và trạng thái trước."
+    },
+    {
+      "en": "A flip-flop stores one bit; a collection can build registers or counters.",
+      "vi": "Một flip-flop lưu một bit; nhiều phần tử tạo thanh ghi hoặc bộ đếm."
+    }
+  ],
+  "relatedSlugs": [
+    "circuit-truth-table-and-expression",
+    "half-full-adders"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.2",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter15.2.3, printed358–361 / PDF374–377; NOR circuit Figure15.15 and tables15.6–15.7; set/reset derived from circuit",
+      "kind": "book"
+    },
+    {
+      "id": "past-qp",
+      "title": "Cambridge9618/32 — October/November2022 question paper",
+      "locator": "Question8(a,b), page7",
+      "kind": "question-paper"
+    },
+    {
+      "id": "past-ms",
+      "title": "Cambridge9618/32 — October/November2022 mark scheme",
+      "locator": "Question8(a,b), pages10–11",
+      "kind": "mark-scheme"
+    }
+  ]
+}

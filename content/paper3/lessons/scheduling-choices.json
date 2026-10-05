@@ -1,0 +1,693 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.1-T02",
+  "slug": "scheduling-choices",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Scheduling choices",
+    "vi": "Lựa chọn thuật toán lập lịch"
+  },
+  "question": {
+    "en": "Which ready process should receive the CPU next, and what does that choice cost?",
+    "vi": "Tiến trình Ready nào nên nhận CPU tiếp theo, và lựa chọn đó đánh đổi điều gì?"
+  },
+  "opening": {
+    "en": "Scheduling converts a queue of runnable processes into a CPU timeline. A correct answer explains the selection rule, applies it at the right event and relates a benefit to the workload. The four policies here use the same processes so their consequences can be compared fairly.",
+    "vi": "Lập lịch biến hàng đợi tiến trình có thể chạy thành dòng thời gian CPU. Đáp án đúng giải thích quy tắc chọn, áp dụng tại đúng sự kiện và liên hệ lợi ích với tải công việc. Bốn chính sách dùng cùng các tiến trình để so sánh hệ quả trên cùng điều kiện."
+  },
+  "objectives": [
+    {
+      "en": "Trace FCFS, RR, SJF and SRT with arrivals, remaining times and stated ties.",
+      "vi": "Trace FCFS, RR, SJF và SRT với thời điểm đến, thời gian còn lại và quy tắc hòa đã nêu."
+    },
+    {
+      "en": "Calculate response, waiting and turnaround for a declared CPU-only model.",
+      "vi": "Tính thời gian phản hồi, chờ và hoàn thành tính từ lúc đến trong mô hình chỉ dùng CPU đã nêu."
+    },
+    {
+      "en": "Justify a policy for a workload without claiming it is universally best.",
+      "vi": "Lý giải lựa chọn chính sách theo tải công việc, không khẳng định luôn tốt nhất."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Distinguish ready, running and blocked; read half-open intervals [start,end).",
+      "vi": "Phân biệt Ready, Running và Blocked; đọc khoảng nửa kín [đầu,cuối)."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "CPU burst",
+      "meaning": {
+        "en": "A period of CPU work required by a process before it finishes or waits for I/O.",
+        "vi": "Một khoảng công việc CPU mà tiến trình cần trước khi kết thúc hoặc chờ I/O."
+      }
+    },
+    {
+      "term": "Preemption",
+      "meaning": {
+        "en": "The scheduler takes the CPU from a runnable process before its current burst completes.",
+        "vi": "Bộ lập lịch thu hồi CPU từ tiến trình vẫn có thể chạy trước khi CPU burst hiện tại kết thúc."
+      }
+    },
+    {
+      "term": "Quantum",
+      "meaning": {
+        "en": "The maximum uninterrupted allocation in one turn of this round-robin model.",
+        "vi": "Thời lượng CPU tối đa liên tục cho một lượt trong mô hình round robin này."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "selection-and-events",
+      "title": {
+        "en": "Select only from eligible processes",
+        "vi": "Chỉ chọn trong các tiến trình đủ điều kiện"
+      },
+      "paragraphs": [
+        {
+          "en": "An arrival makes a process eligible; it cannot run before that time. The ready queue contains processes that could run if given the CPU. A running process that is preempted stays runnable and returns to ready. It becomes blocked only when it must wait for an event, such as an I/O completion. The scheduler does not improve CPU utilisation by choosing a blocked process.",
+          "vi": "Khi đến, tiến trình mới đủ điều kiện; nó không thể chạy trước thời điểm đó. Hàng đợi Ready chứa các tiến trình có thể chạy nếu được cấp CPU. Tiến trình Running bị ngắt quyền CPU vẫn có thể chạy và trở về Ready. Nó chỉ Blocked khi phải chờ sự kiện như I/O hoàn tất. Chọn tiến trình Blocked không giúp tận dụng CPU."
+        },
+        {
+          "en": "Non-preemptive policies choose again when a burst completes or a process blocks. Preemptive policies can reconsider while a burst is unfinished, for example at a timer boundary or a new arrival. Every trace must declare tie rules, event ordering and switching overhead; these are modelling assumptions rather than universal operating-system rules.",
+          "vi": "Chính sách không cưỡng đoạt chọn lại khi burst hoàn tất hoặc tiến trình bị chặn. Chính sách có cưỡng đoạt có thể xét lại khi burst chưa xong, chẳng hạn tại ngắt định thời hoặc có tiến trình mới đến. Mỗi trace phải nêu quy tắc hòa, thứ tự sự kiện và chi phí chuyển đổi; đây là giả định mô hình, không phải quy tắc chung của mọi hệ điều hành."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "fcfs-and-sjf",
+      "title": {
+        "en": "FCFS and SJF: two non-preemptive choices",
+        "vi": "FCFS và SJF: hai lựa chọn không cưỡng đoạt"
+      },
+      "paragraphs": [
+        {
+          "en": "First come first served selects the earliest arrival in the ready queue. It is simple and preserves arrival order, but a long job can delay many short jobs. Shortest job first chooses the shortest next CPU burst among processes already ready; it never chooses a short job that has not arrived. Estimating future CPU bursts is a practical limitation.",
+          "vi": "First come first served chọn tiến trình đến sớm nhất trong hàng Ready. Nó đơn giản và giữ thứ tự đến, nhưng một tác vụ dài có thể giữ nhiều tác vụ ngắn chờ. Shortest job first chọn CPU burst tiếp theo ngắn nhất trong các tiến trình đã Ready; không chọn một tác vụ ngắn chưa đến. Ước lượng burst tương lai là một hạn chế thực tế."
+        },
+        {
+          "en": "SJF can reduce average waiting for suitable workloads, but a long ready job can be postponed if short jobs keep arriving. For a numerical comparison, calculate the actual waiting times instead of repeating a claim that SJF is always faster. In this model neither FCFS nor SJF interrupts a running burst just because a new process arrives.",
+          "vi": "SJF có thể giảm thời gian chờ trung bình với tải phù hợp, nhưng tác vụ dài đang Ready có thể bị trì hoãn khi liên tục có tác vụ ngắn đến. Khi so sánh số liệu, hãy tính thời gian chờ thực tế thay vì nói SJF luôn nhanh hơn. Trong mô hình này, FCFS và SJF đều không ngắt burst đang chạy chỉ vì có tiến trình mới đến."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "round-robin",
+      "title": {
+        "en": "Round robin: bounded turns",
+        "vi": "Round robin: các lượt có giới hạn"
+      },
+      "paragraphs": [
+        {
+          "en": "Round robin takes the front ready process and gives it at most one quantum. A process finishing early releases the CPU immediately. An unfinished process goes to the back of ready when its turn expires; it does not go to blocked. Small quanta can improve initial responsiveness but cause more context switches; a very large quantum approaches FCFS on this CPU-only workload.",
+          "vi": "Round robin lấy tiến trình đầu hàng Ready và cấp tối đa một quantum. Tiến trình kết thúc sớm nhả CPU ngay. Tiến trình chưa xong được đưa về cuối Ready khi hết lượt; nó không chuyển sang Blocked. Quantum nhỏ có thể cải thiện phản hồi ban đầu nhưng làm tăng số lần chuyển ngữ cảnh; quantum rất lớn gần với FCFS trong tải chỉ dùng CPU này."
+        },
+        {
+          "en": "Our quantum is 2 time units. At a boundary we account for work and completion, admit new arrivals in arrival/ID order, then append an unfinished expiring process. Therefore at time 2, newly arrived P2 is before requeued P1. A different declared boundary convention can produce a different valid trace; do not silently change conventions mid-answer.",
+          "vi": "Quantum của ví dụ là 2 đơn vị thời gian. Tại biên, ta ghi nhận công việc và hoàn tất, nhận tiến trình mới theo thời điểm đến/ID rồi thêm tiến trình hết lượt chưa xong vào cuối hàng. Vì vậy tại thời điểm 2, P2 mới đến đứng trước P1 được xếp lại. Quy ước biên khác nếu được nêu rõ có thể cho trace hợp lệ khác; không tự đổi quy ước giữa bài."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "shortest-remaining",
+      "title": {
+        "en": "SRT compares what remains now",
+        "vi": "SRT so sánh phần còn lại tại thời điểm hiện tại"
+      },
+      "paragraphs": [
+        {
+          "en": "Shortest remaining time is preemptive. At an arrival, compare the newcomer’s required burst with the running process’s remaining time after the work already completed. Do not compare against the running process’s original burst. This model preempts only for a strictly smaller value, keeps the running process on equality, and otherwise breaks ready-queue ties by arrival then ID.",
+          "vi": "Shortest remaining time có cưỡng đoạt. Khi có tiến trình đến, so sánh burst cần của tiến trình mới với thời gian còn lại của tiến trình đang chạy sau phần đã làm. Không so với burst ban đầu của tiến trình đang chạy. Mô hình này chỉ cưỡng đoạt khi giá trị mới nhỏ hơn hẳn, giữ tiến trình đang chạy khi bằng nhau và xử lý hòa khác theo thời điểm đến rồi ID."
+        },
+        {
+          "en": "In the main example, P1 has 5 units remaining when P2 arrives at time 2 with 4, so P2 preempts it. At time 4, P2 has 2 remaining and P3 needs 1, so P3 runs. SRT favours short outstanding work but requires estimates and can delay long jobs under a continuing stream of short arrivals.",
+          "vi": "Ở ví dụ chính, P1 còn 5 đơn vị khi P2 đến lúc 2 với 4 đơn vị nên P2 lấy quyền CPU. Lúc 4, P2 còn 2 còn P3 cần 1 nên P3 chạy. SRT ưu tiên phần việc còn lại ngắn, nhưng cần ước lượng và có thể trì hoãn tác vụ dài khi liên tục có tác vụ ngắn đến."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "metrics-and-exam-method",
+      "title": {
+        "en": "Measure the timeline, then justify",
+        "vi": "Đo dòng thời gian rồi lý giải"
+      },
+      "paragraphs": [
+        {
+          "en": "Turnaround is completion minus arrival. Response is first CPU start minus arrival. In our no-I/O model, waiting is turnaround minus the required CPU burst. Waiting and response differ when a preempted process waits again after first running. If I/O waiting is included in a different model, do not automatically label all non-CPU time as ready-queue waiting.",
+          "vi": "Turnaround là thời điểm hoàn tất trừ thời điểm đến. Response là lần đầu nhận CPU trừ thời điểm đến. Trong mô hình không I/O này, waiting bằng turnaround trừ CPU burst cần dùng. Waiting và response khác nhau khi tiến trình bị cưỡng đoạt và phải chờ lại sau lần chạy đầu. Nếu mô hình khác có chờ I/O, không tự coi toàn bộ thời gian ngoài CPU là chờ trong hàng Ready."
+        },
+        {
+          "en": "For exam explanations, state the selection rule, state when a new selection happens, and connect a benefit to the scenario. “Fair” needs an explanation such as bounded turns among a finite ready set; “fast” needs a named quantity such as initial response. Total burst work here is 15 under every policy; reordering alone does not reduce that work.",
+          "vi": "Khi giải thích trong bài thi, nêu quy tắc chọn, thời điểm chọn lại và gắn một lợi ích với tình huống. “Công bằng” cần giải thích như các lượt có giới hạn giữa tập Ready hữu hạn; “nhanh” cần đại lượng cụ thể như phản hồi ban đầu. Tổng công việc CPU ở đây là 15 với mọi chính sách; đổi thứ tự không làm giảm công việc đó."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "w22-32-ms",
+        "s25-31-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "cpu-scheduling",
+    "title": {
+      "en": "One workload, four policies",
+      "vi": "Một tải công việc, bốn chính sách"
+    },
+    "introduction": {
+      "en": "Read the ready queue at the start of an interval and remaining work after that interval. The chart and metrics come from the same trace.",
+      "vi": "Đọc hàng Ready đầu khoảng và phần việc còn lại sau khoảng đó. Biểu đồ và chỉ số xuất phát từ cùng trace."
+    },
+    "task": {
+      "en": "Predict the next process before advancing; compare time 2 and time 4 under RR and SRT.",
+      "vi": "Dự đoán tiến trình tiếp theo trước khi chuyển bước; so sánh thời điểm 2 và 4 giữa RR với SRT."
+    },
+    "conventions": [
+      {
+        "en": "One CPU, no I/O, positive bursts, integer time units, zero switch overhead.",
+        "vi": "Một CPU, không I/O, burst dương, đơn vị thời gian nguyên, chi phí chuyển đổi bằng 0."
+      },
+      {
+        "en": "P1=(0,7), P2=(2,4), P3=(4,1), P4=(5,3); each pair is (arrival,burst).",
+        "vi": "P1=(0,7), P2=(2,4), P3=(4,1), P4=(5,3); mỗi cặp là (thời điểm đến,burst)."
+      },
+      {
+        "en": "RR arrivals enter before an unfinished expired process; SRT equality keeps the running process.",
+        "vi": "RR nhận tiến trình mới trước tiến trình hết lượt chưa xong; SRT giữ tiến trình đang chạy khi thời gian còn lại bằng nhau."
+      },
+      {
+        "en": "Fallback intervals preserve the same process, queue and remaining-time values as the scene.",
+        "vi": "Các khoảng trong bảng thay thế giữ cùng tiến trình, hàng đợi và thời gian còn lại với hình."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "Build and check the SRT timeline",
+      "vi": "Dựng và kiểm dòng thời gian SRT"
+    },
+    "prompt": {
+      "en": "Use the main workload and the declared tie rules. Explain every change of running process.",
+      "vi": "Dùng tải chính và quy tắc hòa đã nêu. Giải thích mọi lần đổi tiến trình đang chạy."
+    },
+    "steps": [
+      {
+        "id": "interval-1",
+        "action": {
+          "en": "Run P1 from 0 to 2.",
+          "vi": "Chạy P1 từ 0 đến 2."
+        },
+        "why": {
+          "en": "Only P1 has arrived at time 0.",
+          "vi": "Lúc 0 chỉ có P1 đã đến."
+        },
+        "result": {
+          "en": "P1 uses 2 of 7 units and has 5 remaining at time 2.",
+          "vi": "P1 dùng 2 trong 7 đơn vị, còn 5 lúc 2."
+        }
+      },
+      {
+        "id": "interval-3",
+        "action": {
+          "en": "Select P2 at time 2.",
+          "vi": "Chọn P2 tại thời điểm 2."
+        },
+        "why": {
+          "en": "P2 needs 4, which is strictly less than P1’s remaining 5.",
+          "vi": "P2 cần 4, nhỏ hơn hẳn 5 còn lại của P1."
+        },
+        "result": {
+          "en": "P2 runs [2,4); P1 waits in ready, not blocked.",
+          "vi": "P2 chạy [2,4); P1 chờ trong Ready, không phải Blocked."
+        }
+      },
+      {
+        "id": "interval-4",
+        "action": {
+          "en": "Select newly arrived P3.",
+          "vi": "Chọn P3 mới đến."
+        },
+        "why": {
+          "en": "At time 4, P3 needs 1 while P2 has 2 left.",
+          "vi": "Lúc 4, P3 cần 1 trong khi P2 còn 2."
+        },
+        "result": {
+          "en": "P3 runs [4,5) and completes at 5.",
+          "vi": "P3 chạy [4,5) và hoàn tất lúc 5."
+        }
+      },
+      {
+        "id": "interval-9",
+        "action": {
+          "en": "Resume P2, then choose P4.",
+          "vi": "Cho P2 chạy tiếp, rồi chọn P4."
+        },
+        "why": {
+          "en": "At time 5, remaining work is P2=2, P4=3, P1=5.",
+          "vi": "Lúc 5, phần còn lại là P2=2, P4=3, P1=5."
+        },
+        "result": {
+          "en": "P2 runs [5,7); P4 runs [7,10); P1 finishes in [10,15).",
+          "vi": "P2 chạy [5,7); P4 chạy [7,10); P1 hoàn tất trong [10,15)."
+        }
+      },
+      {
+        "id": "interval-14",
+        "action": {
+          "en": "Check the metrics for P2 and total work.",
+          "vi": "Kiểm chỉ số P2 và tổng công việc."
+        },
+        "why": {
+          "en": "P2 arrived at 2, first ran at 2, completed at 7 and required 4 CPU units.",
+          "vi": "P2 đến lúc 2, chạy lần đầu lúc 2, xong lúc 7 và cần 4 đơn vị CPU."
+        },
+        "result": {
+          "en": "P2 turnaround=5, waiting=1, response=0; all bursts sum to 15.",
+          "vi": "P2 có turnaround=5, waiting=1, response=0; tổng burst là 15."
+        },
+        "check": {
+          "en": "Check P1 waiting=8 and P3 waiting=0 independently.",
+          "vi": "Tự kiểm waiting của P1=8 và P3=0."
+        }
+      }
+    ],
+    "result": {
+      "en": "SRT completes P3, P2, P4, P1 in that order; short response and short total waiting are different objectives.",
+      "vi": "SRT hoàn tất theo thứ tự P3, P2, P4, P1; phản hồi sớm và tổng thời gian chờ nhỏ là các mục tiêu khác nhau."
+    },
+    "selfCheck": {
+      "en": "Rebuild RR with quantum 2. At time 4, why does P1 run before P3 and requeued P2?",
+      "vi": "Dựng lại RR với quantum 2. Tại thời điểm 4, vì sao P1 chạy trước P3 và P2 được xếp lại?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Arrivals, bursts, a quantum or a Gantt chart signal a scheduling trace.",
+        "vi": "Thời điểm đến, burst, quantum hoặc Gantt báo hiệu bài trace lập lịch."
+      },
+      {
+        "en": "“Function and benefit” asks for a rule plus its consequence, not just an algorithm name.",
+        "vi": "“Function and benefit” yêu cầu quy tắc kèm hệ quả, không chỉ tên thuật toán."
+      }
+    ],
+    "distinguish": {
+      "en": "SJF is non-preemptive; SRT reconsiders unfinished work. Response is first service, turnaround ends at completion.",
+      "vi": "SJF không cưỡng đoạt; SRT xét lại phần việc chưa xong. Response kết thúc ở lần phục vụ đầu, turnaround kết thúc khi hoàn tất."
+    },
+    "method": [
+      {
+        "en": "Write arrival/burst data and all boundary assumptions.",
+        "vi": "Ghi dữ liệu đến/burst và mọi giả định tại biên."
+      },
+      {
+        "en": "At each event update remaining time before choosing among arrived ready processes.",
+        "vi": "Ở mỗi sự kiện, cập nhật thời gian còn lại rồi chọn giữa các tiến trình Ready đã đến."
+      },
+      {
+        "en": "Check CPU-work conservation; calculate named metrics; justify one workload-specific trade-off.",
+        "vi": "Kiểm bảo toàn công việc CPU; tính chỉ số được hỏi; lý giải một đánh đổi theo tải."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A quantum expiry blocks the process.",
+        "vi": "Hết quantum làm tiến trình Blocked."
+      },
+      "correction": {
+        "en": "It remains runnable and returns to ready; blocked requires an outstanding event.",
+        "vi": "Tiến trình vẫn có thể chạy và trở về Ready; Blocked đòi hỏi đang chờ sự kiện."
+      }
+    },
+    {
+      "mistake": {
+        "en": "SRT compares original bursts.",
+        "vi": "SRT so sánh burst ban đầu."
+      },
+      "correction": {
+        "en": "Subtract executed work first, then compare remaining times at the decision boundary.",
+        "vi": "Trừ phần đã chạy trước rồi so sánh thời gian còn lại tại biên quyết định."
+      }
+    },
+    {
+      "mistake": {
+        "en": "The shortest job can run before it arrives.",
+        "vi": "Tác vụ ngắn nhất được chạy trước khi đến."
+      },
+      "correction": {
+        "en": "Selection is restricted to arrived, ready processes.",
+        "vi": "Chỉ được chọn các tiến trình đã đến và đang Ready."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "rr-boundary",
+      "prompt": {
+        "en": "At RR time 2, P2 arrives as P1’s quantum expires. Which runs next under our rule?",
+        "vi": "Trong RR lúc 2, P2 đến khi P1 hết quantum. Theo quy tắc này, ai chạy tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "P2",
+            "vi": "P2"
+          },
+          "feedback": {
+            "en": "Correct: arrivals are admitted before the unfinished process is appended.",
+            "vi": "Đúng: nhận tiến trình mới trước khi thêm tiến trình chưa xong vào cuối hàng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "P1",
+            "vi": "P1"
+          },
+          "feedback": {
+            "en": "That would require the opposite boundary order, which this example does not use.",
+            "vi": "Cần quy tắc biên ngược lại, không phải quy tắc của ví dụ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Neither; P1 is blocked.",
+            "vi": "Không ai; P1 bị Blocked."
+          },
+          "feedback": {
+            "en": "Quantum expiry neither blocks P1 nor prevents P2 from running.",
+            "vi": "Hết quantum không chặn P1 và không ngăn P2 chạy."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Queue order becomes P2, P1, so P2 starts its turn.",
+        "vi": "Thứ tự hàng là P2, P1 nên P2 bắt đầu lượt."
+      }
+    },
+    {
+      "id": "srt-remaining",
+      "prompt": {
+        "en": "At time 4 in SRT, P2 has run for 2 of its 4 units. P3 arrives needing 1. What happens?",
+        "vi": "Lúc 4 trong SRT, P2 đã chạy 2 trong 4 đơn vị. P3 đến cần 1. Điều gì xảy ra?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "P3 preempts P2 because 1 < 2.",
+            "vi": "P3 lấy quyền CPU vì 1 < 2."
+          },
+          "feedback": {
+            "en": "Correct comparison: newcomer burst versus current remaining time.",
+            "vi": "So sánh đúng: burst tiến trình mới với thời gian còn lại hiện tại."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "P2 must finish because SRT is non-preemptive.",
+            "vi": "P2 phải xong vì SRT không cưỡng đoạt."
+          },
+          "feedback": {
+            "en": "That confuses SRT with SJF.",
+            "vi": "Bạn đã nhầm SRT với SJF."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "P1 returns because it arrived first.",
+            "vi": "P1 chạy lại vì đến trước."
+          },
+          "feedback": {
+            "en": "That is an arrival-order argument, not the SRT selection rule.",
+            "vi": "Đây là lý lẽ thứ tự đến, không phải quy tắc SRT."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Remaining P2=2 and P1=5; P3 needs 1, so P3 runs.",
+        "vi": "P2 còn 2 và P1 còn 5; P3 cần 1 nên P3 chạy."
+      }
+    },
+    {
+      "id": "metric-distinction",
+      "prompt": {
+        "en": "P2 arrives at 2, starts at 2, completes at 7 and uses 4 CPU units. What is its waiting time?",
+        "vi": "P2 đến lúc 2, bắt đầu lúc 2, xong lúc 7 và dùng 4 đơn vị CPU. Thời gian chờ là bao nhiêu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Correct: (7−2)−4=1.",
+            "vi": "Đúng: (7−2)−4=1."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "Zero is its response time, not all ready-queue waiting.",
+            "vi": "0 là thời gian phản hồi, không phải toàn bộ thời gian chờ Ready."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "5",
+            "vi": "5"
+          },
+          "feedback": {
+            "en": "Five is turnaround, which includes CPU execution.",
+            "vi": "5 là turnaround, bao gồm thời gian chạy CPU."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Response=0, turnaround=5 and waiting=1 measure different parts of the trace.",
+        "vi": "Response=0, turnaround=5 và waiting=1 đo các phần khác nhau của trace."
+      }
+    },
+    {
+      "id": "equal-remaining",
+      "prompt": {
+        "en": "A is running with 2 units left. B arrives needing 2. What does our SRT model do?",
+        "vi": "A đang chạy còn 2 đơn vị. B đến cần 2. Mô hình SRT này làm gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Keep A running.",
+            "vi": "Giữ A chạy."
+          },
+          "feedback": {
+            "en": "Correct: only a strictly shorter arrival preempts the current process.",
+            "vi": "Đúng: chỉ tiến trình đến có thời gian nhỏ hơn hẳn mới lấy quyền CPU."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Always switch to B.",
+            "vi": "Luôn chuyển sang B."
+          },
+          "feedback": {
+            "en": "Equality does not satisfy the declared strict comparison.",
+            "vi": "Bằng nhau không thỏa điều kiện so sánh nhỏ hơn hẳn đã nêu."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Run both simultaneously on the one CPU.",
+            "vi": "Chạy đồng thời cả hai trên một CPU."
+          },
+          "feedback": {
+            "en": "The model permits one running process, not two simultaneous CPU bursts.",
+            "vi": "Mô hình chỉ có một tiến trình Running, không chạy đồng thời hai burst."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Tie rules are part of a reproducible trace; state them before computing.",
+        "vi": "Quy tắc hòa là thành phần của trace tái lập được; hãy nêu trước khi tính."
+      }
+    },
+    {
+      "id": "policy-transfer",
+      "prompt": {
+        "en": "An interactive workload needs frequent opportunities for all ready processes. Which justification best supports RR?",
+        "vi": "Tải tương tác cần mọi tiến trình Ready thường xuyên có cơ hội chạy. Lý do nào hỗ trợ RR tốt nhất?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Bounded turns improve sharing, with a quantum/overhead trade-off.",
+            "vi": "Các lượt có giới hạn cải thiện chia sẻ, kèm đánh đổi quantum/chi phí chuyển đổi."
+          },
+          "feedback": {
+            "en": "Correct: this links a mechanism to a goal and acknowledges a cost.",
+            "vi": "Đúng: gắn cơ chế với mục tiêu và nêu chi phí."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "RR guarantees every program finishes sooner than SJF.",
+            "vi": "RR bảo đảm mọi chương trình xong sớm hơn SJF."
+          },
+          "feedback": {
+            "en": "No such universal completion-time guarantee follows from round robin.",
+            "vi": "Round robin không có bảo đảm phổ quát đó."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "RR sends all long jobs to blocked so short jobs can run.",
+            "vi": "RR chặn mọi tác vụ dài để tác vụ ngắn chạy."
+          },
+          "feedback": {
+            "en": "It rotates runnable jobs through ready; it does not invent I/O waits.",
+            "vi": "RR luân phiên tác vụ có thể chạy qua Ready, không tạo chờ I/O giả."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Choose policy by the stated objective; responsiveness, waiting and switching cost are distinct.",
+        "vi": "Chọn chính sách theo mục tiêu đã nêu; phản hồi, thời gian chờ và chi phí chuyển đổi khác nhau."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain the four policies and one reason their timelines differ.",
+      "vi": "Giải thích bốn chính sách và một lý do dòng thời gian của chúng khác nhau."
+    },
+    "answerPoints": [
+      {
+        "en": "FCFS uses arrival order; SJF selects the shortest available burst without preemption.",
+        "vi": "FCFS dùng thứ tự đến; SJF chọn burst sẵn có ngắn nhất mà không cưỡng đoạt."
+      },
+      {
+        "en": "RR limits each turn; SRT compares current remaining work and can preempt.",
+        "vi": "RR giới hạn từng lượt; SRT so sánh phần việc còn lại hiện tại và có thể cưỡng đoạt."
+      },
+      {
+        "en": "Arrivals, ties and boundary ordering must be explicit; metrics derive from the timeline.",
+        "vi": "Phải nêu rõ thời điểm đến, quy tắc hòa và thứ tự biên; chỉ số được suy ra từ dòng thời gian."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Preemption returns a runnable process to ready.",
+      "vi": "Cưỡng đoạt đưa tiến trình có thể chạy về Ready."
+    },
+    {
+      "en": "Compare remaining work for SRT, and distinguish waiting from response.",
+      "vi": "So sánh phần còn lại cho SRT và phân biệt chờ với phản hồi."
+    },
+    {
+      "en": "A benefit is meaningful only when linked to a workload and a cost.",
+      "vi": "Lợi ích chỉ có ý nghĩa khi gắn với tải công việc và chi phí."
+    }
+  ],
+  "relatedSlugs": [
+    "resources-processes-and-states",
+    "kernel-interrupts-and-scheduling"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed pp379–382 / PDF pp395–398; corrected teacher traces, not the erroneous SRT worked trace",
+      "kind": "book"
+    },
+    {
+      "id": "w22-32-qp",
+      "title": "Cambridge 9618 w22 Paper 32 Question Paper",
+      "locator": "PDF p8 Q9(a–b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w22-32-ms",
+      "title": "Cambridge 9618 w22 Paper 32 Mark Scheme",
+      "locator": "PDF pp12–13 Q9(a–b)",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s25-31-qp",
+      "title": "Cambridge 9618 s25 Paper 31 Question Paper",
+      "locator": "PDF p10 Q8(a–b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-31-ms",
+      "title": "Cambridge 9618 s25 Paper 31 Mark Scheme",
+      "locator": "PDF p12 Q8(a–b)",
+      "kind": "mark-scheme"
+    }
+  ]
+}

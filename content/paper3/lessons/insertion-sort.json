@@ -1,0 +1,844 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.1-T04",
+  "slug": "insertion-sort",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Insertion sort",
+    "vi": "Sắp xếp chèn"
+  },
+  "question": {
+    "en": "How can a saved key be inserted into a sorted prefix without losing data?",
+    "vi": "Làm sao chèn key đã lưu vào sorted prefix mà không mất dữ liệu?"
+  },
+  "opening": {
+    "en": "The current item is saved before larger prefix items shift right to open one gap.",
+    "vi": "Phần tử hiện tại được lưu trước khi các phần tử prefix lớn hơn shift phải để mở một gap."
+  },
+  "objectives": [
+    {
+      "en": "Trace key, position and shifts.",
+      "vi": "Trace key, position và shifts."
+    },
+    {
+      "en": "Maintain the sorted-prefix invariant.",
+      "vi": "Duy trì invariant sorted-prefix."
+    },
+    {
+      "en": "Write stable ascending pseudocode.",
+      "vi": "Viết giả mã tăng dần stable."
+    },
+    {
+      "en": "Explain order and size effects.",
+      "vi": "Giải thích ảnh hưởng của order và size."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Index an array safely.",
+      "vi": "Đánh index mảng an toàn."
+    },
+    {
+      "en": "Distinguish shifting from swapping.",
+      "vi": "Phân biệt shifting với swapping."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "sorted prefix",
+      "meaning": {
+        "en": "Data[0..Index−1] already ordered.",
+        "vi": "Data[0..Index−1] đã có thứ tự."
+      }
+    },
+    {
+      "term": "key",
+      "meaning": {
+        "en": "Saved copy of the current item.",
+        "vi": "Bản sao đã lưu của phần tử hiện tại."
+      }
+    },
+    {
+      "term": "shift",
+      "meaning": {
+        "en": "Move a larger prefix item one cell right.",
+        "vi": "Di chuyển phần tử prefix lớn hơn sang phải một ô."
+      }
+    },
+    {
+      "term": "gap",
+      "meaning": {
+        "en": "Position opened for the saved key.",
+        "vi": "Vị trí mở ra cho key đã lưu."
+      }
+    },
+    {
+      "term": "stable",
+      "meaning": {
+        "en": "Equal earlier items remain before the key.",
+        "vi": "Phần tử bằng xuất hiện trước vẫn đứng trước key."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "prefix",
+      "title": {
+        "en": "Sorted-prefix invariant",
+        "vi": "Invariant sorted-prefix"
+      },
+      "paragraphs": [
+        {
+          "en": "Before each iteration, Data[0..Index−1] is sorted. Inserting Key makes Data[0..Index] sorted.",
+          "vi": "Trước mỗi iteration, Data[0..Index−1] sorted. Chèn Key làm Data[0..Index] sorted."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "save-key",
+      "title": {
+        "en": "Save before overwriting",
+        "vi": "Lưu trước khi ghi đè"
+      },
+      "paragraphs": [
+        {
+          "en": "Key←Data[Index] preserves the only copy while larger items shift into later cells.",
+          "vi": "Key←Data[Index] giữ bản sao duy nhất trong khi phần tử lớn hơn shift vào ô sau."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "strict-shift",
+      "title": {
+        "en": "Shift only greater values",
+        "vi": "Chỉ shift giá trị lớn hơn"
+      },
+      "paragraphs": [
+        {
+          "en": "The strict > condition leaves equal earlier values in place, so the fixture is stable.",
+          "vi": "Điều kiện > nghiêm ngặt giữ nguyên giá trị bằng xuất hiện trước, nên fixture stable."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "insertion-code",
+      "title": {
+        "en": "Cambridge pseudocode",
+        "vi": "Giả mã Cambridge"
+      },
+      "paragraphs": [
+        {
+          "en": "The saved key is written once after the loop into Position+1.",
+          "vi": "Key đã lưu được ghi một lần sau vòng lặp vào Position+1."
+        }
+      ],
+      "code": "PROCEDURE InsertionSort(BYREF Data : ARRAY[0:4] OF INTEGER)\n  DECLARE Index : INTEGER\n  DECLARE Position : INTEGER\n  DECLARE Key : INTEGER\n  FOR Index ← 1 TO 4\n    Key ← Data[Index]\n    Position ← Index - 1\n    WHILE (Position >= 0) AND (Data[Position] > Key)\n      Data[Position + 1] ← Data[Position]\n      Position ← Position - 1\n    ENDWHILE\n    Data[Position + 1] ← Key\n  NEXT Index\nENDPROCEDURE",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "insertion-sort",
+    "title": {
+      "en": "Key-and-gap workbench",
+      "vi": "Bàn trace key và gap"
+    },
+    "introduction": {
+      "en": "Sorted prefix, saved key, predecessor and gap are visible at every step.",
+      "vi": "Sorted prefix, key đã lưu, predecessor và gap hiển thị ở mọi bước."
+    },
+    "task": {
+      "en": "Predict each shift and verify that no value disappears.",
+      "vi": "Dự đoán mỗi shift và kiểm tra không giá trị nào biến mất."
+    },
+    "conventions": [
+      {
+        "en": "Ascending, zero-based array.",
+        "vi": "Mảng tăng dần, zero-based."
+      },
+      {
+        "en": "Shift while predecessor>Key.",
+        "vi": "Shift khi predecessor>Key."
+      },
+      {
+        "en": "Equality does not shift; fixture is stable.",
+        "vi": "Equality không shift; fixture stable."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Insert 2 into [1,4,5]",
+      "vi": "Chèn 2 vào [1,4,5]"
+    },
+    "prompt": {
+      "en": "Trace the iteration for Data=[1,4,5,2,8], Index=3.",
+      "vi": "Trace iteration cho Data=[1,4,5,2,8], Index=3."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "invariant",
+        "action": {
+          "en": "Mark Data[0..2]=[1,4,5] sorted.",
+          "vi": "Đánh dấu Data[0..2]=[1,4,5] sorted."
+        },
+        "why": {
+          "en": "This is the prefix invariant.",
+          "vi": "Đây là prefix invariant."
+        },
+        "result": {
+          "en": "Index=3 is the next unsorted item.",
+          "vi": "Index=3 là phần tử unsorted tiếp theo."
+        },
+        "check": {
+          "en": "Check that index=3 is the next unsorted item.",
+          "vi": "Kiểm tra rằng index=3 là phần tử unsorted tiếp theo."
+        }
+      },
+      {
+        "id": "save",
+        "action": {
+          "en": "Set Key←2 and Position←2.",
+          "vi": "Đặt Key←2 và Position←2."
+        },
+        "why": {
+          "en": "The original 2 must survive later overwrites.",
+          "vi": "Số 2 gốc phải tồn tại sau các ghi đè."
+        },
+        "result": {
+          "en": "Key safely stores 2.",
+          "vi": "Key lưu an toàn giá trị 2."
+        },
+        "check": {
+          "en": "Check that key safely stores 2.",
+          "vi": "Kiểm tra rằng key lưu an toàn giá trị 2."
+        },
+        "code": "Key ← Data[Index]"
+      },
+      {
+        "id": "shift-5",
+        "action": {
+          "en": "Compare 5>2 and shift 5 to index 3.",
+          "vi": "So 5>2 và shift 5 tới index 3."
+        },
+        "why": {
+          "en": "5 belongs to the right of Key.",
+          "vi": "5 phải ở bên phải Key."
+        },
+        "result": {
+          "en": "Data=[1,4,5,5,8]; Position←1; Key still 2.",
+          "vi": "Data=[1,4,5,5,8]; Position←1; Key vẫn 2."
+        },
+        "check": {
+          "en": "Check that data=[1,4,5,5,8]; position←1; key still 2.",
+          "vi": "Kiểm tra rằng data=[1,4,5,5,8]; position←1; key vẫn 2."
+        }
+      },
+      {
+        "id": "shift-4",
+        "action": {
+          "en": "Compare 4>2 and shift 4 to index 2.",
+          "vi": "So 4>2 và shift 4 tới index 2."
+        },
+        "why": {
+          "en": "4 also belongs to the right.",
+          "vi": "4 cũng phải ở bên phải."
+        },
+        "result": {
+          "en": "Data=[1,4,4,5,8]; Position←0.",
+          "vi": "Data=[1,4,4,5,8]; Position←0."
+        },
+        "check": {
+          "en": "Check that data=[1,4,4,5,8]; position←0.",
+          "vi": "Kiểm tra rằng data=[1,4,4,5,8]; position←0."
+        }
+      },
+      {
+        "id": "stop",
+        "action": {
+          "en": "Compare 1>2; false.",
+          "vi": "So 1>2; false."
+        },
+        "why": {
+          "en": "1 already belongs before Key.",
+          "vi": "1 đã đúng vị trí trước Key."
+        },
+        "result": {
+          "en": "The gap is Position+1=1.",
+          "vi": "Gap ở Position+1=1."
+        },
+        "check": {
+          "en": "Check that the gap is position+1=1.",
+          "vi": "Kiểm tra rằng gap ở position+1=1."
+        }
+      },
+      {
+        "id": "insert",
+        "action": {
+          "en": "Write Key at Data[1].",
+          "vi": "Ghi Key vào Data[1]."
+        },
+        "why": {
+          "en": "All larger prefix items have shifted right.",
+          "vi": "Mọi phần tử prefix lớn hơn đã shift phải."
+        },
+        "result": {
+          "en": "Data=[1,2,4,5,8]; prefix 0..3 sorted and multiset preserved.",
+          "vi": "Data=[1,2,4,5,8]; prefix 0..3 sorted và multiset được giữ."
+        },
+        "check": {
+          "en": "Check that data=[1,2,4,5,8]; prefix 0..3 sorted and multiset preserved.",
+          "vi": "Kiểm tra rằng data=[1,2,4,5,8]; prefix 0..3 sorted và multiset được giữ."
+        }
+      }
+    ],
+    "result": {
+      "en": "The key 2 is inserted at index 1 without losing 4 or 5.",
+      "vi": "Key 2 được chèn tại index 1 mà không mất 4 hoặc 5."
+    },
+    "selfCheck": {
+      "en": "Can you identify the saved key, every shift and the single final key write?",
+      "vi": "Bạn có chỉ ra key đã lưu, từng shift và lần ghi key cuối duy nhất không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "sorted prefix",
+        "vi": "sorted prefix"
+      },
+      {
+        "en": "save key/current item",
+        "vi": "lưu key/phần tử hiện tại"
+      },
+      {
+        "en": "shift larger items",
+        "vi": "shift phần tử lớn hơn"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: bubble sort swaps adjacent pairs over passes; insertion sort saves one key and shifts a prefix.",
+      "vi": "Dễ nhầm: bubble sort swap cặp kề qua các pass; insertion sort lưu một key và shift prefix."
+    },
+    "method": [
+      {
+        "en": "Mark the sorted prefix.",
+        "vi": "Đánh dấu sorted prefix."
+      },
+      {
+        "en": "Save Key.",
+        "vi": "Lưu Key."
+      },
+      {
+        "en": "Set Position to predecessor.",
+        "vi": "Đặt Position ở predecessor."
+      },
+      {
+        "en": "Shift while predecessor>Key.",
+        "vi": "Shift khi predecessor>Key."
+      },
+      {
+        "en": "Write Key once in the gap.",
+        "vi": "Ghi Key một lần vào gap."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Insertion sort: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho Sắp xếp chèn: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Insertion sort; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của Sắp xếp chèn; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Insertion sort to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của Sắp xếp chèn với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Insertion sort with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh Sắp xếp chèn với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Insertion sort, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của Sắp xếp chèn, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Shift before saving Key.",
+        "vi": "Shift trước khi lưu Key."
+      },
+      "correction": {
+        "en": "Copy Key before any overwrite.",
+        "vi": "Copy Key trước mọi ghi đè."
+      },
+      "selfCheck": {
+        "en": "Where is the only safe copy of the item?",
+        "vi": "Bản sao an toàn duy nhất của phần tử ở đâu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Swap Key repeatedly.",
+        "vi": "Swap Key nhiều lần."
+      },
+      "correction": {
+        "en": "Shift prefix values; write Key once.",
+        "vi": "Shift giá trị prefix; ghi Key một lần."
+      },
+      "selfCheck": {
+        "en": "How many final key writes occur?",
+        "vi": "Có bao nhiêu lần ghi key cuối?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Assume the suffix is sorted.",
+        "vi": "Giả sử suffix sorted."
+      },
+      "correction": {
+        "en": "Only the prefix before Index is guaranteed sorted.",
+        "vi": "Chỉ prefix trước Index được bảo đảm sorted."
+      },
+      "selfCheck": {
+        "en": "Which indices satisfy the invariant now?",
+        "vi": "Những index nào thỏa invariant lúc này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Shift equal values.",
+        "vi": "Shift các giá trị bằng."
+      },
+      "correction": {
+        "en": "Use strict > to preserve stability.",
+        "vi": "Dùng > nghiêm ngặt để giữ stability."
+      },
+      "selfCheck": {
+        "en": "Does equality satisfy the WHILE condition?",
+        "vi": "Equality có thỏa điều kiện WHILE không?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What must be saved before shifting?",
+        "vi": "Phải lưu gì trước khi shift?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Data[Index] in Key",
+            "vi": "Data[Index] vào Key"
+          },
+          "feedback": {
+            "en": "Correct: the current item needs a safe copy",
+            "vi": "Đúng: phần tử hiện tại cần bản sao an toàn"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Only UpperBound",
+            "vi": "Chỉ UpperBound"
+          },
+          "feedback": {
+            "en": "Only UpperBound conflicts with the rule: the current item needs a safe copy",
+            "vi": "Chỉ UpperBound trái với quy tắc: phần tử hiện tại cần bản sao an toàn"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The final array",
+            "vi": "Mảng cuối"
+          },
+          "feedback": {
+            "en": "The final array conflicts with the rule: the current item needs a safe copy",
+            "vi": "Mảng cuối trái với quy tắc: phần tử hiện tại cần bản sao an toàn"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the current item needs a safe copy",
+        "vi": "phần tử hiện tại cần bản sao an toàn"
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which clue identifies insertion sort?",
+        "vi": "Dấu hiệu nào nhận diện insertion sort?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Saved key and sorted prefix",
+            "vi": "Key đã lưu và sorted prefix"
+          },
+          "feedback": {
+            "en": "Correct: insertion sort grows a sorted prefix",
+            "vi": "Đúng: insertion sort mở rộng sorted prefix"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Repeated half-discard",
+            "vi": "Liên tục loại nửa"
+          },
+          "feedback": {
+            "en": "Repeated half-discard conflicts with the rule: insertion sort grows a sorted prefix",
+            "vi": "Liên tục loại nửa trái với quy tắc: insertion sort mở rộng sorted prefix"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "FIFO removal",
+            "vi": "Loại FIFO"
+          },
+          "feedback": {
+            "en": "FIFO removal conflicts with the rule: insertion sort grows a sorted prefix",
+            "vi": "Loại FIFO trái với quy tắc: insertion sort mở rộng sorted prefix"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "insertion sort grows a sorted prefix",
+        "vi": "insertion sort mở rộng sorted prefix"
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "Key=2, Position item=5. Next action?",
+        "vi": "Key=2, phần tử Position=5. Hành động tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Shift 5 right",
+            "vi": "Shift 5 sang phải"
+          },
+          "feedback": {
+            "en": "Correct: 5>2 requires one right shift",
+            "vi": "Đúng: 5>2 cần một shift phải"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Overwrite Key with 5",
+            "vi": "Ghi đè Key bằng 5"
+          },
+          "feedback": {
+            "en": "Overwrite Key with 5 conflicts with the rule: 5>2 requires one right shift",
+            "vi": "Ghi đè Key bằng 5 trái với quy tắc: 5>2 cần một shift phải"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Stop immediately",
+            "vi": "Dừng ngay"
+          },
+          "feedback": {
+            "en": "Stop immediately conflicts with the rule: 5>2 requires one right shift",
+            "vi": "Dừng ngay trái với quy tắc: 5>2 cần một shift phải"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "5>2 requires one right shift",
+        "vi": "5>2 cần một shift phải"
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "After shifting 5 and 4, where is the gap?",
+        "vi": "Sau khi shift 5 và 4, gap ở đâu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Index 1",
+            "vi": "Index 1"
+          },
+          "feedback": {
+            "en": "Correct: Position stopped at 0, so write at Position+1",
+            "vi": "Đúng: Position dừng ở 0 nên ghi tại Position+1"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Index 3",
+            "vi": "Index 3"
+          },
+          "feedback": {
+            "en": "Index 3 conflicts with the rule: Position stopped at 0, so write at Position+1",
+            "vi": "Index 3 trái với quy tắc: Position dừng ở 0 nên ghi tại Position+1"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Index 4",
+            "vi": "Index 4"
+          },
+          "feedback": {
+            "en": "Index 4 conflicts with the rule: Position stopped at 0, so write at Position+1",
+            "vi": "Index 4 trái với quy tắc: Position dừng ở 0 nên ghi tại Position+1"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Position stopped at 0, so write at Position+1",
+        "vi": "Position dừng ở 0 nên ghi tại Position+1"
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Which stable loop condition is correct?",
+        "vi": "Điều kiện vòng lặp stable nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Data[Position] > Key",
+            "vi": "Data[Position] > Key"
+          },
+          "feedback": {
+            "en": "Correct: strict greater-than leaves equals in original order",
+            "vi": "Đúng: greater-than nghiêm ngặt giữ equal theo thứ tự gốc"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Data[Position] >= Key",
+            "vi": "Data[Position] >= Key"
+          },
+          "feedback": {
+            "en": "Data[Position] >= Key conflicts with the rule: strict greater-than leaves equals in original order",
+            "vi": "Data[Position] >= Key trái với quy tắc: greater-than nghiêm ngặt giữ equal theo thứ tự gốc"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Data[Position] = Key",
+            "vi": "Data[Position] = Key"
+          },
+          "feedback": {
+            "en": "Data[Position] = Key conflicts with the rule: strict greater-than leaves equals in original order",
+            "vi": "Data[Position] = Key trái với quy tắc: greater-than nghiêm ngặt giữ equal theo thứ tự gốc"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "strict greater-than leaves equals in original order",
+        "vi": "greater-than nghiêm ngặt giữ equal theo thứ tự gốc"
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "The input is already sorted. What happens per iteration?",
+        "vi": "Input đã sorted. Điều gì xảy ra mỗi iteration?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "One failed predecessor comparison; no shifts",
+            "vi": "Một comparison predecessor sai; không shift"
+          },
+          "feedback": {
+            "en": "Correct: the first predecessor is <=Key, so the shift loop stops",
+            "vi": "Đúng: predecessor đầu <=Key nên vòng shift dừng"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every prefix item shifts",
+            "vi": "Mọi phần tử prefix shift"
+          },
+          "feedback": {
+            "en": "Every prefix item shifts conflicts with the rule: the first predecessor is <=Key, so the shift loop stops",
+            "vi": "Mọi phần tử prefix shift trái với quy tắc: predecessor đầu <=Key nên vòng shift dừng"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The key is lost",
+            "vi": "Key bị mất"
+          },
+          "feedback": {
+            "en": "The key is lost conflicts with the rule: the first predecessor is <=Key, so the shift loop stops",
+            "vi": "Key bị mất trái với quy tắc: predecessor đầu <=Key nên vòng shift dừng"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the first predecessor is <=Key, so the shift loop stops",
+        "vi": "predecessor đầu <=Key nên vòng shift dừng"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "State the insertion-sort invariant and safe update order.",
+      "vi": "Nêu invariant và thứ tự cập nhật an toàn của insertion sort."
+    },
+    "answerPoints": [
+      {
+        "en": "Prefix before Index is sorted.",
+        "vi": "Prefix trước Index sorted."
+      },
+      {
+        "en": "Save Key before shifting larger items.",
+        "vi": "Lưu Key trước khi shift phần tử lớn hơn."
+      },
+      {
+        "en": "Write Key once at Position+1.",
+        "vi": "Ghi Key một lần tại Position+1."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Save the key before overwriting.",
+      "vi": "Lưu key trước khi ghi đè."
+    },
+    {
+      "en": "Shift values; do not repeatedly swap the key.",
+      "vi": "Shift giá trị; không swap key lặp lại."
+    },
+    {
+      "en": "Strict > makes the fixture stable.",
+      "vi": "> nghiêm ngặt làm fixture stable."
+    }
+  ],
+  "relatedSlugs": [
+    "bubble-sort",
+    "time-and-space-complexity"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp461–464 / PDF pp477–480: insertion sort and performance",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "s21-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2021 question paper",
+      "locator": "Question 8, pp10–11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s21-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2021 mark scheme",
+      "locator": "Question 8, pp8–9",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s25-33-qp",
+      "title": "Cambridge 9618/33 — May/June 2025 question paper",
+      "locator": "Question 12, pp14–15",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-33-ms",
+      "title": "Cambridge 9618/33 — May/June 2025 mark scheme",
+      "locator": "Question 12, p15",
+      "kind": "mark-scheme"
+    }
+  ]
+}

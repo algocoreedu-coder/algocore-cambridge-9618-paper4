@@ -1,0 +1,664 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.1-T03",
+  "slug": "sets",
+  "title": {
+    "en": "Sets",
+    "vi": "Tập hợp"
+  },
+  "question": {
+    "en": "How can a collection ignore duplicates and still answer useful questions?",
+    "vi": "Một tập hợp bỏ qua phần tử trùng nhưng vẫn trả lời câu hỏi hữu ích như thế nào?"
+  },
+  "opening": {
+    "en": "Two clubs record which activities their members chose. You want everyone who chose either club’s activities, and separately the activities chosen by both. Repeated entries should not create new activities. Sets model membership directly, so the question becomes which elements belong in the result, not which order they arrived.",
+    "vi": "Hai câu lạc bộ ghi các hoạt động thành viên đã chọn. Em cần những hoạt động có ở ít nhất một câu lạc bộ và riêng những hoạt động cả hai cùng chọn. Nhập lặp không tạo hoạt động mới. Tập hợp mô hình hóa việc thuộc tập, nên câu hỏi là phần tử nào thuộc kết quả chứ không phải đến trước hay sau."
+  },
+  "objectives": [
+    {
+      "en": "Define a typed set and explain uniqueness and lack of ordering.",
+      "vi": "Định nghĩa tập hợp có kiểu và giải thích tính không trùng, không có thứ tự."
+    },
+    {
+      "en": "Predict membership, union and intersection from the same data.",
+      "vi": "Dự đoán phép kiểm thuộc, hợp và giao từ cùng dữ liệu."
+    },
+    {
+      "en": "Distinguish an empty set from a false membership result.",
+      "vi": "Phân biệt tập rỗng với kết quả sai của phép kiểm thuộc."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "CHAR values use single quotes in Cambridge pseudocode.",
+      "vi": "Giá trị CHAR dùng dấu nháy đơn trong pseudocode Cambridge."
+    },
+    {
+      "en": "A Boolean result is TRUE or FALSE.",
+      "vi": "Kết quả Boolean là TRUE hoặc FALSE."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Set",
+      "meaning": {
+        "en": "A composite collection of distinct elements; membership does not depend on display order.",
+        "vi": "Tập hợp phức hợp gồm các phần tử khác nhau; việc thuộc tập không phụ thuộc thứ tự hiển thị."
+      }
+    },
+    {
+      "term": "Membership",
+      "meaning": {
+        "en": "A Boolean question asking whether one element belongs to a set.",
+        "vi": "Câu hỏi Boolean kiểm tra một phần tử có thuộc tập hay không."
+      }
+    },
+    {
+      "term": "Union: X ∪ Y",
+      "meaning": {
+        "en": "The set of elements in X or Y or both.",
+        "vi": "Tập phần tử thuộc X hoặc Y hoặc cả hai."
+      }
+    },
+    {
+      "term": "Intersection: X ∩ Y",
+      "meaning": {
+        "en": "The set of elements that belong to both X and Y.",
+        "vi": "Tập phần tử đồng thời thuộc X và Y."
+      }
+    },
+    {
+      "term": "Empty set: ∅",
+      "meaning": {
+        "en": "A set with no elements; it is still a valid set.",
+        "vi": "Tập không có phần tử; vẫn là tập hợp hợp lệ."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "membership-not-position",
+      "title": {
+        "en": "Membership matters; position does not",
+        "vi": "Quan trọng là thuộc tập, không phải vị trí"
+      },
+      "paragraphs": [
+        {
+          "en": "The set {A, C} contains A and C. Listing it as {C, A} does not change it. Adding C again also does not change it: each distinct element appears once in the mathematical set. A list could preserve duplicates and order; a set deliberately does not model those features.",
+          "vi": "Tập {A, C} chứa A và C. Viết thành {C, A} không làm đổi tập. Thêm C lần nữa cũng không đổi: mỗi phần tử khác nhau chỉ có một lần trong tập theo nghĩa toán học. Danh sách có thể giữ trùng lặp và thứ tự; tập hợp không mô hình hóa các thuộc tính đó."
+        },
+        {
+          "en": "A display must place items somewhere, so this visual lists them alphabetically. That is a reading aid, not a claim that the first displayed element has a special set position. The question “is C in X?” has a Boolean answer, not an array index.",
+          "vi": "Giao diện phải đặt phần tử ở vị trí nào đó nên minh họa xếp theo chữ cái. Đây là cách dễ đọc, không có nghĩa phần tử đầu có vị trí đặc biệt trong tập. Câu hỏi “C có thuộc X?” nhận đáp án Boolean, không phải chỉ số mảng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "define-and-use",
+      "title": {
+        "en": "Define the element type and the collection",
+        "vi": "Định nghĩa kiểu phần tử và tập dữ liệu"
+      },
+      "paragraphs": [
+        {
+          "en": "A set type states what kind of elements it can contain. TYPE LetterSet = SET OF CHAR defines a type of character sets. DEFINE then names a particular collection using that same type name. Keep single-character values in single quotes; an integer or a multi-character string would not match this CHAR set.",
+          "vi": "Kiểu tập hợp quy định loại phần tử có thể chứa. TYPE LetterSet = SET OF CHAR định nghĩa kiểu tập ký tự. DEFINE đặt tên cho tập cụ thể bằng đúng tên kiểu đó. Giữ ký tự đơn trong nháy đơn; số nguyên hay chuỗi nhiều ký tự không phù hợp tập CHAR này."
+        },
+        {
+          "en": "This is composite because a set value is a collection of elements grouped under one identifier. It is different from an enum variable that holds just one choice from a declared domain. A record is also composite, but it names fields that may have different types.",
+          "vi": "Set là phức hợp vì một giá trị set gom các phần tử dưới một định danh. Nó khác biến enum chỉ giữ một lựa chọn từ miền đã khai báo. Record cũng phức hợp nhưng có các trường có tên có thể thuộc kiểu khác nhau."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book",
+        "guide"
+      ],
+      "code": "TYPE LetterSet = SET OF CHAR\nDEFINE X ('A', 'C') : LetterSet\nDEFINE Y ('B', 'C') : LetterSet"
+    },
+    {
+      "id": "select-the-rule",
+      "title": {
+        "en": "Choose the rule before collecting the result",
+        "vi": "Chọn quy tắc trước khi tạo kết quả"
+      },
+      "paragraphs": [
+        {
+          "en": "Union asks whether each candidate occurs in at least one input set. Intersection asks whether it occurs in both. With X={A,C} and Y={B,C}, A belongs only to X, B only to Y and C to both. Therefore union is {A,B,C}, while intersection is {C}. C appears once in either result.",
+          "vi": "Phép hợp hỏi mỗi phần tử có thuộc ít nhất một tập đầu vào hay không. Phép giao hỏi nó có thuộc cả hai hay không. Với X={A,C}, Y={B,C}, A chỉ thuộc X, B chỉ thuộc Y, C thuộc cả hai. Vì vậy hợp là {A,B,C}, giao là {C}. C chỉ xuất hiện một lần trong mỗi kết quả."
+        },
+        {
+          "en": "If C is removed from Y, the sets have no common element and their intersection is ∅. This is a valid result, not a processing error. Meanwhile “C belongs to Y” becomes FALSE. One result is a set; the other is a Boolean. Keeping the output type clear helps you answer the actual question.",
+          "vi": "Nếu bỏ C khỏi Y, hai tập không còn phần tử chung và giao là ∅. Đây là kết quả hợp lệ, không phải lỗi xử lý. Trong khi đó “C thuộc Y” trở thành FALSE. Một kết quả là tập, kết quả kia là Boolean. Nắm rõ kiểu đầu ra giúp trả lời đúng yêu cầu."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Element",
+            "vi": "Phần tử"
+          },
+          {
+            "en": "In X?",
+            "vi": "Thuộc X?"
+          },
+          {
+            "en": "In Y?",
+            "vi": "Thuộc Y?"
+          },
+          {
+            "en": "In union?",
+            "vi": "Thuộc hợp?"
+          },
+          {
+            "en": "In intersection?",
+            "vi": "Thuộc giao?"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "A",
+              "vi": "A"
+            },
+            {
+              "en": "Yes",
+              "vi": "Có"
+            },
+            {
+              "en": "No",
+              "vi": "Không"
+            },
+            {
+              "en": "Yes",
+              "vi": "Có"
+            },
+            {
+              "en": "No",
+              "vi": "Không"
+            }
+          ],
+          [
+            {
+              "en": "B",
+              "vi": "B"
+            },
+            {
+              "en": "No",
+              "vi": "Không"
+            },
+            {
+              "en": "Yes",
+              "vi": "Có"
+            },
+            {
+              "en": "Yes",
+              "vi": "Có"
+            },
+            {
+              "en": "No",
+              "vi": "Không"
+            }
+          ],
+          [
+            {
+              "en": "C",
+              "vi": "C"
+            },
+            {
+              "en": "Yes",
+              "vi": "Có"
+            },
+            {
+              "en": "Yes",
+              "vi": "Có"
+            },
+            {
+              "en": "Yes",
+              "vi": "Có"
+            },
+            {
+              "en": "Yes",
+              "vi": "Có"
+            }
+          ],
+          [
+            {
+              "en": "D",
+              "vi": "D"
+            },
+            {
+              "en": "No",
+              "vi": "Không"
+            },
+            {
+              "en": "No",
+              "vi": "Không"
+            },
+            {
+              "en": "No",
+              "vi": "Không"
+            },
+            {
+              "en": "No",
+              "vi": "Không"
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "visual": {
+    "kind": "sets",
+    "title": {
+      "en": "Change the members, keep the rule visible",
+      "vi": "Đổi phần tử, giữ rõ quy tắc"
+    },
+    "introduction": {
+      "en": "Two labelled input sets and a membership table explain why each result element is included.",
+      "vi": "Hai tập đầu vào có nhãn và bảng kiểm thuộc giải thích vì sao mỗi phần tử có trong kết quả."
+    },
+    "task": {
+      "en": "Start with X={A,C}, Y={B,C}. Compare union and intersection, then remove C from Y and explain both results.",
+      "vi": "Bắt đầu X={A,C}, Y={B,C}. So sánh hợp và giao, rồi bỏ C khỏi Y và giải thích hai kết quả."
+    },
+    "conventions": [
+      {
+        "en": "The selectable universe is A, B, C, D. Each element is a character.",
+        "vi": "Miền chọn là A, B, C, D. Mỗi phần tử là ký tự."
+      },
+      {
+        "en": "Alphabetical order is only a display convention; sets have no positional order.",
+        "vi": "Thứ tự chữ cái chỉ để hiển thị; tập hợp không có thứ tự vị trí."
+      },
+      {
+        "en": "Empty sets and FALSE membership results are valid outcomes.",
+        "vi": "Tập rỗng và kết quả FALSE của phép kiểm thuộc là hợp lệ."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Find activities selected by either club and by both",
+      "vi": "Tìm hoạt động ít nhất một câu lạc bộ chọn và cả hai cùng chọn"
+    },
+    "prompt": {
+      "en": "Let X={A,C}, Y={B,C}. Find X∪Y and X∩Y, then remove C from Y and update both results.",
+      "vi": "Cho X={A,C}, Y={B,C}. Tìm X∪Y và X∩Y, rồi bỏ C khỏi Y và cập nhật hai kết quả."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "list-membership",
+        "action": {
+          "en": "Check each candidate against X and Y.",
+          "vi": "Kiểm từng phần tử với X và Y."
+        },
+        "why": {
+          "en": "Both operations are defined by input membership.",
+          "vi": "Cả hai phép toán đều dựa trên việc thuộc các tập đầu vào."
+        },
+        "result": {
+          "en": "A: X only; B: Y only; C: both; D: neither.",
+          "vi": "A: chỉ X; B: chỉ Y; C: cả hai; D: không tập nào."
+        },
+        "check": {
+          "en": "Do not infer membership from a colour or display position.",
+          "vi": "Không suy việc thuộc tập chỉ từ màu hay vị trí hiển thị."
+        }
+      },
+      {
+        "id": "union",
+        "action": {
+          "en": "Include any element appearing in at least one set.",
+          "vi": "Lấy phần tử xuất hiện trong ít nhất một tập."
+        },
+        "why": {
+          "en": "Union uses an inclusive OR condition.",
+          "vi": "Hợp dùng điều kiện HOẶC bao gồm cả trường hợp cả hai."
+        },
+        "result": {
+          "en": "X∪Y={A,B,C}.",
+          "vi": "X∪Y={A,B,C}."
+        },
+        "check": {
+          "en": "C is listed once even though both sets contain it.",
+          "vi": "C được liệt kê một lần dù cả hai tập chứa nó."
+        }
+      },
+      {
+        "id": "intersection",
+        "action": {
+          "en": "Include only elements appearing in both sets.",
+          "vi": "Chỉ lấy phần tử xuất hiện trong cả hai tập."
+        },
+        "why": {
+          "en": "Intersection requires both membership conditions to hold.",
+          "vi": "Giao yêu cầu đồng thời thỏa hai điều kiện thuộc tập."
+        },
+        "result": {
+          "en": "X∩Y={C}.",
+          "vi": "X∩Y={C}."
+        },
+        "check": {
+          "en": "A and B fail one of the two conditions.",
+          "vi": "A và B không thỏa một trong hai điều kiện."
+        }
+      },
+      {
+        "id": "change-input",
+        "action": {
+          "en": "Remove C from Y and apply the same rules again.",
+          "vi": "Bỏ C khỏi Y và áp dụng lại đúng các quy tắc."
+        },
+        "why": {
+          "en": "The operation stays fixed; only input membership changes.",
+          "vi": "Phép toán giữ nguyên; chỉ việc thuộc tập đầu vào đổi."
+        },
+        "result": {
+          "en": "Y={B}; union remains {A,B,C}; intersection becomes ∅.",
+          "vi": "Y={B}; hợp vẫn {A,B,C}; giao thành ∅."
+        },
+        "check": {
+          "en": "C remains in the union because it is still in X.",
+          "vi": "C vẫn thuộc hợp vì còn thuộc X."
+        }
+      }
+    ],
+    "result": {
+      "en": "Union collects either membership; intersection collects shared membership, with no duplicates.",
+      "vi": "Hợp lấy phần tử thuộc ít nhất một tập; giao lấy phần tử chung, không có trùng lặp."
+    },
+    "selfCheck": {
+      "en": "For each result element, state the membership condition that allowed it. For each omission, state which condition failed.",
+      "vi": "Với phần tử có trong kết quả, nêu điều kiện thuộc tập cho phép lấy nó. Với phần tử bị bỏ, nêu điều kiện không thỏa."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book",
+      "guide"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "The task talks about unique members, overlap, either group or both groups.",
+        "vi": "Đề nói về phần tử duy nhất, phần chung, ít nhất một nhóm hoặc cả hai nhóm."
+      },
+      {
+        "en": "“Is an element present?” asks membership; “which elements?” asks for a collection result.",
+        "vi": "“Phần tử có mặt không?” hỏi phép kiểm thuộc; “những phần tử nào?” hỏi kết quả dạng tập."
+      }
+    ],
+    "distinguish": {
+      "en": "An enum lists allowed alternatives for one value. An array has indexed positions and can contain repeated values. Neither should be substituted for set semantics without explaining the difference.",
+      "vi": "Enum liệt kê phương án cho một giá trị. Mảng có vị trí theo chỉ số và có thể chứa giá trị lặp. Không thay ngữ nghĩa tập hợp bằng các cấu trúc đó khi chưa giải thích khác biệt."
+    },
+    "method": [
+      {
+        "en": "State the element type and identify both input sets.",
+        "vi": "Nêu kiểu phần tử và xác định hai tập đầu vào."
+      },
+      {
+        "en": "Write the membership rule for the requested operation.",
+        "vi": "Viết quy tắc thuộc tập của phép toán được yêu cầu."
+      },
+      {
+        "en": "Collect each qualifying element once and check the output type.",
+        "vi": "Lấy mỗi phần tử đạt điều kiện đúng một lần rồi kiểm kiểu đầu ra."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“The union contains two copies of C.”",
+        "vi": "“Hợp chứa hai bản sao C.”"
+      },
+      "correction": {
+        "en": "Sets contain distinct elements; membership in both inputs does not duplicate the result.",
+        "vi": "Tập hợp gồm các phần tử khác nhau; thuộc cả hai đầu vào không làm trùng kết quả."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Changing the display order changes the set.”",
+        "vi": "“Đổi thứ tự hiển thị làm đổi tập.”"
+      },
+      "correction": {
+        "en": "Set equality depends on membership, not display order.",
+        "vi": "Hai tập bằng nhau dựa vào phần tử, không phải thứ tự hiển thị."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“An empty intersection is FALSE.”",
+        "vi": "“Giao rỗng là FALSE.”"
+      },
+      "correction": {
+        "en": "The intersection is a set, ∅. A membership test has a Boolean result.",
+        "vi": "Kết quả giao là tập ∅. Phép kiểm thuộc mới có kết quả Boolean."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "duplicate",
+      "prompt": {
+        "en": "X={A,C}. What is X after adding C again?",
+        "vi": "X={A,C}. X là gì sau khi thêm C lần nữa?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "{A,C,C}",
+            "vi": "{A,C,C}"
+          },
+          "feedback": {
+            "en": "That would count a duplicate as another element, contrary to set semantics.",
+            "vi": "Đáp án này tính bản sao trùng thành phần tử mới, trái ngữ nghĩa tập."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "{A,C}",
+            "vi": "{A,C}"
+          },
+          "feedback": {
+            "en": "Correct. C was already a member, so membership does not change.",
+            "vi": "Đúng. C đã thuộc tập nên không thay đổi phần tử."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "{C}",
+            "vi": "{C}"
+          },
+          "feedback": {
+            "en": "Adding C does not remove A.",
+            "vi": "Thêm C không xóa A."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "A set records presence, not how many times an element was added.",
+        "vi": "Tập ghi sự có mặt, không ghi số lần thêm phần tử."
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "X={A,B}; Y={B,D}. Which is X∩Y?",
+        "vi": "X={A,B}; Y={B,D}. X∩Y là gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "{A,B,D}",
+            "vi": "{A,B,D}"
+          },
+          "feedback": {
+            "en": "This includes members from either set; it is the union.",
+            "vi": "Đây lấy phần tử thuộc ít nhất một tập; đó là hợp."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "{A,D}",
+            "vi": "{A,D}"
+          },
+          "feedback": {
+            "en": "Neither A nor D belongs to both sets.",
+            "vi": "A và D đều không thuộc cả hai tập."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "{B}",
+            "vi": "{B}"
+          },
+          "feedback": {
+            "en": "Correct. B is the only element satisfying membership in both inputs.",
+            "vi": "Đúng. Chỉ B thuộc cả hai đầu vào."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "For intersection, test both conditions for every candidate.",
+        "vi": "Với giao, kiểm cả hai điều kiện cho từng phần tử."
+      }
+    },
+    {
+      "id": "empty",
+      "prompt": {
+        "en": "X={A}; Y={D}. Which pair correctly states X∩Y and whether A belongs to Y?",
+        "vi": "X={A}; Y={D}. Cặp nào nêu đúng X∩Y và A có thuộc Y không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "∅ and FALSE",
+            "vi": "∅ và FALSE"
+          },
+          "feedback": {
+            "en": "Correct: the collection is empty and the membership statement is false.",
+            "vi": "Đúng: tập kết quả rỗng và mệnh đề thuộc tập sai."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "FALSE and ∅",
+            "vi": "FALSE và ∅"
+          },
+          "feedback": {
+            "en": "This swaps the required output types.",
+            "vi": "Đáp án đảo kiểu đầu ra cần có."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "{A,D} and TRUE",
+            "vi": "{A,D} và TRUE"
+          },
+          "feedback": {
+            "en": "The elements are not shared, and A is not in Y.",
+            "vi": "Các phần tử không chung; A không thuộc Y."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Keep a set result separate from a Boolean answer.",
+        "vi": "Tách kết quả tập hợp khỏi đáp án Boolean."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain union and intersection without using a diagram, and give a case with an empty intersection.",
+      "vi": "Giải thích hợp và giao không dùng sơ đồ, rồi cho trường hợp giao rỗng."
+    },
+    "answerPoints": [
+      {
+        "en": "Union includes elements in either input or both.",
+        "vi": "Hợp lấy phần tử thuộc ít nhất một đầu vào."
+      },
+      {
+        "en": "Intersection includes only elements in both inputs.",
+        "vi": "Giao chỉ lấy phần tử thuộc cả hai đầu vào."
+      },
+      {
+        "en": "{A}∩{B}=∅; set order and duplicate additions do not change membership.",
+        "vi": "{A}∩{B}=∅; thứ tự và thêm trùng không đổi việc thuộc tập."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "A set contains unique elements and has no positional order.",
+      "vi": "Tập chứa phần tử duy nhất và không có thứ tự vị trí."
+    },
+    {
+      "en": "Choose the membership rule before constructing the result.",
+      "vi": "Chọn quy tắc thuộc tập trước khi tạo kết quả."
+    },
+    {
+      "en": "A set result and a Boolean membership answer have different types.",
+      "vi": "Kết quả tập hợp và đáp án Boolean của phép kiểm thuộc có kiểu khác nhau."
+    }
+  ],
+  "relatedSlugs": [
+    "user-defined-and-enumerated-types",
+    "records-and-composite-models"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.1, p.32",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=32"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.305,307; examples independently checked",
+      "kind": "book"
+    },
+    {
+      "id": "guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, exams 2026, Version 1",
+      "locator": "pp.13; code in this lesson is algorithmic pseudocode, not executable Python",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide-for-teachers.pdf"
+    }
+  ]
+}

@@ -1,0 +1,550 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.2-T03",
+  "slug": "collisions-and-retrieval",
+  "title": {
+    "en": "Collisions and retrieval",
+    "vi": "Va chạm băm và truy xuất"
+  },
+  "question": {
+    "en": "How can insertion and retrieval still agree after collisions?",
+    "vi": "Ghi và tìm kiếm còn nhất quán thế nào sau va chạm?"
+  },
+  "opening": {
+    "en": "Keys 10,17 and 24 all select slot 3 in a seven-slot table. Keeping all three records needs more than a hash formula. We will use linear probing: inspect the next slot in a fixed route, wrap at the end, and use exactly the same route when finding a record later.",
+    "vi": "Các khóa 10,17,24 đều chọn ô 3 trong bảng bảy ô. Muốn giữ cả ba bản ghi cần thêm quy tắc ngoài hàm hash. Ta dùng dò tuyến tính: xét ô tiếp theo theo đường cố định, quay về đầu khi hết bảng và dùng đúng đường đó khi tìm bản ghi sau này."
+  },
+  "objectives": [
+    {
+      "en": "Trace collision insertion without overwriting another record.",
+      "vi": "Trace chèn khi va chạm mà không ghi đè bản ghi khác."
+    },
+    {
+      "en": "Retrieve a displaced record using the same probing route.",
+      "vi": "Tìm bản ghi bị dời bằng cùng đường dò."
+    },
+    {
+      "en": "Justify empty-slot and full-cycle stopping conditions.",
+      "vi": "Giải thích điều kiện dừng tại ô trống và sau một vòng đầy đủ."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "h(k)=k MOD 7 and zero-based slots 0..6.",
+      "vi": "h(k)=k MOD 7 và ô từ 0..6."
+    },
+    {
+      "en": "Comparing record keys rather than just checking occupancy.",
+      "vi": "So sánh khóa bản ghi thay vì chỉ kiểm ô có dữ liệu."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Linear probing",
+      "meaning": {
+        "en": "Inspecting consecutive slots, wrapping to the start when needed.",
+        "vi": "Xét các ô liên tiếp, quay về đầu khi cần."
+      }
+    },
+    {
+      "term": "Probe",
+      "meaning": {
+        "en": "One inspection of a candidate slot.",
+        "vi": "Một lần xét ô ứng viên."
+      }
+    },
+    {
+      "term": "Wrap-around",
+      "meaning": {
+        "en": "Moving from the last slot back to slot 0.",
+        "vi": "Chuyển từ ô cuối về ô 0."
+      }
+    },
+    {
+      "term": "Duplicate key",
+      "meaning": {
+        "en": "A key already stored in the table; this model rejects a new insertion of it.",
+        "vi": "Khóa đã được lưu trong bảng; mô hình từ chối chèn lại."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "policy",
+      "title": {
+        "en": "State the complete policy",
+        "vi": "Nêu đầy đủ chính sách"
+      },
+      "paragraphs": [
+        {
+          "en": "The model has 7 slots 0..6, home h(k)=k MOD 7 and next=(current+1) MOD 7. A collision means a different key occupies the candidate slot. Compare keys before deciding: a duplicate is rejected, a different occupied key causes another probe, and an empty slot permits insertion.",
+          "vi": "Mô hình có 7 ô 0..6, ô gốc h(k)=k MOD 7 và next=(current+1) MOD 7. Va chạm nghĩa là khóa khác chiếm ô ứng viên. So sánh khóa trước khi quyết định: khóa trùng bị từ chối, khóa khác ở ô có dữ liệu khiến dò tiếp, ô trống cho phép chèn."
+        },
+        {
+          "en": "This is an insert-only teaching table: no deletion and no tombstones. At most 7 distinct slots are inspected. If all are occupied without the sought key, insertion reports full and lookup reports absent. The procedure must terminate instead of circling forever.",
+          "vi": "Đây là bảng minh họa chỉ chèn: không xóa và không có tombstone. Xét tối đa 7 ô khác nhau. Nếu cả bảng có dữ liệu nhưng không có khóa cần tìm, chèn báo đầy còn tìm kiếm báo vắng mặt. Quy trình phải dừng thay vì vòng quanh vô hạn."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "build",
+      "title": {
+        "en": "Build the table in the supplied order",
+        "vi": "Dựng bảng theo đúng thứ tự cho trước"
+      },
+      "paragraphs": [
+        {
+          "en": "Insert 10 first: home 3 is empty. Insert 17: home 3 holds 10, so use 4. Insert 24: compare 10 at 3 and 17 at 4, then use 5. Insert 6 at 6. Finally 13 hashes to 6, finds 6 there, wraps to 0 and is stored at 0. The resulting slots 0..6 are 13,empty,empty,10,17,24,6.",
+          "vi": "Chèn 10 trước: ô gốc 3 trống. Chèn 17: ô 3 chứa 10 nên dùng 4. Chèn 24: so sánh 10 ở 3 và 17 ở 4 rồi dùng 5. Chèn 6 vào 6. Cuối cùng 13 hash tới 6, gặp 6 tại đó, quay về 0 và được lưu ở 0. Kết quả ô 0..6 là 13,trống,trống,10,17,24,6."
+        },
+        {
+          "en": "Insertion order matters because the earlier record can occupy the shared home slot. The hash of 17 is still 3 after it is stored at 4: do not rewrite the hash result to match the final location. Keep “home slot” and “current probe” as different labels.",
+          "vi": "Thứ tự chèn có ý nghĩa vì bản ghi đến trước có thể chiếm ô gốc chung. Hash của 17 vẫn là 3 sau khi lưu ở 4: không sửa kết quả hash thành vị trí cuối. Giữ “ô gốc” và “ô đang dò” là hai nhãn khác nhau."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "retrieve",
+      "title": {
+        "en": "Why the lookup can find a displaced record",
+        "vi": "Vì sao tìm được bản ghi đã bị dời"
+      },
+      "paragraphs": [
+        {
+          "en": "To find 24, recompute home 3 and compare the complete key at each visited slot:10≠24,17≠24,24=24. The path 3→4→5 succeeds. Occupancy alone is not sufficient; stopping at 3 would return the wrong record.",
+          "vi": "Muốn tìm 24, tính lại ô gốc 3 và so sánh khóa đầy đủ ở mỗi ô:10≠24,17≠24,24=24. Đường 3→4→5 thành công. Chỉ có dữ liệu chưa đủ; dừng ở 3 sẽ trả sai bản ghi."
+        },
+        {
+          "en": "To find 31, home 3 leads through 3,4,5,6,0 and then empty 1. In an insert-only table, the empty slot proves absence: insertion of 31 would have used that empty slot before proceeding farther. If deletion were allowed to create gaps, that proof would fail. A deletion-capable design needs another policy, such as markers that distinguish deleted slots from never-used slots.",
+          "vi": "Muốn tìm 31, từ ô gốc 3 đi qua 3,4,5,6,0 rồi ô 1 trống. Trong bảng chỉ chèn, ô trống chứng minh vắng mặt: khi chèn 31, nó đã dùng ô trống đó trước khi đi xa hơn. Nếu xóa tạo khoảng trống, lập luận này không còn đúng. Thiết kế có xóa cần chính sách khác, chẳng hạn đánh dấu phân biệt ô đã xóa với ô chưa dùng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "alternatives",
+      "title": {
+        "en": "Name mechanisms precisely",
+        "vi": "Gọi chính xác cơ chế"
+      },
+      "paragraphs": [
+        {
+          "en": "Another design can store colliding records in a separate overflow area and keep enough information to search that area. A correct answer explains where the extra record goes and how it is found again. Merely naming a collision without a retrieval mechanism is incomplete.",
+          "vi": "Thiết kế khác có thể lưu bản ghi va chạm ở vùng tràn riêng và giữ đủ thông tin để tìm vùng đó. Đáp án đúng giải thích bản ghi thêm đi đâu và được tìm lại thế nào. Chỉ gọi tên va chạm mà không có cơ chế tìm lại là chưa đủ."
+        },
+        {
+          "en": "Terminology such as open and closed hashing is used inconsistently across teaching sources. Here the mechanism is explicitly linear probing; an exam answer should follow the method described in the question and explain its steps. Do not replace the supplied collision rule with a favourite alternative.",
+          "vi": "Thuật ngữ open và closed hashing được dùng không thống nhất giữa các nguồn dạy học. Ở đây cơ chế được nêu rõ là dò tuyến tính; khi làm bài cần theo phương pháp đề mô tả và giải thích các bước. Không thay quy tắc va chạm đề cho bằng cách mình quen."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "collisions",
+    "title": {
+      "en": "Watch the probe, not just the home slot",
+      "vi": "Theo dõi ô dò, không chỉ ô gốc"
+    },
+    "introduction": {
+      "en": "The table, requested key and visited path form one trace. Reading a table does not change its contents.",
+      "vi": "Bảng, khóa yêu cầu và đường đã đi tạo thành một trace. Đọc bảng không đổi nội dung bảng."
+    },
+    "task": {
+      "en": "Build 10,17,24,6,13, then compare lookup 24 with lookup 31. Explain the wrap from 6 to 0 and the reason to stop at empty 1.",
+      "vi": "Dựng 10,17,24,6,13 rồi so sánh tìm 24 với tìm 31. Giải thích bước quay từ 6 về 0 và lý do dừng ở ô 1 trống."
+    },
+    "conventions": [
+      {
+        "en": "Seven slots 0..6; h(k)=k MOD 7; next=(i+1) MOD 7.",
+        "vi": "Bảy ô 0..6; h(k)=k MOD 7; next=(i+1) MOD 7."
+      },
+      {
+        "en": "No deletion. Duplicate insertion is rejected without overwriting.",
+        "vi": "Không xóa. Chèn khóa trùng bị từ chối mà không ghi đè."
+      },
+      {
+        "en": "Stop after a match, a never-used empty slot or at most 7 inspected slots.",
+        "vi": "Dừng khi khớp, gặp ô chưa dùng còn trống hoặc sau tối đa 7 ô đã xét."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Retrieve 24, then explain why 31 is absent",
+      "vi": "Tìm 24 rồi giải thích vì sao thiếu 31"
+    },
+    "prompt": {
+      "en": "Use slots 0..6=[13,empty,empty,10,17,24,6]. Trace lookup 24 and contrast its stopping condition with lookup 31.",
+      "vi": "Dùng ô 0..6=[13,trống,trống,10,17,24,6]. Trace tìm 24 và đối chiếu điều kiện dừng với tìm 31."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "home",
+        "action": {
+          "en": "Compute 24 MOD 7.",
+          "vi": "Tính 24 MOD 7."
+        },
+        "why": {
+          "en": "Lookup must start from the same hash used during insertion.",
+          "vi": "Tìm kiếm phải bắt đầu từ cùng hash dùng khi chèn."
+        },
+        "result": {
+          "en": "Home slot 3 contains 10.",
+          "vi": "Ô gốc 3 chứa 10."
+        },
+        "check": {
+          "en": "This is not success:10≠24.",
+          "vi": "Chưa thành công:10≠24."
+        }
+      },
+      {
+        "id": "probe",
+        "action": {
+          "en": "Advance to 4 and compare its key.",
+          "vi": "Sang 4 rồi so sánh khóa."
+        },
+        "why": {
+          "en": "A different occupied key means continue under linear probing.",
+          "vi": "Khóa khác ở ô có dữ liệu nghĩa là tiếp tục dò tuyến tính."
+        },
+        "result": {
+          "en": "Slot 4 contains 17;17≠24.",
+          "vi": "Ô4 chứa 17;17≠24."
+        },
+        "check": {
+          "en": "Do not overwrite 17 while searching.",
+          "vi": "Không ghi đè 17 khi đang tìm."
+        }
+      },
+      {
+        "id": "match",
+        "action": {
+          "en": "Advance to 5 and compare again.",
+          "vi": "Sang 5 và so sánh lại."
+        },
+        "why": {
+          "en": "A complete key match identifies the requested record.",
+          "vi": "Khóa khớp đầy đủ xác định bản ghi cần tìm."
+        },
+        "result": {
+          "en": "Slot 5 contains 24: found after 3 probes.",
+          "vi": "Ô5 chứa 24: tìm thấy sau 3 lần dò."
+        },
+        "check": {
+          "en": "The table contents and home slot 3 stay unchanged.",
+          "vi": "Nội dung bảng và ô gốc 3 không đổi."
+        }
+      },
+      {
+        "id": "absent",
+        "action": {
+          "en": "Trace a fresh lookup for 31.",
+          "vi": "Trace tìm kiếm mới cho 31."
+        },
+        "why": {
+          "en": "31 also hashes to 3, but no visited record has that key.",
+          "vi": "31 cũng hash tới 3 nhưng không bản ghi đã xét nào có khóa đó."
+        },
+        "result": {
+          "en": "Visit 3→4→5→6→0→1; empty 1 proves absence in this insert-only table.",
+          "vi": "Đi 3→4→5→6→0→1; ô 1 trống chứng minh vắng mặt trong bảng chỉ chèn."
+        },
+        "check": {
+          "en": "The negative result depends on no deletion; it is not a rule for every hash table.",
+          "vi": "Kết luận vắng mặt phụ thuộc không xóa; không phải quy tắc cho mọi bảng hash."
+        }
+      }
+    ],
+    "result": {
+      "en": "24 is stored away from its home slot but is retrievable by the shared route. 31 is absent.",
+      "vi": "24 được lưu xa ô gốc nhưng tìm được theo đường chung. 31 vắng mặt."
+    },
+    "selfCheck": {
+      "en": "List the keys read, not just the indices, and justify the final comparison or empty-slot decision.",
+      "vi": "Liệt kê khóa đã đọc, không chỉ chỉ số, rồi giải thích quyết định cuối khi so sánh hay gặp ô trống."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "The home address is occupied, or the task asks where the next record is stored.",
+        "vi": "Ô gốc có dữ liệu hoặc đề hỏi bản ghi tiếp được lưu đâu."
+      },
+      {
+        "en": "A lookup must find records that were displaced by earlier insertions.",
+        "vi": "Tìm kiếm phải tìm bản ghi bị dời bởi các lần chèn trước."
+      }
+    ],
+    "distinguish": {
+      "en": "The hash chooses the starting point; the collision policy defines the later route. Insertion and lookup must agree.",
+      "vi": "Hash chọn điểm bắt đầu; chính sách va chạm quy định đường tiếp theo. Chèn và tìm phải thống nhất."
+    },
+    "method": [
+      {
+        "en": "Write table size, hash, probe rule and operation.",
+        "vi": "Ghi kích thước, hash, quy tắc dò và thao tác."
+      },
+      {
+        "en": "At each slot compare full keys, or identify an empty slot.",
+        "vi": "Tại mỗi ô so sánh khóa đầy đủ hoặc xác định ô trống."
+      },
+      {
+        "en": "Record every probe and apply the declared stopping bound.",
+        "vi": "Ghi từng lần dò và áp dụng giới hạn dừng đã công bố."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“A collision means replace the record already there.”",
+        "vi": "“Va chạm nghĩa là thay bản ghi đang có.”"
+      },
+      "correction": {
+        "en": "Different records must be retained through the stated collision policy.",
+        "vi": "Phải giữ các bản ghi khác nhau theo chính sách va chạm."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Hash 17 becomes 4 after insertion.”",
+        "vi": "“Hash 17 thành 4 sau khi chèn.”"
+      },
+      "correction": {
+        "en": "Its home remains 3;4 is the final storage slot selected by probing.",
+        "vi": "Ô gốc vẫn 3;4 là ô lưu cuối do dò chọn."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Stop at an empty slot even if deletion created it.”",
+        "vi": "“Dừng tại ô trống kể cả do xóa tạo ra.”"
+      },
+      "correction": {
+        "en": "The proof here relies on no deletion; deleted-slot handling needs a separate policy.",
+        "vi": "Lập luận ở đây dựa vào không xóa; xử lý ô đã xóa cần chính sách riêng."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "wrap",
+      "prompt": {
+        "en": "With seven slots 0..6, what follows slot 6 under (i+1) MOD 7?",
+        "vi": "Với bảy ô 0..6, ô nào theo sau 6 theo (i+1) MOD 7?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "7",
+            "vi": "7"
+          },
+          "feedback": {
+            "en": "7 is outside the allowed indices;7 MOD 7 is 0.",
+            "vi": "7 nằm ngoài chỉ số cho phép;7 MOD 7 bằng 0."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "Correct. The route wraps to the beginning.",
+            "vi": "Đúng. Đường dò quay về đầu."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "6 again",
+            "vi": "Lại 6"
+          },
+          "feedback": {
+            "en": "That would repeat one slot rather than examine the next candidate.",
+            "vi": "Như vậy lặp lại một ô thay vì xét ứng viên tiếp."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "The MOD in the probe rule enforces wrap-around.",
+        "vi": "MOD trong quy tắc dò tạo việc quay vòng."
+      }
+    },
+    {
+      "id": "transfer-probe",
+      "prompt": {
+        "en": "In a fresh table insert keys 2,9,16 with MOD 7 and linear probing. Where is 16 stored?",
+        "vi": "Trong bảng mới, chèn 2,9,16 với MOD 7 và dò tuyến tính. 16 được lưu ở đâu?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "2",
+            "vi": "2"
+          },
+          "feedback": {
+            "en": "Home 2 is already occupied by 2.",
+            "vi": "Ô gốc 2 đã chứa 2."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "3",
+            "vi": "3"
+          },
+          "feedback": {
+            "en": "3 is occupied by 9 after its collision.",
+            "vi": "3 đã chứa 9 sau va chạm của nó."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "Correct. Probe 2 and 3, then use empty 4.",
+            "vi": "Đúng. Dò 2 và 3 rồi dùng ô 4 trống."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "Apply the insertion order; do not compute each key in isolation.",
+        "vi": "Áp dụng thứ tự chèn; không tính từng khóa riêng biệt."
+      }
+    },
+    {
+      "id": "empty-proof",
+      "prompt": {
+        "en": "Why can lookup 31 stop at empty 1 in this model?",
+        "vi": "Vì sao tìm 31 được dừng ở ô 1 trống trong mô hình?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "31 would have been inserted there before any later slot; no deletion is allowed.",
+            "vi": "31 đã được chèn ở đó trước mọi ô sau; mô hình không cho xóa."
+          },
+          "feedback": {
+            "en": "Correct. The insertion invariant supports the stopping proof.",
+            "vi": "Đúng. Tính chất được giữ khi chèn bảo đảm lập luận dừng."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Empty means every slot is empty.",
+            "vi": "Trống nghĩa là mọi ô đều trống."
+          },
+          "feedback": {
+            "en": "One empty slot does not describe the whole table.",
+            "vi": "Một ô trống không mô tả toàn bảng."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "The hash function guarantees 31 does not exist.",
+            "vi": "Hàm hash đảm bảo không có 31."
+          },
+          "feedback": {
+            "en": "The hash only supplies a start; the probe path supplies the evidence.",
+            "vi": "Hash chỉ cho điểm bắt đầu; đường dò mới cung cấp bằng chứng."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Always state the no-deletion assumption with this stopping rule.",
+        "vi": "Luôn nêu giả thiết không xóa khi dùng quy tắc dừng này."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain insertion, successful lookup and unsuccessful lookup under this complete probing policy.",
+      "vi": "Giải thích chèn, tìm thấy và không tìm thấy theo đầy đủ chính sách dò này."
+    },
+    "answerPoints": [
+      {
+        "en": "Use the same hash and next-slot rule for writing and reading.",
+        "vi": "Dùng cùng hash và quy tắc ô tiếp cho ghi và đọc."
+      },
+      {
+        "en": "Compare keys; a collision does not permit overwriting.",
+        "vi": "So sánh khóa; va chạm không cho phép ghi đè."
+      },
+      {
+        "en": "No deletion justifies stopping at empty; a full-table search has a seven-probe bound.",
+        "vi": "Không xóa cho phép dừng ở ô trống; tìm trên bảng đầy có giới hạn bảy lần dò."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Trace home slot, current probe and stored key separately.",
+      "vi": "Trace riêng ô gốc, ô đang dò và khóa được lưu."
+    },
+    {
+      "en": "A correct collision policy includes retrieval and termination.",
+      "vi": "Chính sách va chạm đúng gồm cả tìm lại và kết thúc."
+    }
+  ],
+  "relatedSlugs": [
+    "hashing-to-locate-records",
+    "organisation-versus-access"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.2, p.32",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=32"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.311; examples independently checked",
+      "kind": "book"
+    }
+  ]
+}

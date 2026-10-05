@@ -24,7 +24,7 @@ function loginHref(locale: LoginLocale, nextPath: string): string {
 const copy = {
   en: {
     language: "Choose language",
-    eyebrow: "CAMBRIDGE 9618 · PAPER 3 + PAPER 4 · 2026",
+    eyebrow: "CAMBRIDGE 9618 · PAPER 2 + PAPER 3 + PAPER 4 · 2026",
     title: "Student sign in",
     description: "Use the class account provided by your teacher to continue your A Level Computer Science revision.",
     support: "If you cannot sign in, ask your teacher to check the class account.",
@@ -32,7 +32,7 @@ const copy = {
   },
   vi: {
     language: "Chọn ngôn ngữ",
-    eyebrow: "CAMBRIDGE 9618 · PAPER 3 + PAPER 4 · 2026",
+    eyebrow: "CAMBRIDGE 9618 · PAPER 2 + PAPER 3 + PAPER 4 · 2026",
     title: "Đăng nhập học sinh",
     description: "Hãy dùng tài khoản lớp do giáo viên cung cấp để tiếp tục ôn tập A Level Computer Science.",
     support: "Nếu chưa đăng nhập được, em hãy nhờ giáo viên kiểm tra lại tài khoản lớp.",

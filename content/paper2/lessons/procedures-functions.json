@@ -1,0 +1,616 @@
+{
+  "schemaVersion": 1,
+  "version": "T20-academic-r2",
+  "topicId": "T20",
+  "sectionId": "11.3",
+  "slug": "procedures-functions",
+  "learningMode": "procedural",
+  "estimatedMinutes": 60,
+  "title": {
+    "en": "Procedures and functions",
+    "vi": "Procedure và function"
+  },
+  "question": {
+    "en": "What interface should a module expose, and should the caller receive an action, output or returned value?",
+    "vi": "Module nên công bố interface nào, và caller cần nhận một hành động, output hay giá trị trả về?"
+  },
+  "opening": {
+    "en": "Design the module contract before its body: name, ordered parameters and types, procedure or function, and function return type. A procedure call is a statement; a function call belongs inside an expression and RETURN supplies its value.",
+    "vi": "Thiết kế hợp đồng module trước thân: tên, tham số có thứ tự và kiểu, procedure hay function, cùng kiểu trả về của function. Lời gọi procedure là một câu lệnh; lời gọi function nằm trong biểu thức và RETURN cung cấp giá trị."
+  },
+  "objectives": [
+    {
+      "en": "Define and call procedures and functions using the 2026 guide syntax.",
+      "vi": "Định nghĩa và gọi procedure, function theo cú pháp guide 2026."
+    },
+    {
+      "en": "Choose a procedure for an action and a function for one returned value used in an expression.",
+      "vi": "Chọn procedure cho hành động và function cho một giá trị trả về dùng trong biểu thức."
+    },
+    {
+      "en": "Match parameter order/types and function return type to the caller.",
+      "vi": "Khớp thứ tự/kiểu tham số và kiểu trả về của function với caller."
+    },
+    {
+      "en": "Distinguish OUTPUT, RETURN and caller mutation.",
+      "vi": "Phân biệt OUTPUT, RETURN và thay đổi biến caller."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Algorithm decomposition",
+        "vi": "Phân rã thuật toán"
+      },
+      "reason": {
+        "en": "A module should own one coherent responsibility with a clear interface.",
+        "vi": "Module nên sở hữu một trách nhiệm nhất quán với interface rõ."
+      }
+    },
+    {
+      "title": {
+        "en": "Variables and control structures",
+        "vi": "Biến và cấu trúc điều khiển"
+      },
+      "reason": {
+        "en": "The body still requires typed state, selection and iteration where appropriate.",
+        "vi": "Thân module vẫn cần trạng thái có kiểu, lựa chọn và lặp khi phù hợp."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "module interface",
+      "meaning": {
+        "en": "The name, parameters and types, plus a function return type.",
+        "vi": "Tên, tham số và kiểu, cộng kiểu trả về với function."
+      }
+    },
+    {
+      "term": "procedure",
+      "meaning": {
+        "en": "A named module called as a complete statement; it does not return a function value.",
+        "vi": "Module có tên được gọi như câu lệnh hoàn chỉnh; không trả giá trị function."
+      }
+    },
+    {
+      "term": "function",
+      "meaning": {
+        "en": "A named module that returns one value to replace its call in an expression.",
+        "vi": "Module có tên trả một giá trị thay cho lời gọi trong biểu thức."
+      }
+    },
+    {
+      "term": "argument",
+      "meaning": {
+        "en": "An actual value supplied by the caller to a parameter.",
+        "vi": "Giá trị thực mà caller cung cấp cho tham số."
+      }
+    },
+    {
+      "term": "RETURN",
+      "meaning": {
+        "en": "The statement that immediately supplies a function's value to its caller.",
+        "vi": "Câu lệnh lập tức cung cấp giá trị function cho caller."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The task asks for a module header, definition, call, returned value or procedure/function choice.",
+        "vi": "Đề yêu cầu header module, định nghĩa, lời gọi, giá trị trả về hoặc lựa chọn procedure/function."
+      },
+      {
+        "en": "A calculated result must be used in a larger expression.",
+        "vi": "Kết quả tính phải được dùng trong biểu thức lớn hơn."
+      },
+      {
+        "en": "A self-contained action such as displaying or updating is called as a statement.",
+        "vi": "Hành động độc lập như hiển thị hoặc cập nhật được gọi như câu lệnh."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "OUTPUT displays a value; it does not return that value to an expression.",
+        "vi": "OUTPUT hiển thị giá trị; không trả giá trị đó về biểu thức."
+      },
+      {
+        "en": "CALL is used for procedures, not function calls in expressions.",
+        "vi": "CALL dùng cho procedure, không dùng cho lời gọi function trong biểu thức."
+      },
+      {
+        "en": "Do not replace a parameter with INPUT inside a module unless user input is explicitly the module's responsibility.",
+        "vi": "Không thay tham số bằng INPUT trong module trừ khi nhập từ người dùng là trách nhiệm được nêu rõ."
+      },
+      {
+        "en": "Every executable function path must reach a compatible RETURN.",
+        "vi": "Mọi đường chạy của function phải tới RETURN tương thích."
+      }
+    ],
+    "answerProduct": {
+      "en": "A contract-first header, valid call, body and caller trace that identifies parameters, output and return flow separately.",
+      "vi": "Header theo hợp đồng, lời gọi hợp lệ, thân và trace caller phân biệt tham số, output và luồng return."
+    },
+    "method": [
+      {
+        "en": "State the single responsibility and what the caller needs afterward.",
+        "vi": "Nêu trách nhiệm duy nhất và caller cần gì sau đó."
+      },
+      {
+        "en": "Choose procedure or function and write the header before the body.",
+        "vi": "Chọn procedure hoặc function và viết header trước thân."
+      },
+      {
+        "en": "Match each actual argument to the ordered formal parameter and type.",
+        "vi": "Khớp từng đối số thực với tham số hình thức có thứ tự và kiểu."
+      },
+      {
+        "en": "Trace OUTPUT, RETURN and any mutation on separate arrows.",
+        "vi": "Trace OUTPUT, RETURN và mọi mutation trên các mũi tên riêng."
+      },
+      {
+        "en": "Check all function paths return the declared type.",
+        "vi": "Kiểm mọi đường function trả đúng kiểu đã khai báo."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t20-contract",
+      "title": {
+        "en": "Write the interface before the body",
+        "vi": "Viết interface trước thân"
+      },
+      "paragraphs": [
+        {
+          "en": "A procedure header gives its name and optional typed parameters; call it with CALL as a complete statement. A function header additionally declares RETURNS Type; call it inside an assignment, condition, output expression or another expression without CALL.",
+          "vi": "Header procedure cho tên và tham số có kiểu tùy chọn; gọi bằng CALL như câu lệnh hoàn chỉnh. Header function còn khai báo RETURNS Type; gọi trong phép gán, điều kiện, biểu thức output hoặc biểu thức khác mà không dùng CALL."
+        },
+        {
+          "en": "Actual arguments must match formal parameter order and types. A module should use those parameters rather than silently obtaining replacement input, because the interface defines what the caller supplies.",
+          "vi": "Đối số thực phải khớp thứ tự và kiểu tham số hình thức. Module nên dùng các tham số đó thay vì âm thầm nhập dữ liệu thay thế, vì interface xác định caller cung cấp gì."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "book-t20",
+        "qp-s25-23-q6",
+        "ms-s25-23-q6"
+      ]
+    },
+    {
+      "id": "t20-flows",
+      "title": {
+        "en": "OUTPUT, RETURN and mutation are different flows",
+        "vi": "OUTPUT, RETURN và mutation là các luồng khác nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "OUTPUT sends a display value to the console. RETURN ends the current function call and replaces that call with one value in the caller expression. A procedure can change caller state only through the parameter semantics or shared state explicitly allowed elsewhere.",
+          "vi": "OUTPUT gửi giá trị hiển thị ra console. RETURN kết thúc lời gọi function hiện tại và thay lời gọi bằng một giá trị trong biểu thức caller. Procedure chỉ có thể đổi trạng thái caller qua semantics tham số hoặc trạng thái dùng chung được cho phép rõ ở nơi khác."
+        },
+        {
+          "en": "A function with IF branches must return the declared type on every possible path. A final RETURN after selection is often easier to verify than scattered partial returns, although early RETURN is allowed by the guide.",
+          "vi": "Function có các nhánh IF phải trả đúng kiểu đã khai báo trên mọi đường có thể. RETURN cuối sau selection thường dễ kiểm hơn nhiều RETURN rải rác, dù guide cho phép RETURN sớm."
+        }
+      ],
+      "sourceIds": [
+        "g26-core",
+        "book-t20",
+        "teacher-t20"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T20"
+    ],
+    "title": {
+      "en": "Call, parameter, return and output paths",
+      "vi": "Đường gọi, tham số, return và output"
+    },
+    "introduction": {
+      "en": "Caller and module are shown as separate spaces with distinct arrows for arguments, function return and console output.",
+      "vi": "Caller và module được hiển thị thành hai không gian với mũi tên riêng cho đối số, function return và console output."
+    },
+    "task": {
+      "en": "For the procedure and function, identify where each value travels and where the caller can use it afterward.",
+      "vi": "Với procedure và function, xác định từng giá trị đi đâu và caller có thể dùng ở đâu sau đó."
+    },
+    "conventions": [
+      {
+        "en": "Solid inbound arrows are arguments in header order.",
+        "vi": "Mũi tên liền đi vào là đối số theo thứ tự header."
+      },
+      {
+        "en": "The return arrow enters a caller expression; the output arrow ends at the console.",
+        "vi": "Mũi tên return đi vào biểu thức caller; mũi tên output kết thúc ở console."
+      },
+      {
+        "en": "A procedure call carries CALL; a function expression does not.",
+        "vi": "Lời gọi procedure có CALL; biểu thức function không có."
+      }
+    ],
+    "sourceIds": [
+      "g26-core",
+      "teacher-t20"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T20-W1",
+      "title": {
+        "en": "Calculate then display a delivery charge",
+        "vi": "Tính rồi hiển thị phí giao hàng"
+      },
+      "prompt": {
+        "en": "Design a function DeliveryCharge(Items:INTEGER, UnitPrice:REAL) returning REAL with a fixed teacher-created rule: subtotal plus 2.50. Design a procedure DisplayCharge(Charge:REAL) that outputs a label. Show the caller for Items=3, UnitPrice=4.00.",
+        "vi": "Thiết kế function DeliveryCharge(Items:INTEGER, UnitPrice:REAL) trả REAL theo quy tắc tự biên soạn: subtotal cộng 2.50. Thiết kế procedure DisplayCharge(Charge:REAL) xuất nhãn. Trình bày caller với Items=3, UnitPrice=4.00."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "contracts",
+          "action": {
+            "en": "Write both headers",
+            "vi": "Viết cả hai header"
+          },
+          "why": {
+            "en": "The caller needs a REAL value first, then a separate display action.",
+            "vi": "Caller cần một giá trị REAL trước, rồi hành động hiển thị riêng."
+          },
+          "result": {
+            "en": "FUNCTION DeliveryCharge(Items : INTEGER, UnitPrice : REAL) RETURNS REAL; PROCEDURE DisplayCharge(Charge : REAL).",
+            "vi": "FUNCTION DeliveryCharge(Items : INTEGER, UnitPrice : REAL) RETURNS REAL; PROCEDURE DisplayCharge(Charge : REAL)."
+          }
+        },
+        {
+          "id": "function",
+          "action": {
+            "en": "Return the calculated value",
+            "vi": "Return giá trị đã tính"
+          },
+          "why": {
+            "en": "The returned REAL must replace the function call in the caller expression.",
+            "vi": "REAL được trả phải thay lời gọi function trong biểu thức caller."
+          },
+          "result": {
+            "en": "RETURN (Items * UnitPrice) + 2.50 gives 14.50.",
+            "vi": "RETURN (Items * UnitPrice) + 2.50 cho 14.50."
+          }
+        },
+        {
+          "id": "caller",
+          "action": {
+            "en": "Assign the function result",
+            "vi": "Gán kết quả function"
+          },
+          "why": {
+            "en": "A function call is part of an expression and does not use CALL.",
+            "vi": "Lời gọi function là phần của biểu thức và không dùng CALL."
+          },
+          "result": {
+            "en": "Charge ← DeliveryCharge(3,4.00).",
+            "vi": "Charge ← DeliveryCharge(3,4.00)."
+          }
+        },
+        {
+          "id": "procedure",
+          "action": {
+            "en": "Call the display procedure",
+            "vi": "Gọi procedure hiển thị"
+          },
+          "why": {
+            "en": "The action is a complete statement and therefore uses CALL.",
+            "vi": "Hành động là câu lệnh hoàn chỉnh nên dùng CALL."
+          },
+          "result": {
+            "en": "CALL DisplayCharge(Charge) outputs \"Charge: 14.50\".",
+            "vi": "CALL DisplayCharge(Charge) xuất \"Charge: 14.50\"."
+          }
+        },
+        {
+          "id": "flows",
+          "action": {
+            "en": "Check the two outward flows",
+            "vi": "Kiểm hai luồng đi ra"
+          },
+          "why": {
+            "en": "RETURN and OUTPUT serve different destinations.",
+            "vi": "RETURN và OUTPUT phục vụ đích khác nhau."
+          },
+          "result": {
+            "en": "14.50 returns to variable Charge, then the procedure outputs it.",
+            "vi": "14.50 return về biến Charge, rồi procedure xuất nó."
+          },
+          "check": {
+            "en": "No INPUT appears inside either module because the caller supplied all data.",
+            "vi": "Không có INPUT trong module vì caller đã cung cấp đủ dữ liệu."
+          }
+        }
+      ],
+      "answer": {
+        "en": "DeliveryCharge is a function because one REAL result is used by the caller. DisplayCharge is a procedure because it performs a display action. Caller: Charge ← DeliveryCharge(3,4.00); CALL DisplayCharge(Charge); output is Charge: 14.50.",
+        "vi": "DeliveryCharge là function vì một kết quả REAL được caller sử dụng. DisplayCharge là procedure vì thực hiện hành động hiển thị. Caller: Charge ← DeliveryCharge(3,4.00); CALL DisplayCharge(Charge); output là Charge: 14.50."
+      },
+      "selfCheck": {
+        "en": "Can you draw one arrow to the caller variable and a different arrow to the console?",
+        "vi": "Bạn có thể vẽ một mũi tên tới biến caller và mũi tên khác tới console không?"
+      },
+      "sourceIds": [
+        "g26-core",
+        "teacher-t20"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T20-P1",
+      "title": {
+        "en": "Write a function with complete return paths",
+        "vi": "Viết function có đủ đường return"
+      },
+      "prompt": {
+        "en": "Define FUNCTION Larger(A:INTEGER, B:INTEGER) RETURNS INTEGER and use it to assign Best from X and Y. Equal values may return either A or B because they are equal.",
+        "vi": "Định nghĩa FUNCTION Larger(A:INTEGER, B:INTEGER) RETURNS INTEGER và dùng nó để gán Best từ X, Y. Giá trị bằng nhau có thể trả A hoặc B vì chúng bằng nhau."
+      },
+      "working": [
+        {
+          "en": "Write the header and compare A with B.",
+          "vi": "Viết header và so A với B."
+        },
+        {
+          "en": "Make both branch paths return INTEGER.",
+          "vi": "Làm cả hai đường nhánh return INTEGER."
+        },
+        {
+          "en": "Use the call inside an assignment without CALL.",
+          "vi": "Dùng lời gọi trong phép gán không có CALL."
+        }
+      ],
+      "answer": {
+        "en": "FUNCTION Larger(A : INTEGER, B : INTEGER) RETURNS INTEGER; IF A > B THEN RETURN A ELSE RETURN B ENDIF; ENDFUNCTION. Caller: Best ← Larger(X,Y).",
+        "vi": "FUNCTION Larger(A : INTEGER, B : INTEGER) RETURNS INTEGER; IF A > B THEN RETURN A ELSE RETURN B ENDIF; ENDFUNCTION. Caller: Best ← Larger(X,Y)."
+      },
+      "markGuidance": [
+        {
+          "en": "Header, parameter types and return type are complete.",
+          "vi": "Header, kiểu tham số và kiểu trả về đầy đủ."
+        },
+        {
+          "en": "Every path returns one INTEGER.",
+          "vi": "Mọi đường trả một INTEGER."
+        },
+        {
+          "en": "Caller uses the function in an expression.",
+          "vi": "Caller dùng function trong biểu thức."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Writing CALL Larger(X,Y) as a statement.",
+          "vi": "Viết CALL Larger(X,Y) như câu lệnh."
+        },
+        {
+          "en": "Using OUTPUT instead of RETURN.",
+          "vi": "Dùng OUTPUT thay RETURN."
+        },
+        {
+          "en": "Returning only when A>B and leaving the other path without a value.",
+          "vi": "Chỉ return khi A>B và để đường khác không có giá trị."
+        }
+      ],
+      "selfCheck": {
+        "en": "For A=4,B=9 and A=9,B=4, does a value return on both traces?",
+        "vi": "Với A=4,B=9 và A=9,B=4, cả hai trace đều return giá trị không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "s26-11",
+        "g26-core"
+      ]
+    },
+    {
+      "id": "T20-P2",
+      "title": {
+        "en": "Infer headers and connect modules",
+        "vi": "Suy header và nối các module"
+      },
+      "prompt": {
+        "en": "A design says ReadName has no parameters and outputs a prompt/read result internally; IsPass takes INTEGER Mark and returns BOOLEAN; ShowResult takes STRING Name and BOOLEAN Passed and outputs a message. Write three headers and caller statements for Name and Mark already available before the latter two calls.",
+        "vi": "Thiết kế nêu ReadName không có tham số và tự xuất prompt/đọc kết quả; IsPass nhận INTEGER Mark và trả BOOLEAN; ShowResult nhận STRING Name, BOOLEAN Passed và xuất thông báo. Viết ba header và các câu lệnh caller khi Name, Mark đã có trước hai lời gọi sau."
+      },
+      "working": [
+        {
+          "en": "Classify each module by returned value versus action.",
+          "vi": "Phân loại từng module theo giá trị trả về hay hành động."
+        },
+        {
+          "en": "Write exact ordered parameter types and calls.",
+          "vi": "Viết đúng kiểu tham số có thứ tự và lời gọi."
+        }
+      ],
+      "answer": {
+        "en": "PROCEDURE ReadName(); FUNCTION IsPass(Mark : INTEGER) RETURNS BOOLEAN; PROCEDURE ShowResult(Name : STRING, Passed : BOOLEAN). Caller: CALL ReadName(); Passed ← IsPass(Mark); CALL ShowResult(Name,Passed). If ReadName must provide Name to caller, its contract would need a BYREF parameter or be redesigned as a function; the stated internal-only contract alone does not provide Name.",
+        "vi": "PROCEDURE ReadName(); FUNCTION IsPass(Mark : INTEGER) RETURNS BOOLEAN; PROCEDURE ShowResult(Name : STRING, Passed : BOOLEAN). Caller: CALL ReadName(); Passed ← IsPass(Mark); CALL ShowResult(Name,Passed). Nếu ReadName phải cung cấp Name cho caller, hợp đồng cần tham số BYREF hoặc thiết kế lại thành function; hợp đồng chỉ nội bộ đã nêu không cung cấp Name."
+      },
+      "markGuidance": [
+        {
+          "en": "Each header matches the stated module kind and types.",
+          "vi": "Mỗi header khớp loại module và kiểu được nêu."
+        },
+        {
+          "en": "Function and procedure calls use correct syntax.",
+          "vi": "Lời gọi function và procedure dùng cú pháp đúng."
+        },
+        {
+          "en": "The missing data-flow issue in ReadName is identified rather than guessed away.",
+          "vi": "Vấn đề thiếu luồng dữ liệu ở ReadName được chỉ ra thay vì đoán bỏ."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Assuming OUTPUT from ReadName supplies Name to the caller.",
+          "vi": "Giả sử OUTPUT từ ReadName cung cấp Name cho caller."
+        },
+        {
+          "en": "Reversing ShowResult argument order.",
+          "vi": "Đảo thứ tự đối số ShowResult."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can the caller obtain every value it uses through a declared interface?",
+        "vi": "Caller có nhận được mọi giá trị nó dùng qua interface đã khai báo không?"
+      },
+      "origin": "adapted-from-source",
+      "officialMarks": null,
+      "sourceIds": [
+        "qp-s25-23-q6",
+        "ms-s25-23-q6"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A function is called with CALL.",
+        "vi": "Function được gọi bằng CALL."
+      },
+      "correction": {
+        "en": "A function call belongs inside an expression; CALL is for a procedure statement.",
+        "vi": "Lời gọi function nằm trong biểu thức; CALL dành cho câu lệnh procedure."
+      },
+      "selfCheck": {
+        "en": "Where will the function's returned value be used?",
+        "vi": "Giá trị function trả sẽ được dùng ở đâu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "OUTPUT can replace RETURN.",
+        "vi": "OUTPUT có thể thay RETURN."
+      },
+      "correction": {
+        "en": "OUTPUT sends to the console; RETURN sends one typed value to the caller expression.",
+        "vi": "OUTPUT gửi tới console; RETURN gửi một giá trị có kiểu tới biểu thức caller."
+      },
+      "selfCheck": {
+        "en": "Can the caller assign the displayed value without another interface?",
+        "vi": "Caller có thể gán giá trị đã hiển thị nếu không có interface khác không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "A module may INPUT values instead of using its parameters.",
+        "vi": "Module có thể INPUT thay vì dùng tham số."
+      },
+      "correction": {
+        "en": "Follow the stated responsibility and interface; do not silently replace caller-supplied data.",
+        "vi": "Theo trách nhiệm và interface đã nêu; không âm thầm thay dữ liệu caller cung cấp."
+      },
+      "selfCheck": {
+        "en": "Why was this parameter declared?",
+        "vi": "Tại sao tham số này được khai báo?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What must be fixed before a module body is written?",
+      "vi": "Phải chốt gì trước khi viết thân module?"
+    },
+    "answerPoints": [
+      {
+        "en": "One responsibility and module kind.",
+        "vi": "Một trách nhiệm và loại module."
+      },
+      {
+        "en": "Name and ordered typed parameters.",
+        "vi": "Tên và tham số có kiểu theo thứ tự."
+      },
+      {
+        "en": "Function return type and all return paths.",
+        "vi": "Kiểu trả về và mọi đường return của function."
+      },
+      {
+        "en": "Procedure CALL or function expression syntax.",
+        "vi": "Cú pháp CALL procedure hoặc biểu thức function."
+      },
+      {
+        "en": "Separate output, return and mutation flows.",
+        "vi": "Các luồng output, return và mutation riêng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Contract and caller needs determine procedure versus function.",
+      "vi": "Hợp đồng và nhu cầu caller quyết định procedure hay function."
+    },
+    {
+      "en": "Functions return one typed value into an expression; procedures are called as statements.",
+      "vi": "Function trả một giá trị có kiểu vào biểu thức; procedure được gọi như câu lệnh."
+    },
+    {
+      "en": "OUTPUT is display, RETURN is caller value, and mutation is a third mechanism.",
+      "vi": "OUTPUT là hiển thị, RETURN là giá trị caller, và mutation là cơ chế thứ ba."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F11",
+      "role": "owner",
+      "title": {
+        "en": "Module, interface and structure-chart reasoning",
+        "vi": "Lập luận module, interface và structure chart"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "parameters-byval-byref",
+    "scope-reuse",
+    "structure-charts"
+  ],
+  "sources": [
+    {
+      "id": "s26-11",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§11.1–11.3, printed/PDF pp29–30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "g26-core",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for 2026",
+      "locator": "§2 pp7–9; §5 pp15–18; §6–8 pp18–24, as cited by each lesson.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t20",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp275–280; PDF pp291–296. Guide 2026 supplies current header/call syntax.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-s25-23-q6",
+      "title": "9618/23 May/June 2025 Question 6(a)–(b)",
+      "locator": "QP pp12–13; procedure/function distinction and module headers from a structure chart.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-s25-23-q6",
+      "title": "9618/23 May/June 2025 published mark scheme, Question 6",
+      "locator": "MS p11; module kinds, parameter types and headers. Lesson guidance has no official mark allocation.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "teacher-t20",
+      "title": "AlgoCore teacher-authored T20 contracts and guidance",
+      "locator": "T20-academic-r2, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

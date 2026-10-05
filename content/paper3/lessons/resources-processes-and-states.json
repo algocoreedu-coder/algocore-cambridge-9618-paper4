@@ -1,0 +1,683 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.1-T01",
+  "slug": "resources-processes-and-states",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Resources, processes and states",
+    "vi": "Tài nguyên, tiến trình và trạng thái"
+  },
+  "question": {
+    "en": "How can one CPU keep several programs progressing while devices take time?",
+    "vi": "Một CPU giúp nhiều chương trình tiến triển khi thiết bị cần thời gian bằng cách nào?"
+  },
+  "opening": {
+    "en": "An operating system allocates shared resources and provides a usable interface to them. A process may be able to run, currently running, or waiting for an event. Keeping these conditions separate explains why the CPU can work on something useful while another process waits for I/O.",
+    "vi": "Hệ điều hành phân bổ tài nguyên dùng chung và cung cấp giao diện để sử dụng chúng. Một tiến trình có thể sẵn sàng chạy, đang chạy hoặc chờ sự kiện. Phân biệt các điều kiện này giúp giải thích vì sao CPU vẫn làm việc hữu ích khi tiến trình khác chờ I/O."
+  },
+  "objectives": [
+    {
+      "en": "Explain CPU, memory and I/O resource management with a concrete benefit.",
+      "vi": "Giải thích quản lý CPU, bộ nhớ và I/O cùng lợi ích cụ thể."
+    },
+    {
+      "en": "Distinguish a stored program from a process and its saved context.",
+      "vi": "Phân biệt chương trình được lưu với tiến trình và ngữ cảnh đã lưu của nó."
+    },
+    {
+      "en": "Trace valid state transitions and reject a blocked-to-running shortcut.",
+      "vi": "Trace chuyển trạng thái hợp lệ và bác việc đi tắt từ Blocked sang Running."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Recall CPU execution, RAM and input/output devices.",
+      "vi": "Nhớ hoạt động CPU, RAM và thiết bị vào/ra."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Process",
+      "meaning": {
+        "en": "A program in execution together with its current state and resource context.",
+        "vi": "Chương trình đang được thực thi cùng trạng thái và ngữ cảnh tài nguyên hiện tại."
+      }
+    },
+    {
+      "term": "Context",
+      "meaning": {
+        "en": "Information needed to resume a process, including its program counter and relevant register values.",
+        "vi": "Thông tin cần để tiếp tục tiến trình, gồm bộ đếm chương trình và giá trị thanh ghi liên quan."
+      }
+    },
+    {
+      "term": "PCB",
+      "meaning": {
+        "en": "A process control block stores management information for one process.",
+        "vi": "Khối điều khiển tiến trình lưu thông tin quản lý cho một tiến trình."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "resource-management",
+      "title": {
+        "en": "Allocate resources for useful work",
+        "vi": "Phân bổ tài nguyên cho công việc hữu ích"
+      },
+      "paragraphs": [
+        {
+          "en": "CPU scheduling selects a runnable process so CPU time is not wasted when another process waits. Memory management tracks and allocates memory, protects address spaces and releases allocations when appropriate. I/O management coordinates device requests through drivers, queues and buffers. For example, a print queue can hold several jobs while a printer handles one job at a time.",
+          "vi": "Lập lịch CPU chọn tiến trình có thể chạy để tránh bỏ phí CPU khi tiến trình khác chờ. Quản lý bộ nhớ theo dõi và phân bổ vùng nhớ, bảo vệ không gian địa chỉ và giải phóng khi phù hợp. Quản lý I/O phối hợp yêu cầu thiết bị qua driver, hàng đợi và bộ đệm. Chẳng hạn hàng in giữ nhiều tác vụ trong khi máy in xử lý từng tác vụ."
+        },
+        {
+          "en": "Maximising use means improving useful utilisation and sharing under constraints, not making every resource permanently busy. The OS also balances responsiveness, protection and priorities. Extra context switching can cost time; adding more runnable processes does not automatically increase throughput.",
+          "vi": "Tận dụng tài nguyên nghĩa là cải thiện sử dụng hữu ích và chia sẻ trong các ràng buộc, không phải giữ mọi tài nguyên luôn bận. Hệ điều hành còn cân bằng phản hồi, bảo vệ và ưu tiên. Chuyển ngữ cảnh thêm có thể tốn thời gian; thêm tiến trình có thể chạy không tự động tăng thông lượng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "interface-abstraction",
+      "title": {
+        "en": "Hide device-level detail through an interface",
+        "vi": "Che chi tiết thiết bị bằng giao diện"
+      },
+      "paragraphs": [
+        {
+          "en": "A user opens a named file or selects Print instead of issuing controller commands and calculating storage addresses. The interface accepts the request, the OS checks it and coordinates the necessary file/device operations. A graphical icon or command-line command is an accessible way to request a service; both can hide hardware detail.",
+          "vi": "Người dùng mở tệp có tên hoặc chọn Print thay vì gửi lệnh bộ điều khiển và tính địa chỉ lưu trữ. Giao diện nhận yêu cầu, hệ điều hành kiểm tra rồi phối hợp thao tác tệp/thiết bị cần thiết. Biểu tượng đồ họa hay lệnh dòng lệnh đều là cách yêu cầu dịch vụ dễ sử dụng; cả hai có thể che chi tiết phần cứng."
+        },
+        {
+          "en": "The interface does not remove the hardware work. It abstracts that work behind consistent operations and useful feedback, such as a queued print job or a permission error. In an explanation, name the user action, the hidden complexity and the service supplied by the OS.",
+          "vi": "Giao diện không loại bỏ công việc phần cứng. Nó che công việc đó sau các thao tác nhất quán và phản hồi hữu ích như tác vụ in đang chờ hay lỗi quyền truy cập. Khi giải thích, nêu hành động của người dùng, độ phức tạp được che và dịch vụ hệ điều hành cung cấp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "program-process-context",
+      "title": {
+        "en": "Separate the program from its execution",
+        "vi": "Tách chương trình khỏi lần thực thi"
+      },
+      "paragraphs": [
+        {
+          "en": "A program is stored instructions; a process is an execution of those instructions with its own current data and context. Two executions of the same program can be different processes. The OS identifies each process and stores management information in a PCB, such as process ID, state, scheduling information, memory information and saved context.",
+          "vi": "Chương trình là các lệnh được lưu; tiến trình là một lần thực thi các lệnh đó với dữ liệu và ngữ cảnh hiện tại riêng. Hai lần chạy cùng chương trình có thể là hai tiến trình khác nhau. Hệ điều hành nhận diện từng tiến trình và lưu thông tin quản lý trong PCB, như ID, trạng thái, thông tin lập lịch, bộ nhớ và ngữ cảnh đã lưu."
+        },
+        {
+          "en": "When switching away, the OS preserves enough state to resume correctly later. The next process must use its own values, not the previous process’s registers by accident. The exact saved register set depends on the architecture; PC and general-purpose registers are useful teaching examples rather than a universal complete PCB layout.",
+          "vi": "Khi chuyển đi, hệ điều hành giữ đủ trạng thái để tiếp tục chính xác sau này. Tiến trình tiếp theo phải dùng giá trị của chính nó, không vô tình dùng thanh ghi tiến trình trước. Tập thanh ghi lưu chính xác tùy kiến trúc; PC và thanh ghi đa dụng là ví dụ dạy học, không phải bố cục PCB đầy đủ cho mọi máy."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "multitasking",
+      "title": {
+        "en": "Interleave execution on a single CPU",
+        "vi": "Xen kẽ thực thi trên một CPU"
+      },
+      "paragraphs": [
+        {
+          "en": "Multitasking allows several tasks to make progress over an overlapping period. On the single CPU in this model, only one process executes instructions at an instant. Switching between processes and running another process during I/O waits creates concurrent progress; it does not mean two instructions execute simultaneously on that one CPU.",
+          "vi": "Đa nhiệm cho nhiều tác vụ tiến triển trong khoảng thời gian chồng lấp. Trên một CPU của mô hình này, tại một thời điểm chỉ một tiến trình thực thi lệnh. Chuyển giữa các tiến trình và chạy tiến trình khác lúc chờ I/O tạo tiến triển đồng thời theo thời gian; không có nghĩa hai lệnh chạy cùng lúc trên CPU đó."
+        },
+        {
+          "en": "Scheduling decides which eligible process receives CPU time. A timer can enable preemption, and an I/O-completion interrupt can make a waiting process eligible again. Multiple cores can provide parallel execution, but the three-state principles still apply to each scheduled process.",
+          "vi": "Lập lịch quyết định tiến trình đủ điều kiện nào nhận CPU. Bộ định thời có thể hỗ trợ cưỡng đoạt, còn ngắt I/O hoàn tất có thể giúp tiến trình đang chờ đủ điều kiện trở lại. Nhiều lõi có thể thực thi song song, nhưng nguyên tắc ba trạng thái vẫn áp dụng cho từng tiến trình được lập lịch."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "w24-32-ms"
+      ]
+    },
+    {
+      "id": "state-transitions",
+      "title": {
+        "en": "Use the reason for waiting to classify the state",
+        "vi": "Dùng lý do chờ để phân loại trạng thái"
+      },
+      "paragraphs": [
+        {
+          "en": "Ready means able to run but waiting for CPU allocation. Running means currently assigned the CPU. Blocked means unable to continue until an event occurs. Dispatch moves ready→running; an I/O request can move running→blocked; I/O completion moves blocked→ready; preemption moves running→ready. I/O completion alone does not dispatch the process.",
+          "vi": "Ready nghĩa là có thể chạy nhưng đang chờ cấp CPU. Running nghĩa là hiện được cấp CPU. Blocked nghĩa là chưa thể tiếp tục đến khi có sự kiện. Cấp CPU chuyển Ready→Running; yêu cầu I/O có thể chuyển Running→Blocked; I/O hoàn tất chuyển Blocked→Ready; cưỡng đoạt chuyển Running→Ready. Chỉ riêng I/O hoàn tất không cấp CPU cho tiến trình."
+        },
+        {
+          "en": "A diagram answer needs labelled events on arrows. “Waiting” alone is ambiguous: waiting for CPU is ready, while waiting for requested input is blocked. Creation and termination are outside this simplified three-active-state visual; it does not claim that these are the only states in every real OS.",
+          "vi": "Đáp án sơ đồ cần tên sự kiện trên mũi tên. Chỉ nói “đang chờ” là mơ hồ: chờ CPU là Ready, chờ dữ liệu vào đã yêu cầu là Blocked. Tạo mới và kết thúc nằm ngoài visual ba trạng thái hoạt động đơn giản này; nó không khẳng định mọi hệ điều hành thật chỉ có ba trạng thái."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "process-states",
+    "title": {
+      "en": "Follow two processes through six events",
+      "vi": "Theo dõi hai tiến trình qua sáu sự kiện"
+    },
+    "introduction": {
+      "en": "The CPU, ready queue, blocked queue and state labels update together. Try an event whose precondition is not met and read why the state is preserved.",
+      "vi": "CPU, hàng Ready, hàng Blocked và nhãn trạng thái cập nhật cùng nhau. Thử sự kiện chưa đủ điều kiện và đọc vì sao trạng thái được giữ."
+    },
+    "task": {
+      "en": "Predict whether P1 can run immediately when its I/O completes while P2 is running.",
+      "vi": "Dự đoán P1 có thể chạy ngay không khi I/O của nó hoàn tất trong lúc P2 đang chạy."
+    },
+    "conventions": [
+      {
+        "en": "One CPU; P1 and P2 initially ready. The trace includes only the three active states.",
+        "vi": "Một CPU; ban đầu P1 và P2 Ready. Trace chỉ gồm ba trạng thái hoạt động."
+      },
+      {
+        "en": "Events change state only when their preconditions hold; a rejected event preserves all queues.",
+        "vi": "Sự kiện chỉ đổi trạng thái khi đủ điều kiện; sự kiện bị từ chối giữ mọi hàng đợi."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "Use I/O waiting time productively",
+      "vi": "Tận dụng thời gian chờ I/O"
+    },
+    "prompt": {
+      "en": "P1 and P2 are ready. P1 requests input after being dispatched. Trace how both can make progress without two running processes.",
+      "vi": "P1 và P2 Ready. P1 yêu cầu dữ liệu vào sau khi được cấp CPU. Trace cách cả hai tiến triển mà không có hai tiến trình Running."
+    },
+    "steps": [
+      {
+        "id": "dispatch-p1",
+        "action": {
+          "en": "Dispatch P1.",
+          "vi": "Cấp CPU cho P1."
+        },
+        "why": {
+          "en": "CPU is free and P1 is ready.",
+          "vi": "CPU rảnh và P1 Ready."
+        },
+        "result": {
+          "en": "P1 running; P2 ready.",
+          "vi": "P1 Running; P2 Ready."
+        }
+      },
+      {
+        "id": "io-request",
+        "action": {
+          "en": "P1 requests I/O and waits.",
+          "vi": "P1 yêu cầu I/O rồi chờ."
+        },
+        "why": {
+          "en": "It cannot continue until the requested event completes.",
+          "vi": "Nó chưa thể tiếp tục đến khi sự kiện yêu cầu hoàn tất."
+        },
+        "result": {
+          "en": "P1 blocked; CPU free; P2 still ready.",
+          "vi": "P1 Blocked; CPU rảnh; P2 vẫn Ready."
+        }
+      },
+      {
+        "id": "dispatch-p2",
+        "action": {
+          "en": "Dispatch P2 during P1’s wait.",
+          "vi": "Cấp CPU cho P2 khi P1 chờ."
+        },
+        "why": {
+          "en": "P2 can execute useful work instead of leaving the CPU idle.",
+          "vi": "P2 có thể làm việc hữu ích thay vì để CPU rảnh."
+        },
+        "result": {
+          "en": "P2 running; P1 blocked.",
+          "vi": "P2 Running; P1 Blocked."
+        }
+      },
+      {
+        "id": "io-complete",
+        "action": {
+          "en": "Mark P1 ready when its I/O completes.",
+          "vi": "Đánh dấu P1 Ready khi I/O hoàn tất."
+        },
+        "why": {
+          "en": "The event removes the reason for blocking but does not take CPU ownership from P2.",
+          "vi": "Sự kiện bỏ lý do bị chặn nhưng không lấy quyền CPU của P2."
+        },
+        "result": {
+          "en": "P1 ready; P2 remains running.",
+          "vi": "P1 Ready; P2 vẫn Running."
+        }
+      },
+      {
+        "id": "timer-preempt",
+        "action": {
+          "en": "End P2’s turn and return it to ready.",
+          "vi": "Kết thúc lượt P2 và đưa về Ready."
+        },
+        "why": {
+          "en": "A timer expiry does not create an I/O wait.",
+          "vi": "Hết lượt định thời không tạo chờ I/O."
+        },
+        "result": {
+          "en": "CPU free; ready order P1, P2.",
+          "vi": "CPU rảnh; thứ tự Ready là P1, P2."
+        }
+      },
+      {
+        "id": "resume-p1",
+        "action": {
+          "en": "Dispatch P1 again.",
+          "vi": "Cấp CPU lại cho P1."
+        },
+        "why": {
+          "en": "P1 is now eligible and selected.",
+          "vi": "P1 nay đủ điều kiện và được chọn."
+        },
+        "result": {
+          "en": "P1 running; P2 ready.",
+          "vi": "P1 Running; P2 Ready."
+        }
+      }
+    ],
+    "result": {
+      "en": "CPU work is interleaved with I/O waiting while each process keeps one consistent state.",
+      "vi": "Công việc CPU xen kẽ với chờ I/O trong khi mỗi tiến trình giữ một trạng thái nhất quán."
+    },
+    "selfCheck": {
+      "en": "Explain why requesting dispatch for blocked P1 must be rejected before I/O completion.",
+      "vi": "Giải thích vì sao phải từ chối cấp CPU cho P1 đang Blocked trước khi I/O hoàn tất."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A labelled state diagram or “waiting for input” asks you to classify eligibility.",
+        "vi": "Sơ đồ trạng thái hoặc “chờ dữ liệu vào” yêu cầu phân loại khả năng chạy."
+      },
+      {
+        "en": "“Hides hardware complexity” asks for a user action and the low-level detail it avoids.",
+        "vi": "“Che độ phức tạp phần cứng” yêu cầu hành động người dùng và chi tiết mức thấp được che."
+      }
+    ],
+    "distinguish": {
+      "en": "A program is stored instructions; a process has a live execution context. Ready and blocked both wait, but only ready can be dispatched.",
+      "vi": "Chương trình là lệnh được lưu; tiến trình có ngữ cảnh thực thi. Ready và Blocked đều chờ, nhưng chỉ Ready có thể nhận CPU."
+    },
+    "method": [
+      {
+        "en": "Name the resource and the competing requests.",
+        "vi": "Nêu tài nguyên và các yêu cầu cạnh tranh."
+      },
+      {
+        "en": "For each event, ask whether the process can execute if given CPU now.",
+        "vi": "Với mỗi sự kiện, hỏi tiến trình có chạy được ngay nếu nhận CPU không."
+      },
+      {
+        "en": "Label every transition and link resource management to a concrete benefit.",
+        "vi": "Gắn nhãn mỗi chuyển trạng thái và liên hệ quản lý tài nguyên với lợi ích cụ thể."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Every waiting process is blocked.",
+        "vi": "Mọi tiến trình đang chờ đều Blocked."
+      },
+      "correction": {
+        "en": "Waiting only for CPU is ready; an event dependency makes it blocked.",
+        "vi": "Chỉ chờ CPU là Ready; phụ thuộc sự kiện mới là Blocked."
+      }
+    },
+    {
+      "mistake": {
+        "en": "I/O completion means running immediately.",
+        "vi": "I/O hoàn tất nghĩa là chạy ngay."
+      },
+      "correction": {
+        "en": "It makes the process ready; dispatch is a separate decision.",
+        "vi": "Nó làm tiến trình Ready; cấp CPU là quyết định riêng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A single CPU performs all multitasking instructions simultaneously.",
+        "vi": "Một CPU chạy đồng thời mọi lệnh đa nhiệm."
+      },
+      "correction": {
+        "en": "It interleaves process execution; parallel execution requires appropriate hardware resources.",
+        "vi": "Nó xen kẽ thực thi; chạy song song cần tài nguyên phần cứng phù hợp."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "waiting-for-cpu",
+      "prompt": {
+        "en": "P1 has all required data but another process owns the CPU. What is P1’s state?",
+        "vi": "P1 có đủ dữ liệu cần nhưng tiến trình khác giữ CPU. P1 ở trạng thái nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Ready",
+            "vi": "Ready"
+          },
+          "feedback": {
+            "en": "Correct: only CPU allocation is missing.",
+            "vi": "Đúng: chỉ còn thiếu cấp CPU."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Blocked",
+            "vi": "Blocked"
+          },
+          "feedback": {
+            "en": "No external event or requested I/O is preventing execution.",
+            "vi": "Không có sự kiện ngoài hay I/O đang chờ ngăn việc chạy."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Running",
+            "vi": "Running"
+          },
+          "feedback": {
+            "en": "P1 does not currently own the CPU.",
+            "vi": "P1 hiện không giữ CPU."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Classify the reason for waiting, not the word “waiting” by itself.",
+        "vi": "Phân loại lý do chờ, không chỉ dựa vào từ “chờ”."
+      }
+    },
+    {
+      "id": "io-completion",
+      "prompt": {
+        "en": "P1’s I/O completes while P2 runs. Which transition is correct?",
+        "vi": "I/O của P1 hoàn tất khi P2 chạy. Chuyển trạng thái nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "P1 blocked→ready.",
+            "vi": "P1 Blocked→Ready."
+          },
+          "feedback": {
+            "en": "Correct: P1 becomes eligible, while scheduling remains separate.",
+            "vi": "Đúng: P1 đủ điều kiện trở lại, còn lập lịch là việc riêng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "P1 blocked→running automatically.",
+            "vi": "P1 tự động Blocked→Running."
+          },
+          "feedback": {
+            "en": "This skips dispatch and could assign one CPU to two processes.",
+            "vi": "Đi tắt này bỏ qua cấp CPU và có thể gán một CPU cho hai tiến trình."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "P2 running→blocked because P1 is ready.",
+            "vi": "P2 Running→Blocked vì P1 Ready."
+          },
+          "feedback": {
+            "en": "Another ready process does not create an I/O dependency for P2.",
+            "vi": "Một tiến trình khác Ready không tạo phụ thuộc I/O cho P2."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "I/O completion removes a block; it does not by itself choose the next CPU owner.",
+        "vi": "I/O hoàn tất gỡ chặn; tự nó không chọn chủ CPU tiếp theo."
+      }
+    },
+    {
+      "id": "program-v-process",
+      "prompt": {
+        "en": "Two users launch the same application. Why can this create two processes?",
+        "vi": "Hai người dùng mở cùng ứng dụng. Vì sao có thể tạo hai tiến trình?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Each execution has its own context and data.",
+            "vi": "Mỗi lần thực thi có ngữ cảnh và dữ liệu riêng."
+          },
+          "feedback": {
+            "en": "Correct: program identity does not imply one execution context.",
+            "vi": "Đúng: cùng chương trình không có nghĩa chỉ một ngữ cảnh thực thi."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A process is merely another filename.",
+            "vi": "Tiến trình chỉ là một tên tệp khác."
+          },
+          "feedback": {
+            "en": "A filename identifies stored content, not a running context.",
+            "vi": "Tên tệp nhận diện nội dung lưu, không phải ngữ cảnh đang thực thi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A CPU can only store one PCB.",
+            "vi": "CPU chỉ có thể lưu một PCB."
+          },
+          "feedback": {
+            "en": "The OS maintains management data for multiple processes.",
+            "vi": "Hệ điều hành duy trì dữ liệu quản lý cho nhiều tiến trình."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Stored instructions may be shared while execution state remains distinct.",
+        "vi": "Có thể dùng chung lệnh được lưu trong khi trạng thái thực thi vẫn riêng."
+      }
+    },
+    {
+      "id": "interface-transfer",
+      "prompt": {
+        "en": "A user chooses a named file from a dialog. Which OS abstraction is most relevant?",
+        "vi": "Người dùng chọn tệp có tên trong hộp thoại. Trừu tượng hệ điều hành nào liên quan nhất?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The user need not calculate physical storage locations or issue controller commands.",
+            "vi": "Người dùng không cần tính vị trí lưu vật lý hay gửi lệnh bộ điều khiển."
+          },
+          "feedback": {
+            "en": "Correct: a meaningful file operation hides hardware detail.",
+            "vi": "Đúng: thao tác tệp có ý nghĩa che chi tiết phần cứng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The file is no longer stored on hardware.",
+            "vi": "Tệp không còn lưu trên phần cứng."
+          },
+          "feedback": {
+            "en": "Abstraction hides work; it does not remove storage hardware.",
+            "vi": "Trừu tượng che công việc, không loại bỏ phần cứng lưu trữ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The dialog guarantees the file has no logical errors.",
+            "vi": "Hộp thoại bảo đảm tệp không có lỗi logic."
+          },
+          "feedback": {
+            "en": "That is unrelated to the interface’s storage abstraction.",
+            "vi": "Điều đó không liên quan đến trừu tượng lưu trữ của giao diện."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Link a user-level operation to the device-level complexity the OS handles.",
+        "vi": "Nối thao tác mức người dùng với độ phức tạp thiết bị hệ điều hành xử lý."
+      }
+    },
+    {
+      "id": "utilisation-transfer",
+      "prompt": {
+        "en": "Why dispatch P2 when P1 blocks for a slow input device?",
+        "vi": "Vì sao cấp CPU cho P2 khi P1 bị chặn chờ thiết bị nhập chậm?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "P2 can use otherwise idle CPU time while P1’s I/O proceeds.",
+            "vi": "P2 có thể dùng thời gian CPU vốn rảnh trong khi I/O của P1 diễn ra."
+          },
+          "feedback": {
+            "en": "Correct: different resources can make progress over the same period.",
+            "vi": "Đúng: các tài nguyên khác nhau có thể tiến triển trong cùng khoảng thời gian."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "This makes the device physically faster.",
+            "vi": "Điều này làm thiết bị nhanh hơn về vật lý."
+          },
+          "feedback": {
+            "en": "It improves CPU use, not the device’s inherent transfer rate.",
+            "vi": "Nó cải thiện sử dụng CPU, không đổi tốc độ truyền vốn có của thiết bị."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "P1 should lose its saved context.",
+            "vi": "P1 nên mất ngữ cảnh đã lưu."
+          },
+          "feedback": {
+            "en": "P1 needs that context to resume after its event.",
+            "vi": "P1 cần ngữ cảnh đó để tiếp tục sau sự kiện."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Explain useful overlap, and preserve each process’s execution context.",
+        "vi": "Giải thích sự chồng lấp hữu ích và giữ ngữ cảnh thực thi của từng tiến trình."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Draw the four main state-transition arrows and label their causes.",
+      "vi": "Vẽ bốn mũi tên chuyển trạng thái chính và ghi nguyên nhân."
+    },
+    "answerPoints": [
+      {
+        "en": "Ready→running: dispatch; running→ready: preemption.",
+        "vi": "Ready→Running: cấp CPU; Running→Ready: cưỡng đoạt."
+      },
+      {
+        "en": "Running→blocked: waiting for an event; blocked→ready: event completion.",
+        "vi": "Running→Blocked: chờ sự kiện; Blocked→Ready: sự kiện hoàn tất."
+      },
+      {
+        "en": "CPU, memory and I/O management coordinate shared resources; the interface abstracts hardware work.",
+        "vi": "Quản lý CPU, bộ nhớ và I/O phối hợp tài nguyên dùng chung; giao diện che công việc phần cứng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "State is determined by eligibility and CPU ownership.",
+      "vi": "Trạng thái do khả năng chạy và quyền CPU quyết định."
+    },
+    {
+      "en": "Context allows a process to resume correctly.",
+      "vi": "Ngữ cảnh cho phép tiến trình tiếp tục đúng."
+    },
+    {
+      "en": "Multitasking can improve useful CPU utilisation during I/O waits.",
+      "vi": "Đa nhiệm có thể cải thiện sử dụng CPU hữu ích lúc chờ I/O."
+    }
+  ],
+  "relatedSlugs": [
+    "scheduling-choices",
+    "kernel-interrupts-and-scheduling"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed pp374–378 / PDF pp390–394: resources, kernel, process management and states",
+      "kind": "book"
+    },
+    {
+      "id": "w24-32-qp",
+      "title": "Cambridge 9618 w24 Paper 32 Question Paper",
+      "locator": "PDF p10 Q9(b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w24-32-ms",
+      "title": "Cambridge 9618 w24 Paper 32 Mark Scheme",
+      "locator": "PDF p11 Q9(b)",
+      "kind": "mark-scheme"
+    }
+  ]
+}

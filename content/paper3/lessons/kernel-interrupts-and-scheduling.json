@@ -1,0 +1,662 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.1-T03",
+  "slug": "kernel-interrupts-and-scheduling",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Kernel, interrupts and scheduling",
+    "vi": "Kernel, ngắt và lập lịch"
+  },
+  "question": {
+    "en": "How can the OS service an interrupt without losing a process’s place?",
+    "vi": "Hệ điều hành phục vụ ngắt mà không làm mất vị trí thực thi của tiến trình bằng cách nào?"
+  },
+  "opening": {
+    "en": "Interrupt handling temporarily transfers control to a kernel service. Saving context preserves the interrupted process; updating queues records what the event changed; scheduling decides which process should resume. These are related operations, but an interrupt does not always cause a switch to a different process.",
+    "vi": "Xử lý ngắt tạm chuyển điều khiển tới dịch vụ kernel. Lưu ngữ cảnh giữ tiến trình bị ngắt; cập nhật hàng đợi ghi nhận sự kiện đã đổi điều gì; lập lịch quyết định tiến trình nào tiếp tục. Các thao tác liên quan nhau, nhưng ngắt không phải lúc nào cũng chuyển sang tiến trình khác."
+  },
+  "objectives": [
+    {
+      "en": "Explain the kernel’s interrupt-handling and low-level scheduling responsibilities.",
+      "vi": "Giải thích trách nhiệm xử lý ngắt và lập lịch mức thấp của kernel."
+    },
+    {
+      "en": "Trace saving and restoring the correct process context.",
+      "vi": "Trace việc lưu và khôi phục đúng ngữ cảnh tiến trình."
+    },
+    {
+      "en": "Distinguish a timer-driven process switch from I/O service that resumes the same process.",
+      "vi": "Phân biệt chuyển tiến trình do định thời với xử lý I/O rồi tiếp tục cùng tiến trình."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know ready/running/blocked states and the role of the PC and registers.",
+      "vi": "Biết trạng thái Ready/Running/Blocked và vai trò PC, thanh ghi."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Kernel",
+      "meaning": {
+        "en": "The central OS component that manages privileged services and coordinates hardware resources.",
+        "vi": "Thành phần trung tâm của hệ điều hành quản lý dịch vụ đặc quyền và phối hợp tài nguyên phần cứng."
+      }
+    },
+    {
+      "term": "ISR",
+      "meaning": {
+        "en": "An interrupt service routine handles a particular interrupt event.",
+        "vi": "Thủ tục phục vụ ngắt xử lý một sự kiện ngắt cụ thể."
+      }
+    },
+    {
+      "term": "Low-level scheduling",
+      "meaning": {
+        "en": "Selecting an eligible process to receive the CPU next.",
+        "vi": "Chọn tiến trình đủ điều kiện nhận CPU tiếp theo."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "kernel-services",
+      "title": {
+        "en": "Place the handler inside the OS mechanism",
+        "vi": "Đặt trình xử lý trong cơ chế hệ điều hành"
+      },
+      "paragraphs": [
+        {
+          "en": "The kernel coordinates process, memory and device management and provides protected access to hardware services. A device can signal completion or request attention; a timer can signal that a time allocation has ended. The processor transfers control through the system’s interrupt mechanism so the relevant handler can respond.",
+          "vi": "Kernel phối hợp quản lý tiến trình, bộ nhớ, thiết bị và cung cấp truy cập có bảo vệ tới dịch vụ phần cứng. Thiết bị có thể báo hoàn tất hoặc cần phục vụ; bộ định thời có thể báo hết thời lượng cấp. Bộ xử lý chuyển điều khiển qua cơ chế ngắt của hệ thống để trình xử lý phù hợp đáp ứng."
+        },
+        {
+          "en": "Interrupts are not all program errors. An I/O-completion interrupt is an expected event, while an exception can signal a fault requiring a different response. Exact priority levels, vectors and masking behaviour depend on the architecture. State any supplied rule instead of inventing universal priority numbers.",
+          "vi": "Không phải mọi ngắt đều là lỗi chương trình. Ngắt hoàn tất I/O là sự kiện dự kiến, còn ngoại lệ có thể báo lỗi cần cách xử lý khác. Mức ưu tiên, vector và hành vi che ngắt chính xác tùy kiến trúc. Hãy nêu quy tắc đề cho thay vì tự đặt số ưu tiên chung cho mọi máy."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "save-and-restore",
+      "title": {
+        "en": "Save the interrupted context before reusing registers",
+        "vi": "Lưu ngữ cảnh bị ngắt trước khi dùng lại thanh ghi"
+      },
+      "paragraphs": [
+        {
+          "en": "The interrupted process must later continue with the correct next instruction and values. The system preserves the relevant context, including a return PC and registers, before the handler overwrites working registers. Context can be associated with the process’s control information or a saved kernel stack frame; the exact storage convention is machine-dependent.",
+          "vi": "Tiến trình bị ngắt cần tiếp tục sau này với đúng lệnh kế tiếp và giá trị. Hệ thống giữ ngữ cảnh liên quan, gồm PC để quay lại và thanh ghi, trước khi trình xử lý ghi đè các thanh ghi làm việc. Ngữ cảnh có thể gắn với thông tin điều khiển tiến trình hoặc khung ngăn xếp kernel đã lưu; cách lưu chính xác tùy máy."
+        },
+        {
+          "en": "Restoring is the inverse responsibility: load the selected process’s saved context and return to its execution. Merely remembering a process ID is insufficient. Restoring P1’s PC while selecting P2 would mix two execution contexts and produce incorrect behaviour.",
+          "vi": "Khôi phục là trách nhiệm ngược lại: nạp ngữ cảnh đã lưu của tiến trình được chọn và trở về thực thi của nó. Chỉ nhớ ID tiến trình là chưa đủ. Khôi phục PC của P1 trong khi chọn P2 sẽ trộn hai ngữ cảnh và tạo hành vi sai."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "service-then-schedule",
+      "title": {
+        "en": "Separate servicing the event from selecting a process",
+        "vi": "Tách phục vụ sự kiện khỏi chọn tiến trình"
+      },
+      "paragraphs": [
+        {
+          "en": "The handler identifies and services the event, then process-management information is updated. If P2’s I/O has completed, P2 can move from blocked to ready. If a time slice expired, the runnable interrupted process can return to ready. Neither event should incorrectly classify a runnable process as blocked.",
+          "vi": "Trình xử lý xác định và phục vụ sự kiện, rồi cập nhật thông tin quản lý tiến trình. Nếu I/O của P2 hoàn tất, P2 có thể chuyển từ Blocked sang Ready. Nếu hết lát thời gian, tiến trình bị ngắt vẫn có thể chạy được đưa về Ready. Không sự kiện nào nên phân loại nhầm tiến trình có thể chạy thành Blocked."
+        },
+        {
+          "en": "Low-level scheduling selects the next eligible process according to the stated policy. The dispatcher restores that process and gives it the CPU. A timer scenario may choose P2, whereas an I/O handler may finish and resume P1. An interrupt enables a scheduling decision; it does not prove that a different process must run.",
+          "vi": "Lập lịch mức thấp chọn tiến trình đủ điều kiện tiếp theo theo chính sách đã nêu. Bộ điều phối khôi phục tiến trình đó và cấp CPU. Tình huống định thời có thể chọn P2, còn trình xử lý I/O có thể xong rồi tiếp tục P1. Ngắt cho phép quyết định lập lịch, không chứng minh bắt buộc phải chạy tiến trình khác."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "w24-32-ms"
+      ]
+    },
+    {
+      "id": "trace-boundaries",
+      "title": {
+        "en": "Read application context and handler context separately",
+        "vi": "Đọc riêng ngữ cảnh ứng dụng và trình xử lý"
+      },
+      "paragraphs": [
+        {
+          "en": "The visual uses P1 with PC=120,R1=7 and a saved P2 context PC=240,R1=3. These are illustrative values at an abstract interrupt boundary, not a real instruction-set trace. Handler execution has no invented clock cost here. During service the application CPU context is suspended; a blank application-register panel does not claim that the physical CPU has no registers.",
+          "vi": "Visual dùng P1 với PC=120,R1=7 và ngữ cảnh P2 đã lưu PC=240,R1=3. Đây là giá trị minh họa tại biên ngắt trừu tượng, không phải trace tập lệnh thật. Ở đây không gán chi phí clock giả cho trình xử lý. Trong lúc phục vụ, ngữ cảnh CPU ứng dụng bị tạm dừng; bảng thanh ghi ứng dụng trống không có nghĩa CPU vật lý không có thanh ghi."
+        },
+        {
+          "en": "An exam explanation should connect cause to effect: receive/identify the interrupt, preserve context, service it, update state/queues, select an eligible process, restore and resume. Use the scenario to decide whether the final process is the same one or another one. Avoid claiming every interrupt automatically increases priority or immediately runs the process whose I/O completed.",
+          "vi": "Giải thích bài thi cần nối nguyên nhân với hệ quả: nhận/xác định ngắt, giữ ngữ cảnh, phục vụ, cập nhật trạng thái/hàng đợi, chọn tiến trình đủ điều kiện, khôi phục và tiếp tục. Dùng tình huống để quyết định tiến trình cuối là tiến trình cũ hay khác. Tránh nói mọi ngắt tự tăng ưu tiên hoặc lập tức chạy tiến trình vừa hoàn tất I/O."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "kernel-interrupts",
+    "title": {
+      "en": "Compare timer and I/O paths",
+      "vi": "So sánh đường định thời và I/O"
+    },
+    "introduction": {
+      "en": "Watch saved PC/R1, ready/blocked queues and the selected process through the same handler stages.",
+      "vi": "Theo dõi PC/R1 đã lưu, hàng Ready/Blocked và tiến trình được chọn qua các bước xử lý."
+    },
+    "task": {
+      "en": "Predict which saved values are restored in each scenario before advancing to restore-context.",
+      "vi": "Dự đoán bộ giá trị đã lưu nào được khôi phục trong từng tình huống trước bước restore-context."
+    },
+    "conventions": [
+      {
+        "en": "The timer scenario switches P1→P2; the I/O scenario makes P2 ready and resumes P1.",
+        "vi": "Tình huống định thời chuyển P1→P2; tình huống I/O làm P2 Ready rồi tiếp tục P1."
+      },
+      {
+        "en": "Register values are illustrative application context; priorities and handler timings are not inferred.",
+        "vi": "Giá trị thanh ghi là ngữ cảnh ứng dụng minh họa; không suy diễn ưu tiên hay thời gian trình xử lý."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "A timer interrupt selects P2",
+      "vi": "Ngắt định thời chọn P2"
+    },
+    "prompt": {
+      "en": "P1 currently has PC=120 and R1=7. P2 is ready with saved PC=240 and R1=3. Follow a timer event.",
+      "vi": "P1 hiện có PC=120 và R1=7. P2 Ready với PC=240, R1=3 đã lưu. Theo dõi một sự kiện định thời."
+    },
+    "steps": [
+      {
+        "id": "save-context",
+        "action": {
+          "en": "Save P1’s PC and R1.",
+          "vi": "Lưu PC và R1 của P1."
+        },
+        "why": {
+          "en": "Its unfinished execution must remain recoverable.",
+          "vi": "Phải giữ khả năng tiếp tục phần thực thi chưa xong."
+        },
+        "result": {
+          "en": "Saved P1={120,7}; the application context is suspended.",
+          "vi": "Đã lưu P1={120,7}; ngữ cảnh ứng dụng tạm dừng."
+        }
+      },
+      {
+        "id": "handle-interrupt",
+        "action": {
+          "en": "Service the timer event.",
+          "vi": "Phục vụ sự kiện định thời."
+        },
+        "why": {
+          "en": "The handler must recognise the reason for entry.",
+          "vi": "Trình xử lý phải nhận diện lý do được gọi."
+        },
+        "result": {
+          "en": "Control is in the handler; selection has not yet completed.",
+          "vi": "Điều khiển ở trình xử lý; chưa hoàn tất chọn tiến trình."
+        }
+      },
+      {
+        "id": "update-ready",
+        "action": {
+          "en": "Append P1 after ready P2.",
+          "vi": "Thêm P1 sau P2 đang Ready."
+        },
+        "why": {
+          "en": "P1’s turn ended, but it is still runnable.",
+          "vi": "Lượt P1 đã hết nhưng nó vẫn có thể chạy."
+        },
+        "result": {
+          "en": "Ready queue [P2,P1], with no I/O block invented.",
+          "vi": "Hàng Ready [P2,P1], không tạo chặn I/O giả."
+        }
+      },
+      {
+        "id": "select-process",
+        "action": {
+          "en": "Select P2 and remove it from ready.",
+          "vi": "Chọn P2 và lấy khỏi Ready."
+        },
+        "why": {
+          "en": "This scenario’s scheduling decision gives the next turn to P2.",
+          "vi": "Quyết định lập lịch trong tình huống này cấp lượt tiếp cho P2."
+        },
+        "result": {
+          "en": "Selected=P2; P1 remains ready.",
+          "vi": "Được chọn=P2; P1 vẫn Ready."
+        }
+      },
+      {
+        "id": "restore-context",
+        "action": {
+          "en": "Restore P2’s saved values.",
+          "vi": "Khôi phục giá trị đã lưu của P2."
+        },
+        "why": {
+          "en": "The CPU must use P2’s context, not the interrupted P1 values.",
+          "vi": "CPU phải dùng ngữ cảnh P2, không dùng giá trị của P1 vừa bị ngắt."
+        },
+        "result": {
+          "en": "Application PC=240,R1=3; P1’s saved {120,7} is retained.",
+          "vi": "PC ứng dụng=240,R1=3; vẫn giữ {120,7} đã lưu của P1."
+        }
+      },
+      {
+        "id": "resume",
+        "action": {
+          "en": "Resume P2.",
+          "vi": "Tiếp tục P2."
+        },
+        "why": {
+          "en": "The selected context is now restored.",
+          "vi": "Ngữ cảnh được chọn đã khôi phục."
+        },
+        "result": {
+          "en": "P2 running; P1 ready.",
+          "vi": "P2 Running; P1 Ready."
+        }
+      }
+    ],
+    "result": {
+      "en": "The process switch changes CPU ownership without losing either process’s context.",
+      "vi": "Chuyển tiến trình đổi quyền CPU mà không làm mất ngữ cảnh của tiến trình nào."
+    },
+    "selfCheck": {
+      "en": "For an I/O interrupt that merely makes P2 ready, explain why restoring P1={120,7} can be correct.",
+      "vi": "Với ngắt I/O chỉ làm P2 Ready, giải thích vì sao khôi phục P1={120,7} có thể đúng."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Interrupt, PC/register save, handler or return-to-process wording signals this topic.",
+        "vi": "Các từ ngắt, lưu PC/thanh ghi, handler hoặc quay lại tiến trình báo hiệu chủ đề này."
+      },
+      {
+        "en": "A queue-state change after I/O needs both an event explanation and a scheduling distinction.",
+        "vi": "Đổi trạng thái hàng sau I/O cần giải thích sự kiện và phân biệt với lập lịch."
+      }
+    ],
+    "distinguish": {
+      "en": "An ISR services an event; a scheduler selects a process; context restoration enables correct resumption.",
+      "vi": "ISR phục vụ sự kiện; bộ lập lịch chọn tiến trình; khôi phục ngữ cảnh cho phép tiếp tục đúng."
+    },
+    "method": [
+      {
+        "en": "Identify the interrupt source and the current process.",
+        "vi": "Xác định nguồn ngắt và tiến trình hiện tại."
+      },
+      {
+        "en": "Record saved context before tracing state/queue changes.",
+        "vi": "Ghi ngữ cảnh đã lưu trước khi trace thay đổi trạng thái/hàng đợi."
+      },
+      {
+        "en": "Name the selected process and restore its values; explain whether CPU ownership changed.",
+        "vi": "Nêu tiến trình được chọn và khôi phục giá trị của nó; giải thích quyền CPU có đổi không."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Every interrupt switches to a different process.",
+        "vi": "Mọi ngắt đều chuyển sang tiến trình khác."
+      },
+      "correction": {
+        "en": "The handler can return to the same process after service.",
+        "vi": "Trình xử lý có thể trở lại cùng tiến trình sau phục vụ."
+      }
+    },
+    {
+      "mistake": {
+        "en": "An I/O-completed process is immediately running.",
+        "vi": "Tiến trình vừa xong I/O chạy ngay."
+      },
+      "correction": {
+        "en": "It becomes ready; selection/dispatch remain separate.",
+        "vi": "Nó trở thành Ready; chọn/cấp CPU vẫn là việc riêng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A saved ID is enough to resume correctly.",
+        "vi": "Lưu ID là đủ để tiếp tục đúng."
+      },
+      "correction": {
+        "en": "The continuation requires the relevant PC/register and management state as well.",
+        "vi": "Việc tiếp tục còn cần PC/thanh ghi liên quan và trạng thái quản lý."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "context-purpose",
+      "prompt": {
+        "en": "Why save P1’s register values before handler work?",
+        "vi": "Vì sao lưu thanh ghi P1 trước công việc của handler?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "To restore P1’s unfinished execution correctly later.",
+            "vi": "Để khôi phục đúng phần thực thi chưa xong của P1 sau này."
+          },
+          "feedback": {
+            "en": "Correct: handler work may reuse registers.",
+            "vi": "Đúng: công việc handler có thể dùng lại thanh ghi."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "To guarantee P1 runs next.",
+            "vi": "Để bảo đảm P1 chạy tiếp."
+          },
+          "feedback": {
+            "en": "Saving preserves eligibility for resumption, not the scheduling choice.",
+            "vi": "Lưu giữ khả năng tiếp tục, không quyết định lựa chọn lập lịch."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "To turn P1 into a stored source-code file.",
+            "vi": "Để biến P1 thành tệp mã nguồn."
+          },
+          "feedback": {
+            "en": "Context storage is not source-code translation.",
+            "vi": "Lưu ngữ cảnh không phải dịch mã nguồn."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Context preservation is required whether the same process or another one resumes.",
+        "vi": "Cần giữ ngữ cảnh dù tiếp tục cùng tiến trình hay tiến trình khác."
+      }
+    },
+    {
+      "id": "restore-correct-process",
+      "prompt": {
+        "en": "The timer scenario selects P2. Which values are restored?",
+        "vi": "Tình huống định thời chọn P2. Khôi phục giá trị nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "PC=240,R1=3.",
+            "vi": "PC=240,R1=3."
+          },
+          "feedback": {
+            "en": "Correct: these belong to P2’s saved context.",
+            "vi": "Đúng: chúng thuộc ngữ cảnh P2 đã lưu."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "PC=120,R1=7.",
+            "vi": "PC=120,R1=7."
+          },
+          "feedback": {
+            "en": "Those belong to P1, not the selected process.",
+            "vi": "Chúng thuộc P1, không phải tiến trình được chọn."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "PC=240,R1=7.",
+            "vi": "PC=240,R1=7."
+          },
+          "feedback": {
+            "en": "That mixes contexts from two processes.",
+            "vi": "Đó là trộn ngữ cảnh hai tiến trình."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Restore a coherent context for the selected process.",
+        "vi": "Khôi phục một ngữ cảnh nhất quán của tiến trình được chọn."
+      }
+    },
+    {
+      "id": "timer-state",
+      "prompt": {
+        "en": "P1’s quantum expires while it can still execute. Which state follows?",
+        "vi": "Quantum P1 hết khi nó vẫn chạy được. Trạng thái nào tiếp theo?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Ready.",
+            "vi": "Ready."
+          },
+          "feedback": {
+            "en": "Correct: P1 waits for another allocation of CPU.",
+            "vi": "Đúng: P1 chờ lần cấp CPU khác."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Blocked.",
+            "vi": "Blocked."
+          },
+          "feedback": {
+            "en": "No I/O or external-event dependency was introduced.",
+            "vi": "Không có phụ thuộc I/O hay sự kiện ngoài nào được tạo."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Terminated.",
+            "vi": "Đã kết thúc."
+          },
+          "feedback": {
+            "en": "Quantum expiry does not mean its work is complete.",
+            "vi": "Hết quantum không có nghĩa công việc đã xong."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Loss of CPU ownership is different from inability to execute.",
+        "vi": "Mất quyền CPU khác với không thể thực thi."
+      }
+    },
+    {
+      "id": "same-process-transfer",
+      "prompt": {
+        "en": "An ISR services a device and returns to P1. Is this necessarily wrong?",
+        "vi": "ISR phục vụ thiết bị rồi trở lại P1. Điều này có nhất thiết sai không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No; servicing an interrupt need not switch process.",
+            "vi": "Không; phục vụ ngắt không nhất thiết chuyển tiến trình."
+          },
+          "feedback": {
+            "en": "Correct: the scheduling outcome depends on policy and state.",
+            "vi": "Đúng: kết quả lập lịch phụ thuộc chính sách và trạng thái."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes; every ISR must choose P2.",
+            "vi": "Có; mọi ISR phải chọn P2."
+          },
+          "feedback": {
+            "en": "No universal rule names a particular next process.",
+            "vi": "Không có quy tắc chung chỉ định một tiến trình cụ thể chạy tiếp."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes; saved context may never be reused.",
+            "vi": "Có; ngữ cảnh đã lưu không bao giờ được dùng lại."
+          },
+          "feedback": {
+            "en": "Restoration is precisely what allows correct resumption.",
+            "vi": "Khôi phục chính là điều cho phép tiếp tục đúng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Separate interrupt service from the decision about the next CPU owner.",
+        "vi": "Tách phục vụ ngắt khỏi quyết định chủ CPU tiếp theo."
+      }
+    },
+    {
+      "id": "io-ready-transfer",
+      "prompt": {
+        "en": "P2’s disk read finishes during P1 execution. What must the OS reflect?",
+        "vi": "Việc đọc đĩa của P2 hoàn tất khi P1 chạy. Hệ điều hành cần thể hiện điều gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "P2 no longer waits for that I/O and can enter ready.",
+            "vi": "P2 không còn chờ I/O đó và có thể vào Ready."
+          },
+          "feedback": {
+            "en": "Correct: the completed dependency changes eligibility.",
+            "vi": "Đúng: phụ thuộc đã hoàn tất làm đổi khả năng chạy."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "P1’s data must be copied into P2’s registers.",
+            "vi": "Phải chép dữ liệu P1 vào thanh ghi P2."
+          },
+          "feedback": {
+            "en": "Contexts must remain distinct; this event does not justify copying them.",
+            "vi": "Ngữ cảnh phải riêng; sự kiện này không cho phép chép lẫn."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Both processes must own the one CPU at once.",
+            "vi": "Cả hai phải giữ một CPU cùng lúc."
+          },
+          "feedback": {
+            "en": "The model still has one running application process.",
+            "vi": "Mô hình vẫn chỉ có một tiến trình ứng dụng Running."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Update the event-dependent state before applying the scheduling policy.",
+        "vi": "Cập nhật trạng thái phụ thuộc sự kiện trước khi áp dụng chính sách lập lịch."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Describe the save→service→schedule→restore chain without assuming a compulsory process switch.",
+      "vi": "Mô tả chuỗi lưu→phục vụ→lập lịch→khôi phục mà không giả định bắt buộc đổi tiến trình."
+    },
+    "answerPoints": [
+      {
+        "en": "Preserve interrupted context, identify/service the event and update management state.",
+        "vi": "Giữ ngữ cảnh bị ngắt, xác định/phục vụ sự kiện và cập nhật trạng thái quản lý."
+      },
+      {
+        "en": "Choose an eligible process and restore that process’s values.",
+        "vi": "Chọn tiến trình đủ điều kiện và khôi phục giá trị của tiến trình đó."
+      },
+      {
+        "en": "The same process may resume; I/O completion normally changes blocked to ready first.",
+        "vi": "Có thể tiếp tục cùng tiến trình; I/O hoàn tất trước hết thường đổi Blocked sang Ready."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Interrupt handling and scheduling are related but distinct responsibilities.",
+      "vi": "Xử lý ngắt và lập lịch liên quan nhưng là trách nhiệm khác nhau."
+    },
+    {
+      "en": "Saved context must match the process being resumed.",
+      "vi": "Ngữ cảnh đã lưu phải khớp tiến trình được tiếp tục."
+    },
+    {
+      "en": "State the model’s priority and timing assumptions rather than inventing them.",
+      "vi": "Nêu giả định ưu tiên và thời gian của mô hình thay vì tự suy diễn."
+    }
+  ],
+  "relatedSlugs": [
+    "resources-processes-and-states",
+    "scheduling-choices"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed p375 and p382 / PDF pp391,398: kernel responsibilities and interrupt handling",
+      "kind": "book"
+    },
+    {
+      "id": "w24-32-qp",
+      "title": "Cambridge 9618 w24 Paper 32 Question Paper",
+      "locator": "PDF p10 Q9(a–b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w24-32-ms",
+      "title": "Cambridge 9618 w24 Paper 32 Mark Scheme",
+      "locator": "PDF p11 Q9(a–b)",
+      "kind": "mark-scheme"
+    }
+  ]
+}

@@ -1,0 +1,645 @@
+{
+  "schemaVersion": 1,
+  "version": "T17-academic-r2",
+  "topicId": "T17",
+  "sectionId": "11.1",
+  "slug": "string-processing",
+  "learningMode": "procedural",
+  "estimatedMinutes": 60,
+  "title": {
+    "en": "String processing",
+    "vi": "Xử lý chuỗi"
+  },
+  "question": {
+    "en": "How can a program locate, extract, combine and convert text without calling a string routine outside its valid contract?",
+    "vi": "Chương trình có thể xác định vị trí, cắt, ghép và chuyển đổi văn bản mà không gọi routine chuỗi ngoài hợp đồng hợp lệ như thế nào?"
+  },
+  "opening": {
+    "en": "First write the string's length and positions. Guard length, delimiter and numeric format before extracting or converting. Then apply the exact insert signature and case rule.",
+    "vi": "Trước hết viết độ dài và vị trí của chuỗi. Kiểm độ dài, delimiter và định dạng số trước khi cắt hoặc chuyển đổi. Sau đó áp dụng đúng chữ ký insert và quy tắc hoa thường."
+  },
+  "objectives": [
+    {
+      "en": "Use LEFT, RIGHT, MID, LENGTH, case conversion and & with supplied conventions.",
+      "vi": "Dùng LEFT, RIGHT, MID, LENGTH, chuyển hoa thường và & theo quy ước được cung cấp."
+    },
+    {
+      "en": "Prove that a requested substring lies within the string before extracting it.",
+      "vi": "Chứng minh substring cần lấy nằm trong chuỗi trước khi cắt."
+    },
+    {
+      "en": "Guard numeric conversion with IS_NUM and preserve leading-zero identifiers as strings when needed.",
+      "vi": "Guard chuyển số bằng IS_NUM và giữ identifier có số 0 đầu dưới dạng chuỗi khi cần."
+    },
+    {
+      "en": "Trace delimiter parsing without skipping or duplicating characters.",
+      "vi": "Trace tách delimiter mà không bỏ hoặc lặp ký tự."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Built-in functions and the insert",
+        "vi": "Hàm dựng sẵn và insert"
+      },
+      "reason": {
+        "en": "String calls must follow the supplied signature and error conditions.",
+        "vi": "Lời gọi hàm chuỗi phải theo chữ ký và điều kiện lỗi được cung cấp."
+      }
+    },
+    {
+      "title": {
+        "en": "Iteration",
+        "vi": "Vòng lặp"
+      },
+      "reason": {
+        "en": "Character-by-character parsing advances a position and must terminate.",
+        "vi": "Tách từng ký tự cập nhật vị trí và phải kết thúc."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "substring",
+      "meaning": {
+        "en": "A contiguous sequence of characters taken from a string.",
+        "vi": "Dãy ký tự liên tiếp được lấy từ chuỗi."
+      }
+    },
+    {
+      "term": "position",
+      "meaning": {
+        "en": "The 1-based starting location used by the supplied MID function.",
+        "vi": "Vị trí bắt đầu từ 1 mà hàm MID được cung cấp sử dụng."
+      }
+    },
+    {
+      "term": "delimiter",
+      "meaning": {
+        "en": "A character that separates fields.",
+        "vi": "Ký tự phân tách các field."
+      }
+    },
+    {
+      "term": "concatenation",
+      "meaning": {
+        "en": "Joining strings using & in Cambridge pseudocode.",
+        "vi": "Ghép chuỗi bằng & trong pseudocode Cambridge."
+      }
+    },
+    {
+      "term": "guard",
+      "meaning": {
+        "en": "A condition checked before an operation that could be invalid.",
+        "vi": "Điều kiện được kiểm trước thao tác có thể không hợp lệ."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The task asks for first/last characters, a substring, a field, a case-insensitive comparison or conversion.",
+        "vi": "Đề yêu cầu ký tự đầu/cuối, substring, field, so sánh không phân biệt hoa thường hoặc chuyển kiểu."
+      },
+      {
+        "en": "A compact record contains fixed positions or delimiters.",
+        "vi": "Bản ghi gọn chứa vị trí cố định hoặc delimiter."
+      },
+      {
+        "en": "A numeric value is currently stored as STRING or CHAR.",
+        "vi": "Giá trị số đang được lưu dưới dạng STRING hoặc CHAR."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "MID start is 1-based in the supplied insert; do not assume zero-based indexing.",
+        "vi": "Vị trí bắt đầu của MID là 1 trong insert; không giả định chỉ số bắt đầu từ 0."
+      },
+      {
+        "en": "Calling RIGHT or MID before proving sufficient length can generate an error.",
+        "vi": "Gọi RIGHT hoặc MID trước khi chứng minh đủ độ dài có thể tạo lỗi."
+      },
+      {
+        "en": "A numeric-looking identifier may need to remain STRING to preserve leading zeros.",
+        "vi": "Identifier trông như số có thể cần giữ STRING để bảo toàn số 0 đầu."
+      }
+    ],
+    "answerProduct": {
+      "en": "A guarded extraction/conversion trace that labels character positions, returned fields and invalid paths.",
+      "vi": "Trace cắt/chuyển đổi có guard, gắn nhãn vị trí ký tự, field trả về và đường không hợp lệ."
+    },
+    "method": [
+      {
+        "en": "Write length, positions and expected fields.",
+        "vi": "Viết độ dài, vị trí và field mong đợi."
+      },
+      {
+        "en": "Check length and delimiter before extraction.",
+        "vi": "Kiểm độ dài và delimiter trước khi cắt."
+      },
+      {
+        "en": "Check IS_NUM before STR_TO_NUM.",
+        "vi": "Kiểm IS_NUM trước STR_TO_NUM."
+      },
+      {
+        "en": "Apply case conversion symmetrically when case does not matter.",
+        "vi": "Áp dụng chuyển hoa thường đối xứng khi không phân biệt hoa thường."
+      },
+      {
+        "en": "Trace position updates and termination when parsing in a loop.",
+        "vi": "Trace cập nhật vị trí và kết thúc khi tách bằng vòng lặp."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t17-functions",
+      "title": {
+        "en": "Use positions and exact signatures",
+        "vi": "Dùng vị trí và chữ ký chính xác"
+      },
+      "paragraphs": [
+        {
+          "en": "The insert supplies LEFT(String,x), RIGHT(String,x), MID(String,start,length) and LENGTH(String). MID uses a 1-based start. The last requested position is start+length−1, so a safe non-empty slice requires start>=1, length>=1 and start+length−1<=LENGTH(String).",
+          "vi": "Insert cung cấp LEFT(String,x), RIGHT(String,x), MID(String,start,length) và LENGTH(String). MID dùng vị trí bắt đầu từ 1. Vị trí cuối cần lấy là start+length−1, nên slice không rỗng an toàn cần start>=1, length>=1 và start+length−1<=LENGTH(String)."
+        },
+        {
+          "en": "The insert also supplies whole-string/character case conversion in that paper. Cambridge pseudocode uses & for concatenation. String routines supplied in a paper take priority over names remembered from another language.",
+          "vi": "Insert của đề đó cũng cung cấp chuyển hoa thường cho toàn chuỗi/ký tự. Pseudocode Cambridge dùng & để ghép. Routine chuỗi được cung cấp trong đề có ưu tiên hơn tên nhớ từ ngôn ngữ khác."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "insert-s25-23",
+        "book-t17"
+      ]
+    },
+    {
+      "id": "t17-convert",
+      "title": {
+        "en": "Guard extraction and numeric conversion",
+        "vi": "Guard thao tác cắt và chuyển số"
+      },
+      "paragraphs": [
+        {
+          "en": "IS_NUM(Text) tests whether the supplied string represents a valid numeric value; STR_TO_NUM then returns a numeric representation. Test first. Do not convert customer IDs or codes merely because they contain digits when their string form carries meaning.",
+          "vi": "IS_NUM(Text) kiểm chuỗi được cung cấp có biểu diễn giá trị số hợp lệ không; sau đó STR_TO_NUM trả dạng số. Hãy kiểm trước. Không chuyển customer ID hay code chỉ vì chúng chứa chữ số khi dạng chuỗi mang ý nghĩa."
+        },
+        {
+          "en": "When parsing a delimiter, either find a valid position before MID or scan one character at a time. A loop must advance Position on every path, keep the current field separate, store the final field after the loop, and enforce any array bound.",
+          "vi": "Khi tách delimiter, hãy tìm vị trí hợp lệ trước MID hoặc quét từng ký tự. Vòng lặp phải tăng Position trên mọi đường, giữ field hiện tại riêng, lưu field cuối sau vòng lặp và kiểm mọi cận mảng."
+        }
+      ],
+      "sourceIds": [
+        "insert-s25-23",
+        "qp-w25-22-q6",
+        "ms-w25-22-q6",
+        "qp-s25-23-q5"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T17"
+    ],
+    "title": {
+      "en": "Character strip, safe slice and conversion",
+      "vi": "Dải ký tự, slice an toàn và chuyển đổi"
+    },
+    "introduction": {
+      "en": "The visual numbers every character from 1, then shows length and format guards before any extraction.",
+      "vi": "Visual đánh số mọi ký tự từ 1 rồi hiển thị guard độ dài và định dạng trước mọi thao tác cắt."
+    },
+    "task": {
+      "en": "For a valid, short and non-numeric string, predict which guard stops or permits each function call.",
+      "vi": "Với chuỗi hợp lệ, chuỗi ngắn và chuỗi không phải số, dự đoán guard nào dừng hoặc cho phép mỗi lời gọi hàm."
+    },
+    "conventions": [
+      {
+        "en": "Positions are 1-based because the displayed insert defines them that way.",
+        "vi": "Vị trí bắt đầu từ 1 vì insert hiển thị định nghĩa như vậy."
+      },
+      {
+        "en": "A red blocked call means it was not executed, not that an error was deliberately caught.",
+        "vi": "Lời gọi bị chặn màu đỏ nghĩa là không được chạy, không phải lỗi đã được bắt."
+      },
+      {
+        "en": "Conversion happens only after a TRUE IS_NUM result.",
+        "vi": "Chuyển đổi chỉ xảy ra sau kết quả IS_NUM TRUE."
+      }
+    ],
+    "sourceIds": [
+      "insert-s25-23",
+      "teacher-t17"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T17-W1",
+      "title": {
+        "en": "Parse a guarded product code",
+        "vi": "Tách mã sản phẩm có guard"
+      },
+      "prompt": {
+        "en": "A valid code has exactly six characters: two letters, '-', then three digits, for example AL-407. Extract Prefix as the first two characters and Number as an INTEGER. For invalid input, output a message without making an invalid function call.",
+        "vi": "Mã hợp lệ có đúng sáu ký tự: hai chữ cái, '-', rồi ba chữ số, ví dụ AL-407. Cắt Prefix là hai ký tự đầu và Number là INTEGER. Với đầu vào không hợp lệ, xuất thông báo mà không thực hiện lời gọi hàm không hợp lệ."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "length",
+          "action": {
+            "en": "Check LENGTH(Code)=6 first",
+            "vi": "Kiểm LENGTH(Code)=6 trước"
+          },
+          "why": {
+            "en": "All later fixed-position calls require the six-character layout.",
+            "vi": "Mọi lời gọi vị trí cố định sau đó cần bố cục sáu ký tự."
+          },
+          "result": {
+            "en": "AL-407 passes; A-7 and AL-40X do not yet pass all guards.",
+            "vi": "AL-407 qua; A-7 và AL-40X chưa qua mọi guard."
+          }
+        },
+        {
+          "id": "delimiter",
+          "action": {
+            "en": "Check MID(Code,3,1)='-'",
+            "vi": "Kiểm MID(Code,3,1)='-'"
+          },
+          "why": {
+            "en": "The length guard has already proved position 3 exists.",
+            "vi": "Guard độ dài đã chứng minh vị trí 3 tồn tại."
+          },
+          "result": {
+            "en": "AL-407 has the required delimiter.",
+            "vi": "AL-407 có delimiter yêu cầu."
+          }
+        },
+        {
+          "id": "digits",
+          "action": {
+            "en": "Set DigitText ← RIGHT(Code,3) and test IS_NUM",
+            "vi": "Đặt DigitText ← RIGHT(Code,3) và kiểm IS_NUM"
+          },
+          "why": {
+            "en": "RIGHT is safe after the length guard; conversion is safe only after numeric validation.",
+            "vi": "RIGHT an toàn sau guard độ dài; chuyển đổi chỉ an toàn sau validation số."
+          },
+          "result": {
+            "en": "DigitText=\"407\"; IS_NUM returns TRUE.",
+            "vi": "DigitText=\"407\"; IS_NUM trả TRUE."
+          }
+        },
+        {
+          "id": "extract",
+          "action": {
+            "en": "Extract and convert",
+            "vi": "Cắt và chuyển đổi"
+          },
+          "why": {
+            "en": "All function contracts have now been satisfied.",
+            "vi": "Mọi hợp đồng hàm đã được thỏa."
+          },
+          "result": {
+            "en": "Prefix←LEFT(Code,2) gives \"AL\"; Number←STR_TO_NUM(DigitText) gives 407 INTEGER.",
+            "vi": "Prefix←LEFT(Code,2) cho \"AL\"; Number←STR_TO_NUM(DigitText) cho 407 INTEGER."
+          }
+        },
+        {
+          "id": "invalid",
+          "action": {
+            "en": "Route invalid data to one message",
+            "vi": "Chuyển dữ liệu không hợp lệ tới một thông báo"
+          },
+          "why": {
+            "en": "The nested guards prevent unsafe calls rather than relying on an unspecified recovery mechanism.",
+            "vi": "Các guard lồng ngăn lời gọi không an toàn thay vì dựa vào cơ chế phục hồi không được quy định."
+          },
+          "result": {
+            "en": "Short, wrong-delimiter or non-numeric cases output \"Invalid code\".",
+            "vi": "Case ngắn, sai delimiter hoặc không phải số xuất \"Invalid code\"."
+          },
+          "check": {
+            "en": "For AL-40X, conversion is never executed.",
+            "vi": "Với AL-40X, thao tác chuyển đổi không bao giờ chạy."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Guard in this order: exact length, delimiter, numeric suffix; then Prefix=\"AL\" and Number=407. Invalid cases output the message without evaluating an unsafe extraction or conversion.",
+        "vi": "Guard theo thứ tự: đúng độ dài, delimiter, hậu tố số; sau đó Prefix=\"AL\" và Number=407. Case không hợp lệ xuất thông báo mà không tính thao tác cắt hoặc chuyển đổi không an toàn."
+      },
+      "selfCheck": {
+        "en": "Can every function call be justified by facts established on earlier lines?",
+        "vi": "Mỗi lời gọi hàm có thể được giải thích bằng dữ kiện đã xác lập ở các dòng trước không?"
+      },
+      "sourceIds": [
+        "insert-s25-23",
+        "teacher-t17"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T17-P1",
+      "title": {
+        "en": "Compare a prefix or suffix",
+        "vi": "So sánh prefix hoặc suffix"
+      },
+      "prompt": {
+        "en": "Write the decision logic for Pattern=\"CAT\", Text and Position ('s' for start, 'e' for end). Return FALSE if Text is shorter. When CaseMatters is FALSE, compare in a common case. Use Text=\"Catalogue\" to trace ('s', TRUE), ('s', FALSE with Pattern=\"CAT\") and ('e', FALSE with Pattern=\"GUE\").",
+        "vi": "Viết logic quyết định cho Pattern=\"CAT\", Text và Position ('s' cho đầu, 'e' cho cuối). Trả FALSE nếu Text ngắn hơn. Khi CaseMatters là FALSE, so sánh ở cùng kiểu chữ. Dùng Text=\"Catalogue\" để trace ('s', TRUE), ('s', FALSE với Pattern=\"CAT\") và ('e', FALSE với Pattern=\"GUE\")."
+      },
+      "working": [
+        {
+          "en": "Guard LENGTH(Text) >= LENGTH(Pattern) before LEFT/RIGHT.",
+          "vi": "Guard LENGTH(Text) >= LENGTH(Pattern) trước LEFT/RIGHT."
+        },
+        {
+          "en": "Normalise both operands only when case does not matter.",
+          "vi": "Chuyển cả hai toán hạng về cùng case chỉ khi không phân biệt hoa thường."
+        },
+        {
+          "en": "Choose exactly one extraction from Position, then compare and return.",
+          "vi": "Chọn đúng một phép cắt theo Position rồi so sánh và return."
+        }
+      ],
+      "answer": {
+        "en": "After the length guard: if NOT CaseMatters, apply TO_UPPER to both strings. For 's', compare Pattern with LEFT(Text,LENGTH(Pattern)); for 'e', compare with RIGHT(...). Results: \"CAT\" vs \"Catalogue\" with case matters → FALSE; without case matters at start → TRUE; \"GUE\" at end without case matters → TRUE.",
+        "vi": "Sau guard độ dài: nếu NOT CaseMatters, áp dụng TO_UPPER cho cả hai chuỗi. Với 's', so Pattern với LEFT(Text,LENGTH(Pattern)); với 'e', so với RIGHT(...). Kết quả: \"CAT\" với \"Catalogue\" khi phân biệt hoa thường → FALSE; không phân biệt tại đầu → TRUE; \"GUE\" tại cuối không phân biệt → TRUE."
+      },
+      "markGuidance": [
+        {
+          "en": "The shorter-string path returns before extraction.",
+          "vi": "Đường chuỗi ngắn return trước khi cắt."
+        },
+        {
+          "en": "Both strings are normalised symmetrically.",
+          "vi": "Cả hai chuỗi được chuẩn hóa đối xứng."
+        },
+        {
+          "en": "All three results are correct.",
+          "vi": "Cả ba kết quả đúng."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Extracting before checking length.",
+          "vi": "Cắt trước khi kiểm độ dài."
+        },
+        {
+          "en": "Changing case of only one operand.",
+          "vi": "Chỉ đổi case của một toán hạng."
+        },
+        {
+          "en": "Using LEFT for both Position values.",
+          "vi": "Dùng LEFT cho cả hai giá trị Position."
+        }
+      ],
+      "selfCheck": {
+        "en": "For each case, which exact substring is compared?",
+        "vi": "Với mỗi case, substring chính xác nào được so sánh?"
+      },
+      "origin": "adapted-from-source",
+      "officialMarks": null,
+      "sourceIds": [
+        "qp-w25-22-q6",
+        "ms-w25-22-q6"
+      ]
+    },
+    {
+      "id": "T17-P2",
+      "title": {
+        "en": "Parse comma-separated integers safely",
+        "vi": "Tách số nguyên phân cách bởi dấu phẩy an toàn"
+      },
+      "prompt": {
+        "en": "Input Line=\"12,7,305\". Trace a character-by-character parser into three INTEGER values. Add guards for empty fields, non-numeric fields and a maximum of three output elements.",
+        "vi": "Input Line=\"12,7,305\". Trace bộ tách từng ký tự thành ba giá trị INTEGER. Thêm guard cho field rỗng, field không phải số và tối đa ba phần tử output."
+      },
+      "working": [
+        {
+          "en": "Initialise Position=1, Field='' and Count=0.",
+          "vi": "Khởi tạo Position=1, Field='' và Count=0."
+        },
+        {
+          "en": "On a non-comma, append the character; on comma, validate a non-empty numeric Field before storing.",
+          "vi": "Gặp ký tự không phải dấu phẩy thì nối; gặp dấu phẩy thì kiểm Field không rỗng và là số trước khi lưu."
+        },
+        {
+          "en": "Advance Position on every iteration and process the final Field after the loop.",
+          "vi": "Tăng Position ở mọi lượt và xử lý Field cuối sau vòng lặp."
+        },
+        {
+          "en": "Reject before a fourth store or any invalid STR_TO_NUM call.",
+          "vi": "Từ chối trước lần lưu thứ tư hoặc lời gọi STR_TO_NUM không hợp lệ."
+        }
+      ],
+      "answer": {
+        "en": "The fields evolve \"1\"→\"12\"→store 12; \"7\"→store 7; \"3\"→\"30\"→\"305\"→store 305 after the loop. Final array values are [12,7,305]. Empty or non-numeric fields are rejected before conversion; a fourth field is rejected before writing beyond the bound.",
+        "vi": "Các field đổi \"1\"→\"12\"→lưu 12; \"7\"→lưu 7; \"3\"→\"30\"→\"305\"→lưu 305 sau vòng lặp. Mảng cuối là [12,7,305]. Field rỗng hoặc không phải số bị từ chối trước chuyển đổi; field thứ tư bị từ chối trước khi ghi vượt cận."
+      },
+      "markGuidance": [
+        {
+          "en": "Every character is consumed once and Position terminates after LENGTH(Line).",
+          "vi": "Mỗi ký tự được xử lý một lần và Position kết thúc sau LENGTH(Line)."
+        },
+        {
+          "en": "The final field is stored after the loop.",
+          "vi": "Field cuối được lưu sau vòng lặp."
+        },
+        {
+          "en": "Conversion and array-bound guards precede the risky operations.",
+          "vi": "Guard chuyển đổi và cận mảng đứng trước thao tác rủi ro."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Forgetting the last field because no comma follows it.",
+          "vi": "Quên field cuối vì không có dấu phẩy sau nó."
+        },
+        {
+          "en": "Calling STR_TO_NUM on an empty/non-numeric field.",
+          "vi": "Gọi STR_TO_NUM với field rỗng/không phải số."
+        },
+        {
+          "en": "Incrementing Position only in one branch and creating an infinite loop.",
+          "vi": "Chỉ tăng Position ở một nhánh và tạo vòng lặp vô hạn."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can you account for every character and every array write?",
+        "vi": "Bạn có thể kiểm kê mọi ký tự và mọi lần ghi mảng không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "qp-s25-23-q5",
+        "insert-s25-23",
+        "teacher-t17"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "String positions always start at 0.",
+        "vi": "Vị trí chuỗi luôn bắt đầu từ 0."
+      },
+      "correction": {
+        "en": "Use the supplied insert; its MID examples start at position 1.",
+        "vi": "Dùng insert được cung cấp; ví dụ MID bắt đầu tại vị trí 1."
+      },
+      "selfCheck": {
+        "en": "What does MID(\"ABCDEFGH\",2,3) return in this insert?",
+        "vi": "MID(\"ABCDEFGH\",2,3) trả gì trong insert này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "A length check can be written after the substring call.",
+        "vi": "Có thể viết kiểm độ dài sau lời gọi substring."
+      },
+      "correction": {
+        "en": "The guard must run first so an invalid call is never evaluated.",
+        "vi": "Guard phải chạy trước để lời gọi không hợp lệ không được tính."
+      },
+      "selfCheck": {
+        "en": "Which line executes first?",
+        "vi": "Dòng nào chạy trước?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "All digit strings should become numbers.",
+        "vi": "Mọi chuỗi chữ số nên chuyển thành số."
+      },
+      "correction": {
+        "en": "Keep identifiers as STRING when leading zeros or formatting carry meaning; convert quantities only after validation.",
+        "vi": "Giữ identifier là STRING khi số 0 đầu hoặc định dạng có ý nghĩa; chỉ chuyển đại lượng sau validation."
+      },
+      "selfCheck": {
+        "en": "Would converting \"001204\" preserve the same identifier?",
+        "vi": "Chuyển \"001204\" có giữ nguyên identifier không?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What is the safe order for substring and numeric conversion?",
+      "vi": "Thứ tự an toàn cho substring và chuyển số là gì?"
+    },
+    "answerPoints": [
+      {
+        "en": "Read the supplied indexing and function signatures.",
+        "vi": "Đọc quy ước chỉ số và chữ ký hàm được cung cấp."
+      },
+      {
+        "en": "Prove required positions exist.",
+        "vi": "Chứng minh các vị trí cần thiết tồn tại."
+      },
+      {
+        "en": "Check delimiters and format.",
+        "vi": "Kiểm delimiter và định dạng."
+      },
+      {
+        "en": "Use IS_NUM before STR_TO_NUM.",
+        "vi": "Dùng IS_NUM trước STR_TO_NUM."
+      },
+      {
+        "en": "Then extract, convert, store and verify bounds.",
+        "vi": "Sau đó cắt, chuyển đổi, lưu và kiểm cận."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Indexing and routine names come from the supplied insert.",
+      "vi": "Cách đánh chỉ số và tên routine đến từ insert được cung cấp."
+    },
+    {
+      "en": "Guard length and format before substring or conversion calls.",
+      "vi": "Guard độ dài và định dạng trước lời gọi substring hoặc chuyển đổi."
+    },
+    {
+      "en": "A parser must advance, store the final field and respect output bounds.",
+      "vi": "Bộ tách phải tiến vị trí, lưu field cuối và tôn trọng cận output."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F09",
+      "role": "related",
+      "title": {
+        "en": "Built-in and string functions",
+        "vi": "Hàm dựng sẵn và hàm chuỗi"
+      }
+    },
+    {
+      "id": "F07",
+      "role": "related",
+      "title": {
+        "en": "Text-file processing pipeline",
+        "vi": "Pipeline xử lý text file"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "built-in-functions-insert",
+    "files",
+    "iteration"
+  ],
+  "sources": [
+    {
+      "id": "s26-11",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§11.1–11.3, printed/PDF pp29–30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "g26-core",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for 2026",
+      "locator": "§2 pp7–9; §5 pp15–18; §6–8 pp18–24, as cited by each lesson.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t17",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp269–271 and p279; PDF pp285–287 and p295. Apply corrected guard start+length−1<=LENGTH.",
+      "kind": "book"
+    },
+    {
+      "id": "insert-s25-23",
+      "title": "9618/23 May/June 2025 Insert",
+      "locator": "Insert pp2–4; LEFT/RIGHT/MID/LENGTH, case conversion, IS_NUM, STR_TO_NUM and &.",
+      "kind": "guide"
+    },
+    {
+      "id": "qp-w25-22-q6",
+      "title": "9618/22 October/November 2025 Question 6",
+      "locator": "QP pp10–11; prefix/suffix comparison with case option and shorter-string guard.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-w25-22-q6",
+      "title": "9618/22 October/November 2025 published mark scheme, Question 6",
+      "locator": "MS p11; example guarded Compare() solution. Lesson guidance is teacher-authored, not an official mark allocation.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "qp-s25-23-q5",
+      "title": "9618/23 May/June 2025 Question 5",
+      "locator": "QP pp10–11 / published MS p10; string traversal, count, concatenation and returned STRING.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t17",
+      "title": "AlgoCore teacher-authored T17 guarded parsing guidance",
+      "locator": "T17-academic-r2, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

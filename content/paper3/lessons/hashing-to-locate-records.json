@@ -1,0 +1,529 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.2-T02",
+  "slug": "hashing-to-locate-records",
+  "title": {
+    "en": "Hashing to locate records",
+    "vi": "Dùng hàm băm để định vị bản ghi"
+  },
+  "question": {
+    "en": "How does a key lead to a candidate record location?",
+    "vi": "Khóa dẫn tới vị trí bản ghi ứng viên như thế nào?"
+  },
+  "opening": {
+    "en": "A file has seven logical slots numbered 0 to 6. Instead of searching from the beginning, use the record key to calculate a home slot. The calculation gives a place to start, not proof that the requested record is there: different keys can share that slot.",
+    "vi": "Tệp có bảy ô logic đánh số 0 đến 6. Thay vì tìm từ đầu, dùng khóa bản ghi để tính ô gốc. Phép tính cho nơi bắt đầu, chưa chứng minh bản ghi cần tìm nằm đó: các khóa khác nhau có thể chung ô."
+  },
+  "objectives": [
+    {
+      "en": "Calculate a MOD hash with the stated divisor and index base.",
+      "vi": "Tính hash MOD theo số chia và gốc chỉ số đã cho."
+    },
+    {
+      "en": "Distinguish a logical slot from a physical byte address.",
+      "vi": "Phân biệt ô logic với địa chỉ byte vật lý."
+    },
+    {
+      "en": "Explain why a stored key must be checked after hashing.",
+      "vi": "Giải thích vì sao vẫn phải kiểm khóa được lưu sau khi hash."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Integer division and remainders.",
+      "vi": "Phép chia số nguyên và số dư."
+    },
+    {
+      "en": "Record keys and direct access.",
+      "vi": "Khóa bản ghi và truy cập trực tiếp."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Hash function",
+      "meaning": {
+        "en": "A repeatable calculation that maps a key to a candidate location.",
+        "vi": "Phép tính lặp lại được ánh xạ khóa tới vị trí ứng viên."
+      }
+    },
+    {
+      "term": "Home slot",
+      "meaning": {
+        "en": "The first location selected by the hash function.",
+        "vi": "Vị trí đầu tiên hàm hash chọn."
+      }
+    },
+    {
+      "term": "MOD",
+      "meaning": {
+        "en": "The integer remainder after division.",
+        "vi": "Số dư nguyên của phép chia."
+      }
+    },
+    {
+      "term": "Collision",
+      "meaning": {
+        "en": "Different keys selecting the same home location.",
+        "vi": "Các khóa khác nhau chọn cùng vị trí gốc."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "calculate",
+      "title": {
+        "en": "Use the remainder, not the quotient",
+        "vi": "Dùng số dư, không dùng thương"
+      },
+      "paragraphs": [
+        {
+          "en": "With h(k)=k MOD 7, write k=q×7+r where 0≤r<7. The remainder r selects a slot from 0..6. For key 10, 10=1×7+3, so h(10)=3. The quotient 1 is useful for checking the division, but it is not the address selected by this function.",
+          "vi": "Với h(k)=k MOD 7, viết k=q×7+r với 0≤r<7. Số dư r chọn ô trong 0..6. Khóa 10 có 10=1×7+3 nên h(10)=3. Thương 1 giúp kiểm phép chia nhưng không phải địa chỉ hàm này chọn."
+        },
+        {
+          "en": "The table size, formula and index base are part of the problem. Do not add 1 to a remainder merely because another array used one-based indexing. This model uses seven zero-based slots and nonnegative integer keys. A question using a different formula must be solved with that formula.",
+          "vi": "Kích thước bảng, công thức và gốc chỉ số là một phần bài toán. Không cộng 1 vào số dư chỉ vì mảng khác đánh số từ 1. Mô hình dùng bảy ô từ 0 và khóa nguyên không âm. Nếu đề dùng công thức khác thì phải giải theo công thức đó."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "candidate",
+      "title": {
+        "en": "A home location is a candidate",
+        "vi": "Vị trí gốc là ứng viên"
+      },
+      "paragraphs": [
+        {
+          "en": "Keys 10,17 and 24 all leave remainder 3 when divided by 7. They are distinct records even though the hash agrees. A finite set of slots cannot give a unique home slot to every possible key. This is why a lookup compares the requested key with the key stored in the candidate record.",
+          "vi": "Các khóa 10,17,24 đều dư 3 khi chia 7. Chúng là bản ghi khác nhau dù hash bằng nhau. Tập ô hữu hạn không thể cho mọi khóa khả dĩ một ô gốc riêng. Vì vậy tìm kiếm phải đối chiếu khóa yêu cầu với khóa lưu trong bản ghi ứng viên."
+        },
+        {
+          "en": "If the candidate is occupied by another key, use the declared collision policy for both writing and reading. Do not overwrite the other record or report success merely because the slot is occupied. The next lesson traces a complete linear-probing policy.",
+          "vi": "Nếu ô ứng viên chứa khóa khác, dùng chính sách va chạm đã công bố cho cả ghi và đọc. Không ghi đè bản ghi kia hay báo tìm thấy chỉ vì ô có dữ liệu. Bài tiếp theo trace đầy đủ chính sách dò tuyến tính."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "address",
+      "title": {
+        "en": "Know what the calculated number means",
+        "vi": "Hiểu số được tính có nghĩa gì"
+      },
+      "paragraphs": [
+        {
+          "en": "In this visual,3 is a logical slot index. A byte address needs additional layout information. For fixed-length records, one simple arrangement uses address=base+slot×recordSize. If the base is 1000 bytes and each slot is 4 bytes, slot 3 begins at 1012. The base and size must be supplied; hashing alone does not invent them.",
+          "vi": "Trong minh họa,3 là chỉ số ô logic. Địa chỉ byte cần thông tin bố trí bổ sung. Với bản ghi dài cố định, bố trí đơn giản có address=base+slot×recordSize. Nếu gốc là byte 1000 và mỗi ô 4 byte thì ô 3 bắt đầu tại 1012. Phải có gốc và kích thước; hashing không tự tạo các thông tin đó."
+        },
+        {
+          "en": "A good hash distribution can reduce repeated collisions, but a hash formula does not guarantee one-read access or zero collisions. This file-location use of hashing is not a cryptographic security claim. Evaluate the given mapping and storage policy, not the word “hash” alone.",
+          "vi": "Phân bố hash tốt có thể giảm va chạm lặp, nhưng công thức hash không đảm bảo truy cập chỉ một lần đọc hay không va chạm. Dùng hashing để định vị tệp không phải khẳng định bảo mật mật mã. Cần xét ánh xạ và chính sách lưu đã cho, không chỉ nhìn chữ “hash”."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "hashing",
+    "title": {
+      "en": "From key to home slot",
+      "vi": "Từ khóa đến ô gốc"
+    },
+    "introduction": {
+      "en": "Follow one calculation through key, division, remainder and candidate slot.",
+      "vi": "Theo một phép tính qua khóa, phép chia, số dư và ô ứng viên."
+    },
+    "task": {
+      "en": "Compare 10 with 17, then choose 6. Explain why the first change keeps the home slot but the second changes it.",
+      "vi": "So sánh 10 với 17 rồi chọn 6. Giải thích vì sao lần đổi đầu giữ ô gốc còn lần thứ hai làm đổi ô."
+    },
+    "conventions": [
+      {
+        "en": "h(k)=k MOD 7; slots 0..6; supported keys are nonnegative integers.",
+        "vi": "h(k)=k MOD 7; ô 0..6; khóa hỗ trợ là số nguyên không âm."
+      },
+      {
+        "en": "A slot number is logical; no byte offset is shown in this visual.",
+        "vi": "Số ô là logic; minh họa này không hiển thị offset byte."
+      },
+      {
+        "en": "Matching a hash is not the same as matching a record key.",
+        "vi": "Hash khớp không có nghĩa khóa bản ghi khớp."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Locate the first candidate for key 10",
+      "vi": "Tìm ứng viên đầu cho khóa 10"
+    },
+    "prompt": {
+      "en": "Use seven zero-based slots and h(k)=k MOD 7. Calculate the home slot of 10 and explain the next check.",
+      "vi": "Dùng bảy ô từ 0 và h(k)=k MOD 7. Tính ô gốc của 10 và giải thích kiểm tra tiếp theo."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "key",
+        "action": {
+          "en": "Identify the key and hash rule.",
+          "vi": "Xác định khóa và quy tắc hash."
+        },
+        "why": {
+          "en": "Using a record value other than its key would answer a different question.",
+          "vi": "Dùng dữ liệu khác khóa của bản ghi sẽ trả lời sai yêu cầu."
+        },
+        "result": {
+          "en": "k=10; divisor 7; valid slot indices 0..6.",
+          "vi": "k=10; số chia 7; chỉ số ô hợp lệ 0..6."
+        },
+        "check": {
+          "en": "The table has seven slots, not eight.",
+          "vi": "Bảng có bảy ô, không phải tám."
+        }
+      },
+      {
+        "id": "division",
+        "action": {
+          "en": "Divide 10 by 7 and retain the remainder.",
+          "vi": "Chia 10 cho 7 và giữ số dư."
+        },
+        "why": {
+          "en": "MOD selects the remainder.",
+          "vi": "MOD chọn số dư."
+        },
+        "result": {
+          "en": "10=1×7+3.",
+          "vi": "10=1×7+3."
+        },
+        "check": {
+          "en": "0≤3<7 and 1×7+3 reconstructs 10.",
+          "vi": "0≤3<7 và 1×7+3 khôi phục 10."
+        }
+      },
+      {
+        "id": "slot",
+        "action": {
+          "en": "Select logical slot 3.",
+          "vi": "Chọn ô logic 3."
+        },
+        "why": {
+          "en": "The remainder already matches the zero-based index range.",
+          "vi": "Số dư đã phù hợp miền chỉ số từ 0."
+        },
+        "result": {
+          "en": "h(10)=3; this is the home slot.",
+          "vi": "h(10)=3; đây là ô gốc."
+        },
+        "check": {
+          "en": "Do not substitute quotient 1 or add 1 to produce 4.",
+          "vi": "Không dùng thương 1 hay cộng 1 thành 4."
+        }
+      },
+      {
+        "id": "record-check",
+        "action": {
+          "en": "Compare the stored key with 10.",
+          "vi": "So sánh khóa được lưu với 10."
+        },
+        "why": {
+          "en": "17 and 24 could also hash to slot 3.",
+          "vi": "17 và 24 cũng có thể hash tới ô 3."
+        },
+        "result": {
+          "en": "Only a matching key confirms the record; a different key requires the collision policy.",
+          "vi": "Chỉ khóa khớp xác nhận bản ghi; khóa khác đòi chính sách va chạm."
+        },
+        "check": {
+          "en": "An occupied slot alone is not a successful lookup.",
+          "vi": "Chỉ ô có dữ liệu chưa phải tìm kiếm thành công."
+        }
+      }
+    ],
+    "result": {
+      "en": "The home slot is 3. A record-key comparison is still required.",
+      "vi": "Ô gốc là 3. Vẫn cần so sánh khóa bản ghi."
+    },
+    "selfCheck": {
+      "en": "Check the division identity and explain what the number 3 labels.",
+      "vi": "Kiểm đẳng thức phép chia và giải thích số 3 là nhãn gì."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A task supplies a key and asks for its address or hash using MOD.",
+        "vi": "Đề cho khóa và hỏi địa chỉ hoặc hash bằng MOD."
+      },
+      {
+        "en": "Several keys produce the same remainder, suggesting a collision follow-up.",
+        "vi": "Nhiều khóa cho cùng số dư, gợi ý yêu cầu tiếp về va chạm."
+      }
+    ],
+    "distinguish": {
+      "en": "A hash calculation selects a candidate. Collision resolution decides what happens when that candidate is occupied by another key.",
+      "vi": "Phép hash chọn ứng viên. Xử lý va chạm quyết định việc tiếp theo khi ứng viên chứa khóa khác."
+    },
+    "method": [
+      {
+        "en": "Copy the exact function, table size and index base.",
+        "vi": "Ghi đúng hàm, kích thước bảng và gốc chỉ số."
+      },
+      {
+        "en": "Calculate the remainder and check its range.",
+        "vi": "Tính số dư và kiểm miền giá trị."
+      },
+      {
+        "en": "State whether the result is a slot or byte address, then compare record keys.",
+        "vi": "Nêu kết quả là ô hay địa chỉ byte rồi đối chiếu khóa bản ghi."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“MOD returns the quotient.”",
+        "vi": "“MOD trả thương.”"
+      },
+      "correction": {
+        "en": "MOD returns the remainder; reconstruct the division to verify it.",
+        "vi": "MOD trả số dư; dựng lại phép chia để kiểm."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Equal hashes mean equal keys.”",
+        "vi": "“Hash bằng nhau nghĩa là khóa bằng nhau.”"
+      },
+      "correction": {
+        "en": "Different keys can map to the same slot; compare the full stored key.",
+        "vi": "Khóa khác nhau có thể cùng ô; phải so sánh đầy đủ khóa lưu."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Slot 3 always means byte address 3.”",
+        "vi": "“Ô3 luôn là địa chỉ byte 3.”"
+      },
+      "correction": {
+        "en": "Byte addressing depends on the base and record size.",
+        "vi": "Địa chỉ byte phụ thuộc gốc và kích thước bản ghi."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "remainder",
+      "prompt": {
+        "en": "With h(k)=k MOD 7, what is h(29)?",
+        "vi": "Với h(k)=k MOD 7, h(29) bằng bao nhiêu?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "4 is the quotient:29=4×7+1.",
+            "vi": "4 là thương:29=4×7+1."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Correct. The remainder is 1 and it is within 0..6.",
+            "vi": "Đúng. Số dư là 1 và nằm trong 0..6."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "2",
+            "vi": "2"
+          },
+          "feedback": {
+            "en": "Do not add 1 to a remainder in this zero-based model.",
+            "vi": "Không cộng 1 vào số dư trong mô hình từ 0 này."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Write 29=4×7+1 before naming the selected slot.",
+        "vi": "Viết 29=4×7+1 trước khi nêu ô được chọn."
+      }
+    },
+    {
+      "id": "collision",
+      "prompt": {
+        "en": "10 and 17 both hash to 3. What follows?",
+        "vi": "10 và 17 đều hash tới 3. Điều gì suy ra?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "They are the same record.",
+            "vi": "Chúng là cùng bản ghi."
+          },
+          "feedback": {
+            "en": "Their keys differ; equal remainders do not merge their identities.",
+            "vi": "Khóa khác nhau; số dư bằng không làm chúng cùng định danh."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "The second record may overwrite the first.",
+            "vi": "Bản ghi thứ hai được ghi đè bản ghi đầu."
+          },
+          "feedback": {
+            "en": "That would destroy another record rather than resolve the collision.",
+            "vi": "Làm vậy phá bản ghi khác thay vì xử lý va chạm."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "A collision policy and key comparison are needed.",
+            "vi": "Cần chính sách va chạm và so sánh khóa."
+          },
+          "feedback": {
+            "en": "Correct. The home slot is shared by distinct keys.",
+            "vi": "Đúng. Các khóa khác nhau cùng ô gốc."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "Hashing narrows the search; the key still identifies the record.",
+        "vi": "Hash thu hẹp tìm kiếm; khóa vẫn xác định bản ghi."
+      }
+    },
+    {
+      "id": "byte-address",
+      "prompt": {
+        "en": "Base 1000, fixed slot size 4 bytes, logical slot 3: what is its starting address?",
+        "vi": "Gốc 1000, ô cố định 4 byte, ô logic 3: địa chỉ bắt đầu là gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "1003",
+            "vi": "1003"
+          },
+          "feedback": {
+            "en": "This ignores the four-byte size of each preceding slot.",
+            "vi": "Đáp án bỏ qua kích thước bốn byte của mỗi ô trước."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "1012",
+            "vi": "1012"
+          },
+          "feedback": {
+            "en": "Correct:1000+3×4=1012.",
+            "vi": "Đúng:1000+3×4=1012."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "12",
+            "vi": "12"
+          },
+          "feedback": {
+            "en": "12 is the offset from the base, not the complete address.",
+            "vi": "12 là offset tính từ gốc, chưa phải địa chỉ đầy đủ."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Keep slot index, byte offset and full address separate.",
+        "vi": "Tách chỉ số ô, offset byte và địa chỉ đầy đủ."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain key→hash→home slot→record check using a new key.",
+      "vi": "Giải thích khóa→hash→ô gốc→kiểm bản ghi với khóa mới."
+    },
+    "answerPoints": [
+      {
+        "en": "MOD gives a remainder in the table range.",
+        "vi": "MOD cho số dư trong miền bảng."
+      },
+      {
+        "en": "Different keys can have the same home slot.",
+        "vi": "Khóa khác nhau có thể cùng ô gốc."
+      },
+      {
+        "en": "Stored keys and collision policy determine successful retrieval.",
+        "vi": "Khóa lưu và chính sách va chạm quyết định truy xuất thành công."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Use the problem’s exact formula and index base.",
+      "vi": "Dùng đúng công thức và gốc chỉ số của đề."
+    },
+    {
+      "en": "A calculated location is a candidate, not proof of a match.",
+      "vi": "Vị trí tính được là ứng viên, chưa chứng minh khớp."
+    }
+  ],
+  "relatedSlugs": [
+    "organisation-versus-access",
+    "collisions-and-retrieval"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.2, p.32",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=32"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.310–311; examples independently checked",
+      "kind": "book"
+    }
+  ]
+}

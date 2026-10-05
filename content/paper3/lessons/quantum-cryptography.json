@@ -1,0 +1,653 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.17.1",
+  "topicId": "P3-17.1-T02",
+  "slug": "quantum-cryptography",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Quantum cryptography",
+    "vi": "Mật mã lượng tử"
+  },
+  "question": {
+    "en": "How can a quantum channel reveal disturbance while two parties establish a key?",
+    "vi": "Kênh lượng tử có thể cho thấy nhiễu động thế nào khi hai bên thiết lập khóa?"
+  },
+  "opening": {
+    "en": "Alice and Bob need key material, but an eavesdropper may observe the channel. In the syllabus model, measurement can disturb quantum states and a public sample check can reveal an unacceptable error rate.",
+    "vi": "Alice và Bob cần vật liệu khóa, nhưng người nghe lén có thể quan sát kênh. Trong mô hình syllabus, phép đo có thể làm nhiễu trạng thái lượng tử và kiểm tra mẫu công khai có thể phát hiện tỷ lệ lỗi không chấp nhận được."
+  },
+  "objectives": [
+    {
+      "en": "State the purpose of quantum key distribution.",
+      "vi": "Nêu mục đích của phân phối khóa lượng tử."
+    },
+    {
+      "en": "Trace sender, Eve and receiver choices through a deterministic teaching fixture.",
+      "vi": "Theo dõi lựa chọn của người gửi, Eve và người nhận qua một fixture dạy học xác định."
+    },
+    {
+      "en": "Explain why sample comparison may lead to accept or abort.",
+      "vi": "Giải thích vì sao so sánh mẫu có thể dẫn đến chấp nhận hoặc hủy."
+    },
+    {
+      "en": "Link each benefit and drawback to its mechanism.",
+      "vi": "Liên hệ mỗi lợi ích và hạn chế với cơ chế của nó."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Secret keys must be distributed safely.",
+      "vi": "Khóa bí mật phải được phân phối an toàn."
+    },
+    {
+      "en": "A sample may provide evidence about a larger set without checking every item.",
+      "vi": "Một mẫu có thể cung cấp bằng chứng về tập lớn hơn mà không kiểm tra mọi phần tử."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "QKD",
+      "meaning": {
+        "en": "Quantum key distribution: a method for establishing key material, not for sending the whole application message as quantum data.",
+        "vi": "Phân phối khóa lượng tử: phương thức thiết lập vật liệu khóa, không phải gửi toàn bộ thông điệp ứng dụng dưới dạng dữ liệu lượng tử."
+      }
+    },
+    {
+      "term": "basis",
+      "meaning": {
+        "en": "A measurement/encoding choice in the simplified teaching model.",
+        "vi": "Một lựa chọn đo/mã hóa trong mô hình dạy học giản lược."
+      }
+    },
+    {
+      "term": "sifting",
+      "meaning": {
+        "en": "Keeping positions where Alice and Bob used compatible bases.",
+        "vi": "Giữ các vị trí nơi Alice và Bob dùng cơ sở tương thích."
+      }
+    },
+    {
+      "term": "sample comparison",
+      "meaning": {
+        "en": "Publicly revealing selected sifted positions to estimate disturbance.",
+        "vi": "Công khai các vị trí đã sàng lọc được chọn để ước lượng nhiễu động."
+      }
+    },
+    {
+      "term": "abort",
+      "meaning": {
+        "en": "Rejecting this key-establishment attempt because the observed error is too high.",
+        "vi": "Từ chối lần thiết lập khóa này vì lỗi quan sát được quá cao."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "qkd-purpose",
+      "title": {
+        "en": "Purpose: establish key material",
+        "vi": "Mục đích: thiết lập vật liệu khóa"
+      },
+      "paragraphs": [
+        {
+          "en": "Quantum cryptography in this lesson models QKD. Alice sends quantum states; Bob measures them. They still use a classical channel to compare basis information and a selected sample.",
+          "vi": "Mật mã lượng tử trong bài này mô hình hóa QKD. Alice gửi các trạng thái lượng tử; Bob đo chúng. Họ vẫn dùng kênh cổ điển để so sánh thông tin cơ sở và một mẫu được chọn."
+        },
+        {
+          "en": "After incompatible positions and sample positions are discarded, the remaining accepted bits can contribute to key material. The application message can later use an ordinary encryption mechanism.",
+          "vi": "Sau khi bỏ các vị trí không tương thích và vị trí mẫu, các bit được chấp nhận còn lại có thể góp vào vật liệu khóa. Thông điệp ứng dụng sau đó có thể dùng cơ chế mã hóa thông thường."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "disturbance-and-evidence",
+      "title": {
+        "en": "Disturbance creates evidence, not certainty from one bit",
+        "vi": "Nhiễu động tạo bằng chứng, không phải chắc chắn từ một bit"
+      },
+      "paragraphs": [
+        {
+          "en": "An eavesdropper who measures and resends does not know Alice’s basis. A wrong basis can change what Bob later observes. Comparing a sample can reveal an error rate that is inconsistent with the accepted threshold.",
+          "vi": "Người nghe lén đo rồi gửi lại không biết cơ sở của Alice. Chọn sai cơ sở có thể thay đổi điều Bob quan sát sau đó. So sánh mẫu có thể cho thấy tỷ lệ lỗi không phù hợp ngưỡng chấp nhận."
+        },
+        {
+          "en": "A clean small sample does not prove that no eavesdropper exists. Detection is probabilistic; this teaching fixture shows possible outcomes without claiming certainty from one observation.",
+          "vi": "Một mẫu nhỏ không lỗi không chứng minh không có người nghe lén. Phát hiện mang tính xác suất; fixture dạy học này cho thấy các kết quả có thể xảy ra mà không khẳng định chắc chắn từ một quan sát."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "benefits-drawbacks",
+      "title": {
+        "en": "Benefits and drawbacks follow from the mechanism",
+        "vi": "Lợi ích và hạn chế xuất phát từ cơ chế"
+      },
+      "paragraphs": [
+        {
+          "en": "Benefit: attempted measurement can create detectable disturbance, so parties can reject suspect key material. The security reasoning depends on quantum behaviour rather than assuming a computational problem stays hard forever.",
+          "vi": "Lợi ích: phép đo trái phép có thể tạo nhiễu động phát hiện được, nên các bên có thể từ chối vật liệu khóa đáng ngờ. Lập luận bảo mật dựa vào hành vi lượng tử thay vì giả định một bài toán tính toán mãi khó."
+        },
+        {
+          "en": "Drawbacks: specialist hardware, distance and channel limitations, cost, losses/noise and the need for authenticated classical communication complicate deployment. QKD does not secure endpoints or fix weak application design.",
+          "vi": "Hạn chế: phần cứng chuyên dụng, giới hạn khoảng cách và kênh, chi phí, suy hao/nhiễu và nhu cầu có kênh cổ điển được xác thực làm triển khai phức tạp. QKD không bảo vệ thiết bị đầu cuối hay sửa thiết kế ứng dụng yếu."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "quantum-key-distribution",
+    "title": {
+      "en": "QKD eavesdrop explorer",
+      "vi": "Khám phá nghe lén QKD"
+    },
+    "introduction": {
+      "en": "Run four deterministic traces: no Eve, Eve with a clean sample, Eve with detected disturbance, and an abort decision.",
+      "vi": "Chạy bốn trace xác định: không có Eve, có Eve nhưng mẫu sạch, có Eve với nhiễu động bị phát hiện, và quyết định hủy."
+    },
+    "task": {
+      "en": "For each trace, identify kept positions, sample positions, observed error and the justified decision.",
+      "vi": "Với mỗi trace, xác định vị trí được giữ, vị trí mẫu, lỗi quan sát và quyết định có căn cứ."
+    },
+    "conventions": [
+      {
+        "en": "This is a simplified syllabus model; symbols are teaching fixtures, not physical photon simulation.",
+        "vi": "Đây là mô hình syllabus giản lược; các ký hiệu là fixture dạy học, không phải mô phỏng photon vật lý."
+      },
+      {
+        "en": "Preset scenarios replace randomness so every state can be checked.",
+        "vi": "Kịch bản đặt trước thay thế ngẫu nhiên để mọi trạng thái có thể kiểm tra."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Decide whether Alice and Bob keep the candidate key",
+      "vi": "Quyết định Alice và Bob có giữ khóa ứng viên không"
+    },
+    "prompt": {
+      "en": "A preset trace has eight transmissions. After basis comparison, positions 1, 3, 4, 6 and 8 remain. Alice and Bob reveal positions 3 and 8 as the sample; position 8 disagrees.",
+      "vi": "Một trace đặt trước có tám lần truyền. Sau so sánh cơ sở, các vị trí 1, 3, 4, 6 và 8 còn lại. Alice và Bob công khai vị trí 3 và 8 làm mẫu; vị trí 8 không khớp."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "sift",
+        "action": {
+          "en": "Keep compatible-basis positions.",
+          "vi": "Giữ các vị trí có cơ sở tương thích."
+        },
+        "why": {
+          "en": "Only these positions are candidates for a shared result in the teaching model.",
+          "vi": "Chỉ các vị trí này là ứng viên cho kết quả chung trong mô hình dạy học."
+        },
+        "result": {
+          "en": "Candidate positions: 1, 3, 4, 6, 8.",
+          "vi": "Vị trí ứng viên: 1, 3, 4, 6, 8."
+        }
+      },
+      {
+        "id": "sample",
+        "action": {
+          "en": "Reveal and compare positions 3 and 8.",
+          "vi": "Công khai và so sánh vị trí 3 và 8."
+        },
+        "why": {
+          "en": "A sample estimates disturbance without revealing every candidate bit.",
+          "vi": "Một mẫu ước lượng nhiễu động mà không công khai mọi bit ứng viên."
+        },
+        "result": {
+          "en": "One of two sample positions disagrees: observed sample error = 50%.",
+          "vi": "Một trong hai vị trí mẫu không khớp: lỗi mẫu quan sát = 50%."
+        }
+      },
+      {
+        "id": "decision",
+        "action": {
+          "en": "Abort this key-establishment attempt.",
+          "vi": "Hủy lần thiết lập khóa này."
+        },
+        "why": {
+          "en": "The fixture threshold is 0%; 50% exceeds it and provides evidence of disturbance/noise.",
+          "vi": "Ngưỡng fixture là 0%; 50% vượt ngưỡng và cung cấp bằng chứng nhiễu động/nhiễu."
+        },
+        "result": {
+          "en": "No candidate key is accepted from this run.",
+          "vi": "Không chấp nhận khóa ứng viên từ lần chạy này."
+        }
+      },
+      {
+        "id": "limit",
+        "action": {
+          "en": "State the limit of the conclusion.",
+          "vi": "Nêu giới hạn của kết luận."
+        },
+        "why": {
+          "en": "The observed errors show an unsafe run but do not identify a particular attacker with certainty.",
+          "vi": "Lỗi quan sát cho thấy lần chạy không an toàn nhưng không xác định chắc chắn một kẻ tấn công cụ thể."
+        },
+        "result": {
+          "en": "Paper 3 wording: disturbance was detected, so the parties discard the key and repeat the protocol.",
+          "vi": "Cách viết Paper 3: phát hiện nhiễu động nên các bên loại khóa và lặp lại giao thức."
+        }
+      }
+    ],
+    "result": {
+      "en": "Abort because the sample error exceeds the fixture threshold; disclose that the model is probabilistic and simplified.",
+      "vi": "Hủy vì lỗi mẫu vượt ngưỡng fixture; công bố mô hình mang tính xác suất và giản lược."
+    },
+    "selfCheck": {
+      "en": "Did you separate basis sifting, sample checking and final key acceptance?",
+      "vi": "Bạn đã tách sàng lọc cơ sở, kiểm tra mẫu và chấp nhận khóa cuối chưa?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "quantum channel or QKD",
+        "vi": "kênh lượng tử hoặc QKD"
+      },
+      {
+        "en": "eavesdropper measures/resends",
+        "vi": "người nghe lén đo/gửi lại"
+      },
+      {
+        "en": "compare a public sample",
+        "vi": "so sánh mẫu công khai"
+      },
+      {
+        "en": "purpose, benefit or drawback",
+        "vi": "mục đích, lợi ích hoặc hạn chế"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: QKD establishes key material; it does not mean the whole application message travels as quantum data.",
+      "vi": "Dễ nhầm: QKD thiết lập vật liệu khóa; điều này không có nghĩa toàn bộ thông điệp ứng dụng truyền dưới dạng dữ liệu lượng tử."
+    },
+    "method": [
+      {
+        "en": "Identify the sender, receiver, quantum channel and classical channel.",
+        "vi": "Xác định người gửi, người nhận, kênh lượng tử và kênh cổ điển."
+      },
+      {
+        "en": "Mark compatible positions after basis comparison.",
+        "vi": "Đánh dấu vị trí tương thích sau so sánh cơ sở."
+      },
+      {
+        "en": "Compute the revealed sample error.",
+        "vi": "Tính lỗi mẫu được công khai."
+      },
+      {
+        "en": "Accept or abort using the stated threshold, then state limitations.",
+        "vi": "Chấp nhận hoặc hủy theo ngưỡng đã cho, rồi nêu giới hạn."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "One matching bit proves no eavesdropper exists.",
+        "vi": "Một bit khớp chứng minh không có người nghe lén."
+      },
+      "correction": {
+        "en": "Detection is statistical; a sample provides evidence, not absolute proof from one bit.",
+        "vi": "Phát hiện mang tính thống kê; mẫu cung cấp bằng chứng, không phải chứng minh tuyệt đối từ một bit."
+      }
+    },
+    {
+      "mistake": {
+        "en": "QKD encrypts the entire message.",
+        "vi": "QKD mã hóa toàn bộ thông điệp."
+      },
+      "correction": {
+        "en": "The scoped model distributes key material; later encryption protects application data.",
+        "vi": "Mô hình trong phạm vi phân phối vật liệu khóa; mã hóa sau đó bảo vệ dữ liệu ứng dụng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Quantum cryptography needs no classical communication.",
+        "vi": "Mật mã lượng tử không cần truyền thông cổ điển."
+      },
+      "correction": {
+        "en": "Basis and sample comparison use an authenticated classical channel in the model.",
+        "vi": "So sánh cơ sở và mẫu dùng kênh cổ điển được xác thực trong mô hình."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Quantum technology has no practical limitations.",
+        "vi": "Công nghệ lượng tử không có giới hạn thực tế."
+      },
+      "correction": {
+        "en": "Hardware, distance, noise, loss and cost constrain deployment.",
+        "vi": "Phần cứng, khoảng cách, nhiễu, suy hao và chi phí hạn chế triển khai."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "purpose",
+      "prompt": {
+        "en": "What is the scoped purpose of QKD?",
+        "vi": "Mục đích trong phạm vi của QKD là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Establish key material and reveal suspicious disturbance",
+            "vi": "Thiết lập vật liệu khóa và phát hiện nhiễu động đáng ngờ"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Guarantee every endpoint is malware-free",
+            "vi": "Bảo đảm mọi thiết bị đầu cuối không có mã độc"
+          },
+          "feedback": {
+            "en": "QKD does not secure endpoints.",
+            "vi": "QKD không bảo vệ thiết bị đầu cuối."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Transmit every application byte as a photon",
+            "vi": "Truyền mọi byte ứng dụng dưới dạng photon"
+          },
+          "feedback": {
+            "en": "That is outside the teaching model.",
+            "vi": "Điều đó nằm ngoài mô hình dạy học."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Connect purpose to key establishment and disturbance evidence.",
+        "vi": "Liên hệ mục đích với thiết lập khóa và bằng chứng nhiễu động."
+      }
+    },
+    {
+      "id": "basis",
+      "prompt": {
+        "en": "Why discard incompatible-basis positions?",
+        "vi": "Vì sao bỏ các vị trí cơ sở không tương thích?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "They do not provide a reliably shared value in this model",
+            "vi": "Chúng không cung cấp giá trị dùng chung đáng tin trong mô hình"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "They reveal the final password automatically",
+            "vi": "Chúng tự động làm lộ mật khẩu cuối"
+          },
+          "feedback": {
+            "en": "They are simply unsuitable candidates after sifting.",
+            "vi": "Chúng chỉ là ứng viên không phù hợp sau sàng lọc."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "They prove Eve was present",
+            "vi": "Chúng chứng minh Eve có mặt"
+          },
+          "feedback": {
+            "en": "Basis mismatch between Alice and Bob is expected and does not by itself prove eavesdropping.",
+            "vi": "Không khớp cơ sở giữa Alice và Bob là điều dự kiến và tự nó không chứng minh nghe lén."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Separate ordinary sifting from disturbance detection.",
+        "vi": "Tách sàng lọc thông thường khỏi phát hiện nhiễu động."
+      }
+    },
+    {
+      "id": "clean-sample",
+      "prompt": {
+        "en": "Eve is present in a fixture, but the small revealed sample has no error. What is justified?",
+        "vi": "Eve có mặt trong fixture nhưng mẫu nhỏ công khai không có lỗi. Kết luận nào có căn cứ?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "This sample did not detect disturbance; absence of Eve is not proved",
+            "vi": "Mẫu này không phát hiện nhiễu động; chưa chứng minh không có Eve"
+          },
+          "feedback": {
+            "en": "Correct: detection is probabilistic.",
+            "vi": "Đúng: phát hiện mang tính xác suất."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Eve is impossible",
+            "vi": "Eve không thể tồn tại"
+          },
+          "feedback": {
+            "en": "A clean sample is not absolute proof.",
+            "vi": "Mẫu sạch không phải chứng minh tuyệt đối."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The endpoint is fully secure",
+            "vi": "Thiết bị đầu cuối hoàn toàn an toàn"
+          },
+          "feedback": {
+            "en": "Endpoint security is outside this inference.",
+            "vi": "Bảo mật đầu cuối nằm ngoài suy luận này."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use cautious evidence language.",
+        "vi": "Dùng ngôn ngữ bằng chứng thận trọng."
+      }
+    },
+    {
+      "id": "drawback",
+      "prompt": {
+        "en": "Which drawback follows from the physical mechanism?",
+        "vi": "Hạn chế nào xuất phát từ cơ chế vật lý?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Specialist equipment and channel/distance constraints",
+            "vi": "Thiết bị chuyên dụng và giới hạn kênh/khoảng cách"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No need to authenticate the classical channel",
+            "vi": "Không cần xác thực kênh cổ điển"
+          },
+          "feedback": {
+            "en": "The classical exchange must be protected against impersonation.",
+            "vi": "Trao đổi cổ điển phải được bảo vệ khỏi giả mạo."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Zero deployment cost",
+            "vi": "Chi phí triển khai bằng không"
+          },
+          "feedback": {
+            "en": "Specialist hardware adds cost.",
+            "vi": "Phần cứng chuyên dụng làm tăng chi phí."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Explain a cause, not a memorised adjective.",
+        "vi": "Giải thích nguyên nhân, không chỉ học thuộc tính từ."
+      }
+    },
+    {
+      "id": "order-qkd",
+      "prompt": {
+        "en": "Which ordering matches the bounded QKD teaching model?",
+        "vi": "Thứ tự nào khớp mô hình dạy học QKD có giới hạn?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Prepare/transmit → compare bases and sift → reveal sample → accept candidate material or abort",
+            "vi": "Chuẩn bị/truyền → so cơ sở và sàng lọc → công khai mẫu → chấp nhận vật liệu ứng viên hoặc hủy"
+          },
+          "feedback": {
+            "en": "Correct: the sample check follows sifting and controls the decision.",
+            "vi": "Đúng: kiểm tra mẫu sau sàng lọc và quyết định kết quả."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Publish every bit → choose bases → declare the key secret",
+            "vi": "Công bố mọi bit → chọn cơ sở → tuyên bố khóa bí mật"
+          },
+          "feedback": {
+            "en": "Publishing every candidate bit destroys its secrecy.",
+            "vi": "Công bố mọi bit ứng viên làm mất bí mật."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Encrypt application data → buy hardware → skip sample comparison",
+            "vi": "Mã hóa dữ liệu ứng dụng → mua phần cứng → bỏ so sánh mẫu"
+          },
+          "feedback": {
+            "en": "This omits the QKD evidence sequence.",
+            "vi": "Cách này bỏ chuỗi bằng chứng QKD."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Trace the information state and the decision boundary in order.",
+        "vi": "Theo dõi trạng thái thông tin và ranh giới quyết định theo thứ tự."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Describe the QKD journey from transmission to accept/abort.",
+      "vi": "Mô tả hành trình QKD từ truyền đến chấp nhận/hủy."
+    },
+    "answerPoints": [
+      {
+        "en": "Transmit quantum states, then compare bases over a classical channel.",
+        "vi": "Truyền trạng thái lượng tử, rồi so sánh cơ sở qua kênh cổ điển."
+      },
+      {
+        "en": "Reveal a sample of sifted positions and estimate errors/disturbance.",
+        "vi": "Công khai mẫu vị trí đã sàng lọc và ước lượng lỗi/nhiễu động."
+      },
+      {
+        "en": "Accept remaining material only when the stated check passes; otherwise abort.",
+        "vi": "Chỉ chấp nhận vật liệu còn lại khi kiểm tra đã nêu đạt; nếu không thì hủy."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "QKD establishes key material.",
+      "vi": "QKD thiết lập vật liệu khóa."
+    },
+    {
+      "en": "Eavesdropping may create detectable disturbance.",
+      "vi": "Nghe lén có thể tạo nhiễu động phát hiện được."
+    },
+    {
+      "en": "A sample gives probabilistic evidence and deployment has practical drawbacks.",
+      "vi": "Mẫu cho bằng chứng xác suất và triển khai có hạn chế thực tế."
+    }
+  ],
+  "relatedSlugs": [
+    "confidentiality-and-key-choice",
+    "ssl-tls-communication"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p36, §17.1 Security",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Chapter 17.2, printed pp414–415 / PDF pp430–431: QKD purpose, teaching sequence, advantages and limitations",
+      "kind": "book"
+    },
+    {
+      "id": "s23-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2023 question paper",
+      "locator": "Question 9(b), p9: QKD benefits and drawbacks",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s23-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2023 mark scheme",
+      "locator": "Question 9(b), p7",
+      "kind": "mark-scheme"
+    }
+  ]
+}

@@ -1,0 +1,819 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.1",
+  "topicId": "P3-14.1-T02",
+  "slug": "application-protocol-selection",
+  "title": {
+    "en": "Choose an application protocol",
+    "vi": "Chọn giao thức ứng dụng"
+  },
+  "question": {
+    "en": "Which protocol fits the action, not just the word “email” or “file”?",
+    "vi": "Giao thức nào phù hợp với hành động, thay vì chỉ từ “email” hay “tệp”?"
+  },
+  "opening": {
+    "en": "One revision project involves opening a web page, uploading resources and exchanging email. All move data, but the application services differ. The useful question is what each endpoint is trying to do, in which direction, and whether it must keep shared state.",
+    "vi": "Một dự án ôn tập gồm mở trang web, tải tài liệu lên và trao đổi email. Tất cả đều chuyển dữ liệu nhưng dịch vụ ứng dụng khác nhau. Cần xác định mỗi đầu đang muốn làm gì, dữ liệu đi theo chiều nào và có cần giữ trạng thái dùng chung hay không."
+  },
+  "objectives": [
+    {
+      "en": "Match HTTP, FTP, SMTP, POP3, IMAP and BitTorrent to their purposes.",
+      "vi": "Gắn HTTP, FTP, SMTP, POP3, IMAP và BitTorrent với đúng mục đích."
+    },
+    {
+      "en": "Distinguish email submission/relay from retrieval and mailbox synchronisation.",
+      "vi": "Phân biệt nộp/chuyển tiếp email với lấy thư và đồng bộ hộp thư."
+    },
+    {
+      "en": "Justify a protocol choice with a scenario-specific function and reject a plausible near miss.",
+      "vi": "Giải thích lựa chọn bằng chức năng phù hợp tình huống và loại một phương án gần đúng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know the four-layer TCP/IP model and recognise client/server and peer-to-peer exchanges.",
+      "vi": "Biết mô hình TCP/IP bốn tầng và nhận biết trao đổi client/server, peer-to-peer."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Application protocol",
+      "meaning": {
+        "en": "Rules defining an application-level service and the messages used to request it.",
+        "vi": "Quy tắc xác định dịch vụ ở cấp ứng dụng và thông điệp dùng để yêu cầu dịch vụ."
+      }
+    },
+    {
+      "term": "Mail submission / relay",
+      "meaning": {
+        "en": "Sending a newly composed message into the mail system / forwarding mail between servers.",
+        "vi": "Đưa thư mới soạn vào hệ thống email / chuyển tiếp thư giữa các server."
+      }
+    },
+    {
+      "term": "Mailbox synchronisation",
+      "meaning": {
+        "en": "Keeping a client’s view of server messages, folders and state consistent with the mailbox.",
+        "vi": "Giữ cách ứng dụng hiển thị thư, thư mục và trạng thái nhất quán với hộp thư trên server."
+      }
+    },
+    {
+      "term": "Retrieval",
+      "meaning": {
+        "en": "Obtaining an existing message from a server; this is distinct from submitting outgoing mail.",
+        "vi": "Lấy một thư đã tồn tại từ server; khác với nộp thư gửi đi."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "protocol-purpose",
+      "title": {
+        "en": "Identify the service before naming the protocol",
+        "vi": "Xác định dịch vụ trước khi nêu giao thức"
+      },
+      "paragraphs": [
+        {
+          "en": "A protocol name is not an explanation. “HTTP” identifies a protocol; “HTTP lets a web client request resources and receive responses from a web server” states its purpose. Begin with the action and endpoints, then name the protocol that supplies that service. All six protocols in this lesson belong to the Application layer in the syllabus model.",
+          "vi": "Tên giao thức chưa phải lời giải thích. “HTTP” xác định giao thức; “HTTP cho phép web client yêu cầu tài nguyên và nhận phản hồi từ web server” nêu mục đích. Bắt đầu bằng hành động và các đầu trao đổi, rồi gọi tên giao thức cung cấp dịch vụ đó. Cả sáu giao thức trong bài thuộc tầng Application của mô hình syllabus."
+        },
+        {
+          "en": "A file can be carried by more than one application protocol. A web page image, an FTP upload and an email attachment may contain the same bytes but participate in different services. Choose from the described exchange, not from the filename extension or a claim that only one protocol can ever carry files.",
+          "vi": "Một tệp có thể được mang bằng nhiều giao thức ứng dụng. Ảnh trên trang web, tệp tải bằng FTP và tệp đính kèm email có thể chứa cùng byte nhưng thuộc các dịch vụ khác nhau. Hãy chọn theo cách trao đổi được mô tả, không theo phần mở rộng tệp hoặc khẳng định chỉ một giao thức có thể mang tệp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-application",
+        "s24-ms31"
+      ]
+    },
+    {
+      "id": "web-and-file-services",
+      "title": {
+        "en": "HTTP and FTP: use the service context",
+        "vi": "HTTP và FTP: dựa vào ngữ cảnh dịch vụ"
+      },
+      "paragraphs": [
+        {
+          "en": "HTTP, Hypertext Transfer Protocol, defines web request/response exchanges. A browser can request an HTML document, image or other web resource and the web server returns a response. “Hypertext” does not restrict HTTP to plain text. Rendering the page is the browser’s job; forwarding packets across routers is not HTTP’s application-level purpose.",
+          "vi": "HTTP, Hypertext Transfer Protocol, quy định trao đổi yêu cầu/phản hồi trên web. Trình duyệt có thể yêu cầu tài liệu HTML, ảnh hoặc tài nguyên web khác rồi web server trả phản hồi. “Hypertext” không giới hạn HTTP ở văn bản thuần. Hiển thị trang là công việc của trình duyệt; chuyển packet qua router không phải mục đích cấp ứng dụng của HTTP."
+        },
+        {
+          "en": "FTP, File Transfer Protocol, supplies a client/server file-transfer service, including uploading and downloading files. An editor using a dedicated file-transfer service is an FTP scenario. A browser obtaining a file through a web link can instead be using HTTP. Neither choosing FTP nor choosing HTTP alone proves that a transfer is encrypted.",
+          "vi": "FTP, File Transfer Protocol, cung cấp dịch vụ truyền tệp client/server, gồm tải tệp lên và xuống. Biên tập viên dùng dịch vụ chuyên truyền tệp là tình huống FTP. Trình duyệt lấy tệp qua liên kết web có thể dùng HTTP. Chỉ lựa chọn FTP hay HTTP chưa chứng minh việc truyền có mã hóa."
+        }
+      ],
+      "sourceIds": [
+        "book-application",
+        "w25-ms32",
+        "s24-ms31"
+      ]
+    },
+    {
+      "id": "email-actions",
+      "title": {
+        "en": "Email is a sequence of different actions",
+        "vi": "Email gồm chuỗi hành động khác nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "SMTP, Simple Mail Transfer Protocol, handles outgoing email submission and mail-server relay. A sender’s mail client submits a message to an outgoing server; servers can then relay it towards the recipient’s mail service. The recipient reading a message already stored in a mailbox is a different action. SMTP is not the protocol used to synchronise the recipient’s inbox.",
+          "vi": "SMTP, Simple Mail Transfer Protocol, xử lý nộp thư gửi đi và chuyển tiếp giữa mail server. Ứng dụng bên gửi nộp thư cho server gửi đi; các server có thể chuyển tiếp thư tới dịch vụ email của người nhận. Người nhận đọc thư đã được lưu trong hộp thư là hành động khác. SMTP không phải giao thức dùng để đồng bộ inbox của người nhận."
+        },
+        {
+          "en": "POP3 and IMAP address mailbox access after mail is stored. A complete email example may therefore need SMTP for sending and either POP3 or IMAP for the receiving client. If the question only says “email protocol”, explain the action you mean rather than giving an unexplained acronym. An attachment does not turn email sending into an FTP exchange.",
+          "vi": "POP3 và IMAP xử lý truy cập hộp thư sau khi thư được lưu. Vì vậy ví dụ email đầy đủ có thể cần SMTP để gửi và POP3 hoặc IMAP cho ứng dụng bên nhận. Nếu đề chỉ nói “giao thức email”, hãy giải thích hành động đang nói đến thay vì đưa chữ viết tắt không giải thích. Tệp đính kèm không biến việc gửi email thành trao đổi FTP."
+        }
+      ],
+      "sourceIds": [
+        "book-application",
+        "s24-ms31"
+      ]
+    },
+    {
+      "id": "pop3-versus-imap",
+      "title": {
+        "en": "Retrieval is not the same as shared mailbox state",
+        "vi": "Lấy thư khác với dùng chung trạng thái hộp thư"
+      },
+      "paragraphs": [
+        {
+          "en": "POP3, Post Office Protocol version 3, retrieves messages from a server maildrop into a client. It is a natural match for a simple local-mailbox workflow. Retrieval and deletion are separate operations: a client can be configured to leave copies on the server. Do not write that POP3 must delete every message immediately after downloading it.",
+          "vi": "POP3, Post Office Protocol phiên bản 3, lấy thư từ maildrop trên server về ứng dụng. Nó phù hợp với quy trình hộp thư cục bộ đơn giản. Lấy thư và xóa thư là các thao tác riêng: ứng dụng có thể được cấu hình giữ bản sao trên server. Không viết POP3 bắt buộc xóa mọi thư ngay sau khi tải xuống."
+        },
+        {
+          "en": "IMAP, Internet Message Access Protocol, lets clients access and manage a server-based mailbox, including folders and message flags such as read/unread. This supports consistent mailbox views across a phone and laptop. IMAP can also download or cache content; “IMAP never downloads email” is false. The useful contrast is retrieval-focused POP3 versus richer server-mailbox management and synchronisation with IMAP.",
+          "vi": "IMAP, Internet Message Access Protocol, cho phép ứng dụng truy cập và quản lý hộp thư trên server, gồm thư mục và cờ trạng thái như đã đọc/chưa đọc. Điều này hỗ trợ hiển thị hộp thư nhất quán trên điện thoại và laptop. IMAP cũng có thể tải hoặc lưu đệm nội dung; “IMAP không bao giờ tải email” là sai. Điểm phân biệt hữu ích là POP3 tập trung vào lấy thư, còn IMAP quản lý và đồng bộ hộp thư server phong phú hơn."
+        }
+      ],
+      "sourceIds": [
+        "book-application",
+        "w25-ms32",
+        "pop3-standard",
+        "imap-standard"
+      ]
+    },
+    {
+      "id": "peer-file-purpose",
+      "title": {
+        "en": "Recognise BitTorrent by who supplies the pieces",
+        "vi": "Nhận diện BitTorrent qua bên cung cấp các phần"
+      },
+      "paragraphs": [
+        {
+          "en": "BitTorrent provides peer-to-peer file sharing. A file is divided into pieces; peers can obtain different pieces from different peers and upload pieces they already hold. The distinguishing cue is this distribution of payload supply, not merely a large download or the presence of a file extension. The next lesson traces the inventories in detail.",
+          "vi": "BitTorrent cung cấp chia sẻ tệp peer-to-peer. Tệp được chia thành các phần; peer có thể lấy các phần khác nhau từ các peer khác nhau và tải lên phần đã có. Dấu hiệu phân biệt là nhiều peer cung cấp payload, không chỉ việc tải tệp lớn hay một phần mở rộng tệp. Bài tiếp theo theo dõi chi tiết các phần mỗi peer giữ."
+        },
+        {
+          "en": "These services can coexist. A website may describe a file that is then shared using BitTorrent; a webmail page may use HTTP for its browser interface while the mail system uses SMTP elsewhere. Specify which exchange the question asks about instead of assigning one protocol to an entire website or organisation.",
+          "vi": "Các dịch vụ này có thể cùng tồn tại. Website có thể mô tả một tệp sau đó được chia sẻ bằng BitTorrent; trang webmail có thể dùng HTTP cho giao diện trình duyệt trong khi hệ thống thư dùng SMTP ở chỗ khác. Hãy xác định đúng lượt trao đổi đề đang hỏi thay vì gán một giao thức cho cả website hay tổ chức."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-bittorrent",
+        "w25-ms32"
+      ]
+    },
+    {
+      "id": "decision-method",
+      "title": {
+        "en": "Write a short, discriminating justification",
+        "vi": "Viết lời giải thích ngắn nhưng phân biệt được"
+      },
+      "paragraphs": [
+        {
+          "en": "Use three parts: identify the requested action, select the protocol, and connect its function to a stated requirement. For example: “IMAP fits because the two devices need to manage the same server mailbox and see consistent read/unread state.” Then check the nearest alternative: SMTP sends mail, so it does not solve that mailbox-access requirement.",
+          "vi": "Dùng ba phần: xác định hành động cần làm, chọn giao thức, rồi nối chức năng với yêu cầu đã nêu. Ví dụ: “IMAP phù hợp vì hai thiết bị cần quản lý cùng hộp thư server và thấy trạng thái đã đọc/chưa đọc nhất quán.” Sau đó kiểm tra phương án gần nhất: SMTP gửi thư nên không giải quyết yêu cầu truy cập hộp thư đó."
+        },
+        {
+          "en": "The verified questions include outlining one Application protocol (May/June 2024 Paper 31, question 2(c)) and stating HTTP/IMAP purposes (October/November 2025 Paper 32, question 3(a)). These are examples of task wording, not a measured prediction of future frequency. The visual’s six tasks are newly authored teaching scenarios.",
+          "vi": "Các câu hỏi đã kiểm tra gồm trình bày một giao thức Application (May/June 2024 Paper 31, câu 2(c)) và nêu mục đích HTTP/IMAP (October/November 2025 Paper 32, câu 3(a)). Đây là ví dụ cách hỏi, không phải dự đoán tần suất ra đề trong tương lai. Sáu tác vụ trong visual là tình huống học tập mới biên soạn."
+        }
+      ],
+      "sourceIds": [
+        "s24-qp31",
+        "w25-qp32"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "application-protocols",
+    "title": {
+      "en": "Match the service to the protocol",
+      "vi": "Ghép dịch vụ với giao thức"
+    },
+    "introduction": {
+      "en": "Choose a task, read the endpoints and action, then compare the six possible protocol purposes.",
+      "vi": "Chọn tác vụ, đọc các đầu trao đổi và hành động, rồi so sánh sáu mục đích giao thức."
+    },
+    "task": {
+      "en": "Explain why your choice fits before revealing feedback. Compare a plausible near miss, especially SMTP versus IMAP and POP3 versus IMAP.",
+      "vi": "Giải thích vì sao lựa chọn phù hợp trước khi mở phản hồi. So sánh phương án gần đúng, đặc biệt SMTP với IMAP và POP3 với IMAP."
+    },
+    "conventions": [
+      {
+        "en": "The six tasks are separate scenarios, not six consecutive events in one connection.",
+        "vi": "Sáu tác vụ là các tình huống riêng, không phải sáu sự kiện liên tiếp của một kết nối."
+      },
+      {
+        "en": "Select the best match for the stated service. POP3 and IMAP overlap in retrieval; the prompt distinguishes simple local retrieval from shared server-mailbox management.",
+        "vi": "Chọn phương án phù hợp nhất với dịch vụ đã nêu. POP3 và IMAP cùng có thể lấy thư; đề phân biệt lấy thư cục bộ đơn giản với quản lý hộp thư server dùng chung."
+      },
+      {
+        "en": "Choices show application purposes, not real network connections, port values or security guarantees.",
+        "vi": "Các lựa chọn biểu diễn mục đích ứng dụng, không tạo kết nối mạng thật, số cổng hay bảo đảm bảo mật."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book-application",
+      "book-bittorrent",
+      "w25-ms32"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Six services in one revision project",
+      "vi": "Sáu dịch vụ trong dự án ôn tập"
+    },
+    "prompt": {
+      "en": "For each independent task, state its function and select the best protocol. These rows correspond to the six selectable visual scenarios.",
+      "vi": "Với từng tác vụ độc lập, nêu chức năng và chọn giao thức phù hợp nhất. Các dòng tương ứng sáu tình huống có thể chọn trong visual."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "scenario-web",
+        "action": {
+          "en": "Read this independent task: A browser requests a revision page from a web server. Which listed application protocol fits that request/response service?",
+          "vi": "Đọc tác vụ độc lập này: Trình duyệt yêu cầu trang ôn tập từ web server. Giao thức ứng dụng nào phù hợp với dịch vụ yêu cầu/phản hồi này?"
+        },
+        "why": {
+          "en": "The specified service is the web, even though the resource is also a file.",
+          "vi": "Dịch vụ được nêu là web, dù tài nguyên cũng là một tệp."
+        },
+        "result": {
+          "en": "Best match: HTTP. Request and transfer web resources between a web client and server.",
+          "vi": "Phù hợp nhất: HTTP. Yêu cầu và truyền tài nguyên web giữa web client và server."
+        }
+      },
+      {
+        "id": "scenario-file",
+        "action": {
+          "en": "Read this independent task: An editor connects to a dedicated file-transfer server to upload a folder of lesson files. The task is file transfer, not a browser request or email attachment. Choose the best listed protocol.",
+          "vi": "Đọc tác vụ độc lập này: Biên tập viên kết nối đến server chuyên truyền tệp để tải lên thư mục bài học. Tác vụ là truyền tệp, không phải yêu cầu trình duyệt hay tệp đính kèm email. Chọn giao thức phù hợp nhất trong danh sách."
+        },
+        "why": {
+          "en": "A file-transfer client/server service is required; file content alone does not select the protocol.",
+          "vi": "Cần dịch vụ client/server truyền tệp; chỉ nội dung tệp chưa đủ để chọn giao thức."
+        },
+        "result": {
+          "en": "Best match: FTP. Upload and download files using a file-transfer service.",
+          "vi": "Phù hợp nhất: FTP. Tải tệp lên và xuống bằng dịch vụ truyền tệp."
+        }
+      },
+      {
+        "id": "scenario-send",
+        "action": {
+          "en": "Read this independent task: A mail application submits a newly composed email to its outgoing mail server. Which protocol handles this sending action?",
+          "vi": "Đọc tác vụ độc lập này: Ứng dụng email nộp một email mới soạn cho mail server gửi đi. Giao thức nào xử lý hành động gửi này?"
+        },
+        "why": {
+          "en": "Submitting outgoing mail is different from retrieving an existing inbox message.",
+          "vi": "Nộp thư gửi đi khác với lấy thư đã có trong inbox."
+        },
+        "result": {
+          "en": "Best match: SMTP. Submit outgoing email and relay it between mail servers.",
+          "vi": "Phù hợp nhất: SMTP. Nộp email gửi đi và chuyển tiếp email giữa các mail server."
+        }
+      },
+      {
+        "id": "scenario-download",
+        "action": {
+          "en": "Read this independent task: A simple mail client retrieves messages from a server into a local mailbox for later offline reading. It does not need server-folder or read-state synchronisation. Which is the best match among the listed purposes?",
+          "vi": "Đọc tác vụ độc lập này: Ứng dụng email đơn giản lấy thư từ server về hộp thư cục bộ để đọc ngoại tuyến sau đó. Không cần đồng bộ thư mục trên server hay trạng thái đã đọc. Giao thức nào phù hợp nhất với các mục đích đã nêu?"
+        },
+        "why": {
+          "en": "POP3 is the retrieval-focused match. IMAP can also retrieve mail, so this is a best-fit purpose comparison, not a claim of exclusive capability.",
+          "vi": "POP3 phù hợp với tác vụ tập trung vào lấy thư. IMAP cũng lấy được thư, nên đây là so sánh mục đích phù hợp nhất, không khẳng định khả năng độc quyền."
+        },
+        "result": {
+          "en": "Best match: POP3. Retrieve messages from a server mailbox into a mail client.",
+          "vi": "Phù hợp nhất: POP3. Lấy thông điệp từ hộp thư trên server về ứng dụng email."
+        }
+      },
+      {
+        "id": "scenario-sync",
+        "action": {
+          "en": "Read this independent task: A learner uses a phone and laptop and wants server folders and read/unread changes to stay consistent across both mail clients. Choose the appropriate mailbox-access protocol.",
+          "vi": "Đọc tác vụ độc lập này: Học sinh dùng điện thoại và laptop, muốn thư mục trên server và thay đổi đã đọc/chưa đọc nhất quán giữa hai ứng dụng email. Chọn giao thức truy cập hộp thư phù hợp."
+        },
+        "why": {
+          "en": "The distinguishing requirement is shared server-mailbox state, not simply receiving bytes.",
+          "vi": "Yêu cầu phân biệt là trạng thái hộp thư server dùng chung, không chỉ nhận byte dữ liệu."
+        },
+        "result": {
+          "en": "Best match: IMAP. Access and manage a server mailbox, including synchronised mailbox state.",
+          "vi": "Phù hợp nhất: IMAP. Truy cập và quản lý hộp thư trên server, gồm trạng thái hộp thư đồng bộ."
+        }
+      },
+      {
+        "id": "scenario-p2p",
+        "action": {
+          "en": "Read this independent task: Several computers obtain different pieces of an openly shared dataset from each other and upload pieces they already hold. Which listed protocol matches this swarm-based file sharing?",
+          "vi": "Đọc tác vụ độc lập này: Nhiều máy tính lấy các phần khác nhau của bộ dữ liệu được chia sẻ công khai từ nhau và tải lên các phần đang có. Giao thức nào phù hợp với cách chia sẻ tệp theo swarm này?"
+        },
+        "why": {
+          "en": "Multiple peers supply and receive pieces; one central file server is not the sole payload source.",
+          "vi": "Nhiều peer cung cấp và nhận các phần; một file server trung tâm không phải nguồn payload duy nhất."
+        },
+        "result": {
+          "en": "Best match: BitTorrent. Share file pieces directly among peers in a swarm.",
+          "vi": "Phù hợp nhất: BitTorrent. Chia sẻ các phần tệp trực tiếp giữa các peer trong swarm."
+        }
+      }
+    ],
+    "result": {
+      "en": "HTTP serves web exchanges; FTP transfers files; SMTP sends mail; POP3 retrieves mail; IMAP manages a server mailbox; BitTorrent shares pieces between peers.",
+      "vi": "HTTP phục vụ trao đổi web; FTP truyền tệp; SMTP gửi thư; POP3 lấy thư; IMAP quản lý hộp thư server; BitTorrent chia sẻ phần tệp giữa peer."
+    },
+    "selfCheck": {
+      "en": "Check the verb, endpoints and required state. A protocol acronym without a matching purpose is incomplete.",
+      "vi": "Kiểm tra động từ, các đầu trao đổi và trạng thái cần giữ. Chỉ có chữ viết tắt giao thức mà thiếu mục đích tương ứng là chưa đủ."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "s24-ms31",
+      "w25-ms32"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "“Purpose”, “outline a protocol” and a named Application service call for protocol plus function.",
+        "vi": "“Mục đích”, “trình bày giao thức” và dịch vụ Application cụ thể yêu cầu tên giao thức kèm chức năng."
+      },
+      {
+        "en": "“Send”, “retrieve”, “read on multiple devices” distinguish three email actions.",
+        "vi": "“Gửi”, “lấy thư”, “đọc trên nhiều thiết bị” phân biệt ba hành động email."
+      },
+      {
+        "en": "“Peers”, “pieces” and upload while downloading point towards BitTorrent.",
+        "vi": "“Peer”, “các phần” và tải lên trong khi tải xuống gợi đến BitTorrent."
+      }
+    ],
+    "distinguish": {
+      "en": "Choosing an Application protocol is different from tracing all TCP/IP layers, selecting a router’s next hop or choosing circuit versus packet switching.",
+      "vi": "Chọn giao thức Application khác với theo dõi mọi tầng TCP/IP, chọn next hop của router hay chọn circuit/packet switching."
+    },
+    "method": [
+      {
+        "en": "Underline the action and identify the participants.",
+        "vi": "Gạch chân hành động và xác định các bên."
+      },
+      {
+        "en": "State the service requirement before naming the protocol.",
+        "vi": "Nêu yêu cầu dịch vụ trước khi gọi tên giao thức."
+      },
+      {
+        "en": "Connect one protocol function to that requirement and reject the nearest mismatch.",
+        "vi": "Nối một chức năng giao thức với yêu cầu và loại phương án gần nhưng lệch."
+      },
+      {
+        "en": "Remove absolutes such as POP3 always deletes or IMAP never downloads.",
+        "vi": "Bỏ khẳng định tuyệt đối như POP3 luôn xóa hay IMAP không bao giờ tải thư."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "SMTP receives the user’s inbox because it is an email protocol.",
+        "vi": "SMTP nhận inbox của người dùng vì đây là giao thức email."
+      },
+      "correction": {
+        "en": "SMTP submits or relays outgoing messages; POP3/IMAP serve mailbox access.",
+        "vi": "SMTP nộp hoặc chuyển tiếp thư gửi đi; POP3/IMAP phục vụ truy cập hộp thư."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Every downloaded file uses FTP.",
+        "vi": "Mọi tệp tải xuống đều dùng FTP."
+      },
+      "correction": {
+        "en": "HTTP can transfer web resources that are files; identify the service being used.",
+        "vi": "HTTP có thể truyền tài nguyên web là tệp; cần xác định dịch vụ đang dùng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "POP3 always deletes the server copy and IMAP never downloads content.",
+        "vi": "POP3 luôn xóa bản server còn IMAP không tải nội dung."
+      },
+      "correction": {
+        "en": "Deletion is separate from POP3 retrieval; IMAP can retrieve/cache content while managing a server mailbox.",
+        "vi": "Xóa thư tách biệt với lấy thư POP3; IMAP có thể lấy/lưu đệm nội dung khi quản lý hộp thư server."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A browser interface replaces every mail protocol with HTTP.",
+        "vi": "Giao diện trình duyệt thay mọi giao thức thư bằng HTTP."
+      },
+      "correction": {
+        "en": "The browser-facing exchange and mail-server exchanges can use different protocols.",
+        "vi": "Trao đổi phía trình duyệt và giữa mail server có thể dùng các giao thức khác nhau."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "web-resource",
+      "prompt": {
+        "en": "A browser requests an image from a web server. Which purpose fits HTTP?",
+        "vi": "Trình duyệt yêu cầu ảnh từ web server. Mục đích nào phù hợp HTTP?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Web request/response resource transfer",
+            "vi": "Truyền tài nguyên qua yêu cầu/phản hồi web"
+          },
+          "feedback": {
+            "en": "Correct: web resources include images, not only text.",
+            "vi": "Đúng: tài nguyên web gồm cả ảnh, không chỉ văn bản."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Synchronise mailbox folders",
+            "vi": "Đồng bộ thư mục hộp thư"
+          },
+          "feedback": {
+            "en": "That is mailbox management associated with IMAP.",
+            "vi": "Đó là quản lý hộp thư gắn với IMAP."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Choose a router’s next hop",
+            "vi": "Chọn next hop của router"
+          },
+          "feedback": {
+            "en": "That is routing, not HTTP’s application service.",
+            "vi": "Đó là định tuyến, không phải dịch vụ ứng dụng HTTP."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Identify the requested web service rather than the image’s file type.",
+        "vi": "Nhận diện dịch vụ web được yêu cầu thay vì loại tệp ảnh."
+      }
+    },
+    {
+      "id": "choose-email-action",
+      "prompt": {
+        "en": "A new email is submitted to an outgoing mail server. Choose the protocol and reason.",
+        "vi": "Email mới được nộp cho mail server gửi đi. Chọn giao thức và lý do."
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "SMTP: sending/submission",
+            "vi": "SMTP: gửi/nộp thư"
+          },
+          "feedback": {
+            "en": "Correct: this is an outgoing action.",
+            "vi": "Đúng: đây là hành động gửi đi."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "POP3: shared read-state updates",
+            "vi": "POP3: cập nhật trạng thái đã đọc dùng chung"
+          },
+          "feedback": {
+            "en": "POP3 retrieves mail; this answer also misattributes richer mailbox state.",
+            "vi": "POP3 lấy thư; đáp án này còn gán nhầm quản lý trạng thái hộp thư."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "IMAP: mail-server relay",
+            "vi": "IMAP: chuyển tiếp giữa mail server"
+          },
+          "feedback": {
+            "en": "IMAP accesses mailboxes, while SMTP handles relay.",
+            "vi": "IMAP truy cập hộp thư, còn SMTP xử lý chuyển tiếp."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Sending into the mail system and reading an existing mailbox are separate tasks.",
+        "vi": "Gửi vào hệ thống email và đọc hộp thư đã có là hai tác vụ riêng."
+      }
+    },
+    {
+      "id": "pop3-deletion",
+      "prompt": {
+        "en": "A POP3 client leaves retrieved messages on the server. Which conclusion is valid?",
+        "vi": "Ứng dụng POP3 giữ thư đã lấy trên server. Kết luận nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Impossible: retrieval must delete each message",
+            "vi": "Không thể: lấy thư buộc phải xóa từng thư"
+          },
+          "feedback": {
+            "en": "Retrieval does not itself require deletion.",
+            "vi": "Lấy thư không tự yêu cầu xóa thư."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Possible: retrieval and deletion are separate operations",
+            "vi": "Có thể: lấy và xóa thư là thao tác riêng"
+          },
+          "feedback": {
+            "en": "Correct: client policy can retain copies.",
+            "vi": "Đúng: chính sách ứng dụng có thể giữ bản sao."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "It must therefore be using SMTP",
+            "vi": "Vì vậy chắc chắn đang dùng SMTP"
+          },
+          "feedback": {
+            "en": "SMTP is not selected by whether a retrieved copy remains.",
+            "vi": "Không chọn SMTP dựa vào việc bản thư đã lấy còn hay không."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Avoid turning a typical configuration into a protocol requirement.",
+        "vi": "Không biến cấu hình thường gặp thành yêu cầu bắt buộc của giao thức."
+      }
+    },
+    {
+      "id": "protocol-transfer",
+      "prompt": {
+        "en": "A phone marks mail as read; a laptop should see that state in the same server mailbox. Which service best fits?",
+        "vi": "Điện thoại đánh dấu đã đọc; laptop cần thấy trạng thái đó trong cùng hộp thư server. Dịch vụ nào phù hợp nhất?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "IMAP mailbox access and synchronisation",
+            "vi": "Truy cập và đồng bộ hộp thư IMAP"
+          },
+          "feedback": {
+            "en": "Correct: the key requirement is shared mailbox state.",
+            "vi": "Đúng: yêu cầu chính là trạng thái hộp thư dùng chung."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "SMTP outgoing submission",
+            "vi": "Nộp thư gửi đi SMTP"
+          },
+          "feedback": {
+            "en": "No new outgoing message is being submitted.",
+            "vi": "Không có thư gửi đi mới được nộp."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "FTP transfer of any file",
+            "vi": "Truyền tệp bất kỳ bằng FTP"
+          },
+          "feedback": {
+            "en": "A file transfer alone does not define mailbox flags or folders.",
+            "vi": "Chỉ truyền tệp không quy định cờ trạng thái hay thư mục hộp thư."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Explain the state requirement, not just “it receives emails”.",
+        "vi": "Giải thích yêu cầu về trạng thái, không chỉ nói “nhận email”."
+      }
+    },
+    {
+      "id": "webmail-boundary",
+      "prompt": {
+        "en": "A browser accesses webmail while two mail servers exchange outgoing mail. What is the best explanation?",
+        "vi": "Trình duyệt truy cập webmail trong khi hai mail server trao đổi thư gửi đi. Giải thích nào phù hợp nhất?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Every exchange must be HTTP because a browser is present",
+            "vi": "Mọi trao đổi đều phải dùng HTTP vì có trình duyệt"
+          },
+          "feedback": {
+            "en": "The browser is only one participant in a larger system.",
+            "vi": "Trình duyệt chỉ là một bên trong hệ thống lớn hơn."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The browser service may use HTTP, while server relay uses SMTP",
+            "vi": "Dịch vụ trình duyệt có thể dùng HTTP, còn chuyển tiếp giữa server dùng SMTP"
+          },
+          "feedback": {
+            "en": "Correct: select the protocol for each specified exchange.",
+            "vi": "Đúng: chọn giao thức cho từng lượt trao đổi được chỉ rõ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "IMAP is responsible for every network layer",
+            "vi": "IMAP chịu trách nhiệm mọi tầng mạng"
+          },
+          "feedback": {
+            "en": "IMAP is an Application protocol, not the whole suite.",
+            "vi": "IMAP là giao thức Application, không phải toàn bộ bộ giao thức."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "A single application system can involve several protocols with different purposes.",
+        "vi": "Một hệ thống ứng dụng có thể dùng nhiều giao thức với mục đích khác nhau."
+      }
+    },
+    {
+      "id": "peer-purpose",
+      "prompt": {
+        "en": "Which detail most clearly distinguishes BitTorrent from a simple central file-server download?",
+        "vi": "Chi tiết nào phân biệt rõ BitTorrent với tải từ file server trung tâm đơn giản?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The file is large",
+            "vi": "Tệp có kích thước lớn"
+          },
+          "feedback": {
+            "en": "Size alone does not identify the protocol.",
+            "vi": "Chỉ kích thước không xác định giao thức."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Peers obtain and supply pieces to one another",
+            "vi": "Peer lấy và cung cấp các phần cho nhau"
+          },
+          "feedback": {
+            "en": "Correct: payload sources are distributed among peers.",
+            "vi": "Đúng: nguồn payload được phân bố giữa các peer."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The file has a name",
+            "vi": "Tệp có tên"
+          },
+          "feedback": {
+            "en": "Every named file need not use BitTorrent.",
+            "vi": "Tệp có tên không nhất thiết dùng BitTorrent."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Look for peer-to-peer piece sharing rather than generic download vocabulary.",
+        "vi": "Tìm việc chia sẻ phần tệp peer-to-peer thay vì từ ngữ tải xuống chung chung."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Without the table, give one function for all six protocols and explain the email split.",
+      "vi": "Không nhìn bảng, nêu một chức năng cho cả sáu giao thức và giải thích phân chia trong email."
+    },
+    "answerPoints": [
+      {
+        "en": "HTTP web resources; FTP file-transfer service; BitTorrent peer-to-peer pieces.",
+        "vi": "HTTP tài nguyên web; FTP dịch vụ truyền tệp; BitTorrent các phần peer-to-peer."
+      },
+      {
+        "en": "SMTP outgoing submission/relay; POP3 retrieval; IMAP server-mailbox access and synchronisation.",
+        "vi": "SMTP nộp/chuyển tiếp thư gửi đi; POP3 lấy thư; IMAP truy cập và đồng bộ hộp thư server."
+      },
+      {
+        "en": "Deletion is separate from POP3 retrieval; IMAP can also retrieve content.",
+        "vi": "Xóa thư tách biệt với lấy thư POP3; IMAP cũng lấy được nội dung."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Choose by action, endpoint roles and required state.",
+      "vi": "Chọn theo hành động, vai trò hai đầu và trạng thái cần giữ."
+    },
+    {
+      "en": "Name plus function is stronger than an unexplained acronym.",
+      "vi": "Tên kèm chức năng tốt hơn chữ viết tắt không giải thích."
+    },
+    {
+      "en": "Protocol capabilities can overlap; justify the stated best fit.",
+      "vi": "Khả năng giao thức có thể chồng lấn; giải thích phương án phù hợp yêu cầu nhất."
+    }
+  ],
+  "relatedSlugs": [
+    "tcp-ip-stack-and-message-journey",
+    "bittorrent-and-peer-to-peer-transfer"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 33, section 14.1 Protocols",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-application",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed pages 330–333 (PDF pages 346–349): application protocols and email",
+      "kind": "book"
+    },
+    {
+      "id": "book-bittorrent",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed pages 335–337 (PDF pages 351–353): peer-to-peer file sharing",
+      "kind": "book"
+    },
+    {
+      "id": "s24-qp31",
+      "title": "Cambridge 9618/31 — May/June 2024 question paper",
+      "locator": "Question 2(c), page 3",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s24-ms31",
+      "title": "Cambridge 9618/31 — May/June 2024 mark scheme",
+      "locator": "Question 2(c), page 5",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "w25-qp32",
+      "title": "Cambridge 9618/32 — October/November 2025 question paper",
+      "locator": "Question 3(a), page 4",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w25-ms32",
+      "title": "Cambridge 9618/32 — October/November 2025 mark scheme",
+      "locator": "Question 3(a)–(b), page 8",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "pop3-standard",
+      "title": "IETF RFC 1939 — Post Office Protocol Version 3",
+      "locator": "Sections 5–6: separate retrieval, deletion and update operations; clarification of deletion behaviour",
+      "kind": "guide",
+      "url": "https://www.rfc-editor.org/rfc/rfc1939.html"
+    },
+    {
+      "id": "imap-standard",
+      "title": "IETF RFC 9051 — Internet Message Access Protocol Version 4rev2",
+      "locator": "Abstract: server-mailbox access/manipulation, flags and resynchronisation; technical clarification",
+      "kind": "guide",
+      "url": "https://www.rfc-editor.org/rfc/rfc9051.html#abstract"
+    }
+  ]
+}

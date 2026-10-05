@@ -1,0 +1,844 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.20.1",
+  "topicId": "P3-20.2-T01",
+  "slug": "serial-sequential-text-file-workflows",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Serial and sequential text-file workflows",
+    "vi": "Workflow text file serial và sequential"
+  },
+  "question": {
+    "en": "How do mode, pointer, EOF and close preserve the intended file state?",
+    "vi": "Mode, pointer, EOF và close giữ file state đúng thế nào?"
+  },
+  "opening": {
+    "en": "A program copies valid lines to an archive, appends an audit line and never reads past EOF.",
+    "vi": "Chương trình copy line hợp lệ sang archive, append audit line và không đọc quá EOF."
+  },
+  "objectives": [
+    {
+      "en": "Explain serial and sequential text-file workflows accurately.",
+      "vi": "Giải thích chính xác workflow text file serial và sequential."
+    },
+    {
+      "en": "Trace every visible state change.",
+      "vi": "Trace mọi thay đổi state nhìn thấy."
+    },
+    {
+      "en": "Use the declared convention.",
+      "vi": "Dùng convention đã khai báo."
+    },
+    {
+      "en": "Handle boundary and error cases.",
+      "vi": "Xử lý boundary và error case."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read tables and simple code.",
+      "vi": "Đọc bảng và code đơn giản."
+    },
+    {
+      "en": "Distinguish a value from its location.",
+      "vi": "Phân biệt giá trị với vị trí của nó."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Open",
+      "meaning": {
+        "en": "READ preserves content; WRITE creates/truncates; APPEND preserves content and writes after it.",
+        "vi": "READ giữ content; WRITE tạo/truncate; APPEND giữ content và ghi sau."
+      }
+    },
+    {
+      "term": "state",
+      "meaning": {
+        "en": "Values relevant at one execution point.",
+        "vi": "Các giá trị liên quan tại một thời điểm thực thi."
+      }
+    },
+    {
+      "term": "trace",
+      "meaning": {
+        "en": "Ordered record of state changes.",
+        "vi": "Bản ghi có thứ tự của thay đổi state."
+      }
+    },
+    {
+      "term": "fixture",
+      "meaning": {
+        "en": "Declared teaching example with fixed assumptions.",
+        "vi": "Ví dụ dạy học có giả định cố định."
+      }
+    },
+    {
+      "term": "convention",
+      "meaning": {
+        "en": "Rule that fixes notation or interpretation.",
+        "vi": "Quy tắc khóa notation hoặc cách hiểu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "mode-pointer-eof",
+      "title": {
+        "en": "Open mode defines allowed effects",
+        "vi": "Open mode xác định effect"
+      },
+      "paragraphs": [
+        {
+          "en": "READ preserves content; WRITE creates/truncates; APPEND preserves content and writes after it.",
+          "vi": "READ giữ content; WRITE tạo/truncate; APPEND giữ content và ghi sau."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "read-loop",
+      "title": {
+        "en": "EOF before READFILE",
+        "vi": "EOF trước READFILE"
+      },
+      "paragraphs": [
+        {
+          "en": "Test NOT EOF before each read so an empty or exhausted file is not read.",
+          "vi": "Test NOT EOF trước mỗi read để không đọc file empty/đã hết."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "serial-sequential",
+      "title": {
+        "en": "Serial and sequential",
+        "vi": "Serial và sequential"
+      },
+      "paragraphs": [
+        {
+          "en": "Serial records follow arrival order; sequential records follow a key order. Both may be processed consecutively from the start.",
+          "vi": "Serial record theo thứ tự đến; sequential record theo key. Cả hai có thể xử lý liên tiếp từ đầu."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "copy-lines",
+      "title": {
+        "en": "Close and error paths",
+        "vi": "Close và error path"
+      },
+      "paragraphs": [
+        {
+          "en": "Close every open file; missing/closed/wrong-mode operations follow the declared error path.",
+          "vi": "Close mọi file đã mở; operation missing/closed/wrong-mode theo error path."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ],
+      "code": "OPENFILE \"Input.txt\" FOR READ\nOPENFILE \"Archive.txt\" FOR WRITE\nWHILE NOT EOF(\"Input.txt\")\n   READFILE \"Input.txt\", Line\n   WRITEFILE \"Archive.txt\", Line\nENDWHILE\nCLOSEFILE \"Input.txt\"\nCLOSEFILE \"Archive.txt\""
+    }
+  ],
+  "visual": {
+    "kind": "sequential-files",
+    "title": {
+      "en": "Text-file mode and pointer simulator",
+      "vi": "Mô phỏng mode và pointer của text file"
+    },
+    "introduction": {
+      "en": "Watch content, open mode, next-line pointer, EOF and output after every operation.",
+      "vi": "Xem content, open mode, next-line pointer, EOF và output sau mỗi operation."
+    },
+    "task": {
+      "en": "Trace READ, WRITE, APPEND, EOF, close and invalid closed-file paths.",
+      "vi": "Trace READ, WRITE, APPEND, EOF, close và path file đóng."
+    },
+    "conventions": [
+      {
+        "en": "S20-FILE-TEXT-1, Cambridge pseudocode 2026.",
+        "vi": "S20-FILE-TEXT-1, Cambridge pseudocode 2026."
+      },
+      {
+        "en": "In-memory AlgoCore files only.",
+        "vi": "Chỉ file in-memory AlgoCore."
+      },
+      {
+        "en": "EOF is tested before READFILE.",
+        "vi": "EOF được test trước READFILE."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Copy two lines safely",
+      "vi": "Copy hai line an toàn"
+    },
+    "prompt": {
+      "en": "Input has A,B; Archive initially has OLD. Open Archive for WRITE and copy.",
+      "vi": "Input có A,B; Archive ban đầu có OLD. Mở Archive WRITE và copy."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "step-1",
+        "action": {
+          "en": "Open Input for READ.",
+          "vi": "Mở Input READ."
+        },
+        "why": {
+          "en": "READ permits consecutive reads and preserves data.",
+          "vi": "READ cho đọc liên tiếp và giữ data."
+        },
+        "result": {
+          "en": "pointer=0; content=[A,B].",
+          "vi": "pointer=0; content=[A,B]."
+        },
+        "check": {
+          "en": "Check: pointer=0; content=[A,B].",
+          "vi": "Tự kiểm tra: pointer=0; content=[A,B]."
+        }
+      },
+      {
+        "id": "step-2",
+        "action": {
+          "en": "Open Archive for WRITE.",
+          "vi": "Mở Archive WRITE."
+        },
+        "why": {
+          "en": "WRITE removes existing content.",
+          "vi": "WRITE xóa content cũ."
+        },
+        "result": {
+          "en": "Archive becomes empty.",
+          "vi": "Archive trở thành empty."
+        },
+        "check": {
+          "en": "Check: Archive becomes empty.",
+          "vi": "Tự kiểm tra: Archive trở thành empty."
+        }
+      },
+      {
+        "id": "step-3",
+        "action": {
+          "en": "Test EOF then read A.",
+          "vi": "Test EOF rồi đọc A."
+        },
+        "why": {
+          "en": "pointer 0 has a line.",
+          "vi": "pointer 0 có line."
+        },
+        "result": {
+          "en": "Line=A; pointer=1.",
+          "vi": "Line=A; pointer=1."
+        },
+        "check": {
+          "en": "Check: Line=A; pointer=1.",
+          "vi": "Tự kiểm tra: Line=A; pointer=1."
+        }
+      },
+      {
+        "id": "step-4",
+        "action": {
+          "en": "Write A, then read/write B.",
+          "vi": "Ghi A rồi đọc/ghi B."
+        },
+        "why": {
+          "en": "Operations follow loop order.",
+          "vi": "Operation theo thứ tự loop."
+        },
+        "result": {
+          "en": "Archive=[A,B]; pointer=2.",
+          "vi": "Archive=[A,B]; pointer=2."
+        },
+        "check": {
+          "en": "Check: Archive=[A,B]; pointer=2.",
+          "vi": "Tự kiểm tra: Archive=[A,B]; pointer=2."
+        }
+      },
+      {
+        "id": "step-5",
+        "action": {
+          "en": "Test EOF at pointer 2.",
+          "vi": "Test EOF tại pointer 2."
+        },
+        "why": {
+          "en": "No line remains; READFILE is skipped.",
+          "vi": "Không còn line; bỏ qua READFILE."
+        },
+        "result": {
+          "en": "EOF=TRUE; no over-read.",
+          "vi": "EOF=TRUE; không over-read."
+        },
+        "check": {
+          "en": "Check: EOF=TRUE; no over-read.",
+          "vi": "Tự kiểm tra: EOF=TRUE; không over-read."
+        }
+      },
+      {
+        "id": "step-6",
+        "action": {
+          "en": "Close both files.",
+          "vi": "Đóng cả hai file."
+        },
+        "why": {
+          "en": "Closed resources reject later operations.",
+          "vi": "Resource đóng từ chối operation sau."
+        },
+        "result": {
+          "en": "Both closed; Archive=[A,B].",
+          "vi": "Cả hai đóng; Archive=[A,B]."
+        },
+        "check": {
+          "en": "Check: Both closed; Archive=[A,B].",
+          "vi": "Tự kiểm tra: Cả hai đóng; Archive=[A,B]."
+        }
+      }
+    ],
+    "result": {
+      "en": "OLD is replaced by A,B and no read occurs past EOF.",
+      "vi": "OLD được thay bằng A,B và không đọc quá EOF."
+    },
+    "selfCheck": {
+      "en": "Did you apply WRITE truncation before the loop and test EOF before READFILE?",
+      "vi": "Bạn áp WRITE truncation trước loop và test EOF trước READFILE chưa?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "OPENFILE FOR READ/WRITE/APPEND",
+        "vi": "OPENFILE FOR READ/WRITE/APPEND"
+      },
+      {
+        "en": "one line/record at a time",
+        "vi": "mỗi lần một line/record"
+      },
+      {
+        "en": "WHILE NOT EOF",
+        "vi": "WHILE NOT EOF"
+      },
+      {
+        "en": "serial or key-ordered sequential file",
+        "vi": "file serial hoặc sequential theo key"
+      }
+    ],
+    "distinguish": {
+      "en": "Serial/sequential organisation describes record order; the visual's consecutive read pointer is an access process. Random access selects a position directly.",
+      "vi": "Organisation serial/sequential mô tả thứ tự record; pointer đọc liên tiếp là access process. Random access chọn vị trí trực tiếp."
+    },
+    "method": [
+      {
+        "en": "State file contents and mode before opening.",
+        "vi": "Nêu content và mode trước open."
+      },
+      {
+        "en": "Apply mode effect immediately.",
+        "vi": "Áp effect mode ngay."
+      },
+      {
+        "en": "Trace pointer and EOF before each read.",
+        "vi": "Trace pointer và EOF trước mỗi read."
+      },
+      {
+        "en": "Close and report final contents.",
+        "vi": "Close và nêu content cuối."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "State the convention, then produce syntactically consistent code or notation.",
+          "vi": "Nêu convention rồi viết code/ký hiệu nhất quán cú pháp."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record every relevant state change in execution order.",
+          "vi": "Ghi mọi thay đổi trạng thái liên quan theo thứ tự thực thi."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link a cause or rule to its consequence; do not only name it.",
+          "vi": "Nối nguyên nhân hoặc quy tắc với hệ quả; không chỉ nêu tên."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use the same criterion for both alternatives.",
+          "vi": "Dùng cùng một tiêu chí cho cả hai phương án."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Select a method and connect its feature to the scenario requirement.",
+          "vi": "Chọn phương pháp và nối đặc điểm của nó với yêu cầu tình huống."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "WRITE preserves old content.",
+        "vi": "WRITE giữ content cũ."
+      },
+      "correction": {
+        "en": "WRITE creates/truncates under Cambridge convention.",
+        "vi": "WRITE tạo/truncate theo Cambridge convention."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "APPEND writes at the start.",
+        "vi": "APPEND ghi đầu file."
+      },
+      "correction": {
+        "en": "APPEND writes after existing data.",
+        "vi": "APPEND ghi sau data có sẵn."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Read then test EOF.",
+        "vi": "Read rồi mới test EOF."
+      },
+      "correction": {
+        "en": "Test EOF before the next READFILE.",
+        "vi": "Test EOF trước READFILE tiếp theo."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Random means random numbers.",
+        "vi": "Random nghĩa là số ngẫu nhiên."
+      },
+      "correction": {
+        "en": "Random file access selects a record position directly.",
+        "vi": "Random file access chọn vị trí record trực tiếp."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "cp-text-recall",
+      "prompt": {
+        "en": "Which response begins an accurate answer about serial/sequential text files?",
+        "vi": "Phản hồi nào bắt đầu câu trả lời chính xác về text file serial/sequential?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "State the meaning and declared convention for serial/sequential text files.",
+            "vi": "Nêu ý nghĩa và convention đã khai báo cho text file serial/sequential."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-text-recognition",
+      "prompt": {
+        "en": "Which evidence should identify the required method?",
+        "vi": "Bằng chứng nào xác định phương pháp cần dùng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Use the supplied terms, state and required output.",
+            "vi": "Dùng term, state và output được cung cấp."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-text-next-state",
+      "prompt": {
+        "en": "What must be read before predicting the next state?",
+        "vi": "Cần đọc gì trước khi dự đoán state tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Read the current state and exact operation rule.",
+            "vi": "Đọc current state và operation rule chính xác."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-text-trace",
+      "prompt": {
+        "en": "What makes a trace row complete?",
+        "vi": "Điều gì làm trace row đầy đủ?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Show before state, applied rule, calculation and after state.",
+            "vi": "Cho before state, rule áp dụng, phép tính và after state."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-text-write",
+      "prompt": {
+        "en": "How should code or notation be written?",
+        "vi": "Code hoặc notation nên được viết thế nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Declare one convention and keep all syntax consistent.",
+            "vi": "Khai báo một convention và giữ cú pháp nhất quán."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-text-transfer",
+      "prompt": {
+        "en": "A new question changes a convention. What should you do?",
+        "vi": "Đề mới đổi convention. Bạn nên làm gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Restate the new convention and recompute from that state.",
+            "vi": "Nêu lại convention mới và tính lại từ state đó."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Trace a complete text-file workflow.",
+      "vi": "Trace workflow text file hoàn chỉnh."
+    },
+    "answerPoints": [
+      {
+        "en": "State initial content and open mode.",
+        "vi": "Nêu content đầu và open mode."
+      },
+      {
+        "en": "Apply WRITE/APPEND effects correctly.",
+        "vi": "Áp effect WRITE/APPEND đúng."
+      },
+      {
+        "en": "Show pointer, EOF and read/write each step.",
+        "vi": "Cho pointer, EOF và read/write từng bước."
+      },
+      {
+        "en": "Close and report final file state.",
+        "vi": "Close và nêu file state cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Mode controls permitted effects.",
+      "vi": "Mode kiểm soát effect được phép."
+    },
+    {
+      "en": "WRITE truncates; APPEND preserves the prefix.",
+      "vi": "WRITE truncate; APPEND giữ prefix."
+    },
+    {
+      "en": "Test EOF before reading.",
+      "vi": "Test EOF trước read."
+    },
+    {
+      "en": "Close state and error paths matter.",
+      "vi": "State đóng và error path quan trọng."
+    }
+  ],
+  "relatedSlugs": [
+    "random-file-record-operations",
+    "exceptions-and-controlled-recovery"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Section 20, printed/PDF p.38",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 20, printed pp.526–533",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "Relevant convention on pp.22–29",
+      "kind": "guide"
+    },
+    {
+      "id": "qp",
+      "title": "Cambridge 9618/31 May/June 2023 question paper",
+      "locator": "Q10, PDF p.10",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms",
+      "title": "Cambridge 9618/31 May/June 2023 mark scheme",
+      "locator": "Q10, PDF p.8",
+      "kind": "mark-scheme"
+    }
+  ]
+}

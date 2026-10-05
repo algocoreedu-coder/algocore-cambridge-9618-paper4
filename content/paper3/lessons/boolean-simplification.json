@@ -1,0 +1,685 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.15.1",
+  "topicId": "P3-15.2-T04",
+  "slug": "boolean-simplification",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Boolean simplification",
+    "vi": "Rút gọn biểu thức Boolean"
+  },
+  "question": {
+    "en": "How can an expression become shorter without changing any output?",
+    "vi": "Rút ngắn biểu thức mà không đổi bất kỳ đầu ra nào bằng cách nào?"
+  },
+  "opening": {
+    "en": "A valid simplification preserves the truth function at every step. Name the law, show the exact sub-expression it changes, and use complete input enumeration to check the result.",
+    "vi": "Rút gọn hợp lệ giữ nguyên hàm chân trị ở từng bước. Gọi tên luật, chỉ rõ biểu thức con được đổi và dùng liệt kê đủ đầu vào để kiểm kết quả."
+  },
+  "objectives": [
+    {
+      "en": "Apply Boolean identities and De Morgan’s laws with correct scope.",
+      "vi": "Áp dụng các đồng nhất Boolean và luật De Morgan đúng phạm vi."
+    },
+    {
+      "en": "Present one justified transformation per step.",
+      "vi": "Trình bày mỗi bước một phép biến đổi có lý do."
+    },
+    {
+      "en": "Verify equivalence exhaustively and reject invalid steps with a counterexample.",
+      "vi": "Kiểm tương đương đầy đủ và bác bước sai bằng phản ví dụ."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know truth tables, NOT/AND/OR and parentheses.",
+      "vi": "Biết bảng chân trị, NOT/AND/OR và ngoặc."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Boolean identity",
+      "meaning": {
+        "en": "An equality that holds for every allowed assignment of the Boolean variables.",
+        "vi": "Đẳng thức đúng với mọi cách gán hợp lệ cho biến Boolean."
+      }
+    },
+    {
+      "term": "Literal",
+      "meaning": {
+        "en": "A variable or its complement, such as A or NOT A.",
+        "vi": "Biến hoặc phần bù của biến, như A hoặc NOT A."
+      }
+    },
+    {
+      "term": "Counterexample",
+      "meaning": {
+        "en": "One input assignment on which a proposed equality gives different outputs.",
+        "vi": "Một cách gán đầu vào khiến hai vế được cho là bằng nhau có đầu ra khác."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "notation-and-scope",
+      "title": {
+        "en": "Read operators and complement scope",
+        "vi": "Đọc phép toán và phạm vi phủ định"
+      },
+      "paragraphs": [
+        {
+          "en": "Boolean values are0 and1. AND requires all operands1; OR requires at least one1; NOT reverses one value. Boolean OR is sometimes written+, but1 OR1=1 rather than the arithmetic total2. A dot may mean AND. Translate notation before manipulating an expression.",
+          "vi": "Giá trị Boolean là0/1. AND cần mọi toán hạng1; OR cần ít nhất một1; NOT đảo một giá trị. OR đôi khi viết+, nhưng1 OR1=1 chứ không phải tổng số học2. Dấu chấm có thể nghĩa AND. Dịch ký hiệu trước khi biến đổi."
+        },
+        {
+          "en": "The scope of NOT is essential. NOT(A OR B) complements the whole bracket, whereas(NOT A) OR B complements only A. If a printed overbar covers several terms, preserve that entire group with parentheses. A flattened text extraction can lose overbars; reasoning must use the actual diagram or clearly written expression.",
+          "vi": "Phạm vi NOT rất quan trọng. NOT(A OR B) phủ định cả ngoặc, còn(NOT A) OR B chỉ phủ định A. Nếu dấu gạch trên phủ nhiều hạng, giữ cả nhóm bằng ngoặc. Bản trích văn bản có thể mất gạch phủ định; phải dựa vào hình thực hoặc biểu thức được viết rõ."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "basic-laws",
+      "title": {
+        "en": "Choose the law that matches the structure",
+        "vi": "Chọn luật khớp cấu trúc"
+      },
+      "paragraphs": [
+        {
+          "en": "Identity laws remove neutral values: A AND1=A and A OR0=A. Null laws give A AND0=0 and A OR1=1. Idempotence removes repetition: A AND A=A and A OR A=A. Complement laws give A AND NOT A=0 and A OR NOT A=1. Double negation gives NOT(NOT A)=A.",
+          "vi": "Luật đồng nhất bỏ giá trị trung tính: A AND1=A, A OR0=A. Luật triệt tiêu cho A AND0=0, A OR1=1. Lũy đẳng bỏ lặp: A AND A=A, A OR A=A. Luật bù cho A AND NOT A=0, A OR NOT A=1. Phủ định kép cho NOT(NOT A)=A."
+        },
+        {
+          "en": "Commutative laws swap operands; associative laws regroup repeated ANDs or ORs without changing their order of evaluation meaning. Distributive laws include A AND(B OR C)=(A AND B) OR(A AND C), and its dual A OR(B AND C)=(A OR B) AND(A OR C). Absorption gives A OR(A AND B)=A and A AND(A OR B)=A.",
+          "vi": "Giao hoán đổi chỗ toán hạng; kết hợp nhóm lại các AND hoặc OR liên tiếp mà không đổi ý nghĩa. Phân phối gồm A AND(B OR C)=(A AND B) OR(A AND C), và dạng đối ngẫu A OR(B AND C)=(A OR B) AND(A OR C). Hấp thụ cho A OR(A AND B)=A và A AND(A OR B)=A."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "de-morgan",
+      "title": {
+        "en": "Complement every operand and change the connective",
+        "vi": "Phủ định từng toán hạng và đổi phép nối"
+      },
+      "paragraphs": [
+        {
+          "en": "De Morgan’s laws are NOT(A AND B)=(NOT A) OR(NOT B), and NOT(A OR B)=(NOT A) AND(NOT B). The outer complement is moved onto every operand while AND and OR exchange roles. Applying only one part of that change is incorrect. The law can be applied to sub-expressions as operands, not only single letters.",
+          "vi": "De Morgan: NOT(A AND B)=(NOT A) OR(NOT B), và NOT(A OR B)=(NOT A) AND(NOT B). Phủ định ngoài chuyển vào từng toán hạng đồng thời AND/OR đổi vai. Chỉ làm một phần của biến đổi là sai. Toán hạng có thể là biểu thức con chứ không chỉ một chữ cái."
+        },
+        {
+          "en": "For NOT(A AND B), try A=0,B=1. The original gives NOT0=1; the incorrect candidate NOT A AND NOT B gives1 AND0=0. One such mismatch rejects the candidate. The correct OR form gives1 and agrees on all four input combinations.",
+          "vi": "Với NOT(A AND B), thử A=0,B=1. Biểu thức gốc cho NOT0=1; dạng sai NOT A AND NOT B cho1 AND0=0. Một hàng khác như vậy đủ bác bỏ. Dạng OR đúng cho1 và khớp cả bốn tổ hợp."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "one-law-chain",
+      "title": {
+        "en": "Keep the reasoning visible between lines",
+        "vi": "Giữ lập luận rõ giữa các dòng"
+      },
+      "paragraphs": [
+        {
+          "en": "Consider NOT(A OR B) OR(NOT A AND B). First apply De Morgan only to the complemented bracket. Then factor the common NOT A by distributivity. Next replace NOT B OR B by1 using the complement law. Finally remove AND1 using identity. Each line has one named justification and remains equivalent to the previous line.",
+          "vi": "Xét NOT(A OR B) OR(NOT A AND B). Đầu tiên chỉ áp De Morgan cho ngoặc bị phủ định. Sau đó dùng phân phối đặt NOT A chung. Tiếp theo thay NOT B OR B bằng1 theo luật bù. Cuối bỏ AND1 theo đồng nhất. Mỗi dòng có một lý do gọi tên và tương đương dòng trước."
+        },
+        {
+          "en": "Factoring is a valid use of distributivity in reverse. Do not “cancel” arbitrary terms as if they were fractions. If a question asks for a particular form such as sum-of-products, stop in a form that meets that instruction; the shortest-looking factored answer may not be the requested form.",
+          "vi": "Đặt nhân tử chung là dùng phân phối theo chiều ngược. Không “khử” hạng tùy ý như phân số. Nếu đề yêu cầu dạng cụ thể như tổng các tích, dừng ở dạng đáp ứng yêu cầu; dạng đặt chung trông ngắn nhất chưa chắc là dạng đề hỏi."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "equivalence-and-circuit",
+      "title": {
+        "en": "Check every row and interpret the circuit change",
+        "vi": "Kiểm mọi hàng và hiểu thay đổi mạch"
+      },
+      "paragraphs": [
+        {
+          "en": "For n independent inputs, enumerate2^n rows and compare the original, each intermediate expression and the final expression. All final outputs must agree. Intermediate circuit nodes need not be identical when the structure changes, but the intended final truth function must be preserved.",
+          "vi": "Với n đầu vào độc lập, liệt kê2^n hàng rồi so biểu thức gốc, từng biểu thức trung gian và biểu thức cuối. Mọi đầu ra cuối phải khớp. Các nút trung gian của mạch không nhất thiết giống khi cấu trúc đổi, nhưng hàm đầu ra cần giữ nguyên."
+        },
+        {
+          "en": "A shorter expression can allow a circuit with fewer gates or inputs and make reasoning easier. Exact delay, power or cost improvements need implementation facts not supplied by a truth table. October/November2022 Paper32 question8(c) and May/June2025 Paper32 question7(c) are verified algebra-working examples, not a licence to claim a measured saving.",
+          "vi": "Biểu thức ngắn hơn có thể cho mạch ít cổng hoặc ít đầu vào hơn và dễ suy luận hơn. Mức cải thiện trễ, điện năng hoặc chi phí chính xác cần dữ kiện triển khai ngoài bảng chân trị. October/November2022 Paper32 câu8(c) và May/June2025 Paper32 câu7(c) là ví dụ đã kiểm về trình bày biến đổi, không phải cơ sở tuyên bố mức tiết kiệm đã đo."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "past-qp",
+        "past-ms",
+        "algebra-qp",
+        "algebra-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "boolean-simplification",
+    "title": {
+      "en": "One law per step, every row checked",
+      "vi": "Mỗi bước một luật, kiểm mọi hàng"
+    },
+    "introduction": {
+      "en": "Choose a reviewed chain, inspect the changed sub-expression and compare output columns. Test the incorrect De Morgan candidate too.",
+      "vi": "Chọn chuỗi đã kiểm, xem biểu thức con đổi và so cột đầu ra. Thử cả dạng De Morgan sai."
+    },
+    "task": {
+      "en": "Predict the next expression and justify it by one law before revealing the comparison.",
+      "vi": "Dự đoán biểu thức tiếp và giải thích bằng một luật trước khi mở bảng so."
+    },
+    "conventions": [
+      {
+        "en": "NOT, AND and OR are explicit; parentheses preserve complement scope.",
+        "vi": "NOT/AND/OR được viết rõ; ngoặc giữ phạm vi phủ định."
+      },
+      {
+        "en": "All presets have two independent inputs, so equivalence uses all four rows.",
+        "vi": "Mọi mẫu có hai đầu vào độc lập nên kiểm tương đương dùng đủ bốn hàng."
+      },
+      {
+        "en": "The invalid candidate is intentionally wrong and labelled as a counterexample exercise.",
+        "vi": "Dạng sai được cố ý đưa vào và ghi rõ là bài phản ví dụ."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "syllabus-2026"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Reduce a complemented bracket to NOT A",
+      "vi": "Rút ngoặc phủ định về NOT A"
+    },
+    "prompt": {
+      "en": "Simplify NOT(A OR B) OR(NOT A AND B), giving one reason per line.",
+      "vi": "Rút gọn NOT(A OR B) OR(NOT A AND B), mỗi dòng một lý do."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "original",
+        "action": {
+          "en": "Read NOT(A OR B) OR(NOT A AND B).",
+          "vi": "Đọc NOT(A OR B) OR(NOT A AND B)."
+        },
+        "why": {
+          "en": "Preserve the scope of the first NOT.",
+          "vi": "Giữ phạm vi của NOT đầu."
+        },
+        "result": {
+          "en": "The original output column is1,1,0,0 for00,01,10,11.",
+          "vi": "Cột đầu ra gốc là1,1,0,0 ứng với00,01,10,11."
+        }
+      },
+      {
+        "id": "de-morgan",
+        "action": {
+          "en": "Replace NOT(A OR B) with NOT A AND NOT B.",
+          "vi": "Thay NOT(A OR B) bằng NOT A AND NOT B."
+        },
+        "why": {
+          "en": "De Morgan complements both operands and changes OR to AND.",
+          "vi": "De Morgan phủ định cả hai toán hạng và đổi OR thành AND."
+        },
+        "result": {
+          "en": "(NOT A AND NOT B) OR(NOT A AND B).",
+          "vi": "(NOT A AND NOT B) OR(NOT A AND B)."
+        }
+      },
+      {
+        "id": "factor",
+        "action": {
+          "en": "Factor the common NOT A.",
+          "vi": "Đặt NOT A chung."
+        },
+        "why": {
+          "en": "Use distributivity in reverse.",
+          "vi": "Dùng phân phối theo chiều ngược."
+        },
+        "result": {
+          "en": "NOT A AND(NOT B OR B).",
+          "vi": "NOT A AND(NOT B OR B)."
+        }
+      },
+      {
+        "id": "complement",
+        "action": {
+          "en": "Replace NOT B OR B by1.",
+          "vi": "Thay NOT B OR B bằng1."
+        },
+        "why": {
+          "en": "A variable OR its complement is always1.",
+          "vi": "Biến OR phần bù luôn bằng1."
+        },
+        "result": {
+          "en": "NOT A AND1.",
+          "vi": "NOT A AND1."
+        }
+      },
+      {
+        "id": "identity",
+        "action": {
+          "en": "Remove AND1.",
+          "vi": "Bỏ AND1."
+        },
+        "why": {
+          "en": "The identity law preserves the other operand.",
+          "vi": "Luật đồng nhất giữ toán hạng còn lại."
+        },
+        "result": {
+          "en": "NOT A; every row still gives1,1,0,0.",
+          "vi": "NOT A; mọi hàng vẫn cho1,1,0,0."
+        }
+      }
+    ],
+    "result": {
+      "en": "The final function is NOT A and no longer depends on B.",
+      "vi": "Hàm cuối là NOT A và không còn phụ thuộc B."
+    },
+    "selfCheck": {
+      "en": "Why must the first De Morgan step use AND, and how would row01 expose a wrong connective?",
+      "vi": "Vì sao bước De Morgan đầu cần AND, và hàng01 phát hiện phép nối sai ra sao?"
+    },
+    "sourceIds": [
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A complement over a whole bracket points to De Morgan.",
+        "vi": "Phủ định cả ngoặc hướng tới De Morgan."
+      },
+      {
+        "en": "Repeated factors, a variable with its complement, or a term containing another term suggest distributivity, complement or absorption.",
+        "vi": "Nhân tử lặp, biến cùng phần bù, hoặc hạng chứa hạng khác gợi phân phối, bù hoặc hấp thụ."
+      }
+    ],
+    "distinguish": {
+      "en": "Canonical SOP constructs a function from output1 rows; algebra simplifies while preserving the function. A K-map is another simplification method, not a different truth function.",
+      "vi": "SOP chuẩn dựng hàm từ các hàng đầu ra1; đại số rút gọn nhưng giữ hàm. K-map là phương pháp rút gọn khác, không phải hàm chân trị khác."
+    },
+    "method": [
+      {
+        "en": "Rewrite unclear overbars using explicit NOT and parentheses.",
+        "vi": "Viết lại gạch phủ định không rõ bằng NOT/ngoặc."
+      },
+      {
+        "en": "Select one matching law and show the changed expression.",
+        "vi": "Chọn một luật phù hợp và viết biểu thức sau đổi."
+      },
+      {
+        "en": "Repeat without losing unchanged terms.",
+        "vi": "Lặp lại mà không làm mất các hạng không đổi."
+      },
+      {
+        "en": "Verify every input and respect the requested final form.",
+        "vi": "Kiểm mọi đầu vào và đúng dạng cuối đề yêu cầu."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "De Morgan only moves the NOT signs.",
+        "vi": "De Morgan chỉ chuyển các dấu NOT."
+      },
+      "correction": {
+        "en": "It also changes AND to OR or OR to AND.",
+        "vi": "Nó còn đổi AND thành OR hoặc ngược lại."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A OR A equals2A.",
+        "vi": "A OR A bằng2A."
+      },
+      "correction": {
+        "en": "Boolean idempotence gives A; these are not ordinary arithmetic terms.",
+        "vi": "Lũy đẳng Boolean cho A; đây không phải hạng số học thường."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Matching one row proves equivalence.",
+        "vi": "Khớp một hàng chứng minh tương đương."
+      },
+      "correction": {
+        "en": "A proof by enumeration must cover every input; one mismatch is enough to disprove it.",
+        "vi": "Chứng minh bằng liệt kê phải phủ mọi đầu vào; một hàng khác đủ bác bỏ."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "de-morgan-rule",
+      "prompt": {
+        "en": "Which equals NOT(A AND B)?",
+        "vi": "Biểu thức nào bằng NOT(A AND B)?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "NOT A OR NOT B",
+            "vi": "NOT A OR NOT B"
+          },
+          "feedback": {
+            "en": "Correct: complement each operand and change AND to OR.",
+            "vi": "Đúng: phủ định từng toán hạng và đổi AND thành OR."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "NOT A AND NOT B",
+            "vi": "NOT A AND NOT B"
+          },
+          "feedback": {
+            "en": "This fails when A=0,B=1.",
+            "vi": "Dạng này sai khi A=0,B=1."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A OR B",
+            "vi": "A OR B"
+          },
+          "feedback": {
+            "en": "The complements were lost; test00.",
+            "vi": "Đã mất phủ định; thử00."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Preserve complement scope and change the connective.",
+        "vi": "Giữ phạm vi phủ định và đổi phép nối."
+      }
+    },
+    {
+      "id": "factor-law",
+      "prompt": {
+        "en": "Which law changes AB OR A(NOT B) into A(B OR NOT B)?",
+        "vi": "Luật nào đổi AB OR A(NOT B) thành A(B OR NOT B)?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Distributive law in reverse",
+            "vi": "Phân phối theo chiều ngược"
+          },
+          "feedback": {
+            "en": "Correct: the common A is factored.",
+            "vi": "Đúng: đặt A chung."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Null law",
+            "vi": "Luật triệt tiêu"
+          },
+          "feedback": {
+            "en": "No AND0 or OR1 is being removed at this step.",
+            "vi": "Bước này không xử lý AND0 hay OR1."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "De Morgan",
+            "vi": "De Morgan"
+          },
+          "feedback": {
+            "en": "There is no complement over a compound expression here.",
+            "vi": "Ở đây không có phủ định bao biểu thức hợp."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Name the law for this exact transition, not a later one.",
+        "vi": "Gọi luật của đúng bước này, không phải bước sau."
+      }
+    },
+    {
+      "id": "absorption",
+      "prompt": {
+        "en": "What is A OR(A AND B)?",
+        "vi": "A OR(A AND B) bằng gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "B",
+            "vi": "B"
+          },
+          "feedback": {
+            "en": "If A=1,B=0 the original is1, unlike B.",
+            "vi": "Nếu A=1,B=0, gốc bằng1, khác B."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A",
+            "vi": "A"
+          },
+          "feedback": {
+            "en": "Correct: when A=1 the result is1; when A=0 both terms are0.",
+            "vi": "Đúng: A=1 thì kết quả1; A=0 thì hai hạng0."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A AND B",
+            "vi": "A AND B"
+          },
+          "feedback": {
+            "en": "That loses cases with A=1,B=0.",
+            "vi": "Dạng đó mất trường hợp A=1,B=0."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Absorption can also be justified directly from the two cases of A.",
+        "vi": "Có thể giải thích hấp thụ bằng hai trường hợp của A."
+      }
+    },
+    {
+      "id": "counterexample-transfer",
+      "prompt": {
+        "en": "A student claims NOT(A AND B)=NOT A AND NOT B. Which input disproves it?",
+        "vi": "Học sinh cho NOT(A AND B)=NOT A AND NOT B. Đầu vào nào bác bỏ?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "00",
+            "vi": "00"
+          },
+          "feedback": {
+            "en": "Both sides give1 here, so it is not a counterexample.",
+            "vi": "Hai vế cùng1 ở đây nên không phải phản ví dụ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "01",
+            "vi": "01"
+          },
+          "feedback": {
+            "en": "Correct: the original gives1 and the candidate0.",
+            "vi": "Đúng: gốc cho1 còn dạng đề xuất0."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "11",
+            "vi": "11"
+          },
+          "feedback": {
+            "en": "Both sides give0 here.",
+            "vi": "Hai vế cùng0 ở đây."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "A counterexample compares the same input on both sides.",
+        "vi": "Phản ví dụ so hai vế tại cùng đầu vào."
+      }
+    },
+    {
+      "id": "three-input-transfer",
+      "prompt": {
+        "en": "A new simplification has three independent inputs. How many rows are needed for exhaustive checking?",
+        "vi": "Biểu thức rút gọn mới có ba đầu vào độc lập. Cần bao nhiêu hàng để kiểm đầy đủ?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "3",
+            "vi": "3"
+          },
+          "feedback": {
+            "en": "Each input has two choices; it is not one row per variable.",
+            "vi": "Mỗi đầu vào có hai lựa chọn; không phải một hàng mỗi biến."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "Four rows cover two independent inputs.",
+            "vi": "Bốn hàng chỉ phủ hai đầu vào độc lập."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "8",
+            "vi": "8"
+          },
+          "feedback": {
+            "en": "Correct:2^3=8.",
+            "vi": "Đúng:2^3=8."
+          }
+        }
+      ],
+      "correctChoiceId": "c",
+      "explanation": {
+        "en": "The checking domain grows with the number of independent variables.",
+        "vi": "Miền kiểm tăng theo số biến độc lập."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "State both De Morgan laws and explain how to audit a simplification chain.",
+      "vi": "Nêu hai luật De Morgan và cách kiểm chuỗi rút gọn."
+    },
+    "answerPoints": [
+      {
+        "en": "Complement every operand and exchange AND/OR.",
+        "vi": "Phủ định mọi toán hạng và đổi AND/OR."
+      },
+      {
+        "en": "Name one law per transformation and preserve untouched terms.",
+        "vi": "Mỗi biến đổi gọi một luật, giữ các hạng không đổi."
+      },
+      {
+        "en": "Compare the final output for every input; use a mismatch as a counterexample.",
+        "vi": "So đầu ra cuối với mọi đầu vào; dùng hàng khác làm phản ví dụ."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Equivalent means the same function on all inputs.",
+      "vi": "Tương đương nghĩa cùng hàm trên mọi đầu vào."
+    },
+    {
+      "en": "A justified chain explains why the shorter circuit remains correct.",
+      "vi": "Chuỗi có lý do giải thích vì sao mạch ngắn hơn vẫn đúng."
+    }
+  ],
+  "relatedSlugs": [
+    "circuit-truth-table-and-expression",
+    "karnaugh-maps"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.2",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter15.2.1, printed354–356 / PDF370–372; Table15.2 laws, with complements read from actual source diagram",
+      "kind": "book"
+    },
+    {
+      "id": "past-qp",
+      "title": "Cambridge9618/32 — October/November2022 question paper",
+      "locator": "Question8(c), page7",
+      "kind": "question-paper"
+    },
+    {
+      "id": "past-ms",
+      "title": "Cambridge9618/32 — October/November2022 mark scheme",
+      "locator": "Question8(c), page12",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "algebra-qp",
+      "title": "Cambridge9618/32 — May/June2025 question paper",
+      "locator": "Question7(c), page7",
+      "kind": "question-paper"
+    },
+    {
+      "id": "algebra-ms",
+      "title": "Cambridge9618/32 — May/June2025 mark scheme",
+      "locator": "Question7(c), page9",
+      "kind": "mark-scheme"
+    }
+  ]
+}

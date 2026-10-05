@@ -1,0 +1,845 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.20.1",
+  "topicId": "P3-20.2-T02",
+  "slug": "random-file-record-operations",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Random-file record operations",
+    "vi": "Operation record trong random file"
+  },
+  "question": {
+    "en": "How can one record be selected and updated without changing the others?",
+    "vi": "Chọn và cập nhật một record mà không đổi record khác thế nào?"
+  },
+  "opening": {
+    "en": "A stock file has five fixed records; a key maps to one logical position that is read, checked and updated.",
+    "vi": "Stock file có năm fixed record; key map tới một logical position được đọc, kiểm tra và cập nhật."
+  },
+  "objectives": [
+    {
+      "en": "Explain random-file record operations accurately.",
+      "vi": "Giải thích chính xác operation record trong random file."
+    },
+    {
+      "en": "Trace every visible state change.",
+      "vi": "Trace mọi thay đổi state nhìn thấy."
+    },
+    {
+      "en": "Use the declared convention.",
+      "vi": "Dùng convention đã khai báo."
+    },
+    {
+      "en": "Handle boundary and error cases.",
+      "vi": "Xử lý boundary và error case."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read tables and simple code.",
+      "vi": "Đọc bảng và code đơn giản."
+    },
+    {
+      "en": "Distinguish a value from its location.",
+      "vi": "Phân biệt giá trị với vị trí của nó."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Declared",
+      "meaning": {
+        "en": "Random access requires a declared mapping from key/record number to a valid record position.",
+        "vi": "Random access cần mapping đã khai báo từ key/record number tới position hợp lệ."
+      }
+    },
+    {
+      "term": "state",
+      "meaning": {
+        "en": "Values relevant at one execution point.",
+        "vi": "Các giá trị liên quan tại một thời điểm thực thi."
+      }
+    },
+    {
+      "term": "trace",
+      "meaning": {
+        "en": "Ordered record of state changes.",
+        "vi": "Bản ghi có thứ tự của thay đổi state."
+      }
+    },
+    {
+      "term": "fixture",
+      "meaning": {
+        "en": "Declared teaching example with fixed assumptions.",
+        "vi": "Ví dụ dạy học có giả định cố định."
+      }
+    },
+    {
+      "term": "convention",
+      "meaning": {
+        "en": "Rule that fixes notation or interpretation.",
+        "vi": "Quy tắc khóa notation hoặc cách hiểu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "layout",
+      "title": {
+        "en": "Declared fixed-record layout",
+        "vi": "Layout fixed-record đã khai báo"
+      },
+      "paragraphs": [
+        {
+          "en": "Random access requires a declared mapping from key/record number to a valid record position.",
+          "vi": "Random access cần mapping đã khai báo từ key/record number tới position hợp lệ."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "seek-read-update",
+      "title": {
+        "en": "Seek, read and write",
+        "vi": "Seek, read và write"
+      },
+      "paragraphs": [
+        {
+          "en": "SEEK moves the file pointer; GETRECORD reads the target; PUTRECORD replaces only the target record.",
+          "vi": "SEEK di chuyển file pointer; GETRECORD đọc target; PUTRECORD chỉ thay target record."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "preserve",
+      "title": {
+        "en": "Preserve unrelated records",
+        "vi": "Giữ record không liên quan"
+      },
+      "paragraphs": [
+        {
+          "en": "Take before/after snapshots and assert every non-target record is unchanged.",
+          "vi": "Chụp before/after và khẳng định mọi non-target record không đổi."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "update-record",
+      "title": {
+        "en": "Address formula is declared",
+        "vi": "Công thức address được khai báo"
+      },
+      "paragraphs": [
+        {
+          "en": "The optional byte formula uses one-based recordNumber, baseByte=0 and recordSize=24; SEEK still uses the fixture's logical index.",
+          "vi": "Byte formula tùy chọn dùng recordNumber one-based, baseByte=0, recordSize=24; SEEK vẫn dùng logical index của fixture."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ],
+      "code": "OPENFILE \"Stock.dat\" FOR RANDOM\nPosition ← RecordNumber - 1\nSEEK \"Stock.dat\", Position\nGETRECORD \"Stock.dat\", Stock\nStock.Quantity ← Stock.Quantity + 5\nSEEK \"Stock.dat\", Position\nPUTRECORD \"Stock.dat\", Stock\nCLOSEFILE \"Stock.dat\""
+    }
+  ],
+  "visual": {
+    "kind": "random-files",
+    "title": {
+      "en": "Random record pointer workbench",
+      "vi": "Bàn record pointer random"
+    },
+    "introduction": {
+      "en": "Trace record number, computed position, SEEK pointer, GETRECORD/PUTRECORD and unchanged neighbours.",
+      "vi": "Trace record number, position tính được, SEEK pointer, GETRECORD/PUTRECORD và neighbor không đổi."
+    },
+    "task": {
+      "en": "Read/update a target, reject out-of-range positions and compare with sequential scanning.",
+      "vi": "Read/update target, từ chối position ngoài range và so với scan tuần tự."
+    },
+    "conventions": [
+      {
+        "en": "S20-FILE-RANDOM-1; logical positions 0..4.",
+        "vi": "S20-FILE-RANDOM-1; logical position 0..4."
+      },
+      {
+        "en": "Optional byte example: base 0, record size 24.",
+        "vi": "Ví dụ byte tùy chọn: base 0, record size 24."
+      },
+      {
+        "en": "In-memory AlgoCore records only.",
+        "vi": "Chỉ record in-memory AlgoCore."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Update record 3",
+      "vi": "Cập nhật record 3"
+    },
+    "prompt": {
+      "en": "Five records use logical positions 0..4. RecordNumber=3 has quantity 7; add 5.",
+      "vi": "Năm record dùng position 0..4. RecordNumber=3 có quantity 7; cộng 5."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "step-1",
+        "action": {
+          "en": "Lock layout and range.",
+          "vi": "Khóa layout và range."
+        },
+        "why": {
+          "en": "Address calculations need declared bases.",
+          "vi": "Tính address cần base đã khai báo."
+        },
+        "result": {
+          "en": "RecordNumber 1..5; position 0..4.",
+          "vi": "RecordNumber 1..5; position 0..4."
+        },
+        "check": {
+          "en": "Check: RecordNumber 1..5; position 0..4.",
+          "vi": "Tự kiểm tra: RecordNumber 1..5; position 0..4."
+        }
+      },
+      {
+        "id": "step-2",
+        "action": {
+          "en": "Compute Position=3−1.",
+          "vi": "Tính Position=3−1."
+        },
+        "why": {
+          "en": "Convert one-based record number to zero-based position.",
+          "vi": "Đổi record number one-based sang position zero-based."
+        },
+        "result": {
+          "en": "Position=2.",
+          "vi": "Position=2."
+        },
+        "check": {
+          "en": "Check: Position=2.",
+          "vi": "Tự kiểm tra: Position=2."
+        }
+      },
+      {
+        "id": "step-3",
+        "action": {
+          "en": "SEEK to 2.",
+          "vi": "SEEK tới 2."
+        },
+        "why": {
+          "en": "Random access selects the target directly.",
+          "vi": "Random access chọn target trực tiếp."
+        },
+        "result": {
+          "en": "filePointer=2.",
+          "vi": "filePointer=2."
+        },
+        "check": {
+          "en": "Check: filePointer=2.",
+          "vi": "Tự kiểm tra: filePointer=2."
+        }
+      },
+      {
+        "id": "step-4",
+        "action": {
+          "en": "GETRECORD target.",
+          "vi": "GETRECORD target."
+        },
+        "why": {
+          "en": "Read into the record variable before editing.",
+          "vi": "Đọc vào record variable trước edit."
+        },
+        "result": {
+          "en": "Stock.Quantity=7.",
+          "vi": "Stock.Quantity=7."
+        },
+        "check": {
+          "en": "Check: Stock.Quantity=7.",
+          "vi": "Tự kiểm tra: Stock.Quantity=7."
+        }
+      },
+      {
+        "id": "step-5",
+        "action": {
+          "en": "Add 5 and PUTRECORD.",
+          "vi": "Cộng 5 và PUTRECORD."
+        },
+        "why": {
+          "en": "Write the edited record at the selected pointer.",
+          "vi": "Ghi record đã edit tại pointer."
+        },
+        "result": {
+          "en": "Position 2 quantity=12.",
+          "vi": "Position 2 quantity=12."
+        },
+        "check": {
+          "en": "Check: Position 2 quantity=12.",
+          "vi": "Tự kiểm tra: Position 2 quantity=12."
+        }
+      },
+      {
+        "id": "step-6",
+        "action": {
+          "en": "Compare snapshots and close.",
+          "vi": "So snapshot và close."
+        },
+        "why": {
+          "en": "Only the target may change.",
+          "vi": "Chỉ target được đổi."
+        },
+        "result": {
+          "en": "Other four records unchanged; file closed.",
+          "vi": "Bốn record khác không đổi; file đóng."
+        },
+        "check": {
+          "en": "Check: Other four records unchanged; file closed.",
+          "vi": "Tự kiểm tra: Bốn record khác không đổi; file đóng."
+        }
+      }
+    ],
+    "result": {
+      "en": "Record 3 changes from quantity 7 to 12; every other record is preserved.",
+      "vi": "Record 3 đổi quantity 7 thành 12; mọi record khác được giữ."
+    },
+    "selfCheck": {
+      "en": "Did you distinguish record number, logical position and optional byte offset?",
+      "vi": "Bạn đã phân biệt record number, logical position và byte offset tùy chọn chưa?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "OPENFILE FOR RANDOM",
+        "vi": "OPENFILE FOR RANDOM"
+      },
+      {
+        "en": "SEEK to a location",
+        "vi": "SEEK tới location"
+      },
+      {
+        "en": "GETRECORD/PUTRECORD",
+        "vi": "GETRECORD/PUTRECORD"
+      },
+      {
+        "en": "fixed record/key/position",
+        "vi": "fixed record/key/position"
+      }
+    ],
+    "distinguish": {
+      "en": "Random file access selects a stored record position; it has nothing to do with generating random values.",
+      "vi": "Random file access chọn vị trí record lưu trữ; không liên quan tạo random value."
+    },
+    "method": [
+      {
+        "en": "Copy record layout, base and valid range.",
+        "vi": "Chép record layout, base và range."
+      },
+      {
+        "en": "Compute and range-check the position.",
+        "vi": "Tính và kiểm tra range position."
+      },
+      {
+        "en": "SEEK, GET, edit, SEEK/PUT.",
+        "vi": "SEEK, GET, edit, SEEK/PUT."
+      },
+      {
+        "en": "Compare all records before/after and close.",
+        "vi": "So mọi record before/after và close."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "State the convention, then produce syntactically consistent code or notation.",
+          "vi": "Nêu convention rồi viết code/ký hiệu nhất quán cú pháp."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record every relevant state change in execution order.",
+          "vi": "Ghi mọi thay đổi trạng thái liên quan theo thứ tự thực thi."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link a cause or rule to its consequence; do not only name it.",
+          "vi": "Nối nguyên nhân hoặc quy tắc với hệ quả; không chỉ nêu tên."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use the same criterion for both alternatives.",
+          "vi": "Dùng cùng một tiêu chí cho cả hai phương án."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Select a method and connect its feature to the scenario requirement.",
+          "vi": "Chọn phương pháp và nối đặc điểm của nó với yêu cầu tình huống."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Record number always equals byte offset.",
+        "vi": "Record number luôn bằng byte offset."
+      },
+      "correction": {
+        "en": "Use the declared mapping and record size/base if supplied.",
+        "vi": "Dùng mapping và record size/base được cho."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "PUTRECORD appends.",
+        "vi": "PUTRECORD append."
+      },
+      "correction": {
+        "en": "It replaces the record at the pointer in this fixture.",
+        "vi": "Nó thay record tại pointer trong fixture."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Random access uses random numbers.",
+        "vi": "Random access dùng random number."
+      },
+      "correction": {
+        "en": "It directly selects a record location.",
+        "vi": "Nó chọn trực tiếp record location."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Updating one record may reorder all records.",
+        "vi": "Update một record có thể reorder tất cả."
+      },
+      "correction": {
+        "en": "Unrelated records must remain byte/logically unchanged in the model.",
+        "vi": "Record khác phải không đổi trong model."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "cp-random-recall",
+      "prompt": {
+        "en": "Which response begins an accurate answer about random-file records?",
+        "vi": "Phản hồi nào bắt đầu câu trả lời chính xác về record trong random file?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "State the meaning and declared convention for random-file records.",
+            "vi": "Nêu ý nghĩa và convention đã khai báo cho record trong random file."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-random-recognition",
+      "prompt": {
+        "en": "Which evidence should identify the required method?",
+        "vi": "Bằng chứng nào xác định phương pháp cần dùng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Use the supplied terms, state and required output.",
+            "vi": "Dùng term, state và output được cung cấp."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-random-next-state",
+      "prompt": {
+        "en": "What must be read before predicting the next state?",
+        "vi": "Cần đọc gì trước khi dự đoán state tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Read the current state and exact operation rule.",
+            "vi": "Đọc current state và operation rule chính xác."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-random-trace",
+      "prompt": {
+        "en": "What makes a trace row complete?",
+        "vi": "Điều gì làm trace row đầy đủ?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Show before state, applied rule, calculation and after state.",
+            "vi": "Cho before state, rule áp dụng, phép tính và after state."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-random-write",
+      "prompt": {
+        "en": "How should code or notation be written?",
+        "vi": "Code hoặc notation nên được viết thế nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Declare one convention and keep all syntax consistent.",
+            "vi": "Khai báo một convention và giữ cú pháp nhất quán."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-random-transfer",
+      "prompt": {
+        "en": "A new question changes a convention. What should you do?",
+        "vi": "Đề mới đổi convention. Bạn nên làm gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Restate the new convention and recompute from that state.",
+            "vi": "Nêu lại convention mới và tính lại từ state đó."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Trace a random record update.",
+      "vi": "Trace update random record."
+    },
+    "answerPoints": [
+      {
+        "en": "State layout/base/range.",
+        "vi": "Nêu layout/base/range."
+      },
+      {
+        "en": "Calculate and validate position.",
+        "vi": "Tính và validate position."
+      },
+      {
+        "en": "Show SEEK/GET/edit/PUT pointer state.",
+        "vi": "Cho state SEEK/GET/edit/PUT."
+      },
+      {
+        "en": "Prove unrelated records unchanged.",
+        "vi": "Chứng minh record khác không đổi."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Random access selects a record position directly.",
+      "vi": "Random access chọn position trực tiếp."
+    },
+    {
+      "en": "SEEK moves; GET reads; PUT writes.",
+      "vi": "SEEK di chuyển; GET đọc; PUT ghi."
+    },
+    {
+      "en": "Formula assumptions must be declared.",
+      "vi": "Giả định formula phải khai báo."
+    },
+    {
+      "en": "Non-target preservation is part of correctness.",
+      "vi": "Giữ non-target là phần của correctness."
+    }
+  ],
+  "relatedSlugs": [
+    "serial-sequential-text-file-workflows",
+    "hashing-to-locate-records",
+    "exceptions-and-controlled-recovery"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Section 20, printed/PDF p.38",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 20, printed pp.533–535",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "Relevant convention on pp.22–29",
+      "kind": "guide"
+    },
+    {
+      "id": "qp",
+      "title": "Cambridge 9618/31 October/November 2023 question paper",
+      "locator": "Q8, PDF p.8",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms",
+      "title": "Cambridge 9618/31 October/November 2023 mark scheme",
+      "locator": "Q8, PDF p.6",
+      "kind": "mark-scheme"
+    }
+  ]
+}

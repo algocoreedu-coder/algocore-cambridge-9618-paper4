@@ -1,0 +1,844 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.1-T10",
+  "slug": "implementing-one-adt-with-another",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Implementing one ADT with another",
+    "vi": "Cài đặt một ADT bằng ADT khác"
+  },
+  "question": {
+    "en": "How can different internal structures preserve the same external ADT behaviour?",
+    "vi": "Các cấu trúc nội bộ khác nhau giữ cùng hành vi ADT bên ngoài như thế nào?"
+  },
+  "opening": {
+    "en": "A queue can keep its FIFO interface while two internal stacks move values between inbox and outbox.",
+    "vi": "Queue có thể giữ interface FIFO trong khi hai stack nội bộ chuyển value giữa inbox và outbox."
+  },
+  "objectives": [
+    {
+      "en": "Separate interface from representation.",
+      "vi": "Tách interface khỏi representation."
+    },
+    {
+      "en": "State a representation invariant.",
+      "vi": "Nêu representation invariant."
+    },
+    {
+      "en": "Map external operations to internal operations.",
+      "vi": "Map operation ngoài tới operation trong."
+    },
+    {
+      "en": "Justify behavior and compare costs.",
+      "vi": "Biện minh behavior và so sánh cost."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know stack, queue, list, tree and dictionary interfaces.",
+      "vi": "Biết interface stack, queue, list, tree và dictionary."
+    },
+    {
+      "en": "Trace short operation sequences.",
+      "vi": "Trace chuỗi operation ngắn."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "interface",
+      "meaning": {
+        "en": "Observable operations, inputs and results.",
+        "vi": "Operation, input và result observable."
+      }
+    },
+    {
+      "term": "representation",
+      "meaning": {
+        "en": "Internal data and mapped operations.",
+        "vi": "Data nội bộ và operation mapped."
+      }
+    },
+    {
+      "term": "invariant",
+      "meaning": {
+        "en": "Condition making internal state a valid external value.",
+        "vi": "Điều kiện làm state nội bộ thành value ngoài hợp lệ."
+      }
+    },
+    {
+      "term": "client",
+      "meaning": {
+        "en": "Code using the external interface.",
+        "vi": "Code dùng interface ngoài."
+      }
+    },
+    {
+      "term": "trade-off",
+      "meaning": {
+        "en": "A cost difference with behavior preserved.",
+        "vi": "Khác biệt cost khi behavior vẫn giữ."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "separation",
+      "title": {
+        "en": "Interface before representation",
+        "vi": "Interface trước representation"
+      },
+      "paragraphs": [
+        {
+          "en": "Define observable behavior first. A client should receive the same results even if the internal structure changes.",
+          "vi": "Định nghĩa behavior observable trước. Client phải nhận cùng result dù cấu trúc nội bộ đổi."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "invariant",
+      "title": {
+        "en": "Representation invariant",
+        "vi": "Representation invariant"
+      },
+      "paragraphs": [
+        {
+          "en": "The invariant explains how internal cells, links or component ADTs correspond to the external logical value.",
+          "vi": "Invariant giải thích cách ô, link hoặc component ADT nội bộ tương ứng với logical value ngoài."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "queue-two-stacks",
+      "title": {
+        "en": "Queue from two stacks",
+        "vi": "Queue bằng hai stack"
+      },
+      "paragraphs": [
+        {
+          "en": "ENQUEUE pushes to Inbox. DEQUEUE uses Outbox; if it is empty, pop every Inbox item into Outbox, reversing order exactly once before removal.",
+          "vi": "ENQUEUE push vào Inbox. DEQUEUE dùng Outbox; nếu empty, pop toàn bộ Inbox sang Outbox, đảo order đúng một lần trước remove."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "scope",
+      "title": {
+        "en": "Required representations and graph boundary",
+        "vi": "Representation bắt buộc và boundary graph"
+      },
+      "paragraphs": [
+        {
+          "en": "Arrays/records/other ADTs may implement stack, queue, linked list, dictionary and BST. For graph, know nodes, edges, direction/weight and justify suitability; graph-structure code is not required.",
+          "vi": "Mảng/record/ADT khác có thể cài stack, queue, linked list, dictionary và BST. Với graph, biết node, edge, direction/weight và justify suitability; không yêu cầu code cấu trúc graph."
+        }
+      ],
+      "code": "PROCEDURE Enqueue(NewValue : STRING)\n  CALL Push(Inbox, NewValue)\nENDPROCEDURE\n\nFUNCTION Dequeue() RETURNS STRING\n  IF IsEmpty(Outbox) THEN\n    WHILE NOT IsEmpty(Inbox)\n      CALL Push(Outbox, Pop(Inbox))\n    ENDWHILE\n  ENDIF\n  RETURN Pop(Outbox)\nENDFUNCTION",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "adt-implementation",
+    "title": {
+      "en": "Interface-to-internals workbench",
+      "vi": "Bàn map interface tới internals"
+    },
+    "introduction": {
+      "en": "External request, internal operations, invariant and observable result appear in one timeline.",
+      "vi": "Request ngoài, operation trong, invariant và result observable xuất hiện trên một timeline."
+    },
+    "task": {
+      "en": "Trace a queue built from two stacks, then compare array/list representations and inspect the graph scope card.",
+      "vi": "Trace queue tạo từ hai stack, rồi so representation array/list và xem scope card graph."
+    },
+    "conventions": [
+      {
+        "en": "External FIFO behavior is fixed.",
+        "vi": "Behavior FIFO ngoài cố định."
+      },
+      {
+        "en": "Internal stacks are LIFO.",
+        "vi": "Stack nội bộ là LIFO."
+      },
+      {
+        "en": "Graph code is outside the Section 19 core.",
+        "vi": "Code graph ngoài core Section 19."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Preserve FIFO with two LIFO stacks",
+      "vi": "Giữ FIFO bằng hai stack LIFO"
+    },
+    "prompt": {
+      "en": "ENQUEUE A, ENQUEUE B, ENQUEUE C, DEQUEUE, ENQUEUE D, DEQUEUE.",
+      "vi": "ENQUEUE A, ENQUEUE B, ENQUEUE C, DEQUEUE, ENQUEUE D, DEQUEUE."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "interface",
+        "action": {
+          "en": "Write the external FIFO promise.",
+          "vi": "Ghi promise FIFO ngoài."
+        },
+        "why": {
+          "en": "Representation must be judged against observable behavior.",
+          "vi": "Representation phải được đánh giá theo behavior observable."
+        },
+        "result": {
+          "en": "Expected removals begin A, then B.",
+          "vi": "Removal dự kiến bắt đầu A, rồi B."
+        },
+        "check": {
+          "en": "Check that expected removals begin a, then b.",
+          "vi": "Kiểm tra rằng removal dự kiến bắt đầu a, rồi b."
+        }
+      },
+      {
+        "id": "enqueue",
+        "action": {
+          "en": "Push A, B, C onto Inbox.",
+          "vi": "Push A, B, C vào Inbox."
+        },
+        "why": {
+          "en": "ENQUEUE maps directly to one internal push.",
+          "vi": "ENQUEUE map trực tiếp tới một push nội bộ."
+        },
+        "result": {
+          "en": "Inbox bottom→top A,B,C; Outbox empty.",
+          "vi": "Inbox bottom→top A,B,C; Outbox empty."
+        },
+        "check": {
+          "en": "Check that inbox bottom→top a,b,c; outbox empty.",
+          "vi": "Kiểm tra rằng inbox bottom→top a,b,c; outbox empty."
+        }
+      },
+      {
+        "id": "transfer",
+        "action": {
+          "en": "For first DEQUEUE, move C, B, A from Inbox to Outbox.",
+          "vi": "Với DEQUEUE đầu, chuyển C, B, A từ Inbox sang Outbox."
+        },
+        "why": {
+          "en": "Two reversals make A the Outbox top.",
+          "vi": "Hai lần đảo làm A thành top Outbox."
+        },
+        "result": {
+          "en": "Outbox bottom→top C,B,A; Inbox empty.",
+          "vi": "Outbox bottom→top C,B,A; Inbox empty."
+        },
+        "check": {
+          "en": "Check that outbox bottom→top c,b,a; inbox empty.",
+          "vi": "Kiểm tra rằng outbox bottom→top c,b,a; inbox empty."
+        }
+      },
+      {
+        "id": "dequeue-a",
+        "action": {
+          "en": "POP Outbox and return A.",
+          "vi": "POP Outbox và trả A."
+        },
+        "why": {
+          "en": "A is the oldest enqueued value.",
+          "vi": "A là value enqueue cũ nhất."
+        },
+        "result": {
+          "en": "Observable FIFO promise holds.",
+          "vi": "Promise FIFO observable giữ đúng."
+        },
+        "check": {
+          "en": "Check that observable fifo promise holds.",
+          "vi": "Kiểm tra rằng promise fifo observable giữ đúng."
+        }
+      },
+      {
+        "id": "enqueue-d",
+        "action": {
+          "en": "Push D onto Inbox while Outbox still contains C,B.",
+          "vi": "Push D vào Inbox khi Outbox vẫn chứa C,B."
+        },
+        "why": {
+          "en": "Do not transfer while Outbox can serve older items.",
+          "vi": "Không transfer khi Outbox còn phục vụ item cũ."
+        },
+        "result": {
+          "en": "Inbox top D; Outbox top B.",
+          "vi": "Inbox top D; Outbox top B."
+        },
+        "check": {
+          "en": "Check that inbox top d; outbox top b.",
+          "vi": "Kiểm tra rằng inbox top d; outbox top b."
+        }
+      },
+      {
+        "id": "dequeue-b",
+        "action": {
+          "en": "POP Outbox and return B.",
+          "vi": "POP Outbox và trả B."
+        },
+        "why": {
+          "en": "B is older than C and D.",
+          "vi": "B cũ hơn C và D."
+        },
+        "result": {
+          "en": "Results A then B match a normal queue.",
+          "vi": "Result A rồi B khớp queue bình thường."
+        },
+        "check": {
+          "en": "Check that results a then b match a normal queue.",
+          "vi": "Kiểm tra rằng result a rồi b khớp queue bình thường."
+        }
+      }
+    ],
+    "result": {
+      "en": "Different internals preserve the same ENQUEUE/DEQUEUE results; costs differ by state.",
+      "vi": "Internals khác nhau giữ cùng result ENQUEUE/DEQUEUE; cost khác theo state."
+    },
+    "selfCheck": {
+      "en": "Could a client distinguish this representation from another queue by returned order?",
+      "vi": "Client có phân biệt representation này với queue khác bằng order trả về không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "ADT X using Y",
+        "vi": "ADT X dùng Y"
+      },
+      {
+        "en": "internal representation",
+        "vi": "representation nội bộ"
+      },
+      {
+        "en": "operation mapping/invariant",
+        "vi": "mapping operation/invariant"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: queue-from-two-stacks is one implementation, not the definition of a queue.",
+      "vi": "Dễ nhầm: queue-from-two-stacks là một implementation, không phải định nghĩa queue."
+    },
+    "method": [
+      {
+        "en": "Write external interface.",
+        "vi": "Ghi interface ngoài."
+      },
+      {
+        "en": "Name internal substrate.",
+        "vi": "Nêu substrate trong."
+      },
+      {
+        "en": "State invariant.",
+        "vi": "Nêu invariant."
+      },
+      {
+        "en": "Map each operation and trace results.",
+        "vi": "Map mỗi operation và trace result."
+      },
+      {
+        "en": "Compare cost without changing behavior.",
+        "vi": "So cost mà không đổi behavior."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Implementing one ADT with another: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho Cài đặt một ADT bằng ADT khác: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Implementing one ADT with another; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của Cài đặt một ADT bằng ADT khác; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Implementing one ADT with another to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của Cài đặt một ADT bằng ADT khác với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Implementing one ADT with another with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh Cài đặt một ADT bằng ADT khác với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Implementing one ADT with another, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của Cài đặt một ADT bằng ADT khác, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Representation is the ADT definition.",
+        "vi": "Representation là định nghĩa ADT."
+      },
+      "correction": {
+        "en": "Define observable operations separately.",
+        "vi": "Định nghĩa operation observable riêng."
+      },
+      "selfCheck": {
+        "en": "What can the client observe?",
+        "vi": "Client quan sát được gì?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Same behavior means same complexity.",
+        "vi": "Cùng behavior nghĩa cùng complexity."
+      },
+      "correction": {
+        "en": "Representations can preserve results but change time/space costs.",
+        "vi": "Representation có thể giữ result nhưng đổi cost time/space."
+      },
+      "selfCheck": {
+        "en": "How many internal operations occur?",
+        "vi": "Có bao nhiêu operation nội bộ?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Always transfer Inbox before DEQUEUE.",
+        "vi": "Luôn transfer Inbox trước DEQUEUE."
+      },
+      "correction": {
+        "en": "Transfer only when Outbox is empty.",
+        "vi": "Chỉ transfer khi Outbox empty."
+      },
+      "selfCheck": {
+        "en": "Are older items already in Outbox?",
+        "vi": "Item cũ đã ở Outbox chưa?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Graph structure code is mandatory.",
+        "vi": "Code cấu trúc graph là bắt buộc."
+      },
+      "correction": {
+        "en": "Syllabus requires features/justification and explicitly excludes graph-structure code.",
+        "vi": "Syllabus yêu cầu feature/justification và loại rõ code cấu trúc graph."
+      },
+      "selfCheck": {
+        "en": "What does the syllabus boundary say?",
+        "vi": "Boundary syllabus nói gì?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What belongs to an ADT interface?",
+        "vi": "Điều gì thuộc ADT interface?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Observable operations and results",
+            "vi": "Operation và result observable"
+          },
+          "feedback": {
+            "en": "Correct: the interface describes client-visible behavior",
+            "vi": "Đúng: interface mô tả behavior client nhìn thấy"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "One fixed array layout",
+            "vi": "Một layout mảng cố định"
+          },
+          "feedback": {
+            "en": "One fixed array layout conflicts with the rule: the interface describes client-visible behavior",
+            "vi": "Một layout mảng cố định trái với quy tắc: interface mô tả behavior client nhìn thấy"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Compiler frame addresses",
+            "vi": "Address call frame compiler"
+          },
+          "feedback": {
+            "en": "Compiler frame addresses conflicts with the rule: the interface describes client-visible behavior",
+            "vi": "Address call frame compiler trái với quy tắc: interface mô tả behavior client nhìn thấy"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the interface describes client-visible behavior",
+        "vi": "interface mô tả behavior client nhìn thấy"
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which prompt asks about implementation by another ADT?",
+        "vi": "Prompt nào hỏi implementation bằng ADT khác?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Implement a queue using two stacks",
+            "vi": "Cài queue bằng hai stack"
+          },
+          "feedback": {
+            "en": "Correct: one external interface is mapped onto another structure",
+            "vi": "Đúng: một interface ngoài được map lên cấu trúc khác"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Define FIFO only",
+            "vi": "Chỉ định nghĩa FIFO"
+          },
+          "feedback": {
+            "en": "Define FIFO only conflicts with the rule: one external interface is mapped onto another structure",
+            "vi": "Chỉ định nghĩa FIFO trái với quy tắc: một interface ngoài được map lên cấu trúc khác"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Trace binary search",
+            "vi": "Trace binary search"
+          },
+          "feedback": {
+            "en": "Trace binary search conflicts with the rule: one external interface is mapped onto another structure",
+            "vi": "Trace binary search trái với quy tắc: một interface ngoài được map lên cấu trúc khác"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "one external interface is mapped onto another structure",
+        "vi": "một interface ngoài được map lên cấu trúc khác"
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "Outbox contains top B and Inbox contains D. Next DEQUEUE?",
+        "vi": "Outbox có top B và Inbox có D. DEQUEUE tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Return B without transfer",
+            "vi": "Trả B không transfer"
+          },
+          "feedback": {
+            "en": "Correct: older Outbox items are served before newer Inbox items",
+            "vi": "Đúng: item Outbox cũ được phục vụ trước item Inbox mới"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Return D",
+            "vi": "Trả D"
+          },
+          "feedback": {
+            "en": "Return D conflicts with the rule: older Outbox items are served before newer Inbox items",
+            "vi": "Trả D trái với quy tắc: item Outbox cũ được phục vụ trước item Inbox mới"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Move B back to Inbox",
+            "vi": "Chuyển B về Inbox"
+          },
+          "feedback": {
+            "en": "Move B back to Inbox conflicts with the rule: older Outbox items are served before newer Inbox items",
+            "vi": "Chuyển B về Inbox trái với quy tắc: item Outbox cũ được phục vụ trước item Inbox mới"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "older Outbox items are served before newer Inbox items",
+        "vi": "item Outbox cũ được phục vụ trước item Inbox mới"
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "After enqueue A,B,C then first transfer, Outbox top?",
+        "vi": "Sau enqueue A,B,C rồi transfer đầu, top Outbox?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A",
+            "vi": "A"
+          },
+          "feedback": {
+            "en": "Correct: moving all values reverses order",
+            "vi": "Đúng: chuyển toàn bộ value đảo order"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "C",
+            "vi": "C"
+          },
+          "feedback": {
+            "en": "C conflicts with the rule: moving all values reverses order",
+            "vi": "C trái với quy tắc: chuyển toàn bộ value đảo order"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "B",
+            "vi": "B"
+          },
+          "feedback": {
+            "en": "B conflicts with the rule: moving all values reverses order",
+            "vi": "B trái với quy tắc: chuyển toàn bộ value đảo order"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "moving all values reverses order",
+        "vi": "chuyển toàn bộ value đảo order"
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "When does the transfer WHILE loop run?",
+        "vi": "Vòng WHILE transfer chạy khi nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Only when Outbox is empty",
+            "vi": "Chỉ khi Outbox empty"
+          },
+          "feedback": {
+            "en": "Correct: existing Outbox values are older and must remain first",
+            "vi": "Đúng: value Outbox hiện có cũ hơn và phải ra trước"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "On every ENQUEUE",
+            "vi": "Mỗi ENQUEUE"
+          },
+          "feedback": {
+            "en": "On every ENQUEUE conflicts with the rule: existing Outbox values are older and must remain first",
+            "vi": "Mỗi ENQUEUE trái với quy tắc: value Outbox hiện có cũ hơn và phải ra trước"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "After every POP",
+            "vi": "Sau mọi POP"
+          },
+          "feedback": {
+            "en": "After every POP conflicts with the rule: existing Outbox values are older and must remain first",
+            "vi": "Sau mọi POP trái với quy tắc: value Outbox hiện có cũ hơn và phải ra trước"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "existing Outbox values are older and must remain first",
+        "vi": "value Outbox hiện có cũ hơn và phải ra trước"
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "A road network needs vertices and weighted edges. What Section 19 answer is required?",
+        "vi": "Mạng đường cần vertex và edge có trọng số. Câu trả lời Section 19 cần gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Describe graph features and justify suitability; no structure code required",
+            "vi": "Mô tả feature graph và justify suitability; không cần code cấu trúc"
+          },
+          "feedback": {
+            "en": "Correct: the explicit syllabus boundary is interface/features, not graph code",
+            "vi": "Đúng: boundary syllabus rõ là interface/feature, không phải code graph"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Implement Dijkstra",
+            "vi": "Cài Dijkstra"
+          },
+          "feedback": {
+            "en": "Implement Dijkstra conflicts with the rule: the explicit syllabus boundary is interface/features, not graph code",
+            "vi": "Cài Dijkstra trái với quy tắc: boundary syllabus rõ là interface/feature, không phải code graph"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Write an adjacency matrix program",
+            "vi": "Viết chương trình adjacency matrix"
+          },
+          "feedback": {
+            "en": "Write an adjacency matrix program conflicts with the rule: the explicit syllabus boundary is interface/features, not graph code",
+            "vi": "Viết chương trình adjacency matrix trái với quy tắc: boundary syllabus rõ là interface/feature, không phải code graph"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the explicit syllabus boundary is interface/features, not graph code",
+        "vi": "boundary syllabus rõ là interface/feature, không phải code graph"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain how one ADT can implement another.",
+      "vi": "Giải thích cách một ADT cài ADT khác."
+    },
+    "answerPoints": [
+      {
+        "en": "State external behavior and internal representation.",
+        "vi": "Nêu behavior ngoài và representation trong."
+      },
+      {
+        "en": "Give invariant and operation mapping.",
+        "vi": "Nêu invariant và mapping operation."
+      },
+      {
+        "en": "Show equal observable results and discuss cost.",
+        "vi": "Cho thấy result observable bằng nhau và bàn cost."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Interface and representation are separate.",
+      "vi": "Interface và representation tách nhau."
+    },
+    {
+      "en": "Invariant connects internal state to external behavior.",
+      "vi": "Invariant nối state trong với behavior ngoài."
+    },
+    {
+      "en": "Graph implementation code is outside core.",
+      "vi": "Code implementation graph ngoài core."
+    }
+  ],
+  "relatedSlugs": [
+    "stack",
+    "queue",
+    "dictionary"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp487–489 / PDF pp503–505: graph scope and ADT implementations",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "s23-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2023 question paper",
+      "locator": "Question 11(c), p11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s23-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2023 mark scheme",
+      "locator": "Question 11(c), p9",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "w23-32-qp",
+      "title": "Cambridge 9618/32 — October/November 2023 question paper",
+      "locator": "Question 9(b), p9",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w23-32-ms",
+      "title": "Cambridge 9618/32 — October/November 2023 mark scheme",
+      "locator": "Question 9(b), pp6–7",
+      "kind": "mark-scheme"
+    }
+  ]
+}

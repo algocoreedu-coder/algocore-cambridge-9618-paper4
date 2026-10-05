@@ -1,23 +1,68 @@
-# AlgoCore × Fumadocs
+# AlgoCore Cambridge 9618 Learning
 
-Runnable theme preview using real Fumadocs UI `DocsLayout` and `DocsPage`, Next.js 16 and Tailwind 4. Created separately from the existing Chapter 13 websites.
+Next.js 16 and Fumadocs learning application for Cambridge International AS & A Level Computer Science (9618). The current release includes bilingual Paper 2, Paper 3 and Paper 4 learning areas, interactive visuals, revision practice and the AlgoCore design system.
 
-## Run
+## Requirements
 
-Use Node.js 22 or later. Run `npm install`, then `npm run dev`. Open http://localhost:3018/docs. `npm run build` builds the production app; `npm start` serves it. `npm run typecheck` checks TypeScript.
+- Node.js 22 or later
+- npm 10 or later
 
-## Reuse the theme
+## Local setup
 
-Copy `styles/algocore-theme.css` and import it after the Fumadocs neutral theme and preset in your main CSS. It supplies all Fumadocs color tokens, light/dark modes, a navy sidebar, active navigation and focus rings. `app/globals.css` adds the optional sample lesson styling. Keep color changes centralized in the theme file.
+```bash
+npm ci
+cp .env.example .env.local
+npm run dev
+```
 
-Brand evidence: `assets/hash_tables_visuals_v2/PROMPTS.md` in the parent Computer_Science workspace specifies navy #0B1F33, teal #11B5AE and orange #FF9F1C. The existing logo was copied from `tmp/paper1_rebuild/algocore_logo.png`. UI teal #007C83 is a darker derivative for readable text and white button labels. Dark mode uses #45D6C9. The logo remains unmodified.
+On Windows PowerShell, copy the environment template with:
 
-## Paper 4 learning course
+```powershell
+Copy-Item .env.example .env.local
+```
 
-Open `http://localhost:3018/paper-4` for the bilingual 2026 Paper 4 course hub. Stage 9 provides 13 packages, 26 lesson routes and 260 canonical learning blocks. The 58 Stage 8 visual patterns are embedded in the relevant lessons; lessons outside the executable pattern scope use an explicit static academic fallback.
+Replace every placeholder in `.env.local`, then open `http://127.0.0.1:3018/login`.
 
-Run `npm run stage9:registry` to rebuild and verify the learning-page registry, `npm run stage9:pedagogy` to run the deterministic pedagogy guards, or `npm run verify:stage9` for the complete registry, pedagogy, TypeScript and production-build chain. Stage 8 commands remain available for the visual-runtime input.
+## Authentication configuration
 
-## Scope
+The application uses one teacher-managed student account and a signed 12-hour session cookie. Configure these server-side environment variables:
 
-This workspace contains the theme preview, the Paper 4 learning course and its event visual runtime. It does not include accounts, automated grading or progress persistence. No external publication is configured.
+```text
+ALGOCORE_STUDENT_USERNAME
+ALGOCORE_STUDENT_PASSWORD
+ALGOCORE_SESSION_SECRET
+ALGOCORE_COOKIE_SECURE
+ALGOCORE_BUILD_ID
+```
+
+Use a random session secret of at least 32 bytes. Set `ALGOCORE_COOKIE_SECURE=true` for an HTTPS deployment. Set `ALGOCORE_BUILD_ID` to the `buildId` in `app/lib/paper2/generated/evidence-lock.json` so reviewed Paper 2 lessons are available in that build. Never commit `.env.local`; it is excluded by `.gitignore`.
+
+## Validation
+
+```bash
+npm run typecheck
+npm run build:paper4
+npm run check:student-auth
+```
+
+The full Paper 2 release gate is `npm run build` from the larger Computer Science workspace, where its sibling curriculum and review-evidence directories are available. `check:student-auth` expects a running production server. Override its default address with `STUDENT_AUTH_BASE_URL` when the server is not at `http://127.0.0.1:3041`.
+
+## Production
+
+```bash
+npm ci
+npm run build:paper4
+npm start
+```
+
+The start command listens on `0.0.0.0` and respects the hosting platform's `PORT` environment variable. Add the authentication variables and `ALGOCORE_BUILD_ID` to the deployment platform before publishing.
+
+Main routes:
+
+- `/login`
+- `/paper-2`
+- `/paper-3`
+- `/paper-4`
+- `/docs`
+
+The repository contains application source and generated learning data required at runtime. Local credentials, dependency folders, build output, preview artifacts and temporary agent files are excluded.

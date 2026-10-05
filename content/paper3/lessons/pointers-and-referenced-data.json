@@ -1,0 +1,547 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.1-T02",
+  "slug": "pointers-and-referenced-data",
+  "title": {
+    "en": "Pointers and referenced data",
+    "vi": "Con trỏ và dữ liệu được tham chiếu"
+  },
+  "question": {
+    "en": "What changes when a pointer moves, and what changes when its target value changes?",
+    "vi": "Điều gì thay đổi khi con trỏ chuyển đích và khi dữ liệu tại đích đổi?"
+  },
+  "opening": {
+    "en": "Two integer cells contain 25 and 40. A third cell does not contain either number: it holds the address of one of them. Moving that pointer changes which integer is reached; editing the integer changes the value reached without moving the pointer. Keeping these roles separate prevents a common tracing error.",
+    "vi": "Hai ô số nguyên chứa 25 và 40. Ô thứ ba không chứa một trong hai số đó: nó giữ địa chỉ của một ô. Chuyển con trỏ làm đổi số nguyên được tìm tới; sửa số nguyên làm đổi giá trị đọc được mà không chuyển con trỏ. Tách các vai trò này giúp tránh lỗi trace thường gặp."
+  },
+  "objectives": [
+    {
+      "en": "Define a pointer type compatible with its destination data.",
+      "vi": "Định nghĩa kiểu con trỏ tương thích với dữ liệu đích."
+    },
+    {
+      "en": "Distinguish the pointer value, the target address and the target data.",
+      "vi": "Phân biệt giá trị con trỏ, địa chỉ đích và dữ liệu đích."
+    },
+    {
+      "en": "Trace address-of and dereference without replacing an address with its data.",
+      "vi": "Mô phỏng lấy địa chỉ và giải tham chiếu mà không nhầm địa chỉ với dữ liệu."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "A variable has a type and a current stored value.",
+      "vi": "Biến có kiểu và giá trị hiện tại."
+    },
+    {
+      "en": "Memory can be represented by labelled locations.",
+      "vi": "Có thể mô hình hóa bộ nhớ bằng các vị trí có nhãn."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Pointer",
+      "meaning": {
+        "en": "A non-composite value referencing a memory location that holds data of a specified type.",
+        "vi": "Giá trị không phức hợp tham chiếu vị trí bộ nhớ chứa dữ liệu thuộc kiểu xác định."
+      }
+    },
+    {
+      "term": "Address",
+      "meaning": {
+        "en": "A label identifying a memory location, not the data stored there.",
+        "vi": "Nhãn xác định vị trí bộ nhớ, không phải dữ liệu được lưu ở đó."
+      }
+    },
+    {
+      "term": "Address-of: ^X",
+      "meaning": {
+        "en": "In this Cambridge pseudocode notation, obtain the address of X.",
+        "vi": "Trong ký hiệu pseudocode Cambridge này, lấy địa chỉ của X."
+      }
+    },
+    {
+      "term": "Dereference: P^",
+      "meaning": {
+        "en": "Access the value in the location referenced by P.",
+        "vi": "Truy cập giá trị tại vị trí được P tham chiếu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "address-is-not-data",
+      "title": {
+        "en": "Three labels, three meanings",
+        "vi": "Ba nhãn, ba ý nghĩa"
+      },
+      "paragraphs": [
+        {
+          "en": "In the diagram, address 100 contains integer 25 and address 104 contains integer 40. P contains 100, so its target is the first cell. P is not 25: it holds the address used to reach 25. The numbers 100 and 104 are illustrative memory labels, not a promise about real byte spacing or integer size.",
+          "vi": "Trong sơ đồ, địa chỉ 100 chứa số nguyên 25, địa chỉ 104 chứa số nguyên 40. P chứa 100 nên trỏ tới ô đầu. P không phải 25: nó giữ địa chỉ dùng để tìm tới 25. Các số 100 và 104 là nhãn minh họa, không quy định khoảng cách byte hay kích thước số nguyên thật."
+        },
+        {
+          "en": "Pointers let one structure refer to data elsewhere without copying that data into the pointer. Linked structures can use such references to connect nodes. This lesson teaches the distinction itself; it does not assume every integer that happens to look like an address is a pointer.",
+          "vi": "Con trỏ cho phép cấu trúc tham chiếu dữ liệu nơi khác mà không chép dữ liệu vào con trỏ. Cấu trúc liên kết có thể dùng tham chiếu để nối nút. Bài này tập trung vào sự phân biệt đó; không coi mọi số nguyên trông giống địa chỉ đều là con trỏ."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "typed-reference",
+      "title": {
+        "en": "Declare the type, then the pointer variable",
+        "vi": "Khai báo kiểu rồi biến con trỏ"
+      },
+      "paragraphs": [
+        {
+          "en": "TYPE TIntPointer = ^INTEGER says that this pointer type references an INTEGER location. DECLARE P : TIntPointer creates a pointer variable; it does not contain a caret after the colon because the pointer nature is already part of the type. The destination must match the referenced type.",
+          "vi": "TYPE TIntPointer = ^INTEGER cho biết kiểu con trỏ tham chiếu vị trí INTEGER. DECLARE P : TIntPointer tạo biến con trỏ; không cần thêm dấu mũ sau dấu hai chấm vì đặc tính con trỏ đã thuộc kiểu. Kiểu dữ liệu ở đích phải tương thích."
+        },
+        {
+          "en": "P ← ^A puts A’s address into P. Reading P^ then follows that address and obtains A’s value. The same caret has different roles depending on its position: type construction, address-of before a variable, or dereference after a pointer.",
+          "vi": "P ← ^A đưa địa chỉ của A vào P. Đọc P^ lần theo địa chỉ rồi lấy giá trị A. Dấu mũ có vai trò tùy vị trí: xây kiểu con trỏ, lấy địa chỉ khi đứng trước biến hoặc giải tham chiếu khi đứng sau con trỏ."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book",
+        "guide"
+      ],
+      "code": "TYPE TIntPointer = ^INTEGER\nDECLARE A : INTEGER\nDECLARE B : INTEGER\nDECLARE P : TIntPointer\nA ← 25\nB ← 40\nP ← ^A\nOUTPUT P^"
+    },
+    {
+      "id": "two-different-updates",
+      "title": {
+        "en": "Moving the pointer is not editing its target",
+        "vi": "Chuyển con trỏ khác sửa dữ liệu đích"
+      },
+      "paragraphs": [
+        {
+          "en": "After P ← ^B, the pointer contains B’s address, 104. The stored integers remain A=25 and B=40. A subsequent read of P^ yields 40 because the route changed, not because either integer was moved or overwritten.",
+          "vi": "Sau P ← ^B, con trỏ chứa địa chỉ B là 104. Các số nguyên vẫn là A=25 và B=40. Lần đọc P^ tiếp theo cho 40 vì đường tham chiếu đổi, không phải vì số nguyên được chuyển hoặc ghi đè."
+        },
+        {
+          "en": "Now change B to 45. P still contains 104, but the next read of P^ gives 45. If the model selects “No target”, there is no valid cell to read; it must report that condition instead of inventing zero. This is a demonstration state, not an additional Cambridge NULL syntax rule.",
+          "vi": "Bây giờ đổi B thành 45. P vẫn chứa 104 nhưng lần đọc P^ tiếp theo cho 45. Nếu chọn “Không có đích”, mô hình không có ô hợp lệ để đọc; cần báo tình trạng này thay vì tự trả số không. Đây là trạng thái minh họa, không phải quy tắc cú pháp NULL bổ sung của Cambridge."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "pointers",
+    "title": {
+      "en": "Follow the reference",
+      "vi": "Lần theo tham chiếu"
+    },
+    "introduction": {
+      "en": "Read the pointer cell, the address labels and the integer cells independently.",
+      "vi": "Đọc riêng ô con trỏ, nhãn địa chỉ và các ô số nguyên."
+    },
+    "task": {
+      "en": "Point P at the other cell, read P^, then edit that cell and read again. Predict which labels should stay unchanged.",
+      "vi": "Cho P trỏ sang ô kia, đọc P^ rồi sửa ô đó và đọc lại. Dự đoán nhãn nào phải giữ nguyên."
+    },
+    "conventions": [
+      {
+        "en": "P references INTEGER data; addresses 100 and 104 are illustrative.",
+        "vi": "P tham chiếu dữ liệu INTEGER; 100 và 104 là địa chỉ minh họa."
+      },
+      {
+        "en": "A read through a pointer with no target is rejected, not converted to zero.",
+        "vi": "Đọc qua con trỏ không có đích bị từ chối, không đổi thành số không."
+      },
+      {
+        "en": "Target values and pointer addresses are separate state variables.",
+        "vi": "Giá trị đích và địa chỉ con trỏ là các trạng thái riêng."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Move a pointer, then change its target",
+      "vi": "Chuyển con trỏ rồi sửa đích"
+    },
+    "prompt": {
+      "en": "A at 100 holds 25; B at 104 holds 40; P initially points to A. Move P to B, then set B to 45. State P and P^ after each change.",
+      "vi": "A tại 100 chứa 25; B tại 104 chứa 40; P ban đầu trỏ A. Chuyển P tới B rồi gán B=45. Nêu P và P^ sau mỗi thay đổi."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "initial",
+        "action": {
+          "en": "Read the initial reference.",
+          "vi": "Đọc tham chiếu ban đầu."
+        },
+        "why": {
+          "en": "P identifies a location; dereferencing reads what is stored there.",
+          "vi": "P xác định vị trí; giải tham chiếu đọc dữ liệu tại đó."
+        },
+        "result": {
+          "en": "P=100 and P^=25.",
+          "vi": "P=100 và P^=25."
+        },
+        "check": {
+          "en": "Keep address 100 separate from integer 25.",
+          "vi": "Tách địa chỉ 100 khỏi số nguyên 25."
+        }
+      },
+      {
+        "id": "retarget",
+        "action": {
+          "en": "Assign P the address of B.",
+          "vi": "Gán địa chỉ của B cho P."
+        },
+        "why": {
+          "en": "The address-of expression changes the reference only.",
+          "vi": "Biểu thức lấy địa chỉ chỉ đổi tham chiếu."
+        },
+        "result": {
+          "en": "P=104; A=25 and B=40 are unchanged.",
+          "vi": "P=104; A=25 và B=40 không đổi."
+        },
+        "check": {
+          "en": "No integer cell was assigned in this step.",
+          "vi": "Không có ô số nguyên nào được gán ở bước này."
+        },
+        "code": "P ← ^B"
+      },
+      {
+        "id": "read-target",
+        "action": {
+          "en": "Dereference P.",
+          "vi": "Giải tham chiếu P."
+        },
+        "why": {
+          "en": "The new address leads to B rather than A.",
+          "vi": "Địa chỉ mới dẫn tới B thay vì A."
+        },
+        "result": {
+          "en": "P^=40 while P remains 104.",
+          "vi": "P^=40 trong khi P vẫn 104."
+        },
+        "check": {
+          "en": "Reading a value does not replace the pointer with that value.",
+          "vi": "Đọc giá trị không thay con trỏ bằng giá trị đó."
+        },
+        "code": "OUTPUT P^"
+      },
+      {
+        "id": "edit-target",
+        "action": {
+          "en": "Set B to 45 and read P^ again.",
+          "vi": "Gán B=45 rồi đọc lại P^."
+        },
+        "why": {
+          "en": "The destination data changes without moving the reference.",
+          "vi": "Dữ liệu đích đổi mà tham chiếu không chuyển."
+        },
+        "result": {
+          "en": "P=104; P^=45; A=25.",
+          "vi": "P=104; P^=45; A=25."
+        },
+        "check": {
+          "en": "The only memory value changed is B.",
+          "vi": "Giá trị bộ nhớ duy nhất đổi là B."
+        },
+        "code": "B ← 45\nOUTPUT P^"
+      }
+    ],
+    "result": {
+      "en": "Changing the pointer changed the destination; changing B changed the value at that destination.",
+      "vi": "Đổi con trỏ làm đổi đích; đổi B làm đổi dữ liệu tại đích."
+    },
+    "selfCheck": {
+      "en": "For each statement, mark whether it writes P, writes a data cell, or merely reads. Then follow the current address.",
+      "vi": "Với mỗi lệnh, đánh dấu nó ghi P, ghi ô dữ liệu hay chỉ đọc. Sau đó lần theo địa chỉ hiện tại."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book",
+      "guide"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A declaration uses ^ followed by a target type, or the task distinguishes addresses from contents.",
+        "vi": "Khai báo dùng ^ trước kiểu đích hoặc bài toán phân biệt địa chỉ với nội dung."
+      },
+      {
+        "en": "A trace asks for both a pointer value and the value obtained by dereferencing it.",
+        "vi": "Bài trace hỏi cả giá trị con trỏ và giá trị khi giải tham chiếu."
+      }
+    ],
+    "distinguish": {
+      "en": "A record groups fields; a pointer is a reference to a location. An array index can select a position, but is not automatically a pointer type.",
+      "vi": "Record gom các trường; con trỏ tham chiếu vị trí. Chỉ số mảng chọn vị trí nhưng không tự trở thành kiểu con trỏ."
+    },
+    "method": [
+      {
+        "en": "Label each cell with address, type and current data.",
+        "vi": "Gắn nhãn địa chỉ, kiểu và dữ liệu hiện tại cho mỗi ô."
+      },
+      {
+        "en": "Trace pointer assignments separately from writes to target data.",
+        "vi": "Trace phép gán con trỏ riêng với ghi dữ liệu đích."
+      },
+      {
+        "en": "For P^, follow the current address and check that the target is valid.",
+        "vi": "Với P^, lần theo địa chỉ hiện tại và kiểm đích hợp lệ."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“P becomes 45 when its target becomes 45.”",
+        "vi": "“P thành 45 khi đích của nó thành 45.”"
+      },
+      "correction": {
+        "en": "P keeps the target address. Only the dereferenced result changes.",
+        "vi": "P giữ địa chỉ đích. Chỉ kết quả giải tham chiếu thay đổi."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Any number can be treated as a valid pointer.”",
+        "vi": "“Mọi số đều có thể coi là con trỏ hợp lệ.”"
+      },
+      "correction": {
+        "en": "A pointer has a declared reference type and must identify a valid target in the model.",
+        "vi": "Con trỏ có kiểu tham chiếu đã khai báo và phải xác định đích hợp lệ trong mô hình."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“No target means the value zero.”",
+        "vi": "“Không có đích nghĩa là giá trị không.”"
+      },
+      "correction": {
+        "en": "No valid reference is different from a valid cell containing zero.",
+        "vi": "Không có tham chiếu hợp lệ khác với ô hợp lệ chứa số không."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "retarget",
+      "prompt": {
+        "en": "P moves from address 100 to 104. Which data cell must change?",
+        "vi": "P chuyển từ địa chỉ 100 sang 104. Ô dữ liệu nào bắt buộc đổi?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Neither data cell; only P changes.",
+            "vi": "Không ô dữ liệu nào; chỉ P đổi."
+          },
+          "feedback": {
+            "en": "Correct. Changing the stored address does not write the target integers.",
+            "vi": "Đúng. Đổi địa chỉ được lưu không ghi các số nguyên đích."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "The integer at 100 moves to 104.",
+            "vi": "Số nguyên ở 100 chuyển sang 104."
+          },
+          "feedback": {
+            "en": "Retargeting changes a reference, not the physical data layout.",
+            "vi": "Chuyển đích đổi tham chiếu, không chuyển bố trí dữ liệu."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "Both data cells become 104.",
+            "vi": "Cả hai ô dữ liệu thành 104."
+          },
+          "feedback": {
+            "en": "The assignment writes the pointer, not both targets.",
+            "vi": "Phép gán ghi con trỏ, không ghi hai đích."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Track the destination of the assignment separately from the destination of the pointer.",
+        "vi": "Tách đối tượng nhận phép gán khỏi đích của con trỏ."
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "Q points to address 220, which contains INTEGER 7. That cell is updated to 9. What are Q and Q^?",
+        "vi": "Q trỏ địa chỉ 220 chứa INTEGER 7. Ô này được cập nhật thành 9. Q và Q^ bằng bao nhiêu?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Q=9; Q^=220",
+            "vi": "Q=9; Q^=220"
+          },
+          "feedback": {
+            "en": "This swaps address and data roles.",
+            "vi": "Đáp án này đảo vai trò địa chỉ và dữ liệu."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Q=220; Q^=9",
+            "vi": "Q=220; Q^=9"
+          },
+          "feedback": {
+            "en": "Correct. The reference remains 220; dereferencing reads the updated integer.",
+            "vi": "Đúng. Tham chiếu vẫn là 220; giải tham chiếu đọc số nguyên mới."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "Q=220; Q^=7",
+            "vi": "Q=220; Q^=7"
+          },
+          "feedback": {
+            "en": "A new read sees the current cell value, not a cached copy of the old value.",
+            "vi": "Lần đọc mới thấy giá trị hiện tại, không phải bản sao cũ."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Pointers refer to locations; the data at those locations can change.",
+        "vi": "Con trỏ tham chiếu vị trí; dữ liệu tại vị trí có thể đổi."
+      }
+    },
+    {
+      "id": "type",
+      "prompt": {
+        "en": "Which type matches a pointer to an INTEGER variable?",
+        "vi": "Kiểu nào phù hợp với con trỏ tới biến INTEGER?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "TYPE PType = ^CHAR",
+            "vi": "TYPE PType = ^CHAR"
+          },
+          "feedback": {
+            "en": "This promises a character destination, not an integer destination.",
+            "vi": "Kiểu này yêu cầu đích ký tự, không phải số nguyên."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "TYPE PType = (INTEGER)",
+            "vi": "TYPE PType = (INTEGER)"
+          },
+          "feedback": {
+            "en": "This is enum-shaped syntax, not a pointer declaration.",
+            "vi": "Đây là dạng cú pháp enum, không phải khai báo con trỏ."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "TYPE PType = ^INTEGER",
+            "vi": "TYPE PType = ^INTEGER"
+          },
+          "feedback": {
+            "en": "Correct. The caret constructs a pointer type and INTEGER names its target type.",
+            "vi": "Đúng. Dấu mũ tạo kiểu con trỏ; INTEGER là kiểu đích."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "A destination type is part of the pointer contract.",
+        "vi": "Kiểu đích là một phần của quy ước con trỏ."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain the difference between P, ^A and P^ without drawing arrows.",
+      "vi": "Giải thích sự khác nhau giữa P, ^A và P^ mà không dùng mũi tên."
+    },
+    "answerPoints": [
+      {
+        "en": "P is the pointer variable whose value is an address.",
+        "vi": "P là biến con trỏ có giá trị là địa chỉ."
+      },
+      {
+        "en": "^A obtains the address of A.",
+        "vi": "^A lấy địa chỉ của A."
+      },
+      {
+        "en": "P^ reads the data at the location P currently references.",
+        "vi": "P^ đọc dữ liệu ở vị trí P hiện tham chiếu."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Address and contents are different values.",
+      "vi": "Địa chỉ và nội dung là hai giá trị khác nhau."
+    },
+    {
+      "en": "Changing a reference and changing its target data have different effects.",
+      "vi": "Đổi tham chiếu và đổi dữ liệu đích có tác động khác nhau."
+    },
+    {
+      "en": "Check destination type and validity before dereferencing.",
+      "vi": "Kiểm kiểu và tính hợp lệ của đích trước khi giải tham chiếu."
+    }
+  ],
+  "relatedSlugs": [
+    "user-defined-and-enumerated-types",
+    "records-and-composite-models",
+    "linked-list"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.1, p.32",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=32"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.305–306; examples independently checked",
+      "kind": "book"
+    },
+    {
+      "id": "guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, exams 2026, Version 1",
+      "locator": "pp.12,14; code in this lesson is algorithmic pseudocode, not executable Python",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide-for-teachers.pdf"
+    }
+  ]
+}

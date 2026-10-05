@@ -1,0 +1,958 @@
+{
+  "schemaVersion": 1,
+  "version": "T08-academic-r6-reviewed",
+  "topicId": "T08",
+  "sectionId": "10.2",
+  "slug": "linear-search",
+  "learningMode": "procedural",
+  "estimatedMinutes": 70,
+  "title": {
+    "en": "Linear search",
+    "vi": "Tìm kiếm tuyến tính"
+  },
+  "question": {
+    "en": "What must the search return, and when is it safe to stop?",
+    "vi": "Phép tìm kiếm phải trả gì và khi nào được dừng?"
+  },
+  "opening": {
+    "en": "A linear search checks the active array positions in order. The question contract decides the match condition, the result and whether an early stop is valid.",
+    "vi": "Linear search kiểm tra lần lượt các vị trí đang dùng trong mảng. Hợp đồng của câu hỏi quyết định điều kiện khớp, kết quả và việc có được dừng sớm hay không."
+  },
+  "objectives": [
+    {
+      "en": "State the active domain, match condition, success result and not-found result before writing the loop.",
+      "vi": "Nêu vùng dữ liệu đang dùng, điều kiện khớp, kết quả thành công và kết quả không tìm thấy trước khi viết vòng lặp."
+    },
+    {
+      "en": "Trace a first-match linear search without reading outside the active range.",
+      "vi": "Trace tìm kiếm tuyến tính lấy lần khớp đầu mà không đọc ngoài vùng đang dùng."
+    },
+    {
+      "en": "Adapt the scan for a different result or a two-field match.",
+      "vi": "Điều chỉnh phép duyệt cho đầu ra khác hoặc điều kiện khớp hai field."
+    },
+    {
+      "en": "Embed search and sort logic inside a validated array-of-records problem while preserving field relationships.",
+      "vi": "Đặt logic search và sort trong bài array of records có validation mà vẫn giữ quan hệ giữa các field."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Arrays and indices",
+        "vi": "Mảng và chỉ số"
+      },
+      "reason": {
+        "en": "Capacity, lower/upper bounds and active count determine which cells may be read.",
+        "vi": "Sức chứa, cận dưới/cận trên và số phần tử đang dùng quyết định ô nào được đọc."
+      }
+    },
+    {
+      "title": {
+        "en": "Selection and loops",
+        "vi": "Rẽ nhánh và vòng lặp"
+      },
+      "reason": {
+        "en": "The scan must choose between storing a match and advancing, then terminate safely.",
+        "vi": "Phép duyệt phải chọn giữa lưu kết quả và tăng chỉ số, rồi dừng an toàn."
+      }
+    },
+    {
+      "title": {
+        "en": "Functions and RETURN",
+        "vi": "Hàm và RETURN"
+      },
+      "reason": {
+        "en": "The caller needs a returned index; OUTPUT is a different contract.",
+        "vi": "Nơi gọi cần nhận chỉ số trả về; OUTPUT là hợp đồng khác."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "search key / target",
+      "meaning": {
+        "en": "The value or fields that must match.",
+        "vi": "Giá trị hoặc các field cần khớp."
+      }
+    },
+    {
+      "term": "active range",
+      "meaning": {
+        "en": "The declared subset that currently contains searchable data.",
+        "vi": "Phần đã xác định hiện chứa dữ liệu được phép tìm."
+      }
+    },
+    {
+      "term": "first match",
+      "meaning": {
+        "en": "The matching element with the lowest visited index.",
+        "vi": "Phần tử khớp có chỉ số nhỏ nhất theo thứ tự duyệt."
+      }
+    },
+    {
+      "term": "not-found result",
+      "meaning": {
+        "en": "A contract value such as -1 used when the whole active range contains no match.",
+        "vi": "Giá trị quy ước như -1 dùng khi toàn vùng đang dùng không có phần tử khớp."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "An array or record collection, a target/key and a required output are given.",
+        "vi": "Đề cho mảng hoặc tập record, khóa cần tìm và đầu ra cần trả."
+      },
+      {
+        "en": "“First occurrence” or “stop as soon as found” permits an early stop.",
+        "vi": "“Lần xuất hiện đầu tiên” hoặc “dừng ngay khi tìm thấy” cho phép dừng sớm."
+      },
+      {
+        "en": "A missing case requires a result such as -1, FALSE or one final message.",
+        "vi": "Trường hợp không có cần kết quả như -1, FALSE hoặc một thông báo cuối."
+      },
+      {
+        "en": "A search target contains more than one field or only part of the array is occupied.",
+        "vi": "Mục tiêu search có nhiều hơn một field hoặc chỉ một phần array được sử dụng."
+      },
+      {
+        "en": "The question combines declaration, validation, processing and output around search or sort.",
+        "vi": "Đề kết hợp khai báo, validation, xử lý và output quanh search hoặc sort."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "The word “find” alone does not determine which search or output the question requires.",
+        "vi": "Riêng từ “find” không quyết định thuật toán tìm hay đầu ra cần trả."
+      },
+      {
+        "en": "A sorted array does not replace an explicit linear-search requirement.",
+        "vi": "Mảng đã sắp xếp không thay thế yêu cầu linear search được nêu rõ."
+      },
+      {
+        "en": "A blank record is not an end marker unless the specification guarantees it.",
+        "vi": "Record trống không phải dấu kết thúc nếu đặc tả không bảo đảm điều đó."
+      },
+      {
+        "en": "Search all allocated slots even when only Count records are occupied.",
+        "vi": "Search mọi slot đã cấp phát dù chỉ Count record được sử dụng."
+      },
+      {
+        "en": "Swapping only the key field keeps a record array valid.",
+        "vi": "Chỉ swap field khóa vẫn giữ array record hợp lệ."
+      }
+    ],
+    "answerProduct": {
+      "en": "A complete scan contract and pseudocode/trace that returns exactly the requested index, value, Boolean, count or message.",
+      "vi": "Hợp đồng tìm kiếm đầy đủ và pseudocode/trace trả đúng chỉ số, giá trị, Boolean, số lượng hoặc thông báo mà đề yêu cầu."
+    },
+    "method": [
+      {
+        "en": "Write the active bounds and exact match condition.",
+        "vi": "Viết vùng chỉ số đang dùng và điều kiện khớp chính xác."
+      },
+      {
+        "en": "Choose the success product and the not-found convention.",
+        "vi": "Chọn sản phẩm khi thành công và quy ước không tìm thấy."
+      },
+      {
+        "en": "Visit in index order; advance on every unfinished path.",
+        "vi": "Duyệt theo thứ tự chỉ số; mọi nhánh chưa xong phải làm chỉ số tiến lên."
+      },
+      {
+        "en": "Stop only when the requested product is complete.",
+        "vi": "Chỉ dừng khi sản phẩm được yêu cầu đã hoàn tất."
+      },
+      {
+        "en": "Check first, last, missing, empty and duplicate cases when the contract permits them.",
+        "vi": "Kiểm trường hợp đầu, cuối, vắng, rỗng và trùng khi hợp đồng cho phép."
+      },
+      {
+        "en": "Define the occupied range before searching or sorting.",
+        "vi": "Xác định miền đang sử dụng trước khi search hoặc sort."
+      },
+      {
+        "en": "Write the complete match condition across all required fields.",
+        "vi": "Viết điều kiện match đầy đủ trên mọi field được yêu cầu."
+      },
+      {
+        "en": "If ordering records, move the whole record or every parallel field together.",
+        "vi": "Nếu sắp xếp record, di chuyển cả record hoặc mọi field song song cùng nhau."
+      },
+      {
+        "en": "Handle no-match and invalid input explicitly before output.",
+        "vi": "Xử lý rõ no-match và input không hợp lệ trước khi output."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t08-contract",
+      "title": {
+        "en": "The contract controls the loop",
+        "vi": "Hợp đồng điều khiển vòng lặp"
+      },
+      "paragraphs": [
+        {
+          "en": "Linear search checks active elements from the lower bound in order. It does not require sorted data.",
+          "vi": "Linear search kiểm tra lần lượt các phần tử đang dùng từ cận dưới. Thuật toán không yêu cầu dữ liệu đã sắp xếp."
+        },
+        {
+          "en": "For a first-match contract, all earlier positions have been ruled out when a match is stored. For last/count/all contracts, the scan must continue.",
+          "vi": "Với hợp đồng lấy lần khớp đầu, mọi vị trí trước đó đã bị loại khi lưu kết quả. Với hợp đồng lấy cuối/đếm/tất cả, phép duyệt phải tiếp tục."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Capacity is not the same as the active count.",
+          "vi": "Sức chứa không giống số phần tử đang dùng."
+        },
+        {
+          "en": "An index is a position; an element is the value at that position.",
+          "vi": "Chỉ số là vị trí; phần tử là giá trị tại vị trí đó."
+        },
+        {
+          "en": "Count=0 must perform zero array reads.",
+          "vi": "Count=0 phải không đọc ô mảng nào."
+        }
+      ],
+      "sourceIds": [
+        "s26-10.2",
+        "book-10.2",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "t08-contract-variants",
+      "title": {
+        "en": "One scan, different products",
+        "vi": "Một phép duyệt, nhiều sản phẩm khác nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "The match condition may use one value or several fields in the same record. The requested product may be an index, associated field, Boolean, count or message.",
+          "vi": "Điều kiện khớp có thể dùng một giá trị hoặc nhiều field trong cùng record. Sản phẩm có thể là chỉ số, field liên quan, Boolean, số lượng hoặc thông báo."
+        }
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Contract",
+            "vi": "Hợp đồng"
+          },
+          {
+            "en": "Can stop at first match?",
+            "vi": "Được dừng ở lần khớp đầu?"
+          },
+          {
+            "en": "Stored result",
+            "vi": "Kết quả lưu"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "first",
+              "vi": "đầu tiên"
+            },
+            {
+              "en": "yes",
+              "vi": "có"
+            },
+            {
+              "en": "first index/value",
+              "vi": "chỉ số/giá trị đầu"
+            }
+          ],
+          [
+            {
+              "en": "last",
+              "vi": "cuối cùng"
+            },
+            {
+              "en": "no",
+              "vi": "không"
+            },
+            {
+              "en": "most recent matching index",
+              "vi": "chỉ số khớp gần nhất"
+            }
+          ],
+          [
+            {
+              "en": "count/all",
+              "vi": "đếm/tất cả"
+            },
+            {
+              "en": "no",
+              "vi": "không"
+            },
+            {
+              "en": "count or collection",
+              "vi": "số lượng hoặc tập kết quả"
+            }
+          ]
+        ]
+      },
+      "sourceIds": [
+        "book-10.2",
+        "qp-w25-23-q8a",
+        "ms-w25-23-q8a",
+        "teacher-t08"
+      ]
+    },
+    {
+      "id": "t08-mixed-record-problem",
+      "title": {
+        "en": "Search belongs inside a data contract",
+        "vi": "Search nằm trong một data contract"
+      },
+      "paragraphs": [
+        {
+          "en": "An exam-length search task often begins with declarations and validation, then restricts processing to occupied elements, applies a single or multi-field condition, and produces either one result, every match or a no-match message.",
+          "vi": "Bài search dài thường bắt đầu bằng khai báo và validation, sau đó giới hạn xử lý vào phần tử đang dùng, áp dụng điều kiện một hoặc nhiều field và tạo một kết quả, mọi match hoặc thông báo no-match."
+        },
+        {
+          "en": "For an array of records, a record is the unit of meaning. Sorting or moving a key without its associated fields corrupts the relationship even if the key order looks correct.",
+          "vi": "Với array of records, record là đơn vị có ý nghĩa. Sort hoặc di chuyển khóa mà không đi cùng field liên quan làm hỏng quan hệ dù thứ tự khóa trông đúng."
+        }
+      ],
+      "sourceIds": [
+        "s26-10.2",
+        "guide-2026",
+        "book-10.2",
+        "teacher-t08"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T08"
+    ],
+    "title": {
+      "en": "Follow Index, Result and the active range",
+      "vi": "Theo dõi Index, Result và vùng đang dùng"
+    },
+    "introduction": {
+      "en": "The canonical visual uses Codes[1:8], Count=5, data 31,7,18,42,7 and Target=42. It returns index 4.",
+      "vi": "Visual chuẩn dùng Codes[1:8], Count=5, dữ liệu 31,7,18,42,7 và Target=42. Kết quả là chỉ số 4."
+    },
+    "task": {
+      "en": "At each state, predict whether an element is read and whether the search advances, stores Result or returns.",
+      "vi": "Ở mỗi trạng thái, dự đoán có đọc phần tử không và phép tìm sẽ tăng chỉ số, lưu Result hay trả kết quả."
+    },
+    "conventions": [
+      {
+        "en": "Only positions 1..Count are searchable; the physical capacity remains eight.",
+        "vi": "Chỉ các vị trí 1..Count được tìm; sức chứa vật lý vẫn là tám."
+      },
+      {
+        "en": "The guard is checked before every array read.",
+        "vi": "Điều kiện lặp được kiểm trước mỗi lần đọc mảng."
+      },
+      {
+        "en": "Target=7 returns 2 because first-match semantics ignore the later duplicate after success.",
+        "vi": "Target=7 trả 2 vì hợp đồng khớp đầu không xét bản sao sau khi thành công."
+      }
+    ],
+    "sourceIds": [
+      "s26-10.2",
+      "book-10.2",
+      "teacher-t08"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T08-W1",
+      "title": {
+        "en": "Find the first matching index",
+        "vi": "Tìm chỉ số khớp đầu tiên"
+      },
+      "prompt": {
+        "en": "Codes[1:8] has five active values 31,7,18,42,7. Write FindFirst(Target, Count) returning the first matching index or -1. Trace Target=42, Count=5.",
+        "vi": "Codes[1:8] có năm giá trị đang dùng 31,7,18,42,7. Viết FindFirst(Target, Count) trả chỉ số khớp đầu hoặc -1. Trace Target=42, Count=5."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "contract",
+          "action": {
+            "en": "Fix the contract",
+            "vi": "Chốt hợp đồng"
+          },
+          "why": {
+            "en": "The function returns an index, not the target value.",
+            "vi": "Hàm trả chỉ số, không phải giá trị target."
+          },
+          "result": {
+            "en": "Active range 1..5; match Codes[Index]=Target; missing result -1.",
+            "vi": "Vùng dùng 1..5; khớp khi Codes[Index]=Target; vắng trả -1."
+          }
+        },
+        {
+          "id": "initialise",
+          "action": {
+            "en": "Set Index=1 and Result=-1",
+            "vi": "Gán Index=1 và Result=-1"
+          },
+          "why": {
+            "en": "1 is the lower bound and -1 means no match recorded yet.",
+            "vi": "1 là cận dưới và -1 nghĩa là chưa lưu kết quả."
+          },
+          "result": {
+            "en": "No array cell has been read.",
+            "vi": "Chưa đọc ô mảng nào."
+          }
+        },
+        {
+          "id": "scan",
+          "action": {
+            "en": "Compare positions 1,2,3,4 in order",
+            "vi": "So sánh lần lượt vị trí 1,2,3,4"
+          },
+          "why": {
+            "en": "The first three values differ; Codes[4]=42 matches.",
+            "vi": "Ba giá trị đầu khác target; Codes[4]=42 khớp."
+          },
+          "result": {
+            "en": "Result changes from -1 to 4 after four reads.",
+            "vi": "Result đổi từ -1 thành 4 sau bốn lần đọc."
+          },
+          "check": {
+            "en": "Codes[5] is not read after the first match.",
+            "vi": "Không đọc Codes[5] sau lần khớp đầu."
+          }
+        },
+        {
+          "id": "return",
+          "action": {
+            "en": "Return Result",
+            "vi": "RETURN Result"
+          },
+          "why": {
+            "en": "The next guard is false because Result is no longer -1.",
+            "vi": "Điều kiện lần sau sai vì Result không còn là -1."
+          },
+          "result": {
+            "en": "The caller receives 4.",
+            "vi": "Nơi gọi nhận 4."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Use Index←1 and Result←-1; WHILE Index<=Count AND Result=-1, compare Codes[Index] with Target, store Index on a match, otherwise increment Index; RETURN Result. For the fixture the result is 4.",
+        "vi": "Dùng Index←1 và Result←-1; WHILE Index<=Count AND Result=-1, so Codes[Index] với Target, lưu Index khi khớp, nếu không thì tăng Index; RETURN Result. Với dữ liệu mẫu, kết quả là 4."
+      },
+      "selfCheck": {
+        "en": "Change Target to 90: five reads, Result=-1. Change Count to 0: zero reads, Result=-1.",
+        "vi": "Đổi Target thành 90: đọc năm ô, Result=-1. Đổi Count thành 0: không đọc ô nào, Result=-1."
+      },
+      "sourceIds": [
+        "teacher-t08",
+        "book-10.2"
+      ]
+    },
+    {
+      "id": "T08-W2",
+      "title": {
+        "en": "Find an active booking by two fields",
+        "vi": "Tìm booking đang active theo hai field"
+      },
+      "prompt": {
+        "en": "Bookings[0:99] stores records with Code, Date and Active. Count is the number occupied. Input a code and date, validate Count, find the first active match and output its index or NOT FOUND.",
+        "vi": "Bookings[0:99] lưu record có Code, Date và Active. Count là số phần tử đang dùng. Nhập code và date, validate Count, tìm match active đầu tiên và xuất index hoặc NOT FOUND."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "range",
+          "action": {
+            "en": "Restrict the occupied range",
+            "vi": "Giới hạn miền đang dùng"
+          },
+          "why": {
+            "en": "Unused slots do not contain valid records.",
+            "vi": "Slot chưa dùng không chứa record hợp lệ."
+          },
+          "result": {
+            "en": "Accept Count only from 0 to 100 and search indices 0..Count-1.",
+            "vi": "Chỉ nhận Count từ 0 đến 100 và search index 0..Count-1."
+          }
+        },
+        {
+          "id": "condition",
+          "action": {
+            "en": "Build the complete match",
+            "vi": "Dựng điều kiện match đầy đủ"
+          },
+          "why": {
+            "en": "A code match on another date or inactive record is not the requested result.",
+            "vi": "Code khớp ở ngày khác hoặc record inactive không phải kết quả yêu cầu."
+          },
+          "result": {
+            "en": "Code=TargetCode AND Date=TargetDate AND Active=TRUE.",
+            "vi": "Code=TargetCode AND Date=TargetDate AND Active=TRUE."
+          }
+        },
+        {
+          "id": "stop",
+          "action": {
+            "en": "Use Found and stop at the first match",
+            "vi": "Dùng Found và dừng ở match đầu"
+          },
+          "why": {
+            "en": "A stated first-match contract avoids unnecessary work and accidental overwrite.",
+            "vi": "Contract match đầu giúp tránh việc thừa và ghi đè ngoài ý muốn."
+          },
+          "result": {
+            "en": "Loop while Index<Count AND NOT Found; store MatchIndex on success.",
+            "vi": "Lặp khi Index<Count AND NOT Found; lưu MatchIndex khi thành công."
+          }
+        },
+        {
+          "id": "output",
+          "action": {
+            "en": "Separate success and no-match output",
+            "vi": "Tách output thành công và no-match"
+          },
+          "why": {
+            "en": "An uninitialised index must never be printed.",
+            "vi": "Không bao giờ được in index chưa khởi tạo."
+          },
+          "result": {
+            "en": "Output MatchIndex only if Found, otherwise NOT FOUND.",
+            "vi": "Chỉ output MatchIndex nếu Found, nếu không output NOT FOUND."
+          },
+          "check": {
+            "en": "Count=0 skips the loop and safely produces NOT FOUND.",
+            "vi": "Count=0 bỏ qua vòng lặp và an toàn tạo NOT FOUND."
+          }
+        }
+      ],
+      "answer": {
+      "en": "IF Count < 0 OR Count > 100 THEN\n  OUTPUT \"INVALID COUNT\"\nELSE\n  Index ← 0\n  Found ← FALSE\n  MatchIndex ← -1\n  WHILE Index < Count AND NOT Found\n    IF Bookings[Index].Code = TargetCode AND Bookings[Index].Date = TargetDate AND Bookings[Index].Active = TRUE THEN\n      Found ← TRUE\n      MatchIndex ← Index\n    ELSE\n      Index ← Index + 1\n    ENDIF\n  ENDWHILE\n  IF Found THEN\n    OUTPUT MatchIndex\n  ELSE\n    OUTPUT \"NOT FOUND\"\n  ENDIF\nENDIF",
+      "vi": "IF Count < 0 OR Count > 100 THEN\n  OUTPUT \"INVALID COUNT\"\nELSE\n  Index ← 0\n  Found ← FALSE\n  MatchIndex ← -1\n  WHILE Index < Count AND NOT Found\n    IF Bookings[Index].Code = TargetCode AND Bookings[Index].Date = TargetDate AND Bookings[Index].Active = TRUE THEN\n      Found ← TRUE\n      MatchIndex ← Index\n    ELSE\n      Index ← Index + 1\n    ENDIF\n  ENDWHILE\n  IF Found THEN\n    OUTPUT MatchIndex\n  ELSE\n    OUTPUT \"NOT FOUND\"\n  ENDIF\nENDIF"
+      },
+      "selfCheck": {
+        "en": "Does the loop avoid every unused slot and distinguish inactive or wrong-date records?",
+        "vi": "Vòng lặp có tránh mọi slot chưa dùng và phân biệt record inactive hoặc sai ngày không?"
+      },
+      "sourceIds": [
+        "s26-10.2",
+        "book-10.2",
+        "teacher-t08"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T08-P1",
+      "title": {
+        "en": "Return the last matching position",
+        "vi": "Trả vị trí khớp cuối cùng"
+      },
+      "prompt": {
+        "en": "Write FindLast for active data 10,20,10,30,40,10 with Count=6. Return the last matching index or -1. Give results for target 10, target 99 and Count=0.",
+        "vi": "Viết FindLast cho dữ liệu đang dùng 10,20,10,30,40,10 với Count=6. Trả chỉ số khớp cuối hoặc -1. Nêu kết quả cho target 10, target 99 và Count=0."
+      },
+      "working": [
+        {
+          "en": "Initialise Index=1 and Result=-1.",
+          "vi": "Khởi tạo Index=1 và Result=-1."
+        },
+        {
+          "en": "Scan every active element; update Result whenever a match occurs.",
+          "vi": "Duyệt mọi phần tử đang dùng; cập nhật Result mỗi khi khớp."
+        },
+        {
+          "en": "Increment Index after every element, including a match.",
+          "vi": "Tăng Index sau mọi phần tử, kể cả khi khớp."
+        }
+      ],
+      "answer": {
+        "en": "Target 10 updates Result -1→1→3→6 and returns 6. Target 99 returns -1. Count=0 returns -1 with no array read.",
+        "vi": "Target 10 làm Result đổi -1→1→3→6 rồi trả 6. Target 99 trả -1. Count=0 trả -1 và không đọc mảng."
+      },
+      "markGuidance": [
+        {
+          "en": "Correct function/interface and not-found initial value.",
+          "vi": "Đúng function/interface và giá trị ban đầu cho trường hợp vắng."
+        },
+        {
+          "en": "Includes both active bounds and continues after a match.",
+          "vi": "Gồm cả hai cận và tiếp tục duyệt sau khi khớp."
+        },
+        {
+          "en": "Stores an index and advances on every iteration.",
+          "vi": "Lưu chỉ số và tăng chỉ số ở mọi lượt."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Stopping at the first match gives 1, not the required last index 6.",
+          "vi": "Dừng ở lần khớp đầu cho 1, không phải chỉ số cuối 6."
+        },
+        {
+          "en": "Returning 10 returns the element value rather than its position.",
+          "vi": "Trả 10 là trả giá trị phần tử, không phải vị trí."
+        }
+      ],
+      "selfCheck": {
+        "en": "Explain why the loop condition does not include Result=-1.",
+        "vi": "Giải thích vì sao điều kiện lặp không chứa Result=-1."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t08"
+      ]
+    },
+    {
+      "id": "T08-P2",
+      "title": {
+        "en": "Match two fields in one record",
+        "vi": "Khớp hai field trong cùng record"
+      },
+      "prompt": {
+        "en": "Repairs[0:5] contains (CustomerCode, SerialNo, Open): (C14,X9,FALSE), blank, (C08,K2,TRUE), (C14,K2,TRUE), blank, (C08,X9,FALSE). Write ReportRepair to output exactly OPEN, CLOSED or NO RECORD. Blank records may occur anywhere.",
+        "vi": "Repairs[0:5] chứa (CustomerCode, SerialNo, Open): (C14,X9,FALSE), record trống, (C08,K2,TRUE), (C14,K2,TRUE), record trống, (C08,X9,FALSE). Viết ReportRepair để in đúng một trong OPEN, CLOSED hoặc NO RECORD. Record trống có thể nằm ở bất kỳ vị trí nào."
+      },
+      "working": [
+        {
+          "en": "Use one scan with Found initially FALSE.",
+          "vi": "Dùng một phép duyệt với Found ban đầu là FALSE."
+        },
+        {
+          "en": "Match CustomerCode AND SerialNo in the same record.",
+          "vi": "Khớp CustomerCode AND SerialNo trong cùng record."
+        },
+        {
+          "en": "Read Open only from the matched record; put NO RECORD after the loop.",
+          "vi": "Chỉ đọc Open từ record đã khớp; đặt NO RECORD sau vòng lặp."
+        }
+      ],
+      "answer": {
+        "en": "C08/K2 outputs OPEN at index 2; C08/X9 outputs CLOSED at index 5; C14/Z7 outputs NO RECORD after all six positions. Blank records at indices 1 and 4 never end the scan.",
+        "vi": "C08/K2 in OPEN tại index 2; C08/X9 in CLOSED tại index 5; C14/Z7 in NO RECORD sau cả sáu vị trí. Record trống ở index 1 và 4 không làm dừng phép tìm."
+      },
+      "markGuidance": [
+        {
+          "en": "Procedure has two STRING parameters and scans within 0..5.",
+          "vi": "Procedure có hai tham số STRING và duyệt trong 0..5."
+        },
+        {
+          "en": "Both keys match with AND before checking Open.",
+          "vi": "Cả hai khóa khớp bằng AND trước khi kiểm Open."
+        },
+        {
+          "en": "Outputs one status; NO RECORD occurs only after the scan.",
+          "vi": "Chỉ in một trạng thái; NO RECORD chỉ xuất hiện sau phép duyệt."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Using OR can combine IDs from different records.",
+          "vi": "Dùng OR có thể ghép ID từ các record khác nhau."
+        },
+        {
+          "en": "Stopping at a blank record misses valid repairs stored later.",
+          "vi": "Dừng ở record trống sẽ bỏ các phiếu sửa hợp lệ nằm phía sau."
+        }
+      ],
+      "selfCheck": {
+        "en": "Why is NO RECORD outside the loop? Why is Found enough to stop early here?",
+        "vi": "Vì sao NO RECORD nằm ngoài vòng lặp? Vì sao Found cho phép dừng sớm trong bài này?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t08"
+      ]
+    },
+    {
+      "id": "T08-P3",
+      "title": {
+        "en": "List every multi-field match",
+        "vi": "Liệt kê mọi match nhiều field"
+      },
+      "prompt": {
+        "en": "Players[1:50] stores Team, Age and Score; Used gives the occupied count. Validate Used, then write complete pseudocode to output every index where Team=TargetTeam, Age<=18 and Score>=70, followed by NONE if there is no match.",
+        "vi": "Players[1:50] lưu Team, Age và Score; Used cho số record đang dùng. Hãy validation Used rồi viết pseudocode đầy đủ để xuất mọi index có Team=TargetTeam, Age<=18 và Score>=70, sau đó xuất NONE nếu không có match."
+      },
+      "working": [
+        {
+          "en": "Search 1..Used, not 1..50.",
+          "vi": "Search 1..Used, không phải 1..50."
+        },
+        {
+          "en": "Combine all conditions with AND.",
+          "vi": "Kết hợp mọi điều kiện bằng AND."
+        },
+        {
+          "en": "Use a match count or Found flag for NONE.",
+          "vi": "Dùng số match hoặc Found để xuất NONE."
+        }
+      ],
+      "answer": {
+        "en": "DECLARE Index : INTEGER\nDECLARE Found : BOOLEAN\nIF Used < 0 OR Used > 50 THEN\n  OUTPUT \"INVALID USED COUNT\"\nELSE\n  Found ← FALSE\n  FOR Index ← 1 TO Used\n    IF Players[Index].Team = TargetTeam AND Players[Index].Age <= 18 AND Players[Index].Score >= 70 THEN\n      OUTPUT Index\n      Found ← TRUE\n    ENDIF\n  NEXT Index\n  IF NOT Found THEN\n    OUTPUT \"NONE\"\n  ENDIF\nENDIF",
+        "vi": "DECLARE Index : INTEGER\nDECLARE Found : BOOLEAN\nIF Used < 0 OR Used > 50 THEN\n  OUTPUT \"INVALID USED COUNT\"\nELSE\n  Found ← FALSE\n  FOR Index ← 1 TO Used\n    IF Players[Index].Team = TargetTeam AND Players[Index].Age <= 18 AND Players[Index].Score >= 70 THEN\n      OUTPUT Index\n      Found ← TRUE\n    ENDIF\n  NEXT Index\n  IF NOT Found THEN\n    OUTPUT \"NONE\"\n  ENDIF\nENDIF"
+      },
+      "markGuidance": [
+        {
+          "en": "Occupied range, full condition and no-match branch are correct.",
+          "vi": "Miền đang dùng, điều kiện đầy đủ và nhánh no-match đúng."
+        },
+        {
+          "en": "The algorithm returns all matches rather than stopping at the first.",
+          "vi": "Thuật toán trả mọi match thay vì dừng ở match đầu."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Using OR changes the requested intersection into a union.",
+          "vi": "Dùng OR đổi giao được yêu cầu thành hợp."
+        },
+        {
+          "en": "Stopping after the first match loses later players.",
+          "vi": "Dừng sau match đầu làm mất người chơi phía sau."
+        }
+      ],
+      "selfCheck": {
+        "en": "What output occurs when Used=0?",
+        "vi": "Output nào xảy ra khi Used=0?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t08",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T08-P4",
+      "title": {
+        "en": "Sort records without breaking relationships",
+        "vi": "Sort record mà không phá quan hệ"
+      },
+      "prompt": {
+        "en": "Results[0:99] stores TResult records containing StudentID and Mark; Count is the occupied count. Validate Count, bubble-sort occupied records into descending Mark order, preserve equal-record order, then output every sorted StudentID and Mark. Write complete pseudocode.",
+        "vi": "Results[0:99] lưu record TResult gồm StudentID và Mark; Count là số record đang dùng. Hãy validation Count, bubble-sort các record đang dùng theo Mark giảm dần, giữ thứ tự record bằng nhau rồi xuất mọi StudentID và Mark đã sort. Viết pseudocode đầy đủ."
+      },
+      "working": [
+        {
+          "en": "Compare adjacent Mark fields only in occupied records.",
+          "vi": "Chỉ so field Mark kề nhau trong record đang dùng."
+        },
+        {
+          "en": "Swap the complete records when left Mark is lower.",
+          "vi": "Swap toàn bộ record khi Mark bên trái thấp hơn."
+        },
+        {
+          "en": "Use strict < so equal records do not swap.",
+          "vi": "Dùng < nghiêm ngặt để record bằng nhau không swap."
+        }
+      ],
+      "answer": {
+        "en": "DECLARE Index, Last : INTEGER\nDECLARE Swapped : BOOLEAN\nDECLARE Temp : TResult\nIF Count < 0 OR Count > 100 THEN\n  OUTPUT \"INVALID COUNT\"\nELSE\n  Last ← Count - 1\n  Swapped ← TRUE\n  WHILE Last > 0 AND Swapped\n    Swapped ← FALSE\n    FOR Index ← 0 TO Last - 1\n      IF Results[Index].Mark < Results[Index + 1].Mark THEN\n        Temp ← Results[Index]\n        Results[Index] ← Results[Index + 1]\n        Results[Index + 1] ← Temp\n        Swapped ← TRUE\n      ENDIF\n    NEXT Index\n    Last ← Last - 1\n  ENDWHILE\n  FOR Index ← 0 TO Count - 1\n    OUTPUT Results[Index].StudentID, Results[Index].Mark\n  NEXT Index\nENDIF\nThe complete TResult record is swapped. The strict `<` comparison leaves equal marks in their original order.",
+        "vi": "DECLARE Index, Last : INTEGER\nDECLARE Swapped : BOOLEAN\nDECLARE Temp : TResult\nIF Count < 0 OR Count > 100 THEN\n  OUTPUT \"INVALID COUNT\"\nELSE\n  Last ← Count - 1\n  Swapped ← TRUE\n  WHILE Last > 0 AND Swapped\n    Swapped ← FALSE\n    FOR Index ← 0 TO Last - 1\n      IF Results[Index].Mark < Results[Index + 1].Mark THEN\n        Temp ← Results[Index]\n        Results[Index] ← Results[Index + 1]\n        Results[Index + 1] ← Temp\n        Swapped ← TRUE\n      ENDIF\n    NEXT Index\n    Last ← Last - 1\n  ENDWHILE\n  FOR Index ← 0 TO Count - 1\n    OUTPUT Results[Index].StudentID, Results[Index].Mark\n  NEXT Index\nENDIF\nToàn bộ record TResult được swap. Phép so sánh `<` nghiêm ngặt giữ nguyên thứ tự các điểm bằng nhau."
+      },
+      "markGuidance": [
+        {
+          "en": "The whole-record invariant is explicit.",
+          "vi": "Invariant toàn record được nêu rõ."
+        },
+        {
+          "en": "The comparison direction and equality behaviour produce stable descending order.",
+          "vi": "Hướng so sánh và xử lý bằng nhau tạo thứ tự giảm dần ổn định."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Swapping marks alone assigns marks to the wrong students.",
+          "vi": "Chỉ swap điểm gán điểm cho sai học sinh."
+        },
+        {
+          "en": "Using <= changes the order of equal records.",
+          "vi": "Dùng <= làm đổi thứ tự record bằng nhau."
+        }
+      ],
+      "selfCheck": {
+        "en": "After every swap, does each StudentID still own its original Mark?",
+        "vi": "Sau mỗi swap, mỗi StudentID có vẫn giữ đúng Mark ban đầu không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "book-10.2",
+        "teacher-t08"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Return -1 after the first mismatch.",
+        "vi": "Trả -1 ngay sau lần không khớp đầu tiên."
+      },
+      "correction": {
+        "en": "Conclude not found only after every permitted active position has been ruled out.",
+        "vi": "Chỉ kết luận không tìm thấy sau khi loại hết mọi vị trí được phép tìm."
+      },
+      "selfCheck": {
+        "en": "Would Target=42 survive the first comparison with 31?",
+        "vi": "Target=42 có bị loại sai sau khi so với 31 không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Return Codes[Index] when the question asks for an index.",
+        "vi": "Trả Codes[Index] khi đề hỏi chỉ số."
+      },
+      "correction": {
+        "en": "Write the answer product before the loop and return that exact kind of value.",
+        "vi": "Viết sản phẩm cần trả trước vòng lặp và trả đúng loại giá trị đó."
+      },
+      "selfCheck": {
+        "en": "For Target=42, should the answer be 42 or 4?",
+        "vi": "Với Target=42, đáp án phải là 42 hay 4?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Treat any blank record as a sentinel.",
+        "vi": "Coi mọi record trống là sentinel."
+      },
+      "correction": {
+        "en": "Stop on a sentinel only when the specification guarantees no searchable data follows it.",
+        "vi": "Chỉ dừng ở sentinel khi đặc tả bảo đảm không còn dữ liệu cần tìm phía sau."
+      },
+      "selfCheck": {
+        "en": "Can a valid record appear after the blank in the Loan fixture?",
+        "vi": "Record hợp lệ có thể nằm sau record trống trong ví dụ Loan không?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Rebuild a safe linear search from memory.",
+      "vi": "Dựng lại phép tìm kiếm tuyến tính an toàn từ trí nhớ."
+    },
+    "answerPoints": [
+      {
+        "en": "Contract: active bounds, match, success product, not-found product.",
+        "vi": "Hợp đồng: vùng dùng, điều kiện khớp, sản phẩm thành công, sản phẩm vắng."
+      },
+      {
+        "en": "Initialise at the lower bound and check the bound before reading.",
+        "vi": "Khởi tạo ở cận dưới và kiểm cận trước khi đọc."
+      },
+      {
+        "en": "Advance on every unfinished path; stop only when the requested product is complete.",
+        "vi": "Tiến triển ở mọi nhánh chưa xong; chỉ dừng khi sản phẩm đã hoàn tất."
+      },
+      {
+        "en": "Check first, last, missing, empty and duplicate cases as relevant.",
+        "vi": "Kiểm đầu, cuối, vắng, rỗng và trùng khi phù hợp."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Linear search is ordered array processing; sorted input is not required.",
+      "vi": "Linear search là duyệt mảng theo thứ tự; không cần dữ liệu sắp xếp."
+    },
+    {
+      "en": "The requested output decides whether the first match is enough.",
+      "vi": "Đầu ra được yêu cầu quyết định lần khớp đầu có đủ hay không."
+    },
+    {
+      "en": "A not-found conclusion belongs after the searchable domain has been exhausted.",
+      "vi": "Kết luận không tìm thấy chỉ có sau khi đã xét hết miền được tìm."
+    },
+    {
+      "en": "Mixed search tasks require an occupied-range contract, complete match condition and explicit no-match behaviour.",
+      "vi": "Bài search hỗn hợp cần contract miền đang dùng, điều kiện match đầy đủ và hành vi no-match rõ."
+    },
+    {
+      "en": "A record must move as one unit whenever ordering changes.",
+      "vi": "Record phải di chuyển như một đơn vị khi thứ tự thay đổi."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F04",
+      "role": "owner",
+      "title": {
+        "en": "Single/first match",
+        "vi": "Tìm một/lần khớp đầu"
+      }
+    },
+    {
+      "id": "F05",
+      "role": "related",
+      "title": {
+        "en": "All/count/aggregate",
+        "vi": "Tất cả/đếm/tổng hợp"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "arrays-1d-2d",
+    "selection",
+    "iteration",
+    "procedures-functions"
+  ],
+  "sources": [
+    {
+      "id": "s26-10.2",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§10.2, printed/PDF p28: process arrays; search using a linear search.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "guide-2026",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, examinations in 2026",
+      "locator": "§§3.1–3.2, printed pp10–11 (array declaration/access); §7.3 p21 (conditional loop); §8.2 pp23–24 (procedures/functions). Local 2026 copy inspected 2026-10-02.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-10.2",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp241–244; PDF pp257–260, §10.2.3.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-s25-22-q7a",
+      "title": "9618/22 May/June 2025 Question 7(a)",
+      "locator": "QP pp14–15. Multiple search strategies are valid; used for contract/range/sentinel evidence, not labelled an official linear-search-only question.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-s25-22-q7a",
+      "title": "9618/22 May/June 2025 published mark scheme, Question 7(a)",
+      "locator": "MS pp16–19: conditional/FOR scan, direct access and binary-search alternatives.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "qp-w25-23-q8a",
+      "title": "9618/23 October/November 2025 Question 8(a)",
+      "locator": "QP pp18–19: two-field unique loan match; blank records may occur anywhere.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-w25-23-q8a",
+      "title": "9618/23 October/November 2025 published mark scheme, Question 8(a)",
+      "locator": "MS p16: scan all 8000 or until found; match both fields; one status/not-found output.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "teacher-t08",
+      "title": "AlgoCore teacher-created T08 worked and practice set",
+      "locator": "T08-academic-r2, 2026-10-01. Original fixtures and criteria; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

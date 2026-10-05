@@ -1,0 +1,814 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.15.1",
+  "topicId": "P3-15.1-T03",
+  "slug": "flynn-architectures-and-massive-parallelism",
+  "estimatedMinutes": 30,
+  "title": {
+    "en": "Flynn architectures and massive parallelism",
+    "vi": "Phân loại Flynn và xử lý song song quy mô lớn"
+  },
+  "question": {
+    "en": "Which streams are shared, and which can proceed independently?",
+    "vi": "Luồng nào dùng chung, luồng nào có thể hoạt động độc lập?"
+  },
+  "opening": {
+    "en": "Count instruction streams and data streams before naming an architecture. Then explain how a large parallel system divides a task, communicates partial results and deals with dependencies.",
+    "vi": "Đếm luồng lệnh và dữ liệu trước khi gọi tên kiến trúc. Sau đó giải thích hệ song song lớn chia nhiệm vụ, trao đổi kết quả từng phần và xử lý phụ thuộc ra sao."
+  },
+  "objectives": [
+    {
+      "en": "Classify SISD, SIMD, MISD and MIMD from stream evidence.",
+      "vi": "Phân loại SISD, SIMD, MISD, MIMD từ dữ kiện luồng."
+    },
+    {
+      "en": "Trace independent lane operations and a coordinated parallel sum.",
+      "vi": "Truy vết thao tác ở các nhánh độc lập và phép tổng song song phối hợp."
+    },
+    {
+      "en": "Explain massive parallelism and the cost of coordination.",
+      "vi": "Giải thích massively parallel và chi phí phối hợp."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know instructions, data and the difference between sequential and parallel work.",
+      "vi": "Biết lệnh, dữ liệu và khác biệt giữa làm tuần tự với song song."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Instruction stream",
+      "meaning": {
+        "en": "A sequence of operations directed to processing hardware; count independent control sequences.",
+        "vi": "Chuỗi thao tác gửi tới phần xử lý; đếm các chuỗi điều khiển độc lập."
+      }
+    },
+    {
+      "term": "Data stream",
+      "meaning": {
+        "en": "The sequence of data items being processed. Equal numerical values do not by themselves make two sources one stream.",
+        "vi": "Chuỗi dữ liệu được xử lý. Hai nguồn có số giống nhau chưa đủ để gọi là một luồng."
+      }
+    },
+    {
+      "term": "MPP",
+      "meaning": {
+        "en": "Massively parallel processing: many interconnected processors carry out coordinated parts of a large computation.",
+        "vi": "Xử lý song song quy mô lớn: nhiều bộ xử lý nối với nhau thực hiện các phần phối hợp của phép tính lớn."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "stream-counts",
+      "title": {
+        "en": "Classify streams, not names or boxes",
+        "vi": "Phân loại luồng, không đoán từ tên hoặc số hộp"
+      },
+      "paragraphs": [
+        {
+          "en": "Flynn’s classification has two questions: is there one instruction stream or more than one, and one data stream or more than one? Single/multiple refers to streams, not the number of instructions in the whole program or the number of values stored in RAM.",
+          "vi": "Phân loại Flynn có hai câu hỏi: có một hay nhiều luồng lệnh, và một hay nhiều luồng dữ liệu? Single/multiple nói về luồng, không phải tổng số lệnh của chương trình hay số giá trị trong RAM."
+        },
+        {
+          "en": "A drawing of several processing elements is not enough to distinguish SIMD from MIMD. Look for whether one instruction is broadcast to the lanes or independent control sequences reach different lanes. Likewise, duplicated copies of a shared input can still represent a single data stream.",
+          "vi": "Hình có nhiều phần tử xử lý chưa đủ phân biệt SIMD với MIMD. Hãy xem một lệnh được phát chung hay mỗi nhánh nhận chuỗi điều khiển độc lập. Tương tự, nhiều bản sao của cùng đầu vào dùng chung vẫn có thể biểu diễn một luồng dữ liệu."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "four-architectures",
+      "title": {
+        "en": "Use the two-by-two classification",
+        "vi": "Dùng phân loại hai theo hai"
+      },
+      "paragraphs": [
+        {
+          "en": "SISD has one instruction stream acting on one data stream. SIMD applies one instruction stream to several data streams, such as applying the same brightness operation to independent pixel values. MISD applies multiple instruction streams to one data stream; it is a less common category, so justify it from the stated structure rather than an uncertain product example.",
+          "vi": "SISD có một luồng lệnh tác động lên một luồng dữ liệu. SIMD áp một luồng lệnh cho nhiều luồng dữ liệu, như cùng thao tác độ sáng lên các pixel độc lập. MISD dùng nhiều luồng lệnh với một luồng dữ liệu; đây là nhóm ít phổ biến hơn, nên giải thích từ cấu trúc đề nêu thay vì một ví dụ sản phẩm chưa chắc chắn."
+        },
+        {
+          "en": "MIMD has independent instruction streams and multiple data streams. Different processors can perform different parts of a program on different data. This does not mean every instruction must differ at every instant: independence of the streams, rather than accidental equality of operations, is the important distinction.",
+          "vi": "MIMD có các luồng lệnh độc lập và nhiều luồng dữ liệu. Các bộ xử lý có thể làm những phần khác nhau của chương trình trên dữ liệu khác nhau. Không có nghĩa mỗi lệnh phải khác tại mọi thời điểm: sự độc lập của luồng mới quan trọng, không phải việc thao tác tình cờ giống nhau."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026",
+        "flynn-qp",
+        "flynn-ms"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Category",
+            "vi": "Loại"
+          },
+          {
+            "en": "Instruction streams",
+            "vi": "Luồng lệnh"
+          },
+          {
+            "en": "Data streams",
+            "vi": "Luồng dữ liệu"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "SISD",
+              "vi": "SISD"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            }
+          ],
+          [
+            {
+              "en": "SIMD",
+              "vi": "SIMD"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "Multiple",
+              "vi": "Nhiều"
+            }
+          ],
+          [
+            {
+              "en": "MISD",
+              "vi": "MISD"
+            },
+            {
+              "en": "Multiple",
+              "vi": "Nhiều"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            }
+          ],
+          [
+            {
+              "en": "MIMD",
+              "vi": "MIMD"
+            },
+            {
+              "en": "Multiple",
+              "vi": "Nhiều"
+            },
+            {
+              "en": "Multiple",
+              "vi": "Nhiều"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "lane-traces",
+      "title": {
+        "en": "Trace what each lane receives",
+        "vi": "Theo dữ liệu và lệnh tới mỗi nhánh"
+      },
+      "paragraphs": [
+        {
+          "en": "In the SIMD preset, every lane performs add1 on a different value: 2,4,6,8 become3,5,7,9. In MISD, the shared value6 is processed by add1, multiply2 and multiply3, producing7,12,18. The visual differences are instruction distribution and data distribution, not just output values.",
+          "vi": "Trong mẫu SIMD, mọi nhánh làm add1 trên giá trị khác: 2,4,6,8 thành3,5,7,9. Trong MISD, giá trị6 dùng chung được xử lý bằng add1, nhân2 và nhân3, cho7,12,18. Khác biệt cần nhìn là phân phối lệnh và dữ liệu, không chỉ kết quả."
+        },
+        {
+          "en": "The MIMD preset uses those three different operations on2,4,6, producing3,8,18. Trace each instruction/data pair before combining any results. Do not classify an example as SIMD merely because all lanes happen to complete together.",
+          "vi": "Mẫu MIMD dùng ba thao tác khác nhau ấy trên2,4,6, cho3,8,18. Theo từng cặp lệnh/dữ liệu trước khi gộp kết quả. Không gọi ví dụ là SIMD chỉ vì các nhánh tình cờ xong cùng lúc."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "massive-parallelism",
+      "title": {
+        "en": "Coordinate many processors",
+        "vi": "Phối hợp nhiều bộ xử lý"
+      },
+      "paragraphs": [
+        {
+          "en": "A massively parallel computer brings a large number of processors together through an interconnection network. They work on coordinated parts of a problem, communicate data or partial results, and combine the work into a result for the overall computation. The large processor count and communication infrastructure matter together.",
+          "vi": "Máy tính massively parallel nối một số lượng lớn bộ xử lý bằng mạng liên kết. Chúng làm các phần phối hợp của bài toán, trao đổi dữ liệu hoặc kết quả từng phần và gộp thành kết quả chung. Cần nêu cả số lượng lớn bộ xử lý và hạ tầng trao đổi."
+        },
+        {
+          "en": "Our four-lane sum is a deliberately small illustration of partition, compute, send and combine. It is not itself a claim of massive scale. Weather modelling or scientific simulation can contain large separable calculations, but the answer should explain how parts coordinate rather than merely name an application.",
+          "vi": "Phép tổng bốn nhánh là minh họa cố ý thu nhỏ của chia, tính, gửi và gộp. Không khẳng định bốn nhánh tự nó là quy mô massive. Mô hình thời tiết hoặc mô phỏng khoa học có thể có tính toán lớn chia được, nhưng đáp án cần giải thích phối hợp thay vì chỉ gọi tên ứng dụng."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "past-qp",
+        "past-ms"
+      ]
+    },
+    {
+      "id": "dependencies-and-costs",
+      "title": {
+        "en": "Explain why speedup is not automatic",
+        "vi": "Giải thích vì sao không tự động nhanh hơn"
+      },
+      "paragraphs": [
+        {
+          "en": "Independent partitions can run at the same time, but a combine operation must wait for the partial results it needs. Communication, synchronisation and uneven workloads can leave processors waiting. A dependent calculation cannot simply start before its input is available.",
+          "vi": "Các phần độc lập có thể chạy cùng lúc, nhưng phép gộp phải chờ kết quả thành phần cần thiết. Trao đổi, đồng bộ và công việc không đều có thể khiến bộ xử lý phải đợi. Phép tính có phụ thuộc không thể bắt đầu trước khi có đầu vào."
+        },
+        {
+          "en": "More processors do not guarantee proportional speedup. The software must expose suitable parallel work, and the interconnect and memory system must support it. State these causes when evaluating a proposed parallel solution; do not invent timings or assume parallelism removes every bottleneck.",
+          "vi": "Thêm bộ xử lý không bảo đảm tăng tốc theo tỉ lệ. Phần mềm phải có công việc phù hợp để song song, còn liên kết và bộ nhớ phải hỗ trợ được. Nêu các nguyên nhân này khi đánh giá giải pháp; không tự đặt thời gian hay cho rằng song song xóa mọi điểm nghẽn."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "flynn-parallelism",
+    "title": {
+      "en": "See instruction and data streams",
+      "vi": "Quan sát luồng lệnh và dữ liệu"
+    },
+    "introduction": {
+      "en": "Select each architecture, inspect lane operations, then follow a small coordinated sum.",
+      "vi": "Chọn từng kiến trúc, xem thao tác ở nhánh rồi theo phép tổng nhỏ có phối hợp."
+    },
+    "task": {
+      "en": "Name the streams before revealing the category or combined result.",
+      "vi": "Gọi tên các luồng trước khi mở loại kiến trúc hoặc kết quả gộp."
+    },
+    "conventions": [
+      {
+        "en": "Lane counts are teaching examples, not minimum processor counts for a category.",
+        "vi": "Số nhánh là ví dụ học tập, không phải số bộ xử lý tối thiểu của một loại."
+      },
+      {
+        "en": "The MPP diagram is reduced to four partitions; no time or speedup is assigned.",
+        "vi": "Sơ đồ MPP thu nhỏ còn bốn phần; không gán thời gian hay mức tăng tốc."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "syllabus-2026"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Classify shared control, then coordinate a sum",
+      "vi": "Phân loại điều khiển chung rồi phối hợp tính tổng"
+    },
+    "prompt": {
+      "en": "First choose SIMD and trace add1 on2,4,6,8. Then choose the MPP sum and find1+2+3+4+5+6+7+8 using four partitions. These are two separate scenarios.",
+      "vi": "Đầu tiên chọn SIMD và theo add1 trên2,4,6,8. Sau đó chọn phép tổng MPP để tính1+2+3+4+5+6+7+8 bằng bốn phần. Đây là hai tình huống riêng."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "identify-streams",
+        "action": {
+          "en": "In the SIMD preset, identify one shared add1 instruction stream and four data streams.",
+          "vi": "Trong mẫu SIMD, xác định một luồng lệnh add1 dùng chung và bốn luồng dữ liệu."
+        },
+        "why": {
+          "en": "Classification depends on control and data distribution.",
+          "vi": "Phân loại phụ thuộc phân phối điều khiển và dữ liệu."
+        },
+        "result": {
+          "en": "Instruction streams=1; data streams=4.",
+          "vi": "Luồng lệnh=1; luồng dữ liệu=4."
+        }
+      },
+      {
+        "id": "dispatch",
+        "action": {
+          "en": "Send add1 to every lane with its own input2,4,6 or8.",
+          "vi": "Gửi add1 tới mọi nhánh với đầu vào riêng2,4,6 hoặc8."
+        },
+        "why": {
+          "en": "One shared operation acts on distinct data.",
+          "vi": "Một thao tác chung tác động lên dữ liệu riêng."
+        },
+        "result": {
+          "en": "All four lanes have the same operation but different inputs.",
+          "vi": "Cả bốn nhánh cùng thao tác nhưng khác đầu vào."
+        }
+      },
+      {
+        "id": "compute",
+        "action": {
+          "en": "Compute each lane output.",
+          "vi": "Tính đầu ra mỗi nhánh."
+        },
+        "why": {
+          "en": "Each result follows from its own instruction/data pair.",
+          "vi": "Mỗi kết quả theo cặp lệnh/dữ liệu của nó."
+        },
+        "result": {
+          "en": "Outputs are3,5,7,9.",
+          "vi": "Đầu ra là3,5,7,9."
+        }
+      },
+      {
+        "id": "classify",
+        "action": {
+          "en": "Name the architecture from the1/multiple stream pair.",
+          "vi": "Gọi tên kiến trúc từ cặp một/nhiều luồng."
+        },
+        "why": {
+          "en": "The shared instruction stream distinguishes SIMD from MIMD.",
+          "vi": "Luồng lệnh dùng chung phân biệt SIMD với MIMD."
+        },
+        "result": {
+          "en": "This is SIMD. Now switch to the separate MPP sum scenario.",
+          "vi": "Đây là SIMD. Bây giờ chuyển sang tình huống tổng MPP riêng."
+        }
+      },
+      {
+        "id": "partition",
+        "action": {
+          "en": "Assign[1,2],[3,4],[5,6],[7,8] to four lanes.",
+          "vi": "Giao[1,2],[3,4],[5,6],[7,8] cho bốn nhánh."
+        },
+        "why": {
+          "en": "Each item must belong to the intended partition exactly once.",
+          "vi": "Mỗi phần tử phải vào đúng phần một lần."
+        },
+        "result": {
+          "en": "Four independent local additions are ready.",
+          "vi": "Bốn phép cộng cục bộ độc lập sẵn sàng."
+        }
+      },
+      {
+        "id": "local-compute",
+        "action": {
+          "en": "Compute the local sums.",
+          "vi": "Tính các tổng cục bộ."
+        },
+        "why": {
+          "en": "Each lane can work without another lane’s partial result.",
+          "vi": "Mỗi nhánh làm được mà chưa cần kết quả nhánh khác."
+        },
+        "result": {
+          "en": "The partial results are3,7,11,15.",
+          "vi": "Các kết quả phần là3,7,11,15."
+        }
+      },
+      {
+        "id": "send-partials",
+        "action": {
+          "en": "Send the four partial results to the combine operation.",
+          "vi": "Gửi bốn kết quả phần tới phép gộp."
+        },
+        "why": {
+          "en": "The final operation requires information from every partition.",
+          "vi": "Phép cuối cần thông tin từ mọi phần."
+        },
+        "result": {
+          "en": "The combine stage has3,7,11,15.",
+          "vi": "Giai đoạn gộp có3,7,11,15."
+        }
+      },
+      {
+        "id": "combine",
+        "action": {
+          "en": "Add3+7+11+15.",
+          "vi": "Cộng3+7+11+15."
+        },
+        "why": {
+          "en": "Combining partial results reconstructs the overall sum.",
+          "vi": "Gộp các kết quả phần tạo lại tổng chung."
+        },
+        "result": {
+          "en": "The total is36.",
+          "vi": "Tổng bằng36."
+        }
+      },
+      {
+        "id": "check-cost",
+        "action": {
+          "en": "Identify the work that was parallel and the work that had to wait.",
+          "vi": "Chỉ ra việc song song và việc phải chờ."
+        },
+        "why": {
+          "en": "Correctness and potential speedup are different claims.",
+          "vi": "Tính đúng và khả năng tăng tốc là hai khẳng định khác nhau."
+        },
+        "result": {
+          "en": "Local sums are independent; sending and combining add coordination cost. No fourfold speedup is proved.",
+          "vi": "Tổng cục bộ độc lập; gửi và gộp thêm chi phí phối hợp. Chưa chứng minh nhanh gấp bốn."
+        }
+      }
+    ],
+    "result": {
+      "en": "The first scenario is SIMD with outputs3,5,7,9. In the separate coordinated sum, all eight inputs contribute once, giving36.",
+      "vi": "Tình huống đầu là SIMD với đầu ra3,5,7,9. Trong phép tổng phối hợp riêng, tám đầu vào góp đúng một lần, cho36."
+    },
+    "selfCheck": {
+      "en": "What happens if one partition’s result is omitted or arrives late?",
+      "vi": "Điều gì xảy ra nếu bỏ sót hoặc nhận trễ kết quả một phần?"
+    },
+    "sourceIds": [
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A diagram of shared instruction control and separate data points to SIMD.",
+        "vi": "Sơ đồ điều khiển lệnh chung và dữ liệu riêng hướng tới SIMD."
+      },
+      {
+        "en": "“Characteristics of massively parallel computers” calls for processors, coordination and communication.",
+        "vi": "“Đặc điểm máy massively parallel” cần bộ xử lý, phối hợp và trao đổi."
+      }
+    ],
+    "distinguish": {
+      "en": "Pipelining overlaps stages within instruction processing. Flynn classifies instruction/data streams; MPP describes large coordinated processing systems.",
+      "vi": "Pipeline chồng lấp các giai đoạn xử lý lệnh. Flynn phân loại luồng lệnh/dữ liệu; MPP nói về hệ xử lý phối hợp quy mô lớn."
+    },
+    "method": [
+      {
+        "en": "Count independent instruction streams.",
+        "vi": "Đếm luồng lệnh độc lập."
+      },
+      {
+        "en": "Count independent/shared data streams.",
+        "vi": "Đếm luồng dữ liệu riêng hoặc dùng chung."
+      },
+      {
+        "en": "Select the two-letter pairing and explain lane behaviour.",
+        "vi": "Chọn cặp phân loại và giải thích hành vi nhánh."
+      },
+      {
+        "en": "For MPP, describe division, communication, combination and constraints.",
+        "vi": "Với MPP, mô tả chia, trao đổi, gộp và giới hạn."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Many processors always means MIMD.",
+        "vi": "Nhiều bộ xử lý luôn là MIMD."
+      },
+      "correction": {
+        "en": "SIMD and MISD can also have many processing elements; inspect the streams.",
+        "vi": "SIMD và MISD cũng có thể có nhiều phần tử xử lý; phải xem luồng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Equal data values imply a single data stream.",
+        "vi": "Giá trị bằng nhau nghĩa là một luồng dữ liệu."
+      },
+      "correction": {
+        "en": "Stream identity comes from how data is supplied, not coincidental numerical equality.",
+        "vi": "Danh tính luồng đến từ cách cung cấp dữ liệu, không phải số tình cờ bằng nhau."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Four processors guarantee a fourfold speedup.",
+        "vi": "Bốn bộ xử lý bảo đảm nhanh gấp bốn."
+      },
+      "correction": {
+        "en": "Communication, dependencies and load imbalance can limit the gain.",
+        "vi": "Trao đổi, phụ thuộc và mất cân bằng tải có thể hạn chế lợi ích."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "simd-streams",
+      "prompt": {
+        "en": "One instruction is broadcast to four lanes, each with a different pixel. Which category?",
+        "vi": "Một lệnh phát tới bốn nhánh, mỗi nhánh có pixel khác. Thuộc loại nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "SIMD",
+            "vi": "SIMD"
+          },
+          "feedback": {
+            "en": "Correct: one instruction stream, multiple data streams.",
+            "vi": "Đúng: một luồng lệnh, nhiều luồng dữ liệu."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "MISD",
+            "vi": "MISD"
+          },
+          "feedback": {
+            "en": "MISD reverses these stream counts.",
+            "vi": "MISD đảo số luồng của hai phía."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "SISD",
+            "vi": "SISD"
+          },
+          "feedback": {
+            "en": "There are multiple data streams here.",
+            "vi": "Ở đây có nhiều luồng dữ liệu."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Classify the two stream dimensions separately.",
+        "vi": "Phân loại riêng hai chiều luồng."
+      }
+    },
+    {
+      "id": "misd-streams",
+      "prompt": {
+        "en": "Three independent operations process the same shared input stream. Which category?",
+        "vi": "Ba thao tác độc lập xử lý cùng luồng đầu vào dùng chung. Thuộc loại nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "SIMD",
+            "vi": "SIMD"
+          },
+          "feedback": {
+            "en": "The instruction streams are multiple, not single.",
+            "vi": "Luồng lệnh là nhiều, không phải một."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "MISD",
+            "vi": "MISD"
+          },
+          "feedback": {
+            "en": "Correct: multiple instruction streams and one data stream.",
+            "vi": "Đúng: nhiều luồng lệnh và một luồng dữ liệu."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "MIMD",
+            "vi": "MIMD"
+          },
+          "feedback": {
+            "en": "The stated data stream is shared and single.",
+            "vi": "Luồng dữ liệu đề nêu là chung và đơn."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Use the supplied structure rather than a familiar application name.",
+        "vi": "Dùng cấu trúc đề cho thay vì tên ứng dụng quen thuộc."
+      }
+    },
+    {
+      "id": "partial-total",
+      "prompt": {
+        "en": "Which partial results should be combined in the four-partition sum?",
+        "vi": "Cần gộp các kết quả phần nào trong phép tổng bốn phần?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "3,7,11,15",
+            "vi": "3,7,11,15"
+          },
+          "feedback": {
+            "en": "Correct: each is the sum of its two assigned inputs.",
+            "vi": "Đúng: mỗi số là tổng hai đầu vào được giao."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "3,7,11 only",
+            "vi": "Chỉ3,7,11"
+          },
+          "feedback": {
+            "en": "That omits inputs7 and8.",
+            "vi": "Cách đó bỏ đầu vào7 và8."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "36 from every lane",
+            "vi": "Mỗi nhánh đều36"
+          },
+          "feedback": {
+            "en": "Each lane has only its partition in this model.",
+            "vi": "Mỗi nhánh chỉ có phần của nó trong mô hình này."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Check both local arithmetic and complete input coverage.",
+        "vi": "Kiểm cả số học cục bộ và bao phủ đủ đầu vào."
+      }
+    },
+    {
+      "id": "late-partition",
+      "prompt": {
+        "en": "In a new distributed task, the final answer needs all partial results. One is late. What follows?",
+        "vi": "Ở tác vụ phân tán mới, đáp án cuối cần mọi kết quả phần. Một kết quả đến trễ. Điều gì xảy ra?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The late result can always be ignored",
+            "vi": "Luôn có thể bỏ kết quả trễ"
+          },
+          "feedback": {
+            "en": "That changes the required computation.",
+            "vi": "Làm vậy thay đổi phép tính cần thực hiện."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The combine operation must wait for its required input",
+            "vi": "Phép gộp phải chờ đầu vào cần thiết"
+          },
+          "feedback": {
+            "en": "Correct: the dependency remains despite parallel local work.",
+            "vi": "Đúng: phụ thuộc vẫn tồn tại dù tính cục bộ song song."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "This proves the machine is SISD",
+            "vi": "Điều này chứng minh máy là SISD"
+          },
+          "feedback": {
+            "en": "Waiting is not a Flynn classification rule.",
+            "vi": "Chờ không phải tiêu chí phân loại Flynn."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Parallel execution does not remove data dependencies.",
+        "vi": "Thực hiện song song không xóa phụ thuộc dữ liệu."
+      }
+    },
+    {
+      "id": "mpp-explain",
+      "prompt": {
+        "en": "Which explanation best describes massive parallelism?",
+        "vi": "Giải thích nào mô tả massively parallel tốt nhất?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A faster clock in one processor",
+            "vi": "Clock nhanh hơn trong một bộ xử lý"
+          },
+          "feedback": {
+            "en": "That does not describe many coordinated processors.",
+            "vi": "Đó không mô tả nhiều bộ xử lý phối hợp."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Many connected processors divide coordinated work and exchange results",
+            "vi": "Nhiều bộ xử lý nối với nhau chia công việc phối hợp và trao đổi kết quả"
+          },
+          "feedback": {
+            "en": "Correct: scale, coordinated processing and communication are included.",
+            "vi": "Đúng: gồm quy mô, xử lý phối hợp và trao đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Any program that stores many data items",
+            "vi": "Mọi chương trình lưu nhiều dữ liệu"
+          },
+          "feedback": {
+            "en": "Data volume alone says nothing about parallel architecture.",
+            "vi": "Chỉ lượng dữ liệu không nói được kiến trúc song song."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Explain the structure and operation, not only a performance adjective.",
+        "vi": "Giải thích cấu trúc và hoạt động, không chỉ tính từ về hiệu năng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Classify all four Flynn categories, then explain one limit on MPP speedup.",
+      "vi": "Phân loại bốn nhóm Flynn rồi giải thích một giới hạn tăng tốc MPP."
+    },
+    "answerPoints": [
+      {
+        "en": "Use the instruction/data single-or-multiple grid.",
+        "vi": "Dùng bảng một/nhiều luồng lệnh và dữ liệu."
+      },
+      {
+        "en": "MPP needs coordinated work and interprocessor communication.",
+        "vi": "MPP cần công việc phối hợp và trao đổi giữa bộ xử lý."
+      },
+      {
+        "en": "Dependencies and communication prevent automatic linear speedup.",
+        "vi": "Phụ thuộc và trao đổi khiến tăng tốc không tự động tuyến tính."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Follow streams to classify; follow dependencies to evaluate.",
+      "vi": "Theo luồng để phân loại; theo phụ thuộc để đánh giá."
+    },
+    {
+      "en": "The small sum illustrates coordination, not massive scale or measured speed.",
+      "vi": "Phép tổng nhỏ minh họa phối hợp, không đo quy mô massive hay tốc độ."
+    }
+  ],
+  "relatedSlugs": [
+    "pipelines-registers-and-interrupts"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.1",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter15.1.2, printed350–353 / PDF366–369",
+      "kind": "book"
+    },
+    {
+      "id": "past-qp",
+      "title": "Cambridge9618/31 — May/June2023 question paper",
+      "locator": "Question8, page9",
+      "kind": "question-paper"
+    },
+    {
+      "id": "past-ms",
+      "title": "Cambridge9618/31 — May/June2023 mark scheme",
+      "locator": "Question8, page7",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "flynn-qp",
+      "title": "Cambridge9618/32 — May/June2022 question paper",
+      "locator": "Question5, page8",
+      "kind": "question-paper"
+    },
+    {
+      "id": "flynn-ms",
+      "title": "Cambridge9618/32 — May/June2022 mark scheme",
+      "locator": "Question5, page7",
+      "kind": "mark-scheme"
+    }
+  ]
+}

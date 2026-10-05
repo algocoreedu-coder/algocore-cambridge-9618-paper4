@@ -1,0 +1,668 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.17.1",
+  "topicId": "P3-17.1-T04",
+  "slug": "certificates-and-signatures",
+  "estimatedMinutes": 45,
+  "title": {
+    "en": "Certificates and signatures",
+    "vi": "Chứng chỉ số và chữ ký số"
+  },
+  "question": {
+    "en": "How does a certificate bind an identity to a public key, and how does a signature reveal change?",
+    "vi": "Chứng chỉ liên kết danh tính với khóa công khai thế nào, và chữ ký phát hiện thay đổi ra sao?"
+  },
+  "opening": {
+    "en": "A verifier needs more than a public key copied from an unknown page. A certificate supplies an issuer-backed identity binding; a signature then lets the verifier test who signed and whether the message changed.",
+    "vi": "Người kiểm chứng cần nhiều hơn một khóa công khai sao chép từ trang không rõ. Chứng chỉ cung cấp liên kết danh tính được bên cấp xác nhận; chữ ký sau đó cho phép kiểm tra ai ký và thông điệp có thay đổi không."
+  },
+  "objectives": [
+    {
+      "en": "Trace certificate request, identity check and issuance.",
+      "vi": "Theo dõi yêu cầu chứng chỉ, kiểm tra danh tính và cấp chứng chỉ."
+    },
+    {
+      "en": "Distinguish a certificate from a digital signature.",
+      "vi": "Phân biệt chứng chỉ số với chữ ký số."
+    },
+    {
+      "en": "Trace digest signing and verification in the reviewed teaching model.",
+      "vi": "Theo dõi ký và kiểm chứng bản tóm lược trong mô hình dạy học đã duyệt."
+    },
+    {
+      "en": "Interpret valid, tampered and wrong-key outcomes.",
+      "vi": "Diễn giải kết quả hợp lệ, bị sửa và sai khóa."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Public/private key ownership.",
+      "vi": "Quyền sở hữu khóa công khai/riêng tư."
+    },
+    {
+      "en": "A deterministic function gives the same digest for the same message.",
+      "vi": "Hàm xác định cho cùng bản tóm lược với cùng thông điệp."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "certificate authority (CA)",
+      "meaning": {
+        "en": "A trusted issuer that validates identity and signs a certificate in the teaching model.",
+        "vi": "Bên cấp tin cậy xác thực danh tính và ký chứng chỉ trong mô hình dạy học."
+      }
+    },
+    {
+      "term": "digital certificate",
+      "meaning": {
+        "en": "An electronic document binding an identity to a public key and related metadata.",
+        "vi": "Tài liệu điện tử liên kết danh tính với khóa công khai và siêu dữ liệu liên quan."
+      }
+    },
+    {
+      "term": "digital signature",
+      "meaning": {
+        "en": "Evidence created with the signer’s private-key operation over a digest in this model.",
+        "vi": "Bằng chứng tạo bằng thao tác khóa riêng của người ký trên bản tóm lược trong mô hình này."
+      }
+    },
+    {
+      "term": "digest",
+      "meaning": {
+        "en": "Fixed teaching token produced from message content; a changed message should produce a changed result.",
+        "vi": "Token dạy học cố định tạo từ nội dung thông điệp; thông điệp đổi sẽ tạo kết quả đổi."
+      }
+    },
+    {
+      "term": "verification",
+      "meaning": {
+        "en": "Using the certified signer public key and current message digest to test the signature evidence.",
+        "vi": "Dùng khóa công khai đã được chứng nhận của người ký và bản tóm lược hiện tại để kiểm tra bằng chứng chữ ký."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "certificate-acquisition",
+      "title": {
+        "en": "Acquire an identity–public-key binding",
+        "vi": "Nhận liên kết danh tính–khóa công khai"
+      },
+      "paragraphs": [
+        {
+          "en": "The subject prepares the relevant public-key information and requests a certificate. The CA performs identity/ownership checks at the coursebook’s abstraction level, then issues and signs a certificate that identifies the subject and public key.",
+          "vi": "Chủ thể chuẩn bị thông tin khóa công khai liên quan và yêu cầu chứng chỉ. CA kiểm tra danh tính/quyền sở hữu ở mức trừu tượng của sách, rồi cấp và ký chứng chỉ nhận diện chủ thể và khóa công khai."
+        },
+        {
+          "en": "Certificate fields can include issuer, subject, public key, serial number, validity dates, signature algorithm and issuer signature. The certificate does not contain or become the subject’s private key.",
+          "vi": "Trường chứng chỉ có thể gồm bên cấp, chủ thể, khóa công khai, số sê-ri, ngày hiệu lực, thuật toán chữ ký và chữ ký bên cấp. Chứng chỉ không chứa hay trở thành khóa riêng của chủ thể."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "signature-creation",
+      "title": {
+        "en": "Create signature evidence",
+        "vi": "Tạo bằng chứng chữ ký"
+      },
+      "paragraphs": [
+        {
+          "en": "The sender computes a digest from the message. The sender applies the private-key signing operation to that digest, producing a signature. The message and signature travel as separate logical artefacts.",
+          "vi": "Người gửi tính bản tóm lược từ thông điệp. Người gửi áp dụng thao tác ký bằng khóa riêng lên bản tóm lược, tạo chữ ký. Thông điệp và chữ ký đi như hai tạo phẩm logic riêng."
+        },
+        {
+          "en": "The visual uses a toy digest token so the state change is visible. It is a teaching fixture, not production cryptography and must never be reused as a security algorithm.",
+          "vi": "Minh họa dùng token tóm lược đồ chơi để thấy thay đổi trạng thái. Đây là fixture dạy học, không phải mật mã sản xuất và không được tái dùng làm thuật toán bảo mật."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "signature-verification",
+      "title": {
+        "en": "Verify against the current message",
+        "vi": "Kiểm chứng với thông điệp hiện tại"
+      },
+      "paragraphs": [
+        {
+          "en": "The verifier validates the certificate chain at the simplified level, obtains the claimed signer’s certified public key, recovers/checks the signed digest evidence and independently computes a digest from the received message.",
+          "vi": "Người kiểm chứng xác thực chuỗi chứng chỉ ở mức giản lược, lấy khóa công khai đã được chứng nhận của người ký được khai báo, khôi phục/kiểm tra bằng chứng bản tóm lược đã ký và tự tính bản tóm lược từ thông điệp nhận."
+        },
+        {
+          "en": "Matching results support authenticity and integrity in this model. A changed message or wrong signer key causes verification to fail. This does not hide the message; confidentiality requires separate encryption.",
+          "vi": "Kết quả khớp hỗ trợ tính xác thực và toàn vẹn trong mô hình. Thông điệp bị đổi hoặc khóa người ký sai làm kiểm chứng thất bại. Điều này không che thông điệp; tính bí mật cần mã hóa riêng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "certificate-signature",
+    "title": {
+      "en": "Certificate acquisition and signature verification lab",
+      "vi": "Phòng thực hành cấp chứng chỉ và kiểm chứng chữ ký"
+    },
+    "introduction": {
+      "en": "Switch between certificate acquisition and sign/verify modes. Inspect the certificate, message, digest, signature and key owner as separate artefacts.",
+      "vi": "Chuyển giữa chế độ cấp chứng chỉ và ký/kiểm chứng. Quan sát chứng chỉ, thông điệp, bản tóm lược, chữ ký và chủ khóa như các tạo phẩm riêng."
+    },
+    "task": {
+      "en": "Issue a certificate, verify a valid message, then test tampered-message and wrong-signer fixtures.",
+      "vi": "Cấp chứng chỉ, kiểm chứng thông điệp hợp lệ, rồi thử fixture thông điệp bị sửa và sai người ký."
+    },
+    "conventions": [
+      {
+        "en": "The digest is a visible teaching fixture, not production cryptography.",
+        "vi": "Bản tóm lược là fixture dạy học có thể quan sát, không phải mật mã sản xuất."
+      },
+      {
+        "en": "Certificate, signature and ciphertext are deliberately shown as different artefacts.",
+        "vi": "Chứng chỉ, chữ ký và bản mã được chủ ý hiển thị như các tạo phẩm khác nhau."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Verify a signed results notice",
+      "vi": "Kiểm chứng thông báo kết quả đã ký"
+    },
+    "prompt": {
+      "en": "Registrar Mina owns a certified key pair and sends ‘Results approved’ with a signature. A verifier receives either the original message, a changed message or a signature checked with the wrong public key.",
+      "vi": "Cán bộ Mina sở hữu cặp khóa được chứng nhận và gửi ‘Kết quả đã duyệt’ cùng chữ ký. Người kiểm chứng nhận thông điệp gốc, thông điệp bị đổi hoặc chữ ký được kiểm tra bằng khóa công khai sai."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "digest-sign",
+        "action": {
+          "en": "Mina digests the original message and signs that digest with Mina’s private key.",
+          "vi": "Mina tóm lược thông điệp gốc và ký bản tóm lược bằng khóa riêng của Mina."
+        },
+        "why": {
+          "en": "The signature must be tied to both content and signer.",
+          "vi": "Chữ ký phải gắn với cả nội dung và người ký."
+        },
+        "result": {
+          "en": "Message and signature are delivered; the message is not encrypted by this step.",
+          "vi": "Thông điệp và chữ ký được gửi; thông điệp không bị mã hóa bởi bước này."
+        }
+      },
+      {
+        "id": "certificate",
+        "action": {
+          "en": "Validate Mina’s certificate and obtain Mina’s public key.",
+          "vi": "Xác thực chứng chỉ của Mina và lấy khóa công khai của Mina."
+        },
+        "why": {
+          "en": "The verifier needs an issuer-backed binding between Mina’s identity and key before verification.",
+          "vi": "Người kiểm chứng cần liên kết danh tính Mina–khóa được bên cấp xác nhận trước khi kiểm chứng."
+        },
+        "result": {
+          "en": "The public key is attributed to Mina; Mina’s private key remains private.",
+          "vi": "Khóa công khai được gắn với Mina; khóa riêng của Mina vẫn bí mật."
+        }
+      },
+      {
+        "id": "verify-valid",
+        "action": {
+          "en": "Verifier computes the received-message digest and checks the signature with Mina’s public key.",
+          "vi": "Người kiểm chứng tính bản tóm lược thông điệp nhận và kiểm tra chữ ký bằng khóa công khai của Mina."
+        },
+        "why": {
+          "en": "Matching evidence links the current content to Mina’s signing key.",
+          "vi": "Bằng chứng khớp liên kết nội dung hiện tại với khóa ký của Mina."
+        },
+        "result": {
+          "en": "Original fixture: valid authenticity/integrity evidence.",
+          "vi": "Fixture gốc: bằng chứng xác thực/toàn vẹn hợp lệ."
+        }
+      },
+      {
+        "id": "verify-tampered",
+        "action": {
+          "en": "Repeat after changing ‘approved’ to ‘delayed’.",
+          "vi": "Lặp lại sau khi đổi ‘đã duyệt’ thành ‘bị hoãn’."
+        },
+        "why": {
+          "en": "The current message digest changes while the delivered signature does not.",
+          "vi": "Bản tóm lược thông điệp hiện tại thay đổi trong khi chữ ký đã gửi không đổi."
+        },
+        "result": {
+          "en": "Digest mismatch: invalid; do not accept the message as Mina’s unchanged notice.",
+          "vi": "Bản tóm lược không khớp: không hợp lệ; không chấp nhận là thông báo không đổi của Mina."
+        }
+      },
+      {
+        "id": "wrong-key",
+        "action": {
+          "en": "Check Mina’s signature with Noor’s public key.",
+          "vi": "Kiểm tra chữ ký Mina bằng khóa công khai của Noor."
+        },
+        "why": {
+          "en": "The certificate/key owner is wrong for the claimed signer.",
+          "vi": "Chủ chứng chỉ/khóa sai với người ký được khai báo."
+        },
+        "result": {
+          "en": "Wrong signer/key: invalid verification.",
+          "vi": "Sai người ký/khóa: kiểm chứng không hợp lệ."
+        }
+      }
+    ],
+    "result": {
+      "en": "A valid certificate supplies the identity binding; a valid signature check supports authenticity and integrity of the current message.",
+      "vi": "Chứng chỉ hợp lệ cung cấp liên kết danh tính; kiểm chứng chữ ký hợp lệ hỗ trợ xác thực và toàn vẹn của thông điệp hiện tại."
+    },
+    "selfCheck": {
+      "en": "Can you point to the separate certificate, signature, message and digest and state each role?",
+      "vi": "Bạn có thể chỉ riêng chứng chỉ, chữ ký, thông điệp và bản tóm lược rồi nêu vai trò từng cái không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "CA or trusted third party",
+        "vi": "CA hoặc bên thứ ba tin cậy"
+      },
+      {
+        "en": "identity bound to a public key",
+        "vi": "danh tính liên kết với khóa công khai"
+      },
+      {
+        "en": "changed message fails verification",
+        "vi": "thông điệp bị đổi làm kiểm chứng thất bại"
+      },
+      {
+        "en": "acquire, issue, sign or verify",
+        "vi": "nhận, cấp, ký hoặc kiểm chứng"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: the CA signs the certificate; the message sender signs the message digest. These are related trust steps but different operations on different artefacts.",
+      "vi": "Dễ nhầm: CA ký chứng chỉ; người gửi thông điệp ký bản tóm lược thông điệp. Đây là các bước tin cậy liên quan nhưng là thao tác khác nhau trên tạo phẩm khác nhau."
+    },
+    "method": [
+      {
+        "en": "Identify whether the question is about certificate acquisition or message signing.",
+        "vi": "Xác định câu hỏi về cấp chứng chỉ hay ký thông điệp."
+      },
+      {
+        "en": "Name the issuer, subject/signer and key owner.",
+        "vi": "Ghi bên cấp, chủ thể/người ký và chủ khóa."
+      },
+      {
+        "en": "Trace the artefact at each operation.",
+        "vi": "Theo dõi tạo phẩm tại mỗi thao tác."
+      },
+      {
+        "en": "Conclude authenticity/integrity or failure; mention confidentiality only if separately encrypted.",
+        "vi": "Kết luận xác thực/toàn vẹn hoặc thất bại; chỉ nêu bí mật nếu có mã hóa riêng."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A certificate is a digital signature.",
+        "vi": "Chứng chỉ là chữ ký số."
+      },
+      "correction": {
+        "en": "A certificate is an issuer-signed identity/public-key document; a message signature is separate evidence.",
+        "vi": "Chứng chỉ là tài liệu danh tính/khóa công khai được bên cấp ký; chữ ký thông điệp là bằng chứng riêng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "The certificate contains the subject’s private key.",
+        "vi": "Chứng chỉ chứa khóa riêng của chủ thể."
+      },
+      "correction": {
+        "en": "It distributes public-key identity information; the private key stays with its owner.",
+        "vi": "Nó phân phối thông tin danh tính–khóa công khai; khóa riêng ở lại với chủ sở hữu."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A valid signature makes content confidential.",
+        "vi": "Chữ ký hợp lệ làm nội dung bí mật."
+      },
+      "correction": {
+        "en": "Signature verification supports authenticity/integrity; separate encryption supplies confidentiality.",
+        "vi": "Kiểm chứng chữ ký hỗ trợ xác thực/toàn vẹn; mã hóa riêng tạo tính bí mật."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A valid certificate proves the whole service is safe.",
+        "vi": "Chứng chỉ hợp lệ chứng minh toàn bộ dịch vụ an toàn."
+      },
+      "correction": {
+        "en": "It supports a scoped identity–public-key binding, not every security property or business claim.",
+        "vi": "Nó hỗ trợ liên kết danh tính–khóa công khai trong phạm vi, không phải mọi thuộc tính bảo mật hay tuyên bố kinh doanh."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "certificate-role",
+      "prompt": {
+        "en": "What does a CA-issued certificate bind?",
+        "vi": "Chứng chỉ do CA cấp liên kết gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A named identity and public key",
+            "vi": "Danh tính được nêu và khóa công khai"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The subject’s private key and every password",
+            "vi": "Khóa riêng của chủ thể và mọi mật khẩu"
+          },
+          "feedback": {
+            "en": "Private secrets are not published in the certificate.",
+            "vi": "Bí mật riêng không được công bố trong chứng chỉ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A guarantee that all content is true",
+            "vi": "Bảo đảm mọi nội dung đúng"
+          },
+          "feedback": {
+            "en": "The binding has a narrower purpose.",
+            "vi": "Liên kết có mục đích hẹp hơn."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "State the identity–public-key binding and issuer validation.",
+        "vi": "Nêu liên kết danh tính–khóa công khai và xác nhận của bên cấp."
+      }
+    },
+    {
+      "id": "signer-operation",
+      "prompt": {
+        "en": "Who uses the private key when Mina signs a message?",
+        "vi": "Ai dùng khóa riêng khi Mina ký thông điệp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Mina, the key owner",
+            "vi": "Mina, chủ khóa"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every verifier",
+            "vi": "Mọi người kiểm chứng"
+          },
+          "feedback": {
+            "en": "Verifiers use Mina’s public key.",
+            "vi": "Người kiểm chứng dùng khóa công khai của Mina."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The message recipient’s CA",
+            "vi": "CA của người nhận"
+          },
+          "feedback": {
+            "en": "The signer owns and uses the signing private key.",
+            "vi": "Người ký sở hữu và dùng khóa riêng để ký."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Private keys remain with their owner.",
+        "vi": "Khóa riêng ở lại với chủ sở hữu."
+      }
+    },
+    {
+      "id": "tamper",
+      "prompt": {
+        "en": "Why does a changed message fail against the old signature?",
+        "vi": "Vì sao thông điệp bị đổi thất bại với chữ ký cũ?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The newly computed digest no longer matches the signed evidence",
+            "vi": "Bản tóm lược mới tính không còn khớp bằng chứng đã ký"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The certificate automatically deletes the message",
+            "vi": "Chứng chỉ tự động xóa thông điệp"
+          },
+          "feedback": {
+            "en": "Certificates do not perform that action.",
+            "vi": "Chứng chỉ không thực hiện thao tác đó."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The public key becomes private",
+            "vi": "Khóa công khai trở thành riêng tư"
+          },
+          "feedback": {
+            "en": "Key visibility does not change.",
+            "vi": "Tính công khai của khóa không đổi."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Trace both the received-message digest and signed digest evidence.",
+        "vi": "Theo dõi cả bản tóm lược thông điệp nhận và bằng chứng bản tóm lược đã ký."
+      }
+    },
+    {
+      "id": "confidentiality",
+      "prompt": {
+        "en": "A signed message is readable by everyone. Which conclusion is correct?",
+        "vi": "Thông điệp đã ký ai cũng đọc được. Kết luận nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The signature can support authenticity/integrity, while confidentiality is absent",
+            "vi": "Chữ ký có thể hỗ trợ xác thực/toàn vẹn, còn tính bí mật không có"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Readable means the signature is invalid",
+            "vi": "Có thể đọc nghĩa là chữ ký không hợp lệ"
+          },
+          "feedback": {
+            "en": "Signing does not require hiding content.",
+            "vi": "Ký không đòi hỏi che nội dung."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The certificate encrypted the message",
+            "vi": "Chứng chỉ đã mã hóa thông điệp"
+          },
+          "feedback": {
+            "en": "A certificate is an identity/key document, not this encryption operation.",
+            "vi": "Chứng chỉ là tài liệu danh tính/khóa, không phải thao tác mã hóa này."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Separate verification outcomes from confidentiality.",
+        "vi": "Tách kết quả kiểm chứng khỏi tính bí mật."
+      }
+    },
+    {
+      "id": "order-signature",
+      "prompt": {
+        "en": "Which is the correct verification journey?",
+        "vi": "Hành trình kiểm chứng nào đúng?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Receive message/signature/certificate → validate certificate → use certified public key → hash current message → decide",
+            "vi": "Nhận thông điệp/chữ ký/chứng thư → xác thực chứng thư → dùng khóa công khai đã chứng nhận → băm thông điệp hiện tại → quyết định"
+          },
+          "feedback": {
+            "en": "Correct: trust the key binding before signature verification and compare against current content.",
+            "vi": "Đúng: tin liên kết khóa trước kiểm chứng chữ ký và so với nội dung hiện tại."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Publish private key → delete message → trust any certificate",
+            "vi": "Công bố khóa riêng → xóa thông điệp → tin mọi chứng thư"
+          },
+          "feedback": {
+            "en": "This breaks key ownership and performs no valid check.",
+            "vi": "Cách này phá quyền sở hữu khóa và không kiểm tra hợp lệ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Decrypt certificate as message → assume confidentiality",
+            "vi": "Giải mã chứng thư như thông điệp → giả định bí mật"
+          },
+          "feedback": {
+            "en": "Certificate validation and message confidentiality are different operations.",
+            "vi": "Xác thực chứng thư và bí mật thông điệp là thao tác khác nhau."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Trace certificate trust, key ownership and current-message evidence in order.",
+        "vi": "Theo dõi niềm tin chứng thư, chủ khóa và bằng chứng thông điệp hiện tại theo thứ tự."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Draw the acquisition chain and the sign/verify chain.",
+      "vi": "Vẽ chuỗi cấp chứng chỉ và chuỗi ký/kiểm chứng."
+    },
+    "answerPoints": [
+      {
+        "en": "Subject request + identity/ownership check → CA issues signed identity–public-key certificate.",
+        "vi": "Yêu cầu chủ thể + kiểm tra danh tính/quyền sở hữu → CA cấp chứng chỉ danh tính–khóa công khai đã ký."
+      },
+      {
+        "en": "Message → digest → signer private-key operation → signature.",
+        "vi": "Thông điệp → bản tóm lược → thao tác khóa riêng người ký → chữ ký."
+      },
+      {
+        "en": "Verifier uses certified signer public key and current-message digest; match supports authenticity/integrity, not confidentiality.",
+        "vi": "Người kiểm chứng dùng khóa công khai đã chứng nhận của người ký và bản tóm lược thông điệp hiện tại; khớp hỗ trợ xác thực/toàn vẹn, không phải bí mật."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Certificate issuance and message signing are distinct workflows.",
+      "vi": "Cấp chứng chỉ và ký thông điệp là hai quy trình khác nhau."
+    },
+    {
+      "en": "Always track the artefact and key owner.",
+      "vi": "Luôn theo dõi tạo phẩm và chủ khóa."
+    },
+    {
+      "en": "A signature supports authenticity/integrity; encryption separately supplies confidentiality.",
+      "vi": "Chữ ký hỗ trợ xác thực/toàn vẹn; mã hóa riêng tạo tính bí mật."
+    }
+  ],
+  "relatedSlugs": [
+    "ssl-tls-communication",
+    "confidentiality-and-key-choice"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p36, §17.1 Security",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Chapter 17.4, printed pp418–424 / PDF pp434–440: digital signatures, certificate contents, acquisition and verification",
+      "kind": "book"
+    },
+    {
+      "id": "w25-33-qp",
+      "title": "Cambridge 9618/33 — October/November 2025 question paper",
+      "locator": "Question 9, p8: certificate acquisition flow",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w25-33-ms",
+      "title": "Cambridge 9618/33 — October/November 2025 mark scheme",
+      "locator": "Question 9, p12",
+      "kind": "mark-scheme"
+    }
+  ]
+}

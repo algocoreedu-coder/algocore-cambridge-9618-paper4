@@ -1,0 +1,844 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.20.1",
+  "topicId": "P3-20.1-T02",
+  "slug": "five-addressing-modes",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Five addressing modes",
+    "vi": "Năm chế độ địa chỉ"
+  },
+  "question": {
+    "en": "How does an operand become an effective address or value?",
+    "vi": "Operand trở thành effective address hoặc value như thế nào?"
+  },
+  "opening": {
+    "en": "The same operand 20 can mean literal 20, address 20, a pointer, a base for IX or a displacement.",
+    "vi": "Cùng operand 20 có thể là literal 20, address 20, pointer, base cho IX hoặc displacement."
+  },
+  "objectives": [
+    {
+      "en": "Explain five addressing modes accurately.",
+      "vi": "Giải thích chính xác năm chế độ địa chỉ."
+    },
+    {
+      "en": "Trace every visible state change.",
+      "vi": "Trace mọi thay đổi state nhìn thấy."
+    },
+    {
+      "en": "Use the declared convention.",
+      "vi": "Dùng convention đã khai báo."
+    },
+    {
+      "en": "Handle boundary and error cases.",
+      "vi": "Xử lý boundary và error case."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read tables and simple code.",
+      "vi": "Đọc bảng và code đơn giản."
+    },
+    {
+      "en": "Distinguish a value from its location.",
+      "vi": "Phân biệt giá trị với vị trí của nó."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Operand,",
+      "meaning": {
+        "en": "The operand field is read using the stated mode. An effective address identifies a location; the fetched value is the content used by the instruction.",
+        "vi": "Operand được đọc theo mode đã nêu. Effective address xác định vị trí; fetched value là nội dung lệnh sử dụng."
+      }
+    },
+    {
+      "term": "state",
+      "meaning": {
+        "en": "Values relevant at one execution point.",
+        "vi": "Các giá trị liên quan tại một thời điểm thực thi."
+      }
+    },
+    {
+      "term": "trace",
+      "meaning": {
+        "en": "Ordered record of state changes.",
+        "vi": "Bản ghi có thứ tự của thay đổi state."
+      }
+    },
+    {
+      "term": "fixture",
+      "meaning": {
+        "en": "Declared teaching example with fixed assumptions.",
+        "vi": "Ví dụ dạy học có giả định cố định."
+      }
+    },
+    {
+      "term": "convention",
+      "meaning": {
+        "en": "Rule that fixes notation or interpretation.",
+        "vi": "Quy tắc khóa notation hoặc cách hiểu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "operand-ea",
+      "title": {
+        "en": "Operand, address and value",
+        "vi": "Operand, địa chỉ và giá trị"
+      },
+      "paragraphs": [
+        {
+          "en": "The operand field is read using the stated mode. An effective address identifies a location; the fetched value is the content used by the instruction.",
+          "vi": "Operand được đọc theo mode đã nêu. Effective address xác định vị trí; fetched value là nội dung lệnh sử dụng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "data-modes",
+      "title": {
+        "en": "Immediate, direct and indirect",
+        "vi": "Immediate, direct và indirect"
+      },
+      "paragraphs": [
+        {
+          "en": "Immediate uses the literal. Direct uses M[operand]. Indirect first reads a pointer M[operand], then reads M[pointer].",
+          "vi": "Immediate dùng literal. Direct dùng M[operand]. Indirect đọc pointer M[operand], rồi đọc M[pointer]."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "computed-modes",
+      "title": {
+        "en": "Indexed and relative",
+        "vi": "Indexed và relative"
+      },
+      "paragraphs": [
+        {
+          "en": "Indexed data address is operand+IX. The fixture relative branch target is instructionAddress+signed displacement.",
+          "vi": "Địa chỉ data indexed là operand+IX. Target relative của fixture là instructionAddress+signed displacement."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "address-code",
+      "title": {
+        "en": "Declared notation",
+        "vi": "Notation đã khai báo"
+      },
+      "paragraphs": [
+        {
+          "en": "The displayed mnemonic determines whether the result is data or a control target. An out-of-range address stops resolution with an error.",
+          "vi": "Mnemonic hiển thị quyết định kết quả là data hay control target. Địa chỉ ngoài range dừng với error."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ],
+      "code": "LDM #20   // immediate\nLDD 20    // direct\nLDI 20    // indirect\nLDX 20    // indexed with IX\nJMR #5    // relative in this fixture"
+    }
+  ],
+  "visual": {
+    "kind": "addressing-modes",
+    "title": {
+      "en": "Five-mode resolver",
+      "vi": "Bộ phân giải năm mode"
+    },
+    "introduction": {
+      "en": "Follow operand → calculation → effective address → value without merging the stages.",
+      "vi": "Theo operand → phép tính → effective address → value mà không gộp bước."
+    },
+    "task": {
+      "en": "Resolve five modes and test invalid addresses.",
+      "vi": "Phân giải năm mode và thử địa chỉ không hợp lệ."
+    },
+    "conventions": [
+      {
+        "en": "S20-ASM-COURSEBOOK-1; addresses 0..255 in the visual fixture.",
+        "vi": "S20-ASM-COURSEBOOK-1; address 0..255 trong fixture."
+      },
+      {
+        "en": "PC points to the current instruction before fetch.",
+        "vi": "PC trỏ lệnh hiện tại trước fetch."
+      },
+      {
+        "en": "Concept-aligned AlgoCore redraw; no official marks.",
+        "vi": "AlgoCore redraw theo khái niệm; không có điểm chính thức."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Resolve five meanings of operand 20",
+      "vi": "Phân giải năm nghĩa của operand 20"
+    },
+    "prompt": {
+      "en": "M[20]=40, M[40]=7, M[23]=9, IX=3, instruction address=100.",
+      "vi": "M[20]=40, M[40]=7, M[23]=9, IX=3, địa chỉ lệnh=100."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "step-1",
+        "action": {
+          "en": "Lock memory, registers and PC convention.",
+          "vi": "Khóa memory, register và PC convention."
+        },
+        "why": {
+          "en": "Each mode needs a declared state.",
+          "vi": "Mỗi mode cần state đã khai báo."
+        },
+        "result": {
+          "en": "IX=3; current instruction address=100.",
+          "vi": "IX=3; địa chỉ lệnh hiện tại=100."
+        },
+        "check": {
+          "en": "Check: IX=3; current instruction address=100.",
+          "vi": "Tự kiểm tra: IX=3; địa chỉ lệnh hiện tại=100."
+        }
+      },
+      {
+        "id": "step-2",
+        "action": {
+          "en": "Resolve LDM #20.",
+          "vi": "Phân giải LDM #20."
+        },
+        "why": {
+          "en": "Immediate uses the literal.",
+          "vi": "Immediate dùng literal."
+        },
+        "result": {
+          "en": "Value=20; no data-memory EA.",
+          "vi": "Value=20; không có data-memory EA."
+        },
+        "check": {
+          "en": "Check: Value=20; no data-memory EA.",
+          "vi": "Tự kiểm tra: Value=20; không có data-memory EA."
+        }
+      },
+      {
+        "id": "step-3",
+        "action": {
+          "en": "Resolve LDD 20.",
+          "vi": "Phân giải LDD 20."
+        },
+        "why": {
+          "en": "Direct uses operand as EA.",
+          "vi": "Direct dùng operand làm EA."
+        },
+        "result": {
+          "en": "EA=20; value=M[20]=40.",
+          "vi": "EA=20; value=M[20]=40."
+        },
+        "check": {
+          "en": "Check: EA=20; value=M[20]=40.",
+          "vi": "Tự kiểm tra: EA=20; value=M[20]=40."
+        }
+      },
+      {
+        "id": "step-4",
+        "action": {
+          "en": "Resolve LDI 20.",
+          "vi": "Phân giải LDI 20."
+        },
+        "why": {
+          "en": "Indirect dereferences the pointer.",
+          "vi": "Indirect dereference pointer."
+        },
+        "result": {
+          "en": "pointer=M[20]=40; value=M[40]=7.",
+          "vi": "pointer=M[20]=40; value=M[40]=7."
+        },
+        "check": {
+          "en": "Check: pointer=M[20]=40; value=M[40]=7.",
+          "vi": "Tự kiểm tra: pointer=M[20]=40; value=M[40]=7."
+        }
+      },
+      {
+        "id": "step-5",
+        "action": {
+          "en": "Resolve LDX 20.",
+          "vi": "Phân giải LDX 20."
+        },
+        "why": {
+          "en": "Indexed adds IX before fetch.",
+          "vi": "Indexed cộng IX trước khi fetch."
+        },
+        "result": {
+          "en": "EA=20+3=23; value=M[23]=9.",
+          "vi": "EA=20+3=23; value=M[23]=9."
+        },
+        "check": {
+          "en": "Check: EA=20+3=23; value=M[23]=9.",
+          "vi": "Tự kiểm tra: EA=20+3=23; value=M[23]=9."
+        }
+      },
+      {
+        "id": "step-6",
+        "action": {
+          "en": "Resolve JMR #5.",
+          "vi": "Phân giải JMR #5."
+        },
+        "why": {
+          "en": "Relative targets control using the locked current-address rule.",
+          "vi": "Relative tính target theo quy tắc current-address đã khóa."
+        },
+        "result": {
+          "en": "target=100+5=105.",
+          "vi": "target=100+5=105."
+        },
+        "check": {
+          "en": "Check: target=100+5=105.",
+          "vi": "Tự kiểm tra: target=100+5=105."
+        }
+      }
+    ],
+    "result": {
+      "en": "The five paths produce literal 20, 40, 7, 9 and branch target 105.",
+      "vi": "Năm path cho literal 20, 40, 7, 9 và target 105."
+    },
+    "selfCheck": {
+      "en": "Did you keep pointer, EA and fetched value separate?",
+      "vi": "Bạn có tách pointer, EA và fetched value không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "# before an operand",
+        "vi": "# trước operand"
+      },
+      {
+        "en": "contents of the given address",
+        "vi": "nội dung của địa chỉ đã cho"
+      },
+      {
+        "en": "address stored at another address",
+        "vi": "địa chỉ lưu trong địa chỉ khác"
+      },
+      {
+        "en": "base plus IX or PC displacement",
+        "vi": "base cộng IX hoặc PC displacement"
+      }
+    ],
+    "distinguish": {
+      "en": "Relative addressing computes a control target in this fixture; indexed addressing computes a data address.",
+      "vi": "Relative tính control target trong fixture; indexed tính data address."
+    },
+    "method": [
+      {
+        "en": "Copy the supplied instruction meaning.",
+        "vi": "Chép nghĩa lệnh được cung cấp."
+      },
+      {
+        "en": "Write registers and memory cells.",
+        "vi": "Ghi register và memory cell."
+      },
+      {
+        "en": "Calculate EA before fetching.",
+        "vi": "Tính EA trước khi fetch."
+      },
+      {
+        "en": "Range-check then state the final value/target.",
+        "vi": "Kiểm tra range rồi nêu value/target cuối."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "State the convention, then produce syntactically consistent code or notation.",
+          "vi": "Nêu convention rồi viết code/ký hiệu nhất quán cú pháp."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record every relevant state change in execution order.",
+          "vi": "Ghi mọi thay đổi trạng thái liên quan theo thứ tự thực thi."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link a cause or rule to its consequence; do not only name it.",
+          "vi": "Nối nguyên nhân hoặc quy tắc với hệ quả; không chỉ nêu tên."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use the same criterion for both alternatives.",
+          "vi": "Dùng cùng một tiêu chí cho cả hai phương án."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Select a method and connect its feature to the scenario requirement.",
+          "vi": "Chọn phương pháp và nối đặc điểm của nó với yêu cầu tình huống."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "The operand is always the value.",
+        "vi": "Operand luôn là value."
+      },
+      "correction": {
+        "en": "Its interpretation depends on the mode.",
+        "vi": "Cách hiểu phụ thuộc mode."
+      },
+      "selfCheck": {
+        "en": "Can you write the resolution formula?",
+        "vi": "Bạn có viết được công thức phân giải không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Indirect reads M[operand] once.",
+        "vi": "Indirect chỉ đọc M[operand] một lần."
+      },
+      "correction": {
+        "en": "That first content is the EA; read M[EA] again.",
+        "vi": "Nội dung đầu là EA; cần đọc M[EA] lần nữa."
+      },
+      "selfCheck": {
+        "en": "Did you show both arrows?",
+        "vi": "Bạn đã cho cả hai mũi tên chưa?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Indexed changes the base address.",
+        "vi": "Indexed thay base address."
+      },
+      "correction": {
+        "en": "It computes base+IX for this access; the operand field stays fixed.",
+        "vi": "Nó tính base+IX cho lần truy cập; operand không đổi."
+      },
+      "selfCheck": {
+        "en": "Which value is register IX?",
+        "vi": "Giá trị nào là IX?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Relative always uses the next PC.",
+        "vi": "Relative luôn dùng next PC."
+      },
+      "correction": {
+        "en": "Use the PC timing explicitly supplied; this fixture uses current instruction address.",
+        "vi": "Dùng PC timing được cung cấp; fixture này dùng địa chỉ lệnh hiện tại."
+      },
+      "selfCheck": {
+        "en": "What timing rule is written?",
+        "vi": "Quy tắc timing nào đã ghi?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "cp-address",
+      "prompt": {
+        "en": "LDM #12 produces what?",
+        "vi": "LDM #12 cho gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Literal 12",
+            "vi": "Literal 12"
+          },
+          "feedback": {
+            "en": "Correct: # marks the denary literal.",
+            "vi": "Đúng: # đánh dấu literal denary."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "M[12]",
+            "vi": "M[12]"
+          },
+          "feedback": {
+            "en": "That would be direct.",
+            "vi": "Đó là direct."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "M[M[12]]",
+            "vi": "M[M[12]]"
+          },
+          "feedback": {
+            "en": "That would be indirect.",
+            "vi": "Đó là indirect."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Immediate has no data-memory EA.",
+        "vi": "Immediate không có data-memory EA."
+      }
+    },
+    {
+      "id": "cp-direct",
+      "prompt": {
+        "en": "If M[20]=40, LDD 20 loads?",
+        "vi": "Nếu M[20]=40, LDD 20 load gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "20",
+            "vi": "20"
+          },
+          "feedback": {
+            "en": "20 is the EA, not the content.",
+            "vi": "20 là EA, không phải content."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "40",
+            "vi": "40"
+          },
+          "feedback": {
+            "en": "Correct: direct reads M[20].",
+            "vi": "Đúng: direct đọc M[20]."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "M[40]",
+            "vi": "M[40]"
+          },
+          "feedback": {
+            "en": "That adds an indirect dereference.",
+            "vi": "Đó là thêm dereference indirect."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Direct uses operand as EA.",
+        "vi": "Direct dùng operand làm EA."
+      }
+    },
+    {
+      "id": "cp-indirect",
+      "prompt": {
+        "en": "M[20]=40 and M[40]=7. LDI 20 loads?",
+        "vi": "M[20]=40 và M[40]=7. LDI 20 load gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "20",
+            "vi": "20"
+          },
+          "feedback": {
+            "en": "Operand is the pointer location.",
+            "vi": "Operand là vị trí pointer."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "40",
+            "vi": "40"
+          },
+          "feedback": {
+            "en": "40 is the effective address.",
+            "vi": "40 là effective address."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "7",
+            "vi": "7"
+          },
+          "feedback": {
+            "en": "Correct: the second read supplies the value.",
+            "vi": "Đúng: lần đọc thứ hai cho value."
+          }
+        }
+      ],
+      "correctChoiceId": "c",
+      "explanation": {
+        "en": "Show both memory reads.",
+        "vi": "Cho thấy cả hai lần đọc memory."
+      }
+    },
+    {
+      "id": "cp-indexed",
+      "prompt": {
+        "en": "Base 20, IX=3 gives which EA?",
+        "vi": "Base 20, IX=3 cho EA nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "17",
+            "vi": "17"
+          },
+          "feedback": {
+            "en": "The fixture adds IX, not subtracts.",
+            "vi": "Fixture cộng IX, không trừ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "23",
+            "vi": "23"
+          },
+          "feedback": {
+            "en": "Correct: 20+3.",
+            "vi": "Đúng: 20+3."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "60",
+            "vi": "60"
+          },
+          "feedback": {
+            "en": "Indexed is addition, not multiplication.",
+            "vi": "Indexed là cộng, không nhân."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Then fetch M[23].",
+        "vi": "Sau đó fetch M[23]."
+      }
+    },
+    {
+      "id": "cp-relative",
+      "prompt": {
+        "en": "At instruction 100, JMR #5 targets?",
+        "vi": "Tại lệnh 100, JMR #5 target?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "105",
+            "vi": "105"
+          },
+          "feedback": {
+            "en": "Correct under the displayed current-address rule.",
+            "vi": "Đúng theo current-address rule đã hiển thị."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "106",
+            "vi": "106"
+          },
+          "feedback": {
+            "en": "That silently uses next-instruction timing.",
+            "vi": "Đó là tự đổi sang next-instruction timing."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "M[5]",
+            "vi": "M[5]"
+          },
+          "feedback": {
+            "en": "Relative computes a target, not M[5].",
+            "vi": "Relative tính target, không phải M[5]."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "State the PC timing before calculating.",
+        "vi": "Nêu PC timing trước khi tính."
+      }
+    },
+    {
+      "id": "cp-invalid",
+      "prompt": {
+        "en": "EA=260 but valid memory is 0..255. Next action?",
+        "vi": "EA=260 nhưng memory hợp lệ 0..255. Làm gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Wrap to 4",
+            "vi": "Quay vòng về 4"
+          },
+          "feedback": {
+            "en": "No wrap rule was supplied.",
+            "vi": "Không có quy tắc wrap."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Read 0",
+            "vi": "Đọc 0"
+          },
+          "feedback": {
+            "en": "Do not invent a value.",
+            "vi": "Không tự đặt value."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Report out-of-range and stop the access",
+            "vi": "Báo out-of-range và dừng truy cập"
+          },
+          "feedback": {
+            "en": "Correct: range failure is explicit.",
+            "vi": "Đúng: lỗi range phải rõ."
+          }
+        }
+      ],
+      "correctChoiceId": "c",
+      "explanation": {
+        "en": "A resolver must not read outside its declared memory.",
+        "vi": "Resolver không được đọc ngoài memory đã khai báo."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain all five resolution paths.",
+      "vi": "Giải thích cả năm đường phân giải."
+    },
+    "answerPoints": [
+      {
+        "en": "State the supplied mnemonic and operand.",
+        "vi": "Nêu mnemonic và operand."
+      },
+      {
+        "en": "Write the formula or dereference path.",
+        "vi": "Viết formula hoặc dereference path."
+      },
+      {
+        "en": "Separate EA/target from final value.",
+        "vi": "Tách EA/target khỏi final value."
+      },
+      {
+        "en": "Apply range and PC-timing rules.",
+        "vi": "Áp dụng range và PC-timing rule."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Mode controls operand interpretation.",
+      "vi": "Mode điều khiển cách hiểu operand."
+    },
+    {
+      "en": "Indirect needs two reads.",
+      "vi": "Indirect cần hai lần đọc."
+    },
+    {
+      "en": "Indexed and relative use different bases and purposes.",
+      "vi": "Indexed và relative dùng base và mục đích khác."
+    },
+    {
+      "en": "Question-supplied conventions override the fixture.",
+      "vi": "Convention đề bài ghi đè fixture."
+    }
+  ],
+  "relatedSlugs": [
+    "assembly-execution-and-construction",
+    "paradigms-and-procedural-design"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Section 20, printed/PDF p.38",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 20 pp.498–500 and Chapter 4 pp.121–129",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "Relevant convention on pp.22–29",
+      "kind": "guide"
+    },
+    {
+      "id": "qp",
+      "title": "Cambridge 9618/31 May/June 2022 question paper",
+      "locator": "Q9, PDF pp.14–15",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms",
+      "title": "Cambridge 9618/31 May/June 2022 mark scheme",
+      "locator": "Q9, PDF p.11",
+      "kind": "mark-scheme"
+    }
+  ]
+}

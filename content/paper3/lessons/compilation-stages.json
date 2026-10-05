@@ -1,0 +1,705 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.2-T02",
+  "slug": "compilation-stages",
+  "estimatedMinutes": 45,
+  "title": {
+    "en": "Compilation stages",
+    "vi": "Các giai đoạn biên dịch"
+  },
+  "question": {
+    "en": "How does source text become efficient target code without changing its meaning?",
+    "vi": "Văn bản nguồn trở thành mã đích hiệu quả mà không đổi ý nghĩa bằng cách nào?"
+  },
+  "opening": {
+    "en": "A compiler does more than replace words with machine instructions. It recognises tokens, checks structure, records information about names and generates code. Optimisation may improve the resulting program, but only if required behaviour is preserved. Follow the representation produced by each stage rather than memorising four labels in isolation.",
+    "vi": "Trình biên dịch không chỉ thay từ bằng lệnh máy. Nó nhận diện token, kiểm cấu trúc, ghi thông tin về tên và sinh mã. Tối ưu có thể cải thiện chương trình kết quả nhưng phải giữ hành vi cần thiết. Hãy theo dạng biểu diễn mỗi giai đoạn tạo ra thay vì học thuộc bốn nhãn rời rạc."
+  },
+  "objectives": [
+    {
+      "en": "Explain lexical analysis, syntax analysis, code generation and code optimisation.",
+      "vi": "Giải thích phân tích từ vựng, phân tích cú pháp, sinh mã và tối ưu mã."
+    },
+    {
+      "en": "Trace tokens, a symbol table and an expression structure on a small program.",
+      "vi": "Trace token, bảng ký hiệu và cấu trúc biểu thức của chương trình nhỏ."
+    },
+    {
+      "en": "Distinguish lexical/syntax diagnostics and justify a behaviour-preserving optimisation.",
+      "vi": "Phân biệt chẩn đoán từ vựng/cú pháp và lý giải tối ưu giữ hành vi."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know identifiers, literals, data types, assignment and translator workflows.",
+      "vi": "Biết định danh, hằng, kiểu dữ liệu, phép gán và quy trình bộ dịch."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Token",
+      "meaning": {
+        "en": "A recognised source-language unit such as a keyword, identifier, literal or operator.",
+        "vi": "Đơn vị ngôn ngữ nguồn được nhận diện như từ khóa, định danh, hằng hoặc toán tử."
+      }
+    },
+    {
+      "term": "Symbol table",
+      "meaning": {
+        "en": "Information associated with names, such as declared type and scope, used during translation.",
+        "vi": "Thông tin gắn với tên như kiểu khai báo và phạm vi, được dùng trong quá trình dịch."
+      }
+    },
+    {
+      "term": "Parse structure",
+      "meaning": {
+        "en": "A representation showing how tokens combine according to grammar rules.",
+        "vi": "Biểu diễn cho thấy token kết hợp theo quy tắc văn phạm."
+      }
+    },
+    {
+      "term": "Constant folding",
+      "meaning": {
+        "en": "Replacing a constant expression with its computed value when doing so preserves behaviour.",
+        "vi": "Thay biểu thức hằng bằng giá trị tính sẵn khi việc đó giữ nguyên hành vi."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "lexical-tokens",
+      "title": {
+        "en": "Characters become tokens",
+        "vi": "Ký tự trở thành token"
+      },
+      "paragraphs": [
+        {
+          "en": "Lexical analysis groups source characters into tokens and recognises their classes. In total ← 2 + 3, total is an identifier, ← an assignment operator, 2 and 3 integer literals and + an addition operator. A lexeme is the actual source spelling; a token records its recognised role and any relevant value/reference. Unknown character @ is a lexical error in this lesson’s deliberately small source language.",
+          "vi": "Phân tích từ vựng nhóm ký tự nguồn thành token và nhận diện lớp của chúng. Trong total ← 2 + 3, total là định danh, ← là toán tử gán, 2 và 3 là hằng nguyên, + là toán tử cộng. Lexeme là cách viết cụ thể trong nguồn; token ghi vai trò đã nhận diện và giá trị/tham chiếu liên quan. Ký tự lạ @ là lỗi từ vựng trong ngôn ngữ nguồn nhỏ được chọn cho bài này."
+        },
+        {
+          "en": "Comments and insignificant spacing may be ignored according to language rules. Do not delete whitespace that separates tokens or belongs inside a string literal: OUTPUT \"A B\" must retain the space in its value. Lexical processing can identify names for a symbol table; further stages add or check attributes as declarations and scope become known.",
+          "vi": "Có thể bỏ chú thích và khoảng trắng không có ý nghĩa theo quy tắc ngôn ngữ. Không xóa khoảng trắng phân cách token hoặc thuộc chuỗi: OUTPUT \"A B\" phải giữ dấu cách trong giá trị. Xử lý từ vựng có thể nhận diện tên cho bảng ký hiệu; các bước tiếp bổ sung hoặc kiểm thuộc tính khi biết khai báo và phạm vi."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "s25-32-qp",
+        "s25-32-ms"
+      ]
+    },
+    {
+      "id": "syntax-grammar",
+      "title": {
+        "en": "Tokens must form a permitted structure",
+        "vi": "Token phải tạo cấu trúc được phép"
+      },
+      "paragraphs": [
+        {
+          "en": "Syntax analysis checks token order against the language grammar and builds a parse structure. The valid expression 2+3 combines two operands with addition. In total ← 2 +, every individual token is recognisable but the expression lacks its right operand, so syntax analysis fails. Known tokens are necessary but not sufficient for a valid statement.",
+          "vi": "Phân tích cú pháp kiểm thứ tự token theo văn phạm ngôn ngữ và dựng cấu trúc phân tích. Biểu thức hợp lệ 2+3 kết hợp hai toán hạng bằng phép cộng. Trong total ← 2 +, từng token đều nhận diện được nhưng biểu thức thiếu toán hạng phải nên phân tích cú pháp thất bại. Token hợp lệ là cần nhưng chưa đủ cho câu lệnh hợp lệ."
+        },
+        {
+          "en": "A parse representation preserves grouping and precedence, for example assign(total,add(2,3)). Grammar rules can be expressed with BNF or syntax diagrams. Passing this structural check does not by itself prove that a variable is declared, that types agree or that the algorithm solves the intended problem.",
+          "vi": "Biểu diễn phân tích giữ nhóm và độ ưu tiên, ví dụ assign(total,add(2,3)). Quy tắc văn phạm có thể diễn đạt bằng BNF hoặc sơ đồ cú pháp. Qua kiểm tra cấu trúc tự nó không chứng minh biến đã khai báo, kiểu tương thích hay thuật toán giải đúng bài toán."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "symbol-information",
+      "title": {
+        "en": "Keep declared types and meanings consistent",
+        "vi": "Giữ nhất quán kiểu khai báo và ý nghĩa"
+      },
+      "paragraphs": [
+        {
+          "en": "The declaration DECLARE total : INTEGER associates total with integer type. The symbol table can also hold scope, storage or other attributes needed by the implementation. A name declared STRING must not be labelled INTEGER simply because another example uses numbers. Repeated uses of a name must refer to the correct declaration within its scope.",
+          "vi": "Khai báo DECLARE total : INTEGER gắn total với kiểu nguyên. Bảng ký hiệu cũng có thể chứa phạm vi, nơi lưu hoặc thuộc tính cần cho cách triển khai. Tên được khai báo STRING không được gắn INTEGER chỉ vì ví dụ khác dùng số. Các lần dùng tên phải tham chiếu đúng khai báo trong phạm vi."
+        },
+        {
+          "en": "The visual includes a supporting semantic check: the operands are integers and the result can be assigned to integer total. This helps explain the symbol table; it is not an extra fifth stage added to the syllabus’s four named stages. Real compilers may organise or combine these checks differently.",
+          "vi": "Visual có kiểm tra ngữ nghĩa bổ trợ: toán hạng là số nguyên và kết quả gán được cho total nguyên. Điều này giúp giải thích bảng ký hiệu; không thêm giai đoạn thứ năm vào bốn giai đoạn được syllabus nêu. Trình biên dịch thật có thể tổ chức hoặc kết hợp các kiểm tra khác nhau."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "target-generation",
+      "title": {
+        "en": "Generate instructions that implement the source",
+        "vi": "Sinh lệnh thực hiện ý nghĩa nguồn"
+      },
+      "paragraphs": [
+        {
+          "en": "Code generation translates the checked program representation into target instructions. The teaching sequence LOAD 2; ADD 3; STORE total; OUTPUT total computes the assignment and then prints total. It is symbolic target code, not an assertion about a particular processor instruction set or the exact number of machine cycles.",
+          "vi": "Sinh mã dịch biểu diễn chương trình đã kiểm thành lệnh đích. Chuỗi giảng dạy LOAD 2; ADD 3; STORE total; OUTPUT total tính phép gán rồi xuất total. Đây là mã đích ký hiệu, không phải khẳng định về tập lệnh bộ xử lý cụ thể hay số chu kỳ máy chính xác."
+        },
+        {
+          "en": "Keep translation and execution distinct: generating OUTPUT total does not yet produce 5. The separate run-check demonstrates the observable output. A compiler may generate assembly, machine code or an intermediate target depending on its design; use the target specified by the question.",
+          "vi": "Giữ riêng dịch và thực thi: sinh OUTPUT total chưa tạo giá trị 5. Bước run-check riêng minh họa đầu ra quan sát được. Trình biên dịch có thể sinh hợp ngữ, mã máy hoặc mã đích trung gian tùy thiết kế; dùng loại đích được đề nêu."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "safe-optimisation",
+      "title": {
+        "en": "Improve code while preserving required behaviour",
+        "vi": "Cải thiện mã mà giữ hành vi cần thiết"
+      },
+      "paragraphs": [
+        {
+          "en": "Because 2 and 3 are fixed constants in this example, their sum can be computed during translation. LOAD 2; ADD 3 becomes LOAD 5 while STORE total and OUTPUT total remain. Both versions output 5. This constant fold reduces this symbolic instruction sequence; it is not a measured speedup or a guarantee that every optimisation makes all programs faster.",
+          "vi": "Vì 2 và 3 là hằng cố định trong ví dụ, tổng có thể tính khi dịch. LOAD 2; ADD 3 trở thành LOAD 5 trong khi STORE total và OUTPUT total vẫn giữ. Cả hai bản xuất 5. Gấp hằng này rút ngắn chuỗi lệnh ký hiệu, không phải mức tăng tốc đo được hay bảo đảm mọi tối ưu làm mọi chương trình nhanh hơn."
+        },
+        {
+          "en": "An optimisation must preserve relevant observable behaviour, including output and required error/type behaviour. Removing OUTPUT changes the task even if the program becomes shorter. Arithmetic rewrites that are safe for mathematical integers may need additional checks for finite machine values, overflow or side effects; do not assume a transformation is valid solely because it looks algebraically familiar.",
+          "vi": "Tối ưu phải giữ hành vi quan sát được liên quan, gồm đầu ra và hành vi lỗi/kiểu cần thiết. Bỏ OUTPUT làm đổi nhiệm vụ dù chương trình ngắn hơn. Biến đổi số học an toàn với số nguyên toán học có thể cần kiểm tra thêm với giá trị máy hữu hạn, tràn hoặc tác dụng phụ; không giả định biến đổi hợp lệ chỉ vì quen thuộc về đại số."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "w22-32-qp",
+        "w22-32-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "compilation-pipeline",
+    "title": {
+      "en": "Track representations through four named stages",
+      "vi": "Theo dạng biểu diễn qua bốn giai đoạn được nêu"
+    },
+    "introduction": {
+      "en": "Compare source, classified tokens, symbols, parse structure and generated code. A separate semantic badge supplies supporting checks; run-check shows behaviour after translation.",
+      "vi": "So sánh nguồn, token đã phân lớp, ký hiệu, cấu trúc phân tích và mã sinh. Nhãn ngữ nghĩa riêng cung cấp kiểm tra bổ trợ; run-check thể hiện hành vi sau dịch."
+    },
+    "task": {
+      "en": "Predict whether @ and a missing right operand fail at the same stage. Toggle constant folding and compare the retained OUTPUT instruction.",
+      "vi": "Dự đoán @ và thiếu toán hạng phải có lỗi ở cùng giai đoạn không. Bật/tắt gấp hằng và so lệnh OUTPUT được giữ."
+    },
+    "conventions": [
+      {
+        "en": "The four required stage names are lexical analysis, syntax analysis, code generation and code optimisation.",
+        "vi": "Bốn tên giai đoạn cần học là phân tích từ vựng, phân tích cú pháp, sinh mã và tối ưu mã."
+      },
+      {
+        "en": "The target instructions are teaching pseudocode; optimisation and execution are distinct events.",
+        "vi": "Lệnh đích là mã giả giảng dạy; tối ưu và thực thi là hai sự kiện riêng."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "Compile a constant addition",
+      "vi": "Biên dịch phép cộng hằng"
+    },
+    "prompt": {
+      "en": "Trace DECLARE total : INTEGER; total ← 2 + 3; OUTPUT total with optimisation enabled.",
+      "vi": "Trace DECLARE total : INTEGER; total ← 2 + 3; OUTPUT total khi bật tối ưu."
+    },
+    "steps": [
+      {
+        "id": "lexical",
+        "action": {
+          "en": "Classify keywords, total, literals, punctuation and operators.",
+          "vi": "Phân lớp từ khóa, total, hằng, dấu và toán tử."
+        },
+        "why": {
+          "en": "Later analysis operates on recognised tokens rather than unexplained characters.",
+          "vi": "Phân tích tiếp theo dùng token đã nhận diện thay vì ký tự chưa giải thích."
+        },
+        "result": {
+          "en": "DECLARE/INTEGER/OUTPUT are keywords; total is an identifier; 2 and 3 are integer literals.",
+          "vi": "DECLARE/INTEGER/OUTPUT là từ khóa; total là định danh; 2 và 3 là hằng nguyên."
+        }
+      },
+      {
+        "id": "syntax",
+        "action": {
+          "en": "Build assign(total,add(2,3)).",
+          "vi": "Dựng assign(total,add(2,3))."
+        },
+        "why": {
+          "en": "The token sequence follows assignment and addition grammar rules.",
+          "vi": "Chuỗi token theo quy tắc phép gán và cộng."
+        },
+        "result": {
+          "en": "The addition has both operands and an assignment target.",
+          "vi": "Phép cộng có đủ hai toán hạng và đích gán."
+        }
+      },
+      {
+        "id": "semantic",
+        "action": {
+          "en": "Check total:INTEGER and compatible integer addition.",
+          "vi": "Kiểm total:INTEGER và phép cộng nguyên tương thích."
+        },
+        "why": {
+          "en": "Symbol information supports declaration/type checks beyond shape alone.",
+          "vi": "Thông tin ký hiệu hỗ trợ kiểm khai báo/kiểu vượt ngoài cấu trúc đơn thuần."
+        },
+        "result": {
+          "en": "The assignment is compatible; this is a supporting check.",
+          "vi": "Phép gán tương thích; đây là kiểm tra bổ trợ."
+        }
+      },
+      {
+        "id": "generate",
+        "action": {
+          "en": "Emit LOAD 2; ADD 3; STORE total; OUTPUT total.",
+          "vi": "Sinh LOAD 2; ADD 3; STORE total; OUTPUT total."
+        },
+        "why": {
+          "en": "Each required source operation is represented in target code.",
+          "vi": "Mỗi thao tác nguồn cần thiết được biểu diễn trong mã đích."
+        },
+        "result": {
+          "en": "Four symbolic instructions; no runtime output yet.",
+          "vi": "Bốn lệnh ký hiệu; chưa có đầu ra khi chạy."
+        }
+      },
+      {
+        "id": "optimize",
+        "action": {
+          "en": "Replace the constant calculation with LOAD 5.",
+          "vi": "Thay tính hằng bằng LOAD 5."
+        },
+        "why": {
+          "en": "2+3 can be computed now without changing this program’s behaviour.",
+          "vi": "Có thể tính 2+3 ngay mà không đổi hành vi chương trình này."
+        },
+        "result": {
+          "en": "LOAD 5; STORE total; OUTPUT total.",
+          "vi": "LOAD 5; STORE total; OUTPUT total."
+        }
+      },
+      {
+        "id": "run-check",
+        "action": {
+          "en": "Execute the resulting symbolic program.",
+          "vi": "Thực thi chương trình ký hiệu thu được."
+        },
+        "why": {
+          "en": "Observable output checks this example’s transformation.",
+          "vi": "Đầu ra quan sát được kiểm tra phép biến đổi của ví dụ."
+        },
+        "result": {
+          "en": "Output [5], matching the unoptimised version.",
+          "vi": "Đầu ra [5], khớp bản chưa tối ưu."
+        }
+      }
+    ],
+    "result": {
+      "en": "The representation changes at each stage while the valid program’s required output stays 5.",
+      "vi": "Dạng biểu diễn đổi qua từng giai đoạn trong khi đầu ra cần thiết của chương trình hợp lệ vẫn là 5."
+    },
+    "selfCheck": {
+      "en": "Replace + by @, then remove the operand 3 instead. Identify the first failing stage and what later artifacts should be absent.",
+      "vi": "Thay + bằng @, rồi thử bỏ toán hạng 3. Xác định giai đoạn lỗi đầu tiên và sản phẩm sau nào phải vắng mặt."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Keywords, tokens and removal of insignificant material indicate lexical analysis.",
+        "vi": "Từ khóa, token và bỏ thành phần không có ý nghĩa gợi ý phân tích từ vựng."
+      },
+      {
+        "en": "Grammar, token order or parse structure indicate syntax; target instructions and constant folding indicate generation/optimisation.",
+        "vi": "Văn phạm, thứ tự token hoặc cấu trúc phân tích gợi ý cú pháp; lệnh đích và gấp hằng gợi ý sinh/tối ưu mã."
+      }
+    ],
+    "distinguish": {
+      "en": "Lexical validity concerns token recognition; syntax concerns token structure; type checks use symbol information; optimisation must preserve behaviour.",
+      "vi": "Hợp lệ từ vựng liên quan nhận token; cú pháp liên quan cấu trúc token; kiểm kiểu dùng thông tin ký hiệu; tối ưu phải giữ hành vi."
+    },
+    "method": [
+      {
+        "en": "Name the stage and describe its input, action and output.",
+        "vi": "Nêu giai đoạn, đầu vào, thao tác và đầu ra."
+      },
+      {
+        "en": "For a diagnostic, point to the offending character or missing grammatical component.",
+        "vi": "Với chẩn đoán, chỉ ký tự sai hoặc thành phần văn phạm thiếu."
+      },
+      {
+        "en": "For optimisation, show before/after code and what required behaviour remains equal.",
+        "vi": "Với tối ưu, trình bày mã trước/sau và hành vi cần thiết nào vẫn bằng nhau."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Removing whitespace means deleting spaces inside strings.",
+        "vi": "Bỏ khoảng trắng nghĩa là xóa dấu cách trong chuỗi."
+      },
+      "correction": {
+        "en": "Only insignificant material can be ignored; literal values must be preserved.",
+        "vi": "Chỉ bỏ thành phần không có ý nghĩa; phải giữ giá trị hằng chuỗi."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Recognised tokens guarantee correct syntax.",
+        "vi": "Token được nhận diện bảo đảm cú pháp đúng."
+      },
+      "correction": {
+        "en": "An operator can be valid while its required operand is missing.",
+        "vi": "Toán tử có thể hợp lệ nhưng thiếu toán hạng cần có."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Shorter target code is automatically a valid optimisation.",
+        "vi": "Mã đích ngắn hơn tự động là tối ưu hợp lệ."
+      },
+      "correction": {
+        "en": "Required output and other observable behaviour must stay the same.",
+        "vi": "Đầu ra cần thiết và hành vi quan sát khác phải giữ nguyên."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "lexical-error",
+      "prompt": {
+        "en": "In this source language, 2 @ 3 fails first at which stage?",
+        "vi": "Trong ngôn ngữ nguồn này, 2 @ 3 lỗi đầu tiên ở bước nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Lexical analysis: @ is not a recognised token.",
+            "vi": "Từ vựng: @ không là token được nhận diện."
+          },
+          "feedback": {
+            "en": "Correct: token recognition already fails.",
+            "vi": "Đúng: việc nhận token đã thất bại."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Code optimisation only.",
+            "vi": "Chỉ tối ưu mã."
+          },
+          "feedback": {
+            "en": "The source cannot legitimately reach successful target generation.",
+            "vi": "Nguồn không thể đi hợp lệ đến sinh mã thành công."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Running OUTPUT.",
+            "vi": "Chạy OUTPUT."
+          },
+          "feedback": {
+            "en": "This diagnostic is detected before program execution.",
+            "vi": "Chẩn đoán này được phát hiện trước thực thi."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "The error category depends on the specified language’s token rules.",
+        "vi": "Loại lỗi phụ thuộc quy tắc token của ngôn ngữ đã nêu."
+      }
+    },
+    {
+      "id": "syntax-error",
+      "prompt": {
+        "en": "Why does total ← 2 + fail syntax despite recognised tokens?",
+        "vi": "Vì sao total ← 2 + sai cú pháp dù token được nhận diện?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The addition has no right operand.",
+            "vi": "Phép cộng thiếu toán hạng phải."
+          },
+          "feedback": {
+            "en": "Correct: the expression structure is incomplete.",
+            "vi": "Đúng: cấu trúc biểu thức chưa đủ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every plus sign is an invalid character.",
+            "vi": "Mọi dấu cộng là ký tự sai."
+          },
+          "feedback": {
+            "en": "+ is a recognised operator in this language.",
+            "vi": "+ là toán tử được nhận diện trong ngôn ngữ này."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "total must always be a string.",
+            "vi": "total luôn phải là chuỗi."
+          },
+          "feedback": {
+            "en": "Its declaration is INTEGER; the stated problem is a missing operand.",
+            "vi": "Khai báo là INTEGER; vấn đề đang nêu là thiếu toán hạng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Syntax checks arrangements of tokens, not only the token list.",
+        "vi": "Cú pháp kiểm cách sắp token, không chỉ danh sách token."
+      }
+    },
+    {
+      "id": "symbol-type",
+      "prompt": {
+        "en": "DECLARE label : STRING appears. Which symbol-table type is appropriate?",
+        "vi": "Có DECLARE label : STRING. Kiểu nào phù hợp trong bảng ký hiệu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "STRING.",
+            "vi": "STRING."
+          },
+          "feedback": {
+            "en": "Correct: preserve the actual declaration.",
+            "vi": "Đúng: giữ đúng khai báo thực."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "INTEGER because tables use numeric addresses.",
+            "vi": "INTEGER vì bảng dùng địa chỉ số."
+          },
+          "feedback": {
+            "en": "A storage address does not change the variable’s declared type.",
+            "vi": "Địa chỉ lưu không đổi kiểu khai báo của biến."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Always the same type as total.",
+            "vi": "Luôn cùng kiểu total."
+          },
+          "feedback": {
+            "en": "Each declaration has its own attributes.",
+            "vi": "Mỗi khai báo có thuộc tính riêng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Do not confuse a value’s type with storage metadata.",
+        "vi": "Không nhầm kiểu giá trị với siêu dữ liệu lưu trữ."
+      }
+    },
+    {
+      "id": "output-transfer",
+      "prompt": {
+        "en": "An optimiser removes OUTPUT total to reduce code length. Is that valid here?",
+        "vi": "Bộ tối ưu bỏ OUTPUT total để giảm độ dài mã. Có hợp lệ ở đây không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No; the required observable output is lost.",
+            "vi": "Không; mất đầu ra quan sát được cần thiết."
+          },
+          "feedback": {
+            "en": "Correct: fewer instructions do not justify changed behaviour.",
+            "vi": "Đúng: ít lệnh hơn không biện minh việc đổi hành vi."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes; any shorter program is equivalent.",
+            "vi": "Có; mọi chương trình ngắn hơn tương đương."
+          },
+          "feedback": {
+            "en": "Equivalence concerns behaviour, not length alone.",
+            "vi": "Tương đương liên quan hành vi, không chỉ độ dài."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes; the compiler already printed 5.",
+            "vi": "Có; trình biên dịch đã in 5."
+          },
+          "feedback": {
+            "en": "Compilation did not run the program’s OUTPUT.",
+            "vi": "Biên dịch không chạy OUTPUT của chương trình."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A valid optimisation improves implementation while preserving the task’s semantics.",
+        "vi": "Tối ưu hợp lệ cải thiện cách thực hiện mà giữ ngữ nghĩa nhiệm vụ."
+      }
+    },
+    {
+      "id": "string-space-transfer",
+      "prompt": {
+        "en": "Can lexical analysis change OUTPUT \"A B\" to OUTPUT \"AB\" by deleting the space?",
+        "vi": "Phân tích từ vựng có thể đổi OUTPUT \"A B\" thành OUTPUT \"AB\" bằng xóa dấu cách không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No; the space is part of the string value.",
+            "vi": "Không; dấu cách là một phần giá trị chuỗi."
+          },
+          "feedback": {
+            "en": "Correct: it is significant within the literal.",
+            "vi": "Đúng: nó có ý nghĩa trong hằng chuỗi."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes; all whitespace is always ignored.",
+            "vi": "Có; mọi khoảng trắng luôn bị bỏ."
+          },
+          "feedback": {
+            "en": "Only whitespace that the language treats as insignificant may be ignored.",
+            "vi": "Chỉ được bỏ khoảng trắng ngôn ngữ xem là không có ý nghĩa."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only if the string is stored in a symbol table.",
+            "vi": "Chỉ khi chuỗi lưu trong bảng ký hiệu."
+          },
+          "feedback": {
+            "en": "Storage representation does not permit changing the required value.",
+            "vi": "Cách lưu không cho phép đổi giá trị cần thiết."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Tokenisation must preserve the meaning of literal data.",
+        "vi": "Tách token phải giữ ý nghĩa dữ liệu hằng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain the four stages using the representations they produce.",
+      "vi": "Giải thích bốn giai đoạn qua dạng biểu diễn chúng tạo ra."
+    },
+    "answerPoints": [
+      {
+        "en": "Lexical analysis recognises tokens; syntax analysis checks grammar and structure.",
+        "vi": "Từ vựng nhận token; cú pháp kiểm văn phạm và cấu trúc."
+      },
+      {
+        "en": "Symbol information supports name/type checks; code generation emits target instructions.",
+        "vi": "Thông tin ký hiệu hỗ trợ kiểm tên/kiểu; sinh mã tạo lệnh đích."
+      },
+      {
+        "en": "Optimisation preserves required behaviour while improving code; runtime output follows execution.",
+        "vi": "Tối ưu giữ hành vi cần thiết khi cải thiện mã; đầu ra khi chạy theo sau thực thi."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Recognise an error at its earliest appropriate stage.",
+      "vi": "Nhận diện lỗi ở giai đoạn phù hợp sớm nhất."
+    },
+    {
+      "en": "Keep declarations, token values and literal spaces accurate.",
+      "vi": "Giữ đúng khai báo, giá trị token và dấu cách trong hằng."
+    },
+    {
+      "en": "Justify equivalence before claiming an optimisation is safe.",
+      "vi": "Lý giải tương đương trước khi khẳng định tối ưu an toàn."
+    }
+  ],
+  "relatedSlugs": [
+    "interpreter-versus-compiler",
+    "bnf-and-syntax-diagrams"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed pp395–398 / PDF pp411–414, compilation stages; symbol-table type corrections applied",
+      "kind": "book"
+    },
+    {
+      "id": "w22-32-qp",
+      "title": "Cambridge 9618 w22 Paper 32 Question Paper",
+      "locator": "PDF p3 Q2(a–b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w22-32-ms",
+      "title": "Cambridge 9618 w22 Paper 32 Mark Scheme",
+      "locator": "PDF pp4–5 Q2(a–b)",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s25-32-qp",
+      "title": "Cambridge 9618 s25 Paper 32 Question Paper",
+      "locator": "PDF p7 Q8",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-32-ms",
+      "title": "Cambridge 9618 s25 Paper 32 Mark Scheme",
+      "locator": "PDF p9 Q8",
+      "kind": "mark-scheme"
+    }
+  ]
+}

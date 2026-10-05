@@ -1,0 +1,845 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.1-T01",
+  "slug": "linear-search",
+  "estimatedMinutes": 30,
+  "title": {
+    "en": "Linear search",
+    "vi": "Tìm kiếm tuyến tính"
+  },
+  "question": {
+    "en": "How can a sequential scan prove that a target is found or absent?",
+    "vi": "Quét tuần tự chứng minh target được tìm thấy hoặc không tồn tại như thế nào?"
+  },
+  "opening": {
+    "en": "A class list is unsorted. The search must inspect only valid cells and report the first match or −1.",
+    "vi": "Danh sách lớp chưa sắp xếp. Thuật toán chỉ được xét ô hợp lệ và trả match đầu tiên hoặc −1."
+  },
+  "objectives": [
+    {
+      "en": "Trace a zero-based first-match scan.",
+      "vi": "Trace phép quét zero-based trả match đầu tiên."
+    },
+    {
+      "en": "Write bounded Cambridge pseudocode.",
+      "vi": "Viết giả mã Cambridge có giới hạn."
+    },
+    {
+      "en": "Handle empty, duplicate and missing cases.",
+      "vi": "Xử lý empty, duplicate và missing."
+    },
+    {
+      "en": "Explain O(n) worst-case growth.",
+      "vi": "Giải thích tăng trưởng worst-case O(n)."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read a one-dimensional array and its bounds.",
+      "vi": "Đọc mảng một chiều và cận."
+    },
+    {
+      "en": "Use equality and a WHILE loop.",
+      "vi": "Dùng phép bằng và vòng WHILE."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "target",
+      "meaning": {
+        "en": "Value being sought.",
+        "vi": "Giá trị cần tìm."
+      }
+    },
+    {
+      "term": "first match",
+      "meaning": {
+        "en": "Lowest valid index containing the target.",
+        "vi": "Chỉ số hợp lệ nhỏ nhất chứa target."
+      }
+    },
+    {
+      "term": "comparison",
+      "meaning": {
+        "en": "One test of the current item against the target.",
+        "vi": "Một lần so phần tử hiện tại với target."
+      }
+    },
+    {
+      "term": "sentinel result",
+      "meaning": {
+        "en": "Declared value −1 meaning not found.",
+        "vi": "Giá trị −1 đã quy ước nghĩa là không tìm thấy."
+      }
+    },
+    {
+      "term": "valid range",
+      "meaning": {
+        "en": "Indices 0 through UpperBound inclusive.",
+        "vi": "Các chỉ số từ 0 tới UpperBound, có tính cả hai đầu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "valid-range",
+      "title": {
+        "en": "Lock the range",
+        "vi": "Khóa miền hợp lệ"
+      },
+      "paragraphs": [
+        {
+          "en": "The fixture is zero-based. Index starts at 0 and no cell above UpperBound is read.",
+          "vi": "Fixture dùng zero-based. Index bắt đầu tại 0 và không đọc ô lớn hơn UpperBound."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "compare-then-advance",
+      "title": {
+        "en": "Compare before advancing",
+        "vi": "So sánh trước khi tăng"
+      },
+      "paragraphs": [
+        {
+          "en": "Test Data[Index] first. Return Index immediately on equality; otherwise increment exactly once.",
+          "vi": "Kiểm tra Data[Index] trước. Trả Index ngay khi bằng; nếu không thì tăng đúng một lần."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "missing-duplicate",
+      "title": {
+        "en": "First match and missing",
+        "vi": "Match đầu tiên và missing"
+      },
+      "paragraphs": [
+        {
+          "en": "Duplicates stop at the first reachable index. Missing is known only after the valid range is exhausted; an empty array makes zero comparisons.",
+          "vi": "Dữ liệu trùng dừng tại chỉ số đầu tiên gặp. Chỉ kết luận missing sau khi hết miền hợp lệ; mảng rỗng có 0 phép so sánh."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "linear-pseudocode",
+      "title": {
+        "en": "Cambridge pseudocode",
+        "vi": "Giả mã Cambridge"
+      },
+      "paragraphs": [
+        {
+          "en": "The function below records the match before any increment, avoiding an off-by-one result.",
+          "vi": "Hàm dưới lưu match trước mọi lần tăng, tránh kết quả lệch một chỉ số."
+        }
+      ],
+      "code": "FUNCTION LinearSearch(Data : ARRAY[0:5] OF INTEGER, Target : INTEGER) RETURNS INTEGER\n  DECLARE Index : INTEGER\n  Index ← 0\n  WHILE Index <= 5\n    IF Data[Index] = Target THEN\n      RETURN Index\n    ENDIF\n    Index ← Index + 1\n  ENDWHILE\n  RETURN -1\nENDFUNCTION",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "linear-search",
+    "title": {
+      "en": "Sequential search workbench",
+      "vi": "Bàn trace tìm kiếm tuần tự"
+    },
+    "introduction": {
+      "en": "The checked prefix, active index, comparison count and result advance together.",
+      "vi": "Prefix đã xét, chỉ số hiện tại, số phép so sánh và kết quả tiến cùng nhau."
+    },
+    "task": {
+      "en": "Predict each next comparison, then test first, duplicate, missing and empty fixtures.",
+      "vi": "Dự đoán phép so sánh tiếp theo, rồi thử fixture đầu, trùng, missing và empty."
+    },
+    "conventions": [
+      {
+        "en": "Index base 0; valid range 0..UpperBound.",
+        "vi": "Index base 0; miền hợp lệ 0..UpperBound."
+      },
+      {
+        "en": "Return first matching index, else −1.",
+        "vi": "Trả chỉ số match đầu tiên, nếu không trả −1."
+      },
+      {
+        "en": "AlgoCore teaching fixtures; no official marks.",
+        "vi": "Fixture dạy học AlgoCore; không có điểm chính thức."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Find the first 7",
+      "vi": "Tìm số 7 đầu tiên"
+    },
+    "prompt": {
+      "en": "Trace Data=[4,9,2,7,7,1], Target=7.",
+      "vi": "Trace Data=[4,9,2,7,7,1], Target=7."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "declare",
+        "action": {
+          "en": "Write bounds 0..5 and first-match return rule.",
+          "vi": "Ghi cận 0..5 và quy tắc trả match đầu tiên."
+        },
+        "why": {
+          "en": "This fixes which cells may be read.",
+          "vi": "Điều này khóa các ô được phép đọc."
+        },
+        "result": {
+          "en": "UpperBound=5; missing result is −1.",
+          "vi": "UpperBound=5; kết quả missing là −1."
+        },
+        "check": {
+          "en": "Check that upperbound=5; missing result is −1.",
+          "vi": "Kiểm tra rằng upperbound=5; kết quả missing là −1."
+        }
+      },
+      {
+        "id": "initialise",
+        "action": {
+          "en": "Set Index←0.",
+          "vi": "Đặt Index←0."
+        },
+        "why": {
+          "en": "The first valid cell is 0.",
+          "vi": "Ô hợp lệ đầu tiên là 0."
+        },
+        "result": {
+          "en": "No cells checked; comparisons=0.",
+          "vi": "Chưa xét ô nào; comparisons=0."
+        },
+        "check": {
+          "en": "Check that no cells checked; comparisons=0.",
+          "vi": "Kiểm tra rằng chưa xét ô nào; comparisons=0."
+        },
+        "code": "Index ← 0"
+      },
+      {
+        "id": "check-0",
+        "action": {
+          "en": "Compare 4 with 7.",
+          "vi": "So sánh 4 với 7."
+        },
+        "why": {
+          "en": "The current cell is tested before advancing.",
+          "vi": "Ô hiện tại được xét trước khi tăng."
+        },
+        "result": {
+          "en": "Mismatch; Index←1; comparisons=1.",
+          "vi": "Không khớp; Index←1; comparisons=1."
+        },
+        "check": {
+          "en": "Check that mismatch; index←1; comparisons=1.",
+          "vi": "Kiểm tra rằng không khớp; index←1; comparisons=1."
+        }
+      },
+      {
+        "id": "check-1",
+        "action": {
+          "en": "Compare 9 with 7.",
+          "vi": "So sánh 9 với 7."
+        },
+        "why": {
+          "en": "Linear search does not use ordering.",
+          "vi": "Linear search không dùng thứ tự."
+        },
+        "result": {
+          "en": "Mismatch; Index←2; comparisons=2.",
+          "vi": "Không khớp; Index←2; comparisons=2."
+        },
+        "check": {
+          "en": "Check that mismatch; index←2; comparisons=2.",
+          "vi": "Kiểm tra rằng không khớp; index←2; comparisons=2."
+        }
+      },
+      {
+        "id": "check-2",
+        "action": {
+          "en": "Compare 2 with 7.",
+          "vi": "So sánh 2 với 7."
+        },
+        "why": {
+          "en": "Every earlier valid item must be ruled out.",
+          "vi": "Mọi phần tử hợp lệ trước đó phải bị loại."
+        },
+        "result": {
+          "en": "Mismatch; Index←3; comparisons=3.",
+          "vi": "Không khớp; Index←3; comparisons=3."
+        },
+        "check": {
+          "en": "Check that mismatch; index←3; comparisons=3.",
+          "vi": "Kiểm tra rằng không khớp; index←3; comparisons=3."
+        }
+      },
+      {
+        "id": "check-3",
+        "action": {
+          "en": "Compare 7 with 7 and return 3.",
+          "vi": "So sánh 7 với 7 và trả 3."
+        },
+        "why": {
+          "en": "Equality satisfies the first-match contract.",
+          "vi": "Phép bằng thỏa contract match đầu tiên."
+        },
+        "result": {
+          "en": "Result=3; comparisons=4; index 4 is not inspected.",
+          "vi": "Result=3; comparisons=4; không xét index 4."
+        },
+        "check": {
+          "en": "Check that result=3; comparisons=4; index 4 is not inspected.",
+          "vi": "Kiểm tra rằng result=3; comparisons=4; không xét index 4."
+        },
+        "code": "RETURN Index"
+      }
+    ],
+    "result": {
+      "en": "The first target is at index 3 after four comparisons.",
+      "vi": "Target đầu tiên ở index 3 sau bốn phép so sánh."
+    },
+    "selfCheck": {
+      "en": "Did the trace compare before incrementing and stop at the first duplicate?",
+      "vi": "Trace có so sánh trước khi tăng và dừng ở phần tử trùng đầu tiên không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "scan/check each item",
+        "vi": "quét/kiểm tra từng phần tử"
+      },
+      {
+        "en": "unsorted data",
+        "vi": "dữ liệu chưa sắp xếp"
+      },
+      {
+        "en": "first occurrence",
+        "vi": "lần xuất hiện đầu tiên"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: a long list alone does not justify binary search; the list must be sorted under the comparison rule.",
+      "vi": "Dễ nhầm: chỉ danh sách dài chưa đủ để dùng binary search; danh sách phải được sắp theo quy tắc so sánh."
+    },
+    "method": [
+      {
+        "en": "Write the bounds and duplicate policy.",
+        "vi": "Ghi cận và chính sách duplicate."
+      },
+      {
+        "en": "Initialise the first valid index.",
+        "vi": "Khởi tạo chỉ số hợp lệ đầu tiên."
+      },
+      {
+        "en": "Compare before incrementing.",
+        "vi": "So sánh trước khi tăng."
+      },
+      {
+        "en": "Return immediately on the first match.",
+        "vi": "Trả ngay tại match đầu tiên."
+      },
+      {
+        "en": "Return −1 only after exhaustion.",
+        "vi": "Chỉ trả −1 sau khi hết miền."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Linear search: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho Tìm kiếm tuyến tính: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Linear search; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của Tìm kiếm tuyến tính; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Linear search to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của Tìm kiếm tuyến tính với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Linear search with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh Tìm kiếm tuyến tính với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Linear search, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của Tìm kiếm tuyến tính, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Increment before saving the match.",
+        "vi": "Tăng trước khi lưu match."
+      },
+      "correction": {
+        "en": "Return the current index before incrementing.",
+        "vi": "Trả chỉ số hiện tại trước khi tăng."
+      },
+      "selfCheck": {
+        "en": "Which index actually contained the target?",
+        "vi": "Chỉ số nào thực sự chứa target?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Report missing after one mismatch.",
+        "vi": "Báo missing sau một mismatch."
+      },
+      "correction": {
+        "en": "Continue until every valid cell has been ruled out.",
+        "vi": "Tiếp tục tới khi mọi ô hợp lệ bị loại."
+      },
+      "selfCheck": {
+        "en": "Has the valid range been exhausted?",
+        "vi": "Miền hợp lệ đã hết chưa?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Use binary search because the list is large.",
+        "vi": "Dùng binary search vì danh sách lớn."
+      },
+      "correction": {
+        "en": "Confirm the sorted precondition before selecting binary search.",
+        "vi": "Xác nhận điều kiện sorted trước khi chọn binary search."
+      },
+      "selfCheck": {
+        "en": "What evidence says the values are sorted?",
+        "vi": "Dữ kiện nào cho biết các giá trị đã sorted?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Read Data[0] for an empty input.",
+        "vi": "Đọc Data[0] với input rỗng."
+      },
+      "correction": {
+        "en": "Use a pre-condition loop so zero comparisons are possible.",
+        "vi": "Dùng vòng lặp kiểm tra trước để có thể thực hiện 0 phép so sánh."
+      },
+      "selfCheck": {
+        "en": "Is index 0 valid when UpperBound=−1?",
+        "vi": "Index 0 có hợp lệ khi UpperBound=−1 không?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What does this fixture return for a missing target?",
+        "vi": "Fixture này trả gì khi thiếu target?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "−1",
+            "vi": "−1"
+          },
+          "feedback": {
+            "en": "Correct: −1 is the declared missing sentinel.",
+            "vi": "Đúng: −1 là sentinel missing đã công bố."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "Index 0 is a valid location, so it cannot mean missing here.",
+            "vi": "Index 0 là vị trí hợp lệ nên không thể nghĩa là missing."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "UpperBound",
+            "vi": "UpperBound"
+          },
+          "feedback": {
+            "en": "UpperBound names the last valid cell, not failure.",
+            "vi": "UpperBound là ô hợp lệ cuối, không phải failure."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use the declared return contract.",
+        "vi": "Dùng contract trả về đã công bố."
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which clue best identifies linear search?",
+        "vi": "Dấu hiệu nào nhận diện linear search rõ nhất?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Check each item in an unsorted list",
+            "vi": "Kiểm tra từng phần tử trong danh sách chưa sorted"
+          },
+          "feedback": {
+            "en": "Correct: sequential scanning does not require sorting.",
+            "vi": "Đúng: quét tuần tự không yêu cầu sorted."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Repeatedly discard half",
+            "vi": "Liên tục loại một nửa"
+          },
+          "feedback": {
+            "en": "Discarding half is binary-search language.",
+            "vi": "Loại một nửa là ngôn ngữ của binary search."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Compare adjacent pairs",
+            "vi": "So sánh cặp kề nhau"
+          },
+          "feedback": {
+            "en": "Adjacent pairs indicate bubble sort.",
+            "vi": "Cặp kề nhau cho thấy bubble sort."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use the scan/unsorted clue.",
+        "vi": "Dùng dấu hiệu quét/unsorted."
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "After mismatches at indices 0 and 1, which cell is checked next?",
+        "vi": "Sau mismatch tại index 0 và 1, ô nào được xét tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Index 2",
+            "vi": "Index 2"
+          },
+          "feedback": {
+            "en": "Correct: Index advances exactly once per mismatch.",
+            "vi": "Đúng: Index tăng đúng một lần cho mỗi mismatch."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Index 3",
+            "vi": "Index 3"
+          },
+          "feedback": {
+            "en": "That skips index 2 and cannot prove absence.",
+            "vi": "Cách này bỏ index 2 và không chứng minh được absence."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Index 1 again",
+            "vi": "Lại index 1"
+          },
+          "feedback": {
+            "en": "Without increment the algorithm would not progress.",
+            "vi": "Không tăng thì thuật toán không tiến triển."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "The unchecked prefix begins at index 2.",
+        "vi": "Prefix chưa xét bắt đầu tại index 2."
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "For [4,9,2,7,7,1], how many comparisons find the first 7?",
+        "vi": "Với [4,9,2,7,7,1], cần bao nhiêu phép so sánh để tìm 7 đầu tiên?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "Correct: indices 0,1,2,3 are tested.",
+            "vi": "Đúng: xét index 0,1,2,3."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "3",
+            "vi": "3"
+          },
+          "feedback": {
+            "en": "Three mismatches occur before the fourth comparison matches.",
+            "vi": "Có ba mismatch trước phép so sánh thứ tư khớp."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "5",
+            "vi": "5"
+          },
+          "feedback": {
+            "en": "The first match stops before checking the duplicate at index 4.",
+            "vi": "Match đầu tiên dừng trước khi xét duplicate tại index 4."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Count comparisons, including the successful one.",
+        "vi": "Đếm cả phép so sánh thành công."
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Which update belongs after a mismatch?",
+        "vi": "Cập nhật nào đặt sau mismatch?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Index ← Index + 1",
+            "vi": "Index ← Index + 1"
+          },
+          "feedback": {
+            "en": "Correct: this checks the next valid cell.",
+            "vi": "Đúng: bước này xét ô hợp lệ tiếp theo."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Index ← Index + 2",
+            "vi": "Index ← Index + 2"
+          },
+          "feedback": {
+            "en": "This can skip a possible target.",
+            "vi": "Cách này có thể bỏ qua target."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "RETURN −1",
+            "vi": "RETURN −1"
+          },
+          "feedback": {
+            "en": "Failure is returned only after range exhaustion.",
+            "vi": "Chỉ trả failure sau khi hết miền."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Progress one cell without skipping.",
+        "vi": "Tiến một ô mà không bỏ sót."
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "UpperBound=−1. What happens?",
+        "vi": "UpperBound=−1. Điều gì xảy ra?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Zero comparisons; return −1",
+            "vi": "0 phép so sánh; trả −1"
+          },
+          "feedback": {
+            "en": "Correct: 0<=−1 is false before any read.",
+            "vi": "Đúng: 0<=−1 sai trước mọi lần đọc."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Read Data[0]",
+            "vi": "Đọc Data[0]"
+          },
+          "feedback": {
+            "en": "Index 0 is outside the declared empty range.",
+            "vi": "Index 0 nằm ngoài miền rỗng đã công bố."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Return 0",
+            "vi": "Trả 0"
+          },
+          "feedback": {
+            "en": "0 is a valid index in non-empty fixtures, not the missing sentinel.",
+            "vi": "0 là index hợp lệ trong fixture không rỗng, không phải sentinel missing."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A WHILE guard makes the empty case safe.",
+        "vi": "Guard WHILE làm trường hợp empty an toàn."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "State the invariant and termination rule for first-match linear search.",
+      "vi": "Nêu invariant và quy tắc dừng của linear search match đầu tiên."
+    },
+    "answerPoints": [
+      {
+        "en": "All indices below Index have been checked and do not match.",
+        "vi": "Mọi chỉ số dưới Index đã được xét và không khớp."
+      },
+      {
+        "en": "Return Index on equality.",
+        "vi": "Trả Index khi bằng."
+      },
+      {
+        "en": "Return −1 only after Index passes UpperBound.",
+        "vi": "Chỉ trả −1 khi Index vượt UpperBound."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Compare before incrementing.",
+      "vi": "So sánh trước khi tăng."
+    },
+    {
+      "en": "Missing follows complete exhaustion.",
+      "vi": "Missing chỉ sau khi hết toàn bộ miền."
+    },
+    {
+      "en": "Worst-case comparisons grow linearly with n.",
+      "vi": "Số phép so sánh worst-case tăng tuyến tính theo n."
+    }
+  ],
+  "relatedSlugs": [
+    "binary-search",
+    "time-and-space-complexity"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp451–454 / PDF pp467–470: linear search",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "s22-32-qp",
+      "title": "Cambridge 9618/32 — May/June 2022 question paper",
+      "locator": "Question 8(a), p11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s22-32-ms",
+      "title": "Cambridge 9618/32 — May/June 2022 mark scheme",
+      "locator": "Question 8(a), p8",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s24-32-qp",
+      "title": "Cambridge 9618/32 — May/June 2024 question paper",
+      "locator": "Question 8(a), p9",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s24-32-ms",
+      "title": "Cambridge 9618/32 — May/June 2024 mark scheme",
+      "locator": "Question 8(a), p10",
+      "kind": "mark-scheme"
+    }
+  ]
+}

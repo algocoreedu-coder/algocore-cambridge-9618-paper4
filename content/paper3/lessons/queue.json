@@ -1,0 +1,843 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.1-T06",
+  "slug": "queue",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Queue ADT",
+    "vi": "ADT queue"
+  },
+  "question": {
+    "en": "How do Front, Rear and Count preserve FIFO order through circular wrap-around?",
+    "vi": "Front, Rear và Count giữ thứ tự FIFO qua wrap-around vòng tròn như thế nào?"
+  },
+  "opening": {
+    "en": "A printer queue reuses a fixed array without moving live jobs when an index reaches the end.",
+    "vi": "Queue máy in tái sử dụng mảng cố định mà không di chuyển job sống khi index tới cuối."
+  },
+  "objectives": [
+    {
+      "en": "Describe FIFO and the queue interface.",
+      "vi": "Mô tả FIFO và interface queue."
+    },
+    {
+      "en": "Trace circular ENQUEUE and DEQUEUE.",
+      "vi": "Trace ENQUEUE và DEQUEUE vòng tròn."
+    },
+    {
+      "en": "Write count-based empty/full guards.",
+      "vi": "Viết guard empty/full dựa trên Count."
+    },
+    {
+      "en": "Explain wrap-around and no-mutation errors.",
+      "vi": "Giải thích wrap-around và lỗi không mutation."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Use MOD with a positive capacity.",
+      "vi": "Dùng MOD với capacity dương."
+    },
+    {
+      "en": "Read a fixed array by index.",
+      "vi": "Đọc mảng cố định theo index."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "FIFO",
+      "meaning": {
+        "en": "First in, first out.",
+        "vi": "Vào trước, ra trước."
+      }
+    },
+    {
+      "term": "Front",
+      "meaning": {
+        "en": "Index of the next removal.",
+        "vi": "Index của lần remove tiếp theo."
+      }
+    },
+    {
+      "term": "Rear",
+      "meaning": {
+        "en": "Index of the next insertion.",
+        "vi": "Index của lần insert tiếp theo."
+      }
+    },
+    {
+      "term": "Count",
+      "meaning": {
+        "en": "Number of live queue items.",
+        "vi": "Số item sống trong queue."
+      }
+    },
+    {
+      "term": "wrap-around",
+      "meaning": {
+        "en": "MOD returns an index from the end to 0.",
+        "vi": "MOD đưa index từ cuối về 0."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "fifo",
+      "title": {
+        "en": "FIFO interface",
+        "vi": "Interface FIFO"
+      },
+      "paragraphs": [
+        {
+          "en": "ENQUEUE adds at the logical rear; DEQUEUE removes the oldest live value at Front.",
+          "vi": "ENQUEUE thêm tại rear logic; DEQUEUE loại giá trị sống cũ nhất tại Front."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "pointer-contract",
+      "title": {
+        "en": "Exact pointer meanings",
+        "vi": "Ý nghĩa pointer chính xác"
+      },
+      "paragraphs": [
+        {
+          "en": "Initially Front=0, Rear=0, Count=0. Front names next removal and Rear names next insertion.",
+          "vi": "Ban đầu Front=0, Rear=0, Count=0. Front là lần remove tiếp và Rear là lần insert tiếp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "count-wrap",
+      "title": {
+        "en": "Count separates equal pointer states",
+        "vi": "Count phân biệt trạng thái pointer bằng nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "Count=0 is empty and Count=Capacity is full, even though Front can equal Rear in either state. MOD advances without moving data.",
+          "vi": "Count=0 là empty và Count=Capacity là full, dù Front có thể bằng Rear ở cả hai trạng thái. MOD tiến index mà không di chuyển dữ liệu."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "queue-code",
+      "title": {
+        "en": "Safe operation order",
+        "vi": "Thứ tự thao tác an toàn"
+      },
+      "paragraphs": [
+        {
+          "en": "ENQUEUE writes then advances Rear; DEQUEUE saves/clears then advances Front. Count changes last.",
+          "vi": "ENQUEUE ghi rồi tăng Rear; DEQUEUE lưu/xóa rồi tăng Front. Count đổi cuối."
+        }
+      ],
+      "code": "// ENQUEUE\nIF Count = Capacity THEN RETURN FALSE\nQueue[Rear] ← NewValue\nRear ← (Rear + 1) MOD Capacity\nCount ← Count + 1\n// DEQUEUE\nIF Count = 0 THEN RETURN ErrorValue\nRemoved ← Queue[Front]\nQueue[Front] ← EmptyValue\nFront ← (Front + 1) MOD Capacity\nCount ← Count - 1\nRETURN Removed",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "queue-adt",
+    "title": {
+      "en": "Circular FIFO workbench",
+      "vi": "Bàn trace FIFO vòng tròn"
+    },
+    "introduction": {
+      "en": "Physical cells, logical order, pointers and Count remain visible together.",
+      "vi": "Ô vật lý, thứ tự logic, pointer và Count cùng hiển thị."
+    },
+    "task": {
+      "en": "Create wrap-around, then distinguish full from empty when Front=Rear.",
+      "vi": "Tạo wrap-around, rồi phân biệt full với empty khi Front=Rear."
+    },
+    "conventions": [
+      {
+        "en": "Initial Front=Rear=0, Count=0.",
+        "vi": "Ban đầu Front=Rear=0, Count=0."
+      },
+      {
+        "en": "Rear is next insertion; Front next removal.",
+        "vi": "Rear là insert tiếp; Front là remove tiếp."
+      },
+      {
+        "en": "Count disambiguates empty/full.",
+        "vi": "Count phân biệt empty/full."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Wrap a capacity-4 queue",
+      "vi": "Wrap queue capacity 4"
+    },
+    "prompt": {
+      "en": "ENQUEUE A,B,C; DEQUEUE twice; ENQUEUE D,E.",
+      "vi": "ENQUEUE A,B,C; DEQUEUE hai lần; ENQUEUE D,E."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "initial",
+        "action": {
+          "en": "Set Front=0, Rear=0, Count=0.",
+          "vi": "Đặt Front=0, Rear=0, Count=0."
+        },
+        "why": {
+          "en": "These meanings define all later states.",
+          "vi": "Các ý nghĩa này định nghĩa mọi state sau."
+        },
+        "result": {
+          "en": "Queue empty.",
+          "vi": "Queue empty."
+        },
+        "check": {
+          "en": "Check that queue empty.",
+          "vi": "Kiểm tra rằng queue empty."
+        }
+      },
+      {
+        "id": "enqueue-abc",
+        "action": {
+          "en": "Write A at 0, B at 1, C at 2.",
+          "vi": "Ghi A tại 0, B tại 1, C tại 2."
+        },
+        "why": {
+          "en": "Rear marks each next insertion.",
+          "vi": "Rear đánh dấu mỗi lần insert tiếp."
+        },
+        "result": {
+          "en": "Front=0, Rear=3, Count=3; logical A,B,C.",
+          "vi": "Front=0, Rear=3, Count=3; logic A,B,C."
+        },
+        "check": {
+          "en": "Check that front=0, rear=3, count=3; logical a,b,c.",
+          "vi": "Kiểm tra rằng front=0, rear=3, count=3; logic a,b,c."
+        }
+      },
+      {
+        "id": "dequeue-a",
+        "action": {
+          "en": "Save/clear Queue[0], advance Front to 1.",
+          "vi": "Lưu/xóa Queue[0], tăng Front tới 1."
+        },
+        "why": {
+          "en": "A is the oldest live item.",
+          "vi": "A là item sống cũ nhất."
+        },
+        "result": {
+          "en": "Return A; Count=2; logical B,C.",
+          "vi": "Trả A; Count=2; logic B,C."
+        },
+        "check": {
+          "en": "Check that return a; count=2; logical b,c.",
+          "vi": "Kiểm tra rằng trả a; count=2; logic b,c."
+        }
+      },
+      {
+        "id": "dequeue-b",
+        "action": {
+          "en": "Save/clear Queue[1], advance Front to 2.",
+          "vi": "Lưu/xóa Queue[1], tăng Front tới 2."
+        },
+        "why": {
+          "en": "FIFO next removes B.",
+          "vi": "FIFO tiếp theo loại B."
+        },
+        "result": {
+          "en": "Return B; Count=1; logical C.",
+          "vi": "Trả B; Count=1; logic C."
+        },
+        "check": {
+          "en": "Check that return b; count=1; logical c.",
+          "vi": "Kiểm tra rằng trả b; count=1; logic c."
+        }
+      },
+      {
+        "id": "enqueue-d",
+        "action": {
+          "en": "Write D at Rear=3; advance Rear to 0 by MOD 4.",
+          "vi": "Ghi D tại Rear=3; tăng Rear về 0 bằng MOD 4."
+        },
+        "why": {
+          "en": "The physical end wraps without moving C.",
+          "vi": "Cuối vật lý wrap mà không di chuyển C."
+        },
+        "result": {
+          "en": "Front=2, Rear=0, Count=2; logical C,D.",
+          "vi": "Front=2, Rear=0, Count=2; logic C,D."
+        },
+        "check": {
+          "en": "Check that front=2, rear=0, count=2; logical c,d.",
+          "vi": "Kiểm tra rằng front=2, rear=0, count=2; logic c,d."
+        }
+      },
+      {
+        "id": "enqueue-e",
+        "action": {
+          "en": "Write E at Rear=0; advance Rear to 1.",
+          "vi": "Ghi E tại Rear=0; tăng Rear tới 1."
+        },
+        "why": {
+          "en": "Cell 0 is now free and reusable.",
+          "vi": "Ô 0 đã free và có thể tái dùng."
+        },
+        "result": {
+          "en": "Front=2, Rear=1, Count=3; logical C,D,E.",
+          "vi": "Front=2, Rear=1, Count=3; logic C,D,E."
+        },
+        "check": {
+          "en": "Check that front=2, rear=1, count=3; logical c,d,e.",
+          "vi": "Kiểm tra rằng front=2, rear=1, count=3; logic c,d,e."
+        }
+      }
+    ],
+    "result": {
+      "en": "Physical order [E,_,C,D] represents logical FIFO order C,D,E.",
+      "vi": "Thứ tự vật lý [E,_,C,D] biểu diễn FIFO logic C,D,E."
+    },
+    "selfCheck": {
+      "en": "Did you read logical order from Front for Count items rather than left-to-right array order?",
+      "vi": "Bạn có đọc thứ tự logic từ Front trong Count item thay vì trái-sang-phải không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "FIFO",
+        "vi": "FIFO"
+      },
+      {
+        "en": "enqueue/dequeue",
+        "vi": "enqueue/dequeue"
+      },
+      {
+        "en": "front/rear",
+        "vi": "front/rear"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: a stack may use an array too, but POP removes the newest item; DEQUEUE removes the oldest.",
+      "vi": "Dễ nhầm: stack cũng có thể dùng mảng, nhưng POP loại item mới nhất; DEQUEUE loại item cũ nhất."
+    },
+    "method": [
+      {
+        "en": "Lock pointer meanings.",
+        "vi": "Khóa ý nghĩa pointer."
+      },
+      {
+        "en": "Check Count before mutation.",
+        "vi": "Check Count trước mutation."
+      },
+      {
+        "en": "Read/write at the named pointer.",
+        "vi": "Đọc/ghi tại pointer đã nêu."
+      },
+      {
+        "en": "Advance with MOD.",
+        "vi": "Tăng bằng MOD."
+      },
+      {
+        "en": "Update Count and report logical order.",
+        "vi": "Update Count và báo thứ tự logic."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Queue ADT: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho ADT queue: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Queue ADT; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của ADT queue; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Queue ADT to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của ADT queue với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Queue ADT with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh ADT queue với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Queue ADT, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của ADT queue, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Rear is the last occupied cell.",
+        "vi": "Rear là ô occupied cuối."
+      },
+      "correction": {
+        "en": "In this fixture Rear is the next insertion index.",
+        "vi": "Trong fixture này Rear là index insert tiếp."
+      },
+      "selfCheck": {
+        "en": "Where will the next ENQUEUE write?",
+        "vi": "ENQUEUE tiếp theo sẽ ghi ở đâu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Front=Rear always means empty.",
+        "vi": "Front=Rear luôn nghĩa empty."
+      },
+      "correction": {
+        "en": "Read Count: 0 means empty and Capacity means full.",
+        "vi": "Đọc Count: 0 là empty và Capacity là full."
+      },
+      "selfCheck": {
+        "en": "What is Count?",
+        "vi": "Count bằng bao nhiêu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Read physical cells left to right as FIFO order.",
+        "vi": "Đọc ô vật lý trái sang phải như thứ tự FIFO."
+      },
+      "correction": {
+        "en": "Start at Front and follow Count cells modulo Capacity.",
+        "vi": "Bắt đầu tại Front và theo Count ô modulo Capacity."
+      },
+      "selfCheck": {
+        "en": "Which live item is oldest?",
+        "vi": "Item sống nào cũ nhất?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Reset pointers whenever queue becomes empty.",
+        "vi": "Reset pointer mỗi khi queue empty."
+      },
+      "correction": {
+        "en": "Pointers naturally coincide; do not reset merely because Count becomes 0.",
+        "vi": "Pointer tự nhiên trùng nhau; không reset chỉ vì Count về 0."
+      },
+      "selfCheck": {
+        "en": "Does the contract require a reset?",
+        "vi": "Contract có yêu cầu reset không?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What order does a queue use?",
+        "vi": "Queue dùng thứ tự nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "FIFO",
+            "vi": "FIFO"
+          },
+          "feedback": {
+            "en": "Correct: the oldest live item is removed first",
+            "vi": "Đúng: item sống cũ nhất được loại trước"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "LIFO",
+            "vi": "LIFO"
+          },
+          "feedback": {
+            "en": "LIFO conflicts with the rule: the oldest live item is removed first",
+            "vi": "LIFO trái với quy tắc: item sống cũ nhất được loại trước"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "BST order",
+            "vi": "Thứ tự BST"
+          },
+          "feedback": {
+            "en": "BST order conflicts with the rule: the oldest live item is removed first",
+            "vi": "Thứ tự BST trái với quy tắc: item sống cũ nhất được loại trước"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the oldest live item is removed first",
+        "vi": "item sống cũ nhất được loại trước"
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which words identify a queue?",
+        "vi": "Từ nào nhận diện queue?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "enqueue, dequeue, front, rear",
+            "vi": "enqueue, dequeue, front, rear"
+          },
+          "feedback": {
+            "en": "Correct: queue operations use front and rear",
+            "vi": "Đúng: thao tác queue dùng front và rear"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "push, pop, top",
+            "vi": "push, pop, top"
+          },
+          "feedback": {
+            "en": "push, pop, top conflicts with the rule: queue operations use front and rear",
+            "vi": "push, pop, top trái với quy tắc: thao tác queue dùng front và rear"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "key, value, lookup",
+            "vi": "key, value, lookup"
+          },
+          "feedback": {
+            "en": "key, value, lookup conflicts with the rule: queue operations use front and rear",
+            "vi": "key, value, lookup trái với quy tắc: thao tác queue dùng front và rear"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "queue operations use front and rear",
+        "vi": "thao tác queue dùng front và rear"
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "Capacity=4, Rear=3. After successful ENQUEUE, new Rear?",
+        "vi": "Capacity=4, Rear=3. Sau ENQUEUE thành công, Rear mới?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "Correct: (3+1) MOD 4 wraps to 0",
+            "vi": "Đúng: (3+1) MOD 4 wrap về 0"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "4 conflicts with the rule: (3+1) MOD 4 wraps to 0",
+            "vi": "4 trái với quy tắc: (3+1) MOD 4 wrap về 0"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "2",
+            "vi": "2"
+          },
+          "feedback": {
+            "en": "2 conflicts with the rule: (3+1) MOD 4 wraps to 0",
+            "vi": "2 trái với quy tắc: (3+1) MOD 4 wrap về 0"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "(3+1) MOD 4 wraps to 0",
+        "vi": "(3+1) MOD 4 wrap về 0"
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "Physical [E,_,C,D], Front=2, Count=3. Logical order?",
+        "vi": "Vật lý [E,_,C,D], Front=2, Count=3. Thứ tự logic?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "C,D,E",
+            "vi": "C,D,E"
+          },
+          "feedback": {
+            "en": "Correct: read three live cells from Front modulo capacity",
+            "vi": "Đúng: đọc ba ô sống từ Front modulo capacity"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "E,C,D",
+            "vi": "E,C,D"
+          },
+          "feedback": {
+            "en": "E,C,D conflicts with the rule: read three live cells from Front modulo capacity",
+            "vi": "E,C,D trái với quy tắc: đọc ba ô sống từ Front modulo capacity"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "D,E,C",
+            "vi": "D,E,C"
+          },
+          "feedback": {
+            "en": "D,E,C conflicts with the rule: read three live cells from Front modulo capacity",
+            "vi": "D,E,C trái với quy tắc: đọc ba ô sống từ Front modulo capacity"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "read three live cells from Front modulo capacity",
+        "vi": "đọc ba ô sống từ Front modulo capacity"
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Which ENQUEUE order is correct?",
+        "vi": "Thứ tự ENQUEUE nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "guard → write at Rear → advance Rear → increment Count",
+            "vi": "guard → ghi tại Rear → tăng Rear → tăng Count"
+          },
+          "feedback": {
+            "en": "Correct: Rear names the next insertion cell",
+            "vi": "Đúng: Rear là ô insert tiếp"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "advance Front → write",
+            "vi": "tăng Front → ghi"
+          },
+          "feedback": {
+            "en": "advance Front → write conflicts with the rule: Rear names the next insertion cell",
+            "vi": "tăng Front → ghi trái với quy tắc: Rear là ô insert tiếp"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "increment Count before full guard",
+            "vi": "tăng Count trước full guard"
+          },
+          "feedback": {
+            "en": "increment Count before full guard conflicts with the rule: Rear names the next insertion cell",
+            "vi": "tăng Count trước full guard trái với quy tắc: Rear là ô insert tiếp"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Rear names the next insertion cell",
+        "vi": "Rear là ô insert tiếp"
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "Front=Rear and Count=Capacity. State?",
+        "vi": "Front=Rear và Count=Capacity. Trạng thái?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Full",
+            "vi": "Full"
+          },
+          "feedback": {
+            "en": "Correct: Count, not pointer equality, distinguishes full",
+            "vi": "Đúng: Count, không phải pointer equality, phân biệt full"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Empty",
+            "vi": "Empty"
+          },
+          "feedback": {
+            "en": "Empty conflicts with the rule: Count, not pointer equality, distinguishes full",
+            "vi": "Empty trái với quy tắc: Count, không phải pointer equality, phân biệt full"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Invalid automatically",
+            "vi": "Tự động invalid"
+          },
+          "feedback": {
+            "en": "Invalid automatically conflicts with the rule: Count, not pointer equality, distinguishes full",
+            "vi": "Tự động invalid trái với quy tắc: Count, không phải pointer equality, phân biệt full"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Count, not pointer equality, distinguishes full",
+        "vi": "Count, không phải pointer equality, phân biệt full"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "State the circular-queue contract and operation order.",
+      "vi": "Nêu contract queue vòng và thứ tự thao tác."
+    },
+    "answerPoints": [
+      {
+        "en": "Front next removal; Rear next insertion.",
+        "vi": "Front remove tiếp; Rear insert tiếp."
+      },
+      {
+        "en": "Count=0 empty; Count=Capacity full.",
+        "vi": "Count=0 empty; Count=Capacity full."
+      },
+      {
+        "en": "Use MOD and mutate only after guards.",
+        "vi": "Dùng MOD và chỉ mutate sau guard."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Queue is FIFO.",
+      "vi": "Queue là FIFO."
+    },
+    {
+      "en": "Count disambiguates equal pointers.",
+      "vi": "Count phân biệt pointer bằng nhau."
+    },
+    {
+      "en": "Logical order may wrap across the array end.",
+      "vi": "Thứ tự logic có thể wrap qua cuối mảng."
+    }
+  ],
+  "relatedSlugs": [
+    "stack",
+    "implementing-one-adt-with-another"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp466–469 / PDF pp482–485: circular queue",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "s23-32-qp",
+      "title": "Cambridge 9618/32 — May/June 2023 question paper",
+      "locator": "Question 11, pp13–14",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s23-32-ms",
+      "title": "Cambridge 9618/32 — May/June 2023 mark scheme",
+      "locator": "Question 11, p12",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s23-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2023 question paper",
+      "locator": "Question 11, pp10–11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s23-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2023 mark scheme",
+      "locator": "Question 11, pp8–9",
+      "kind": "mark-scheme"
+    }
+  ]
+}

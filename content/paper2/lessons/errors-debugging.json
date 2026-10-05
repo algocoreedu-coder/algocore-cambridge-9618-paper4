@@ -1,0 +1,841 @@
+{
+  "schemaVersion": 1,
+  "version": "T27-academic-r3-reviewed",
+  "topicId": "T27",
+  "sectionId": "12.3",
+  "slug": "errors-debugging",
+  "learningMode": "testing",
+  "estimatedMinutes": 75,
+  "title": {
+    "en": "Errors and debugging",
+    "vi": "Lỗi và gỡ lỗi"
+  },
+  "question": {
+    "en": "How can evidence identify an error, justify a precise patch and show that the correction has not broken related behaviour?",
+    "vi": "Bằng chứng giúp xác định lỗi, giải thích bản vá chính xác và cho thấy sửa lỗi không làm hỏng hành vi liên quan như thế nào?"
+  },
+  "opening": {
+    "en": "Name an error type from its cause and effect, not from a memorised keyword. A useful debugging answer links location → mechanism → counterexample → patch → retest and regression.",
+    "vi": "Đặt loại lỗi từ nguyên nhân và tác động, không từ từ khóa học thuộc. Câu trả lời debugging hữu ích nối vị trí → cơ chế → phản ví dụ → bản vá → retest và regression."
+  },
+  "objectives": [
+    {
+      "en": "Distinguish syntax, logic and run-time errors by mechanism.",
+      "vi": "Phân biệt lỗi syntax, logic và run-time theo cơ chế."
+    },
+    {
+      "en": "Choose a revealing counterexample and locate the faulty statement.",
+      "vi": "Chọn phản ví dụ làm lộ lỗi và định vị câu lệnh sai."
+    },
+    {
+      "en": "Patch the fault and retest the failing and neighbouring cases.",
+      "vi": "Sửa lỗi rồi retest trường hợp hỏng và các trường hợp lân cận."
+    },
+    {
+      "en": "Build a fault-prevention plan using defensive design, validation, modularity, documentation, clear interfaces and review, then distinguish prevention, detection and correction.",
+      "vi": "Dựng kế hoạch phòng lỗi bằng defensive design, validation, modularity, documentation, interface rõ và review, rồi phân biệt phòng ngừa, phát hiện và sửa lỗi."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Dry runs",
+        "vi": "Dry run"
+      },
+      "reason": {
+        "en": "A trace supplies evidence for where observed behaviour first diverges from expected behaviour.",
+        "vi": "Trace cung cấp bằng chứng về nơi hành vi thực tế bắt đầu lệch khỏi hành vi mong đợi."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "syntax error",
+      "meaning": {
+        "en": "A violation of language grammar that prevents valid translation or execution.",
+        "vi": "Vi phạm ngữ pháp ngôn ngữ làm chương trình không thể dịch hoặc thực thi hợp lệ."
+      }
+    },
+    {
+      "term": "logic error",
+      "meaning": {
+        "en": "An executable algorithm produces an incorrect result or behaviour.",
+        "vi": "Thuật toán chạy được nhưng tạo kết quả hoặc hành vi sai."
+      }
+    },
+    {
+      "term": "run-time error",
+      "meaning": {
+        "en": "An error arising during execution for a particular operation or state.",
+        "vi": "Lỗi phát sinh khi chạy do một thao tác hoặc trạng thái cụ thể."
+      }
+    },
+    {
+      "term": "regression test",
+      "meaning": {
+        "en": "A repeat test that checks behaviour that should remain correct after a change.",
+        "vi": "Test lặp lại kiểm hành vi cần tiếp tục đúng sau thay đổi."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The program gives a wrong result, fails to translate, or fails for particular input.",
+        "vi": "Chương trình cho kết quả sai, không dịch được hoặc hỏng với input cụ thể."
+      },
+      {
+        "en": "The question asks identify, locate, correct, debug or give a revealing test.",
+        "vi": "Đề yêu cầu identify, locate, correct, debug hoặc đưa test làm lộ lỗi."
+      },
+      {
+        "en": "The task asks how to avoid faults before tests run or asks which mechanism addresses a risk.",
+        "vi": "Bài hỏi cách tránh lỗi trước khi chạy test hoặc cơ chế nào xử lý một rủi ro."
+      },
+      {
+        "en": "Several actions must be classified as prevent, detect or correct.",
+        "vi": "Nhiều hành động cần phân loại là phòng ngừa, phát hiện hoặc sửa."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "A poor algorithm can be inefficient without containing a syntax error.",
+        "vi": "Thuật toán kém hiệu quả có thể không chứa lỗi syntax."
+      },
+      {
+        "en": "An invalid user input is test data; it becomes a run-time fault only if the program mishandles it during execution.",
+        "vi": "Input người dùng không hợp lệ là dữ liệu test; nó chỉ trở thành lỗi run-time khi chương trình xử lý sai trong lúc chạy."
+      },
+      {
+        "en": "Testing is the main way software prevents faults from being introduced.",
+        "vi": "Testing là cách chính phần mềm ngăn lỗi được đưa vào."
+      },
+      {
+        "en": "Comments prevent every logic error because they document intention.",
+        "vi": "Comment ngăn mọi logic error vì ghi lại ý định."
+      }
+    ],
+    "answerProduct": {
+      "en": "A classification supported by location, mechanism, counterexample, patch and retest evidence.",
+      "vi": "Phân loại được chứng minh bằng vị trí, cơ chế, phản ví dụ, bản vá và bằng chứng retest."
+    },
+    "method": [
+      {
+        "en": "Compare expected and traced behaviour to find the first divergence.",
+        "vi": "So expected với hành vi trace để tìm điểm lệch đầu tiên."
+      },
+      {
+        "en": "Classify the mechanism: grammar, wrong rule, or failing operation at run time.",
+        "vi": "Phân loại cơ chế: ngữ pháp, quy tắc sai hoặc thao tác hỏng khi chạy."
+      },
+      {
+        "en": "Write the smallest patch that restores the stated contract.",
+        "vi": "Viết bản vá nhỏ nhất khôi phục contract đã nêu."
+      },
+      {
+        "en": "Run the counterexample again and add old/boundary regression cases.",
+        "vi": "Chạy lại phản ví dụ và thêm regression case cũ/biên."
+      },
+      {
+        "en": "Name the risk and the lifecycle point where it could be introduced.",
+        "vi": "Nêu rủi ro và điểm trong vòng đời nơi nó có thể được đưa vào."
+      },
+      {
+        "en": "Choose a preventive mechanism that removes ambiguity or blocks invalid state before execution.",
+        "vi": "Chọn cơ chế phòng ngừa loại mơ hồ hoặc chặn state không hợp lệ trước khi chạy."
+      },
+      {
+        "en": "Choose detection evidence such as review, trace, assertions or tests.",
+        "vi": "Chọn bằng chứng phát hiện như review, trace, assertion hoặc test."
+      },
+      {
+        "en": "Define correction plus regression so the fix preserves prior behaviour.",
+        "vi": "Định nghĩa sửa đổi cùng regression để bản sửa giữ hành vi trước."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "T27-U1",
+      "title": {
+        "en": "Classify from cause and effect",
+        "vi": "Phân loại từ nguyên nhân và tác động"
+      },
+      "paragraphs": [
+        {
+          "en": "A syntax error breaks the defined grammar. A logic error runs but violates the required result. A run-time error occurs while executing a legal statement in a problematic state, such as division by zero or an invalid index.",
+          "vi": "Lỗi syntax phá ngữ pháp định nghĩa. Lỗi logic chạy được nhưng vi phạm kết quả yêu cầu. Lỗi run-time xảy ra khi thực thi câu lệnh hợp lệ trong trạng thái có vấn đề, như chia cho 0 hoặc chỉ số không hợp lệ."
+        },
+        {
+          "en": "Use the language model in the question. Do not import a Python-specific exception classification into Cambridge pseudocode without evidence.",
+          "vi": "Dùng mô hình ngôn ngữ trong đề. Không đưa phân loại exception riêng của Python vào pseudocode Cambridge khi không có bằng chứng."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Syntax: translation/grammar failure",
+          "vi": "Syntax: lỗi dịch/ngữ pháp"
+        },
+        {
+          "en": "Logic: wrong result/path",
+          "vi": "Logic: kết quả/đường đi sai"
+        },
+        {
+          "en": "Run time: failure during execution",
+          "vi": "Run time: hỏng trong lúc chạy"
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book"
+      ]
+    },
+    {
+      "id": "T27-U2",
+      "title": {
+        "en": "Debug with a counterexample",
+        "vi": "Gỡ lỗi bằng phản ví dụ"
+      },
+      "paragraphs": [
+        {
+          "en": "A counterexample is a concrete input with an independently calculated expected result that exposes the fault.",
+          "vi": "Phản ví dụ là input cụ thể có expected result được tính độc lập và làm lộ lỗi."
+        },
+        {
+          "en": "After patching, rerun the counterexample and cases that previously worked. A single passing test cannot establish that the change is safe.",
+          "vi": "Sau khi vá, chạy lại phản ví dụ và các case từng đúng. Một test pass không đủ chứng minh thay đổi an toàn."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Locate first divergence",
+          "vi": "Tìm điểm lệch đầu tiên"
+        },
+        {
+          "en": "Explain mechanism",
+          "vi": "Giải thích cơ chế"
+        },
+        {
+          "en": "Patch minimally",
+          "vi": "Vá tối thiểu"
+        },
+        {
+          "en": "Retest and regress",
+          "vi": "Retest và regression"
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book"
+      ]
+    },
+    {
+      "id": "T27-U3",
+      "title": {
+        "en": "Prevent, detect and correct are different obligations",
+        "vi": "Phòng ngừa, phát hiện và sửa là các nghĩa vụ khác nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "Fault prevention reduces the chance of introducing a defect: precise requirements, simple modular designs, typed and minimal interfaces, validation at boundaries, named constants, meaningful identifiers, documentation of contracts and peer review before implementation all address specific risks.",
+          "vi": "Phòng lỗi giảm khả năng đưa defect vào: yêu cầu chính xác, thiết kế module đơn giản, interface có kiểu và tối thiểu, validation tại biên, constant có tên, identifier có nghĩa, tài liệu contract và peer review trước triển khai đều xử lý rủi ro cụ thể."
+        },
+        {
+          "en": "Detection supplies evidence that a fault exists through walkthroughs, dry runs, trace tables, assertions or testing. Correction changes the faulty artefact; regression then verifies that old required behaviour remains. One action should not be credited for all three roles without an explanation.",
+          "vi": "Phát hiện cung cấp bằng chứng có lỗi qua walkthrough, dry run, trace table, assertion hoặc testing. Sửa đổi thay artefact lỗi; regression sau đó kiểm hành vi cũ vẫn giữ. Không nên tính một hành động cho cả ba vai trò nếu thiếu giải thích."
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book",
+        "teacher-t27"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T27",
+      "T27-X01"
+    ],
+    "title": {
+      "en": "Counterexample and patch comparison",
+      "vi": "So sánh phản ví dụ và bản vá"
+    },
+    "introduction": {
+      "en": "The original trace and corrected trace remain side by side so evidence for the patch is visible.",
+      "vi": "Trace gốc và trace đã sửa nằm cạnh nhau để bằng chứng cho bản vá được thấy rõ."
+    },
+    "task": {
+      "en": "Find the first divergent row, predict the corrected value and choose regression cases.",
+      "vi": "Tìm hàng lệch đầu tiên, dự đoán giá trị đã sửa và chọn regression cases."
+    },
+    "conventions": [
+      {
+        "en": "Red marks the first wrong state, not every later consequence.",
+        "vi": "Màu đỏ đánh dấu trạng thái sai đầu tiên, không phải mọi hậu quả phía sau."
+      },
+      {
+        "en": "Expected values are derived before execution.",
+        "vi": "Expected value được suy trước khi chạy."
+      },
+      {
+        "en": "A patch is accepted only after the failing case and related cases pass.",
+        "vi": "Bản vá chỉ được chấp nhận sau khi case hỏng và case liên quan pass."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "teacher-t27"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T27-W1",
+      "title": {
+        "en": "Repair an inclusive upper bound",
+        "vi": "Sửa cận trên có lấy"
+      },
+      "prompt": {
+        "en": "A function should accept marks 0..100 inclusive but uses IF Mark>=0 AND Mark<100. A learner with 100 is rejected. Diagnose and repair it.",
+        "vi": "Hàm cần chấp nhận điểm 0..100 gồm cả cận nhưng dùng IF Mark>=0 AND Mark<100. Học sinh điểm 100 bị từ chối. Hãy chẩn đoán và sửa."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "T27-W1-S1",
+          "action": {
+            "en": "State expected and actual behaviour for Mark=100.",
+            "vi": "Nêu expected và actual với Mark=100."
+          },
+          "why": {
+            "en": "The counterexample fixes the contract and observed divergence.",
+            "vi": "Phản ví dụ chốt contract và điểm lệch quan sát."
+          },
+          "result": {
+            "en": "Expected accept; condition evaluates FALSE, so actual rejects.",
+            "vi": "Expected chấp nhận; điều kiện FALSE nên actual từ chối."
+          },
+          "check": {
+            "en": "Calculate the Boolean expression explicitly.",
+            "vi": "Tính rõ biểu thức Boolean."
+          }
+        },
+        {
+          "id": "T27-W1-S2",
+          "action": {
+            "en": "Locate the faulty comparison and classify it.",
+            "vi": "Định vị phép so sánh sai và phân loại."
+          },
+          "why": {
+            "en": "The program executes but encodes the wrong endpoint rule.",
+            "vi": "Chương trình chạy nhưng mã hóa sai quy tắc cận."
+          },
+          "result": {
+            "en": "Logic error at Mark<100.",
+            "vi": "Lỗi logic tại Mark<100."
+          },
+          "check": {
+            "en": "This is not a grammar or run-time failure.",
+            "vi": "Đây không phải lỗi ngữ pháp hay run-time."
+          }
+        },
+        {
+          "id": "T27-W1-S3",
+          "action": {
+            "en": "Patch to Mark<=100 and retest 99,100,101 and 0,-1.",
+            "vi": "Vá thành Mark<=100 và retest 99,100,101 cùng 0,-1."
+          },
+          "why": {
+            "en": "The failing boundary plus adjacent valid/invalid cases protect both endpoints.",
+            "vi": "Biên hỏng cùng case hợp lệ/không hợp lệ kề nhau bảo vệ cả hai cận."
+          },
+          "result": {
+            "en": "0,99,100 accepted; -1,101 rejected.",
+            "vi": "0,99,100 được chấp nhận; -1,101 bị từ chối."
+          },
+          "check": {
+            "en": "Old valid behaviour and new boundary behaviour are both covered.",
+            "vi": "Hành vi cũ đúng và hành vi biên mới đều được phủ."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Logic error: the upper-bound comparison excludes 100. Replace `<100` with `<=100`; retest both endpoints and adjacent outside values.",
+        "vi": "Lỗi logic: phép so sánh cận trên loại 100. Thay `<100` bằng `<=100`; retest hai cận và giá trị ngay bên ngoài."
+      },
+      "selfCheck": {
+        "en": "Did you name location, mechanism, counterexample, patch and regression cases?",
+        "vi": "Bạn có nêu vị trí, cơ chế, phản ví dụ, bản vá và regression cases không?"
+      },
+      "sourceIds": [
+        "teacher-t27"
+      ]
+    },
+    {
+      "id": "T27-W2",
+      "title": {
+        "en": "Plan fault controls for a transfer module",
+        "vi": "Lập kiểm soát lỗi cho module chuyển tiền"
+      },
+      "prompt": {
+        "en": "A module transfers Amount from one account to another. Risks include negative amount, insufficient funds, duplicate transfer after retry and inconsistent debit/credit. Give preventive, detective and corrective controls.",
+        "vi": "Một module chuyển Amount từ tài khoản này sang tài khoản khác. Rủi ro gồm số tiền âm, thiếu số dư, chuyển trùng sau retry và debit/credit không nhất quán. Nêu kiểm soát phòng ngừa, phát hiện và sửa."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "risks",
+          "action": {
+            "en": "State invariants and interfaces",
+            "vi": "Nêu invariant và interface"
+          },
+          "why": {
+            "en": "Prevention must target a named failure mode.",
+            "vi": "Phòng ngừa phải nhắm một failure mode cụ thể."
+          },
+          "result": {
+            "en": "Amount>0; source balance remains non-negative; one request ID is applied once; debit and credit commit together.",
+            "vi": "Amount>0; số dư nguồn không âm; một request ID áp dụng một lần; debit và credit commit cùng nhau."
+          }
+        },
+        {
+          "id": "prevent",
+          "action": {
+            "en": "Design barriers",
+            "vi": "Thiết kế rào chắn"
+          },
+          "why": {
+            "en": "Invalid state should be rejected before mutation.",
+            "vi": "State không hợp lệ phải bị từ chối trước mutation."
+          },
+          "result": {
+            "en": "Validate typed inputs and funds; use one cohesive transfer module, explicit request ID and atomic update contract; review the interface.",
+            "vi": "Validation input có kiểu và số dư; dùng một module chuyển gắn kết, request ID rõ và contract cập nhật atomic; review interface."
+          }
+        },
+        {
+          "id": "detect",
+          "action": {
+            "en": "Specify evidence",
+            "vi": "Đặc tả bằng chứng"
+          },
+          "why": {
+            "en": "Prevention does not prove an implementation is correct.",
+            "vi": "Phòng ngừa không chứng minh implementation đúng."
+          },
+          "result": {
+            "en": "Walk through boundaries, trace retry, assert total funds unchanged, and test insufficient/duplicate/failure cases.",
+            "vi": "Walkthrough biên, trace retry, assert tổng tiền không đổi và test ca thiếu/duplicate/thất bại."
+          }
+        },
+        {
+          "id": "correct",
+          "action": {
+            "en": "Fix and regress",
+            "vi": "Sửa và regression"
+          },
+          "why": {
+            "en": "A correction needs proof it did not break accepted transfers.",
+            "vi": "Bản sửa cần bằng chứng không phá giao dịch hợp lệ."
+          },
+          "result": {
+            "en": "Patch the smallest faulty contract/code, rerun failing case and all valid, boundary, retry and rollback tests; update documentation.",
+            "vi": "Patch contract/code lỗi nhỏ nhất, chạy lại ca lỗi và mọi test hợp lệ, biên, retry, rollback; cập nhật tài liệu."
+          },
+          "check": {
+            "en": "Testing detects and verifies; it does not replace preventive design.",
+            "vi": "Testing phát hiện và xác minh; không thay thiết kế phòng ngừa."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Prevent with explicit invariants, validation before mutation, a cohesive atomic transfer interface, unique request IDs, minimal shared state, contract documentation and peer review. Detect with walkthrough/trace, assertions and boundary/failure/retry tests. Correct the identified artefact, rerun the failing case and regression suite, and update the contract documentation.",
+        "vi": "Phòng ngừa bằng invariant rõ, validation trước mutation, interface chuyển atomic gắn kết, request ID duy nhất, shared state tối thiểu, tài liệu contract và peer review. Phát hiện bằng walkthrough/trace, assertion và test biên/thất bại/retry. Sửa artefact đã xác định, chạy lại ca lỗi cùng regression suite và cập nhật tài liệu contract."
+      },
+      "selfCheck": {
+        "en": "Can each control be tied to one risk and one prevention/detection/correction role?",
+        "vi": "Mỗi kiểm soát có nối với một rủi ro và một vai trò phòng ngừa/phát hiện/sửa không?"
+      },
+      "sourceIds": [
+        "syl",
+        "book",
+        "teacher-t27"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T27-P1",
+      "title": {
+        "en": "Prevent division by zero",
+        "vi": "Ngăn chia cho 0"
+      },
+      "prompt": {
+        "en": "Average←Total/Count fails when Count=0. Classify the error for that input, propose a guarded patch and tests.",
+        "vi": "Average←Total/Count hỏng khi Count=0. Phân loại lỗi cho input đó, đề xuất bản vá có guard và tests."
+      },
+      "working": [
+        {
+          "en": "State the failing operation and input state.",
+          "vi": "Nêu thao tác hỏng và trạng thái input."
+        },
+        {
+          "en": "Guard the division with Count>0 and specify the Count=0 response.",
+          "vi": "Bảo vệ phép chia bằng Count>0 và nêu phản hồi khi Count=0."
+        },
+        {
+          "en": "Retest Count=0,1 and a normal larger value.",
+          "vi": "Retest Count=0,1 và giá trị thường lớn hơn."
+        }
+      ],
+      "answer": {
+        "en": "Run-time error caused by division by zero. Execute the division only when Count>0; otherwise produce the specified no-data response. Test 0,1 and normal counts.",
+        "vi": "Lỗi run-time do chia cho 0. Chỉ thực hiện phép chia khi Count>0; nếu không đưa phản hồi không có dữ liệu theo đặc tả. Test 0,1 và count thường."
+      },
+      "markGuidance": [
+        {
+          "en": "Correct run-time classification and cause.",
+          "vi": "Phân loại run-time và nguyên nhân đúng."
+        },
+        {
+          "en": "Guarded patch with defined alternative.",
+          "vi": "Bản vá có guard và nhánh thay thế được định nghĩa."
+        },
+        {
+          "en": "Failing and regression tests.",
+          "vi": "Test hỏng và regression."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Call every division problem a syntax error.",
+          "vi": "Gọi mọi vấn đề chia là syntax error."
+        },
+        {
+          "en": "Skip defining behaviour for zero records.",
+          "vi": "Bỏ qua việc định nghĩa hành vi khi có 0 record."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can Count=0 reach a division after your patch?",
+        "vi": "Count=0 còn có thể đi tới phép chia sau bản vá không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t27"
+      ]
+    },
+    {
+      "id": "T27-P2",
+      "title": {
+        "en": "Find a loop logic fault",
+        "vi": "Tìm lỗi logic vòng lặp"
+      },
+      "prompt": {
+        "en": "A search sets Found←FALSE and loops WHILE Found=TRUE AND I<=Last. Explain why it never searches and correct it.",
+        "vi": "Thuật toán search đặt Found←FALSE rồi lặp WHILE Found=TRUE AND I<=Last. Giải thích vì sao nó không search và sửa."
+      },
+      "working": [
+        {
+          "en": "Evaluate the first WHILE condition using Found=FALSE.",
+          "vi": "Đánh giá điều kiện WHILE đầu với Found=FALSE."
+        },
+        {
+          "en": "Relate the condition to the intended continue rule.",
+          "vi": "Liên hệ điều kiện với quy tắc tiếp tục dự định."
+        },
+        {
+          "en": "Retest empty, first, middle and absent cases.",
+          "vi": "Retest rỗng, phần tử đầu, giữa và không có."
+        }
+      ],
+      "answer": {
+        "en": "The first condition is FALSE, so the loop executes zero times. Use WHILE Found=FALSE AND I<=Last (or NOT Found) and retest boundaries and absent data.",
+        "vi": "Điều kiện đầu FALSE nên vòng lặp chạy 0 lần. Dùng WHILE Found=FALSE AND I<=Last (hoặc NOT Found) và retest biên cùng trường hợp không có."
+      },
+      "markGuidance": [
+        {
+          "en": "Shows initial condition is FALSE.",
+          "vi": "Cho thấy điều kiện đầu FALSE."
+        },
+        {
+          "en": "Correct continuation condition.",
+          "vi": "Điều kiện tiếp tục đúng."
+        },
+        {
+          "en": "Relevant regression set.",
+          "vi": "Bộ regression phù hợp."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Change initial Found to TRUE, which breaks the meaning.",
+          "vi": "Đổi Found đầu thành TRUE làm sai ý nghĩa."
+        },
+        {
+          "en": "Test only an item at the first position.",
+          "vi": "Chỉ test phần tử ở vị trí đầu."
+        }
+      ],
+      "selfCheck": {
+        "en": "Does the corrected condition continue only while the item is not found and indices remain valid?",
+        "vi": "Điều kiện sửa có chỉ tiếp tục khi chưa tìm thấy và chỉ số còn hợp lệ không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t27"
+      ]
+    },
+    {
+      "id": "T27-P3",
+      "title": {
+        "en": "Classify controls by role",
+        "vi": "Phân loại kiểm soát theo vai trò"
+      },
+      "prompt": {
+        "en": "Classify and justify: typed parameter interface; peer review of a design; boundary test at 100; trace table exposing a wrong update; changing <= to <; rerunning old tests after the change.",
+        "vi": "Phân loại và giải thích: interface parameter có kiểu; peer review thiết kế; test biên tại 100; trace table làm lộ cập nhật sai; đổi <= thành <; chạy lại test cũ sau thay đổi."
+      },
+      "working": [
+        {
+          "en": "Use the effect of each action, not its name.",
+          "vi": "Dùng tác dụng của mỗi hành động, không chỉ tên."
+        },
+        {
+          "en": "Distinguish finding evidence from changing the artefact.",
+          "vi": "Phân biệt tìm bằng chứng với thay artefact."
+        },
+        {
+          "en": "Treat regression as verification after correction.",
+          "vi": "Coi regression là xác minh sau sửa."
+        }
+      ],
+      "answer": {
+        "en": "Typed interface is preventive because it blocks/clarifies invalid interactions. Design peer review is preventive when it removes ambiguity before coding and also detective of design defects; state the timing. Boundary test and trace table are detective. Changing <= to < is corrective if that operator caused the fault. Rerunning old tests is regression detection/verification after correction.",
+        "vi": "Interface có kiểu là phòng ngừa vì chặn/làm rõ tương tác không hợp lệ. Peer review thiết kế là phòng ngừa khi loại mơ hồ trước coding và cũng phát hiện defect thiết kế; phải nêu thời điểm. Test biên và trace table là phát hiện. Đổi <= thành < là sửa nếu operator đó gây lỗi. Chạy lại test cũ là regression phát hiện/xác minh sau sửa."
+      },
+      "markGuidance": [
+        {
+          "en": "Every classification includes a causal explanation.",
+          "vi": "Mỗi phân loại có giải thích nhân quả."
+        },
+        {
+          "en": "Actions with two roles are qualified by timing/effect.",
+          "vi": "Hành động có hai vai trò được giới hạn theo thời điểm/tác dụng."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Calling every review action testing.",
+          "vi": "Gọi mọi hành động review là testing."
+        },
+        {
+          "en": "Calling a code change detection rather than correction.",
+          "vi": "Gọi thay đổi code là phát hiện thay vì sửa."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which action changes the faulty artefact, and which only supplies evidence?",
+        "vi": "Hành động nào đổi artefact lỗi và hành động nào chỉ cung cấp bằng chứng?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t27",
+        "book"
+      ]
+    },
+    {
+      "id": "T27-P4",
+      "title": {
+        "en": "Choose prevention for specific risks",
+        "vi": "Chọn phòng ngừa cho rủi ro cụ thể"
+      },
+      "prompt": {
+        "en": "For each risk choose and justify a preventive mechanism: an invalid age enters a calculation; two modules interpret status codes differently; repeated discount code is copied into three branches; a maintainer cannot tell what a procedure may change.",
+        "vi": "Với mỗi rủi ro, chọn và giải thích cơ chế phòng ngừa: tuổi không hợp lệ đi vào phép tính; hai module hiểu status code khác nhau; code giảm giá lặp ở ba nhánh; maintainer không biết procedure có thể đổi gì."
+      },
+      "working": [
+        {
+          "en": "Name one mechanism per risk.",
+          "vi": "Nêu một cơ chế cho mỗi rủi ro."
+        },
+        {
+          "en": "Explain how it reduces introduction of that fault.",
+          "vi": "Giải thích cách nó giảm việc đưa lỗi đó vào."
+        },
+        {
+          "en": "Avoid replacing prevention with `test it later`.",
+          "vi": "Tránh thay phòng ngừa bằng `test sau`."
+        }
+      ],
+      "answer": {
+        "en": "Validate Age at the input/module boundary against the specified range before calculation. Define one typed enumeration or named-constant contract for status and share the interface documentation. Extract the discount rule into one reusable function with a single contract. Document the procedure precondition, parameters, BYVAL/BYREF effects and postcondition, and peer-review that interface before use.",
+        "vi": "Validation Age tại biên input/module theo miền quy định trước phép tính. Định nghĩa một contract enum có kiểu hoặc named constant cho status và dùng chung tài liệu interface. Tách quy tắc giảm giá thành một function tái dùng với một contract duy nhất. Ghi precondition, parameter, tác động BYVAL/BYREF và postcondition của procedure, rồi peer-review interface trước khi dùng."
+      },
+      "markGuidance": [
+        {
+          "en": "Each mechanism directly addresses the stated risk.",
+          "vi": "Mỗi cơ chế trực tiếp xử lý rủi ro đã nêu."
+        },
+        {
+          "en": "Validation, interface, modularity and documentation/review are all represented.",
+          "vi": "Có đủ validation, interface, modularity và documentation/review."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Using comments after duplicated code does not remove duplication.",
+          "vi": "Thêm comment sau code lặp không loại duplication."
+        },
+        {
+          "en": "A boundary test detects an invalid-age bug but does not by itself prevent its introduction.",
+          "vi": "Test biên phát hiện bug tuổi không hợp lệ nhưng tự nó không ngăn bug được đưa vào."
+        }
+      ],
+      "selfCheck": {
+        "en": "At what point does each preventive control act?",
+        "vi": "Mỗi kiểm soát phòng ngừa tác động ở điểm nào?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "syl",
+        "teacher-t27"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Use error type as a guess from one keyword.",
+        "vi": "Đoán loại lỗi từ một từ khóa."
+      },
+      "correction": {
+        "en": "Classify using cause and observed/predicted effect.",
+        "vi": "Phân loại bằng nguyên nhân và tác động quan sát/dự đoán."
+      },
+      "selfCheck": {
+        "en": "Does the program fail to translate, run incorrectly, or fail during execution?",
+        "vi": "Chương trình không dịch, chạy sai hay hỏng trong lúc chạy?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Stop after changing one operator.",
+        "vi": "Dừng sau khi đổi một toán tử."
+      },
+      "correction": {
+        "en": "A patch needs the original counterexample and regression cases.",
+        "vi": "Bản vá cần phản ví dụ gốc và regression cases."
+      },
+      "selfCheck": {
+        "en": "What previously correct behaviour could the change affect?",
+        "vi": "Thay đổi có thể ảnh hưởng hành vi từng đúng nào?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What is the five-link debugging chain?",
+      "vi": "Chuỗi năm mắt xích debugging là gì?"
+    },
+    "answerPoints": [
+      {
+        "en": "Location.",
+        "vi": "Vị trí."
+      },
+      {
+        "en": "Mechanism/classification.",
+        "vi": "Cơ chế/phân loại."
+      },
+      {
+        "en": "Counterexample.",
+        "vi": "Phản ví dụ."
+      },
+      {
+        "en": "Patch.",
+        "vi": "Bản vá."
+      },
+      {
+        "en": "Retest and regression.",
+        "vi": "Retest và regression."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Classify errors by mechanism, not vocabulary alone.",
+      "vi": "Phân loại lỗi theo cơ chế, không chỉ từ ngữ."
+    },
+    {
+      "en": "A concrete counterexample connects expected and actual behaviour.",
+      "vi": "Phản ví dụ cụ thể nối expected và actual."
+    },
+    {
+      "en": "A correction is incomplete until retest and regression pass.",
+      "vi": "Sửa lỗi chưa hoàn tất tới khi retest và regression pass."
+    },
+    {
+      "en": "Prevention reduces fault introduction; detection supplies evidence; correction changes the faulty artefact.",
+      "vi": "Phòng ngừa giảm việc đưa lỗi vào; phát hiện cung cấp bằng chứng; sửa đổi thay artefact lỗi."
+    },
+    {
+      "en": "A prevention plan connects each risk to a design, interface, validation, documentation or review control.",
+      "vi": "Kế hoạch phòng ngừa nối mỗi rủi ro với kiểm soát thiết kế, interface, validation, documentation hoặc review."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F12",
+      "role": "owner",
+      "title": {
+        "en": "Trace and debug",
+        "vi": "Trace và gỡ lỗi"
+      }
+    },
+    {
+      "id": "F13",
+      "role": "related",
+      "title": {
+        "en": "Testing evidence",
+        "vi": "Bằng chứng kiểm thử"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "dry-run-trace-tables",
+    "testing-methods",
+    "amendment-efficiency"
+  ],
+  "sources": [
+    {
+      "id": "syl",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§12.3, printed/PDF p31.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp293–297; PDF pp309–313, including fault avoidance, exposure and correction.",
+      "kind": "book"
+    },
+    {
+      "id": "qp1",
+      "title": "9618/21 May/June 2025 Question 2(a),(c)",
+      "locator": "QP pp4–6; error and correction calibration.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t27",
+      "title": "AlgoCore teacher-created T27 worked examples, practice and marking guidance",
+      "locator": "T27-academic-r1, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

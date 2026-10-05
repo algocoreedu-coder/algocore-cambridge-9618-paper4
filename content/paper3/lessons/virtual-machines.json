@@ -1,0 +1,704 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.15.1",
+  "topicId": "P3-15.1-T04",
+  "slug": "virtual-machines",
+  "estimatedMinutes": 30,
+  "title": {
+    "en": "Virtual machines",
+    "vi": "Máy ảo"
+  },
+  "question": {
+    "en": "How can one physical computer provide several separate computing environments?",
+    "vi": "Một máy vật lý cung cấp nhiều môi trường máy tính riêng bằng cách nào?"
+  },
+  "opening": {
+    "en": "A virtual machine presents virtual hardware to a guest operating system. Follow the control boundary and the shared resources: isolation helps separate environments, but the underlying hardware is still finite.",
+    "vi": "Máy ảo cung cấp phần cứng ảo cho hệ điều hành khách. Hãy theo ranh giới điều khiển và tài nguyên chung: sự cô lập giúp tách môi trường, nhưng phần cứng bên dưới vẫn hữu hạn."
+  },
+  "objectives": [
+    {
+      "en": "Explain host OS, guest OS and hypervisor roles in a hosted model.",
+      "vi": "Giải thích host OS, guest OS và hypervisor trong mô hình hosted."
+    },
+    {
+      "en": "Trace a guest request and manage a bounded allocation example.",
+      "vi": "Theo một yêu cầu của guest và quản lý ví dụ phân bổ có giới hạn."
+    },
+    {
+      "en": "Evaluate compatibility, isolation, performance and maintenance trade-offs.",
+      "vi": "Đánh giá tương thích, cô lập, hiệu năng và chi phí bảo trì."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know the roles of an operating system, memory and physical devices.",
+      "vi": "Biết vai trò hệ điều hành, bộ nhớ và thiết bị vật lý."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Guest OS",
+      "meaning": {
+        "en": "The operating system inside the VM, managing the virtual hardware presented to it.",
+        "vi": "Hệ điều hành trong VM, quản lý phần cứng ảo được cung cấp."
+      }
+    },
+    {
+      "term": "Host OS",
+      "meaning": {
+        "en": "In this hosted model, the operating system managing physical resources and running the VM software.",
+        "vi": "Trong mô hình hosted này, hệ điều hành quản lý tài nguyên vật lý và chạy phần mềm VM."
+      }
+    },
+    {
+      "term": "Hypervisor",
+      "meaning": {
+        "en": "Software that creates/manages VMs and mediates access to the host’s resources.",
+        "vi": "Phần mềm tạo/quản lý VM và làm trung gian truy cập tài nguyên máy chủ."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "vm-not-memory",
+      "title": {
+        "en": "Separate a machine environment from memory management",
+        "vi": "Phân biệt môi trường máy với quản lý bộ nhớ"
+      },
+      "paragraphs": [
+        {
+          "en": "A VM is a software-provided computing environment with virtual processor, memory and devices on which a guest OS can run. It can support applications needing a different or older environment. Virtual memory is a different OS technique involving address spaces and memory management; it does not by itself create another guest OS.",
+          "vi": "VM là môi trường máy tính do phần mềm cung cấp, có bộ xử lý, bộ nhớ và thiết bị ảo để chạy guest OS. Nó có thể hỗ trợ ứng dụng cần môi trường khác hoặc cũ hơn. Virtual memory là kỹ thuật OS khác về không gian địa chỉ và quản lý bộ nhớ; bản thân nó không tạo guest OS khác."
+        },
+        {
+          "en": "A VM does not create unlimited physical capacity. Several guests still share the host’s CPU, RAM and storage. The word virtual describes the interface and abstraction, not free resources or guaranteed compatibility with every possible device.",
+          "vi": "VM không tạo tài nguyên vật lý vô hạn. Nhiều guest vẫn chia sẻ CPU, RAM và lưu trữ của host. Từ virtual nói về giao diện và sự trừu tượng, không phải tài nguyên miễn phí hay tương thích bảo đảm với mọi thiết bị."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "hosted-layers",
+      "title": {
+        "en": "Assign each layer its role",
+        "vi": "Gán đúng vai trò từng lớp"
+      },
+      "paragraphs": [
+        {
+          "en": "In the hosted model used here, the host OS controls the real machine and runs the hypervisor as software. Each guest OS controls the virtual hardware it sees. A guest application asks its guest OS for a service; the virtualisation layer mediates the request before physical resources are used.",
+          "vi": "Trong mô hình hosted ở đây, host OS điều khiển máy thật và chạy hypervisor dưới dạng phần mềm. Mỗi guest OS điều khiển phần cứng ảo nó thấy. Ứng dụng guest yêu cầu guest OS cung cấp dịch vụ; lớp ảo hóa làm trung gian trước khi dùng tài nguyên vật lý."
+        },
+        {
+          "en": "The layers explain responsibilities, not a measured instruction-by-instruction trace of an actual disk driver. Other hypervisor arrangements can run directly on hardware without a host OS. If a question gives the hosted model, label the host and guest roles precisely instead of claiming every VM must have the same stack.",
+          "vi": "Các lớp giải thích trách nhiệm, không phải trace từng lệnh đã đo của driver đĩa thực. Cách tổ chức hypervisor khác có thể chạy trực tiếp trên phần cứng mà không có host OS. Khi đề cho mô hình hosted, ghi chính xác vai trò host/guest thay vì nói mọi VM có cùng chồng lớp."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "allocation-and-lifecycle",
+      "title": {
+        "en": "Track reservations before starting a guest",
+        "vi": "Theo dõi tài nguyên cấp trước khi chạy guest"
+      },
+      "paragraphs": [
+        {
+          "en": "The interactive model has16GiB total RAM, reserves4GiB for the host, and initially assigns4GiB each to guests A and B. Used capacity is4+4+4=12GiB, leaving4GiB. An extra2GiB for A fits; an extra6GiB for B from that initial state would require18GiB and is refused.",
+          "vi": "Mô hình tương tác có16GiB RAM, dành4GiB cho host và ban đầu cấp4GiB cho mỗi guest A/B. Tổng đã dùng4+4+4=12GiB, còn4GiB. Cấp thêm2GiB cho A thì vừa; cấp thêm6GiB cho B từ trạng thái đầu cần18GiB nên bị từ chối."
+        },
+        {
+          "en": "Create adds a uniquely named stopped VM if its reservation fits. Start runs a created VM; Stop changes its running state but retains its RAM reservation in this teaching policy. Resize is allowed only while stopped, and every accepted change must still fit the capacity. These are declared model rules, not universal behaviour of all hypervisors.",
+          "vi": "Create thêm VM đã dừng với tên không trùng nếu phần cấp vừa giới hạn. Start chạy VM đã tạo; Stop đổi trạng thái chạy nhưng vẫn giữ RAM được cấp theo policy minh họa. Resize chỉ được phép khi dừng, và mọi thay đổi được chấp nhận phải vừa dung lượng. Đây là quy tắc mô hình, không phải hành vi mọi hypervisor."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "benefits-and-isolation",
+      "title": {
+        "en": "Explain a benefit through its mechanism",
+        "vi": "Giải thích lợi ích bằng cơ chế"
+      },
+      "paragraphs": [
+        {
+          "en": "A suitable guest environment can run legacy or otherwise incompatible software, and several OS environments can be tested on one physical computer. Keeping a test inside a VM helps contain a guest fault and can make recovery easier. Multiple VMs may also reduce the need for separate physical machines.",
+          "vi": "Guest phù hợp có thể chạy phần mềm cũ hoặc không tương thích với host; một máy vật lý có thể thử nhiều môi trường OS. Giữ thử nghiệm trong VM giúp cô lập sự cố guest và có thể dễ phục hồi hơn. Nhiều VM cũng có thể giảm nhu cầu mua các máy vật lý riêng."
+        },
+        {
+          "en": "Isolation is a managed boundary, not an absolute security guarantee. The fault preset assumes guest A stops while the hypervisor and host continue functioning, so guest B remains running. Shared resources, configuration errors or failures below that boundary can still affect more than one guest.",
+          "vi": "Cô lập là ranh giới được quản lý, không phải bảo đảm bảo mật tuyệt đối. Mẫu sự cố giả định guest A dừng trong khi hypervisor và host vẫn hoạt động, nên B tiếp tục chạy. Tài nguyên chung, cấu hình sai hoặc lỗi ở dưới ranh giới vẫn có thể ảnh hưởng nhiều guest."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "costs-and-answering",
+      "title": {
+        "en": "Evaluate the limitations in context",
+        "vi": "Đánh giá hạn chế theo tình huống"
+      },
+      "paragraphs": [
+        {
+          "en": "Virtualisation adds mediation and resource-management work; guests compete for finite physical resources. Performance depends on the workload, hardware and implementation. Setting up and maintaining guest images, compatible devices and VM software can also be complex or expensive.",
+          "vi": "Ảo hóa thêm công việc trung gian và quản lý tài nguyên; guest cạnh tranh tài nguyên vật lý hữu hạn. Hiệu năng phụ thuộc công việc, phần cứng và triển khai. Thiết lập và bảo trì ảnh guest, thiết bị tương thích và phần mềm VM cũng có thể phức tạp hoặc tốn chi phí."
+        },
+        {
+          "en": "For a benefits-and-limitations answer, connect each point to the user’s task: a legacy app gains a compatible guest environment, but the host must have adequate resources and suitable device support. May/June2024 Paper32 question9 directly asks for VM trade-offs and host/guest roles; it does not justify invented percentages or universal performance claims.",
+          "vi": "Khi nêu lợi ích/hạn chế, gắn từng ý với nhiệm vụ: ứng dụng cũ có môi trường guest tương thích nhưng host cần đủ tài nguyên và hỗ trợ thiết bị phù hợp. May/June2024 Paper32 câu9 hỏi trực tiếp các đánh đổi và vai trò host/guest; không có cơ sở tự đặt phần trăm hoặc kết luận hiệu năng phổ quát."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "past-qp",
+        "past-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "virtual-machines",
+    "title": {
+      "en": "Follow the guest request and manage resources",
+      "vi": "Theo yêu cầu guest và quản lý tài nguyên"
+    },
+    "introduction": {
+      "en": "Trace the hosted layers, then create, start, stop or resize guests within a fixed RAM budget.",
+      "vi": "Theo các lớp hosted, sau đó tạo, chạy, dừng hoặc đổi RAM guest trong giới hạn cố định."
+    },
+    "task": {
+      "en": "Predict whether a request fits and which layer handles the next part of a guest disk request.",
+      "vi": "Dự đoán yêu cầu có vừa tài nguyên và lớp nào xử lý tiếp yêu cầu đĩa của guest."
+    },
+    "conventions": [
+      {
+        "en": "Capacity16GiB, host reserve4GiB, initial A4/B4; no overcommit in this model.",
+        "vi": "Dung lượng16GiB, host dự phòng4GiB, ban đầu A4/B4; mô hình không overcommit."
+      },
+      {
+        "en": "Stopping retains the assigned RAM; resizing requires a stopped VM.",
+        "vi": "Dừng vẫn giữ RAM đã cấp; đổi RAM cần VM đang dừng."
+      },
+      {
+        "en": "Guest-failure isolation assumes the host and hypervisor remain functioning.",
+        "vi": "Cô lập lỗi guest giả định host và hypervisor vẫn hoạt động."
+      },
+      {
+        "en": "The layer journey is conceptual and has no assigned latency.",
+        "vi": "Hành trình các lớp là khái niệm và không gán độ trễ."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "syllabus-2026"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "A guest reads a virtual disk block",
+      "vi": "Guest đọc một khối đĩa ảo"
+    },
+    "prompt": {
+      "en": "Follow the request from a guest application to physical storage and back in the hosted model.",
+      "vi": "Theo yêu cầu từ ứng dụng guest đến lưu trữ vật lý rồi trả về trong mô hình hosted."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "ready",
+        "action": {
+          "en": "Identify application, guest OS, hypervisor, host OS and hardware.",
+          "vi": "Xác định ứng dụng, guest OS, hypervisor, host OS và phần cứng."
+        },
+        "why": {
+          "en": "Roles must be clear before following control.",
+          "vi": "Phải rõ vai trò trước khi theo điều khiển."
+        },
+        "result": {
+          "en": "The guest sees virtual devices; physical storage is shared host hardware.",
+          "vi": "Guest thấy thiết bị ảo; lưu trữ vật lý là phần cứng host dùng chung."
+        }
+      },
+      {
+        "id": "application-request",
+        "action": {
+          "en": "The application requests a disk read.",
+          "vi": "Ứng dụng yêu cầu đọc đĩa."
+        },
+        "why": {
+          "en": "Applications normally request OS services rather than directly controlling physical devices.",
+          "vi": "Ứng dụng thường yêu cầu dịch vụ OS thay vì trực tiếp điều khiển thiết bị vật lý."
+        },
+        "result": {
+          "en": "The request reaches the guest OS.",
+          "vi": "Yêu cầu tới guest OS."
+        }
+      },
+      {
+        "id": "guest-os",
+        "action": {
+          "en": "The guest OS addresses its virtual disk.",
+          "vi": "Guest OS truy cập đĩa ảo của nó."
+        },
+        "why": {
+          "en": "Its device view belongs to the virtual environment.",
+          "vi": "Góc nhìn thiết bị của nó thuộc môi trường ảo."
+        },
+        "result": {
+          "en": "A virtual-device request is ready for mediation.",
+          "vi": "Yêu cầu thiết bị ảo sẵn sàng được làm trung gian."
+        }
+      },
+      {
+        "id": "hypervisor",
+        "action": {
+          "en": "The hypervisor mediates the virtual resource request.",
+          "vi": "Hypervisor làm trung gian yêu cầu tài nguyên ảo."
+        },
+        "why": {
+          "en": "It connects the guest’s abstraction to managed host resources.",
+          "vi": "Nó nối sự trừu tượng của guest với tài nguyên host được quản lý."
+        },
+        "result": {
+          "en": "The appropriate host resource access is requested.",
+          "vi": "Truy cập tài nguyên host phù hợp được yêu cầu."
+        }
+      },
+      {
+        "id": "host-os",
+        "action": {
+          "en": "The host OS manages the physical resource access.",
+          "vi": "Host OS quản lý truy cập tài nguyên vật lý."
+        },
+        "why": {
+          "en": "In this hosted model it controls the real hardware.",
+          "vi": "Trong mô hình hosted này nó điều khiển phần cứng thật."
+        },
+        "result": {
+          "en": "Physical storage receives the managed read operation.",
+          "vi": "Lưu trữ vật lý nhận thao tác đọc được quản lý."
+        }
+      },
+      {
+        "id": "physical-resource",
+        "action": {
+          "en": "Read the required data using the physical device.",
+          "vi": "Đọc dữ liệu cần thiết bằng thiết bị vật lý."
+        },
+        "why": {
+          "en": "A virtual disk still needs underlying storage.",
+          "vi": "Đĩa ảo vẫn cần lưu trữ bên dưới."
+        },
+        "result": {
+          "en": "The data is available to return through the managed layers.",
+          "vi": "Dữ liệu sẵn sàng trả về qua các lớp quản lý."
+        }
+      },
+      {
+        "id": "return-result",
+        "action": {
+          "en": "Return the data to the guest application.",
+          "vi": "Trả dữ liệu cho ứng dụng guest."
+        },
+        "why": {
+          "en": "The guest uses the virtual interface without becoming the physical host.",
+          "vi": "Guest dùng giao diện ảo mà không trở thành host vật lý."
+        },
+        "result": {
+          "en": "The request is served; no response time has been inferred.",
+          "vi": "Yêu cầu được phục vụ; không suy ra thời gian đáp ứng."
+        }
+      }
+    ],
+    "result": {
+      "en": "A guest-controlled virtual device is backed by host-controlled physical resources.",
+      "vi": "Thiết bị ảo guest điều khiển được hỗ trợ bởi tài nguyên vật lý do host quản lý."
+    },
+    "selfCheck": {
+      "en": "Which role changes if a hypervisor runs directly on hardware instead of on a host OS?",
+      "vi": "Vai trò nào thay đổi khi hypervisor chạy trực tiếp trên phần cứng thay vì trên host OS?"
+    },
+    "sourceIds": [
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Host/guest, hypervisor, legacy OS or isolated testing cues point to virtual machines.",
+        "vi": "Host/guest, hypervisor, OS cũ hoặc thử nghiệm cô lập hướng tới máy ảo."
+      },
+      {
+        "en": "Paging, page faults and address translation point to virtual memory instead.",
+        "vi": "Paging, page fault và dịch địa chỉ hướng tới virtual memory."
+      }
+    ],
+    "distinguish": {
+      "en": "VM creates a computing environment; virtual memory manages a process’s memory view. A guest OS is not the hypervisor and does not become the host OS merely by requesting a device.",
+      "vi": "VM tạo môi trường máy tính; virtual memory quản lý góc nhìn bộ nhớ của tiến trình. Guest OS không phải hypervisor và không thành host OS chỉ vì yêu cầu thiết bị."
+    },
+    "method": [
+      {
+        "en": "State the virtualisation model and identify host/guest roles.",
+        "vi": "Nêu mô hình ảo hóa và vai trò host/guest."
+      },
+      {
+        "en": "Follow the request through the labelled boundary.",
+        "vi": "Theo yêu cầu qua ranh giới ghi nhãn."
+      },
+      {
+        "en": "For allocation, include the host reservation and every guest.",
+        "vi": "Khi phân bổ, tính dự phòng host và mọi guest."
+      },
+      {
+        "en": "Explain each benefit or cost using the scenario.",
+        "vi": "Giải thích từng lợi ích hoặc chi phí theo tình huống."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A VM is the same as virtual memory.",
+        "vi": "VM giống virtual memory."
+      },
+      "correction": {
+        "en": "A guest computing environment and memory-management abstraction solve different problems.",
+        "vi": "Môi trường máy tính guest và sự trừu tượng quản lý bộ nhớ giải quyết hai vấn đề khác."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Stopping a VM always frees its reservation.",
+        "vi": "Dừng VM luôn giải phóng phần tài nguyên được cấp."
+      },
+      "correction": {
+        "en": "Lifecycle and reservation policy are separate; this model retains assigned RAM while stopped.",
+        "vi": "Vòng đời và policy cấp tài nguyên khác nhau; mô hình này giữ RAM khi dừng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A guest can never affect anything outside it.",
+        "vi": "Guest không bao giờ ảnh hưởng bên ngoài."
+      },
+      "correction": {
+        "en": "Isolation depends on functioning boundaries and shared infrastructure; it is not an unconditional guarantee.",
+        "vi": "Cô lập phụ thuộc ranh giới hoạt động đúng và hạ tầng chung; không phải bảo đảm vô điều kiện."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "host-role",
+      "prompt": {
+        "en": "Which controls real hardware in the stated hosted model?",
+        "vi": "Thành phần nào điều khiển phần cứng thật trong mô hình hosted đã nêu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Host OS",
+            "vi": "Host OS"
+          },
+          "feedback": {
+            "en": "Correct: the guest manages a virtual hardware view.",
+            "vi": "Đúng: guest quản lý góc nhìn phần cứng ảo."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every guest independently owns all physical hardware",
+            "vi": "Mỗi guest độc lập sở hữu toàn bộ phần cứng vật lý"
+          },
+          "feedback": {
+            "en": "Physical resources remain shared and mediated.",
+            "vi": "Tài nguyên vật lý vẫn chung và được làm trung gian."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Virtual memory alone",
+            "vi": "Chỉ virtual memory"
+          },
+          "feedback": {
+            "en": "Virtual memory is not an operating system role.",
+            "vi": "Virtual memory không phải vai trò hệ điều hành."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Name the layer and the kind of hardware it manages.",
+        "vi": "Gọi tên lớp và loại phần cứng nó quản lý."
+      }
+    },
+    {
+      "id": "budget",
+      "prompt": {
+        "en": "From the initial state, can B receive6GiB more?",
+        "vi": "Từ trạng thái đầu, B có nhận thêm6GiB được không?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes: B alone would use10GiB",
+            "vi": "Có: riêng B chỉ dùng10GiB"
+          },
+          "feedback": {
+            "en": "This ignores A and the host reservation.",
+            "vi": "Cách tính bỏ A và dự phòng host."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No: total reservation would be18GiB",
+            "vi": "Không: tổng phần cấp sẽ là18GiB"
+          },
+          "feedback": {
+            "en": "Correct:4host+4A+10B exceeds16.",
+            "vi": "Đúng:4host+4A+10B vượt16."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes: virtual RAM has no physical limit",
+            "vi": "Có: RAM ảo không có giới hạn vật lý"
+          },
+          "feedback": {
+            "en": "The model explicitly forbids overcommit.",
+            "vi": "Mô hình nêu rõ không overcommit."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Count all reservations, not only the changed VM.",
+        "vi": "Tính mọi phần cấp, không chỉ VM đổi."
+      }
+    },
+    {
+      "id": "stop-policy",
+      "prompt": {
+        "en": "Create C2GiB, then stop A. What is used RAM under this model?",
+        "vi": "Tạo C2GiB rồi dừng A. RAM đã dùng theo mô hình là bao nhiêu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "10GiB",
+            "vi": "10GiB"
+          },
+          "feedback": {
+            "en": "Stopping does not release A’s4GiB reservation here.",
+            "vi": "Ở đây dừng không trả phần4GiB của A."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "14GiB",
+            "vi": "14GiB"
+          },
+          "feedback": {
+            "en": "Correct:4host+4A+4B+2C remains reserved.",
+            "vi": "Đúng:4host+4A+4B+2C vẫn được cấp."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "16GiB",
+            "vi": "16GiB"
+          },
+          "feedback": {
+            "en": "No resize has added the remaining2GiB.",
+            "vi": "Chưa có resize thêm2GiB còn lại."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Distinguish running state from reserved capacity.",
+        "vi": "Phân biệt trạng thái chạy với dung lượng được cấp."
+      }
+    },
+    {
+      "id": "legacy-transfer",
+      "prompt": {
+        "en": "An old app needs an OS different from the host. What is a reasoned VM proposal?",
+        "vi": "Ứng dụng cũ cần OS khác host. Đề xuất VM nào có cơ sở?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Use a compatible guest, then check resource and device support",
+            "vi": "Dùng guest tương thích rồi kiểm tài nguyên và hỗ trợ thiết bị"
+          },
+          "feedback": {
+            "en": "Correct: benefit and practical constraints are connected.",
+            "vi": "Đúng: liên hệ lợi ích với ràng buộc thực tế."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Any guest is guaranteed to run every app",
+            "vi": "Mọi guest bảo đảm chạy mọi ứng dụng"
+          },
+          "feedback": {
+            "en": "Compatibility still depends on the environment and supported hardware.",
+            "vi": "Tương thích vẫn phụ thuộc môi trường và phần cứng được hỗ trợ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Increase virtual memory instead of installing a guest",
+            "vi": "Tăng virtual memory thay vì cài guest"
+          },
+          "feedback": {
+            "en": "Memory management does not supply the required OS environment.",
+            "vi": "Quản lý bộ nhớ không cung cấp môi trường OS cần thiết."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Explain compatibility without assuming unlimited emulation.",
+        "vi": "Giải thích tương thích mà không giả định giả lập vô hạn."
+      }
+    },
+    {
+      "id": "fault-transfer",
+      "prompt": {
+        "en": "If the physical host fails, does the contained guest-fault preset prove B stays running?",
+        "vi": "Nếu host vật lý hỏng, mẫu lỗi guest được cô lập có chứng minh B vẫn chạy không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes: VMs never depend on the host",
+            "vi": "Có: VM không bao giờ phụ thuộc host"
+          },
+          "feedback": {
+            "en": "VMs still need the underlying host resources.",
+            "vi": "VM vẫn cần tài nguyên host bên dưới."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No: that changes the preset’s functioning-host assumption",
+            "vi": "Không: điều đó thay giả định host vẫn hoạt động của mẫu"
+          },
+          "feedback": {
+            "en": "Correct: a conclusion must stay within its stated assumptions.",
+            "vi": "Đúng: kết luận phải nằm trong giả định đã nêu."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes, because B has its own virtual disk",
+            "vi": "Có, vì B có đĩa ảo riêng"
+          },
+          "feedback": {
+            "en": "A virtual disk still relies on physical storage and host operation.",
+            "vi": "Đĩa ảo vẫn phụ thuộc lưu trữ vật lý và hoạt động host."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Identify which boundary the failure crosses.",
+        "vi": "Xác định sự cố vượt ranh giới nào."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain the hosted stack, one benefit and one limitation of a VM.",
+      "vi": "Giải thích chồng lớp hosted, một lợi ích và một hạn chế của VM."
+    },
+    "answerPoints": [
+      {
+        "en": "Guest OS controls virtual hardware; host OS controls real hardware in this model.",
+        "vi": "Guest OS điều khiển phần cứng ảo; host OS điều khiển phần cứng thật trong mô hình này."
+      },
+      {
+        "en": "The hypervisor creates/manages guests and mediates resources.",
+        "vi": "Hypervisor tạo/quản lý guest và làm trung gian tài nguyên."
+      },
+      {
+        "en": "Compatibility and isolation benefits still have capacity, performance and maintenance constraints.",
+        "vi": "Lợi ích tương thích/cô lập vẫn chịu ràng buộc dung lượng, hiệu năng và bảo trì."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Virtual machines and virtual memory are different concepts.",
+      "vi": "Máy ảo và virtual memory là hai khái niệm khác nhau."
+    },
+    {
+      "en": "A virtual resource has a real backing and a stated allocation policy.",
+      "vi": "Tài nguyên ảo có tài nguyên thật hỗ trợ và policy phân bổ cụ thể."
+    }
+  ],
+  "relatedSlugs": [
+    "flynn-architectures-and-massive-parallelism"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.1",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Section16.2, printed392–394 / PDF408–410; hosted diagram and benefits/limitations",
+      "kind": "book"
+    },
+    {
+      "id": "past-qp",
+      "title": "Cambridge9618/32 — May/June2024 question paper",
+      "locator": "Question9(a,b), page10",
+      "kind": "question-paper"
+    },
+    {
+      "id": "past-ms",
+      "title": "Cambridge9618/32 — May/June2024 mark scheme",
+      "locator": "Question9(a,b), page12",
+      "kind": "mark-scheme"
+    }
+  ]
+}

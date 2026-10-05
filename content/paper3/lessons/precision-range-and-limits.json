@@ -1,0 +1,615 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.3-T03",
+  "slug": "precision-range-and-limits",
+  "title": {
+    "en": "Precision, range and limits",
+    "vi": "Độ chính xác, phạm vi và giới hạn"
+  },
+  "question": {
+    "en": "With a fixed bit budget, can we make both nearby values and very large values easier to represent?",
+    "vi": "Với số bit cố định, có thể đồng thời biểu diễn sát nhau hơn và vươn tới số lớn hơn không?"
+  },
+  "opening": {
+    "en": "You have 12 bits to divide between mantissa and exponent. Giving more bits to M creates finer steps between nearby values. Giving more bits to E allows more scales. Compare the same exponent when studying spacing, and the full exponent range when studying limits; otherwise the two effects become confused.",
+    "vi": "Bạn có 12 bit chia cho định trị và số mũ. Thêm bit cho M tạo bước nhỏ hơn giữa giá trị lân cận. Thêm bit cho E cho nhiều thang độ lớn hơn. Hãy giữ cùng số mũ khi xét khoảng cách và dùng toàn miền số mũ khi xét giới hạn; nếu không sẽ lẫn hai tác động."
+  },
+  "objectives": [
+    {
+      "en": "Calculate spacing at a specified exponent.",
+      "vi": "Tính khoảng cách tại số mũ xác định."
+    },
+    {
+      "en": "Explain the mantissa/exponent trade-off under a fixed total width.",
+      "vi": "Giải thích đánh đổi giữa định trị và số mũ khi tổng bit cố định."
+    },
+    {
+      "en": "Derive positive and negative normalised limits without assuming symmetry.",
+      "vi": "Suy ra giới hạn chuẩn hóa dương và âm mà không giả định đối xứng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Two’s-complement signed integers and fractional mantissa weights.",
+      "vi": "Số nguyên có dấu bù hai và trọng số phân số định trị."
+    },
+    {
+      "en": "Nonzero normalised M starts 01 for positive values and 10 for negative values.",
+      "vi": "M khác không chuẩn hóa bắt đầu 01 khi dương và 10 khi âm."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Precision",
+      "meaning": {
+        "en": "The fineness of representable distinctions; here compared through spacing at a fixed exponent.",
+        "vi": "Mức độ phân biệt tinh giữa giá trị biểu diễn được; ở đây so qua khoảng cách tại số mũ cố định."
+      }
+    },
+    {
+      "term": "Range",
+      "meaning": {
+        "en": "The span of magnitudes and signs supported by the format.",
+        "vi": "Phạm vi độ lớn và dấu mà định dạng hỗ trợ."
+      }
+    },
+    {
+      "term": "Spacing",
+      "meaning": {
+        "en": "The difference between adjacent mantissa values at the same exponent.",
+        "vi": "Hiệu giữa hai giá trị định trị kế tiếp tại cùng số mũ."
+      }
+    },
+    {
+      "term": "Normalised limits",
+      "meaning": {
+        "en": "Extremes found under the explicit requirement that nonzero mantissas begin 01 or 10.",
+        "vi": "Các cực trị dưới yêu cầu rõ rằng định trị khác không bắt đầu 01 hoặc 10."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "spacing",
+      "title": {
+        "en": "One extra mantissa bit halves the step",
+        "vi": "Thêm một bit định trị làm bước giảm nửa"
+      },
+      "paragraphs": [
+        {
+          "en": "With m mantissa bits, including the sign bit, there are m−1 fractional positions. Adjacent M values differ by δ=2^(−(m−1)). At exponent E the represented-number spacing is Δ=δ×2^E. Therefore compare mantissas at the same E: changing the exponent also changes the spacing.",
+          "vi": "Với m bit định trị gồm bit dấu, có m−1 vị trí phân số. Hai M kế tiếp cách δ=2^(−(m−1)). Tại số mũ E, khoảng cách giữa các số biểu diễn là Δ=δ×2^E. Vì vậy phải so định trị tại cùng E: đổi số mũ cũng đổi khoảng cách."
+        },
+        {
+          "en": "At E0, M8 gives steps 1/128, M6 gives 1/32 and M10 gives 1/512. Around 0.5, the next positive values are respectively 0.5078125,0.53125 and 0.501953125. The M10 format distinguishes the closest neighbours among these three. This says nothing yet about which format reaches the largest magnitude.",
+          "vi": "Tại E0, M8 có bước 1/128, M6 có 1/32 và M10 có 1/512. Quanh 0.5, giá trị dương kế tiếp lần lượt là 0.5078125,0.53125 và 0.501953125. M10 phân biệt các hàng xóm sát nhất trong ba dạng. Điều đó chưa cho biết dạng nào vươn tới độ lớn lớn nhất."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "budget",
+      "title": {
+        "en": "Exponent bits provide more scales",
+        "vi": "Bit số mũ cung cấp thêm thang độ lớn"
+      },
+      "paragraphs": [
+        {
+          "en": "An e-bit two’s-complement exponent ranges from−2^(e−1) to 2^(e−1)−1. E4 therefore ranges−8..7; E6 ranges−32..31; E2 ranges−2..1. Increasing the exponent width permits both larger positive exponents and more negative exponents. It widens the accessible magnitudes, rather than adding more mantissa positions at one fixed scale.",
+          "vi": "Số mũ bù hai e bit có miền từ−2^(e−1) đến 2^(e−1)−1. E4 vì thế có miền−8..7; E6 là−32..31; E2 là−2..1. Tăng độ rộng số mũ cho số mũ dương lớn hơn và số mũ âm hơn. Nó mở độ lớn đạt được, không thêm vị trí định trị tại cùng thang."
+        },
+        {
+          "en": "With a fixed total of 12 bits, the compared allocations are M8/E4, M6/E6 and M10/E2. Moving two bits from M to E makes mantissa steps four times larger at E0, but substantially widens the exponent range. A suitable choice depends on whether the application needs close distinctions or extreme scales.",
+          "vi": "Với tổng cố định 12 bit, các cách chia được so là M8/E4, M6/E6 và M10/E2. Chuyển hai bit từ M sang E làm bước định trị lớn gấp bốn tại E0 nhưng mở đáng kể miền số mũ. Lựa chọn phù hợp phụ thuộc ứng dụng cần phân biệt sát hay các thang độ lớn cực trị."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Allocation",
+            "vi": "Cách chia"
+          },
+          {
+            "en": "Exponent range",
+            "vi": "Miền số mũ"
+          },
+          {
+            "en": "Spacing at E=0",
+            "vi": "Khoảng cách tại E=0"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "M8/E4:12 bits",
+              "vi": "M8/E4:12 bit"
+            },
+            {
+              "en": "−8..7",
+              "vi": "−8..7"
+            },
+            {
+              "en": "1/128",
+              "vi": "1/128"
+            }
+          ],
+          [
+            {
+              "en": "M6/E6:12 bits",
+              "vi": "M6/E6:12 bit"
+            },
+            {
+              "en": "−32..31",
+              "vi": "−32..31"
+            },
+            {
+              "en": "1/32",
+              "vi": "1/32"
+            }
+          ],
+          [
+            {
+              "en": "M10/E2:12 bits",
+              "vi": "M10/E2:12 bit"
+            },
+            {
+              "en": "−2..1",
+              "vi": "−2..1"
+            },
+            {
+              "en": "1/512",
+              "vi": "1/512"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "signed-limits",
+      "title": {
+        "en": "Derive four limits, not a symmetric picture",
+        "vi": "Suy ra bốn giới hạn, không vẽ đối xứng"
+      },
+      "paragraphs": [
+        {
+          "en": "Normalised positive M ranges from 1/2 to 1−δ. For maximum positive, use M=1−δ and the maximum E. For the smallest positive normalised value, use M=1/2 and the minimum E. Do not use all-zero M as the “smallest positive”: zero is not positive.",
+          "vi": "M dương chuẩn hóa nằm từ 1/2 đến 1−δ. Với số dương lớn nhất, dùng M=1−δ và E lớn nhất. Với số dương chuẩn hóa nhỏ nhất, dùng M=1/2 và E nhỏ nhất. Không dùng M toàn không làm “dương nhỏ nhất”: không không phải số dương."
+        },
+        {
+          "en": "Negative normalised M ranges from−1 to−1/2−δ. The most negative value uses M=−1 and maximum E. The negative value nearest zero uses M=−1/2−δ and minimum E. In eight mantissa bits, those endpoints are 10000000 and 10111111. The pattern 11000000 represents−1/2 but is not normalised, so it cannot define a limit that requires a 10 prefix.",
+          "vi": "M âm chuẩn hóa nằm từ−1 đến−1/2−δ. Số âm xa không nhất dùng M=−1 và E lớn nhất. Số âm gần không nhất dùng M=−1/2−δ và E nhỏ nhất. Với tám bit định trị, hai đầu là 10000000 và 10111111. Mẫu 11000000 biểu diễn−1/2 nhưng chưa chuẩn hóa nên không được dùng làm giới hạn yêu cầu đầu 10."
+        },
+        {
+          "en": "Two’s complement includes M=−1 but cannot include M=+1 in the same fractional field. Positive and negative extrema therefore need separate calculations. Always state the normalised-nonzero assumption; allowing unnormalised representations would change the near-zero limits.",
+          "vi": "Bù hai chứa M=−1 nhưng không chứa M=+1 trong cùng trường phân số. Vì vậy cực trị dương và âm phải tính riêng. Luôn nêu giả thiết chuẩn hóa số khác không; cho phép biểu diễn chưa chuẩn hóa sẽ làm đổi giới hạn gần không."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "compare-results",
+      "title": {
+        "en": "Read the scale of each comparison",
+        "vi": "Đọc thang của từng phép so"
+      },
+      "paragraphs": [
+        {
+          "en": "For M8/E4, the four limits are maximum positive 127, minimum positive 1/512, most negative−128 and negative nearest zero−65/32768. For M6/E6 they are(31/32)×2^31,2^(−33),−2^31 and(−17/32)×2^(−32). For M10/E2 they are 511/256,1/8,−2 and−257/2048. Exact fractions make the assumptions easier to check than a long rounded decimal.",
+          "vi": "Với M8/E4, bốn giới hạn là dương lớn nhất 127, dương nhỏ nhất 1/512, âm xa không nhất−128 và âm gần không nhất−65/32768. Với M6/E6, chúng là(31/32)×2^31,2^(−33),−2^31 và(−17/32)×2^(−32). Với M10/E2, chúng là 511/256,1/8,−2 và−257/2048. Phân số chính xác giúp kiểm giả thiết dễ hơn chuỗi thập phân dài đã làm tròn."
+        },
+        {
+          "en": "A local number line around 0.5 shows resolution. It is not the entire representable range. Conversely, a display spanning billions cannot show tiny local spacing faithfully at ordinary screen width. Use the spacing view for neighbouring values and the limits view for extremes.",
+          "vi": "Trục số cục bộ quanh 0.5 cho thấy độ phân giải, không phải toàn miền biểu diễn. Ngược lại, hình trải hàng tỷ đơn vị không thể hiện rõ khoảng cách cục bộ rất nhỏ ở độ rộng màn hình thường. Dùng chế độ khoảng cách cho hàng xóm và chế độ giới hạn cho cực trị."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "precision-range",
+    "title": {
+      "en": "Change the allocation, keep the comparison fair",
+      "vi": "Đổi cách chia nhưng giữ phép so công bằng"
+    },
+    "introduction": {
+      "en": "Choose a 12-bit allocation and view either local spacing at E0 or the four normalised limits.",
+      "vi": "Chọn cách chia 12 bit rồi xem khoảng cách cục bộ tại E0 hoặc bốn giới hạn chuẩn hóa."
+    },
+    "task": {
+      "en": "Compare M6/E6 with M10/E2 at E0. Predict which has finer spacing, then switch to limits and explain the opposite range trade-off.",
+      "vi": "So M6/E6 với M10/E2 tại E0. Dự đoán dạng nào sát hơn rồi chuyển sang giới hạn và giải thích đánh đổi ngược về phạm vi."
+    },
+    "conventions": [
+      {
+        "en": "All three allocations total 12 bits and use two’s complement for M and E.",
+        "vi": "Cả ba cách chia đều 12 bit và dùng bù hai cho M lẫn E."
+      },
+      {
+        "en": "Spacing is compared at E0; the local number line is a zoom, not the whole range.",
+        "vi": "Khoảng cách được so tại E0; trục cục bộ là vùng phóng, không phải toàn miền."
+      },
+      {
+        "en": "Limits require normalised nonzero M. Zero is represented separately.",
+        "vi": "Giới hạn yêu cầu M khác không chuẩn hóa. Số không biểu diễn riêng."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Derive all four M8/E4 limits",
+      "vi": "Suy ra cả bốn giới hạn M8/E4"
+    },
+    "prompt": {
+      "en": "Use eight mantissa bits and four exponent bits, both two’s complement. Find the four signed limits for normalised nonzero values.",
+      "vi": "Dùng tám bit định trị và bốn bit số mũ, đều bù hai. Tìm bốn giới hạn có dấu cho số khác không chuẩn hóa."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "fields",
+        "action": {
+          "en": "Identify the mantissa step and exponent limits.",
+          "vi": "Xác định bước định trị và giới hạn số mũ."
+        },
+        "why": {
+          "en": "The sign bit counts toward the width, leaving seven fractional positions.",
+          "vi": "Bit dấu tính trong độ rộng, còn bảy vị trí phân số."
+        },
+        "result": {
+          "en": "δ=1/128; E ranges−8..7.",
+          "vi": "δ=1/128; E có miền−8..7."
+        },
+        "check": {
+          "en": "Do not use eight fractional places or an unsigned exponent.",
+          "vi": "Không dùng tám vị trí phân số hay số mũ không dấu."
+        }
+      },
+      {
+        "id": "positive",
+        "action": {
+          "en": "Combine positive M endpoints with the appropriate E.",
+          "vi": "Kết hợp đầu M dương với E phù hợp."
+        },
+        "why": {
+          "en": "Larger E increases magnitude; smallest positive uses the lowest normalised M and E.",
+          "vi": "E lớn làm tăng độ lớn; dương nhỏ nhất dùng M chuẩn hóa thấp nhất và E thấp nhất."
+        },
+        "result": {
+          "en": "Max+=(127/128)×128=127. Min+=(1/2)×(1/256)=1/512.",
+          "vi": "Max+=(127/128)×128=127. Min+=(1/2)×(1/256)=1/512."
+        },
+        "check": {
+          "en": "Both selected M values begin 01.",
+          "vi": "Cả hai M chọn đều bắt đầu 01."
+        }
+      },
+      {
+        "id": "negative",
+        "action": {
+          "en": "Use the two negative normalised M endpoints.",
+          "vi": "Dùng hai đầu M âm chuẩn hóa."
+        },
+        "why": {
+          "en": "Two’s complement is asymmetric; the positive endpoints cannot simply be negated.",
+          "vi": "Bù hai không đối xứng; không thể chỉ đổi dấu các đầu dương."
+        },
+        "result": {
+          "en": "Most negative=−1×128=−128. Negative nearest zero=(−65/128)×(1/256)=−65/32768.",
+          "vi": "Âm xa không nhất=−1×128=−128. Âm gần không nhất=(−65/128)×(1/256)=−65/32768."
+        },
+        "check": {
+          "en": "M10111111 is−65/128; M11000000 is not normalised.",
+          "vi": "M10111111 là−65/128; M11000000 chưa chuẩn hóa."
+        }
+      },
+      {
+        "id": "interpret",
+        "action": {
+          "en": "Explain the asymmetry and the scope.",
+          "vi": "Giải thích tính không đối xứng và phạm vi áp dụng."
+        },
+        "why": {
+          "en": "The four values answer different signed-limit questions.",
+          "vi": "Bốn giá trị trả lời các câu hỏi giới hạn có dấu khác nhau."
+        },
+        "result": {
+          "en": "Magnitude 128 exists on the negative side; positive maximum is 127. Zero is outside the nonzero-limit calculation.",
+          "vi": "Độ lớn 128 tồn tại phía âm; dương lớn nhất là 127. Số không nằm ngoài phép tính giới hạn khác không."
+        },
+        "check": {
+          "en": "Every limit must satisfy the bit widths and 01/10 test.",
+          "vi": "Mọi giới hạn phải thỏa độ rộng bit và kiểm 01/10."
+        }
+      }
+    ],
+    "result": {
+      "en": "The limits are +127,+1/512,−128 and−65/32768, under the stated normalisation requirement.",
+      "vi": "Các giới hạn là +127,+1/512,−128 và−65/32768 theo yêu cầu chuẩn hóa đã nêu."
+    },
+    "selfCheck": {
+      "en": "Construct the endpoint bit patterns, decode them and check that no admissible endpoint is more extreme.",
+      "vi": "Dựng mẫu bit đầu mút, giải mã rồi kiểm không có đầu mút hợp lệ cực trị hơn."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A question reallocates a fixed total between M and E, or asks about precision versus range.",
+        "vi": "Đề chia lại tổng bit cố định giữa M và E hoặc hỏi precision với range."
+      },
+      {
+        "en": "Words such as largest positive, smallest positive or negative closest to zero ask different limits.",
+        "vi": "Các từ dương lớn nhất, dương nhỏ nhất hay âm gần không nhất hỏi các giới hạn khác nhau."
+      }
+    ],
+    "distinguish": {
+      "en": "Precision concerns distinguishable neighbours; range concerns reachable magnitudes. A change can improve one while worsening the other.",
+      "vi": "Precision nói về hàng xóm phân biệt được; range nói về độ lớn đạt tới. Thay đổi có thể cải thiện một mặt và giảm mặt kia."
+    },
+    "method": [
+      {
+        "en": "State total width, sign convention and whether nonzero values must be normalised.",
+        "vi": "Nêu tổng độ rộng, quy ước dấu và có yêu cầu chuẩn hóa số khác không hay không."
+      },
+      {
+        "en": "For spacing, fix E and use 2^(E−(m−1)).",
+        "vi": "Với khoảng cách, giữ E và dùng 2^(E−(m−1))."
+      },
+      {
+        "en": "For limits, select appropriate signed M and E endpoints, then multiply.",
+        "vi": "Với giới hạn, chọn đầu M có dấu và E phù hợp rồi nhân."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“More exponent bits mean finer precision at the same E.”",
+        "vi": "“Thêm bit số mũ làm precision tốt hơn tại cùng E.”"
+      },
+      "correction": {
+        "en": "Mantissa width determines local steps at fixed E; exponent width supplies more scales.",
+        "vi": "Độ rộng định trị quyết định bước cục bộ tại E cố định; độ rộng số mũ cho thêm thang."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“The positive and negative limits are symmetric.”",
+        "vi": "“Giới hạn dương và âm đối xứng.”"
+      },
+      "correction": {
+        "en": "M includes−1 but excludes+1; derive signed endpoints separately.",
+        "vi": "M chứa−1 nhưng không chứa+1; phải suy ra đầu có dấu riêng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Zero is the smallest positive value.”",
+        "vi": "“Không là số dương nhỏ nhất.”"
+      },
+      "correction": {
+        "en": "Zero is neither positive nor negative; use the least positive normalised M and E.",
+        "vi": "Không không dương cũng không âm; dùng M dương chuẩn hóa nhỏ nhất và E nhỏ nhất."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "spacing-transfer",
+      "prompt": {
+        "en": "At E=2, which spacing belongs to an eight-bit mantissa?",
+        "vi": "Tại E=2, khoảng cách nào thuộc định trị tám bit?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "1/32",
+            "vi": "1/32"
+          },
+          "feedback": {
+            "en": "Correct:(1/128)×4=1/32.",
+            "vi": "Đúng:(1/128)×4=1/32."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "1/128",
+            "vi": "1/128"
+          },
+          "feedback": {
+            "en": "That is the spacing at E0, not E2.",
+            "vi": "Đó là khoảng cách tại E0, không phải E2."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "1/512",
+            "vi": "1/512"
+          },
+          "feedback": {
+            "en": "That divides by 4 instead of applying 2^2.",
+            "vi": "Đáp án chia 4 thay vì nhân 2^2."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Include the exponent’s scale when converting mantissa spacing to value spacing.",
+        "vi": "Tính cả thang số mũ khi chuyển khoảng cách định trị sang khoảng cách giá trị."
+      }
+    },
+    {
+      "id": "allocation",
+      "prompt": {
+        "en": "At E0, which allocation gives the finest spacing among M8/E4, M6/E6 and M10/E2?",
+        "vi": "Tại E0, cách chia nào có khoảng cách nhỏ nhất trong M8/E4, M6/E6 và M10/E2?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "M6/E6",
+            "vi": "M6/E6"
+          },
+          "feedback": {
+            "en": "Its larger exponent field expands range, but its mantissa step is the coarsest here.",
+            "vi": "Trường số mũ lớn mở range nhưng bước định trị ở đây thô nhất."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "M10/E2",
+            "vi": "M10/E2"
+          },
+          "feedback": {
+            "en": "Correct. Nine fractional mantissa bits give step 1/512.",
+            "vi": "Đúng. Chín bit phân số định trị cho bước 1/512."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "All are equal because all have 12 bits.",
+            "vi": "Tất cả bằng nhau vì đều 12 bit."
+          },
+          "feedback": {
+            "en": "How the bits are allocated changes the representable values.",
+            "vi": "Cách phân chia bit làm đổi các giá trị biểu diễn được."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "A fixed total does not imply fixed precision or range.",
+        "vi": "Tổng cố định không có nghĩa precision hay range cố định."
+      }
+    },
+    {
+      "id": "negative-limit",
+      "prompt": {
+        "en": "Why is−1/2 not used as the negative M closest to zero in the normalised M8 range?",
+        "vi": "Vì sao không dùng−1/2 làm M âm gần không nhất trong miền M8 chuẩn hóa?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Negative mantissas cannot represent−1/2 at all.",
+            "vi": "Định trị âm hoàn toàn không biểu diễn được−1/2."
+          },
+          "feedback": {
+            "en": "11000000 does represent−1/2, but it is unnormalised.",
+            "vi": "11000000 biểu diễn−1/2 nhưng chưa chuẩn hóa."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Its pattern 11000000 begins 11, not 10.",
+            "vi": "Mẫu 11000000 bắt đầu 11, không phải 10."
+          },
+          "feedback": {
+            "en": "Correct. The nearest-zero allowed normalised M is 10111111=−65/128.",
+            "vi": "Đúng. M chuẩn hóa gần không nhất cho phép là 10111111=−65/128."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "The exponent must always be positive.",
+            "vi": "Số mũ luôn phải dương."
+          },
+          "feedback": {
+            "en": "Signed exponents may be negative; the issue is the mantissa prefix.",
+            "vi": "Số mũ có dấu có thể âm; vấn đề là mẫu đầu định trị."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Respect the declared normalisation requirement before choosing an endpoint.",
+        "vi": "Tuân yêu cầu chuẩn hóa trước khi chọn đầu mút."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain the fixed-width trade-off and derive one spacing and one signed limit from the field sizes.",
+      "vi": "Giải thích đánh đổi độ rộng cố định rồi suy ra một khoảng cách và một giới hạn có dấu từ kích thước trường."
+    },
+    "answerPoints": [
+      {
+        "en": "More M bits refine local steps; more E bits expand scales.",
+        "vi": "Thêm bit M làm mịn bước cục bộ; thêm bit E mở thang."
+      },
+      {
+        "en": "Δ=2^(E−(m−1)) at a fixed exponent.",
+        "vi": "Δ=2^(E−(m−1)) tại số mũ cố định."
+      },
+      {
+        "en": "Signed limits depend on normalisation and are not automatically symmetric.",
+        "vi": "Giới hạn có dấu phụ thuộc chuẩn hóa và không tự đối xứng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Compare spacing under the same E.",
+      "vi": "So khoảng cách dưới cùng E."
+    },
+    {
+      "en": "Derive each signed extreme rather than memorising a symmetric range.",
+      "vi": "Suy ra từng cực trị có dấu thay vì nhớ miền đối xứng."
+    }
+  ],
+  "relatedSlugs": [
+    "normalisation",
+    "approximation-rounding-and-range-errors",
+    "signed-floating-point-conversion"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.3, p.33",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=33"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.323–324; examples independently checked",
+      "kind": "book"
+    }
+  ]
+}

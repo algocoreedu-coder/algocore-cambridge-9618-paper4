@@ -1,0 +1,992 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.15.1",
+  "topicId": "P3-15.2-T02",
+  "slug": "half-full-adders",
+  "estimatedMinutes": 30,
+  "title": {
+    "en": "Half/full adders",
+    "vi": "Bộ cộng bán phần và toàn phần"
+  },
+  "question": {
+    "en": "How do one-bit sum and carry outputs represent a larger numerical result?",
+    "vi": "Hai đầu ra một bit sum và carry biểu diễn kết quả số lớn hơn bằng cách nào?"
+  },
+  "opening": {
+    "en": "An adder separates a column’s result into a sum bit and a carry for the next column. Follow the intermediate gates, then check their outputs against ordinary arithmetic.",
+    "vi": "Bộ cộng tách kết quả của một cột thành bit tổng và bit nhớ cho cột tiếp theo. Theo các cổng trung gian rồi kiểm đầu ra bằng số học thông thường."
+  },
+  "objectives": [
+    {
+      "en": "Derive all half-adder and full-adder truth-table rows.",
+      "vi": "Suy ra mọi hàng bảng chân trị half adder và full adder."
+    },
+    {
+      "en": "Construct a full adder from two half adders and an OR gate.",
+      "vi": "Dựng full adder từ hai half adder và cổng OR."
+    },
+    {
+      "en": "Explain carry-in/carry-out when adding multi-bit numbers.",
+      "vi": "Giải thích carry-in/carry-out khi cộng số nhiều bit."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know XOR, AND and OR truth rules and positional binary notation.",
+      "vi": "Biết quy tắc XOR, AND, OR và hệ nhị phân theo vị trí."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Sum bit",
+      "meaning": {
+        "en": "The bit for the current column after adding its inputs.",
+        "vi": "Bit của cột hiện tại sau khi cộng các đầu vào."
+      }
+    },
+    {
+      "term": "Carry-in",
+      "meaning": {
+        "en": "A bit arriving from the next less significant column.",
+        "vi": "Bit nhớ đến từ cột có trọng số thấp hơn liền trước."
+      }
+    },
+    {
+      "term": "Carry-out",
+      "meaning": {
+        "en": "A bit sent to the next more significant column.",
+        "vi": "Bit nhớ gửi tới cột có trọng số cao hơn liền sau."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "sum-carry-meaning",
+      "title": {
+        "en": "Read two outputs with different weights",
+        "vi": "Đọc hai đầu ra có trọng số khác nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "For two input bits A and B, the numerical total is0,1 or2. The half-adder outputs satisfy A+B=2C+S, where S has weight1 and carry C has weight2 relative to this column. Thus1+1 produces C=1,S=0: the two-bit result10, not a sum bit of10.",
+          "vi": "Với hai bit A/B, tổng số học là0,1 hoặc2. Đầu ra half adder thỏa A+B=2C+S, trong đó S có trọng số1 và carry C có trọng số2 so với cột này. Vì vậy1+1 cho C=1,S=0: kết quả hai bit10, không phải một bit tổng bằng10."
+        },
+        {
+          "en": "Read table headings carefully: a table may list S before C even though the binary number is written CS. These are separate output wires, each carrying a single bit. Ordinary arithmetic plus is used in the numeric check; OR in a logic expression follows a different rule.",
+          "vi": "Đọc kỹ tiêu đề cột: bảng có thể liệt kê S trước C dù số nhị phân viết CS. Đây là các dây đầu ra riêng, mỗi dây mang một bit. Dấu cộng số học dùng trong phép kiểm số; OR của biểu thức logic có quy tắc khác."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "half-adder",
+      "title": {
+        "en": "Derive the half adder",
+        "vi": "Suy ra half adder"
+      },
+      "paragraphs": [
+        {
+          "en": "The sum is1 exactly when one of A,B is1, so S=A XOR B. Carry is1 only when both are1, so C=A AND B. Fan out each input to the XOR and AND gates, label the two outputs, and check all four input combinations.",
+          "vi": "Sum bằng1 khi đúng một trong A/B bằng1, nên S=A XOR B. Carry bằng1 chỉ khi cả hai bằng1, nên C=A AND B. Tách mỗi đầu vào tới cổng XOR và AND, ghi tên hai đầu ra rồi kiểm đủ bốn tổ hợp."
+        },
+        {
+          "en": "A half adder has no input for a previous column’s carry. It can handle the least significant column when no carry-in is required, but using it alone in every column can lose an incoming carry. The name half does not mean it produces half a numerical answer.",
+          "vi": "Half adder không có đầu vào cho bit nhớ của cột trước. Nó xử lý được cột thấp nhất khi không có carry-in, nhưng dùng riêng nó ở mọi cột có thể làm mất nhớ vào. Tên half không có nghĩa cho một nửa đáp án số."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "A",
+            "vi": "A"
+          },
+          {
+            "en": "B",
+            "vi": "B"
+          },
+          {
+            "en": "S",
+            "vi": "S"
+          },
+          {
+            "en": "C",
+            "vi": "C"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            }
+          ],
+          [
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            }
+          ],
+          [
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            }
+          ],
+          [
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "full-adder-construction",
+      "title": {
+        "en": "Join two half adders",
+        "vi": "Ghép hai half adder"
+      },
+      "paragraphs": [
+        {
+          "en": "The first half adder combines A and B: P=A XOR B and C1=A AND B. The second combines P with Cin: S=P XOR Cin and C2=P AND Cin. Either half adder can generate a carry, so Cout=C1 OR C2. The intermediate P is not the final sum whenever Cin changes it.",
+          "vi": "Half adder thứ nhất kết hợp A/B: P=A XOR B và C1=A AND B. Half adder thứ hai kết hợp P với Cin: S=P XOR Cin và C2=P AND Cin. Một trong hai có thể tạo nhớ, nên Cout=C1 OR C2. P trung gian không phải sum cuối khi Cin làm nó thay đổi."
+        },
+        {
+          "en": "A full adder therefore has three input bits and two output bits. Its arithmetic invariant is A+B+Cin=2Cout+S. The maximum total is3, represented by Cout=1,S=1. Do not turn a carry output into an extra input bit in the same column; it belongs to the next column.",
+          "vi": "Full adder có ba bit đầu vào và hai bit đầu ra. Bất biến số học là A+B+Cin=2Cout+S. Tổng lớn nhất3 biểu diễn bằng Cout=1,S=1. Không đưa carry-out thành bit vào bổ sung của chính cột đó; nó thuộc cột tiếp theo."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "full-table",
+      "title": {
+        "en": "Verify all eight combinations",
+        "vi": "Kiểm đủ tám tổ hợp"
+      },
+      "paragraphs": [
+        {
+          "en": "Enumerate A,B,Cin in binary order000 through111. Compute P,C1,S,C2 and Cout for every row, then compare with the arithmetic invariant. This catches errors where a learner handles the carry from A+B but forgets the carry caused by P+Cin.",
+          "vi": "Liệt kê A,B,Cin theo thứ tự000 đến111. Tính P,C1,S,C2,Cout ở mọi hàng rồi so với bất biến số học. Cách này phát hiện lỗi chỉ xử lý nhớ từ A+B mà quên nhớ do P+Cin."
+        },
+        {
+          "en": "For input101, P=1,C1=0,S=0,C2=1,Cout=1. For111, P=0,C1=1,S=1,C2=0,Cout=1. Different internal routes can produce a carry; a single successful example does not verify the complete circuit.",
+          "vi": "Với101: P=1,C1=0,S=0,C2=1,Cout=1. Với111: P=0,C1=1,S=1,C2=0,Cout=1. Các đường nội bộ khác nhau có thể tạo nhớ; một ví dụ đúng chưa kiểm được toàn mạch."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "A",
+            "vi": "A"
+          },
+          {
+            "en": "B",
+            "vi": "B"
+          },
+          {
+            "en": "Cin",
+            "vi": "Cin"
+          },
+          {
+            "en": "S",
+            "vi": "S"
+          },
+          {
+            "en": "Cout",
+            "vi": "Cout"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            }
+          ],
+          [
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            }
+          ],
+          [
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            }
+          ],
+          [
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            }
+          ],
+          [
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            }
+          ],
+          [
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            }
+          ],
+          [
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "0",
+              "vi": "0"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            }
+          ],
+          [
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            },
+            {
+              "en": "1",
+              "vi": "1"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "multi-bit-columns",
+      "title": {
+        "en": "Link columns in the correct direction",
+        "vi": "Nối các cột đúng chiều"
+      },
+      "paragraphs": [
+        {
+          "en": "For multi-bit addition, connect each column’s Cout to Cin of the next more significant column. Begin at the least significant column with a declared initial carry, commonly0. Each full adder still implements the same one-column truth table.",
+          "vi": "Với phép cộng nhiều bit, nối Cout của mỗi cột vào Cin của cột cao hơn liền sau. Bắt đầu từ cột thấp nhất với carry ban đầu được nêu, thường là0. Mỗi full adder vẫn thực hiện cùng bảng một cột."
+        },
+        {
+          "en": "For01+01 with initial carry0, the low column gives S0=0,C1=1; the high column receives that1 and gives S1=1,C2=0, so the result is10. This explains why carry is necessary; no propagation delay is calculated in this lesson.",
+          "vi": "Với01+01 và carry đầu0, cột thấp cho S0=0,C1=1; cột cao nhận bit1 ấy rồi cho S1=1,C2=0, nên kết quả10. Điều này giải thích nhu cầu carry; bài không tính độ trễ truyền."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "adders",
+    "title": {
+      "en": "Follow sum and carry through the gates",
+      "vi": "Theo sum và carry qua các cổng"
+    },
+    "introduction": {
+      "en": "Choose half or full adder, set each input bit, and reveal intermediate outputs before checking the number.",
+      "vi": "Chọn half/full adder, đặt từng bit vào rồi mở đầu ra trung gian trước khi kiểm giá trị số."
+    },
+    "task": {
+      "en": "Predict which carry path becomes1, and test every truth-table row.",
+      "vi": "Dự đoán đường carry nào bằng1 và thử mọi hàng chân trị."
+    },
+    "conventions": [
+      {
+        "en": "Input order is A,B or A,B,Cin. Displayed S/Cout are separate single bits.",
+        "vi": "Thứ tự đầu vào là A,B hoặc A,B,Cin. S/Cout là các bit riêng."
+      },
+      {
+        "en": "The full-adder circuit is two half adders plus carry OR; step order is explanatory, not physical timing.",
+        "vi": "Mạch full adder gồm hai half adder và OR carry; thứ tự bước để giải thích, không phải thời gian vật lý."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "syllabus-2026"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Add1+0 with carry-in1",
+      "vi": "Cộng1+0 với nhớ vào1"
+    },
+    "prompt": {
+      "en": "Trace the full adder with A=1,B=0,Cin=1.",
+      "vi": "Theo full adder với A=1,B=0,Cin=1."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "inputs",
+        "action": {
+          "en": "Set A=1,B=0,Cin=1.",
+          "vi": "Đặt A=1,B=0,Cin=1."
+        },
+        "why": {
+          "en": "All three inputs contribute to the same column.",
+          "vi": "Cả ba đầu vào góp vào cùng một cột."
+        },
+        "result": {
+          "en": "The required numerical total is2.",
+          "vi": "Tổng số học cần đạt là2."
+        }
+      },
+      {
+        "id": "xor-ab",
+        "action": {
+          "en": "Compute P=A XOR B.",
+          "vi": "Tính P=A XOR B."
+        },
+        "why": {
+          "en": "The first half adder finds the parity of A and B.",
+          "vi": "Half adder đầu tìm parity của A/B."
+        },
+        "result": {
+          "en": "P=1.",
+          "vi": "P=1."
+        }
+      },
+      {
+        "id": "and-ab",
+        "action": {
+          "en": "Compute C1=A AND B.",
+          "vi": "Tính C1=A AND B."
+        },
+        "why": {
+          "en": "A carry here requires both A and B to be1.",
+          "vi": "Nhớ ở đây cần cả A/B bằng1."
+        },
+        "result": {
+          "en": "C1=0.",
+          "vi": "C1=0."
+        }
+      },
+      {
+        "id": "xor-cin",
+        "action": {
+          "en": "Compute S=P XOR Cin.",
+          "vi": "Tính S=P XOR Cin."
+        },
+        "why": {
+          "en": "The second half adder includes the incoming carry.",
+          "vi": "Half adder thứ hai tính thêm nhớ vào."
+        },
+        "result": {
+          "en": "S=0.",
+          "vi": "S=0."
+        }
+      },
+      {
+        "id": "and-cin",
+        "action": {
+          "en": "Compute C2=P AND Cin.",
+          "vi": "Tính C2=P AND Cin."
+        },
+        "why": {
+          "en": "Two1s in the second addition generate a carry.",
+          "vi": "Hai bit1 trong phép cộng thứ hai tạo nhớ."
+        },
+        "result": {
+          "en": "C2=1.",
+          "vi": "C2=1."
+        }
+      },
+      {
+        "id": "carry-or",
+        "action": {
+          "en": "Compute Cout=C1 OR C2.",
+          "vi": "Tính Cout=C1 OR C2."
+        },
+        "why": {
+          "en": "A carry from either stage must reach the next column.",
+          "vi": "Nhớ từ một trong hai giai đoạn phải tới cột sau."
+        },
+        "result": {
+          "en": "Cout=1.",
+          "vi": "Cout=1."
+        }
+      },
+      {
+        "id": "numeric-check",
+        "action": {
+          "en": "Check2Cout+S against A+B+Cin.",
+          "vi": "So2Cout+S với A+B+Cin."
+        },
+        "why": {
+          "en": "The circuit must preserve the numerical total.",
+          "vi": "Mạch phải giữ đúng tổng số học."
+        },
+        "result": {
+          "en": "2×1+0=1+0+1=2; output Cout,S is10.",
+          "vi": "2×1+0=1+0+1=2; đầu ra Cout,S là10."
+        }
+      }
+    ],
+    "result": {
+      "en": "The sum bit is0 and the carry-out is1.",
+      "vi": "Bit tổng bằng0, nhớ ra bằng1."
+    },
+    "selfCheck": {
+      "en": "If Cin changes to0, which intermediate value and output change?",
+      "vi": "Nếu Cin thành0, giá trị trung gian và đầu ra nào đổi?"
+    },
+    "sourceIds": [
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Two data inputs with sum/carry outputs suggest a half adder.",
+        "vi": "Hai đầu vào dữ liệu với đầu ra sum/carry gợi ý half adder."
+      },
+      {
+        "en": "An extra carry-in or linked binary columns requires full-adder reasoning.",
+        "vi": "Có thêm carry-in hoặc các cột nhị phân nối nhau cần tư duy full adder."
+      }
+    ],
+    "distinguish": {
+      "en": "An OR gate is not an adder:1 OR1=1, while1+1 needs sum0 and carry1. An adder is combinational; it does not store a previous Q.",
+      "vi": "Cổng OR không phải bộ cộng:1 OR1=1, còn1+1 cần sum0/carry1. Bộ cộng là mạch tổ hợp; không lưu Q trước đó."
+    },
+    "method": [
+      {
+        "en": "Identify whether Cin exists.",
+        "vi": "Xác định có Cin không."
+      },
+      {
+        "en": "Label P,C1,C2,S,Cout for a two-half-adder construction.",
+        "vi": "Ghi nhãn P,C1,C2,S,Cout trong cấu trúc hai half adder."
+      },
+      {
+        "en": "Evaluate every input combination through the gates.",
+        "vi": "Tính mọi tổ hợp đầu vào qua các cổng."
+      },
+      {
+        "en": "Check numerical weight and carry direction.",
+        "vi": "Kiểm trọng số số học và chiều carry."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "1+1 gives sum1 because OR gives1.",
+        "vi": "1+1 cho sum1 vì OR cho1."
+      },
+      "correction": {
+        "en": "Sum uses XOR; the extra value is carried separately.",
+        "vi": "Sum dùng XOR; phần giá trị thêm được nhớ riêng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "P is always the full-adder sum.",
+        "vi": "P luôn là sum của full adder."
+      },
+      "correction": {
+        "en": "Cin can change P through the second XOR.",
+        "vi": "Cin có thể đổi P qua XOR thứ hai."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Cout returns to the same column’s input.",
+        "vi": "Cout quay về đầu vào cùng cột."
+      },
+      "correction": {
+        "en": "Carry-out feeds the next more significant column.",
+        "vi": "Carry-out cấp cho cột cao hơn liền sau."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "half-eleven",
+      "prompt": {
+        "en": "For half-adder inputs11, what are S,C?",
+        "vi": "Với half adder đầu vào11, S,C là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "0,1",
+            "vi": "0,1"
+          },
+          "feedback": {
+            "en": "Correct:1+1=10 with carry1 and sum0.",
+            "vi": "Đúng:1+1=10 với carry1/sum0."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "1,0",
+            "vi": "1,0"
+          },
+          "feedback": {
+            "en": "That represents1, not2.",
+            "vi": "Đó biểu diễn1, không phải2."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "1,1",
+            "vi": "1,1"
+          },
+          "feedback": {
+            "en": "That represents3, exceeding1+1.",
+            "vi": "Đó biểu diễn3, lớn hơn1+1."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Check2C+S, not just one gate.",
+        "vi": "Kiểm2C+S, không chỉ một cổng."
+      }
+    },
+    {
+      "id": "full-111",
+      "prompt": {
+        "en": "For A=B=Cin=1, what are S,Cout?",
+        "vi": "Với A=B=Cin=1, S,Cout là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "0,1",
+            "vi": "0,1"
+          },
+          "feedback": {
+            "en": "That totals2, but three inputs sum to3.",
+            "vi": "Đó có tổng2, nhưng ba bit vào cộng được3."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "1,1",
+            "vi": "1,1"
+          },
+          "feedback": {
+            "en": "Correct:2×1+1=3.",
+            "vi": "Đúng:2×1+1=3."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "1,0",
+            "vi": "1,0"
+          },
+          "feedback": {
+            "en": "This loses the carry.",
+            "vi": "Cách này mất carry."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "A full adder accepts three one-bit contributions.",
+        "vi": "Full adder nhận ba thành phần mỗi thành phần một bit."
+      }
+    },
+    {
+      "id": "second-carry",
+      "prompt": {
+        "en": "In input101, where is the carry generated?",
+        "vi": "Với101, carry được tạo ở đâu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "C1=A AND B",
+            "vi": "C1=A AND B"
+          },
+          "feedback": {
+            "en": "B=0 makes C1=0.",
+            "vi": "B=0 làm C1=0."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "C2=P AND Cin",
+            "vi": "C2=P AND Cin"
+          },
+          "feedback": {
+            "en": "Correct: P=1 and Cin=1.",
+            "vi": "Đúng: P=1 và Cin=1."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No carry is produced",
+            "vi": "Không có carry"
+          },
+          "feedback": {
+            "en": "The total is2, so carry-out must be1.",
+            "vi": "Tổng bằng2 nên carry-out phải1."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Follow both carry paths before their OR.",
+        "vi": "Theo cả hai đường carry trước OR."
+      }
+    },
+    {
+      "id": "next-column",
+      "prompt": {
+        "en": "A lower column outputs Cout=1. Where does it go in a multi-bit addition?",
+        "vi": "Cột thấp xuất Cout=1. Nó đi đâu trong cộng nhiều bit?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Cin of the next more significant column",
+            "vi": "Cin của cột cao hơn liền sau"
+          },
+          "feedback": {
+            "en": "Correct: the carry has the next column’s weight.",
+            "vi": "Đúng: carry có trọng số cột sau."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Back to the same column’s Cin",
+            "vi": "Quay về Cin cùng cột"
+          },
+          "feedback": {
+            "en": "That would count the same contribution again.",
+            "vi": "Làm vậy tính lại cùng thành phần."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "It is discarded in every addition",
+            "vi": "Luôn bỏ nó trong mọi phép cộng"
+          },
+          "feedback": {
+            "en": "Discarding it loses numerical value.",
+            "vi": "Bỏ nó làm mất giá trị số."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use place value to explain the connection.",
+        "vi": "Dùng trọng số vị trí để giải thích kết nối."
+      }
+    },
+    {
+      "id": "new-total",
+      "prompt": {
+        "en": "A proposed full-adder row has input011 and S=1,Cout=1. How can you reject it?",
+        "vi": "Hàng full adder đề xuất có đầu vào011 và S=1,Cout=1. Bác bỏ bằng cách nào?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The input total is2 but the output represents3",
+            "vi": "Tổng đầu vào2 nhưng đầu ra biểu diễn3"
+          },
+          "feedback": {
+            "en": "Correct: the arithmetic invariant fails.",
+            "vi": "Đúng: bất biến số học không thỏa."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A full adder can never output11",
+            "vi": "Full adder không bao giờ xuất11"
+          },
+          "feedback": {
+            "en": "It can output11 for input111.",
+            "vi": "Nó xuất11 với đầu vào111."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The input must have only two bits",
+            "vi": "Đầu vào phải chỉ hai bit"
+          },
+          "feedback": {
+            "en": "A full adder has three input bits.",
+            "vi": "Full adder có ba bit đầu vào."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use a check that generalises to every row.",
+        "vi": "Dùng phép kiểm áp dụng được mọi hàng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Reconstruct a full adder from two half adders and explain its numerical check.",
+      "vi": "Dựng lại full adder từ hai half adder và giải thích phép kiểm số."
+    },
+    "answerPoints": [
+      {
+        "en": "P=A XOR B,C1=A AND B.",
+        "vi": "P=A XOR B,C1=A AND B."
+      },
+      {
+        "en": "S=P XOR Cin,C2=P AND Cin,Cout=C1 OR C2.",
+        "vi": "S=P XOR Cin,C2=P AND Cin,Cout=C1 OR C2."
+      },
+      {
+        "en": "A+B+Cin=2Cout+S for every row.",
+        "vi": "A+B+Cin=2Cout+S ở mọi hàng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Sum and carry are separate bits with different weights.",
+      "vi": "Sum và carry là bit riêng có trọng số khác."
+    },
+    {
+      "en": "A full adder includes incoming carry; a half adder does not.",
+      "vi": "Full adder tính nhớ vào; half adder không có nhớ vào."
+    }
+  ],
+  "relatedSlugs": [
+    "circuit-truth-table-and-expression",
+    "sr-and-jk-flip-flops"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.2",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter15.2.2, printed356–358 / PDF372–374",
+      "kind": "book"
+    },
+    {
+      "id": "past-qp",
+      "title": "Cambridge9618/32 — May/June2022 question paper",
+      "locator": "Question6(a,b), page9",
+      "kind": "question-paper"
+    },
+    {
+      "id": "past-ms",
+      "title": "Cambridge9618/32 — May/June2022 mark scheme",
+      "locator": "Question6(a,b), page7",
+      "kind": "mark-scheme"
+    }
+  ]
+}

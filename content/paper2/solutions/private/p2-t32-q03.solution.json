@@ -1,0 +1,121 @@
+{
+  "rubricId": "rubric-p2-t32-q03",
+  "rubricVersion": "1.0.0",
+  "questionId": "p2-t32-q03",
+  "questionVersion": "1.0.0",
+  "modelAnswer": {
+    "en": "IF ItemCount = 0 THEN\n   OUTPUT \"No scores\"\nELSE\n   Total ← 0\n   DistinctionCount ← 0\n   FOR Index ← 1 TO ItemCount\n      Total ← Total + Scores[Index]\n      IF Scores[Index] >= 70 THEN\n         DistinctionCount ← DistinctionCount + 1\n      ENDIF\n   NEXT Index\n   Average ← Total / ItemCount\n   OUTPUT Average, DistinctionCount\nENDIF\n\nFor ItemCount > 0, each used score contributes once to the same Total and exactly the same >= 70 test, so both results are preserved. Combining the passes reduces the traversal from 2 × ItemCount element visits to ItemCount. The guard prevents division by zero.\n\nRegression evidence: ItemCount 0 → \"No scores\"; [50] → 50.0, 0; [70] → 70.0, 1; [69, 70, 100] → 239/3, 2; [0, 100] → 50.0, 1. Include a case where array capacity exceeds ItemCount to prove unused cells are ignored.",
+    "vi": "IF ItemCount = 0 THEN\n   OUTPUT \"Không có điểm\"\nELSE\n   Total ← 0\n   DistinctionCount ← 0\n   FOR Index ← 1 TO ItemCount\n      Total ← Total + Scores[Index]\n      IF Scores[Index] >= 70 THEN\n         DistinctionCount ← DistinctionCount + 1\n      ENDIF\n   NEXT Index\n   Average ← Total / ItemCount\n   OUTPUT Average, DistinctionCount\nENDIF\n\nKhi ItemCount > 0, mỗi điểm đang dùng đóng góp đúng một lần vào cùng Total và được kiểm tra đúng cùng điều kiện >= 70, nên cả hai kết quả được giữ nguyên. Gộp hai lượt duyệt làm số lần thăm phần tử giảm từ 2 × ItemCount xuống ItemCount. Guard ngăn chia cho 0.\n\nBằng chứng regression: ItemCount 0 → \"Không có điểm\"; [50] → 50.0, 0; [70] → 70.0, 1; [69, 70, 100] → 239/3, 2; [0, 100] → 50.0, 1. Thêm ca sức chứa mảng lớn hơn ItemCount để chứng minh ô chưa dùng bị bỏ qua."
+  },
+  "markPoints": [
+    {
+      "markPointId": "p2-t32-q03-mp01",
+      "description": {
+        "en": "Guards ItemCount = 0 before division and outputs the required no-scores message.",
+        "vi": "Guard ItemCount = 0 trước phép chia và xuất thông báo không có điểm theo yêu cầu."
+      },
+      "marks": 1,
+      "sourceIds": [
+        "src-algocore-paper2-remediation-20261004"
+      ],
+      "authority": "teacher-created"
+    },
+    {
+      "markPointId": "p2-t32-q03-mp02",
+      "description": {
+        "en": "Initialises Total and DistinctionCount before traversal for the non-empty case.",
+        "vi": "Khởi tạo Total và DistinctionCount trước khi duyệt trong trường hợp không rỗng."
+      },
+      "marks": 1,
+      "sourceIds": [
+        "src-algocore-paper2-remediation-20261004"
+      ],
+      "authority": "teacher-created"
+    },
+    {
+      "markPointId": "p2-t32-q03-mp03",
+      "description": {
+        "en": "Uses one FOR loop over indices 1 to ItemCount and adds each used score once.",
+        "vi": "Dùng một vòng FOR qua chỉ số 1 đến ItemCount và cộng mỗi điểm đang dùng đúng một lần."
+      },
+      "marks": 1,
+      "sourceIds": [
+        "src-algocore-paper2-remediation-20261004"
+      ],
+      "authority": "teacher-created"
+    },
+    {
+      "markPointId": "p2-t32-q03-mp04",
+      "description": {
+        "en": "Counts a distinction in that same loop using the inclusive threshold Scores[Index] >= 70.",
+        "vi": "Đếm distinction trong cùng vòng lặp bằng ngưỡng gồm biên Scores[Index] >= 70."
+      },
+      "marks": 1,
+      "sourceIds": [
+        "src-algocore-paper2-remediation-20261004"
+      ],
+      "authority": "teacher-created"
+    },
+    {
+      "markPointId": "p2-t32-q03-mp05",
+      "description": {
+        "en": "Computes/outputs the average and count only after the traversal when ItemCount > 0.",
+        "vi": "Tính/xuất trung bình và số đếm sau khi duyệt khi ItemCount > 0."
+      },
+      "marks": 1,
+      "sourceIds": [
+        "src-algocore-paper2-remediation-20261004"
+      ],
+      "authority": "teacher-created"
+    },
+    {
+      "markPointId": "p2-t32-q03-mp06",
+      "description": {
+        "en": "Explains preservation of both results and the reduction from two traversals to one.",
+        "vi": "Giải thích việc giữ nguyên cả hai kết quả và giảm từ hai lượt duyệt xuống một."
+      },
+      "marks": 1,
+      "sourceIds": [
+        "src-algocore-paper2-remediation-20261004"
+      ],
+      "authority": "teacher-created"
+    },
+    {
+      "markPointId": "p2-t32-q03-mp07",
+      "description": {
+        "en": "Provides expected regression outcomes covering empty, one below threshold, threshold 70, mixed values/boundaries and unused capacity.",
+        "vi": "Nêu expected outcome regression bao phủ rỗng, một giá trị dưới ngưỡng, ngưỡng 70, giá trị hỗn hợp/biên và sức chứa chưa dùng."
+      },
+      "marks": 1,
+      "sourceIds": [
+        "src-algocore-paper2-remediation-20261004"
+      ],
+      "authority": "teacher-created"
+    }
+  ],
+  "acceptedAlternatives": [
+    {
+      "en": "Accept technically equivalent Cambridge-style pseudocode or reasoning that preserves every stated boundary, invariant and observable output.",
+      "vi": "Chấp nhận pseudocode theo chuẩn Cambridge hoặc lập luận tương đương về kỹ thuật nếu giữ mọi boundary, invariant và output quan sát được đã nêu."
+    }
+  ],
+  "dependencyCredit": {
+    "en": "Award each atomic point independently when it remains logically valid; do not award the same idea twice in different wording.",
+    "vi": "Chấm từng ý nguyên tử độc lập khi ý đó vẫn hợp lý; không chấm hai lần cùng một ý chỉ vì diễn đạt khác."
+  },
+  "commonErrors": [
+    {
+      "en": "Moving the division but still evaluating it when ItemCount is zero.",
+      "vi": "Di chuyển phép chia nhưng vẫn thực hiện khi ItemCount bằng 0."
+    },
+    {
+      "en": "Claiming improved efficiency without preserving the inclusive 70 threshold or giving observable regression evidence.",
+      "vi": "Khẳng định hiệu quả hơn nhưng không giữ ngưỡng gồm biên 70 hoặc không nêu bằng chứng regression quan sát được."
+    }
+  ],
+  "misconceptionIds": [
+    "misconception-t32-amendment-efficiency"
+  ],
+  "authority": "teacher-created",
+  "privateHash": "6e5355eb4509a4624158e280f11aecc0a5dd4d4e63d9ae0c6c5d2c13d1d919e8"
+}

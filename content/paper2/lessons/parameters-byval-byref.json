@@ -1,0 +1,600 @@
+{
+  "schemaVersion": 1,
+  "version": "T21-academic-r1",
+  "topicId": "T21",
+  "sectionId": "11.3",
+  "slug": "parameters-byval-byref",
+  "learningMode": "procedural",
+  "estimatedMinutes": 60,
+  "title": {
+    "en": "Parameters, BYVAL and BYREF",
+    "vi": "Tham số, BYVAL và BYREF"
+  },
+  "question": {
+    "en": "Which parameter changes remain visible in the caller, and how do order, type and passing mode determine the final state?",
+    "vi": "Thay đổi tham số nào còn thấy ở caller, và thứ tự, kiểu, chế độ truyền quyết định trạng thái cuối như thế nào?"
+  },
+  "opening": {
+    "en": "Draw caller and callee as two spaces. Match arguments to formal parameters in order. BYVAL starts with a copied value; BYREF denotes the caller variable, so a callee assignment remains visible after the procedure returns.",
+    "vi": "Vẽ caller và callee thành hai không gian. Khớp đối số với tham số hình thức theo thứ tự. BYVAL bắt đầu bằng bản sao giá trị; BYREF chỉ tới biến caller nên phép gán trong callee vẫn thấy sau khi procedure kết thúc."
+  },
+  "objectives": [
+    {
+      "en": "Match actual arguments to formal parameters by position and type.",
+      "vi": "Khớp đối số thực với tham số hình thức theo vị trí và kiểu."
+    },
+    {
+      "en": "Trace caller and callee values before, during and after BYVAL or BYREF calls.",
+      "vi": "Trace giá trị caller và callee trước, trong, sau lời gọi BYVAL hoặc BYREF."
+    },
+    {
+      "en": "Choose BYREF only when a procedure contract must update caller state.",
+      "vi": "Chỉ chọn BYREF khi hợp đồng procedure phải cập nhật trạng thái caller."
+    },
+    {
+      "en": "Explain why functions do not take BYREF parameters under the guide convention.",
+      "vi": "Giải thích vì sao function không nhận tham số BYREF theo quy ước guide."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Procedures and functions",
+        "vi": "Procedure và function"
+      },
+      "reason": {
+        "en": "Passing mode is part of a module interface and must agree with its caller.",
+        "vi": "Chế độ truyền là phần của interface module và phải khớp caller."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "formal parameter",
+      "meaning": {
+        "en": "The named typed variable in a module header.",
+        "vi": "Biến có tên và kiểu trong header module."
+      }
+    },
+    {
+      "term": "actual argument",
+      "meaning": {
+        "en": "The value or variable supplied at a call site.",
+        "vi": "Giá trị hoặc biến được cung cấp tại nơi gọi."
+      }
+    },
+    {
+      "term": "BYVAL",
+      "meaning": {
+        "en": "Pass a value copy; reassigning the parameter does not change the caller variable.",
+        "vi": "Truyền bản sao giá trị; gán lại tham số không đổi biến caller."
+      }
+    },
+    {
+      "term": "BYREF",
+      "meaning": {
+        "en": "Pass a reference to a caller variable; compatible assignments affect caller state.",
+        "vi": "Truyền tham chiếu tới biến caller; phép gán tương thích ảnh hưởng trạng thái caller."
+      }
+    },
+    {
+      "term": "caller/callee",
+      "meaning": {
+        "en": "The module making the call / the module being executed.",
+        "vi": "Module thực hiện lời gọi / module được chạy."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The question asks for final caller values or says a change must remain after a call.",
+        "vi": "Đề hỏi giá trị caller cuối hoặc nói thay đổi phải giữ sau lời gọi."
+      },
+      {
+        "en": "A procedure header or structure chart shows parameter direction.",
+        "vi": "Header procedure hoặc structure chart thể hiện hướng tham số."
+      },
+      {
+        "en": "The task asks to choose, compare or change BYVAL/BYREF.",
+        "vi": "Đề yêu cầu chọn, so sánh hoặc đổi BYVAL/BYREF."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "BYREF is chosen for required caller mutation, not merely because the item is large.",
+        "vi": "BYREF được chọn cho mutation caller cần thiết, không chỉ vì dữ liệu lớn."
+      },
+      {
+        "en": "Changing a BYVAL local copy can affect later callee statements but not the caller variable.",
+        "vi": "Đổi bản sao BYVAL có thể ảnh hưởng các câu lệnh callee sau nhưng không đổi biến caller."
+      },
+      {
+        "en": "Argument order and type still matter even when parameter names differ.",
+        "vi": "Thứ tự và kiểu đối số vẫn quan trọng ngay cả khi tên tham số khác."
+      },
+      {
+        "en": "The 2026 guide says parameters should not be passed by reference to a function.",
+        "vi": "Guide 2026 nói không nên truyền tham số BYREF cho function."
+      }
+    ],
+    "answerProduct": {
+      "en": "A two-space caller/callee trace showing binding, local writes, reference writes and final caller values.",
+      "vi": "Trace hai không gian caller/callee thể hiện binding, ghi local, ghi tham chiếu và giá trị caller cuối."
+    },
+    "method": [
+      {
+        "en": "Copy the header and number formal parameters.",
+        "vi": "Chép header và đánh số tham số hình thức."
+      },
+      {
+        "en": "Bind each actual argument by position and verify type.",
+        "vi": "Gắn từng đối số thực theo vị trí và kiểm kiểu."
+      },
+      {
+        "en": "Draw BYVAL copies and BYREF links.",
+        "vi": "Vẽ bản sao BYVAL và liên kết BYREF."
+      },
+      {
+        "en": "Execute assignments in the callee space.",
+        "vi": "Thực hiện phép gán trong không gian callee."
+      },
+      {
+        "en": "Project only reference changes back to the caller and state final values.",
+        "vi": "Chỉ phản chiếu thay đổi tham chiếu về caller và nêu giá trị cuối."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t21-binding",
+      "title": {
+        "en": "Bind arguments before executing the body",
+        "vi": "Gắn đối số trước khi chạy thân"
+      },
+      "paragraphs": [
+        {
+          "en": "Calls supply values in the same sequence and compatible types as the definition. Parameter names are local to the module; actual argument names may differ. If no passing mode is stated, the guide assumes pass by value.",
+          "vi": "Lời gọi cung cấp giá trị theo cùng thứ tự và kiểu tương thích với định nghĩa. Tên tham số là local của module; tên đối số thực có thể khác. Nếu không nêu chế độ truyền, guide giả định truyền giá trị."
+        },
+        {
+          "en": "Use BYREF only for procedure parameters whose updates belong to the caller contract. A literal or arbitrary expression cannot serve as a mutable caller variable for an output-style BYREF parameter.",
+          "vi": "Chỉ dùng BYREF cho tham số procedure mà cập nhật thuộc hợp đồng caller. Literal hoặc biểu thức tùy ý không thể làm biến caller có thể thay đổi cho tham số BYREF kiểu output."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "g26-core",
+        "book-t21",
+        "qp-s25-23-q7a",
+        "ms-s25-23-q7a"
+      ]
+    },
+    {
+      "id": "t21-spaces",
+      "title": {
+        "en": "Copy versus shared caller storage",
+        "vi": "Bản sao so với vùng nhớ caller dùng chung"
+      },
+      "paragraphs": [
+        {
+          "en": "A BYVAL parameter receives the argument's starting value in callee storage. Reassigning it changes that local parameter only. A BYREF parameter refers to the caller variable, so assignment through the parameter changes the caller-visible value.",
+          "vi": "Tham số BYVAL nhận giá trị đầu của đối số trong vùng nhớ callee. Gán lại chỉ đổi tham số local đó. Tham số BYREF tham chiếu biến caller nên gán qua tham số làm đổi giá trị caller thấy được."
+        },
+        {
+          "en": "Functions return their one result through RETURN and should not use BYREF parameters under the 2026 guide. Procedures may have multiple BYREF parameters when their explicit contract returns several caller updates, as in a date and points update.",
+          "vi": "Function trả một kết quả qua RETURN và không nên dùng tham số BYREF theo guide 2026. Procedure có thể có nhiều tham số BYREF khi hợp đồng rõ ràng trả nhiều cập nhật caller, như cập nhật ngày và điểm."
+        }
+      ],
+      "sourceIds": [
+        "g26-core",
+        "book-t21",
+        "teacher-t21"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T21"
+    ],
+    "title": {
+      "en": "Caller and callee: copy or reference",
+      "vi": "Caller và callee: bản sao hay tham chiếu"
+    },
+    "introduction": {
+      "en": "Two memory panels show the same call under BYVAL and BYREF, with bindings formed before body execution.",
+      "vi": "Hai panel bộ nhớ hiển thị cùng lời gọi dưới BYVAL và BYREF, với binding được tạo trước khi chạy thân."
+    },
+    "task": {
+      "en": "Predict callee values after each assignment, then say exactly which caller variables change after return.",
+      "vi": "Dự đoán giá trị callee sau mỗi phép gán rồi nêu chính xác biến caller nào đổi sau return."
+    },
+    "conventions": [
+      {
+        "en": "A dashed copy arrow creates separate callee storage.",
+        "vi": "Mũi tên bản sao nét đứt tạo vùng nhớ callee riêng."
+      },
+      {
+        "en": "A solid reference link points to caller storage.",
+        "vi": "Liên kết tham chiếu nét liền chỉ vào vùng nhớ caller."
+      },
+      {
+        "en": "The final panel reports both caller and callee names to avoid name-based guessing.",
+        "vi": "Panel cuối báo cả tên caller và callee để tránh đoán theo tên."
+      }
+    ],
+    "sourceIds": [
+      "g26-core",
+      "teacher-t21"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T21-W1",
+      "title": {
+        "en": "One copied input and one caller update",
+        "vi": "Một input được sao chép và một cập nhật caller"
+      },
+      "prompt": {
+        "en": "Trace PROCEDURE UpdateScore(BYVAL Increase:INTEGER, BYREF Score:INTEGER): Increase←Increase+1; Score←Score+Increase. Caller begins Bonus=2, CurrentScore=10 and calls UpdateScore(Bonus,CurrentScore).",
+        "vi": "Trace PROCEDURE UpdateScore(BYVAL Increase:INTEGER, BYREF Score:INTEGER): Increase←Increase+1; Score←Score+Increase. Caller bắt đầu Bonus=2, CurrentScore=10 và gọi UpdateScore(Bonus,CurrentScore)."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "bind",
+          "action": {
+            "en": "Bind in header order",
+            "vi": "Gắn theo thứ tự header"
+          },
+          "why": {
+            "en": "Position and type establish which argument supplies which parameter.",
+            "vi": "Vị trí và kiểu xác lập đối số nào cung cấp tham số nào."
+          },
+          "result": {
+            "en": "Increase gets a BYVAL copy 2; Score references CurrentScore=10.",
+            "vi": "Increase nhận bản sao BYVAL 2; Score tham chiếu CurrentScore=10."
+          }
+        },
+        {
+          "id": "local",
+          "action": {
+            "en": "Execute Increase←Increase+1",
+            "vi": "Chạy Increase←Increase+1"
+          },
+          "why": {
+            "en": "This changes only the callee copy.",
+            "vi": "Phép này chỉ đổi bản sao callee."
+          },
+          "result": {
+            "en": "Callee Increase=3; caller Bonus remains 2.",
+            "vi": "Callee Increase=3; caller Bonus vẫn 2."
+          }
+        },
+        {
+          "id": "reference",
+          "action": {
+            "en": "Execute Score←Score+Increase",
+            "vi": "Chạy Score←Score+Increase"
+          },
+          "why": {
+            "en": "Score is a reference and uses the current callee Increase.",
+            "vi": "Score là tham chiếu và dùng Increase hiện tại trong callee."
+          },
+          "result": {
+            "en": "Referenced CurrentScore becomes 10+3=13.",
+            "vi": "CurrentScore được tham chiếu thành 10+3=13."
+          }
+        },
+        {
+          "id": "return",
+          "action": {
+            "en": "End the procedure and compare spaces",
+            "vi": "Kết thúc procedure và so hai không gian"
+          },
+          "why": {
+            "en": "The local copy disappears; the reference write remains in caller storage.",
+            "vi": "Bản sao local biến mất; lần ghi tham chiếu còn trong vùng nhớ caller."
+          },
+          "result": {
+            "en": "Caller final Bonus=2, CurrentScore=13.",
+            "vi": "Caller cuối Bonus=2, CurrentScore=13."
+          },
+          "check": {
+            "en": "If Score were BYVAL too, caller CurrentScore would remain 10.",
+            "vi": "Nếu Score cũng là BYVAL, CurrentScore caller sẽ vẫn là 10."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Increase is copied, changes from 2 to 3 only inside the callee, and then contributes 3 to the referenced score. Caller finishes Bonus=2 and CurrentScore=13.",
+        "vi": "Increase được sao chép, đổi từ 2 thành 3 chỉ trong callee rồi góp 3 vào score được tham chiếu. Caller kết thúc Bonus=2 và CurrentScore=13."
+      },
+      "selfCheck": {
+        "en": "Can you label each write as local-copy or caller-storage before calculating it?",
+        "vi": "Bạn có thể gắn nhãn mỗi lần ghi là bản sao local hay vùng nhớ caller trước khi tính không?"
+      },
+      "sourceIds": [
+        "g26-core",
+        "teacher-t21"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T21-P1",
+      "title": {
+        "en": "Change the passing mode and retrace",
+        "vi": "Đổi chế độ truyền và trace lại"
+      },
+      "prompt": {
+        "en": "Using UpdateScore from the worked example, trace three variants: (a) both parameters BYVAL, (b) Increase BYVAL and Score BYREF, (c) both parameters BYREF. Caller starts Bonus=2, CurrentScore=10.",
+        "vi": "Dùng UpdateScore ở ví dụ giải, trace ba biến thể: (a) cả hai BYVAL, (b) Increase BYVAL và Score BYREF, (c) cả hai BYREF. Caller bắt đầu Bonus=2, CurrentScore=10."
+      },
+      "working": [
+        {
+          "en": "Draw the binding for each variant before the body.",
+          "vi": "Vẽ binding cho từng biến thể trước thân."
+        },
+        {
+          "en": "Execute Increase update before Score update.",
+          "vi": "Chạy cập nhật Increase trước Score."
+        },
+        {
+          "en": "Project only reference writes to caller.",
+          "vi": "Chỉ phản chiếu lần ghi tham chiếu về caller."
+        }
+      ],
+      "answer": {
+        "en": "(a) caller final (Bonus=2, CurrentScore=10); both changes are local. (b) final (2,13); only Score is shared. (c) final (3,13); Increase updates Bonus to 3, and Score uses 3 to update CurrentScore.",
+        "vi": "(a) caller cuối (Bonus=2, CurrentScore=10); cả hai thay đổi là local. (b) cuối (2,13); chỉ Score dùng chung. (c) cuối (3,13); Increase cập nhật Bonus thành 3 và Score dùng 3 để cập nhật CurrentScore."
+      },
+      "markGuidance": [
+        {
+          "en": "All three final pairs are correct.",
+          "vi": "Cả ba cặp cuối đúng."
+        },
+        {
+          "en": "The order Increase then Score is preserved.",
+          "vi": "Giữ đúng thứ tự Increase rồi Score."
+        },
+        {
+          "en": "The explanation names which storage each assignment changes.",
+          "vi": "Giải thích nêu vùng nhớ mà mỗi phép gán thay đổi."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Making CurrentScore 12 by using the old Increase after it has changed.",
+          "vi": "Làm CurrentScore thành 12 do dùng Increase cũ sau khi nó đã đổi."
+        },
+        {
+          "en": "Changing caller variables for BYVAL assignments.",
+          "vi": "Đổi biến caller cho phép gán BYVAL."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which value does the second assignment read at that exact time?",
+        "vi": "Phép gán thứ hai đọc giá trị nào tại đúng thời điểm đó?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "g26-core",
+        "teacher-t21"
+      ]
+    },
+    {
+      "id": "T21-P2",
+      "title": {
+        "en": "Update date and points through two references",
+        "vi": "Cập nhật ngày và điểm qua hai tham chiếu"
+      },
+      "prompt": {
+        "en": "A procedure has header UpdateVisit(BYREF LastVisit:DATE, LoyaltyPoints:INTEGER) where the BYREF keyword applies to both listed parameters in that group. Frozen TodayDate=15/10/2026; caller starts LastVisit=24/09/2026, LoyaltyPoints=10. Add 4 for equal month number else 1, add another 2 for equal DAYINDEX, then write LastVisit last. Trace caller state. Contrast with BYVAL.",
+        "vi": "Procedure có header UpdateVisit(BYREF LastVisit:DATE, LoyaltyPoints:INTEGER), trong đó BYREF áp dụng cho cả hai tham số trong nhóm đó. TodayDate cố định=15/10/2026; caller bắt đầu LastVisit=24/09/2026, LoyaltyPoints=10. Cộng 4 nếu cùng số tháng nếu không cộng 1, cộng thêm 2 nếu cùng DAYINDEX, rồi ghi LastVisit cuối. Trace trạng thái caller. So sánh với BYVAL."
+      },
+      "working": [
+        {
+          "en": "Use the old date for MONTH and DAYINDEX before overwriting.",
+          "vi": "Dùng ngày cũ cho MONTH và DAYINDEX trước khi ghi đè."
+        },
+        {
+          "en": "Apply both independent point rules and then update the date.",
+          "vi": "Áp dụng cả hai quy tắc điểm độc lập rồi cập nhật ngày."
+        },
+        {
+          "en": "Project both reference changes to caller and state the BYVAL contrast.",
+          "vi": "Phản chiếu cả hai thay đổi tham chiếu về caller và nêu đối chiếu BYVAL."
+        }
+      ],
+      "answer": {
+        "en": "MONTH differs, so Points 10→11. DAYINDEX is 5 for both dates, so 11→13. Then LastVisit becomes 15/10/2026. With BYREF, caller finishes Points=13 and the new date. With BYVAL, callee computes these values but caller remains Points=10 and LastVisit=24/09/2026.",
+        "vi": "MONTH khác nên Points 10→11. DAYINDEX bằng 5 cho cả hai ngày nên 11→13. Sau đó LastVisit thành 15/10/2026. Với BYREF, caller kết thúc Points=13 và ngày mới. Với BYVAL, callee tính các giá trị này nhưng caller vẫn Points=10 và LastVisit=24/09/2026."
+      },
+      "markGuidance": [
+        {
+          "en": "Both conditions use the old date.",
+          "vi": "Cả hai điều kiện dùng ngày cũ."
+        },
+        {
+          "en": "Point arithmetic and final date match the fixture.",
+          "vi": "Phép tính điểm và ngày cuối khớp fixture."
+        },
+        {
+          "en": "BYREF and BYVAL caller outcomes are distinguished.",
+          "vi": "Phân biệt outcome caller BYREF và BYVAL."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Writing LastVisit first and forcing all date comparisons to match TodayDate.",
+          "vi": "Ghi LastVisit trước và khiến mọi so sánh ngày khớp TodayDate."
+        },
+        {
+          "en": "Assuming only the first parameter is BYREF despite the grouped guide convention.",
+          "vi": "Giả sử chỉ tham số đầu là BYREF dù quy ước nhóm của guide."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which exact caller variables does the header permit the procedure to change?",
+        "vi": "Header cho phép procedure đổi chính xác những biến caller nào?"
+      },
+      "origin": "adapted-from-source",
+      "officialMarks": null,
+      "sourceIds": [
+        "insert-s25-23",
+        "qp-s25-23-q7a",
+        "ms-s25-23-q7a",
+        "teacher-t21"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "BYVAL means the parameter cannot change inside the module.",
+        "vi": "BYVAL nghĩa là tham số không thể đổi trong module."
+      },
+      "correction": {
+        "en": "The local copy may change; the caller variable does not.",
+        "vi": "Bản sao local có thể đổi; biến caller không đổi."
+      },
+      "selfCheck": {
+        "en": "Which storage contains the changed value?",
+        "vi": "Vùng nhớ nào chứa giá trị đã đổi?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Use BYREF whenever data is large.",
+        "vi": "Dùng BYREF bất cứ khi nào dữ liệu lớn."
+      },
+      "correction": {
+        "en": "Choose BYREF when the procedure contract requires caller mutation.",
+        "vi": "Chọn BYREF khi hợp đồng procedure yêu cầu mutation caller."
+      },
+      "selfCheck": {
+        "en": "Must the caller observe a new value after the call?",
+        "vi": "Caller có bắt buộc thấy giá trị mới sau lời gọi không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Parameter names determine binding.",
+        "vi": "Tên tham số quyết định binding."
+      },
+      "correction": {
+        "en": "Calls bind by the stated sequence and compatible type.",
+        "vi": "Lời gọi bind theo thứ tự đã nêu và kiểu tương thích."
+      },
+      "selfCheck": {
+        "en": "What is argument number two in the header?",
+        "vi": "Đối số số hai trong header là gì?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "How do you calculate final caller values after a call?",
+      "vi": "Làm sao tính giá trị caller cuối sau lời gọi?"
+    },
+    "answerPoints": [
+      {
+        "en": "Match arguments to formal parameters by order and type.",
+        "vi": "Khớp đối số với tham số hình thức theo thứ tự và kiểu."
+      },
+      {
+        "en": "Draw a copy for BYVAL and a link for BYREF.",
+        "vi": "Vẽ bản sao cho BYVAL và liên kết cho BYREF."
+      },
+      {
+        "en": "Execute assignments in order inside the callee.",
+        "vi": "Chạy phép gán theo thứ tự trong callee."
+      },
+      {
+        "en": "Project only reference writes to caller storage.",
+        "vi": "Chỉ phản chiếu lần ghi tham chiếu về vùng nhớ caller."
+      },
+      {
+        "en": "State every caller variable after return.",
+        "vi": "Nêu mọi biến caller sau return."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Order and type bind actual arguments to formal parameters.",
+      "vi": "Thứ tự và kiểu gắn đối số thực với tham số hình thức."
+    },
+    {
+      "en": "BYVAL isolates caller storage; BYREF permits explicit procedure updates.",
+      "vi": "BYVAL tách vùng nhớ caller; BYREF cho phép procedure cập nhật rõ ràng."
+    },
+    {
+      "en": "Trace both caller and callee, and perform old-state checks before reference writes.",
+      "vi": "Trace cả caller và callee, đồng thời kiểm trạng thái cũ trước lần ghi tham chiếu."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F11",
+      "role": "related",
+      "title": {
+        "en": "Module interfaces and parameter directions",
+        "vi": "Interface module và hướng tham số"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "procedures-functions",
+    "scope-reuse",
+    "built-in-functions-insert",
+    "structure-charts"
+  ],
+  "sources": [
+    {
+      "id": "s26-11",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§11.1–11.3, printed/PDF pp29–30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "g26-core",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for 2026",
+      "locator": "§2 pp7–9; §5 pp15–18; §6–8 pp18–24, as cited by each lesson.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t21",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp275–280; PDF pp291–296. Guide 2026 takes priority for current BYVAL/BYREF notation.",
+      "kind": "book"
+    },
+    {
+      "id": "insert-s25-23",
+      "title": "9618/23 May/June 2025 Insert",
+      "locator": "Insert p3; MONTH, DAYINDEX and TODAY signatures used by the DATE practice.",
+      "kind": "guide"
+    },
+    {
+      "id": "qp-s25-23-q7a",
+      "title": "9618/23 May/June 2025 Question 7(a)",
+      "locator": "QP pp14–15; two caller updates in UpdateVisit.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-s25-23-q7a",
+      "title": "9618/23 May/June 2025 published mark scheme, Question 7(a)",
+      "locator": "MS p12; both parameters BYREF, old-date comparison and final date update. Lesson allocation remains teacher-authored.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "teacher-t21",
+      "title": "AlgoCore teacher-authored T21 caller/callee fixtures",
+      "locator": "T21-academic-r1, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

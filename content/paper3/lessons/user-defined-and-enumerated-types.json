@@ -1,0 +1,666 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.1-T01",
+  "slug": "user-defined-and-enumerated-types",
+  "title": {
+    "en": "User-defined and enumerated types",
+    "vi": "Kiểu tự định nghĩa và kiểu liệt kê"
+  },
+  "question": {
+    "en": "How can a type prevent values that make no sense for a variable?",
+    "vi": "Kiểu dữ liệu ngăn những giá trị không có nghĩa đối với một biến như thế nào?"
+  },
+  "opening": {
+    "en": "A learning app records whether a course is Active, Paused or Completed. A STRING could also contain \"Actve\" or \"Maybe\". An enumerated type makes the intended choices explicit. The type defines the available choices; a variable stores one choice at a time.",
+    "vi": "Ứng dụng học tập lưu trạng thái khóa học là Active, Paused hoặc Completed. STRING cũng có thể chứa \"Actve\" hay \"Maybe\". Kiểu liệt kê làm rõ những lựa chọn được phép. Kiểu định nghĩa các lựa chọn; một biến lưu một lựa chọn tại mỗi thời điểm."
+  },
+  "objectives": [
+    {
+      "en": "Explain why a built-in type may be too general for a problem.",
+      "vi": "Giải thích vì sao kiểu có sẵn có thể quá tổng quát cho bài toán."
+    },
+    {
+      "en": "Define an enumerated type, declare a variable and assign a valid member.",
+      "vi": "Định nghĩa kiểu liệt kê, khai báo biến và gán phần tử hợp lệ."
+    },
+    {
+      "en": "Distinguish an enum value, a string and the whole type.",
+      "vi": "Phân biệt giá trị enum, chuỗi và toàn bộ kiểu."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Built-in types such as INTEGER, STRING and BOOLEAN.",
+      "vi": "Các kiểu có sẵn như INTEGER, STRING và BOOLEAN."
+    },
+    {
+      "en": "The difference between a declaration and an assignment.",
+      "vi": "Sự khác nhau giữa khai báo và gán."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "User-defined type",
+      "meaning": {
+        "en": "A type designed by the programmer to model the permitted data of a problem.",
+        "vi": "Kiểu do lập trình viên thiết kế để mô hình hóa dữ liệu được phép của bài toán."
+      }
+    },
+    {
+      "term": "Enumerated type",
+      "meaning": {
+        "en": "A non-composite type whose possible values are explicitly listed as named constants.",
+        "vi": "Kiểu không phức hợp có các giá trị được liệt kê rõ bằng hằng có tên."
+      }
+    },
+    {
+      "term": "Domain",
+      "meaning": {
+        "en": "The set of values a type permits.",
+        "vi": "Tập giá trị mà kiểu cho phép."
+      }
+    },
+    {
+      "term": "Variable",
+      "meaning": {
+        "en": "A named storage location declared to hold a value of a particular type.",
+        "vi": "Vùng lưu trữ có tên được khai báo để giữ giá trị thuộc kiểu cụ thể."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "model-the-domain",
+      "title": {
+        "en": "Choose meaning before syntax",
+        "vi": "Chọn ý nghĩa trước cú pháp"
+      },
+      "paragraphs": [
+        {
+          "en": "Built-in types describe broad kinds of values. They do not always express the exact meaning needed by an application. An INTEGER for a month would permit values beyond the intended twelve unless other checks were added. A named user-defined type makes that intended domain visible wherever it is used.",
+          "vi": "Kiểu có sẵn mô tả nhóm giá trị rộng, không phải lúc nào cũng thể hiện đúng ý nghĩa ứng dụng cần. INTEGER dùng cho tháng cho phép giá trị ngoài mười hai tháng nếu không thêm kiểm tra. Kiểu tự định nghĩa có tên làm miền giá trị dự định trở nên rõ ở mọi nơi sử dụng."
+        },
+        {
+          "en": "An enum lists alternatives, but an enum variable holds one selected value, not the entire list. It is classified as non-composite in this syllabus. A record, by contrast, groups several fields into one value and is composite. Do not classify an enum as composite merely because its definition shows several alternatives.",
+          "vi": "Enum liệt kê các phương án nhưng biến enum giữ một giá trị được chọn, không giữ toàn bộ danh sách. Syllabus xếp enum vào kiểu không phức hợp. Ngược lại, record gom nhiều trường trong một giá trị nên là phức hợp. Không gọi enum là phức hợp chỉ vì định nghĩa có nhiều phương án."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "three-different-actions",
+      "title": {
+        "en": "Define, declare, assign",
+        "vi": "Định nghĩa, khai báo, gán"
+      },
+      "paragraphs": [
+        {
+          "en": "TYPE creates the type name and permitted constants. DECLARE creates a variable of that type. Assignment then gives the variable a current value. These are three different acts: defining TStudyStatus does not create a variable called Status, and declaring Status does not choose Active as its value.",
+          "vi": "TYPE tạo tên kiểu và các hằng được phép. DECLARE tạo biến thuộc kiểu đó. Phép gán sau đó cho biến một giá trị hiện tại. Đây là ba việc khác nhau: định nghĩa TStudyStatus không tự tạo biến Status; khai báo Status không tự chọn giá trị Active."
+        },
+        {
+          "en": "The constants are identifiers, not quoted strings. Active is a value of TStudyStatus; \"Active\" is a string literal. They look similar when printed, but their types are different. Follow the spelling and declaration supplied by the problem.",
+          "vi": "Các hằng là định danh, không phải chuỗi đặt trong dấu nháy. Active là giá trị thuộc TStudyStatus; \"Active\" là chuỗi literal. Khi in ra chúng có thể giống nhau nhưng kiểu khác nhau. Cần giữ tên và khai báo mà đề cho."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book",
+        "guide"
+      ],
+      "code": "TYPE TStudyStatus = (Active, Paused, Completed)\nDECLARE Status : TStudyStatus\nStatus ← Active"
+    },
+    {
+      "id": "check-before-changing",
+      "title": {
+        "en": "Validate against the declared domain",
+        "vi": "Kiểm theo miền đã khai báo"
+      },
+      "paragraphs": [
+        {
+          "en": "To decide whether an assignment is valid, identify the variable’s type and compare the candidate with its permitted members. If Archived was not declared, Status ← Archived is not a valid assignment to this type. A teaching interface should reject it without replacing the previous valid value.",
+          "vi": "Muốn biết phép gán hợp lệ hay không, xác định kiểu của biến rồi đối chiếu giá trị thử với các phần tử được phép. Nếu chưa khai báo Archived thì Status ← Archived không hợp lệ với kiểu này. Giao diện minh họa cần từ chối và giữ giá trị hợp lệ trước đó."
+        },
+        {
+          "en": "A type is not a runtime list that gains members whenever a user enters new text. Changing the type definition changes the model. This visual allows you to rebuild a small domain, then resets the demonstration variable to unassigned so it never pretends an obsolete value still belongs to the new type.",
+          "vi": "Kiểu không phải danh sách tự thêm phần tử mỗi khi người dùng nhập chữ mới. Đổi định nghĩa kiểu là đổi mô hình. Minh họa cho phép tạo lại miền nhỏ rồi đưa biến về chưa gán, tránh giả vờ giá trị cũ vẫn thuộc kiểu mới."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "enum-record-field",
+      "title": {
+        "en": "Reuse an enum as a record field type",
+        "vi": "Dùng lại enum làm kiểu trường record"
+      },
+      "paragraphs": [
+        {
+          "en": "A record field can use a user-defined type just as a standalone variable can. First define TStudyStatus, then use it for the Status field inside TCourse. One course record now combines a STRING title with one constrained status value. The record is composite even though its enum field is non-composite.",
+          "vi": "Trường record có thể dùng kiểu tự định nghĩa như biến độc lập. Trước hết định nghĩa TStudyStatus rồi dùng cho trường Status trong TCourse. Một bản ghi khóa học kết hợp tiêu đề STRING với một giá trị trạng thái được giới hạn. Record là phức hợp dù trường enum của nó không phức hợp."
+        },
+        {
+          "en": "Course.Status ← Paused assigns to one field in one record. It neither adds Paused to the enum nor changes every course. The dot selects a named field; the declared field type determines which values are valid. The records lesson extends this idea to arrays of records.",
+          "vi": "Course.Status ← Paused gán cho một trường của một bản ghi. Nó không thêm Paused vào enum hay đổi mọi khóa học. Dấu chấm chọn trường có tên; kiểu đã khai báo của trường quyết định giá trị hợp lệ. Bài record mở rộng ý này sang mảng bản ghi."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book",
+        "guide"
+      ],
+      "code": "TYPE TStudyStatus = (Active, Paused, Completed)\nTYPE TCourse\n   DECLARE Title : STRING\n   DECLARE Status : TStudyStatus\nENDTYPE\nDECLARE Course : TCourse\nCourse.Title ← \"Computer Science\"\nCourse.Status ← Paused"
+    }
+  ],
+  "visual": {
+    "kind": "enumeration",
+    "title": {
+      "en": "Build a domain and test an assignment",
+      "vi": "Tạo miền và thử phép gán"
+    },
+    "introduction": {
+      "en": "Watch the type definition and the variable separately: the available members are not the current stored value.",
+      "vi": "Quan sát riêng định nghĩa kiểu và biến: các phần tử được phép không phải giá trị hiện đang lưu."
+    },
+    "task": {
+      "en": "Remove a permitted member, rebuild the type, then test an allowed value, an absent value and a quoted string.",
+      "vi": "Bỏ một phần tử được phép, tạo lại kiểu rồi thử giá trị hợp lệ, giá trị vắng mặt và chuỗi có dấu nháy."
+    },
+    "conventions": [
+      {
+        "en": "The demonstration uses a finite domain of named status constants.",
+        "vi": "Minh họa dùng miền hữu hạn gồm các hằng trạng thái có tên."
+      },
+      {
+        "en": "An invalid assignment preserves the previous valid value; rebuilding the type resets the example variable.",
+        "vi": "Phép gán sai giữ giá trị hợp lệ trước; tạo lại kiểu đặt biến ví dụ về chưa gán."
+      },
+      {
+        "en": "Displayed pseudocode follows Cambridge 9618 conventions; it is not a Python interpreter.",
+        "vi": "Pseudocode theo quy ước Cambridge 9618; đây không phải trình thông dịch Python."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "A course changes from Active to Paused",
+      "vi": "Khóa học chuyển từ Active sang Paused"
+    },
+    "prompt": {
+      "en": "Define TStudyStatus with Active, Paused and Completed. Declare Status, set it to Active, then pause the course. Explain why Archived cannot be assigned.",
+      "vi": "Định nghĩa TStudyStatus gồm Active, Paused, Completed. Khai báo Status, gán Active rồi tạm dừng khóa học. Giải thích vì sao không thể gán Archived."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "define",
+        "action": {
+          "en": "Define the finite domain.",
+          "vi": "Định nghĩa miền hữu hạn."
+        },
+        "why": {
+          "en": "The problem provides exactly three valid states.",
+          "vi": "Bài toán có đúng ba trạng thái hợp lệ."
+        },
+        "result": {
+          "en": "TStudyStatus permits Active, Paused and Completed.",
+          "vi": "TStudyStatus cho phép Active, Paused và Completed."
+        },
+        "check": {
+          "en": "Every listed constant corresponds to a required state.",
+          "vi": "Mỗi hằng được liệt kê tương ứng trạng thái được yêu cầu."
+        },
+        "code": "TYPE TStudyStatus = (Active, Paused, Completed)"
+      },
+      {
+        "id": "declare",
+        "action": {
+          "en": "Declare one variable of that type.",
+          "vi": "Khai báo một biến thuộc kiểu đó."
+        },
+        "why": {
+          "en": "A type definition alone has not created a place to store the current state.",
+          "vi": "Chỉ định nghĩa kiểu chưa tạo nơi lưu trạng thái hiện tại."
+        },
+        "result": {
+          "en": "Status has type TStudyStatus; no value has yet been assigned.",
+          "vi": "Status thuộc TStudyStatus; chưa có giá trị được gán."
+        },
+        "check": {
+          "en": "The variable name and the type name serve different roles.",
+          "vi": "Tên biến và tên kiểu có vai trò khác nhau."
+        },
+        "code": "DECLARE Status : TStudyStatus"
+      },
+      {
+        "id": "assign",
+        "action": {
+          "en": "Assign Active, then Paused.",
+          "vi": "Gán Active rồi Paused."
+        },
+        "why": {
+          "en": "Both candidates are members of the declared domain.",
+          "vi": "Cả hai giá trị đều thuộc miền đã khai báo."
+        },
+        "result": {
+          "en": "The final current value is Paused; the domain itself is unchanged.",
+          "vi": "Giá trị hiện tại cuối cùng là Paused; miền giá trị không đổi."
+        },
+        "check": {
+          "en": "The variable stores one state, not two historical values.",
+          "vi": "Biến lưu một trạng thái, không lưu hai giá trị trong lịch sử."
+        },
+        "code": "Status ← Active\nStatus ← Paused"
+      },
+      {
+        "id": "reject",
+        "action": {
+          "en": "Check the candidate Archived.",
+          "vi": "Kiểm giá trị Archived."
+        },
+        "why": {
+          "en": "It is absent from the domain; a new identifier does not automatically extend the type.",
+          "vi": "Nó không thuộc miền; định danh mới không tự mở rộng kiểu."
+        },
+        "result": {
+          "en": "Reject the assignment and retain Paused in this model.",
+          "vi": "Từ chối phép gán và giữ Paused trong mô hình."
+        },
+        "check": {
+          "en": "List membership and candidate type explain the decision.",
+          "vi": "Tư cách phần tử và kiểu của giá trị giải thích quyết định."
+        }
+      }
+    ],
+    "result": {
+      "en": "Status is Paused; Archived and the string \"Paused\" are not permitted enum assignments.",
+      "vi": "Status là Paused; Archived và chuỗi \"Paused\" không phải phép gán enum được phép."
+    },
+    "selfCheck": {
+      "en": "Read each line as type definition, variable declaration or value assignment. Check every assigned constant against the definition.",
+      "vi": "Đọc từng dòng là định nghĩa kiểu, khai báo biến hay gán giá trị. Đối chiếu mỗi hằng được gán với định nghĩa."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book",
+      "guide"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A finite list of named permitted values suggests an enum when the question asks you to define a type.",
+        "vi": "Danh sách hữu hạn các giá trị có tên gợi ý enum khi đề yêu cầu định nghĩa kiểu."
+      },
+      {
+        "en": "“Declare a variable” requires a variable name and an already defined type; it is not the same request as TYPE.",
+        "vi": "“Declare a variable” cần tên biến và kiểu đã định nghĩa; không phải yêu cầu TYPE."
+      }
+    ],
+    "distinguish": {
+      "en": "Multiple attributes of one entity suggest a record. A set holds a collection of members; an enum variable chooses one allowed value.",
+      "vi": "Nhiều thuộc tính của một thực thể gợi ý record. Set giữ một tập phần tử; biến enum chọn một giá trị được phép."
+    },
+    "method": [
+      {
+        "en": "Extract all permitted values and choose one type name.",
+        "vi": "Trích mọi giá trị được phép và chọn tên kiểu."
+      },
+      {
+        "en": "Define the type, then declare the requested variables.",
+        "vi": "Định nghĩa kiểu rồi khai báo các biến được yêu cầu."
+      },
+      {
+        "en": "Assign unquoted enum constants and justify the chosen domain.",
+        "vi": "Gán hằng enum không đặt dấu nháy và giải thích miền đã chọn."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“Defining a type assigns its first member.”",
+        "vi": "“Định nghĩa kiểu là gán phần tử đầu.”"
+      },
+      "correction": {
+        "en": "Definition, declaration and assignment are separate. No default value is assumed in this model.",
+        "vi": "Định nghĩa, khai báo và gán là riêng biệt. Mô hình không giả định giá trị mặc định."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“An enum is composite because its definition lists several words.”",
+        "vi": "“Enum là phức hợp vì định nghĩa liệt kê nhiều từ.”"
+      },
+      "correction": {
+        "en": "An enum variable stores one member; the syllabus classifies enum as non-composite.",
+        "vi": "Biến enum lưu một phần tử; syllabus xếp enum là không phức hợp."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Active and \"Active\" are interchangeable.”",
+        "vi": "“Active và \"Active\" thay thế nhau được.”"
+      },
+      "correction": {
+        "en": "The first is a declared constant; the second is a string literal with a different type.",
+        "vi": "Cái đầu là hằng đã khai báo; cái sau là chuỗi literal có kiểu khác."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "declaration",
+      "prompt": {
+        "en": "After TYPE and DECLARE, but before assignment, which claim is justified?",
+        "vi": "Sau TYPE và DECLARE nhưng trước phép gán, kết luận nào có cơ sở?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "The variable already contains Active.",
+            "vi": "Biến đã chứa Active."
+          },
+          "feedback": {
+            "en": "No assignment has selected Active; do not invent a default.",
+            "vi": "Chưa có phép gán chọn Active; không tự đặt mặc định."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "The variable has a type, but no value has been assigned in this example.",
+            "vi": "Biến đã có kiểu nhưng chưa được gán giá trị trong ví dụ."
+          },
+          "feedback": {
+            "en": "Correct. The type constrains later values; declaration and assignment are distinct.",
+            "vi": "Đúng. Kiểu giới hạn giá trị về sau; khai báo và gán khác nhau."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "The variable contains all three constants.",
+            "vi": "Biến chứa cả ba hằng."
+          },
+          "feedback": {
+            "en": "The domain lists alternatives, not three simultaneous stored values.",
+            "vi": "Miền liệt kê phương án, không phải ba giá trị cùng lưu."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Identify what each statement changes: available type, declared variable or current value.",
+        "vi": "Xác định mỗi lệnh thay đổi gì: kiểu có sẵn, biến đã khai báo hay giá trị hiện tại."
+      }
+    },
+    {
+      "id": "new-domain",
+      "prompt": {
+        "en": "A ticket can be Adult, Child or Student. Which definition models these categories?",
+        "vi": "Vé có thể là Adult, Child hoặc Student. Định nghĩa nào mô hình hóa các loại vé?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "TYPE TicketKind = (Adult, Child, Student)",
+            "vi": "TYPE TicketKind = (Adult, Child, Student)"
+          },
+          "feedback": {
+            "en": "Correct. It declares a finite enum domain using named constants.",
+            "vi": "Đúng. Nó định nghĩa miền enum hữu hạn bằng hằng có tên."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "DECLARE TicketKind : STRING",
+            "vi": "DECLARE TicketKind : STRING"
+          },
+          "feedback": {
+            "en": "This declares a string variable; it does not define the three permitted categories.",
+            "vi": "Đây là khai báo biến chuỗi, không định nghĩa ba loại được phép."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "TicketKind ← Adult",
+            "vi": "TicketKind ← Adult"
+          },
+          "feedback": {
+            "en": "This is an assignment, not a type definition.",
+            "vi": "Đây là phép gán, không phải định nghĩa kiểu."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Choose the declaration form by the requested output: the problem asks for a type.",
+        "vi": "Chọn dạng khai báo theo đầu ra cần có: bài toán yêu cầu một kiểu."
+      }
+    },
+    {
+      "id": "invalid",
+      "prompt": {
+        "en": "Status is Paused. An attempt assigns Archived, which is not in the type. What happens in this visual?",
+        "vi": "Status đang là Paused. Thử gán Archived không thuộc kiểu. Điều gì xảy ra trong minh họa?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "The type silently gains Archived.",
+            "vi": "Kiểu tự thêm Archived."
+          },
+          "feedback": {
+            "en": "Assignment does not redefine the type.",
+            "vi": "Phép gán không định nghĩa lại kiểu."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Status becomes a STRING.",
+            "vi": "Status trở thành STRING."
+          },
+          "feedback": {
+            "en": "An invalid candidate does not change the declared type.",
+            "vi": "Giá trị sai không đổi kiểu đã khai báo."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "The attempt is rejected and Status remains Paused.",
+            "vi": "Phép gán bị từ chối và Status giữ Paused."
+          },
+          "feedback": {
+            "en": "Correct. The last valid state is preserved while feedback explains the mismatch.",
+            "vi": "Đúng. Trạng thái hợp lệ trước được giữ và phản hồi giải thích vì sao không khớp."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "Check domain and candidate type before mutating the stored value.",
+        "vi": "Kiểm miền và kiểu giá trị trước khi đổi dữ liệu đang lưu."
+      }
+    },
+    {
+      "id": "enum-record-field",
+      "prompt": {
+        "en": "Inside TCourse, which field declaration restricts Status to the already defined enum TStudyStatus?",
+        "vi": "Trong TCourse, khai báo trường nào giới hạn Status theo enum TStudyStatus đã định nghĩa?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "DECLARE Status : STRING",
+            "vi": "DECLARE Status : STRING"
+          },
+          "feedback": {
+            "en": "STRING permits arbitrary text rather than the declared enum domain.",
+            "vi": "STRING cho văn bản tùy ý thay vì miền enum đã khai báo."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "DECLARE Status : TStudyStatus",
+            "vi": "DECLARE Status : TStudyStatus"
+          },
+          "feedback": {
+            "en": "Correct. The field uses the existing enum type; Course.Status can hold one of its members.",
+            "vi": "Đúng. Trường dùng kiểu enum có sẵn; Course.Status giữ một phần tử thuộc kiểu đó."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "DECLARE TStudyStatus : Status",
+            "vi": "DECLARE TStudyStatus : Status"
+          },
+          "feedback": {
+            "en": "The field name and type roles have been reversed.",
+            "vi": "Vai trò tên trường và kiểu đã bị đảo."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "A user-defined type can be reused in a field declaration without redefining its members.",
+        "vi": "Có thể dùng lại kiểu tự định nghĩa trong khai báo trường mà không định nghĩa lại phần tử."
+      }
+    },
+    {
+      "id": "composite-choice",
+      "prompt": {
+        "en": "Which statement correctly classifies TStudyStatus and TCourse in this syllabus?",
+        "vi": "Phát biểu nào phân loại đúng TStudyStatus và TCourse trong syllabus?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Both are composite because both definitions contain several names.",
+            "vi": "Cả hai phức hợp vì định nghĩa đều có nhiều tên."
+          },
+          "feedback": {
+            "en": "An enum lists alternatives for one value; multiple names do not make it composite.",
+            "vi": "Enum liệt kê phương án cho một giá trị; nhiều tên không làm nó phức hợp."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "The enum is non-composite; the record is composite.",
+            "vi": "Enum không phức hợp; record phức hợp."
+          },
+          "feedback": {
+            "en": "Correct. One enum variable selects one member; a record groups several fields.",
+            "vi": "Đúng. Biến enum chọn một phần tử; record gom nhiều trường."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "The enum is composite; the record is non-composite.",
+            "vi": "Enum phức hợp; record không phức hợp."
+          },
+          "feedback": {
+            "en": "This reverses the roles of a single enumerated choice and grouped fields.",
+            "vi": "Đáp án đảo vai trò một lựa chọn liệt kê với các trường được gom."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Classify the structure of a value, not the number of words in the type definition.",
+        "vi": "Phân loại cấu trúc một giá trị, không đếm từ trong định nghĩa kiểu."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain the three statements needed to create a traffic-light enum and store Red.",
+      "vi": "Giải thích ba lệnh cần để tạo enum đèn giao thông và lưu Red."
+    },
+    "answerPoints": [
+      {
+        "en": "Define TYPE Signal = (Red, Amber, Green).",
+        "vi": "Định nghĩa TYPE Signal = (Red, Amber, Green)."
+      },
+      {
+        "en": "DECLARE Current : Signal creates the variable.",
+        "vi": "DECLARE Current : Signal tạo biến."
+      },
+      {
+        "en": "Current ← Red assigns a permitted constant; \"Red\" would be a string.",
+        "vi": "Current ← Red gán hằng hợp lệ; \"Red\" là chuỗi."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Use a domain that matches the problem, not every possible string.",
+      "vi": "Dùng miền đúng bài toán, không phải mọi chuỗi có thể có."
+    },
+    {
+      "en": "Define the type, declare the variable, then assign one member.",
+      "vi": "Định nghĩa kiểu, khai báo biến rồi gán một phần tử."
+    },
+    {
+      "en": "An enum constant is not a quoted string.",
+      "vi": "Hằng enum không phải chuỗi có dấu nháy."
+    }
+  ],
+  "relatedSlugs": [
+    "records-and-composite-models",
+    "sets",
+    "pointers-and-referenced-data"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.1, p.32",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=32"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.304–305; examples independently checked",
+      "kind": "book"
+    },
+    {
+      "id": "guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, exams 2026, Version 1",
+      "locator": "pp.12,14; code in this lesson is algorithmic pseudocode, not executable Python",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide-for-teachers.pdf"
+    }
+  ]
+}

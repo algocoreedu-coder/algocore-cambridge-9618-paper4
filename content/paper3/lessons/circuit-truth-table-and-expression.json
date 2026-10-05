@@ -1,0 +1,900 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.1",
+  "topicId": "P3-15.2-T01",
+  "slug": "circuit-truth-table-and-expression",
+  "title": {
+    "en": "Circuit, truth table and expression",
+    "vi": "Mạch logic, bảng chân trị và biểu thức"
+  },
+  "question": {
+    "en": "How can three representations describe exactly the same logic?",
+    "vi": "Ba cách biểu diễn có thể mô tả đúng cùng một logic như thế nào?"
+  },
+  "opening": {
+    "en": "A circuit shows how gates connect, a truth table lists every possible input and output, and an expression states the rule symbolically. Moving between them makes an answer checkable: each representation can test the others. Start by following one signal, then account for every input combination before claiming equivalence.",
+    "vi": "Mạch cho thấy cách nối cổng, bảng chân trị liệt kê mọi đầu vào và đầu ra, còn biểu thức viết quy tắc bằng ký hiệu. Chuyển đổi giữa chúng giúp kiểm tra đáp án: mỗi cách có thể đối chiếu cách khác. Bắt đầu bằng theo một tín hiệu, rồi xét đủ mọi tổ hợp trước khi kết luận tương đương."
+  },
+  "estimatedMinutes": 30,
+  "objectives": [
+    {
+      "en": "Evaluate gates, including a three-input AND, in dependency order.",
+      "vi": "Tính các cổng, gồm AND ba đầu vào, theo thứ tự phụ thuộc."
+    },
+    {
+      "en": "Construct a complete truth table with named intermediate outputs.",
+      "vi": "Lập bảng chân trị đầy đủ với đầu ra trung gian có tên."
+    },
+    {
+      "en": "Derive canonical sum-of-products from exactly the output-1 rows.",
+      "vi": "Suy SOP chuẩn từ đúng các hàng đầu ra bằng1."
+    },
+    {
+      "en": "Rebuild an equivalent circuit and check all input combinations.",
+      "vi": "Dựng lại mạch tương đương và kiểm mọi tổ hợp đầu vào."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know that Boolean values0 and1 represent FALSE and TRUE.",
+      "vi": "Biết giá trị Boolean0 và1 biểu diễn FALSE và TRUE."
+    },
+    {
+      "en": "Recognise NOT, AND and OR gate functions; XOR differs from OR.",
+      "vi": "Nhận biết chức năng NOT, AND, OR; XOR khác OR."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Combinational circuit",
+      "meaning": {
+        "en": "A logic circuit whose stable outputs depend only on current inputs.",
+        "vi": "Mạch logic có đầu ra ổn định chỉ phụ thuộc đầu vào hiện tại."
+      }
+    },
+    {
+      "term": "Intermediate output",
+      "meaning": {
+        "en": "A named gate output used as an input to a later gate.",
+        "vi": "Đầu ra cổng có tên được dùng làm đầu vào cho cổng sau."
+      }
+    },
+    {
+      "term": "Literal",
+      "meaning": {
+        "en": "A variable or its complement, such as A or NOT A.",
+        "vi": "Một biến hoặc phủ định của nó, như A hoặc NOT A."
+      }
+    },
+    {
+      "term": "Product term",
+      "meaning": {
+        "en": "An AND of literals; the word product means logical AND here.",
+        "vi": "Một AND của các literal; từ tích ở đây chỉ AND logic."
+      }
+    },
+    {
+      "term": "Sum of products",
+      "meaning": {
+        "en": "An OR of product terms; sum means logical OR, not binary addition.",
+        "vi": "Một OR của các tích; tổng ở đây là OR logic, không phải cộng nhị phân."
+      }
+    },
+    {
+      "term": "Logical equivalence",
+      "meaning": {
+        "en": "The same output for every possible input combination.",
+        "vi": "Cùng đầu ra với mọi tổ hợp đầu vào có thể có."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "gate-rules",
+      "title": {
+        "en": "Read the gate and any inversion first",
+        "vi": "Đọc loại cổng và phép đảo trước"
+      },
+      "paragraphs": [
+        {
+          "en": "AND outputs1 only when every input is1. OR outputs1 when at least one input is1. NOT reverses one bit. A three-input AND therefore tests all three inputs; it does not mean “any two are1”. NAND and NOR complement the whole AND or OR result. An inversion bubble belongs to the signal or gate output on which it is drawn, so retain it when writing the expression.",
+          "vi": "AND cho1 chỉ khi mọi đầu vào bằng1. OR cho1 khi ít nhất một đầu vào bằng1. NOT đảo một bit. Vì vậy AND ba đầu vào xét cả ba, không phải “bất kỳ hai đầu vào bằng1”. NAND và NOR phủ định toàn bộ kết quả AND hoặc OR. Vòng tròn đảo thuộc tín hiệu hoặc đầu ra cổng nơi nó được vẽ, nên phải giữ nó khi viết biểu thức."
+        },
+        {
+          "en": "Two-input XOR outputs1 when its inputs differ, unlike OR which also outputs1 for11. Do not replace OR by XOR merely because both are described informally as “either”. Write the actual condition. In Boolean algebra, A+B means OR and A·B means AND;1 OR1 is1. The visual uses the words NOT, AND and OR so the scope of each operation stays readable.",
+          "vi": "XOR hai đầu vào cho1 khi hai đầu vào khác nhau, khác OR còn cho1 tại11. Không thay OR bằng XOR chỉ vì cả hai được nói nôm na là “hoặc”. Hãy viết điều kiện thực tế. Trong đại số Boolean, A+B nghĩa là OR và A·B là AND;1 OR1 bằng1. Visual dùng chữ NOT, AND, OR để phạm vi mỗi phép rõ ràng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-logic"
+      ]
+    },
+    {
+      "id": "dependency-order",
+      "title": {
+        "en": "Name intermediate wires and follow dependencies",
+        "vi": "Đặt tên dây trung gian và theo phụ thuộc"
+      },
+      "paragraphs": [
+        {
+          "en": "For Y=(A AND B AND C) OR(NOT A AND C), name nA=NOT A, abc=A AND B AND C, and nAc=nA AND C. Then Y=abc OR nAc. You can calculate nA and abc from the inputs, but nAc needs nA first, and Y needs both branches. This is a dependency order, not simply “all gates from the top of the drawing”.",
+          "vi": "Với Y=(A AND B AND C) OR(NOT A AND C), đặt nA=NOT A, abc=A AND B AND C và nAc=nA AND C. Khi đó Y=abc OR nAc. Có thể tính nA và abc từ đầu vào, nhưng nAc cần nA trước, còn Y cần cả hai nhánh. Đây là thứ tự phụ thuộc, không đơn giản là “mọi cổng từ trên hình xuống”."
+        },
+        {
+          "en": "At input A=0,B=0,C=1: nA=1; abc=0; nAc=1; hence Y=1. Record each intermediate value rather than guessing from the final shape. The animation reveals this reasoning one gate at a time. It is a teaching evaluation order, not a measured propagation delay or a simulation of transient electrical glitches. The stable combinational output has no stored previous Q.",
+          "vi": "Tại A=0,B=0,C=1: nA=1; abc=0; nAc=1; do đó Y=1. Ghi từng giá trị trung gian thay vì đoán theo hình cuối. Hoạt cảnh mở cách suy luận này từng cổng. Đây là thứ tự tính để học, không phải độ trễ truyền đo được hay mô phỏng nhiễu điện tạm thời. Đầu ra tổ hợp ổn định không có Q trước đó được lưu."
+        }
+      ],
+      "sourceIds": [
+        "book-logic",
+        "s25-qp32",
+        "s25-ms32"
+      ]
+    },
+    {
+      "id": "complete-truth-table",
+      "title": {
+        "en": "Cover every input, not only convincing examples",
+        "vi": "Bao phủ mọi đầu vào, không chỉ ví dụ có vẻ đúng"
+      },
+      "paragraphs": [
+        {
+          "en": "With n independent binary inputs there are2^n input combinations. Two inputs need4 rows, three need8 and four need16. Enumerating in ascending binary order with A as the leftmost bit avoids omitted or repeated cases. For three inputs use000,001,010,011,100,101,110,111. Keep the chosen input-column order consistent when transferring between the circuit, table and expression.",
+          "vi": "Với n đầu vào nhị phân độc lập có2^n tổ hợp. Hai đầu vào cần4 hàng, ba cần8, bốn cần16. Liệt kê theo thứ tự nhị phân tăng dần với A là bit bên trái giúp tránh bỏ sót hoặc lặp. Ba đầu vào dùng000,001,010,011,100,101,110,111. Giữ nhất quán thứ tự cột khi chuyển giữa mạch, bảng và biểu thức."
+        },
+        {
+          "en": "Make a column for each named intermediate output and fill it from its gate rule. In the three-input example the Y column is0,1,0,1,0,0,0,1. Checking only001 would miss errors at the other seven rows. The four-input circuit in May/June2025 Paper32 question7 is a verified example of why a complete table and working columns matter; the visual’s two-/three-input presets are not an examination limit.",
+          "vi": "Tạo cột cho từng đầu ra trung gian có tên và điền theo quy tắc cổng. Trong ví dụ ba đầu vào, cột Y là0,1,0,1,0,0,0,1. Chỉ kiểm001 sẽ bỏ qua lỗi ở bảy hàng khác. Mạch bốn đầu vào ở May/June2025 Paper32 câu7 là ví dụ đã kiểm cho thấy cần bảng đầy đủ và cột làm việc; các mẫu hai/ba đầu vào của visual không phải giới hạn bài thi."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-logic",
+        "s25-qp32",
+        "s25-ms32"
+      ]
+    },
+    {
+      "id": "sop-from-ones",
+      "title": {
+        "en": "Give each output-1 row its own product",
+        "vi": "Tạo một tích cho mỗi hàng đầu ra1"
+      },
+      "paragraphs": [
+        {
+          "en": "A product for one complete row includes every input once. A row bit1 uses the variable; a row bit0 uses NOT of that variable. Thus001 becomes(NOT A AND NOT B AND C). This product is1 for that row and0 for every other row. Do not drop B merely because another example later simplifies it: canonical construction and simplification are separate operations.",
+          "vi": "Tích cho một hàng đầy đủ chứa mỗi đầu vào một lần. Bit1 dùng biến thường; bit0 dùng NOT của biến. Vì vậy001 thành(NOT A AND NOT B AND C). Tích này bằng1 tại hàng đó và0 ở mọi hàng khác. Không bỏ B chỉ vì một ví dụ sau sẽ rút gọn nó: lập dạng chuẩn và rút gọn là hai thao tác khác nhau."
+        },
+        {
+          "en": "OR the products for all and only the rows where Y=1. Here those rows are001,011,111, giving(NOT A AND NOT B AND C) OR(NOT A AND B AND C) OR(A AND B AND C). Every included product contributes an allowed1 row. Including a0 row creates a false positive; leaving out a1 row creates a false negative. This is why the selection step must be justified from the completed table.",
+          "vi": "OR các tích của tất cả và chỉ các hàng Y=1. Ở đây là001,011,111, cho(NOT A AND NOT B AND C) OR(NOT A AND B AND C) OR(A AND B AND C). Mỗi tích góp một hàng1 được phép. Thêm hàng0 tạo kết quả1 sai; bỏ một hàng1 tạo kết quả0 sai. Vì vậy bước chọn hàng phải dựa vào bảng đã hoàn tất."
+        }
+      ],
+      "sourceIds": [
+        "book-logic",
+        "s25-qp32",
+        "s25-ms32"
+      ]
+    },
+    {
+      "id": "expression-to-circuit",
+      "title": {
+        "en": "Build the expression structure as a circuit",
+        "vi": "Dựng cấu trúc biểu thức thành mạch"
+      },
+      "paragraphs": [
+        {
+          "en": "For each product, obtain any NOT signals first, then feed its literals to an AND gate. Feed the product outputs into an OR gate. Label intermediate signals and the final output so that a reader can see which sub-expression each gate implements. Shared NOT A may feed more than one product; a wire may fan out without changing its logical value.",
+          "vi": "Với mỗi tích, tạo tín hiệu NOT cần thiết trước rồi đưa các literal vào cổng AND. Đưa đầu ra các tích vào cổng OR. Ghi tên tín hiệu trung gian và đầu ra cuối để người đọc thấy mỗi cổng thực hiện biểu thức con nào. NOT A dùng chung có thể cấp cho nhiều tích; một dây tách nhánh không làm đổi giá trị logic."
+        },
+        {
+          "en": "Parentheses define grouping. NOT(A OR B) needs an OR followed by inversion; it is not the same circuit as(NOT A) OR B. If the question restricts allowed gates, honour that restriction and show an equivalent construction. A logically equivalent circuit may look different and may use a different number of gates. For this lesson, build the canonical SOP first; Boolean laws and K-maps address simplification later.",
+          "vi": "Ngoặc xác định nhóm. NOT(A OR B) cần OR rồi đảo; không phải cùng mạch với(NOT A) OR B. Nếu đề giới hạn cổng được dùng, tuân thủ và dựng dạng tương đương. Mạch tương đương logic có thể trông khác và có số cổng khác. Trong bài này dựng SOP chuẩn trước; các luật Boolean và K-map xử lý rút gọn ở bài sau."
+        }
+      ],
+      "sourceIds": [
+        "book-logic"
+      ]
+    },
+    {
+      "id": "verify-equivalence",
+      "title": {
+        "en": "Use the complete truth table as a check",
+        "vi": "Dùng toàn bảng chân trị để kiểm"
+      },
+      "paragraphs": [
+        {
+          "en": "Evaluate the original circuit and the reconstructed expression for each possible input. Matching all outputs proves Boolean equivalence for that finite domain. Matching one sample does not. Intermediate columns are useful for locating an error but need not match across structurally different circuits; it is the intended final output that must agree for every input.",
+          "vi": "Tính mạch gốc và biểu thức dựng lại với từng đầu vào có thể có. Khớp mọi đầu ra chứng minh tương đương Boolean trên miền hữu hạn đó. Khớp một mẫu thì không. Cột trung gian giúp tìm lỗi nhưng không nhất thiết giống nhau giữa các mạch khác cấu trúc; đầu ra cuối cần khớp với mọi đầu vào."
+        },
+        {
+          "en": "For the two-input example Y=(A AND B) OR NOT A, the output rows are1,1,0,1 in order00,01,10,11. Its canonical SOP has three products. If a proposed answer gives1 at10, one counterexample is already enough to reject it. Explain the mismatching row and gate rule, rather than merely stating that the answer “looks wrong”.",
+          "vi": "Với ví dụ hai đầu vào Y=(A AND B) OR NOT A, các đầu ra là1,1,0,1 theo00,01,10,11. SOP chuẩn có ba tích. Nếu đáp án đề xuất cho1 tại10, một phản ví dụ đã đủ bác bỏ. Hãy giải thích hàng không khớp và quy tắc cổng, thay vì chỉ nói đáp án “trông sai”."
+        }
+      ],
+      "sourceIds": [
+        "book-logic"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "logic-circuit",
+    "title": {
+      "en": "Translate one function three ways",
+      "vi": "Chuyển một hàm qua ba cách biểu diễn"
+    },
+    "introduction": {
+      "en": "Choose a two-input or three-input circuit, select a bit combination, and reveal the intermediate signals before building the full table and SOP.",
+      "vi": "Chọn mạch hai hoặc ba đầu vào, chọn tổ hợp bit rồi mở các tín hiệu trung gian trước khi lập toàn bảng và SOP."
+    },
+    "task": {
+      "en": "Predict each gate output, identify every Y=1 row and explain how its literals become a product term.",
+      "vi": "Dự đoán từng đầu ra cổng, xác định mọi hàng Y=1 và giải thích cách các literal thành một tích."
+    },
+    "conventions": [
+      {
+        "en": "Input order is A,B or A,B,C, with A the most significant bit for row numbering.",
+        "vi": "Thứ tự đầu vào là A,B hoặc A,B,C; A là bit có trọng số lớn nhất khi đánh số hàng."
+      },
+      {
+        "en": "The original functions are(A AND B) OR NOT A and(A AND B AND C) OR(NOT A AND C). The latter includes a genuine three-input AND.",
+        "vi": "Các hàm gốc là(A AND B) OR NOT A và(A AND B AND C) OR(NOT A AND C). Hàm sau có AND ba đầu vào thực sự."
+      },
+      {
+        "en": "Unrevealed node values mean not yet evaluated in the teaching trace, not an unknown physical logic level.",
+        "vi": "Giá trị nút chưa mở nghĩa là chưa tính trong trace học tập, không phải mức logic vật lý không xác định."
+      },
+      {
+        "en": "Signal stepping illustrates dependency order; no propagation-time or glitch simulation is implied.",
+        "vi": "Đi từng tín hiệu minh họa thứ tự phụ thuộc; không hàm ý mô phỏng thời gian truyền hay glitch."
+      },
+      {
+        "en": "The presets teach a method; circuits in examinations may have more inputs and different gates.",
+        "vi": "Các mẫu dạy phương pháp; mạch trong đề có thể có nhiều đầu vào và cổng khác."
+      }
+    ],
+    "sourceIds": [
+      "book-logic",
+      "s25-qp32"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "From a three-input circuit to canonical SOP",
+      "vi": "Từ mạch ba đầu vào đến SOP chuẩn"
+    },
+    "prompt": {
+      "en": "For Y=(A AND B AND C) OR(NOT A AND C), trace input001, complete all eight rows, derive the canonical SOP and rebuild an equivalent circuit.",
+      "vi": "Với Y=(A AND B AND C) OR(NOT A AND C), truy vết đầu vào001, hoàn tất tám hàng, suy SOP chuẩn và dựng mạch tương đương."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "inputs",
+        "action": {
+          "en": "Use input row 001.",
+          "vi": "Dùng hàng đầu vào 001."
+        },
+        "why": {
+          "en": "Each distinct input combination needs its own truth-table row.",
+          "vi": "Mỗi tổ hợp đầu vào khác nhau cần một hàng chân trị riêng."
+        },
+        "result": {
+          "en": "Internal nodes are not yet evaluated in this teaching trace.",
+          "vi": "Các nút trung gian chưa được tính trong lượt minh họa này."
+        }
+      },
+      {
+        "id": "gate-nA",
+        "action": {
+          "en": "Apply NOT to A.",
+          "vi": "Áp dụng NOT cho A."
+        },
+        "why": {
+          "en": "Use known inputs to this gate; do not skip an intermediate dependency.",
+          "vi": "Dùng các đầu vào đã biết của cổng; không bỏ qua phụ thuộc trung gian."
+        },
+        "result": {
+          "en": "nA = 1; other known values are retained.",
+          "vi": "nA = 1; các giá trị đã biết khác được giữ."
+        }
+      },
+      {
+        "id": "gate-abc",
+        "action": {
+          "en": "Apply AND to A, B, C.",
+          "vi": "Áp dụng AND cho A, B, C."
+        },
+        "why": {
+          "en": "Use known inputs to this gate; do not skip an intermediate dependency.",
+          "vi": "Dùng các đầu vào đã biết của cổng; không bỏ qua phụ thuộc trung gian."
+        },
+        "result": {
+          "en": "abc = 0; other known values are retained.",
+          "vi": "abc = 0; các giá trị đã biết khác được giữ."
+        }
+      },
+      {
+        "id": "gate-nAc",
+        "action": {
+          "en": "Apply AND to nA, C.",
+          "vi": "Áp dụng AND cho nA, C."
+        },
+        "why": {
+          "en": "Use known inputs to this gate; do not skip an intermediate dependency.",
+          "vi": "Dùng các đầu vào đã biết của cổng; không bỏ qua phụ thuộc trung gian."
+        },
+        "result": {
+          "en": "nAc = 1; other known values are retained.",
+          "vi": "nAc = 1; các giá trị đã biết khác được giữ."
+        }
+      },
+      {
+        "id": "gate-y",
+        "action": {
+          "en": "Apply OR to abc, nAc.",
+          "vi": "Áp dụng OR cho abc, nAc."
+        },
+        "why": {
+          "en": "Use known inputs to this gate; do not skip an intermediate dependency.",
+          "vi": "Dùng các đầu vào đã biết của cổng; không bỏ qua phụ thuộc trung gian."
+        },
+        "result": {
+          "en": "y = 1; other known values are retained.",
+          "vi": "y = 1; các giá trị đã biết khác được giữ."
+        }
+      },
+      {
+        "id": "record-row",
+        "action": {
+          "en": "Copy inputs, intermediate values and Y into one row.",
+          "vi": "Ghi đầu vào, giá trị trung gian và Y vào một hàng."
+        },
+        "why": {
+          "en": "One tested combination is evidence for only that row.",
+          "vi": "Một tổ hợp đã thử chỉ xác minh hàng đó."
+        },
+        "result": {
+          "en": "The selected row is recorded; the table is not yet complete.",
+          "vi": "Đã ghi hàng đang chọn; bảng chưa đầy đủ."
+        }
+      },
+      {
+        "id": "complete-table",
+        "action": {
+          "en": "Evaluate all 8 combinations in binary order with A first.",
+          "vi": "Tính đủ 8 tổ hợp theo thứ tự nhị phân, A đứng trước."
+        },
+        "why": {
+          "en": "A complete truth table covers every possible input, not a few samples.",
+          "vi": "Bảng chân trị đầy đủ bao phủ mọi đầu vào, không chỉ vài mẫu."
+        },
+        "result": {
+          "en": "All 8 rows are available.",
+          "vi": "Đã có đủ 8 hàng."
+        }
+      },
+      {
+        "id": "select-ones",
+        "action": {
+          "en": "Highlight exactly the rows whose Y output is 1.",
+          "vi": "Đánh dấu đúng các hàng có đầu ra Y bằng 1."
+        },
+        "why": {
+          "en": "A sum-of-products expression must make each such row true.",
+          "vi": "Biểu thức tổng các tích phải cho đúng tại từng hàng đó."
+        },
+        "result": {
+          "en": "Selected rows: 001, 011, 111.",
+          "vi": "Các hàng được chọn: 001, 011, 111."
+        }
+      },
+      {
+        "id": "derive-sop",
+        "action": {
+          "en": "AND the literals for each 1 row, then OR the products.",
+          "vi": "AND các literal trong mỗi hàng 1 rồi OR các tích."
+        },
+        "why": {
+          "en": "Use a complemented variable for bit 0 and the variable for bit 1.",
+          "vi": "Dùng biến phủ định cho bit 0 và biến thường cho bit 1."
+        },
+        "result": {
+          "en": "Y = (NOT A AND NOT B AND C) OR (NOT A AND B AND C) OR (A AND B AND C)",
+          "vi": "Y = (NOT A AND NOT B AND C) OR (NOT A AND B AND C) OR (A AND B AND C)"
+        }
+      },
+      {
+        "id": "rebuild-circuit",
+        "action": {
+          "en": "Create an AND path for each product and combine paths with OR.",
+          "vi": "Tạo nhánh AND cho mỗi tích rồi gộp các nhánh bằng OR."
+        },
+        "why": {
+          "en": "The circuit follows the expression structure, including each required inversion.",
+          "vi": "Mạch theo cấu trúc biểu thức, gồm từng phép đảo cần thiết."
+        },
+        "result": {
+          "en": "The reconstructed circuit implements the canonical SOP.",
+          "vi": "Mạch dựng lại thực hiện SOP chuẩn."
+        }
+      },
+      {
+        "id": "verify-equivalence",
+        "action": {
+          "en": "Compare original-circuit and reconstructed-SOP outputs over the full table.",
+          "vi": "So đầu ra mạch gốc và SOP dựng lại trên toàn bảng."
+        },
+        "why": {
+          "en": "Equivalence requires matching outputs for every input combination.",
+          "vi": "Tương đương đòi hỏi đầu ra khớp với mọi tổ hợp đầu vào."
+        },
+        "result": {
+          "en": "All 8 outputs agree; the circuits are logically equivalent.",
+          "vi": "Cả 8 đầu ra khớp; hai mạch tương đương logic."
+        }
+      }
+    ],
+    "result": {
+      "en": "Output1 occurs at001,011,111. OR the three corresponding products; checking all eight inputs confirms equivalence to the original circuit.",
+      "vi": "Đầu ra1 xảy ra tại001,011,111. OR ba tích tương ứng; kiểm đủ tám đầu vào xác nhận tương đương với mạch gốc."
+    },
+    "selfCheck": {
+      "en": "Why does row001 contain NOT B, while row011 contains B? What error results if the two products are ANDed instead of ORed?",
+      "vi": "Vì sao hàng001 chứa NOT B còn011 chứa B? Nếu AND hai tích thay vì OR thì gây lỗi gì?"
+    },
+    "sourceIds": [
+      "book-logic",
+      "s25-qp32",
+      "s25-ms32"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A gate diagram with labelled intermediate wires asks for local evaluation before the final output.",
+        "vi": "Sơ đồ cổng có dây trung gian ghi tên yêu cầu tính từng phần trước đầu ra cuối."
+      },
+      {
+        "en": "“Complete the truth table” requires all supplied rows; “show working” calls for useful intermediate columns.",
+        "vi": "“Hoàn tất bảng chân trị” đòi hỏi mọi hàng đã cho; “trình bày cách làm” cần cột trung gian hữu ích."
+      },
+      {
+        "en": "“As a sum-of-products” points to selecting output1 rows and ORing their products; do not substitute an unrelated simplified form if a particular form is requested.",
+        "vi": "“Dưới dạng tổng các tích” hướng đến chọn hàng đầu ra1 rồi OR các tích; không thay bằng dạng rút gọn khác nếu đề yêu cầu dạng cụ thể."
+      }
+    ],
+    "distinguish": {
+      "en": "A combinational truth table uses current inputs only. A flip-flop table also needs previous state and a circuit/clock convention. K-map grouping and Boolean simplification preserve the same final truth table but are separate methods.",
+      "vi": "Bảng tổ hợp chỉ dùng đầu vào hiện tại. Bảng flip-flop còn cần trạng thái trước và quy ước mạch/clock. Nhóm K-map và rút gọn Boolean giữ nguyên bảng cuối nhưng là các phương pháp riêng."
+    },
+    "method": [
+      {
+        "en": "Copy input order and label each intermediate gate output.",
+        "vi": "Ghi thứ tự đầu vào và đặt tên từng đầu ra trung gian."
+      },
+      {
+        "en": "Enumerate2^n combinations; evaluate one gate only after its inputs are known.",
+        "vi": "Liệt kê2^n tổ hợp; chỉ tính cổng khi biết các đầu vào của nó."
+      },
+      {
+        "en": "Select Y=1 rows; make each product with every literal in the correct polarity.",
+        "vi": "Chọn hàng Y=1; tạo mỗi tích với đủ literal và đúng phủ định."
+      },
+      {
+        "en": "OR the products, construct the requested circuit, then compare every final output.",
+        "vi": "OR các tích, dựng mạch yêu cầu rồi so mọi đầu ra cuối."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Three-input AND gives1 if two of its inputs are1.",
+        "vi": "AND ba đầu vào cho1 nếu hai đầu vào bằng1."
+      },
+      "correction": {
+        "en": "AND requires all inputs1. Test110: the missing third1 makes the output0.",
+        "vi": "AND đòi mọi đầu vào bằng1. Kiểm110: đầu vào thứ ba chưa1 khiến đầu ra0."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Every row belongs in the SOP.",
+        "vi": "Mọi hàng đều thuộc SOP."
+      },
+      "correction": {
+        "en": "Only output1 rows contribute products. Including every row would make the function always1.",
+        "vi": "Chỉ hàng đầu ra1 góp tích. Thêm mọi hàng sẽ khiến hàm luôn1."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A row bit0 means omit that variable.",
+        "vi": "Bit0 trong hàng nghĩa là bỏ biến đó."
+      },
+      "correction": {
+        "en": "In canonical SOP, bit0 means include NOT of that variable. Omitting it covers more than one row.",
+        "vi": "Trong SOP chuẩn, bit0 nghĩa là thêm NOT của biến. Bỏ nó sẽ bao phủ nhiều hơn một hàng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Identical outputs on one sample prove the circuits equivalent.",
+        "vi": "Khớp đầu ra ở một mẫu chứng minh hai mạch tương đương."
+      },
+      "correction": {
+        "en": "Check every input combination. A single mismatch disproves equivalence; one match does not prove it.",
+        "vi": "Kiểm mọi tổ hợp. Một hàng khác đủ bác bỏ; một hàng khớp chưa chứng minh."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Boolean OR is ordinary addition, so1 OR1 produces10.",
+        "vi": "OR Boolean là cộng thường nên1 OR1 tạo10."
+      },
+      "correction": {
+        "en": "OR produces one bit1. A binary adder has separate sum and carry outputs; that is a different circuit.",
+        "vi": "OR cho một bit1. Bộ cộng nhị phân có sum và carry riêng; đó là mạch khác."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "multi-input-and",
+      "prompt": {
+        "en": "What is AND(1,1,0)?",
+        "vi": "AND(1,1,0) bằng bao nhiêu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "All three inputs must be1; a majority is not enough.",
+            "vi": "Cả ba đầu vào phải1; đa số chưa đủ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "Correct: the zero input makes the AND output0.",
+            "vi": "Đúng: đầu vào0 khiến AND cho0."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "10",
+            "vi": "10"
+          },
+          "feedback": {
+            "en": "A logic-gate output here is one bit; this is not a binary addition.",
+            "vi": "Đầu ra cổng ở đây một bit; đây không phải cộng nhị phân."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Apply the gate rule to every input.",
+        "vi": "Áp dụng quy tắc cổng cho mọi đầu vào."
+      }
+    },
+    {
+      "id": "intermediate-001",
+      "prompt": {
+        "en": "For input001 in the three-input example, what are nA,abc,nAc,Y?",
+        "vi": "Với đầu vào001 ở ví dụ ba đầu vào, nA,abc,nAc,Y là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1,0,1,1",
+            "vi": "1,0,1,1"
+          },
+          "feedback": {
+            "en": "Correct: NOT A=1, all-input AND=0, and nA AND C=1.",
+            "vi": "Đúng: NOT A=1, AND mọi đầu vào=0 và nA AND C=1."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "0,0,0,0",
+            "vi": "0,0,0,0"
+          },
+          "feedback": {
+            "en": "NOT reverses A=0, so nA cannot be0.",
+            "vi": "NOT đảo A=0 nên nA không thể0."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "1,1,1,1",
+            "vi": "1,1,1,1"
+          },
+          "feedback": {
+            "en": "abc includes A=0 and B=0, so it cannot be1.",
+            "vi": "abc có A=0 và B=0 nên không thể1."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Compute each named dependency before the final OR.",
+        "vi": "Tính từng phụ thuộc có tên trước OR cuối."
+      }
+    },
+    {
+      "id": "row-literals",
+      "prompt": {
+        "en": "Which product describes exactly row A=0,B=1,C=1?",
+        "vi": "Tích nào mô tả đúng riêng hàng A=0,B=1,C=1?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A AND B AND C",
+            "vi": "A AND B AND C"
+          },
+          "feedback": {
+            "en": "That product selects111, not011.",
+            "vi": "Tích đó chọn111, không phải011."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "NOT A AND B AND C",
+            "vi": "NOT A AND B AND C"
+          },
+          "feedback": {
+            "en": "Correct: only the0 bit requires a complemented literal.",
+            "vi": "Đúng: chỉ bit0 cần literal phủ định."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "B AND C",
+            "vi": "B AND C"
+          },
+          "feedback": {
+            "en": "That covers both011 and111, so it is not the canonical product for one row.",
+            "vi": "Tích này bao phủ011 và111 nên không phải tích chuẩn của một hàng."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Canonical row products include every input.",
+        "vi": "Tích chuẩn của hàng chứa mọi đầu vào."
+      }
+    },
+    {
+      "id": "combine-products",
+      "prompt": {
+        "en": "Why are the products for001 and011 joined by OR?",
+        "vi": "Vì sao các tích cho001 và011 nối bằng OR?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Either input case is allowed to make Y=1",
+            "vi": "Một trong hai trường hợp đều được phép làm Y=1"
+          },
+          "feedback": {
+            "en": "Correct: the output is1 when any selected row’s product is1.",
+            "vi": "Đúng: đầu ra1 khi bất kỳ tích của hàng được chọn bằng1."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Both distinct complete rows must be true simultaneously",
+            "vi": "Hai hàng đầy đủ khác nhau phải đúng cùng lúc"
+          },
+          "feedback": {
+            "en": "One input cannot be both001 and011; ANDing those products would make that branch0.",
+            "vi": "Một đầu vào không thể vừa001 vừa011; AND hai tích sẽ làm nhánh đó0."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "OR always gives a smaller circuit",
+            "vi": "OR luôn cho mạch nhỏ hơn"
+          },
+          "feedback": {
+            "en": "The reason is the function’s allowed cases, not a universal gate-count claim.",
+            "vi": "Lý do là các trường hợp hàm cho phép, không phải quy tắc phổ quát về số cổng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Explain the truth condition before choosing the operator.",
+        "vi": "Giải thích điều kiện đúng trước khi chọn phép toán."
+      }
+    },
+    {
+      "id": "four-input-transfer",
+      "prompt": {
+        "en": "A new circuit has four independent binary inputs. How many rows are needed to prove equivalence by complete enumeration?",
+        "vi": "Một mạch mới có bốn đầu vào nhị phân độc lập. Cần bao nhiêu hàng để chứng minh tương đương bằng liệt kê đầy đủ?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "There are two possibilities for each input, not one row per wire.",
+            "vi": "Mỗi đầu vào có hai khả năng, không phải một hàng mỗi dây."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "8",
+            "vi": "8"
+          },
+          "feedback": {
+            "en": "Eight covers three inputs; the fourth doubles the cases.",
+            "vi": "Tám hàng cho ba đầu vào; đầu vào thứ tư làm gấp đôi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "16",
+            "vi": "16"
+          },
+          "feedback": {
+            "en": "Correct:2^4=16 combinations.",
+            "vi": "Đúng:2^4=16 tổ hợp."
+          }
+        }
+      ],
+      "correctChoiceId": "c",
+      "explanation": {
+        "en": "Use the number of independent bits, not the number of gates.",
+        "vi": "Dùng số bit độc lập, không phải số cổng."
+      }
+    },
+    {
+      "id": "counterexample",
+      "prompt": {
+        "en": "Someone replaces(A AND B) OR NOT A by A OR B. Which row exposes the error?",
+        "vi": "Có người thay(A AND B) OR NOT A bằng A OR B. Hàng nào chỉ ra lỗi?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "00",
+            "vi": "00"
+          },
+          "feedback": {
+            "en": "Correct: the original gives1 through NOT A, but A OR B gives0.",
+            "vi": "Đúng: mạch gốc cho1 qua NOT A, còn A OR B cho0."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "01",
+            "vi": "01"
+          },
+          "feedback": {
+            "en": "Both functions give1 here, so this row does not expose the mismatch.",
+            "vi": "Cả hai cho1 ở đây nên hàng này không chỉ ra khác biệt."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "11",
+            "vi": "11"
+          },
+          "feedback": {
+            "en": "Both functions give1 here; try a row affected by NOT A.",
+            "vi": "Cả hai cho1 ở đây; hãy thử hàng chịu ảnh hưởng của NOT A."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A counterexample must show different final outputs under the same inputs.",
+        "vi": "Phản ví dụ phải cho đầu ra cuối khác nhau dưới cùng đầu vào."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Describe a reliable circuit→truth-table→SOP→circuit method without using this example’s numbers.",
+      "vi": "Mô tả phương pháp mạch→bảng chân trị→SOP→mạch đáng tin cậy mà không dùng số của ví dụ."
+    },
+    "answerPoints": [
+      {
+        "en": "Name intermediate wires and evaluate gates in dependency order for every input combination.",
+        "vi": "Đặt tên dây trung gian và tính cổng theo phụ thuộc cho mọi tổ hợp đầu vào."
+      },
+      {
+        "en": "For each output1 row, AND all inputs with the appropriate complements, then OR the products.",
+        "vi": "Với mỗi hàng đầu ra1, AND đủ đầu vào theo đúng phủ định rồi OR các tích."
+      },
+      {
+        "en": "Build gates following the expression and check every final output against the original.",
+        "vi": "Dựng cổng theo biểu thức và kiểm mọi đầu ra cuối với mạch gốc."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "A gate’s rule applies to all of its inputs.",
+      "vi": "Quy tắc cổng áp dụng cho mọi đầu vào của nó."
+    },
+    {
+      "en": "SOP construction begins with a complete table and exactly its output1 rows.",
+      "vi": "Lập SOP bắt đầu từ bảng đầy đủ và đúng các hàng đầu ra1."
+    },
+    {
+      "en": "Logical equivalence is a statement about every input, not visual similarity.",
+      "vi": "Tương đương logic nói về mọi đầu vào, không phải hình dáng giống nhau."
+    }
+  ],
+  "relatedSlugs": [
+    "half-full-adders",
+    "sr-and-jk-flip-flops",
+    "boolean-simplification",
+    "karnaugh-maps"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.2",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-logic",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter15.2, printed pages354–355 and361–362 (PDF pages370–371 and377–378): Boolean rules, circuit/expression conversion and sum of products",
+      "kind": "book"
+    },
+    {
+      "id": "s25-qp32",
+      "title": "Cambridge9618/32 — May/June2025 question paper",
+      "locator": "Question7(a–c), pages6–7; includes a four-input circuit and intermediate working columns",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-ms32",
+      "title": "Cambridge9618/32 — May/June2025 mark scheme",
+      "locator": "Question7(a–c), pages8–9",
+      "kind": "mark-scheme"
+    }
+  ]
+}

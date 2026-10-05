@@ -1,0 +1,751 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.18.1",
+  "topicId": "P3-18.1-T02",
+  "slug": "a-star-and-heuristic-search",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "A* and heuristic search",
+    "vi": "A* và tìm kiếm heuristic"
+  },
+  "question": {
+    "en": "How does a goal estimate guide search without replacing the cost already paid?",
+    "vi": "Ước lượng tới đích hướng dẫn tìm kiếm mà không thay thế chi phí đã đi như thế nào?"
+  },
+  "opening": {
+    "en": "The same route graph now provides a reviewed estimate from each node to G. A* combines that estimate with the path cost already paid.",
+    "vi": "Cùng đồ thị tuyến đường nay cung cấp ước lượng đã duyệt từ mỗi nút tới G. A* kết hợp ước lượng đó với chi phí đường đã đi."
+  },
+  "objectives": [
+    {
+      "en": "Distinguish g(n), h(n) and f(n)=g(n)+h(n).",
+      "vi": "Phân biệt g(n), h(n) và f(n)=g(n)+h(n)."
+    },
+    {
+      "en": "Trace open, closed, predecessor and cost updates.",
+      "vi": "Trace open, closed, predecessor và cập nhật chi phí."
+    },
+    {
+      "en": "Compare A* selection order with Dijkstra on one graph.",
+      "vi": "So sánh thứ tự chọn của A* với Dijkstra trên cùng đồ thị."
+    },
+    {
+      "en": "State the heuristic condition and limitation before claiming optimality.",
+      "vi": "Nêu điều kiện và giới hạn heuristic trước khi tuyên bố tối ưu."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Dijkstra cumulative cost and predecessor tracing.",
+      "vi": "Chi phí tích lũy Dijkstra và trace predecessor."
+    },
+    {
+      "en": "Addition of g and h values.",
+      "vi": "Cộng các giá trị g và h."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "g(n)",
+      "meaning": {
+        "en": "Known path cost from the start to n.",
+        "vi": "Chi phí đường đã biết từ nút đầu tới n."
+      }
+    },
+    {
+      "term": "h(n)",
+      "meaning": {
+        "en": "Fixture-supplied estimate from n to the goal.",
+        "vi": "Ước lượng do fixture cung cấp từ n tới đích."
+      }
+    },
+    {
+      "term": "f(n)",
+      "meaning": {
+        "en": "Selection score g(n)+h(n).",
+        "vi": "Điểm chọn g(n)+h(n)."
+      }
+    },
+    {
+      "term": "open",
+      "meaning": {
+        "en": "Discovered candidate nodes not yet selected for expansion.",
+        "vi": "Nút ứng viên đã phát hiện nhưng chưa được chọn để mở rộng."
+      }
+    },
+    {
+      "term": "closed",
+      "meaning": {
+        "en": "Nodes selected and expanded under the reviewed model.",
+        "vi": "Nút đã được chọn và mở rộng theo mô hình đã duyệt."
+      }
+    },
+    {
+      "term": "admissible heuristic",
+      "meaning": {
+        "en": "An estimate that does not exceed the true remaining cost.",
+        "vi": "Ước lượng không vượt chi phí còn lại thật."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "g-h-f",
+      "title": {
+        "en": "Keep cost paid and estimate separate",
+        "vi": "Giữ riêng chi phí đã đi và ước lượng"
+      },
+      "paragraphs": [
+        {
+          "en": "g(n) is cumulative start-to-node cost. h(n) estimates node-to-goal cost. A* selects by f(n)=g(n)+h(n), not h alone and not by adding f values along a route. Trace the supplied states; you do not need to implement the graph-search algorithm.",
+          "vi": "g(n) là chi phí tích lũy từ nút đầu. h(n) ước lượng chi phí từ nút tới đích. A* chọn theo f(n)=g(n)+h(n), không chỉ dùng h và không cộng các f dọc đường. Hãy trace các trạng thái được cho; bạn không cần cài đặt thuật toán tìm kiếm đồ thị."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "open-closed",
+      "title": {
+        "en": "Select from open and expand",
+        "vi": "Chọn từ open và mở rộng"
+      },
+      "paragraphs": [
+        {
+          "en": "Open holds discovered candidates. Select the smallest f, breaking an equal f by ascending node ID. After testing neighbours, move the selected node to closed in this consistent reviewed fixture.",
+          "vi": "Open chứa các ứng viên đã phát hiện. Chọn f nhỏ nhất, phá hòa f bằng ID nút tăng dần. Sau khi xét nút kề, chuyển nút đã chọn sang closed trong fixture consistent đã duyệt này."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "update-g",
+      "title": {
+        "en": "Relax with candidate g",
+        "vi": "Cập nhật bằng g ứng viên"
+      },
+      "paragraphs": [
+        {
+          "en": "Calculate a new cumulative g through the current node. If lower, update g and predecessor, then recompute f using the node's fixed h. Equal or higher g keeps the earlier route.",
+          "vi": "Tính g tích lũy mới qua nút hiện tại. Nếu thấp hơn, cập nhật g và predecessor, rồi tính lại f bằng h cố định của nút. g bằng hoặc cao hơn giữ tuyến trước."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "heuristic-boundary",
+      "title": {
+        "en": "State the optimality boundary",
+        "vi": "Nêu giới hạn tối ưu"
+      },
+      "paragraphs": [
+        {
+          "en": "The primary fixture uses an admissible, consistent heuristic, so the declared stop rule returns the shortest path. The boundary fixture deliberately overestimates B and returns cost 10 although a cost-6 route exists. Arbitrary h values do not justify an optimality claim.",
+          "vi": "Fixture chính dùng heuristic admissible, consistent nên quy tắc dừng đã công bố trả về đường ngắn nhất. Fixture giới hạn cố ý ước lượng B quá cao và trả về chi phí 10 dù có tuyến chi phí 6. Giá trị h tùy ý không chứng minh tối ưu."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "astar-search",
+    "title": {
+      "en": "A* heuristic-search explorer",
+      "vi": "Bộ khám phá tìm kiếm heuristic A*"
+    },
+    "introduction": {
+      "en": "The graph, g/h/f table, open/closed sets and predecessor path advance together.",
+      "vi": "Đồ thị, bảng g/h/f, tập open/closed và đường predecessor tiến cùng nhau."
+    },
+    "task": {
+      "en": "Compare primary A* with Dijkstra, inspect the tie, then explain the inadmissible boundary result.",
+      "vi": "So sánh A* chính với Dijkstra, xem trường hợp hòa, rồi giải thích kết quả giới hạn inadmissible."
+    },
+    "conventions": [
+      {
+        "en": "f=g+h; g is cumulative cost and h is never substituted for g.",
+        "vi": "f=g+h; g là chi phí tích lũy và h không bao giờ thay g."
+      },
+      {
+        "en": "Open tie: ascending node ID; equal g keeps the previous predecessor.",
+        "vi": "Hòa trong open: ID nút tăng dần; g bằng nhau giữ predecessor trước."
+      },
+      {
+        "en": "Optimal only under the reviewed admissible/consistent fixture assumptions.",
+        "vi": "Chỉ tối ưu theo giả định fixture admissible/consistent đã duyệt."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Guide the search from S to G",
+      "vi": "Hướng dẫn tìm kiếm từ S tới G"
+    },
+    "prompt": {
+      "en": "Use h(S,A,B,C,D,G)=7,8,5,9,3,0 on the shared graph.",
+      "vi": "Dùng h(S,A,B,C,D,G)=7,8,5,9,3,0 trên đồ thị dùng chung."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "start",
+        "action": {
+          "en": "Set g(S)=0 and f(S)=0+7=7.",
+          "vi": "Đặt g(S)=0 và f(S)=0+7=7."
+        },
+        "why": {
+          "en": "The start has no path cost yet paid.",
+          "vi": "Nút đầu chưa trả chi phí đường nào."
+        },
+        "result": {
+          "en": "Open={S7}.",
+          "vi": "Open={S7}."
+        }
+      },
+      {
+        "id": "expand-s",
+        "action": {
+          "en": "Select S and calculate A and B.",
+          "vi": "Chọn S rồi tính A và B."
+        },
+        "why": {
+          "en": "A: g2+h8=f10; B: g2+h5=f7.",
+          "vi": "A: g2+h8=f10; B: g2+h5=f7."
+        },
+        "result": {
+          "en": "Close S; open={B7,A10}.",
+          "vi": "Đóng S; open={B7,A10}."
+        }
+      },
+      {
+        "id": "expand-b",
+        "action": {
+          "en": "Select B and update D.",
+          "vi": "Chọn B và cập nhật D."
+        },
+        "why": {
+          "en": "D has g=2+2=4 and f=4+3=7.",
+          "vi": "D có g=2+2=4 và f=4+3=7."
+        },
+        "result": {
+          "en": "D←B; close B; open={D7,A10}.",
+          "vi": "D←B; đóng B; open={D7,A10}."
+        }
+      },
+      {
+        "id": "expand-d",
+        "action": {
+          "en": "Select D and discover G.",
+          "vi": "Chọn D và phát hiện G."
+        },
+        "why": {
+          "en": "G has g=4+3=7,h0,f7; route to A through D has worse g9.",
+          "vi": "G có g=4+3=7,h0,f7; tuyến tới A qua D có g9 kém hơn."
+        },
+        "result": {
+          "en": "G←D; close D; open={G7,A10}.",
+          "vi": "G←D; đóng D; open={G7,A10}."
+        }
+      },
+      {
+        "id": "goal",
+        "action": {
+          "en": "Select G and stop.",
+          "vi": "Chọn G và dừng."
+        },
+        "why": {
+          "en": "G is the smallest f in open.",
+          "vi": "G có f nhỏ nhất trong open."
+        },
+        "result": {
+          "en": "Selection order S,B,D,G.",
+          "vi": "Thứ tự chọn S,B,D,G."
+        }
+      },
+      {
+        "id": "path",
+        "action": {
+          "en": "Follow G←D←B←S.",
+          "vi": "Theo G←D←B←S."
+        },
+        "why": {
+          "en": "Predecessors track accepted lower-g routes.",
+          "vi": "Predecessor theo dõi tuyến g thấp hơn đã chấp nhận."
+        },
+        "result": {
+          "en": "S→B→D→G; path cost g(G)=7.",
+          "vi": "S→B→D→G; chi phí đường g(G)=7."
+        }
+      }
+    ],
+    "result": {
+      "en": "A* and Dijkstra return the same cost-7 path; A* selects only S,B,D,G in the primary fixture.",
+      "vi": "A* và Dijkstra trả về cùng đường chi phí 7; A* chỉ chọn S,B,D,G trong fixture chính."
+    },
+    "selfCheck": {
+      "en": "Can you state g, h and f for every selected node without adding f values across nodes?",
+      "vi": "Bạn có thể nêu g, h và f cho mọi nút được chọn mà không cộng f giữa các nút không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "heuristic estimate, g/h/f",
+        "vi": "ước lượng heuristic, g/h/f"
+      },
+      {
+        "en": "open and closed sets",
+        "vi": "tập open và closed"
+      },
+      {
+        "en": "compare A* with Dijkstra",
+        "vi": "so sánh A* với Dijkstra"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: choosing the smallest h ignores the cost already paid. Selection uses f=g+h.",
+      "vi": "Dễ nhầm: chọn h nhỏ nhất bỏ qua chi phí đã đi. Việc chọn dùng f=g+h."
+    },
+    "method": [
+      {
+        "en": "Write meanings of g, h and f.",
+        "vi": "Ghi ý nghĩa g, h và f."
+      },
+      {
+        "en": "Declare tie and stop rules.",
+        "vi": "Công bố quy tắc hòa và dừng."
+      },
+      {
+        "en": "Compute candidate g, then fixed h and f.",
+        "vi": "Tính g ứng viên, rồi h cố định và f."
+      },
+      {
+        "en": "Update predecessor only for lower g.",
+        "vi": "Chỉ cập nhật predecessor khi g thấp hơn."
+      },
+      {
+        "en": "State heuristic assumptions before optimality.",
+        "vi": "Nêu giả định heuristic trước khi nói tối ưu."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "describe",
+        "guidance": {
+          "en": "State the open and closed sets and each relevant node's g, h and f values.",
+          "vi": "Nêu tập open, closed và các giá trị g, h, f của từng nút liên quan."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link f=g+h to the chosen node and explain how the heuristic guides the search.",
+          "vi": "Liên hệ f=g+h với nút được chọn và giải thích heuristic định hướng tìm kiếm như thế nào."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Show each selection, candidate g, recomputed f and predecessor update in order.",
+          "vi": "Trình bày theo thứ tự mỗi lần chọn, g ứng viên, f được tính lại và cập nhật predecessor."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Compare A* selection by g+h with Dijkstra selection by cumulative distance only.",
+          "vi": "So sánh A* chọn theo g+h với Dijkstra chỉ chọn theo khoảng cách tích lũy."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Use the declared tie-break and heuristic assumptions before making an optimality claim.",
+          "vi": "Dùng quy tắc phá hòa và giả định heuristic đã công bố trước khi đưa ra tuyên bố tối ưu."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "f is the heuristic.",
+        "vi": "f là heuristic."
+      },
+      "correction": {
+        "en": "h is the heuristic; f=g+h.",
+        "vi": "h là heuristic; f=g+h."
+      },
+      "selfCheck": {
+        "en": "Which symbol is the heuristic, and how is f calculated?",
+        "vi": "Ký hiệu nào là heuristic và f được tính như thế nào?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Add f values to get route cost.",
+        "vi": "Cộng các giá trị f để có chi phí tuyến."
+      },
+      "correction": {
+        "en": "Route cost is goal g and the sum of edge weights.",
+        "vi": "Chi phí tuyến là g tại đích và tổng trọng số cạnh."
+      },
+      "selfCheck": {
+        "en": "Is route cost read from goal g or by adding f values?",
+        "vi": "Chi phí tuyến được đọc từ g tại đích hay bằng cách cộng các giá trị f?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Any heuristic guarantees an optimal route.",
+        "vi": "Mọi heuristic đều bảo đảm tuyến tối ưu."
+      },
+      "correction": {
+        "en": "Name admissibility/consistency and the stop rule.",
+        "vi": "Nêu admissibility/consistency và quy tắc dừng."
+      },
+      "selfCheck": {
+        "en": "What heuristic condition and stop rule support an optimality claim?",
+        "vi": "Điều kiện heuristic và quy tắc dừng nào hỗ trợ tuyên bố tối ưu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "A* and Dijkstra use the same selection score.",
+        "vi": "A* và Dijkstra dùng cùng điểm chọn."
+      },
+      "correction": {
+        "en": "Dijkstra uses cumulative distance; A* uses g+h.",
+        "vi": "Dijkstra dùng khoảng cách tích lũy; A* dùng g+h."
+      },
+      "selfCheck": {
+        "en": "Which score selects the next node in A*, and which score does Dijkstra use?",
+        "vi": "Điểm nào chọn nút tiếp theo trong A* và Dijkstra dùng điểm nào?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What do g, h and f mean?",
+        "vi": "g, h và f có nghĩa gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "g: cost from start; h: estimate to goal; f=g+h",
+            "vi": "g: chi phí từ đầu; h: ước lượng tới đích; f=g+h"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "g: goal name; h: edge count; f: final path",
+            "vi": "g: tên đích; h: số cạnh; f: đường cuối"
+          },
+          "feedback": {
+            "en": "These do not match the reviewed convention.",
+            "vi": "Các ý nghĩa này không khớp quy ước đã duyệt."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "g and h are always identical",
+            "vi": "g và h luôn giống nhau"
+          },
+          "feedback": {
+            "en": "They represent different directions and evidence.",
+            "vi": "Chúng biểu diễn hai hướng và dữ kiện khác nhau."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Keep paid cost and remaining estimate separate.",
+        "vi": "Giữ riêng chi phí đã đi và ước lượng còn lại."
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which clue identifies A* rather than Dijkstra?",
+        "vi": "Dấu hiệu nào nhận diện A* thay vì Dijkstra?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Supplied heuristic h and open/closed g/h/f table",
+            "vi": "Heuristic h được cho và bảng g/h/f open/closed"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Only positive edge weights",
+            "vi": "Chỉ có trọng số cạnh dương"
+          },
+          "feedback": {
+            "en": "Both reviewed algorithms use positive weights.",
+            "vi": "Cả hai thuật toán đã duyệt dùng trọng số dương."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A continuous target value",
+            "vi": "Một giá trị mục tiêu liên tục"
+          },
+          "feedback": {
+            "en": "That is a regression clue.",
+            "vi": "Đó là dấu hiệu hồi quy."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Look for the additional goal estimate.",
+        "vi": "Tìm ước lượng bổ sung tới đích."
+      }
+    },
+    {
+      "id": "ordering",
+      "prompt": {
+        "en": "Which A* update order is correct?",
+        "vi": "Thứ tự cập nhật A* nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "candidate g → fixed h → f=g+h → update predecessor/open → select smallest f",
+            "vi": "g ứng viên → h cố định → f=g+h → cập nhật predecessor/open → chọn f nhỏ nhất"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "smallest h → add every f → ignore g",
+            "vi": "h nhỏ nhất → cộng mọi f → bỏ qua g"
+          },
+          "feedback": {
+            "en": "This loses the path cost already paid.",
+            "vi": "Cách này làm mất chi phí đường đã đi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "close goal before discovering it",
+            "vi": "đóng đích trước khi phát hiện"
+          },
+          "feedback": {
+            "en": "A node must enter open before selection.",
+            "vi": "Nút phải vào open trước khi được chọn."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Calculate and update before the next selection.",
+        "vi": "Tính và cập nhật trước lần chọn tiếp theo."
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "After S is expanded in the primary fixture, which node is selected?",
+        "vi": "Sau khi mở rộng S trong fixture chính, nút nào được chọn?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "B because f=2+5=7",
+            "vi": "B vì f=2+5=7"
+          },
+          "feedback": {
+            "en": "Correct: A has f10.",
+            "vi": "Đúng: A có f10."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A because A is alphabetically first",
+            "vi": "A vì A đứng trước theo chữ cái"
+          },
+          "feedback": {
+            "en": "Tie-break applies only when scores tie; 10 is greater than 7.",
+            "vi": "Phá hòa chỉ áp dụng khi điểm bằng nhau; 10 lớn hơn 7."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "G because h(G)=0",
+            "vi": "G vì h(G)=0"
+          },
+          "feedback": {
+            "en": "G has not been discovered; h alone is not the score.",
+            "vi": "G chưa được phát hiện; h đơn lẻ không phải điểm chọn."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Compare f values in open.",
+        "vi": "So sánh các giá trị f trong open."
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "The boundary fixture returns cost 10 while a cost-6 path exists. What is the correct conclusion?",
+        "vi": "Fixture giới hạn trả về chi phí 10 dù có đường chi phí 6. Kết luận nào đúng?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The supplied overestimating heuristic does not support an optimality claim",
+            "vi": "Heuristic ước lượng quá cao được cho không hỗ trợ tuyên bố tối ưu"
+          },
+          "feedback": {
+            "en": "Correct: this is the intended limitation.",
+            "vi": "Đúng: đây là giới hạn chủ đích."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A* is always wrong",
+            "vi": "A* luôn sai"
+          },
+          "feedback": {
+            "en": "One inadmissible fixture does not invalidate reviewed A* assumptions.",
+            "vi": "Một fixture inadmissible không phủ định giả định A* đã duyệt."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The cost-10 route is secretly shorter",
+            "vi": "Tuyến chi phí 10 thực ra ngắn hơn"
+          },
+          "feedback": {
+            "en": "Edge sums show 10 is greater than 6.",
+            "vi": "Tổng trọng số cho thấy 10 lớn hơn 6."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Tie an optimality statement to the heuristic assumptions.",
+        "vi": "Gắn tuyên bố tối ưu với giả định heuristic."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Compare Dijkstra and A* in two sentences.",
+      "vi": "So sánh Dijkstra và A* trong hai câu."
+    },
+    "answerPoints": [
+      {
+        "en": "Dijkstra selects the lowest cumulative distance and uses no heuristic.",
+        "vi": "Dijkstra chọn khoảng cách tích lũy thấp nhất và không dùng heuristic."
+      },
+      {
+        "en": "A* selects the lowest g+h and needs a stated heuristic.",
+        "vi": "A* chọn g+h thấp nhất và cần heuristic đã nêu."
+      },
+      {
+        "en": "Both reconstruct a route from predecessors; optimality depends on stated assumptions.",
+        "vi": "Cả hai dựng tuyến từ predecessor; tính tối ưu phụ thuộc giả định đã nêu."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Never replace g with h.",
+      "vi": "Không bao giờ thay g bằng h."
+    },
+    {
+      "en": "Use f for selection and g for final path cost.",
+      "vi": "Dùng f để chọn và g cho chi phí đường cuối."
+    },
+    {
+      "en": "Declare heuristic limitations.",
+      "vi": "Công bố giới hạn heuristic."
+    }
+  ],
+  "relatedSlugs": [
+    "graphs-and-dijkstra",
+    "learning-categories"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p36, §18.1 Artificial Intelligence (AI)",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Chapter 18.1.2, printed pp429–434 / PDF pp445–450: A* and heuristic search",
+      "kind": "book"
+    },
+    {
+      "id": "w21-31-qp",
+      "title": "Cambridge 9618/31 — October/November 2021 question paper",
+      "locator": "Question 9(b), p12",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w21-31-ms",
+      "title": "Cambridge 9618/31 — October/November 2021 mark scheme",
+      "locator": "Question 9(b), p9",
+      "kind": "mark-scheme"
+    }
+  ]
+}

@@ -1,0 +1,565 @@
+{
+  "schemaVersion": 1,
+  "version": "T26-academic-r1",
+  "topicId": "T26",
+  "sectionId": "12.3",
+  "slug": "dry-run-trace-tables",
+  "learningMode": "procedural",
+  "estimatedMinutes": 55,
+  "title": {
+    "en": "Dry runs and trace tables",
+    "vi": "Chạy thử bằng tay và bảng trace"
+  },
+  "question": {
+    "en": "How do you execute the given algorithm exactly and preserve the order of every state change and output?",
+    "vi": "Làm thế nào thực hiện chính xác thuật toán được cho và giữ đúng thứ tự mọi thay đổi trạng thái cùng đầu ra?"
+  },
+  "opening": {
+    "en": "A trace table records what the code does, including an error in the code. Separate initial values, each executed update, condition result and output; never silently trace what you think the algorithm intended.",
+    "vi": "Bảng trace ghi đúng điều code thực hiện, kể cả lỗi trong code. Tách giá trị khởi tạo, từng cập nhật đã chạy, kết quả điều kiện và đầu ra; không tự ý trace theo ý định bạn đoán."
+  },
+  "objectives": [
+    {
+      "en": "Trace assignments, conditions, loops and output in execution order.",
+      "vi": "Trace phép gán, điều kiện, vòng lặp và đầu ra theo thứ tự thực thi."
+    },
+    {
+      "en": "Design a trace table with only the columns needed to expose state changes.",
+      "vi": "Thiết kế bảng trace chỉ có các cột cần thiết để thấy thay đổi trạng thái."
+    },
+    {
+      "en": "Distinguish a pre-test from a post-test loop and justify termination.",
+      "vi": "Phân biệt vòng lặp kiểm tra trước và sau, đồng thời giải thích việc dừng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Variables and assignment",
+        "vi": "Biến và phép gán"
+      },
+      "reason": {
+        "en": "A trace records each value after the assignment has executed.",
+        "vi": "Trace ghi mỗi giá trị sau khi phép gán đã chạy."
+      }
+    },
+    {
+      "title": {
+        "en": "Selection and iteration",
+        "vi": "Rẽ nhánh và lặp"
+      },
+      "reason": {
+        "en": "Only executed branches and iterations create state changes.",
+        "vi": "Chỉ nhánh và lần lặp được thực hiện mới tạo thay đổi trạng thái."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "dry run",
+      "meaning": {
+        "en": "Manual execution of an algorithm with chosen input.",
+        "vi": "Thực hiện thuật toán bằng tay với đầu vào đã chọn."
+      }
+    },
+    {
+      "term": "trace table",
+      "meaning": {
+        "en": "A table recording selected values, conditions and outputs as execution proceeds.",
+        "vi": "Bảng ghi các giá trị, điều kiện và đầu ra đã chọn trong khi thực thi."
+      }
+    },
+    {
+      "term": "state",
+      "meaning": {
+        "en": "The current values of relevant variables at one point in execution.",
+        "vi": "Các giá trị hiện tại của biến liên quan tại một thời điểm thực thi."
+      }
+    },
+    {
+      "term": "termination",
+      "meaning": {
+        "en": "The point at which the loop or algorithm stops.",
+        "vi": "Thời điểm vòng lặp hoặc thuật toán dừng."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The question says trace, dry run, complete a trace table or give the output.",
+        "vi": "Đề yêu cầu trace, dry run, hoàn thành bảng trace hoặc nêu output."
+      },
+      {
+        "en": "Code and a concrete input are supplied.",
+        "vi": "Code và một input cụ thể được cho."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "A request to correct the algorithm is debugging; trace the current code first.",
+        "vi": "Yêu cầu sửa thuật toán là debugging; trước hết trace code hiện tại."
+      },
+      {
+        "en": "A high-level explanation does not replace the required row-by-row values.",
+        "vi": "Giải thích khái quát không thay thế các giá trị theo từng hàng."
+      }
+    ],
+    "answerProduct": {
+      "en": "A row-by-row trace showing initial state, executed updates, condition outcomes and output.",
+      "vi": "Bảng trace theo từng hàng cho biết trạng thái đầu, cập nhật đã chạy, kết quả điều kiện và output."
+    },
+    "method": [
+      {
+        "en": "Copy the code and mark the first executable statement.",
+        "vi": "Chép code và đánh dấu câu lệnh đầu tiên được thực thi."
+      },
+      {
+        "en": "Create columns only for variables/conditions/output that can change or reveal control flow.",
+        "vi": "Tạo cột chỉ cho biến/điều kiện/output có thể đổi hoặc làm rõ luồng điều khiển."
+      },
+      {
+        "en": "Execute one statement at a time and record values after it runs.",
+        "vi": "Thực hiện từng câu lệnh và ghi giá trị sau khi chạy."
+      },
+      {
+        "en": "At termination, verify the last condition and stated output.",
+        "vi": "Khi dừng, kiểm điều kiện cuối và output đã nêu."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "T26-U1",
+      "title": {
+        "en": "Record execution, not intention",
+        "vi": "Ghi việc thực thi, không ghi ý định"
+      },
+      "paragraphs": [
+        {
+          "en": "A reliable trace follows the supplied syntax and control flow. If a condition is wrong, its wrong branch is still the branch to trace.",
+          "vi": "Trace đáng tin cậy bám cú pháp và luồng điều khiển được cho. Nếu điều kiện sai, nhánh sai đó vẫn là nhánh cần trace."
+        },
+        {
+          "en": "Record a variable when an executed statement changes it. Repeating unchanged values can hide where the actual change occurred.",
+          "vi": "Ghi biến khi câu lệnh đã chạy làm nó thay đổi. Lặp lại giá trị không đổi có thể che nơi thay đổi thực sự xảy ra."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Initial values before the first update",
+          "vi": "Giá trị đầu trước cập nhật đầu tiên"
+        },
+        {
+          "en": "Condition result at the point it is tested",
+          "vi": "Kết quả điều kiện tại thời điểm được kiểm"
+        },
+        {
+          "en": "Output on the exact statement that produces it",
+          "vi": "Output tại đúng câu lệnh sinh ra nó"
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book"
+      ]
+    },
+    {
+      "id": "T26-U2",
+      "title": {
+        "en": "Loop checkpoints and termination",
+        "vi": "Checkpoint vòng lặp và việc dừng"
+      },
+      "paragraphs": [
+        {
+          "en": "For WHILE, test before entering each iteration. For REPEAT, execute the body before testing the terminating condition.",
+          "vi": "Với WHILE, kiểm trước mỗi lần lặp. Với REPEAT, thực hiện thân trước khi kiểm điều kiện dừng."
+        },
+        {
+          "en": "Show the final failed WHILE condition or final true UNTIL condition so the reason for stopping is visible.",
+          "vi": "Cho thấy điều kiện WHILE sai cuối cùng hoặc điều kiện UNTIL đúng cuối cùng để lý do dừng được rõ."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "WHILE can execute zero times.",
+          "vi": "WHILE có thể chạy 0 lần."
+        },
+        {
+          "en": "REPEAT executes at least once.",
+          "vi": "REPEAT chạy ít nhất 1 lần."
+        },
+        {
+          "en": "Check array indices before reading an element.",
+          "vi": "Kiểm chỉ số mảng trước khi đọc phần tử."
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T26"
+    ],
+    "title": {
+      "en": "Code–trace–output synchroniser",
+      "vi": "Bộ đồng bộ code–trace–output"
+    },
+    "introduction": {
+      "en": "The active code line, changed table cell and emitted output are highlighted together.",
+      "vi": "Dòng code đang chạy, ô bảng thay đổi và output được sinh được tô sáng cùng lúc."
+    },
+    "task": {
+      "en": "Predict the next row before advancing one executed statement.",
+      "vi": "Dự đoán hàng kế tiếp trước khi tiến một câu lệnh đã chạy."
+    },
+    "conventions": [
+      {
+        "en": "Blank means no value is recorded on that step; it does not mean zero.",
+        "vi": "Ô trống nghĩa là không ghi giá trị ở bước đó; không có nghĩa là 0."
+      },
+      {
+        "en": "A condition column records TRUE/FALSE when the condition is evaluated.",
+        "vi": "Cột điều kiện ghi TRUE/FALSE khi điều kiện được đánh giá."
+      },
+      {
+        "en": "Output is recorded only when an OUTPUT statement executes.",
+        "vi": "Output chỉ được ghi khi câu lệnh OUTPUT chạy."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "teacher-t26"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T26-W1",
+      "title": {
+        "en": "Trace a pre-test loop",
+        "vi": "Trace vòng lặp kiểm tra trước"
+      },
+      "prompt": {
+        "en": "Trace Total←0, I←1; WHILE I<=3: Total←Total+2*I; I←I+1; ENDWHILE; OUTPUT Total.",
+        "vi": "Trace Total←0, I←1; WHILE I<=3: Total←Total+2*I; I←I+1; ENDWHILE; OUTPUT Total."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "T26-W1-S1",
+          "action": {
+            "en": "Record Total=0 and I=1 before the first test.",
+            "vi": "Ghi Total=0 và I=1 trước lần kiểm đầu."
+          },
+          "why": {
+            "en": "These assignments establish the initial state.",
+            "vi": "Các phép gán này thiết lập trạng thái đầu."
+          },
+          "result": {
+            "en": "Initial row: I 1, Total 0.",
+            "vi": "Hàng đầu: I 1, Total 0."
+          },
+          "check": {
+            "en": "No output has occurred.",
+            "vi": "Chưa có output."
+          }
+        },
+        {
+          "id": "T26-W1-S2",
+          "action": {
+            "en": "For I=1,2,3, test TRUE then update Total and I.",
+            "vi": "Với I=1,2,3, kiểm TRUE rồi cập nhật Total và I."
+          },
+          "why": {
+            "en": "The body executes only after each successful pre-test.",
+            "vi": "Thân chỉ chạy sau mỗi lần kiểm trước thành công."
+          },
+          "result": {
+            "en": "Totals are 2, 6, 12; I becomes 2, 3, 4.",
+            "vi": "Total lần lượt 2, 6, 12; I thành 2, 3, 4."
+          },
+          "check": {
+            "en": "Each Total uses the old I before I is incremented.",
+            "vi": "Mỗi Total dùng I cũ trước khi I tăng."
+          }
+        },
+        {
+          "id": "T26-W1-S3",
+          "action": {
+            "en": "Test I<=3 with I=4, then output.",
+            "vi": "Kiểm I<=3 với I=4 rồi output."
+          },
+          "why": {
+            "en": "The false condition terminates the loop.",
+            "vi": "Điều kiện sai kết thúc vòng lặp."
+          },
+          "result": {
+            "en": "Condition FALSE; output 12.",
+            "vi": "Điều kiện FALSE; output 12."
+          },
+          "check": {
+            "en": "Do not execute the body for I=4.",
+            "vi": "Không chạy thân với I=4."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Trace updates: (I=1,Total=0) → Total=2,I=2 → Total=6,I=3 → Total=12,I=4 → condition FALSE → output 12.",
+        "vi": "Cập nhật trace: (I=1,Total=0) → Total=2,I=2 → Total=6,I=3 → Total=12,I=4 → điều kiện FALSE → output 12."
+      },
+      "selfCheck": {
+        "en": "Does your table show the terminating false condition and only one output value?",
+        "vi": "Bảng có cho thấy điều kiện sai làm dừng và chỉ một giá trị output không?"
+      },
+      "sourceIds": [
+        "teacher-t26"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T26-P1",
+      "title": {
+        "en": "Trace an array scan",
+        "vi": "Trace quét mảng"
+      },
+      "prompt": {
+        "en": "A=[4,7,2], Count←0. FOR I←0 TO 2: IF A[I]>3 THEN Count←Count+1 ENDIF; NEXT I. OUTPUT Count. Trace I, A[I], condition and Count.",
+        "vi": "A=[4,7,2], Count←0. FOR I←0 TO 2: IF A[I]>3 THEN Count←Count+1 ENDIF; NEXT I. OUTPUT Count. Trace I, A[I], điều kiện và Count."
+      },
+      "working": [
+        {
+          "en": "Evaluate the comparison for each valid index.",
+          "vi": "Đánh giá phép so sánh cho từng chỉ số hợp lệ."
+        },
+        {
+          "en": "Update Count only on TRUE rows.",
+          "vi": "Chỉ cập nhật Count ở hàng TRUE."
+        },
+        {
+          "en": "Output after all three iterations.",
+          "vi": "Output sau cả ba lần lặp."
+        }
+      ],
+      "answer": {
+        "en": "Rows: 0,4,TRUE,1; 1,7,TRUE,2; 2,2,FALSE,2. Output 2.",
+        "vi": "Các hàng: 0,4,TRUE,1; 1,7,TRUE,2; 2,2,FALSE,2. Output 2."
+      },
+      "markGuidance": [
+        {
+          "en": "Three correct index/value pairs.",
+          "vi": "Ba cặp index/value đúng."
+        },
+        {
+          "en": "Correct Boolean result each row.",
+          "vi": "Kết quả Boolean đúng mỗi hàng."
+        },
+        {
+          "en": "Final Count and output are 2.",
+          "vi": "Count cuối và output là 2."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Use index 3.",
+          "vi": "Dùng chỉ số 3."
+        },
+        {
+          "en": "Increment Count on the false row.",
+          "vi": "Tăng Count ở hàng FALSE."
+        }
+      ],
+      "selfCheck": {
+        "en": "Did you read exactly A[0], A[1] and A[2]?",
+        "vi": "Bạn có đọc đúng A[0], A[1] và A[2] không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t26"
+      ]
+    },
+    {
+      "id": "T26-P2",
+      "title": {
+        "en": "Trace REPEAT and CASE",
+        "vi": "Trace REPEAT và CASE"
+      },
+      "prompt": {
+        "en": "X←1. REPEAT X←X+1; CASE X OF 2: OUTPUT 'A'; 3: OUTPUT 'B'; OTHERWISE: OUTPUT 'C' ENDCASE UNTIL X=3. Give the outputs and final X.",
+        "vi": "X←1. REPEAT X←X+1; CASE X OF 2: OUTPUT 'A'; 3: OUTPUT 'B'; OTHERWISE: OUTPUT 'C' ENDCASE UNTIL X=3. Nêu outputs và X cuối."
+      },
+      "working": [
+        {
+          "en": "Execute the REPEAT body before testing X=3.",
+          "vi": "Thực hiện thân REPEAT trước khi kiểm X=3."
+        },
+        {
+          "en": "Select exactly one CASE branch each iteration.",
+          "vi": "Chọn đúng một nhánh CASE mỗi lần lặp."
+        },
+        {
+          "en": "Stop when the UNTIL condition becomes TRUE.",
+          "vi": "Dừng khi điều kiện UNTIL thành TRUE."
+        }
+      ],
+      "answer": {
+        "en": "First body: X=2, output A, condition FALSE. Second: X=3, output B, condition TRUE. Outputs A then B; final X=3.",
+        "vi": "Thân đầu: X=2, output A, điều kiện FALSE. Thân hai: X=3, output B, điều kiện TRUE. Outputs A rồi B; X cuối=3."
+      },
+      "markGuidance": [
+        {
+          "en": "Shows two body executions.",
+          "vi": "Cho thấy hai lần chạy thân."
+        },
+        {
+          "en": "Outputs A then B in order.",
+          "vi": "Outputs A rồi B đúng thứ tự."
+        },
+        {
+          "en": "Stops with X=3.",
+          "vi": "Dừng với X=3."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Test before the first REPEAT body.",
+          "vi": "Kiểm trước thân REPEAT đầu tiên."
+        },
+        {
+          "en": "Execute OTHERWISE as well as a matched case.",
+          "vi": "Chạy OTHERWISE cùng với case đã khớp."
+        }
+      ],
+      "selfCheck": {
+        "en": "Is the UNTIL test placed after each output?",
+        "vi": "Kiểm UNTIL có nằm sau mỗi output không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t26"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Correct the code while tracing it.",
+        "vi": "Sửa code trong khi trace."
+      },
+      "correction": {
+        "en": "Trace the supplied algorithm first; debugging is a separate requested action.",
+        "vi": "Trước hết trace thuật toán được cho; debugging là hành động riêng khi đề yêu cầu."
+      },
+      "selfCheck": {
+        "en": "Did the supplied statement actually say what you wrote?",
+        "vi": "Câu lệnh được cho có thực sự nói điều bạn ghi không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Put a value in every cell of every row.",
+        "vi": "Điền giá trị vào mọi ô của mọi hàng."
+      },
+      "correction": {
+        "en": "Record the point of change or evaluation so sequence remains visible.",
+        "vi": "Ghi tại điểm thay đổi hoặc đánh giá để thứ tự vẫn rõ."
+      },
+      "selfCheck": {
+        "en": "Can the reader tell which statement created this value?",
+        "vi": "Người đọc có biết câu lệnh nào tạo giá trị này không?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What must a complete trace make visible?",
+      "vi": "Trace đầy đủ phải làm rõ điều gì?"
+    },
+    "answerPoints": [
+      {
+        "en": "Initial values.",
+        "vi": "Giá trị đầu."
+      },
+      {
+        "en": "Executed statements and updates in order.",
+        "vi": "Câu lệnh đã chạy và cập nhật theo thứ tự."
+      },
+      {
+        "en": "Condition outcomes including termination.",
+        "vi": "Kết quả điều kiện kể cả lúc dừng."
+      },
+      {
+        "en": "Outputs at the moment they occur.",
+        "vi": "Output tại thời điểm xảy ra."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Trace the given code, not the intended solution.",
+      "vi": "Trace code được cho, không trace lời giải dự định."
+    },
+    {
+      "en": "Separate state before/after an update and output.",
+      "vi": "Tách trạng thái trước/sau cập nhật và output."
+    },
+    {
+      "en": "Show why a loop stops.",
+      "vi": "Cho thấy vì sao vòng lặp dừng."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F12",
+      "role": "owner",
+      "title": {
+        "en": "Trace and debug",
+        "vi": "Trace và gỡ lỗi"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "variables-constants-io",
+    "selection",
+    "iteration",
+    "errors-debugging"
+  ],
+  "sources": [
+    {
+      "id": "syl",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§12.3, printed/PDF p31.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp293–295 and examples in chapters 9–11; PDF pp309–311.",
+      "kind": "book"
+    },
+    {
+      "id": "qp1",
+      "title": "9618/21 May/June 2025 Question 4(b)",
+      "locator": "QP pp8–9; trace-table calibration.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "qp2",
+      "title": "9618/22 May/June 2025 Question 6(a)",
+      "locator": "QP pp12–13; unfamiliar-code trace calibration.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t26",
+      "title": "AlgoCore teacher-created T26 worked examples, practice and marking guidance",
+      "locator": "T26-academic-r1, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

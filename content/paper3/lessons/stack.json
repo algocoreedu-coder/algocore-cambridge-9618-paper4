@@ -1,0 +1,843 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.1-T05",
+  "slug": "stack",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Stack ADT",
+    "vi": "ADT stack"
+  },
+  "question": {
+    "en": "How do Top and the visible data change under LIFO operations?",
+    "vi": "Top và dữ liệu nhìn thấy thay đổi thế nào dưới các thao tác LIFO?"
+  },
+  "opening": {
+    "en": "A browser history stores the most recent live item at one accessible end.",
+    "vi": "Lịch sử trình duyệt lưu phần tử sống gần nhất tại một đầu truy cập."
+  },
+  "objectives": [
+    {
+      "en": "Describe LIFO and the stack interface.",
+      "vi": "Mô tả LIFO và interface stack."
+    },
+    {
+      "en": "Trace PUSH, POP and PEEK.",
+      "vi": "Trace PUSH, POP và PEEK."
+    },
+    {
+      "en": "Write array-stack guards and updates.",
+      "vi": "Viết guard và update stack bằng mảng."
+    },
+    {
+      "en": "Handle underflow and overflow without mutation.",
+      "vi": "Xử lý underflow và overflow không mutation."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Use a fixed zero-based array.",
+      "vi": "Dùng mảng cố định zero-based."
+    },
+    {
+      "en": "Distinguish an index from a stored value.",
+      "vi": "Phân biệt index với giá trị lưu."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "LIFO",
+      "meaning": {
+        "en": "Last in, first out.",
+        "vi": "Vào sau, ra trước."
+      }
+    },
+    {
+      "term": "Top",
+      "meaning": {
+        "en": "Index of the last occupied cell; −1 when empty.",
+        "vi": "Index của ô occupied cuối; −1 khi empty."
+      }
+    },
+    {
+      "term": "PUSH",
+      "meaning": {
+        "en": "Add at the top.",
+        "vi": "Thêm tại top."
+      }
+    },
+    {
+      "term": "POP",
+      "meaning": {
+        "en": "Remove and return the top value.",
+        "vi": "Loại và trả giá trị top."
+      }
+    },
+    {
+      "term": "PEEK",
+      "meaning": {
+        "en": "Read the top without mutation.",
+        "vi": "Đọc top không mutation."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "interface",
+      "title": {
+        "en": "One-end LIFO interface",
+        "vi": "Interface LIFO một đầu"
+      },
+      "paragraphs": [
+        {
+          "en": "PUSH adds, POP removes/returns and PEEK reads the newest live item. The interface does not require an array representation.",
+          "vi": "PUSH thêm, POP loại/trả và PEEK đọc phần tử sống mới nhất. Interface không bắt buộc representation bằng mảng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "state",
+      "title": {
+        "en": "Top convention",
+        "vi": "Quy ước Top"
+      },
+      "paragraphs": [
+        {
+          "en": "In the fixture, Top=−1 is empty and Top=Capacity−1 is full. These pointer values are declared choices, not universal definitions.",
+          "vi": "Trong fixture, Top=−1 là empty và Top=Capacity−1 là full. Các giá trị pointer này là lựa chọn đã công bố, không phải định nghĩa phổ quát."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "order",
+      "title": {
+        "en": "Safe update order",
+        "vi": "Thứ tự cập nhật an toàn"
+      },
+      "paragraphs": [
+        {
+          "en": "PUSH guards, increments, then writes. POP guards, saves, clears, decrements, then returns. PEEK never changes Top.",
+          "vi": "PUSH guard, tăng rồi ghi. POP guard, lưu, xóa, giảm rồi trả. PEEK không đổi Top."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "errors",
+      "title": {
+        "en": "Errors preserve state",
+        "vi": "Lỗi giữ nguyên trạng thái"
+      },
+      "paragraphs": [
+        {
+          "en": "Underflow and overflow are explicit results. No invalid cell is read or overwritten.",
+          "vi": "Underflow và overflow là kết quả rõ ràng. Không đọc hoặc ghi đè ô không hợp lệ."
+        }
+      ],
+      "code": "// PUSH\nIF Top = Capacity - 1 THEN RETURN FALSE\nTop ← Top + 1\nStack[Top] ← NewValue\n// POP\nIF Top = -1 THEN RETURN ErrorValue\nRemoved ← Stack[Top]\nStack[Top] ← EmptyValue\nTop ← Top - 1\nRETURN Removed",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "stack-adt",
+    "title": {
+      "en": "LIFO stack workbench",
+      "vi": "Bàn trace stack LIFO"
+    },
+    "introduction": {
+      "en": "Array cells, Top, operation result and logical stack change together.",
+      "vi": "Ô mảng, Top, kết quả thao tác và stack logic thay đổi cùng nhau."
+    },
+    "task": {
+      "en": "Predict pointer order, then test underflow and overflow.",
+      "vi": "Dự đoán thứ tự pointer, rồi thử underflow và overflow."
+    },
+    "conventions": [
+      {
+        "en": "Top=−1 empty.",
+        "vi": "Top=−1 là empty."
+      },
+      {
+        "en": "Top=Capacity−1 full.",
+        "vi": "Top=Capacity−1 là full."
+      },
+      {
+        "en": "Rejected operations do not mutate state.",
+        "vi": "Thao tác bị từ chối không mutate trạng thái."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Push A, B; peek; pop",
+      "vi": "Push A, B; peek; pop"
+    },
+    "prompt": {
+      "en": "Use Capacity=3 and initial Top=−1.",
+      "vi": "Dùng Capacity=3 và Top ban đầu=−1."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "initial",
+        "action": {
+          "en": "Declare Stack[0:2] and Top←−1.",
+          "vi": "Khai báo Stack[0:2] và Top←−1."
+        },
+        "why": {
+          "en": "The pointer convention defines empty/full.",
+          "vi": "Quy ước pointer định nghĩa empty/full."
+        },
+        "result": {
+          "en": "Logical stack is empty.",
+          "vi": "Stack logic empty."
+        },
+        "check": {
+          "en": "Check that logical stack is empty.",
+          "vi": "Kiểm tra rằng stack logic empty."
+        }
+      },
+      {
+        "id": "push-a",
+        "action": {
+          "en": "Guard, set Top←0, write A.",
+          "vi": "Guard, đặt Top←0, ghi A."
+        },
+        "why": {
+          "en": "Increment-before-write targets the first valid cell.",
+          "vi": "Tăng trước ghi nhắm ô hợp lệ đầu."
+        },
+        "result": {
+          "en": "Stack=[A,_,_], Top=0.",
+          "vi": "Stack=[A,_,_], Top=0."
+        },
+        "check": {
+          "en": "Check that stack=[a,_,_], top=0.",
+          "vi": "Kiểm tra rằng stack=[a,_,_], top=0."
+        }
+      },
+      {
+        "id": "push-b",
+        "action": {
+          "en": "Guard, set Top←1, write B.",
+          "vi": "Guard, đặt Top←1, ghi B."
+        },
+        "why": {
+          "en": "B is the most recent item.",
+          "vi": "B là phần tử mới nhất."
+        },
+        "result": {
+          "en": "Stack=[A,B,_], Top=1.",
+          "vi": "Stack=[A,B,_], Top=1."
+        },
+        "check": {
+          "en": "Check that stack=[a,b,_], top=1.",
+          "vi": "Kiểm tra rằng stack=[a,b,_], top=1."
+        }
+      },
+      {
+        "id": "peek",
+        "action": {
+          "en": "Read Stack[Top].",
+          "vi": "Đọc Stack[Top]."
+        },
+        "why": {
+          "en": "PEEK observes without mutation.",
+          "vi": "PEEK quan sát không mutation."
+        },
+        "result": {
+          "en": "Return B; Top remains 1.",
+          "vi": "Trả B; Top vẫn 1."
+        },
+        "check": {
+          "en": "Check that return b; top remains 1.",
+          "vi": "Kiểm tra rằng trả b; top vẫn 1."
+        }
+      },
+      {
+        "id": "pop",
+        "action": {
+          "en": "Save B, clear cell 1, set Top←0.",
+          "vi": "Lưu B, xóa ô 1, đặt Top←0."
+        },
+        "why": {
+          "en": "The old top must be saved before decrement.",
+          "vi": "Top cũ phải được lưu trước khi giảm."
+        },
+        "result": {
+          "en": "Return B; logical stack contains A.",
+          "vi": "Trả B; stack logic chứa A."
+        },
+        "check": {
+          "en": "Check that return b; logical stack contains a.",
+          "vi": "Kiểm tra rằng trả b; stack logic chứa a."
+        }
+      },
+      {
+        "id": "error",
+        "action": {
+          "en": "On an empty stack, reject POP before reading.",
+          "vi": "Với stack empty, từ chối POP trước khi đọc."
+        },
+        "why": {
+          "en": "Top=−1 has no valid cell.",
+          "vi": "Top=−1 không có ô hợp lệ."
+        },
+        "result": {
+          "en": "Underflow result; entire before-state preserved.",
+          "vi": "Kết quả underflow; giữ nguyên toàn bộ before-state."
+        },
+        "check": {
+          "en": "Check that underflow result; entire before-state preserved.",
+          "vi": "Kiểm tra rằng kết quả underflow; giữ nguyên toàn bộ before-state."
+        }
+      }
+    ],
+    "result": {
+      "en": "LIFO returns B before A; PEEK and rejected operations preserve state.",
+      "vi": "LIFO trả B trước A; PEEK và thao tác bị từ chối giữ nguyên trạng thái."
+    },
+    "selfCheck": {
+      "en": "Did POP save the old top value before decrementing Top?",
+      "vi": "POP có lưu giá trị top cũ trước khi giảm Top không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "LIFO",
+        "vi": "LIFO"
+      },
+      {
+        "en": "push/pop/top",
+        "vi": "push/pop/top"
+      },
+      {
+        "en": "most recent item first",
+        "vi": "phần tử mới nhất ra trước"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: a runtime call stack also behaves LIFO but stores call frames; it is not this manually implemented Stack array.",
+      "vi": "Dễ nhầm: runtime call stack cũng LIFO nhưng lưu call frame; nó không phải mảng Stack cài thủ công này."
+    },
+    "method": [
+      {
+        "en": "Write Top meaning.",
+        "vi": "Ghi ý nghĩa Top."
+      },
+      {
+        "en": "Check empty/full first.",
+        "vi": "Kiểm tra empty/full trước."
+      },
+      {
+        "en": "Apply pointer update in declared order.",
+        "vi": "Áp dụng pointer update theo thứ tự đã nêu."
+      },
+      {
+        "en": "Record returned value.",
+        "vi": "Ghi giá trị trả về."
+      },
+      {
+        "en": "Verify error leaves state unchanged.",
+        "vi": "Kiểm tra lỗi giữ state không đổi."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Stack ADT: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho ADT stack: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Stack ADT; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của ADT stack; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Stack ADT to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của ADT stack với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Stack ADT with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh ADT stack với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Stack ADT, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của ADT stack, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Write before checking full.",
+        "vi": "Ghi trước khi check full."
+      },
+      "correction": {
+        "en": "Guard overflow before changing Top or data.",
+        "vi": "Guard overflow trước khi đổi Top hoặc dữ liệu."
+      },
+      "selfCheck": {
+        "en": "Could a live cell be overwritten?",
+        "vi": "Có thể ghi đè ô sống không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Decrement before saving POP value.",
+        "vi": "Giảm trước khi lưu giá trị POP."
+      },
+      "correction": {
+        "en": "Save Stack[Top] first.",
+        "vi": "Lưu Stack[Top] trước."
+      },
+      "selfCheck": {
+        "en": "Which cell contains the return value?",
+        "vi": "Ô nào chứa giá trị trả về?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "PEEK removes the item.",
+        "vi": "PEEK loại phần tử."
+      },
+      "correction": {
+        "en": "PEEK returns Stack[Top] without mutation.",
+        "vi": "PEEK trả Stack[Top] không mutation."
+      },
+      "selfCheck": {
+        "en": "Did Top change?",
+        "vi": "Top có đổi không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Top=0 means empty.",
+        "vi": "Top=0 nghĩa là empty."
+      },
+      "correction": {
+        "en": "Under this fixture Top=−1 is empty; Top=0 holds one item.",
+        "vi": "Trong fixture này Top=−1 là empty; Top=0 chứa một phần tử."
+      },
+      "selfCheck": {
+        "en": "Is cell 0 occupied?",
+        "vi": "Ô 0 có occupied không?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What order does a stack use?",
+        "vi": "Stack dùng thứ tự nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "LIFO",
+            "vi": "LIFO"
+          },
+          "feedback": {
+            "en": "Correct: the most recent pushed item is removed first",
+            "vi": "Đúng: phần tử push gần nhất được loại trước"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "FIFO",
+            "vi": "FIFO"
+          },
+          "feedback": {
+            "en": "FIFO conflicts with the rule: the most recent pushed item is removed first",
+            "vi": "FIFO trái với quy tắc: phần tử push gần nhất được loại trước"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Sorted key order",
+            "vi": "Thứ tự key sorted"
+          },
+          "feedback": {
+            "en": "Sorted key order conflicts with the rule: the most recent pushed item is removed first",
+            "vi": "Thứ tự key sorted trái với quy tắc: phần tử push gần nhất được loại trước"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the most recent pushed item is removed first",
+        "vi": "phần tử push gần nhất được loại trước"
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which words identify a stack?",
+        "vi": "Từ nào nhận diện stack?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "push, pop, top",
+            "vi": "push, pop, top"
+          },
+          "feedback": {
+            "en": "Correct: stack operations use one logical top",
+            "vi": "Đúng: thao tác stack dùng một logical top"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "enqueue, dequeue, front",
+            "vi": "enqueue, dequeue, front"
+          },
+          "feedback": {
+            "en": "enqueue, dequeue, front conflicts with the rule: stack operations use one logical top",
+            "vi": "enqueue, dequeue, front trái với quy tắc: thao tác stack dùng một logical top"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "head, next, null",
+            "vi": "head, next, null"
+          },
+          "feedback": {
+            "en": "head, next, null conflicts with the rule: stack operations use one logical top",
+            "vi": "head, next, null trái với quy tắc: thao tác stack dùng một logical top"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "stack operations use one logical top",
+        "vi": "thao tác stack dùng một logical top"
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "Top=0; PUSH X succeeds. New Top?",
+        "vi": "Top=0; PUSH X thành công. Top mới?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "Correct: PUSH increments before writing",
+            "vi": "Đúng: PUSH tăng trước khi ghi"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "0 conflicts with the rule: PUSH increments before writing",
+            "vi": "0 trái với quy tắc: PUSH tăng trước khi ghi"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "−1",
+            "vi": "−1"
+          },
+          "feedback": {
+            "en": "−1 conflicts with the rule: PUSH increments before writing",
+            "vi": "−1 trái với quy tắc: PUSH tăng trước khi ghi"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "PUSH increments before writing",
+        "vi": "PUSH tăng trước khi ghi"
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "After PUSH A, PUSH B, POP, what is returned?",
+        "vi": "Sau PUSH A, PUSH B, POP, trả gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "B",
+            "vi": "B"
+          },
+          "feedback": {
+            "en": "Correct: LIFO removes the most recent B",
+            "vi": "Đúng: LIFO loại B mới nhất"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A",
+            "vi": "A"
+          },
+          "feedback": {
+            "en": "A conflicts with the rule: LIFO removes the most recent B",
+            "vi": "A trái với quy tắc: LIFO loại B mới nhất"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Nothing",
+            "vi": "Không có gì"
+          },
+          "feedback": {
+            "en": "Nothing conflicts with the rule: LIFO removes the most recent B",
+            "vi": "Không có gì trái với quy tắc: LIFO loại B mới nhất"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "LIFO removes the most recent B",
+        "vi": "LIFO loại B mới nhất"
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Which POP order is safe?",
+        "vi": "Thứ tự POP nào an toàn?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "guard → save → clear/decrement → return",
+            "vi": "guard → lưu → xóa/giảm → trả"
+          },
+          "feedback": {
+            "en": "Correct: the old top must be saved before pointer change",
+            "vi": "Đúng: top cũ phải được lưu trước khi đổi pointer"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "decrement → read",
+            "vi": "giảm → đọc"
+          },
+          "feedback": {
+            "en": "decrement → read conflicts with the rule: the old top must be saved before pointer change",
+            "vi": "giảm → đọc trái với quy tắc: top cũ phải được lưu trước khi đổi pointer"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "write → guard",
+            "vi": "ghi → guard"
+          },
+          "feedback": {
+            "en": "write → guard conflicts with the rule: the old top must be saved before pointer change",
+            "vi": "ghi → guard trái với quy tắc: top cũ phải được lưu trước khi đổi pointer"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the old top must be saved before pointer change",
+        "vi": "top cũ phải được lưu trước khi đổi pointer"
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "Top=−1 and POP is requested. What happens?",
+        "vi": "Top=−1 và yêu cầu POP. Điều gì xảy ra?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Underflow; no mutation",
+            "vi": "Underflow; không mutation"
+          },
+          "feedback": {
+            "en": "Correct: empty guard rejects before any invalid read",
+            "vi": "Đúng: empty guard từ chối trước mọi lần đọc sai"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Read Stack[−1]",
+            "vi": "Đọc Stack[−1]"
+          },
+          "feedback": {
+            "en": "Read Stack[−1] conflicts with the rule: empty guard rejects before any invalid read",
+            "vi": "Đọc Stack[−1] trái với quy tắc: empty guard từ chối trước mọi lần đọc sai"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Set Top=0",
+            "vi": "Đặt Top=0"
+          },
+          "feedback": {
+            "en": "Set Top=0 conflicts with the rule: empty guard rejects before any invalid read",
+            "vi": "Đặt Top=0 trái với quy tắc: empty guard từ chối trước mọi lần đọc sai"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "empty guard rejects before any invalid read",
+        "vi": "empty guard từ chối trước mọi lần đọc sai"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Write the stack pointer contract and safe operation orders.",
+      "vi": "Viết pointer contract và thứ tự thao tác an toàn của stack."
+    },
+    "answerPoints": [
+      {
+        "en": "Top=−1 empty; Capacity−1 full.",
+        "vi": "Top=−1 empty; Capacity−1 full."
+      },
+      {
+        "en": "PUSH guard, increment, write.",
+        "vi": "PUSH guard, tăng, ghi."
+      },
+      {
+        "en": "POP guard, save, clear/decrement, return.",
+        "vi": "POP guard, lưu, xóa/giảm, trả."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Stack is LIFO.",
+      "vi": "Stack là LIFO."
+    },
+    {
+      "en": "Pointer order controls correctness.",
+      "vi": "Thứ tự pointer quyết định tính đúng."
+    },
+    {
+      "en": "Errors do not mutate state.",
+      "vi": "Lỗi không mutate state."
+    }
+  ],
+  "relatedSlugs": [
+    "queue",
+    "call-stacks-and-unwinding"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp464–466 / PDF pp480–482: ADT and stack",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "w23-31-qp",
+      "title": "Cambridge 9618/31 — October/November 2023 question paper",
+      "locator": "Question 10, pp10–11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w23-31-ms",
+      "title": "Cambridge 9618/31 — October/November 2023 mark scheme",
+      "locator": "Question 10, p8",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "w25-32-qp",
+      "title": "Cambridge 9618/32 — October/November 2025 question paper",
+      "locator": "Question 12, p12",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w25-32-ms",
+      "title": "Cambridge 9618/32 — October/November 2025 mark scheme",
+      "locator": "Question 12, p17",
+      "kind": "mark-scheme"
+    }
+  ]
+}

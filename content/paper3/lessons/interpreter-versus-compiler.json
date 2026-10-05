@@ -1,0 +1,640 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.2-T01",
+  "slug": "interpreter-versus-compiler",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Interpreter versus compiler",
+    "vi": "Thông dịch và biên dịch"
+  },
+  "question": {
+    "en": "When does translation happen, and when does the program actually run?",
+    "vi": "Khi nào việc dịch xảy ra, và khi nào chương trình thực sự chạy?"
+  },
+  "opening": {
+    "en": "Both workflows make a source program usable by a computer, but the relationship between translation and execution differs. Follow an output statement carefully: recognising or translating it is not the same as producing its output. A controlled example makes that distinction visible without pretending all language implementations behave identically.",
+    "vi": "Cả hai quy trình giúp máy tính sử dụng chương trình nguồn, nhưng quan hệ giữa dịch và thực thi khác nhau. Hãy theo dõi kỹ lệnh xuất: nhận diện hoặc dịch nó không giống tạo đầu ra. Một ví dụ có kiểm soát làm rõ sự khác biệt mà không giả định mọi cách triển khai ngôn ngữ đều giống nhau."
+  },
+  "objectives": [
+    {
+      "en": "Explain execution by an interpreter without a standalone translated program.",
+      "vi": "Giải thích thực thi bằng trình thông dịch không tạo chương trình đã dịch độc lập."
+    },
+    {
+      "en": "Separate compile-time diagnostics, target-code creation and runtime output.",
+      "vi": "Tách chẩn đoán khi biên dịch, tạo mã đích và đầu ra khi chạy."
+    },
+    {
+      "en": "Compare workflows for a task using qualified benefits and limitations.",
+      "vi": "So sánh quy trình theo nhiệm vụ với lợi ích và giới hạn có điều kiện."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read assignment and OUTPUT statements; distinguish syntax errors from wrong intended results.",
+      "vi": "Đọc phép gán và OUTPUT; phân biệt lỗi cú pháp với kết quả sai ý định."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Source code",
+      "meaning": {
+        "en": "The program expressed in its source language.",
+        "vi": "Chương trình được biểu diễn bằng ngôn ngữ nguồn."
+      }
+    },
+    {
+      "term": "Interpreter",
+      "meaning": {
+        "en": "Software that executes the source program’s instructions without requiring a standalone translated executable in this model.",
+        "vi": "Phần mềm thực thi lệnh của chương trình nguồn mà không cần sản phẩm thực thi đã dịch độc lập trong mô hình này."
+      }
+    },
+    {
+      "term": "Compiler",
+      "meaning": {
+        "en": "Software that translates source into target code for subsequent use or execution.",
+        "vi": "Phần mềm dịch mã nguồn thành mã đích để dùng hoặc chạy sau đó."
+      }
+    },
+    {
+      "term": "Diagnostic",
+      "meaning": {
+        "en": "A report describing a detected issue; it is not a numerical program result.",
+        "vi": "Thông báo mô tả vấn đề phát hiện được; không phải kết quả số của chương trình."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "interpreter-workflow",
+      "title": {
+        "en": "Execute through the interpreter",
+        "vi": "Thực thi thông qua trình thông dịch"
+      },
+      "paragraphs": [
+        {
+          "en": "In the syllabus model, an interpreter processes instructions and carries out their actions without first producing a complete standalone translated program. Execution relies on the interpreter being available. Our trace processes one statement at a time: assign x=5, output 5, then output 10. Variables and output change during execution, not merely because source text is displayed.",
+          "vi": "Trong mô hình syllabus, trình thông dịch xử lý lệnh và thực hiện hành động mà không tạo trước một chương trình đã dịch độc lập hoàn chỉnh. Việc chạy cần trình thông dịch có sẵn. Trace này xử lý từng câu lệnh: gán x=5, xuất 5 rồi xuất 10. Biến và đầu ra đổi trong lúc thực thi, không chỉ vì văn bản nguồn được hiển thị."
+        },
+        {
+          "en": "If this sequential example reaches a malformed third statement, it stops with a diagnostic after the first output has already occurred. This is an explicit teaching model, not a promise that every interpreter executes earlier lines before checking later syntax. Some systems parse whole inputs or use intermediate representations internally.",
+          "vi": "Nếu ví dụ tuần tự này gặp câu lệnh thứ ba sai, nó dừng với chẩn đoán sau khi đầu ra đầu tiên đã xảy ra. Đây là mô hình giảng dạy được nêu rõ, không phải bảo đảm mọi trình thông dịch chạy các dòng trước rồi mới kiểm cú pháp sau. Một số hệ thống phân tích toàn đầu vào hoặc dùng biểu diễn trung gian bên trong."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "s25-31-qp",
+        "s25-31-ms"
+      ]
+    },
+    {
+      "id": "compiler-workflow",
+      "title": {
+        "en": "Translate first; run the result separately",
+        "vi": "Dịch trước; chạy kết quả riêng"
+      },
+      "paragraphs": [
+        {
+          "en": "A compiler analyses source and generates target code. A successful compiled artifact can later be executed without repeating the source-compilation step for every run, although libraries and a runtime environment may still be required. Compilation does not itself perform the user program’s OUTPUT operations. In the visual, the artifact-ready state has no program output.",
+          "vi": "Trình biên dịch phân tích nguồn và sinh mã đích. Sản phẩm biên dịch thành công có thể được chạy sau mà không lặp bước biên dịch nguồn mỗi lần, dù vẫn có thể cần thư viện và môi trường chạy. Bản thân biên dịch không thực hiện các thao tác OUTPUT của chương trình người dùng. Trong visual, trạng thái sản phẩm sẵn sàng chưa có đầu ra chương trình."
+        },
+        {
+          "en": "Target code may need further processing, such as linking, before it is runnable; the compact visual groups successful preparation into one artifact stage. If source contains a detected syntax error, this model produces no successful runnable artifact and does not execute earlier OUTPUT statements. It does not claim that real compilers never emit partial diagnostic or intermediate files.",
+          "vi": "Mã đích có thể cần xử lý tiếp như liên kết trước khi chạy; visual rút gọn gộp việc chuẩn bị thành công vào một bước sản phẩm. Nếu nguồn có lỗi cú pháp được phát hiện, mô hình không tạo sản phẩm chạy thành công và không thực thi các OUTPUT trước đó. Điều này không có nghĩa trình biên dịch thật không bao giờ tạo tệp chẩn đoán hoặc trung gian từng phần."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "errors-and-correctness",
+      "title": {
+        "en": "Locate an error without confusing its category",
+        "vi": "Xác định lỗi mà không nhầm loại"
+      },
+      "paragraphs": [
+        {
+          "en": "A syntax diagnostic concerns a failure to match language rules, such as an addition with no right operand. A runtime failure occurs during execution, such as division by zero under a language’s rules. A logic error can produce the wrong intended result even when translation and execution succeed. Successful compilation therefore does not prove that the program solves its task correctly.",
+          "vi": "Chẩn đoán cú pháp liên quan việc không khớp quy tắc ngôn ngữ, như phép cộng thiếu toán hạng phải. Lỗi khi chạy xảy ra trong thực thi, như chia cho 0 theo quy tắc ngôn ngữ. Lỗi logic có thể tạo kết quả sai ý định dù dịch và chạy thành công. Vì vậy biên dịch thành công không chứng minh chương trình giải đúng nhiệm vụ."
+        },
+        {
+          "en": "When comparing the malformed program, record exactly which statements have executed and whether an executable artifact exists. Do not put a compiler’s diagnostic into the program-output list, and do not erase already produced output from the sequential interpreter trace simply because a later statement fails.",
+          "vi": "Khi so chương trình sai, ghi chính xác câu lệnh nào đã chạy và sản phẩm thực thi có tồn tại không. Không đưa chẩn đoán trình biên dịch vào danh sách đầu ra chương trình, và không xóa đầu ra đã tạo của trace thông dịch tuần tự chỉ vì câu lệnh sau lỗi."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "qualified-comparison",
+      "title": {
+        "en": "Choose a workflow for a reason",
+        "vi": "Chọn quy trình có lý do"
+      },
+      "paragraphs": [
+        {
+          "en": "An interpreter can support immediate experimentation and feedback during development; repeated execution still needs the interpreting system and can repeat work. Ahead-of-time compilation can move translation work before repeated runs and support distribution of a target artifact; rebuilding may be needed after source changes, and the target must match a compatible environment. Relate each benefit to the stated task.",
+          "vi": "Thông dịch có thể hỗ trợ thử nghiệm và phản hồi ngay khi phát triển; chạy lại vẫn cần hệ thông dịch và có thể lặp công việc xử lý. Biên dịch trước có thể chuyển công việc dịch ra trước các lần chạy lặp và hỗ trợ phân phối sản phẩm đích; có thể cần dựng lại khi nguồn đổi, và đích phải phù hợp môi trường. Gắn mỗi lợi ích với nhiệm vụ đã nêu."
+        },
+        {
+          "en": "Do not rank all languages as permanently interpreted or compiled, or assert that one method is always faster, safer or easier to debug. Implementations can combine interpretation, bytecode and just-in-time compilation. The exam distinction remains useful when the question specifies the abstract workflow; this visual is not a speed benchmark.",
+          "vi": "Không xếp mọi ngôn ngữ cố định vào nhóm thông dịch hoặc biên dịch, hay khẳng định một cách luôn nhanh hơn, an toàn hơn hoặc dễ gỡ lỗi hơn. Cách triển khai có thể kết hợp thông dịch, bytecode và biên dịch đúng lúc. Phân biệt trong bài thi vẫn hữu ích khi đề chỉ rõ quy trình trừu tượng; visual này không phải phép đo tốc độ."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "translation-workflows",
+    "title": {
+      "en": "Compare effects on the same program",
+      "vi": "So sánh tác động lên cùng chương trình"
+    },
+    "introduction": {
+      "en": "Follow the active statement, x, output list and artifact flag. The fallback records the same before/after states as the animated view.",
+      "vi": "Theo dõi câu lệnh hiện tại, x, danh sách đầu ra và cờ sản phẩm. Bảng thay thế ghi cùng trạng thái trước/sau với hình động."
+    },
+    "task": {
+      "en": "Run the valid program through both workflows; then predict which output survives the third-statement syntax error.",
+      "vi": "Chạy chương trình hợp lệ qua cả hai quy trình; rồi dự đoán đầu ra nào còn khi câu lệnh thứ ba sai cú pháp."
+    },
+    "conventions": [
+      {
+        "en": "This interpreter executes statements sequentially. The compiler checks the complete supplied program before a successful artifact is available.",
+        "vi": "Trình thông dịch này chạy câu lệnh tuần tự. Trình biên dịch kiểm toàn chương trình được cho trước khi có sản phẩm thành công."
+      },
+      {
+        "en": "Artifact preparation is simplified; no timing or universal language-implementation claim is made.",
+        "vi": "Việc chuẩn bị sản phẩm được giản lược; không đưa thời gian hay khẳng định chung về cách triển khai ngôn ngữ."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "Compile, then run three statements",
+      "vi": "Biên dịch rồi chạy ba câu lệnh"
+    },
+    "prompt": {
+      "en": "Use x ← 2 + 3; OUTPUT x; OUTPUT x * 2. State when output first exists.",
+      "vi": "Dùng x ← 2 + 3; OUTPUT x; OUTPUT x * 2. Nêu khi nào đầu ra xuất hiện lần đầu."
+    },
+    "steps": [
+      {
+        "id": "analyse",
+        "action": {
+          "en": "Check the whole supplied source.",
+          "vi": "Kiểm tra toàn bộ nguồn được cho."
+        },
+        "why": {
+          "en": "The compiler must establish that this program can proceed through translation.",
+          "vi": "Trình biên dịch phải xác định chương trình này có thể tiếp tục được dịch."
+        },
+        "result": {
+          "en": "No program output; no successful artifact yet.",
+          "vi": "Chưa có đầu ra chương trình; chưa có sản phẩm thành công."
+        }
+      },
+      {
+        "id": "generate",
+        "action": {
+          "en": "Generate target code for assignment and outputs.",
+          "vi": "Sinh mã đích cho phép gán và các lệnh xuất."
+        },
+        "why": {
+          "en": "Translating OUTPUT creates instructions rather than executing them.",
+          "vi": "Dịch OUTPUT tạo lệnh thay vì thực thi chúng."
+        },
+        "result": {
+          "en": "Output list remains empty.",
+          "vi": "Danh sách đầu ra vẫn rỗng."
+        }
+      },
+      {
+        "id": "object-ready",
+        "action": {
+          "en": "Retain the successfully prepared artifact.",
+          "vi": "Giữ sản phẩm đã chuẩn bị thành công."
+        },
+        "why": {
+          "en": "Translation and the later run are separate events.",
+          "vi": "Dịch và chạy sau đó là hai sự kiện riêng."
+        },
+        "result": {
+          "en": "Artifact available; output still empty.",
+          "vi": "Có sản phẩm; đầu ra vẫn rỗng."
+        }
+      },
+      {
+        "id": "run",
+        "action": {
+          "en": "Execute the prepared program.",
+          "vi": "Thực thi chương trình đã chuẩn bị."
+        },
+        "why": {
+          "en": "Runtime now evaluates assignments and performs OUTPUT actions.",
+          "vi": "Lúc chạy mới tính phép gán và thực hiện OUTPUT."
+        },
+        "result": {
+          "en": "x=5; outputs [5,10].",
+          "vi": "x=5; đầu ra [5,10]."
+        }
+      }
+    ],
+    "result": {
+      "en": "The valid interpreter and compiled run agree on outputs [5,10]; the routes to those effects differ.",
+      "vi": "Thông dịch hợp lệ và chạy sản phẩm biên dịch cùng cho [5,10]; đường dẫn đến các tác động đó khác nhau."
+    },
+    "selfCheck": {
+      "en": "Replace the final statement by OUTPUT x +. Explain why this compiler produces no output while the sequential interpreter has already output 5.",
+      "vi": "Thay câu cuối bằng OUTPUT x +. Giải thích vì sao trình biên dịch này không tạo đầu ra còn trình thông dịch tuần tự đã xuất 5."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Questions mentioning a standalone translated program or repeated runs concern translator workflow.",
+        "vi": "Câu hỏi nói đến chương trình đã dịch độc lập hoặc chạy lặp liên quan quy trình bộ dịch."
+      },
+      {
+        "en": "An error reported before running differs from output created before a later error.",
+        "vi": "Lỗi được báo trước lúc chạy khác với đầu ra được tạo trước một lỗi xảy ra sau."
+      }
+    ],
+    "distinguish": {
+      "en": "Translation creates or interprets program meaning; execution produces runtime effects. Compilation success is not proof of logic correctness.",
+      "vi": "Dịch tạo hoặc diễn giải ý nghĩa chương trình; thực thi tạo tác động khi chạy. Biên dịch thành công không chứng minh logic đúng."
+    },
+    "method": [
+      {
+        "en": "Identify the specified model rather than inferring from a language name.",
+        "vi": "Xác định mô hình được nêu thay vì suy từ tên ngôn ngữ."
+      },
+      {
+        "en": "Track source processing, artifact availability and actual output separately.",
+        "vi": "Theo riêng xử lý nguồn, sự tồn tại sản phẩm và đầu ra thực."
+      },
+      {
+        "en": "For comparisons, state mechanism→benefit→condition or cost.",
+        "vi": "Khi so sánh, nêu cơ chế→lợi ích→điều kiện hoặc chi phí."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Compiling OUTPUT immediately prints its value.",
+        "vi": "Biên dịch OUTPUT lập tức in giá trị."
+      },
+      "correction": {
+        "en": "Translation generates an instruction; executing it produces output.",
+        "vi": "Dịch sinh lệnh; thực thi lệnh mới tạo đầu ra."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Every interpreter always checks errors one source line at a time.",
+        "vi": "Mọi trình thông dịch luôn kiểm lỗi từng dòng nguồn."
+      },
+      "correction": {
+        "en": "That is a simplified workflow; real implementations may parse or translate larger units.",
+        "vi": "Đó là quy trình giản lược; cách triển khai thật có thể phân tích hoặc dịch đơn vị lớn hơn."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A program that compiles must give the intended answer.",
+        "vi": "Chương trình biên dịch được chắc chắn cho đáp án mong muốn."
+      },
+      "correction": {
+        "en": "Testing is still needed for logic and runtime behaviour.",
+        "vi": "Vẫn cần kiểm thử logic và hành vi khi chạy."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "artifact-output",
+      "prompt": {
+        "en": "At object-ready in the valid compiler trace, what is the program output?",
+        "vi": "Ở object-ready trong trace biên dịch hợp lệ, đầu ra chương trình là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Empty; it has not run.",
+            "vi": "Rỗng; chương trình chưa chạy."
+          },
+          "feedback": {
+            "en": "Correct: the artifact is available for a later run.",
+            "vi": "Đúng: sản phẩm sẵn có để chạy sau."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "[5,10] already printed.",
+            "vi": "Đã in [5,10]."
+          },
+          "feedback": {
+            "en": "That confuses translation with execution.",
+            "vi": "Bạn đã nhầm dịch với thực thi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The syntax diagnostic.",
+            "vi": "Chẩn đoán cú pháp."
+          },
+          "feedback": {
+            "en": "The valid trace has no syntax error, and diagnostics are not program output.",
+            "vi": "Trace hợp lệ không có lỗi cú pháp; chẩn đoán cũng không phải đầu ra chương trình."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A prepared artifact and a completed run are distinct states.",
+        "vi": "Sản phẩm đã chuẩn bị và lần chạy hoàn tất là hai trạng thái khác nhau."
+      }
+    },
+    {
+      "id": "interpreter-error",
+      "prompt": {
+        "en": "The sequential interpreter reaches OUTPUT x + after outputting x=5. What remains?",
+        "vi": "Trình thông dịch tuần tự tới OUTPUT x + sau khi đã xuất x=5. Còn gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "[5] and a missing-operand diagnostic.",
+            "vi": "[5] và chẩn đoán thiếu toán hạng."
+          },
+          "feedback": {
+            "en": "Correct: previous execution effects already occurred.",
+            "vi": "Đúng: tác động thực thi trước đã xảy ra."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No output, because a compiler would reject the program.",
+            "vi": "Không đầu ra vì biên dịch sẽ từ chối chương trình."
+          },
+          "feedback": {
+            "en": "This question specifies sequential interpretation, not compilation.",
+            "vi": "Câu này chỉ rõ thông dịch tuần tự, không phải biên dịch."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "[5,10] despite the malformed statement.",
+            "vi": "[5,10] dù câu lệnh sai."
+          },
+          "feedback": {
+            "en": "The invalid addition cannot produce the intended second output.",
+            "vi": "Phép cộng sai không thể tạo đầu ra thứ hai dự kiến."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Follow the chosen workflow rather than borrowing the other workflow’s error behaviour.",
+        "vi": "Theo quy trình đã chọn, không lấy hành vi lỗi của quy trình kia."
+      }
+    },
+    {
+      "id": "standalone",
+      "prompt": {
+        "en": "Which statement matches the syllabus interpreter model?",
+        "vi": "Phát biểu nào khớp mô hình thông dịch trong syllabus?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "It executes without first producing a standalone translated program.",
+            "vi": "Nó thực thi mà không tạo trước chương trình đã dịch độc lập."
+          },
+          "feedback": {
+            "en": "Correct: the interpreting system participates in execution.",
+            "vi": "Đúng: hệ thông dịch tham gia thực thi."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "It must create a separate executable before any instruction runs.",
+            "vi": "Nó phải tạo tệp thực thi riêng trước khi bất kỳ lệnh nào chạy."
+          },
+          "feedback": {
+            "en": "That describes the compiled-artifact workflow here.",
+            "vi": "Đó là quy trình sản phẩm biên dịch ở đây."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "It never reads source instructions.",
+            "vi": "Nó không bao giờ đọc lệnh nguồn."
+          },
+          "feedback": {
+            "en": "Interpreting requires processing the program representation.",
+            "vi": "Thông dịch cần xử lý biểu diễn chương trình."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "The distinction concerns how source is processed and execution is supported.",
+        "vi": "Sự phân biệt liên quan cách xử lý nguồn và hỗ trợ thực thi."
+      }
+    },
+    {
+      "id": "repeat-transfer",
+      "prompt": {
+        "en": "A stable program is run many times after successful compilation. Which benefit is justified?",
+        "vi": "Chương trình ổn định được chạy nhiều lần sau biên dịch thành công. Lợi ích nào có cơ sở?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Runs can reuse the artifact without recompiling unchanged source each time.",
+            "vi": "Các lần chạy dùng lại sản phẩm mà không biên dịch lại nguồn không đổi mỗi lần."
+          },
+          "feedback": {
+            "en": "Correct, assuming a compatible target/runtime environment.",
+            "vi": "Đúng, với giả định môi trường đích/chạy tương thích."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "All runs are guaranteed to have no runtime failures.",
+            "vi": "Mọi lần chạy được bảo đảm không có lỗi khi chạy."
+          },
+          "feedback": {
+            "en": "Compilation does not prove all runtime conditions safe.",
+            "vi": "Biên dịch không chứng minh mọi điều kiện khi chạy an toàn."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The program becomes independent of every library and platform.",
+            "vi": "Chương trình độc lập mọi thư viện và nền tảng."
+          },
+          "feedback": {
+            "en": "Dependencies and target compatibility may remain.",
+            "vi": "Phụ thuộc và tương thích đích vẫn có thể tồn tại."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "State a specific saved translation step, not an absolute guarantee.",
+        "vi": "Nêu bước dịch cụ thể được tiết kiệm, không bảo đảm tuyệt đối."
+      }
+    },
+    {
+      "id": "logic-transfer",
+      "prompt": {
+        "en": "A program compiles and outputs 10, but the task requires 12. What should you conclude?",
+        "vi": "Chương trình biên dịch được và xuất 10 nhưng nhiệm vụ cần 12. Kết luận gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Investigate the algorithm or logic; compilation did not prove the required result.",
+            "vi": "Kiểm tra thuật toán hoặc logic; biên dịch không chứng minh kết quả yêu cầu."
+          },
+          "feedback": {
+            "en": "Correct: accepted syntax and intended behaviour are different questions.",
+            "vi": "Đúng: cú pháp được chấp nhận và hành vi mong muốn là hai câu hỏi khác nhau."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The compiler must have checked the task specification.",
+            "vi": "Trình biên dịch chắc chắn đã kiểm đặc tả nhiệm vụ."
+          },
+          "feedback": {
+            "en": "A compiler does not generally know the intended external task.",
+            "vi": "Trình biên dịch nói chung không biết nhiệm vụ bên ngoài mong muốn."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "10 is necessarily a lexical error.",
+            "vi": "10 nhất thiết là lỗi từ vựng."
+          },
+          "feedback": {
+            "en": "A valid numeric output can still be the wrong result.",
+            "vi": "Đầu ra số hợp lệ vẫn có thể là kết quả sai."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Translate, run and test against requirements as separate responsibilities.",
+        "vi": "Dịch, chạy và kiểm theo yêu cầu là các trách nhiệm riêng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Compare interpreter execution with compilation followed by a run.",
+      "vi": "So sánh chạy bằng thông dịch với biên dịch rồi chạy."
+    },
+    "answerPoints": [
+      {
+        "en": "The interpreter model executes without a standalone translated program.",
+        "vi": "Mô hình thông dịch chạy không cần chương trình đã dịch độc lập."
+      },
+      {
+        "en": "Compilation prepares target code; program output occurs during a later run.",
+        "vi": "Biên dịch chuẩn bị mã đích; đầu ra chương trình xảy ra trong lần chạy sau."
+      },
+      {
+        "en": "Error behaviour and performance claims require an explicit model and task.",
+        "vi": "Hành vi lỗi và nhận định hiệu năng cần mô hình và nhiệm vụ rõ."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Artifact creation is not program execution.",
+      "vi": "Tạo sản phẩm không phải thực thi chương trình."
+    },
+    {
+      "en": "Successful translation does not prove a correct algorithm.",
+      "vi": "Dịch thành công không chứng minh thuật toán đúng."
+    },
+    {
+      "en": "Real implementations can combine techniques.",
+      "vi": "Cách triển khai thật có thể kết hợp kỹ thuật."
+    }
+  ],
+  "relatedSlugs": [
+    "compilation-stages",
+    "rpn-and-the-stack"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed pp394–395 / PDF pp410–411, interpreters and compilers",
+      "kind": "book"
+    },
+    {
+      "id": "s25-31-qp",
+      "title": "Cambridge 9618 s25 Paper 31 Question Paper",
+      "locator": "PDF p7 Q6",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-31-ms",
+      "title": "Cambridge 9618 s25 Paper 31 Mark Scheme",
+      "locator": "PDF p11 Q6",
+      "kind": "mark-scheme"
+    }
+  ]
+}

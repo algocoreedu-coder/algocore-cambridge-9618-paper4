@@ -1,0 +1,788 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.3-T01",
+  "slug": "signed-floating-point-conversion",
+  "title": {
+    "en": "Signed floating-point conversion",
+    "vi": "Chuyển đổi số dấu phẩy động có dấu"
+  },
+  "question": {
+    "en": "How can a signed fraction and a power of two store the same value as a denary number?",
+    "vi": "Một phân số có dấu và lũy thừa của hai lưu cùng giá trị với số thập phân như thế nào?"
+  },
+  "opening": {
+    "en": "A temperature sensor reports −13.25. A computer cannot put a decimal point or a minus symbol into an ordinary bit cell: it needs an agreed representation. In this lesson, eight bits describe a signed fraction and four bits describe its scale. Your task is to build those two bit patterns and prove that they still mean −13.25.",
+    "vi": "Cảm biến nhiệt độ báo −13.25. Máy tính không thể đặt dấu thập phân hay dấu trừ vào một ô bit thông thường: nó cần quy ước biểu diễn. Trong bài này, tám bit mô tả phân số có dấu và bốn bit mô tả hệ số phóng theo lũy thừa hai. Em sẽ tạo hai dãy bit rồi chứng minh chúng vẫn mang giá trị −13.25."
+  },
+  "objectives": [
+    {
+      "en": "Read the width, point position and signedness before interpreting a floating-point number.",
+      "vi": "Đọc số bit, vị trí dấu chấm và quy ước dấu trước khi diễn giải số dấu phẩy động."
+    },
+    {
+      "en": "Encode an exactly representable positive or negative denary value in the stated format.",
+      "vi": "Mã hóa số thập phân dương hoặc âm biểu diễn chính xác được trong định dạng đã cho."
+    },
+    {
+      "en": "Decode both fields and use their weights to check the original value.",
+      "vi": "Giải mã hai trường và dùng trọng số để kiểm lại giá trị ban đầu."
+    },
+    {
+      "en": "Distinguish a negative mantissa from a negative exponent, and check normalisation separately.",
+      "vi": "Phân biệt định trị âm với số mũ âm và kiểm chuẩn hóa riêng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Binary place values, including 1/2, 1/4 and 1/8.",
+      "vi": "Trọng số nhị phân, gồm 1/2, 1/4 và 1/8."
+    },
+    {
+      "en": "Two’s complement: invert all bits and add one within a stated width.",
+      "vi": "Bù hai: đảo toàn bộ bit rồi cộng một trong số bit được quy định."
+    },
+    {
+      "en": "Powers of two; a negative exponent divides by a power of two.",
+      "vi": "Lũy thừa hai; số mũ âm tương ứng chia cho lũy thừa hai."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Mantissa (M)",
+      "meaning": {
+        "en": "The signed fractional part multiplied by a power of two. Here its point is immediately after its sign bit.",
+        "vi": "Phần phân số có dấu được nhân với lũy thừa hai. Ở đây dấu chấm nằm ngay sau bit dấu."
+      }
+    },
+    {
+      "term": "Exponent (E)",
+      "meaning": {
+        "en": "A signed integer giving the power in the scale factor 2^E; it is not the sign of the stored number.",
+        "vi": "Số nguyên có dấu cho biết số mũ trong hệ số 2^E; nó không quyết định dấu của số được lưu."
+      }
+    },
+    {
+      "term": "Two’s complement",
+      "meaning": {
+        "en": "A signed binary encoding whose leftmost bit has a negative weight. The width is part of its meaning.",
+        "vi": "Cách mã hóa nhị phân có dấu mà bit trái nhất có trọng số âm. Số bit là một phần của quy ước."
+      }
+    },
+    {
+      "term": "Binary point",
+      "meaning": {
+        "en": "The boundary between whole-number and fractional weights; its position is implied rather than stored as another bit.",
+        "vi": "Ranh giới giữa trọng số phần nguyên và phần lẻ; vị trí được quy ước, không lưu bằng một bit dấu chấm riêng."
+      }
+    },
+    {
+      "term": "Normalised",
+      "meaning": {
+        "en": "For a nonzero value in this convention, the first two mantissa bits differ: 01 for positive, 10 for negative.",
+        "vi": "Với số khác không trong quy ước này, hai bit định trị đầu khác nhau: 01 cho số dương, 10 cho số âm."
+      }
+    },
+    {
+      "term": "Decode",
+      "meaning": {
+        "en": "Interpret a stored bit pattern as the value it represents.",
+        "vi": "Diễn giải dãy bit đã lưu thành giá trị mà nó biểu diễn."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "fraction-and-scale",
+      "title": {
+        "en": "One value, two roles",
+        "vi": "Một giá trị, hai vai trò"
+      },
+      "paragraphs": [
+        {
+          "en": "Binary floating point writes a value as M × 2^E. M supplies the signed significant fraction; E supplies the scale. Changing either field normally changes the value. If M is doubled while E is reduced by one, their effects cancel and the same value is preserved.",
+          "vi": "Số dấu phẩy động nhị phân biểu diễn giá trị bằng M × 2^E. M cung cấp phần phân số có dấu; E cung cấp thang độ lớn. Đổi một trong hai trường thường làm đổi giá trị. Nếu nhân M với hai đồng thời giảm E một đơn vị, hai thay đổi bù nhau và giữ nguyên giá trị."
+        },
+        {
+          "en": "Think of 13.25 as 0.828125 × 16. The fraction carries the digits and 16 = 2^4 restores their original size. For −13.25 the fraction becomes negative, while E can remain +4. A negative number does not require a negative exponent.",
+          "vi": "Hãy viết 13.25 thành 0.828125 × 16. Phân số mang các chữ số, còn 16 = 2^4 khôi phục độ lớn ban đầu. Với −13.25, phân số trở thành âm trong khi E vẫn có thể là +4. Số âm không bắt buộc có số mũ âm."
+        },
+        {
+          "en": "This compact model can represent values on several scales. It still has finite precision: not every real number has an exact bit pattern. This lesson first uses exact examples so that conversion is separate from rounding; the approximation lesson handles values that need rounding.",
+          "vi": "Mô hình gọn này biểu diễn giá trị ở nhiều thang độ lớn nhưng vẫn có độ chính xác hữu hạn: không phải mọi số thực đều có dãy bit chính xác. Bài này dùng ví dụ chính xác để tách phép chuyển đổi khỏi làm tròn; bài xấp xỉ xử lý các giá trị cần làm tròn."
+        }
+      ],
+      "sourceIds": [
+        "syllabus13-3",
+        "book13-3"
+      ]
+    },
+    {
+      "id": "read-the-format",
+      "title": {
+        "en": "Read the format before the bits",
+        "vi": "Đọc định dạng trước khi đọc bit"
+      },
+      "paragraphs": [
+        {
+          "en": "For this lesson, the mantissa has 8 bits and the exponent has 4 bits, both in two’s complement. The mantissa point is immediately after the sign bit. Thus the mantissa is a signed fraction, while the exponent is a signed integer. These widths are a teaching example, not a rule that every exam question uses.",
+          "vi": "Trong bài này, định trị có 8 bit và số mũ có 4 bit, cả hai dùng bù hai. Dấu chấm định trị nằm ngay sau bit dấu. Vì vậy định trị là phân số có dấu còn số mũ là số nguyên có dấu. Đây là định dạng ví dụ, không phải quy định cho mọi câu thi."
+        },
+        {
+          "en": "The sign bit of M has weight −1, not −128. The sign bit of E has weight −8, not −1. Reading both fields with the same weights is a different representation and gives the wrong scale. The point is a printed label; it does not consume one of the eight mantissa bits.",
+          "vi": "Bit dấu của M có trọng số −1, không phải −128. Bit dấu của E có trọng số −8, không phải −1. Đọc hai trường bằng cùng một hàng trọng số sẽ đổi định dạng và cho sai thang độ lớn. Dấu chấm chỉ là nhãn, không chiếm một trong tám bit định trị."
+        }
+      ],
+      "sourceIds": [
+        "syllabus13-3",
+        "book13-3"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Field",
+            "vi": "Trường"
+          },
+          {
+            "en": "Left-to-right weights",
+            "vi": "Trọng số từ trái sang phải"
+          },
+          {
+            "en": "Interpretation",
+            "vi": "Cách diễn giải"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "M: 8 bits",
+              "vi": "M: 8 bit"
+            },
+            {
+              "en": "−1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/128",
+              "vi": "−1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/128"
+            },
+            {
+              "en": "Signed fraction",
+              "vi": "Phân số có dấu"
+            }
+          ],
+          [
+            {
+              "en": "E: 4 bits",
+              "vi": "E: 4 bit"
+            },
+            {
+              "en": "−8, 4, 2, 1",
+              "vi": "−8, 4, 2, 1"
+            },
+            {
+              "en": "Signed integer from −8 to +7",
+              "vi": "Số nguyên có dấu từ −8 đến +7"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "make-a-negative-mantissa",
+      "title": {
+        "en": "Make the mantissa negative without changing its scale",
+        "vi": "Tạo định trị âm mà không đổi thang độ lớn"
+      },
+      "paragraphs": [
+        {
+          "en": "First choose a scale and encode the magnitude. For an ordinary negative example, take two’s complement of the whole mantissa field: invert every mantissa bit, then add one within eight bits. Do not flip only its first bit; that would apply a sign-and-magnitude idea to a two’s-complement format.",
+          "vi": "Trước hết chọn thang độ lớn và mã hóa độ lớn. Với ví dụ âm thông thường, lấy bù hai của toàn bộ trường định trị: đảo từng bit định trị rồi cộng một trong tám bit. Không chỉ đổi bit đầu; đó là đem ý tưởng dấu–độ lớn áp vào định dạng bù hai."
+        },
+        {
+          "en": "Keep the exponent while changing the sign of the mantissa. Then inspect normalisation. A negative power of two needs care: −8 can be written as −0.5 × 2^4, but M = 11000000 starts with 11. Its normalised form is −1 × 2^3, so M = 10000000 and E = 0011. Both forms decode to −8; only the latter passes the normalisation test.",
+          "vi": "Giữ số mũ khi đổi dấu định trị, sau đó kiểm chuẩn hóa. Cần chú ý số âm là lũy thừa hai: −8 có thể viết thành −0.5 × 2^4 nhưng M = 11000000 bắt đầu bằng 11. Dạng chuẩn hóa là −1 × 2^3, tức M = 10000000 và E = 0011. Cả hai giải mã thành −8; chỉ dạng sau đạt kiểm tra chuẩn hóa."
+        },
+        {
+          "en": "For zero, this model explicitly uses M = 00000000 and E = 0000. Zero is a special case, not a nonzero normalised mantissa. Do not keep shifting zero in an attempt to create leading 01 or 10.",
+          "vi": "Với số không, mô hình quy định M = 00000000 và E = 0000. Đây là trường hợp riêng, không phải định trị chuẩn hóa khác không. Không tiếp tục dịch số không để cố tạo đầu 01 hoặc 10."
+        }
+      ],
+      "sourceIds": [
+        "syllabus13-3",
+        "book13-3"
+      ]
+    },
+    {
+      "id": "decode-and-check",
+      "title": {
+        "en": "Decode with weights, then check independently",
+        "vi": "Giải mã bằng trọng số rồi kiểm độc lập"
+      },
+      "paragraphs": [
+        {
+          "en": "A quick equivalent check is to interpret the eight mantissa bits as a signed integer I, then divide by 128 because seven positions follow the binary point. Thus M = I/128 and value = (I/128) × 2^E. If the first bit is 1, unsigned(M) − 256 gives I. This shortcut must still use the correct mantissa width.",
+          "vi": "Một cách kiểm tương đương là đọc tám bit định trị như số nguyên có dấu I rồi chia 128 vì có bảy vị trí sau dấu chấm. Do đó M = I/128 và giá trị = (I/128) × 2^E. Nếu bit đầu là 1 thì I = unsigned(M) − 256. Cách tắt này vẫn phải dùng đúng số bit định trị."
+        },
+        {
+          "en": "For M = 01100000 and E = 1111, I = 96, M = 96/128 = 0.75 and E = −8 + 4 + 2 + 1 = −1. The stored value is 0.75 × 2^(−1) = 0.375. The number is positive even though its exponent is negative. By contrast, M = 10110000 and E = 0011 gives I = 176 − 256 = −80, so the value is −80/128 × 8 = −5.",
+          "vi": "Với M = 01100000 và E = 1111, I = 96, M = 96/128 = 0.75 và E = −8 + 4 + 2 + 1 = −1. Giá trị được lưu là 0.75 × 2^(−1) = 0.375. Số vẫn dương dù số mũ âm. Ngược lại, M = 10110000 và E = 0011 cho I = 176 − 256 = −80 nên giá trị bằng −80/128 × 8 = −5."
+        },
+        {
+          "en": "When encoding, decode your final answer and compare it with the prompt. Also check the two field widths and, if requested, the first two mantissa bits. A pattern can have the correct value but be unnormalised; a pattern can look normalised but have the wrong exponent. Neither check replaces the other.",
+          "vi": "Khi mã hóa, hãy giải mã đáp án cuối rồi so với đề. Đồng thời kiểm số bit của hai trường và, nếu được yêu cầu, hai bit định trị đầu. Một dãy có thể mang đúng giá trị nhưng chưa chuẩn hóa; dãy khác có thể trông chuẩn hóa nhưng sai số mũ. Hai phép kiểm không thay thế nhau."
+        }
+      ],
+      "sourceIds": [
+        "syllabus13-3",
+        "book13-3"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "floating-conversion",
+    "title": {
+      "en": "Build the bits, then read them back",
+      "vi": "Tạo dãy bit rồi đọc ngược lại"
+    },
+    "introduction": {
+      "en": "Keep the mantissa and exponent in separate strips. The highlighted cells show what the current step changes; the weight labels explain what those bits mean.",
+      "vi": "Giữ định trị và số mũ trên hai dải riêng. Các ô được đánh dấu cho biết bước hiện tại thay đổi gì; nhãn trọng số giải thích ý nghĩa của bit."
+    },
+    "task": {
+      "en": "Start with −13.25. Predict the exponent before revealing it, then compare with +6.5 and +0.375. Switch to decode and follow how each field contributes to the final value.",
+      "vi": "Bắt đầu với −13.25. Dự đoán số mũ trước khi xem, rồi so sánh với +6.5 và +0.375. Chuyển sang giải mã và theo dõi cách từng trường góp phần tạo giá trị cuối."
+    },
+    "conventions": [
+      {
+        "en": "M: 8-bit two’s complement with a point after the sign; E: 4-bit two’s-complement integer.",
+        "vi": "M: bù hai 8 bit, dấu chấm sau bit dấu; E: số nguyên bù hai 4 bit."
+      },
+      {
+        "en": "Choose one of the supported exact examples: −13.25, +6.5, +0.375, −8 or 0. This visual does not accept arbitrary decimal inputs or silently round them.",
+        "vi": "Chọn một trong các ví dụ chính xác được hỗ trợ: −13.25, +6.5, +0.375, −8 hoặc 0. Minh họa này không nhận số thập phân tùy ý hoặc âm thầm làm tròn chúng."
+      },
+      {
+        "en": "Normalised nonzero M begins 01 or 10. Zero uses 00000000 / 0000 as a separate case.",
+        "vi": "M chuẩn hóa khác không bắt đầu bằng 01 hoặc 10. Số không dùng 00000000 / 0000 như trường hợp riêng."
+      },
+      {
+        "en": "Changing the input restarts this visual only. Moving through its steps does not record mastery.",
+        "vi": "Đổi đầu vào chỉ đưa minh họa này về đầu. Xem qua các bước không đồng nghĩa đã thành thạo."
+      }
+    ],
+    "sourceIds": [
+      "syllabus13-3",
+      "book13-3"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Encode −13.25 and prove the result",
+      "vi": "Mã hóa −13.25 và kiểm chứng kết quả"
+    },
+    "prompt": {
+      "en": "Represent −13.25 using an 8-bit two’s-complement mantissa and a 4-bit two’s-complement exponent. The binary point is immediately after the mantissa sign bit. Give the normalised form and show a reverse check.",
+      "vi": "Biểu diễn −13.25 bằng định trị bù hai 8 bit và số mũ bù hai 4 bit. Dấu chấm nhị phân nằm ngay sau bit dấu định trị. Cho dạng chuẩn hóa và trình bày kiểm ngược."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "magnitude",
+        "action": {
+          "en": "Convert the magnitude 13.25 to binary.",
+          "vi": "Đổi độ lớn 13.25 sang nhị phân."
+        },
+        "why": {
+          "en": "Separate the integer and fractional parts so each place value is visible.",
+          "vi": "Tách phần nguyên và phần lẻ để thấy từng trọng số."
+        },
+        "result": {
+          "en": "13 = 8 + 4 + 1 = 1101₂; 0.25 = 1/4 = 0.01₂. Therefore 13.25 = 1101.01₂.",
+          "vi": "13 = 8 + 4 + 1 = 1101₂; 0.25 = 1/4 = 0.01₂. Vậy 13.25 = 1101.01₂."
+        },
+        "check": {
+          "en": "8 + 4 + 1 + 1/4 = 13.25. The minus sign is handled in the mantissa later.",
+          "vi": "8 + 4 + 1 + 1/4 = 13.25. Dấu âm sẽ được xử lý trong định trị ở bước sau."
+        }
+      },
+      {
+        "id": "scale",
+        "action": {
+          "en": "Move the point four places left to make the positive fractional mantissa.",
+          "vi": "Dịch dấu chấm trái bốn vị trí để tạo định trị phân số dương."
+        },
+        "why": {
+          "en": "Moving the point left divides the fraction by 16; multiplying by 2^4 keeps the original magnitude.",
+          "vi": "Dịch dấu chấm trái chia giá trị cho 16; nhân với 2^4 giữ nguyên độ lớn ban đầu."
+        },
+        "result": {
+          "en": "1101.01₂ = 0.110101₂ × 2^4, so E = +4.",
+          "vi": "1101.01₂ = 0.110101₂ × 2^4 nên E = +4."
+        },
+        "check": {
+          "en": "0.110101₂ = 53/64; 53/64 × 16 = 13.25.",
+          "vi": "0.110101₂ = 53/64; 53/64 × 16 = 13.25."
+        }
+      },
+      {
+        "id": "pad",
+        "action": {
+          "en": "Write exactly eight mantissa bits and four exponent bits.",
+          "vi": "Viết đúng tám bit định trị và bốn bit số mũ."
+        },
+        "why": {
+          "en": "The implied point leaves seven fractional bits after the sign. A trailing zero preserves this exact positive fraction.",
+          "vi": "Dấu chấm quy ước để lại bảy bit phần lẻ sau bit dấu. Thêm số không ở cuối giữ nguyên phân số dương đang chính xác."
+        },
+        "result": {
+          "en": "Positive M = 01101010; E = 0100.",
+          "vi": "M dương = 01101010; E = 0100."
+        },
+        "check": {
+          "en": "M has 1 sign + 7 fractional bits; E = 0×(−8) + 4 = 4.",
+          "vi": "M có 1 bit dấu + 7 bit phần lẻ; E = 0×(−8) + 4 = 4."
+        }
+      },
+      {
+        "id": "invert",
+        "action": {
+          "en": "Invert all eight mantissa bits.",
+          "vi": "Đảo toàn bộ tám bit định trị."
+        },
+        "why": {
+          "en": "Inversion is the first part of two’s complement; it is not the finished negative representation.",
+          "vi": "Đảo bit là phần đầu của phép bù hai; đây chưa phải biểu diễn âm hoàn chỉnh."
+        },
+        "result": {
+          "en": "01101010 becomes 10010101. E stays 0100.",
+          "vi": "01101010 thành 10010101. E giữ 0100."
+        },
+        "check": {
+          "en": "Every bit changes, including the sign. Do not invert the exponent.",
+          "vi": "Mọi bit đều đổi, gồm bit dấu. Không đảo số mũ."
+        }
+      },
+      {
+        "id": "add-one",
+        "action": {
+          "en": "Add one to the inverted mantissa.",
+          "vi": "Cộng một vào định trị vừa đảo."
+        },
+        "why": {
+          "en": "The +1 completes two’s complement within the eight-bit mantissa field.",
+          "vi": "Cộng 1 hoàn tất phép bù hai trong trường định trị tám bit."
+        },
+        "result": {
+          "en": "10010101 + 00000001 = 10010110. E remains 0100.",
+          "vi": "10010101 + 00000001 = 10010110. E vẫn là 0100."
+        },
+        "check": {
+          "en": "Unsigned 150 represents signed 150 − 256 = −106; compare with the original positive integer 106.",
+          "vi": "Giá trị không dấu 150 biểu diễn số có dấu 150 − 256 = −106; đối chiếu với số nguyên dương ban đầu 106."
+        }
+      },
+      {
+        "id": "normalised",
+        "action": {
+          "en": "Check the first two mantissa bits.",
+          "vi": "Kiểm hai bit định trị đầu."
+        },
+        "why": {
+          "en": "A normalised nonzero negative mantissa begins 10 under this convention.",
+          "vi": "Theo quy ước này, định trị âm chuẩn hóa khác không bắt đầu bằng 10."
+        },
+        "result": {
+          "en": "10010110 begins 10, so no further shift is needed.",
+          "vi": "10010110 bắt đầu bằng 10 nên không cần dịch thêm."
+        },
+        "check": {
+          "en": "This is a check, not permission to alter the stored value. The exponent stays +4.",
+          "vi": "Đây là phép kiểm, không phải lý do để đổi giá trị được lưu. Số mũ vẫn là +4."
+        }
+      },
+      {
+        "id": "verify",
+        "action": {
+          "en": "Decode the completed pair.",
+          "vi": "Giải mã cặp bit hoàn chỉnh."
+        },
+        "why": {
+          "en": "A reverse calculation tests sign, scale and width together.",
+          "vi": "Phép tính ngược kiểm đồng thời dấu, thang độ lớn và số bit."
+        },
+        "result": {
+          "en": "M = (150 − 256)/128 = −106/128 = −0.828125; E = 4; M × 2^E = −0.828125 × 16 = −13.25.",
+          "vi": "M = (150 − 256)/128 = −106/128 = −0.828125; E = 4; M × 2^E = −0.828125 × 16 = −13.25."
+        },
+        "check": {
+          "en": "Direct weights give −1 + 1/8 + 1/32 + 1/64 = −0.828125, independently confirming M.",
+          "vi": "Cộng trực tiếp trọng số cho −1 + 1/8 + 1/32 + 1/64 = −0.828125, kiểm chứng M theo cách khác."
+        }
+      }
+    ],
+    "result": {
+      "en": "Mantissa 10010110; exponent 0100. This pair is normalised and represents exactly −13.25.",
+      "vi": "Định trị 10010110; số mũ 0100. Cặp này chuẩn hóa và biểu diễn chính xác −13.25."
+    },
+    "selfCheck": {
+      "en": "Count the fields, inspect leading 10, then decode using both signed-integer scaling and fractional weights. All checks agree without rounding.",
+      "vi": "Đếm bit của hai trường, kiểm đầu 10 rồi giải mã bằng cả cách chia số nguyên có dấu và cộng trọng số phân số. Các phép kiểm cùng cho một kết quả, không cần làm tròn."
+    },
+    "sourceIds": [
+      "syllabus13-3",
+      "book13-3"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "The prompt gives separate mantissa and exponent widths, signedness and a point position. These define how to read the bits.",
+        "vi": "Đề cho riêng số bit định trị, số bit số mũ, quy ước dấu và vị trí dấu chấm. Các dữ kiện này quyết định cách đọc bit."
+      },
+      {
+        "en": "A denary value plus “represent” asks you to encode; a bit pair plus “denary value” asks you to decode. “Normalised” adds a separate condition.",
+        "vi": "Giá trị thập phân kèm yêu cầu “represent” là mã hóa; cặp bit kèm “denary value” là giải mã. “Normalised” thêm điều kiện riêng."
+      },
+      {
+        "en": "The requested output is the two fields and supporting working, not a single signed integer of their combined width.",
+        "vi": "Đầu ra cần là hai trường cùng cách làm, không phải một số nguyên có dấu có số bit bằng tổng hai trường."
+      }
+    ],
+    "distinguish": {
+      "en": "If an existing pair must be changed without changing its value, focus on normalisation. If the question changes the bit allocation, focus on precision and range. Do not import IEEE 754 bias or a separate sign field unless that format is actually specified.",
+      "vi": "Nếu phải đổi một cặp bit có sẵn mà giữ nguyên giá trị, trọng tâm là chuẩn hóa. Nếu đề đổi phân bổ bit, trọng tâm là độ chính xác và phạm vi. Không thêm bias IEEE 754 hay trường dấu riêng khi đề không quy định định dạng đó."
+    },
+    "method": [
+      {
+        "en": "Write the format and the required direction: encode or decode.",
+        "vi": "Ghi định dạng và chiều chuyển đổi: mã hóa hay giải mã."
+      },
+      {
+        "en": "Use the mantissa’s fractional weights and the exponent’s integer weights.",
+        "vi": "Dùng trọng số phân số của định trị và trọng số nguyên của số mũ."
+      },
+      {
+        "en": "For encoding, choose a scale, fill the width, handle the sign and check normalisation.",
+        "vi": "Khi mã hóa, chọn thang độ lớn, điền đủ bit, xử lý dấu rồi kiểm chuẩn hóa."
+      },
+      {
+        "en": "Reverse the conversion and compare with the original value; treat any required approximation explicitly.",
+        "vi": "Chuyển đổi ngược và đối chiếu giá trị ban đầu; nếu cần xấp xỉ phải nêu rõ."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“A negative number needs a negative exponent.”",
+        "vi": "“Số âm phải có số mũ âm.”"
+      },
+      "correction": {
+        "en": "The mantissa determines the sign. The exponent sets scale: −13.25 uses E=+4, whereas +0.375 uses E=−1.",
+        "vi": "Định trị quyết định dấu. Số mũ đặt thang độ lớn: −13.25 dùng E=+4 còn +0.375 dùng E=−1."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Flip just the sign bit to make the mantissa negative.”",
+        "vi": "“Chỉ đổi bit dấu để tạo định trị âm.”"
+      },
+      "correction": {
+        "en": "In this two’s-complement format, invert all mantissa bits and add one. Flipping only the first bit gives a different value.",
+        "vi": "Với định dạng bù hai này, đảo toàn bộ bit định trị rồi cộng một. Chỉ đổi bit đầu cho giá trị khác."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“The eight-bit mantissa sign has weight −128.”",
+        "vi": "“Bit dấu định trị tám bit có trọng số −128.”"
+      },
+      "correction": {
+        "en": "Its point is after the sign, so that weight is −1. You may calculate a signed integer first only if you then divide it by 128.",
+        "vi": "Dấu chấm nằm sau bit dấu nên trọng số là −1. Chỉ được tính số nguyên có dấu trước nếu sau đó chia cho 128."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Correct leading bits prove the whole answer is correct.”",
+        "vi": "“Hai bit đầu đúng chứng minh toàn bộ đáp án đúng.”"
+      },
+      "correction": {
+        "en": "They check normalisation only. Decode M and E to catch a wrong scale or wrong remaining bits.",
+        "vi": "Chúng chỉ kiểm chuẩn hóa. Cần giải mã M và E để phát hiện sai thang độ lớn hoặc các bit còn lại."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Zero should be shifted until it begins 01.”",
+        "vi": "“Phải dịch số không cho đến khi bắt đầu bằng 01.”"
+      },
+      "correction": {
+        "en": "Shifting zero never creates a 1. Use the declared zero convention and keep it separate from normalised nonzero values.",
+        "vi": "Dịch số không không tạo ra bit 1. Dùng quy ước số không đã công bố và tách khỏi các số khác không chuẩn hóa."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "sign-versus-scale",
+      "prompt": {
+        "en": "You are encoding −13.25 in the lesson format. Which field change makes the positive 13.25 representation negative?",
+        "vi": "Em đang mã hóa −13.25 theo định dạng bài học. Thay đổi nào biến biểu diễn dương 13.25 thành âm?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Take two’s complement of M; keep E=0100.",
+            "vi": "Lấy bù hai của M; giữ E=0100."
+          },
+          "feedback": {
+            "en": "Correct. Changing the signed fraction changes the sign; the factor 2^4 is still the required scale.",
+            "vi": "Đúng. Đổi phân số có dấu làm đổi dấu của số; hệ số 2^4 vẫn là thang độ lớn cần dùng."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Take two’s complement of both M and E.",
+            "vi": "Lấy bù hai của cả M và E."
+          },
+          "feedback": {
+            "en": "That changes the scale from 2^4 to 2^(−4) as well as the sign, so the value is no longer −13.25.",
+            "vi": "Cách này đổi cả thang độ lớn từ 2^4 sang 2^(−4), nên giá trị không còn là −13.25."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "Keep M and change only E to a negative value.",
+            "vi": "Giữ M và chỉ đổi E thành âm."
+          },
+          "feedback": {
+            "en": "A power of two is positive even when its exponent is negative. The value would remain positive.",
+            "vi": "Lũy thừa hai vẫn dương dù số mũ âm. Giá trị sẽ vẫn dương."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Separate sign from scale: the sign is carried by the two’s-complement mantissa.",
+        "vi": "Tách dấu khỏi thang độ lớn: dấu nằm trong định trị bù hai."
+      }
+    },
+    {
+      "id": "decode-negative-exponent",
+      "prompt": {
+        "en": "Decode M=01100000 and E=1111 using M8/E4. What value is stored?",
+        "vi": "Giải mã M=01100000 và E=1111 theo M8/E4. Giá trị được lưu là gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "−0.75",
+            "vi": "−0.75"
+          },
+          "feedback": {
+            "en": "The mantissa sign bit is 0. A negative exponent halves the scale; it does not change the sign.",
+            "vi": "Bit dấu định trị bằng 0. Số mũ âm giảm thang độ lớn còn một nửa, không đổi dấu."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "0.375",
+            "vi": "0.375"
+          },
+          "feedback": {
+            "en": "Correct: M=96/128=0.75 and E=−1, so 0.75 × 1/2 = 0.375.",
+            "vi": "Đúng: M=96/128=0.75 và E=−1 nên 0.75 × 1/2 = 0.375."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "24 576",
+            "vi": "24 576"
+          },
+          "feedback": {
+            "en": "That treats 1111 as unsigned 15. Here E is two’s complement, so its value is −1.",
+            "vi": "Đáp án này đọc 1111 như số không dấu 15. Ở đây E dùng bù hai nên bằng −1."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Read signedness for each field independently, then multiply the fraction by 2^E.",
+        "vi": "Đọc quy ước dấu riêng cho từng trường rồi nhân phân số với 2^E."
+      }
+    },
+    {
+      "id": "encode-transfer",
+      "prompt": {
+        "en": "Use the same format to encode −5.75 in normalised form. Which pair is correct?",
+        "vi": "Dùng cùng định dạng để mã hóa −5.75 ở dạng chuẩn hóa. Cặp nào đúng?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "M=11011100, E=0011",
+            "vi": "M=11011100, E=0011"
+          },
+          "feedback": {
+            "en": "This flips the sign bit of positive 01011100 only. Its signed integer is −36, so it stores −36/128 × 8 = −2.25.",
+            "vi": "Cặp này chỉ đổi bit dấu của 01011100 dương. Số nguyên có dấu là −36 nên lưu −36/128 × 8 = −2.25."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "M=10100100, E=1101",
+            "vi": "M=10100100, E=1101"
+          },
+          "feedback": {
+            "en": "The mantissa is correct, but E=1101 is −3. You changed the required scale from 8 to 1/8.",
+            "vi": "Định trị đúng nhưng E=1101 là −3. Em đã đổi thang độ lớn cần dùng từ 8 sang 1/8."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "M=10100100, E=0011",
+            "vi": "M=10100100, E=0011"
+          },
+          "feedback": {
+            "en": "Correct. +5.75=0.1011100₂ × 2^3; two’s complement of 01011100 is 10100100. Decode: −92/128 × 8 = −5.75.",
+            "vi": "Đúng. +5.75=0.1011100₂ × 2^3; bù hai của 01011100 là 10100100. Giải mã: −92/128 × 8 = −5.75."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "The leading 10 checks normalisation; reverse decoding checks the entire value.",
+        "vi": "Đầu 10 kiểm chuẩn hóa; giải mã ngược kiểm toàn bộ giá trị."
+      }
+    },
+    {
+      "id": "negative-power-two",
+      "prompt": {
+        "en": "M=11000000, E=0100 decodes to −8. What still needs checking if the question asks for normalised form?",
+        "vi": "M=11000000, E=0100 giải mã thành −8. Cần kiểm thêm gì nếu đề yêu cầu dạng chuẩn hóa?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Nothing: any correct value is normalised.",
+            "vi": "Không cần: mọi dạng có giá trị đúng đều chuẩn hóa."
+          },
+          "feedback": {
+            "en": "Value equality alone is insufficient. The mantissa begins 11, so it contains a redundant sign bit.",
+            "vi": "Chỉ bằng nhau về giá trị là chưa đủ. Định trị bắt đầu bằng 11 nên có bit dấu dư."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Shift M left once and reduce E to 3.",
+            "vi": "Dịch M trái một lần và giảm E còn 3."
+          },
+          "feedback": {
+            "en": "Correct. M becomes 10000000 = −1 and E becomes 0011 = 3; −1 × 8 still equals −8.",
+            "vi": "Đúng. M thành 10000000 = −1, E thành 0011 = 3; −1 × 8 vẫn bằng −8."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "Shift M left once and increase E to 5.",
+            "vi": "Dịch M trái một lần và tăng E thành 5."
+          },
+          "feedback": {
+            "en": "Doubling M requires halving the power-of-two factor, so E must decrease, not increase.",
+            "vi": "Nhân M với hai cần chia hệ số lũy thừa hai cho hai, nên E phải giảm thay vì tăng."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Check the value and the representation condition separately.",
+        "vi": "Kiểm giá trị và điều kiện biểu diễn riêng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Without the example open, explain how you would encode a negative value, and how you would prove the bits are correct.",
+      "vi": "Không mở ví dụ, hãy giải thích cách mã hóa số âm và cách chứng minh các bit đúng."
+    },
+    "answerPoints": [
+      {
+        "en": "State both widths, two’s-complement signedness and the mantissa point position.",
+        "vi": "Nêu số bit hai trường, quy ước bù hai và vị trí dấu chấm định trị."
+      },
+      {
+        "en": "Choose M and E with the same value; handle the mantissa sign and check normalisation.",
+        "vi": "Chọn M và E giữ cùng giá trị; xử lý dấu định trị rồi kiểm chuẩn hóa."
+      },
+      {
+        "en": "Decode the mantissa as fractional weights or signed integer divided by 2^(Mbits−1); decode E separately.",
+        "vi": "Giải mã định trị bằng trọng số phân số hoặc số nguyên có dấu chia 2^(số bit M−1); giải mã E riêng."
+      },
+      {
+        "en": "Multiply by 2^E and compare with the original; acknowledge zero and any unsupported approximation explicitly.",
+        "vi": "Nhân với 2^E rồi so giá trị ban đầu; nêu rõ trường hợp số không và xấp xỉ chưa được mô hình hỗ trợ."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "The format gives the bits their meaning. M is a signed fraction; E is a signed integer.",
+      "vi": "Định dạng tạo ý nghĩa cho bit. M là phân số có dấu; E là số nguyên có dấu."
+    },
+    {
+      "en": "Changing a number’s sign and changing its scale are different operations.",
+      "vi": "Đổi dấu của số và đổi thang độ lớn là hai thao tác khác nhau."
+    },
+    {
+      "en": "Count bits, check normalisation when requested, and always decode to verify.",
+      "vi": "Đếm bit, kiểm chuẩn hóa khi được yêu cầu và luôn giải mã để kiểm chứng."
+    }
+  ],
+  "relatedSlugs": [
+    "normalisation",
+    "precision-range-and-limits",
+    "approximation-rounding-and-range-errors"
+  ],
+  "sources": [
+    {
+      "id": "syllabus13-3",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.3, p.33: representation, two’s complement and conversion",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=33"
+    },
+    {
+      "id": "book13-3",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13.3, printed pp.313–320 (PDF pp.329–336): representation and conversion; examples independently checked",
+      "kind": "book"
+    },
+    {
+      "id": "qp25-31-conversion",
+      "title": "Cambridge 9618/31, May/June 2025 — Question Paper",
+      "locator": "Q2(b), p.3: negative conversion in a 10-bit mantissa / 6-bit exponent format; related exam task, not the example above",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms25-31-conversion",
+      "title": "Cambridge 9618/31, May/June 2025 — Mark Scheme",
+      "locator": "Q2(b), p.7: working and representation checked against this exact question",
+      "kind": "mark-scheme"
+    }
+  ]
+}

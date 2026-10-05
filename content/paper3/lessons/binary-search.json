@@ -1,0 +1,846 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.1-T02",
+  "slug": "binary-search",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Binary search",
+    "vi": "Tìm kiếm nhị phân"
+  },
+  "question": {
+    "en": "How does sorted order let one comparison discard half of the remaining window?",
+    "vi": "Thứ tự sorted giúp một phép so sánh loại một nửa cửa sổ còn lại như thế nào?"
+  },
+  "opening": {
+    "en": "A sorted ID list can be searched by keeping an inclusive Low..High window.",
+    "vi": "Danh sách ID đã sorted có thể được tìm bằng cửa sổ Low..High tính cả hai đầu."
+  },
+  "objectives": [
+    {
+      "en": "State and test the sorted precondition.",
+      "vi": "Nêu và kiểm tra điều kiện sorted."
+    },
+    {
+      "en": "Trace inclusive Low, High and Mid.",
+      "vi": "Trace Low, High, Mid tính cả hai đầu."
+    },
+    {
+      "en": "Write a progressing search that checks the last candidate.",
+      "vi": "Viết thuật toán tiến triển có xét ứng viên cuối."
+    },
+    {
+      "en": "Explain logarithmic comparison growth.",
+      "vi": "Giải thích tăng trưởng phép so sánh logarithmic."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Compare ordered integers.",
+      "vi": "So sánh số nguyên có thứ tự."
+    },
+    {
+      "en": "Use DIV and inclusive bounds.",
+      "vi": "Dùng DIV và cận inclusive."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "sorted precondition",
+      "meaning": {
+        "en": "Values are non-decreasing under the search comparison.",
+        "vi": "Giá trị không giảm theo phép so sánh của search."
+      }
+    },
+    {
+      "term": "search window",
+      "meaning": {
+        "en": "Inclusive indices Low through High still possible.",
+        "vi": "Các index Low tới High còn có thể, tính cả hai đầu."
+      }
+    },
+    {
+      "term": "midpoint",
+      "meaning": {
+        "en": "Index (Low+High) DIV 2.",
+        "vi": "Index (Low+High) DIV 2."
+      }
+    },
+    {
+      "term": "discard",
+      "meaning": {
+        "en": "Remove a proven-impossible half from the next window.",
+        "vi": "Loại nửa đã chứng minh không thể chứa target."
+      }
+    },
+    {
+      "term": "logarithmic",
+      "meaning": {
+        "en": "Repeated halving gives O(log n) growth.",
+        "vi": "Liên tục chia đôi tạo tăng trưởng O(log n)."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "sorted",
+      "title": {
+        "en": "Sorted data is required",
+        "vi": "Cần dữ liệu sorted"
+      },
+      "paragraphs": [
+        {
+          "en": "The comparison at Mid is useful only when values are sorted by the same rule. An unsorted fixture is blocked, not searched.",
+          "vi": "So sánh tại Mid chỉ hữu ích khi giá trị sorted theo cùng quy tắc. Fixture unsorted bị chặn, không được search."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "inclusive",
+      "title": {
+        "en": "Inclusive window",
+        "vi": "Cửa sổ inclusive"
+      },
+      "paragraphs": [
+        {
+          "en": "Low and High are both candidates. WHILE Low<=High checks a singleton and safely skips an empty window.",
+          "vi": "Low và High đều là ứng viên. WHILE Low<=High xét singleton và bỏ qua an toàn cửa sổ rỗng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "progress",
+      "title": {
+        "en": "Exclude Mid after inequality",
+        "vi": "Loại Mid sau bất đẳng thức"
+      },
+      "paragraphs": [
+        {
+          "en": "Target larger sets Low←Mid+1; target smaller sets High←Mid−1. Equality returns the first matching midpoint encountered, not necessarily the first duplicate.",
+          "vi": "Target lớn hơn đặt Low←Mid+1; target nhỏ hơn đặt High←Mid−1. Equality trả midpoint khớp đầu tiên gặp, không nhất thiết duplicate đầu tiên."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "binary-code",
+      "title": {
+        "en": "Cambridge pseudocode",
+        "vi": "Giả mã Cambridge"
+      },
+      "paragraphs": [
+        {
+          "en": "The implementation checks the final candidate and returns −1 only when Low>High.",
+          "vi": "Cài đặt xét ứng viên cuối và chỉ trả −1 khi Low>High."
+        }
+      ],
+      "code": "FUNCTION BinarySearch(Data : ARRAY[0:6] OF INTEGER, Target : INTEGER) RETURNS INTEGER\n  DECLARE Low : INTEGER\n  DECLARE High : INTEGER\n  DECLARE Mid : INTEGER\n  Low ← 0\n  High ← 6\n  WHILE Low <= High\n    Mid ← (Low + High) DIV 2\n    IF Data[Mid] = Target THEN\n      RETURN Mid\n    ELSE\n      IF Data[Mid] < Target THEN\n        Low ← Mid + 1\n      ELSE\n        High ← Mid - 1\n      ENDIF\n    ENDIF\n  ENDWHILE\n  RETURN -1\nENDFUNCTION",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "binary-search",
+    "title": {
+      "en": "Halving-window workbench",
+      "vi": "Bàn trace cửa sổ chia đôi"
+    },
+    "introduction": {
+      "en": "The window, midpoint, comparison and discarded cells change together.",
+      "vi": "Cửa sổ, midpoint, phép so sánh và ô bị loại thay đổi cùng nhau."
+    },
+    "task": {
+      "en": "Predict the next window, then diagnose the unsorted near-miss.",
+      "vi": "Dự đoán cửa sổ tiếp theo, rồi chẩn đoán near-miss unsorted."
+    },
+    "conventions": [
+      {
+        "en": "Zero-based; Low/High inclusive.",
+        "vi": "Zero-based; Low/High inclusive."
+      },
+      {
+        "en": "Mid=(Low+High) DIV 2.",
+        "vi": "Mid=(Low+High) DIV 2."
+      },
+      {
+        "en": "Duplicate result is first midpoint match, not first duplicate.",
+        "vi": "Kết quả duplicate là midpoint khớp đầu tiên, không phải duplicate đầu tiên."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Find 31 in seven values",
+      "vi": "Tìm 31 trong bảy giá trị"
+    },
+    "prompt": {
+      "en": "Trace [3,8,12,19,24,31,45], Target=31.",
+      "vi": "Trace [3,8,12,19,24,31,45], Target=31."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "precondition",
+        "action": {
+          "en": "Confirm non-decreasing order.",
+          "vi": "Xác nhận thứ tự không giảm."
+        },
+        "why": {
+          "en": "Half-discard logic depends on order.",
+          "vi": "Logic loại nửa phụ thuộc thứ tự."
+        },
+        "result": {
+          "en": "Binary search may run.",
+          "vi": "Binary search có thể chạy."
+        },
+        "check": {
+          "en": "Check that binary search may run.",
+          "vi": "Kiểm tra rằng binary search có thể chạy."
+        }
+      },
+      {
+        "id": "initialise",
+        "action": {
+          "en": "Set Low←0 and High←6.",
+          "vi": "Đặt Low←0 và High←6."
+        },
+        "why": {
+          "en": "Both endpoints are valid candidates.",
+          "vi": "Cả hai đầu đều là ứng viên hợp lệ."
+        },
+        "result": {
+          "en": "Window contains seven values.",
+          "vi": "Cửa sổ chứa bảy giá trị."
+        },
+        "check": {
+          "en": "Check that window contains seven values.",
+          "vi": "Kiểm tra rằng cửa sổ chứa bảy giá trị."
+        }
+      },
+      {
+        "id": "mid-3",
+        "action": {
+          "en": "Calculate Mid←3 and compare 19 with 31.",
+          "vi": "Tính Mid←3 và so 19 với 31."
+        },
+        "why": {
+          "en": "19<31 proves indices 0..3 cannot contain 31.",
+          "vi": "19<31 chứng minh index 0..3 không thể chứa 31."
+        },
+        "result": {
+          "en": "Low←4; High remains 6.",
+          "vi": "Low←4; High vẫn là 6."
+        },
+        "check": {
+          "en": "Check that low←4; high remains 6.",
+          "vi": "Kiểm tra rằng low←4; high vẫn là 6."
+        },
+        "code": "Low ← Mid + 1"
+      },
+      {
+        "id": "mid-5",
+        "action": {
+          "en": "Calculate Mid←(4+6) DIV 2=5.",
+          "vi": "Tính Mid←(4+6) DIV 2=5."
+        },
+        "why": {
+          "en": "The window midpoint is a live candidate.",
+          "vi": "Midpoint của cửa sổ là ứng viên còn sống."
+        },
+        "result": {
+          "en": "Data[5]=31 matches.",
+          "vi": "Data[5]=31 khớp."
+        },
+        "check": {
+          "en": "Check that data[5]=31 matches.",
+          "vi": "Kiểm tra rằng data[5]=31 khớp."
+        },
+        "code": "Mid ← (Low + High) DIV 2"
+      },
+      {
+        "id": "return",
+        "action": {
+          "en": "Return 5 immediately.",
+          "vi": "Trả 5 ngay."
+        },
+        "why": {
+          "en": "Equality satisfies the result contract.",
+          "vi": "Equality thỏa result contract."
+        },
+        "result": {
+          "en": "Result=5 after two comparisons.",
+          "vi": "Result=5 sau hai phép so sánh."
+        },
+        "check": {
+          "en": "Check that result=5 after two comparisons.",
+          "vi": "Kiểm tra rằng result=5 sau hai phép so sánh."
+        },
+        "code": "RETURN Mid"
+      },
+      {
+        "id": "verify",
+        "action": {
+          "en": "Check the window invariant and index.",
+          "vi": "Kiểm tra invariant cửa sổ và index."
+        },
+        "why": {
+          "en": "Every discarded value is below Target.",
+          "vi": "Mọi giá trị bị loại đều nhỏ hơn Target."
+        },
+        "result": {
+          "en": "Index 5 contains 31; no excluded region is revisited.",
+          "vi": "Index 5 chứa 31; không xét lại vùng đã loại."
+        },
+        "check": {
+          "en": "Check that index 5 contains 31; no excluded region is revisited.",
+          "vi": "Kiểm tra rằng index 5 chứa 31; không xét lại vùng đã loại."
+        }
+      }
+    ],
+    "result": {
+      "en": "Binary search returns index 5 after two comparisons.",
+      "vi": "Binary search trả index 5 sau hai phép so sánh."
+    },
+    "selfCheck": {
+      "en": "Did every inequality exclude Mid and strictly shrink the inclusive window?",
+      "vi": "Mỗi bất đẳng thức có loại Mid và thu nhỏ nghiêm ngặt cửa sổ inclusive không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "sorted/ordered list",
+        "vi": "danh sách sorted/có thứ tự"
+      },
+      {
+        "en": "middle item",
+        "vi": "phần tử giữa"
+      },
+      {
+        "en": "discard half",
+        "vi": "loại một nửa"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: a middle-item comparison on unsorted values cannot justify discarding either side.",
+      "vi": "Dễ nhầm: so sánh phần tử giữa trên dữ liệu unsorted không biện minh được việc loại bên nào."
+    },
+    "method": [
+      {
+        "en": "Confirm sorted order.",
+        "vi": "Xác nhận thứ tự sorted."
+      },
+      {
+        "en": "Write inclusive bounds.",
+        "vi": "Ghi cận inclusive."
+      },
+      {
+        "en": "Calculate floor midpoint.",
+        "vi": "Tính midpoint làm tròn xuống."
+      },
+      {
+        "en": "Use the comparison to exclude Mid and one half.",
+        "vi": "Dùng phép so sánh để loại Mid và một nửa."
+      },
+      {
+        "en": "Stop on equality or Low>High.",
+        "vi": "Dừng khi bằng hoặc Low>High."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Binary search: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho Tìm kiếm nhị phân: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Binary search; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của Tìm kiếm nhị phân; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Binary search to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của Tìm kiếm nhị phân với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Binary search with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh Tìm kiếm nhị phân với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Binary search, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của Tìm kiếm nhị phân, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Run on unsorted data.",
+        "vi": "Chạy trên dữ liệu unsorted."
+      },
+      "correction": {
+        "en": "Block the run until the sorted precondition holds.",
+        "vi": "Chặn run tới khi điều kiện sorted đúng."
+      },
+      "selfCheck": {
+        "en": "Which inequality proves a whole side impossible?",
+        "vi": "Bất đẳng thức nào chứng minh cả một bên là không thể?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Set Low←Mid after Target is larger.",
+        "vi": "Đặt Low←Mid khi Target lớn hơn."
+      },
+      "correction": {
+        "en": "Use Low←Mid+1 so the state must progress.",
+        "vi": "Dùng Low←Mid+1 để trạng thái chắc chắn tiến."
+      },
+      "selfCheck": {
+        "en": "Can the same Mid repeat?",
+        "vi": "Mid cũ có thể lặp không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Stop when Low=High without checking.",
+        "vi": "Dừng khi Low=High mà không xét."
+      },
+      "correction": {
+        "en": "Keep WHILE Low<=High so the final candidate is tested.",
+        "vi": "Giữ WHILE Low<=High để xét ứng viên cuối."
+      },
+      "selfCheck": {
+        "en": "Was the singleton candidate compared?",
+        "vi": "Ứng viên singleton đã được so sánh chưa?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Promise the first duplicate.",
+        "vi": "Hứa trả duplicate đầu tiên."
+      },
+      "correction": {
+        "en": "State that this fixture returns the first matching midpoint encountered.",
+        "vi": "Nêu fixture trả midpoint khớp đầu tiên gặp."
+      },
+      "selfCheck": {
+        "en": "Does the algorithm scan left after equality?",
+        "vi": "Thuật toán có quét trái sau equality không?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "Which precondition is essential?",
+        "vi": "Điều kiện nào là thiết yếu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Values sorted by the same comparison rule",
+            "vi": "Giá trị sorted theo cùng quy tắc so sánh"
+          },
+          "feedback": {
+            "en": "Correct: only then can one half be ruled out.",
+            "vi": "Đúng: chỉ khi đó mới loại được một nửa."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "All values unique",
+            "vi": "Mọi giá trị unique"
+          },
+          "feedback": {
+            "en": "Duplicates are allowed under the declared result policy.",
+            "vi": "Duplicate được phép theo result policy đã nêu."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Array length is even",
+            "vi": "Độ dài mảng là số chẵn"
+          },
+          "feedback": {
+            "en": "Binary search works for odd, even and singleton sizes.",
+            "vi": "Binary search chạy với size lẻ, chẵn và singleton."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Sorted order supports the discard proof.",
+        "vi": "Thứ tự sorted hỗ trợ chứng minh loại nửa."
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which wording signals binary search?",
+        "vi": "Cụm nào báo hiệu binary search?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Sorted values; compare middle; discard half",
+            "vi": "Giá trị sorted; so giữa; loại nửa"
+          },
+          "feedback": {
+            "en": "Correct: all three clues fit binary search.",
+            "vi": "Đúng: cả ba dấu hiệu khớp binary search."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Unsorted; check every item",
+            "vi": "Unsorted; kiểm tra từng phần tử"
+          },
+          "feedback": {
+            "en": "That identifies linear search.",
+            "vi": "Đó là linear search."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Adjacent swap passes",
+            "vi": "Các pass đổi cặp kề"
+          },
+          "feedback": {
+            "en": "That identifies bubble sort.",
+            "vi": "Đó là bubble sort."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Look for sorted, midpoint and halving.",
+        "vi": "Tìm sorted, midpoint và chia đôi."
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "Low=0, High=6, Data[3]=19<Target. Next Low?",
+        "vi": "Low=0, High=6, Data[3]=19<Target. Low tiếp theo?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "Correct: Mid 3 and the lower half are excluded.",
+            "vi": "Đúng: Mid 3 và nửa dưới bị loại."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "3",
+            "vi": "3"
+          },
+          "feedback": {
+            "en": "Mid would remain possible and may repeat.",
+            "vi": "Mid vẫn còn và có thể lặp."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "Leaving Low unchanged discards nothing.",
+            "vi": "Không đổi Low thì không loại gì."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use Low←Mid+1.",
+        "vi": "Dùng Low←Mid+1."
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "How many comparisons find 31 in the worked fixture?",
+        "vi": "Cần bao nhiêu phép so sánh để tìm 31 trong fixture?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "2",
+            "vi": "2"
+          },
+          "feedback": {
+            "en": "Correct: compare indices 3 then 5.",
+            "vi": "Đúng: so index 3 rồi 5."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "1",
+            "vi": "1"
+          },
+          "feedback": {
+            "en": "The first midpoint contains 19, not 31.",
+            "vi": "Midpoint đầu chứa 19, không phải 31."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "The window halves; indices 0,1,2 are not scanned.",
+            "vi": "Cửa sổ chia đôi; không quét index 0,1,2."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Count midpoint comparisons only.",
+        "vi": "Chỉ đếm các phép so sánh midpoint."
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Which loop guard checks the final candidate safely?",
+        "vi": "Guard nào xét ứng viên cuối an toàn?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "WHILE Low <= High",
+            "vi": "WHILE Low <= High"
+          },
+          "feedback": {
+            "en": "Correct: equality represents one live candidate.",
+            "vi": "Đúng: equality biểu diễn một ứng viên còn sống."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "WHILE Low < High",
+            "vi": "WHILE Low < High"
+          },
+          "feedback": {
+            "en": "This can exit before checking a singleton window.",
+            "vi": "Cách này có thể thoát trước khi xét cửa sổ singleton."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "REPEAT forever",
+            "vi": "REPEAT mãi"
+          },
+          "feedback": {
+            "en": "There is no safe missing termination.",
+            "vi": "Không có termination missing an toàn."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Inclusive bounds require <=.",
+        "vi": "Cận inclusive cần <=."
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "Values=[10,5,20] and Target=5. What should the visual do?",
+        "vi": "Values=[10,5,20], Target=5. Visual nên làm gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Report precondition failure without search mutation",
+            "vi": "Báo precondition failure mà không mutate search"
+          },
+          "feedback": {
+            "en": "Correct: the values are not sorted.",
+            "vi": "Đúng: các giá trị chưa sorted."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Return −1 as a valid binary result",
+            "vi": "Trả −1 như kết quả binary hợp lệ"
+          },
+          "feedback": {
+            "en": "A result from an invalid precondition is unreliable.",
+            "vi": "Kết quả từ precondition sai là không đáng tin."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Sort silently and return 0",
+            "vi": "Âm thầm sort rồi trả 0"
+          },
+          "feedback": {
+            "en": "Silently changing the question data violates the contract.",
+            "vi": "Âm thầm đổi dữ liệu đề bài vi phạm contract."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Diagnose the failed precondition first.",
+        "vi": "Chẩn đoán precondition sai trước."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "State the binary-search invariant and progress rule.",
+      "vi": "Nêu invariant và quy tắc tiến triển của binary search."
+    },
+    "answerPoints": [
+      {
+        "en": "If present, Target remains in inclusive Low..High.",
+        "vi": "Nếu tồn tại, Target còn trong Low..High inclusive."
+      },
+      {
+        "en": "Mid uses DIV 2.",
+        "vi": "Mid dùng DIV 2."
+      },
+      {
+        "en": "Inequality sets Low=Mid+1 or High=Mid−1.",
+        "vi": "Bất đẳng thức đặt Low=Mid+1 hoặc High=Mid−1."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Sorted order is mandatory.",
+      "vi": "Thứ tự sorted là bắt buộc."
+    },
+    {
+      "en": "Check the singleton candidate.",
+      "vi": "Xét ứng viên singleton."
+    },
+    {
+      "en": "Repeated halving gives O(log n) growth.",
+      "vi": "Liên tục chia đôi tạo tăng trưởng O(log n)."
+    }
+  ],
+  "relatedSlugs": [
+    "linear-search",
+    "time-and-space-complexity"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp454–457 / PDF pp470–473: binary search",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "w22-31-qp",
+      "title": "Cambridge 9618/31 — October/November 2022 question paper",
+      "locator": "Question 12, p11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w22-31-ms",
+      "title": "Cambridge 9618/31 — October/November 2022 mark scheme",
+      "locator": "Question 12, pp14–15",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s24-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2024 question paper",
+      "locator": "Question 10, pp10–11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s24-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2024 mark scheme",
+      "locator": "Question 10, pp12–13",
+      "kind": "mark-scheme"
+    }
+  ]
+}

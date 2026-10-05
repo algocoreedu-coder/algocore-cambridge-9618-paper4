@@ -1,0 +1,774 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.18.1",
+  "topicId": "P3-18.1-T05",
+  "slug": "backpropagation",
+  "estimatedMinutes": 30,
+  "title": {
+    "en": "Backpropagation",
+    "vi": "Lan truyền ngược"
+  },
+  "question": {
+    "en": "How does a training error produce a backward correction while predictions still move forward?",
+    "vi": "Sai số huấn luyện tạo hiệu chỉnh truyền ngược như thế nào trong khi dự đoán vẫn truyền xuôi?"
+  },
+  "opening": {
+    "en": "A one-weight teaching model makes a prediction that misses its known target. The learner can see the forward signal, backward correction and next forward result as separate stages.",
+    "vi": "Một mô hình dạy học một trọng số tạo dự đoán lệch mục tiêu đã biết. Học sinh có thể thấy tín hiệu xuôi, hiệu chỉnh ngược và kết quả xuôi tiếp theo thành các giai đoạn riêng."
+  },
+  "objectives": [
+    {
+      "en": "Order the eight training-cycle stages.",
+      "vi": "Sắp xếp tám giai đoạn chu trình training."
+    },
+    {
+      "en": "Distinguish prediction, target, error and squared error.",
+      "vi": "Phân biệt dự đoán, mục tiêu, sai số và sai số bình phương."
+    },
+    {
+      "en": "Trace an old/new weight and prediction with the declared toy rule.",
+      "vi": "Trace trọng số và dự đoán cũ/mới bằng quy tắc đồ chơi đã công bố."
+    },
+    {
+      "en": "Distinguish training from inference and backward correction from normal data flow.",
+      "vi": "Phân biệt training với inference và hiệu chỉnh ngược với luồng dữ liệu bình thường."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Forward inference and fixed weights.",
+      "vi": "Inference xuôi và trọng số cố định."
+    },
+    {
+      "en": "Multiply decimals and square a number.",
+      "vi": "Nhân số thập phân và bình phương một số."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "forward pass",
+      "meaning": {
+        "en": "Apply current weights to inputs to produce a prediction.",
+        "vi": "Áp dụng trọng số hiện tại lên đầu vào để tạo dự đoán."
+      }
+    },
+    {
+      "term": "target",
+      "meaning": {
+        "en": "Known expected output used during training.",
+        "vi": "Đầu ra mong đợi đã biết dùng khi training."
+      }
+    },
+    {
+      "term": "error",
+      "meaning": {
+        "en": "Target minus prediction under this fixture's convention.",
+        "vi": "Mục tiêu trừ dự đoán theo quy ước fixture này."
+      }
+    },
+    {
+      "term": "backpropagation",
+      "meaning": {
+        "en": "Use error/correction information backwards to adjust weights during training.",
+        "vi": "Dùng thông tin sai số/hiệu chỉnh theo chiều ngược để điều chỉnh trọng số khi training."
+      }
+    },
+    {
+      "term": "learning rate",
+      "meaning": {
+        "en": "The declared factor controlling the toy update size.",
+        "vi": "Hệ số đã công bố kiểm soát độ lớn cập nhật đồ chơi."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "forward-prediction",
+      "title": {
+        "en": "First produce a prediction",
+        "vi": "Trước hết tạo dự đoán"
+      },
+      "paragraphs": [
+        {
+          "en": "The forward pass applies the current weight to the input. A prediction must exist before its error can guide a training update.",
+          "vi": "Lan truyền xuôi áp dụng trọng số hiện tại lên đầu vào. Phải có dự đoán trước khi sai số có thể hướng dẫn cập nhật training."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "compare-error",
+      "title": {
+        "en": "Compare with the known target",
+        "vi": "So sánh với mục tiêu đã biết"
+      },
+      "paragraphs": [
+        {
+          "en": "During this supervised teaching fixture, error=target−prediction and squared error makes the size non-negative. These are declared conventions, not a full loss-function catalogue.",
+          "vi": "Trong fixture có giám sát này, sai số=mục tiêu−dự đoán và sai số bình phương làm độ lớn không âm. Đây là quy ước đã công bố, không phải danh mục đầy đủ hàm mất mát."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    },
+    {
+      "id": "backward-adjust",
+      "title": {
+        "en": "Send correction information backwards",
+        "vi": "Gửi thông tin hiệu chỉnh ngược"
+      },
+      "paragraphs": [
+        {
+          "en": "Error information is used to adjust the selected weight. The normal input is not being predicted backwards. This arithmetic is a transparent delta-rule teaching model, not a full production neural-network implementation.",
+          "vi": "Thông tin sai số được dùng để điều chỉnh trọng số đã chọn. Đầu vào bình thường không được dự đoán ngược. Phép tính này là mô hình dạy học delta-rule minh bạch, không phải cài đặt mạng nơ-ron sản xuất đầy đủ."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "repeat-boundary",
+      "title": {
+        "en": "Repeat and measure again",
+        "vi": "Lặp và đo lại"
+      },
+      "paragraphs": [
+        {
+          "en": "Run another forward pass with the changed weight and compare error again. Both reviewed fixtures reduce squared error, but the lesson does not promise that every learning rate or update always reduces error or finds a global solution.",
+          "vi": "Chạy lần xuôi khác với trọng số đã đổi và so sai số lại. Cả hai fixture đã duyệt đều giảm sai số bình phương, nhưng bài học không hứa mọi learning rate hoặc cập nhật luôn giảm sai số hay tìm được nghiệm toàn cục."
+        }
+      ],
+      "sourceIds": [
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "backpropagation",
+    "title": {
+      "en": "Backpropagation training-cycle visual",
+      "vi": "Minh họa chu trình training lan truyền ngược"
+    },
+    "introduction": {
+      "en": "Eight deterministic stages separate forward prediction, comparison, backward correction and the next result.",
+      "vi": "Tám giai đoạn xác định tách dự đoán xuôi, so sánh, hiệu chỉnh ngược và kết quả tiếp theo."
+    },
+    "task": {
+      "en": "Trace BP-01 and BP-02, then explain why the update happens only in training.",
+      "vi": "Trace BP-01 và BP-02, rồi giải thích vì sao cập nhật chỉ xảy ra trong training."
+    },
+    "conventions": [
+      {
+        "en": "Toy rule: y=xw; e=t−y; w′=w+ηex.",
+        "vi": "Quy tắc đồ chơi: y=xw; e=t−y; w′=w+ηex."
+      },
+      {
+        "en": "Forward arrows carry prediction; backward arrows carry correction information.",
+        "vi": "Mũi tên xuôi mang dự đoán; mũi tên ngược mang thông tin hiệu chỉnh."
+      },
+      {
+        "en": "Teaching model—not a full production neural-network implementation.",
+        "vi": "Mô hình dạy học—không phải cài đặt mạng nơ-ron sản xuất đầy đủ."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Run BP-01",
+      "vi": "Chạy BP-01"
+    },
+    "prompt": {
+      "en": "Given x=2, target=1, weight=0.20 and learning rate 0.10, run one declared update and compare squared errors.",
+      "vi": "Cho x=2, mục tiêu=1, trọng số=0.20 và learning rate=0.10, chạy một cập nhật đã công bố và so sai số bình phương."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "forward",
+        "action": {
+          "en": "Start the forward pass with x=2 and old weight 0.20.",
+          "vi": "Bắt đầu lượt xuôi với x=2 và trọng số cũ 0.20."
+        },
+        "why": {
+          "en": "The current input and parameter determine the forward calculation.",
+          "vi": "Đầu vào và tham số hiện tại quyết định phép tính xuôi."
+        },
+        "result": {
+          "en": "Forward rule selected: y=xw.",
+          "vi": "Đã chọn quy tắc xuôi: y=xw."
+        }
+      },
+      {
+        "id": "prediction",
+        "action": {
+          "en": "Calculate the prediction.",
+          "vi": "Tính dự đoán."
+        },
+        "why": {
+          "en": "A prediction must exist before a training error can be measured.",
+          "vi": "Phải có dự đoán trước khi đo sai số training."
+        },
+        "result": {
+          "en": "y=2×0.20=0.40.",
+          "vi": "y=2×0.20=0.40."
+        }
+      },
+      {
+        "id": "compare",
+        "action": {
+          "en": "Compare prediction 0.40 with target 1.00.",
+          "vi": "So dự đoán 0.40 với mục tiêu 1.00."
+        },
+        "why": {
+          "en": "The target is known training evidence, not an inference input.",
+          "vi": "Mục tiêu là dữ kiện training đã biết, không phải đầu vào inference."
+        },
+        "result": {
+          "en": "The prediction is 0.60 below the target.",
+          "vi": "Dự đoán thấp hơn mục tiêu 0.60."
+        }
+      },
+      {
+        "id": "error",
+        "action": {
+          "en": "Apply the declared error convention.",
+          "vi": "Áp dụng quy ước sai số đã công bố."
+        },
+        "why": {
+          "en": "This fixture uses e=t−y and reports squared error separately.",
+          "vi": "Fixture này dùng e=t−y và báo sai số bình phương riêng."
+        },
+        "result": {
+          "en": "e=1.00−0.40=0.60; e²=0.36.",
+          "vi": "e=1.00−0.40=0.60; e²=0.36."
+        }
+      },
+      {
+        "id": "propagate",
+        "action": {
+          "en": "Carry error information backwards.",
+          "vi": "Đưa thông tin sai số ngược."
+        },
+        "why": {
+          "en": "The correction uses e, x and η.",
+          "vi": "Hiệu chỉnh dùng e, x và η."
+        },
+        "result": {
+          "en": "Direction changes for correction, not for normal prediction data.",
+          "vi": "Hướng đổi cho hiệu chỉnh, không phải dữ liệu dự đoán bình thường."
+        }
+      },
+      {
+        "id": "adjust",
+        "action": {
+          "en": "Calculate Δw=0.10×0.60×2=0.12.",
+          "vi": "Tính Δw=0.10×0.60×2=0.12."
+        },
+        "why": {
+          "en": "Apply the declared toy update once.",
+          "vi": "Áp dụng cập nhật đồ chơi đã công bố một lần."
+        },
+        "result": {
+          "en": "w′=0.20+0.12=0.32.",
+          "vi": "w′=0.20+0.12=0.32."
+        }
+      },
+      {
+        "id": "next-forward",
+        "action": {
+          "en": "Run the next forward pass.",
+          "vi": "Chạy lần truyền xuôi tiếp theo."
+        },
+        "why": {
+          "en": "The changed weight must be evaluated.",
+          "vi": "Phải đánh giá trọng số đã đổi."
+        },
+        "result": {
+          "en": "y′=2×0.32=0.64.",
+          "vi": "y′=2×0.32=0.64."
+        }
+      },
+      {
+        "id": "compare-after",
+        "action": {
+          "en": "Compare the next prediction with the same target.",
+          "vi": "So dự đoán tiếp theo với cùng mục tiêu."
+        },
+        "why": {
+          "en": "Only the verified fixture supports this before/after claim.",
+          "vi": "Chỉ fixture đã kiểm chứng hỗ trợ tuyên bố trước/sau này."
+        },
+        "result": {
+          "en": "e′=0.36; e′²=0.1296, lower than 0.36.",
+          "vi": "e′=0.36; e′²=0.1296, thấp hơn 0.36."
+        }
+      }
+    ],
+    "result": {
+      "en": "For BP-01, one declared update changes w 0.20→0.32 and squared error 0.36→0.1296.",
+      "vi": "Với BP-01, một cập nhật đã công bố đổi w 0.20→0.32 và sai số bình phương 0.36→0.1296."
+    },
+    "selfCheck": {
+      "en": "Can you point to the forward prediction and backward correction as different stages?",
+      "vi": "Bạn có thể chỉ dự đoán xuôi và hiệu chỉnh ngược là hai giai đoạn khác nhau không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "prediction compared with target",
+        "vi": "dự đoán so với mục tiêu"
+      },
+      {
+        "en": "error propagated backwards",
+        "vi": "sai số lan truyền ngược"
+      },
+      {
+        "en": "weights adjusted and training repeated",
+        "vi": "trọng số được điều chỉnh và training lặp"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: a forward inference uses fixed weights and has no target/error update; backpropagation belongs to training.",
+      "vi": "Dễ nhầm: inference xuôi dùng trọng số cố định và không có cập nhật mục tiêu/sai số; lan truyền ngược thuộc training."
+    },
+    "method": [
+      {
+        "en": "Write the forward prediction.",
+        "vi": "Ghi dự đoán xuôi."
+      },
+      {
+        "en": "State target and error convention.",
+        "vi": "Nêu mục tiêu và quy ước sai số."
+      },
+      {
+        "en": "Show backward correction information.",
+        "vi": "Trình bày thông tin hiệu chỉnh ngược."
+      },
+      {
+        "en": "Calculate old/new weight and next prediction.",
+        "vi": "Tính trọng số cũ/mới và dự đoán tiếp theo."
+      },
+      {
+        "en": "Compare verified before/after errors without generalising.",
+        "vi": "So sai số trước/sau đã kiểm chứng mà không khái quát quá mức."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "describe",
+        "guidance": {
+          "en": "State the forward prediction, target, error information and weight being adjusted.",
+          "vi": "Nêu dự đoán xuôi, mục tiêu, thông tin sai số và trọng số đang được điều chỉnh."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link target comparison to backward correction and the next forward pass.",
+          "vi": "Liên hệ so sánh với mục tiêu với hiệu chỉnh ngược và lần truyền xuôi tiếp theo."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Keep forward prediction, comparison, backward propagation, update and rerun in order.",
+          "vi": "Giữ đúng thứ tự dự đoán xuôi, so sánh, truyền ngược, cập nhật và chạy lại."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Compare old and new weight, prediction and squared error for the verified fixture.",
+          "vi": "So sánh trọng số, dự đoán và sai số bình phương cũ với mới trong fixture đã kiểm."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Use the declared toy update rule and calculated values; do not claim a universal guarantee.",
+          "vi": "Dùng quy tắc cập nhật đồ chơi đã công bố và các giá trị tính được; không tuyên bố bảo đảm phổ quát."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Backpropagation runs on every inference request.",
+        "vi": "Lan truyền ngược chạy trong mọi yêu cầu inference."
+      },
+      "correction": {
+        "en": "It is a training process; normal inference holds weights fixed.",
+        "vi": "Đó là quá trình training; inference bình thường giữ trọng số cố định."
+      },
+      "selfCheck": {
+        "en": "Is this a training update or a normal inference request?",
+        "vi": "Đây là cập nhật training hay yêu cầu inference bình thường?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "The input data is predicted backwards.",
+        "vi": "Dữ liệu đầu vào được dự đoán ngược."
+      },
+      "correction": {
+        "en": "Backward arrows represent correction/error information.",
+        "vi": "Mũi tên ngược biểu diễn thông tin hiệu chỉnh/sai số."
+      },
+      "selfCheck": {
+        "en": "What moves backwards: input data or error/correction information?",
+        "vi": "Thứ gì đi ngược: dữ liệu đầu vào hay thông tin sai số/hiệu chỉnh?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "One update guarantees a perfect global solution.",
+        "vi": "Một cập nhật bảo đảm nghiệm toàn cục hoàn hảo."
+      },
+      "correction": {
+        "en": "Report only the verified fixture result and repeated-training purpose.",
+        "vi": "Chỉ báo cáo kết quả fixture đã kiểm và mục đích training lặp."
+      },
+      "selfCheck": {
+        "en": "Does the evidence show one fixture update or prove a global guarantee?",
+        "vi": "Dữ kiện cho thấy một lần cập nhật fixture hay chứng minh bảo đảm toàn cục?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Error is calculated before a prediction exists.",
+        "vi": "Sai số được tính trước khi có dự đoán."
+      },
+      "correction": {
+        "en": "Forward prediction precedes target comparison.",
+        "vi": "Dự đoán xuôi đi trước so sánh mục tiêu."
+      },
+      "selfCheck": {
+        "en": "Has a forward prediction been produced before calculating error?",
+        "vi": "Dự đoán xuôi đã được tạo trước khi tính sai số chưa?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What is backpropagated in this teaching model?",
+        "vi": "Điều gì được lan truyền ngược trong mô hình này?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Error/correction information used to adjust weights",
+            "vi": "Thông tin sai số/hiệu chỉnh dùng để điều chỉnh trọng số"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The normal input as a backward prediction",
+            "vi": "Đầu vào bình thường như dự đoán ngược"
+          },
+          "feedback": {
+            "en": "Prediction data flows forward.",
+            "vi": "Dữ liệu dự đoán đi xuôi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A graph heuristic",
+            "vi": "Một heuristic đồ thị"
+          },
+          "feedback": {
+            "en": "That belongs to A*.",
+            "vi": "Điều đó thuộc A*."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Separate signal direction from correction direction.",
+        "vi": "Tách hướng tín hiệu khỏi hướng hiệu chỉnh."
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which wording identifies backpropagation?",
+        "vi": "Cách diễn đạt nào nhận diện lan truyền ngược?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Actual output compared with expected output; error adjusts weights",
+            "vi": "Đầu ra thực so với đầu ra mong đợi; sai số điều chỉnh trọng số"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Open set selects smallest f",
+            "vi": "Tập open chọn f nhỏ nhất"
+          },
+          "feedback": {
+            "en": "That is A*.",
+            "vi": "Đó là A*."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Unlabelled points form clusters",
+            "vi": "Điểm không nhãn tạo cụm"
+          },
+          "feedback": {
+            "en": "That is unsupervised learning.",
+            "vi": "Đó là học không giám sát."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Look for target comparison and weight adjustment.",
+        "vi": "Tìm so sánh mục tiêu và điều chỉnh trọng số."
+      }
+    },
+    {
+      "id": "ordering",
+      "prompt": {
+        "en": "Which training order is correct?",
+        "vi": "Thứ tự training nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "forward → prediction → target comparison/error → backward correction → adjust weight → forward again",
+            "vi": "xuôi → dự đoán → so mục tiêu/sai số → hiệu chỉnh ngược → điều chỉnh trọng số → xuôi lại"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "adjust weight before any prediction → infer backwards",
+            "vi": "chỉnh trọng số trước mọi dự đoán → suy luận ngược"
+          },
+          "feedback": {
+            "en": "No error evidence exists yet.",
+            "vi": "Chưa có dữ kiện sai số."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "predict once → never compare",
+            "vi": "dự đoán một lần → không bao giờ so"
+          },
+          "feedback": {
+            "en": "That omits training feedback.",
+            "vi": "Cách này bỏ phản hồi training."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Keep the eight-stage causal cycle.",
+        "vi": "Giữ chu trình nhân quả tám giai đoạn."
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "For BP-01, what new weight follows the declared rule?",
+        "vi": "Với BP-01, trọng số mới theo quy tắc đã công bố là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "0.32",
+            "vi": "0.32"
+          },
+          "feedback": {
+            "en": "Correct: Δw=0.12.",
+            "vi": "Đúng: Δw=0.12."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "0.20",
+            "vi": "0.20"
+          },
+          "feedback": {
+            "en": "That leaves the training weight unchanged.",
+            "vi": "Giá trị này không thay trọng số training."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "1.20",
+            "vi": "1.20"
+          },
+          "feedback": {
+            "en": "This omits the learning rate and input relationship.",
+            "vi": "Cách này bỏ learning rate và quan hệ đầu vào."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Show η×e×x before adding it to w.",
+        "vi": "Trình bày η×e×x trước khi cộng vào w."
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "Which conclusion is valid after BP-01?",
+        "vi": "Kết luận nào hợp lệ sau BP-01?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "This fixture's squared error fell from 0.36 to 0.1296; no universal one-step guarantee follows",
+            "vi": "Sai số bình phương của fixture này giảm 0.36 xuống 0.1296; không suy ra bảo đảm một bước phổ quát"
+          },
+          "feedback": {
+            "en": "Correct.",
+            "vi": "Đúng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every network always reaches zero error in one update",
+            "vi": "Mọi mạng luôn đạt sai số 0 trong một cập nhật"
+          },
+          "feedback": {
+            "en": "The fixture does not support that generalisation.",
+            "vi": "Fixture không hỗ trợ khái quát đó."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Inference must now run backpropagation forever",
+            "vi": "Inference giờ phải chạy lan truyền ngược mãi"
+          },
+          "feedback": {
+            "en": "Inference and training remain separate modes.",
+            "vi": "Inference và training vẫn là hai chế độ riêng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Limit the claim to verified arithmetic.",
+        "vi": "Giới hạn tuyên bố ở phép tính đã kiểm chứng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "State the backpropagation cycle and its mode boundary.",
+      "vi": "Nêu chu trình lan truyền ngược và giới hạn chế độ."
+    },
+    "answerPoints": [
+      {
+        "en": "Forward prediction precedes target comparison.",
+        "vi": "Dự đoán xuôi đi trước so mục tiêu."
+      },
+      {
+        "en": "Error/correction information moves backwards to adjust weights.",
+        "vi": "Thông tin sai số/hiệu chỉnh đi ngược để điều chỉnh trọng số."
+      },
+      {
+        "en": "Repeat during training; normal inference keeps weights fixed.",
+        "vi": "Lặp trong training; inference bình thường giữ trọng số cố định."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Prediction moves forward; correction information moves backward.",
+      "vi": "Dự đoán đi xuôi; thông tin hiệu chỉnh đi ngược."
+    },
+    {
+      "en": "Backpropagation changes weights during training.",
+      "vi": "Lan truyền ngược đổi trọng số khi training."
+    },
+    {
+      "en": "Toy arithmetic is scoped evidence, not production implementation.",
+      "vi": "Phép tính đồ chơi là bằng chứng có phạm vi, không phải cài đặt sản xuất."
+    }
+  ],
+  "relatedSlugs": [
+    "neural-networks-and-deep-learning",
+    "regression"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p36, §18.1 Artificial Intelligence (AI)",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Chapter 18.2.6, printed pp444–445 / PDF pp460–461: iterative error comparison and weight adjustment",
+      "kind": "book"
+    },
+    {
+      "id": "w25-32-qp",
+      "title": "Cambridge 9618/32 — October/November 2025 question paper",
+      "locator": "Question 9(b), p9",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w25-32-ms",
+      "title": "Cambridge 9618/32 — October/November 2025 mark scheme",
+      "locator": "Question 9(b), p15",
+      "kind": "mark-scheme"
+    }
+  ]
+}

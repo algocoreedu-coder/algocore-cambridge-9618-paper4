@@ -1,0 +1,704 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.2-T03",
+  "slug": "bnf-and-syntax-diagrams",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "BNF and syntax diagrams",
+    "vi": "BNF và sơ đồ cú pháp"
+  },
+  "question": {
+    "en": "How can a grammar prove that every symbol in a candidate string follows the required structure?",
+    "vi": "Văn phạm chứng minh mọi ký hiệu trong chuỗi ứng viên tuân theo cấu trúc yêu cầu bằng cách nào?"
+  },
+  "opening": {
+    "en": "A grammar defines form rather than program purpose. BNF writes production rules; a syntax diagram draws paths through the same choices, sequences and repetitions. To validate a string, begin at the start symbol, apply only permitted rules and consume the whole input.",
+    "vi": "Văn phạm định nghĩa hình thức chứ không định nghĩa mục đích chương trình. BNF viết các luật sinh; sơ đồ cú pháp vẽ đường đi qua cùng lựa chọn, thứ tự và lặp. Để kiểm tra chuỗi, bắt đầu từ ký hiệu đầu, chỉ áp dụng luật được phép và phải dùng hết đầu vào."
+  },
+  "objectives": [
+    {
+      "en": "Distinguish terminals, non-terminals, production rules, choice and sequence.",
+      "vi": "Phân biệt ký hiệu kết thúc, không kết thúc, luật sinh, lựa chọn và nối tiếp."
+    },
+    {
+      "en": "Trace a derivation and the equivalent syntax-diagram path for a bounded grammar.",
+      "vi": "Trace phép dẫn xuất và đường đi tương đương trong sơ đồ cú pháp của văn phạm hữu hạn."
+    },
+    {
+      "en": "Accept or reject a candidate only after checking the whole string.",
+      "vi": "Chỉ chấp nhận hoặc bác chuỗi sau khi kiểm tra toàn bộ chuỗi."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read a sequence from left to right and distinguish a symbol name from the character it can generate.",
+      "vi": "Đọc chuỗi từ trái sang phải và phân biệt tên ký hiệu với ký tự nó có thể sinh."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Terminal",
+      "meaning": {
+        "en": "A literal symbol that can occur in the generated string.",
+        "vi": "Ký hiệu literal có thể xuất hiện trong chuỗi được sinh."
+      }
+    },
+    {
+      "term": "Non-terminal",
+      "meaning": {
+        "en": "A named grammar category that must be expanded by a production rule.",
+        "vi": "Tên phạm trù văn phạm phải được mở rộng bằng luật sinh."
+      }
+    },
+    {
+      "term": "Production",
+      "meaning": {
+        "en": "A rule describing what a non-terminal may be replaced by.",
+        "vi": "Luật mô tả một ký hiệu không kết thúc có thể được thay bằng gì."
+      }
+    },
+    {
+      "term": "Derivation",
+      "meaning": {
+        "en": "A sequence of valid rule applications from the start symbol to terminals.",
+        "vi": "Chuỗi áp dụng luật hợp lệ từ ký hiệu đầu đến các ký hiệu kết thúc."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "symbols-and-productions",
+      "title": {
+        "en": "Read the two sides of a production",
+        "vi": "Đọc hai vế của luật sinh"
+      },
+      "paragraphs": [
+        {
+          "en": "In BNF, a non-terminal such as <letter> names a syntactic category. A production such as <letter> ::= A | B says that the category may generate terminal A or terminal B. The left side is the category being defined; the right side contains alternatives built from terminals and non-terminals.",
+          "vi": "Trong BNF, ký hiệu không kết thúc như <letter> đặt tên một phạm trù cú pháp. Luật <letter> ::= A | B cho biết phạm trù có thể sinh terminal A hoặc B. Vế trái là phạm trù được định nghĩa; vế phải chứa các phương án tạo từ terminal và non-terminal."
+        },
+        {
+          "en": "Angle brackets are a notation used here for non-terminal names; they are not characters in the generated name. The operator ::= means “is defined as”. The vertical bar means choice. It does not mean that both alternatives must appear and it is not a character to type into the candidate string.",
+          "vi": "Dấu ngoặc nhọn góc là ký pháp dùng ở đây cho tên non-terminal; chúng không phải ký tự trong tên được sinh. Toán tử ::= nghĩa là “được định nghĩa là”. Dấu gạch đứng là lựa chọn. Nó không yêu cầu cả hai phương án xuất hiện và không phải ký tự cần gõ trong chuỗi."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "sequence-and-choice",
+      "title": {
+        "en": "Do not replace sequence with choice",
+        "vi": "Không thay nối tiếp bằng lựa chọn"
+      },
+      "paragraphs": [
+        {
+          "en": "Adjacent grammar items form a sequence. <name> ::= <letter><tail> requires a letter followed by a tail. In contrast, <letter> | <digit> selects one category. The printed textbook example on page 400 uses a vertical bar while describing a letter followed by a digit; the reviewed lesson corrects that printing error and uses adjacency for sequence.",
+          "vi": "Các mục văn phạm đứng cạnh nhau tạo nối tiếp. <name> ::= <letter><tail> yêu cầu một chữ cái theo sau bởi tail. Ngược lại, <letter> | <digit> chọn một phạm trù. Ví dụ sách in trang 400 dùng dấu gạch đứng trong khi mô tả chữ cái theo sau chữ số; bài đã review sửa lỗi in đó và dùng đặt cạnh nhau cho nối tiếp."
+        },
+        {
+          "en": "A syntax diagram expresses the same distinction spatially: consecutive boxes lie along one path, while branches show alternatives. A loop can show repetition and a bypass can show an optional component or zero repetitions. The direction and reconnection of arrows are part of the grammar.",
+          "vi": "Sơ đồ cú pháp biểu diễn cùng phân biệt theo không gian: các hộp liên tiếp nằm trên một đường, nhánh thể hiện lựa chọn. Vòng lặp có thể thể hiện lặp và đường bỏ qua thể hiện thành phần tùy chọn hoặc không lần lặp. Hướng và điểm nối lại của mũi tên là một phần văn phạm."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "s25-31-qp",
+        "s25-31-ms"
+      ]
+    },
+    {
+      "id": "recursion-and-repetition",
+      "title": {
+        "en": "Use recursion to generate zero or more digits",
+        "vi": "Dùng đệ quy để sinh không hoặc nhiều chữ số"
+      },
+      "paragraphs": [
+        {
+          "en": "The rule <tail> ::= <digit><tail> | ε is recursive because <tail> appears in its own definition. Choosing <digit><tail> consumes one digit and leaves another tail to expand; choosing ε stops without adding a character. This generates zero or more digits after the initial letter.",
+          "vi": "Luật <tail> ::= <digit><tail> | ε là đệ quy vì <tail> xuất hiện trong chính định nghĩa. Chọn <digit><tail> dùng một chữ số và để lại tail tiếp tục mở rộng; chọn ε dừng mà không thêm ký tự. Cách này sinh không hoặc nhiều chữ số sau chữ cái đầu."
+        },
+        {
+          "en": "Recursion must have a stopping alternative. Without ε or another non-recursive route, this particular derivation could never finish. In a syntax diagram, the equivalent path enters a digit box, may loop for another digit, and may leave the loop.",
+          "vi": "Đệ quy phải có phương án dừng. Không có ε hoặc đường không đệ quy, phép dẫn xuất này không thể kết thúc. Trong sơ đồ cú pháp, đường tương đương đi qua hộp chữ số, có thể lặp để lấy chữ số khác rồi có thể rời vòng lặp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "derive-and-consume",
+      "title": {
+        "en": "Expand and consume in a controlled order",
+        "vi": "Mở rộng và tiêu thụ theo thứ tự có kiểm soát"
+      },
+      "paragraphs": [
+        {
+          "en": "To test B20, begin with <name>, expand it to <letter><tail>, choose B for <letter>, then expand <tail> to <digit><tail> twice to consume 2 and 0. Finally choose ε. The derivation is valid because every replacement follows a production and the resulting terminal string is exactly B20.",
+          "vi": "Để kiểm B20, bắt đầu từ <name>, mở rộng thành <letter><tail>, chọn B cho <letter>, rồi mở rộng <tail> thành <digit><tail> hai lần để dùng 2 và 0. Cuối cùng chọn ε. Dẫn xuất hợp lệ vì mỗi thay thế theo luật và chuỗi terminal thu được đúng B20."
+        },
+        {
+          "en": "A prefix match is not enough. A012B begins legally but leaves B after the digit repetition; AB consumes A then encounters B where only digit or end is allowed. A parser or diagram trace must report the first violated expectation and reject any unmatched suffix.",
+          "vi": "Khớp tiền tố chưa đủ. A012B bắt đầu hợp lệ nhưng còn B sau phần lặp chữ số; AB dùng A rồi gặp B tại nơi chỉ chấp nhận chữ số hoặc kết thúc. Bộ phân tích hoặc trace sơ đồ phải báo kỳ vọng bị vi phạm đầu tiên và bác mọi hậu tố chưa dùng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "syntax-not-meaning",
+      "title": {
+        "en": "Keep grammar separate from program meaning",
+        "vi": "Tách văn phạm khỏi ý nghĩa chương trình"
+      },
+      "paragraphs": [
+        {
+          "en": "A grammar can show that an identifier or statement has an allowed structure. It does not prove that the identifier was declared, that types are compatible, that a division is safe or that an algorithm is correct. Those are semantic, runtime or problem-solving questions.",
+          "vi": "Văn phạm có thể cho thấy định danh hoặc câu lệnh có cấu trúc được phép. Nó không chứng minh định danh đã khai báo, kiểu tương thích, phép chia an toàn hay thuật toán đúng. Đó là các câu hỏi ngữ nghĩa, runtime hoặc giải quyết vấn đề."
+        },
+        {
+          "en": "In exam answers, state what the supplied grammar proves. If the task asks whether a passcode is valid, cite the exact failed box, branch or production and any remaining character. Do not infer password strength or program correctness from syntax alone.",
+          "vi": "Trong đáp án thi, nêu đúng điều văn phạm được cho chứng minh. Nếu đề hỏi passcode hợp lệ, chỉ rõ hộp, nhánh hoặc luật bị lỗi cùng ký tự còn thừa. Không suy ra độ mạnh mật khẩu hay tính đúng chương trình chỉ từ cú pháp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "s25-31-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "bnf-explorer",
+    "title": {
+      "en": "Derive a name and follow the matching diagram",
+      "vi": "Dẫn xuất tên và đi theo sơ đồ tương ứng"
+    },
+    "introduction": {
+      "en": "Choose a candidate, expand the current non-terminal and watch the consumed prefix, remaining suffix, production and expected symbols update together.",
+      "vi": "Chọn chuỗi, mở rộng non-terminal hiện tại và quan sát tiền tố đã dùng, hậu tố còn lại, luật và ký hiệu kỳ vọng cập nhật cùng nhau."
+    },
+    "task": {
+      "en": "Predict whether B20, A, AB and A3 can consume the complete input. For an invalid case, identify the first symbol that cannot follow a valid path.",
+      "vi": "Dự đoán B20, A, AB và A3 có dùng hết đầu vào không. Với trường hợp sai, xác định ký hiệu đầu tiên không thể đi theo đường hợp lệ."
+    },
+    "conventions": [
+      {
+        "en": "Grammar: <name> ::= <letter><tail>; <letter> ::= A | B; <tail> ::= <digit><tail> | ε; <digit> ::= 0 | 1 | 2.",
+        "vi": "Văn phạm: <name> ::= <letter><tail>; <letter> ::= A | B; <tail> ::= <digit><tail> | ε; <digit> ::= 0 | 1 | 2."
+      },
+      {
+        "en": "The visual checks at most 12 characters for a bounded teaching trace; longer input is reported unsupported, not declared invalid by the grammar.",
+        "vi": "Visual kiểm tối đa 12 ký tự để trace hữu hạn; đầu vào dài hơn được báo ngoài phạm vi công cụ, không bị kết luận là sai theo văn phạm."
+      },
+      {
+        "en": "Acceptance requires the whole candidate to be consumed.",
+        "vi": "Chấp nhận yêu cầu dùng hết toàn bộ chuỗi."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "Derive B20 from the start symbol",
+      "vi": "Dẫn xuất B20 từ ký hiệu đầu"
+    },
+    "prompt": {
+      "en": "Use the reviewed grammar to construct B20 and show the rule chosen at each step.",
+      "vi": "Dùng văn phạm đã review để tạo B20 và nêu luật ở từng bước."
+    },
+    "steps": [
+      {
+        "id": "start",
+        "action": {
+          "en": "Write <name>.",
+          "vi": "Viết <name>."
+        },
+        "why": {
+          "en": "Validation begins at the stated start symbol.",
+          "vi": "Kiểm tra bắt đầu từ ký hiệu đầu đã nêu."
+        },
+        "result": {
+          "en": "Current form: <name>; input remaining B20.",
+          "vi": "Dạng hiện tại: <name>; đầu vào còn B20."
+        }
+      },
+      {
+        "id": "expand-name",
+        "action": {
+          "en": "Apply <name> ::= <letter><tail>.",
+          "vi": "Áp dụng <name> ::= <letter><tail>."
+        },
+        "why": {
+          "en": "The two non-terminals are a required sequence.",
+          "vi": "Hai non-terminal là một chuỗi bắt buộc."
+        },
+        "result": {
+          "en": "Current form: <letter><tail>.",
+          "vi": "Dạng hiện tại: <letter><tail>."
+        }
+      },
+      {
+        "id": "choose-letter",
+        "action": {
+          "en": "Choose <letter> ::= B and consume B.",
+          "vi": "Chọn <letter> ::= B và dùng B."
+        },
+        "why": {
+          "en": "B is one permitted terminal alternative.",
+          "vi": "B là một terminal được phép trong lựa chọn."
+        },
+        "result": {
+          "en": "Consumed B; remaining 20; current <tail>.",
+          "vi": "Đã dùng B; còn 20; hiện tại <tail>."
+        }
+      },
+      {
+        "id": "first-digit",
+        "action": {
+          "en": "Use <tail> ::= <digit><tail>, then <digit> ::= 2.",
+          "vi": "Dùng <tail> ::= <digit><tail>, rồi <digit> ::= 2."
+        },
+        "why": {
+          "en": "A recursive tail consumes one digit and keeps the option to continue.",
+          "vi": "Tail đệ quy dùng một chữ số và giữ khả năng tiếp tục."
+        },
+        "result": {
+          "en": "Consumed B2; remaining 0; current <tail>.",
+          "vi": "Đã dùng B2; còn 0; hiện tại <tail>."
+        }
+      },
+      {
+        "id": "second-digit",
+        "action": {
+          "en": "Repeat and choose <digit> ::= 0.",
+          "vi": "Lặp lại và chọn <digit> ::= 0."
+        },
+        "why": {
+          "en": "The second digit uses the same production, not a new ad-hoc rule.",
+          "vi": "Chữ số thứ hai dùng cùng luật, không phải luật tự đặt."
+        },
+        "result": {
+          "en": "Consumed B20; remaining empty; current <tail>.",
+          "vi": "Đã dùng B20; đầu vào hết; hiện tại <tail>."
+        }
+      },
+      {
+        "id": "stop",
+        "action": {
+          "en": "Choose <tail> ::= ε.",
+          "vi": "Chọn <tail> ::= ε."
+        },
+        "why": {
+          "en": "The stopping alternative adds no terminal after the input is consumed.",
+          "vi": "Phương án dừng không thêm terminal sau khi đầu vào đã hết."
+        },
+        "result": {
+          "en": "Only terminals B20 remain and the complete input is consumed: accept.",
+          "vi": "Chỉ còn terminal B20 và toàn bộ đầu vào đã dùng: chấp nhận."
+        },
+        "check": {
+          "en": "Stopping before consuming 0 would leave an unmatched suffix.",
+          "vi": "Dừng trước khi dùng 0 sẽ để lại hậu tố chưa khớp."
+        }
+      }
+    ],
+    "result": {
+      "en": "B20 is valid because B is an allowed letter, both digits are allowed, recursion handles the repetition and ε ends the derivation after the whole input is consumed.",
+      "vi": "B20 hợp lệ vì B là chữ được phép, hai chữ số đều được phép, đệ quy xử lý phần lặp và ε kết thúc sau khi toàn bộ đầu vào được dùng."
+    },
+    "selfCheck": {
+      "en": "Trace AB and explain why the second character cannot be consumed by <tail>.",
+      "vi": "Trace AB và giải thích vì sao ký tự thứ hai không thể được <tail> dùng."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Angle-bracket names, ::= and | signal a BNF production question.",
+        "vi": "Tên trong ngoặc góc, ::= và | báo hiệu câu BNF."
+      },
+      {
+        "en": "Boxes, arrows, branches, loops or bypass paths signal a syntax-diagram trace.",
+        "vi": "Hộp, mũi tên, nhánh, vòng lặp hoặc đường bỏ qua báo hiệu trace sơ đồ cú pháp."
+      },
+      {
+        "en": "“Complete”, “construct”, “derive” and “state why invalid” require different outputs: a rule, a derivation or a precise failure.",
+        "vi": "“Hoàn thành”, “xây dựng”, “dẫn xuất” và “nêu vì sao sai” yêu cầu đầu ra khác nhau: luật, dẫn xuất hoặc lỗi chính xác."
+      }
+    ],
+    "distinguish": {
+      "en": "BNF and syntax diagrams describe valid structure. RPN uses a stack to evaluate an already supplied expression; compilation syntax analysis applies grammar rules to token streams.",
+      "vi": "BNF và sơ đồ cú pháp mô tả cấu trúc hợp lệ. RPN dùng stack để tính biểu thức đã cho; phân tích cú pháp khi biên dịch áp dụng văn phạm cho chuỗi token."
+    },
+    "method": [
+      {
+        "en": "Identify the start symbol, terminals and each alternative.",
+        "vi": "Xác định ký hiệu đầu, terminal và từng phương án."
+      },
+      {
+        "en": "Expand one non-terminal at a time while marking the consumed input.",
+        "vi": "Mở rộng từng non-terminal đồng thời đánh dấu đầu vào đã dùng."
+      },
+      {
+        "en": "Require a legal stopping route and no unmatched suffix; cite the first failed expectation.",
+        "vi": "Yêu cầu đường dừng hợp lệ và không còn hậu tố; chỉ kỳ vọng bị lỗi đầu tiên."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A | B means A followed by B.",
+        "vi": "A | B nghĩa là A theo sau B."
+      },
+      "correction": {
+        "en": "The bar means choice; adjacency expresses sequence.",
+        "vi": "Dấu gạch đứng là lựa chọn; đặt cạnh nhau biểu diễn nối tiếp."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Matching a valid prefix is enough.",
+        "vi": "Khớp tiền tố hợp lệ là đủ."
+      },
+      "correction": {
+        "en": "The derivation must consume the complete candidate.",
+        "vi": "Dẫn xuất phải dùng toàn bộ chuỗi ứng viên."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A syntactically valid statement must be logically correct.",
+        "vi": "Câu lệnh đúng cú pháp chắc chắn đúng logic."
+      },
+      "correction": {
+        "en": "Grammar checks form; declarations, types, runtime safety and intended result need other checks.",
+        "vi": "Văn phạm kiểm hình thức; khai báo, kiểu, an toàn runtime và kết quả mong muốn cần kiểm tra khác."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "terminal-role",
+      "prompt": {
+        "en": "In <letter> ::= A | B, which items are terminals?",
+        "vi": "Trong <letter> ::= A | B, mục nào là terminal?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A and B.",
+            "vi": "A và B."
+          },
+          "feedback": {
+            "en": "Correct: they can appear literally in a generated string.",
+            "vi": "Đúng: chúng có thể xuất hiện nguyên dạng trong chuỗi sinh."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "<letter>.",
+            "vi": "<letter>."
+          },
+          "feedback": {
+            "en": "That is the non-terminal being defined.",
+            "vi": "Đó là non-terminal đang được định nghĩa."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "::= and |.",
+            "vi": "::= và |."
+          },
+          "feedback": {
+            "en": "They are grammar notation, not generated characters.",
+            "vi": "Chúng là ký pháp văn phạm, không phải ký tự được sinh."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Terminals are the literal alternatives on the right side.",
+        "vi": "Terminal là các phương án literal ở vế phải."
+      }
+    },
+    {
+      "id": "sequence-choice",
+      "prompt": {
+        "en": "Which rule means a letter followed by a digit?",
+        "vi": "Luật nào nghĩa là chữ cái theo sau bởi chữ số?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "<item> ::= <letter><digit>",
+            "vi": "<item> ::= <letter><digit>"
+          },
+          "feedback": {
+            "en": "Correct: adjacency means sequence.",
+            "vi": "Đúng: đặt cạnh nhau nghĩa là nối tiếp."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "<item> ::= <letter> | <digit>",
+            "vi": "<item> ::= <letter> | <digit>"
+          },
+          "feedback": {
+            "en": "That chooses one item rather than requiring both.",
+            "vi": "Luật này chọn một mục thay vì yêu cầu cả hai."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "<item> ::= | <letter><digit>",
+            "vi": "<item> ::= | <letter><digit>"
+          },
+          "feedback": {
+            "en": "This adds an empty alternative not stated by the task.",
+            "vi": "Luật này thêm phương án rỗng không được đề nêu."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use | only for alternatives.",
+        "vi": "Chỉ dùng | cho các phương án."
+      }
+    },
+    {
+      "id": "recursive-tail",
+      "prompt": {
+        "en": "Why does <tail> ::= <digit><tail> | ε allow A012?",
+        "vi": "Vì sao <tail> ::= <digit><tail> | ε cho phép A012?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Choose the recursive alternative three times, then ε.",
+            "vi": "Chọn phương án đệ quy ba lần rồi ε."
+          },
+          "feedback": {
+            "en": "Correct: each recursion consumes one digit and ε stops.",
+            "vi": "Đúng: mỗi lần đệ quy dùng một chữ số và ε dừng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The vertical bar concatenates every digit.",
+            "vi": "Dấu gạch đứng nối mọi chữ số."
+          },
+          "feedback": {
+            "en": "The bar selects an alternative; recursion creates repetition.",
+            "vi": "Dấu gạch đứng chọn phương án; đệ quy tạo phần lặp."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "ε is the digit 0.",
+            "vi": "ε là chữ số 0."
+          },
+          "feedback": {
+            "en": "ε contributes no character.",
+            "vi": "ε không thêm ký tự."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Count one recursive expansion per consumed digit.",
+        "vi": "Đếm một lần mở rộng đệ quy cho mỗi chữ số được dùng."
+      }
+    },
+    {
+      "id": "invalid-symbol-transfer",
+      "prompt": {
+        "en": "Why is A3 rejected by this grammar?",
+        "vi": "Vì sao A3 bị văn phạm này bác?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "<digit> permits only 0, 1 or 2.",
+            "vi": "<digit> chỉ cho 0, 1 hoặc 2."
+          },
+          "feedback": {
+            "en": "Correct: the first unmatched symbol violates the digit choice.",
+            "vi": "Đúng: ký hiệu không khớp đầu tiên vi phạm lựa chọn chữ số."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A cannot begin a name.",
+            "vi": "A không thể bắt đầu tên."
+          },
+          "feedback": {
+            "en": "A is an allowed <letter>.",
+            "vi": "A là <letter> được phép."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Every name must contain exactly two digits.",
+            "vi": "Mọi tên phải có đúng hai chữ số."
+          },
+          "feedback": {
+            "en": "The recursive tail allows zero or more digits.",
+            "vi": "Tail đệ quy cho phép không hoặc nhiều chữ số."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Name the rejected symbol and the production that excludes it.",
+        "vi": "Nêu ký hiệu bị bác và luật sinh loại nó."
+      }
+    },
+    {
+      "id": "syntax-meaning-transfer",
+      "prompt": {
+        "en": "B20 is generated by the grammar. What has been proved?",
+        "vi": "B20 được văn phạm sinh. Điều gì đã được chứng minh?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Its syntax matches this grammar.",
+            "vi": "Cú pháp của nó khớp văn phạm này."
+          },
+          "feedback": {
+            "en": "Correct: no claim about declaration, security or program purpose follows.",
+            "vi": "Đúng: không suy ra khai báo, bảo mật hay mục đích chương trình."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "It is a declared variable with the correct type.",
+            "vi": "Nó là biến đã khai báo với kiểu đúng."
+          },
+          "feedback": {
+            "en": "Declaration and type are semantic/context checks.",
+            "vi": "Khai báo và kiểu là kiểm tra ngữ nghĩa/ngữ cảnh."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "It is a strong password.",
+            "vi": "Nó là mật khẩu mạnh."
+          },
+          "feedback": {
+            "en": "Grammar membership is not a security-strength assessment.",
+            "vi": "Thuộc văn phạm không phải đánh giá độ mạnh bảo mật."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "State the exact scope of a syntax result.",
+        "vi": "Nêu chính xác phạm vi của kết quả cú pháp."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Derive B20 and explain why AB is invalid.",
+      "vi": "Dẫn xuất B20 và giải thích vì sao AB sai."
+    },
+    "answerPoints": [
+      {
+        "en": "Expand <name> to <letter><tail>, choose B, consume 2 and 0 through recursive tail expansions, then choose ε.",
+        "vi": "Mở rộng <name> thành <letter><tail>, chọn B, dùng 2 và 0 qua các lần mở rộng tail đệ quy rồi chọn ε."
+      },
+      {
+        "en": "AB fails after A because <tail> accepts a digit or ε, not B; ε would leave an unmatched suffix.",
+        "vi": "AB sai sau A vì <tail> nhận chữ số hoặc ε, không nhận B; chọn ε sẽ để lại hậu tố."
+      },
+      {
+        "en": "The same choices, sequence and repetition can be represented by a syntax-diagram path.",
+        "vi": "Cùng lựa chọn, nối tiếp và lặp có thể biểu diễn bằng đường đi trong sơ đồ cú pháp."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Choice, sequence and repetition are different grammar operations.",
+      "vi": "Lựa chọn, nối tiếp và lặp là các thao tác văn phạm khác nhau."
+    },
+    {
+      "en": "A valid derivation starts at the start symbol and consumes the whole string.",
+      "vi": "Dẫn xuất hợp lệ bắt đầu từ ký hiệu đầu và dùng hết chuỗi."
+    },
+    {
+      "en": "Valid syntax does not establish semantic correctness.",
+      "vi": "Đúng cú pháp không chứng minh đúng ngữ nghĩa."
+    }
+  ],
+  "relatedSlugs": [
+    "compilation-stages",
+    "rpn-and-the-stack"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed pp398–400 / PDF pp414–416; corrected teacher grammar for sequence",
+      "kind": "book"
+    },
+    {
+      "id": "s25-31-qp",
+      "title": "Cambridge 9618 s25 Paper 31 Question Paper",
+      "locator": "PDF pp8–9 Q7",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-31-ms",
+      "title": "Cambridge 9618 s25 Paper 31 Mark Scheme",
+      "locator": "PDF p12 Q7",
+      "kind": "mark-scheme"
+    }
+  ]
+}

@@ -1,0 +1,839 @@
+{
+  "schemaVersion": 1,
+  "version": "T10-academic-r4-reviewed",
+  "topicId": "T10",
+  "sectionId": "10.3",
+  "slug": "text-files",
+  "learningMode": "procedural",
+  "estimatedMinutes": 75,
+  "title": {
+    "en": "Text files",
+    "vi": "Tệp văn bản"
+  },
+  "question": {
+    "en": "How do file mode, cursor and line schema control safe processing?",
+    "vi": "Mode file, con trỏ và schema dòng chi phối xử lý an toàn thế nào?"
+  },
+  "opening": {
+    "en": "Open in the required mode, test EOF before READFILE, process, then close.",
+    "vi": "Mở đúng mode, kiểm EOF trước READFILE, xử lý rồi đóng."
+  },
+  "objectives": [
+    {
+      "en": "Distinguish READ, WRITE and APPEND.",
+      "vi": "Phân biệt READ, WRITE và APPEND."
+    },
+    {
+      "en": "Use EOF safely for empty files.",
+      "vi": "Dùng EOF an toàn với file rỗng."
+    },
+    {
+      "en": "Parse a stated line schema.",
+      "vi": "Parse schema dòng đã nêu."
+    },
+    {
+      "en": "Complete a multi-record read-parse-filter-transform-write pipeline, including empty input and explicit close operations.",
+      "vi": "Hoàn thành pipeline nhiều record gồm đọc-parse-lọc-biến đổi-ghi, kể cả input rỗng và đóng file rõ ràng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Strings and loops",
+        "vi": "Chuỗi và vòng lặp"
+      },
+      "reason": {
+        "en": "READFILE returns STRING lines processed repeatedly.",
+        "vi": "READFILE trả dòng STRING được xử lý lặp."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "EOF",
+      "meaning": {
+        "en": "TRUE when no more lines can be read",
+        "vi": "TRUE khi không còn dòng để đọc"
+      }
+    },
+    {
+      "term": "READ",
+      "meaning": {
+        "en": "mode for reading",
+        "vi": "mode đọc"
+      }
+    },
+    {
+      "term": "WRITE",
+      "meaning": {
+        "en": "replace/create output",
+        "vi": "ghi thay/tạo output"
+      }
+    },
+    {
+      "term": "APPEND",
+      "meaning": {
+        "en": "add after existing content",
+        "vi": "thêm sau nội dung cũ"
+      }
+    },
+    {
+      "term": "schema",
+      "meaning": {
+        "en": "rule mapping lines to fields",
+        "vi": "quy tắc ánh xạ dòng vào field"
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "OPENFILE/READFILE/WRITEFILE/EOF appears.",
+        "vi": "Có OPENFILE/READFILE/WRITEFILE/EOF."
+      },
+      {
+        "en": "Physical lines form records.",
+        "vi": "Các dòng vật lý tạo record."
+      },
+      {
+        "en": "The specification names an input file, an output file and a condition for copying or transforming records.",
+        "vi": "Đặc tả nêu file input, file output và điều kiện copy hoặc biến đổi record."
+      },
+      {
+        "en": "The output must be a one-pass report, first/last records or a serialised record stream.",
+        "vi": "Output phải là báo cáo một lượt, các record đầu/cuối hoặc luồng record được serialize."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "Blank line equals EOF.",
+        "vi": "Dòng trống bằng EOF."
+      },
+      {
+        "en": "Missing and empty files are the same.",
+        "vi": "File thiếu và file rỗng giống nhau."
+      },
+      {
+        "en": "Opening the destination in APPEND is always safe for a fresh report.",
+        "vi": "Mở file đích bằng APPEND luôn an toàn cho báo cáo mới."
+      },
+      {
+        "en": "A multi-line record can be partially read at EOF and still be processed.",
+        "vi": "Record nhiều dòng có thể bị đọc một phần ở EOF mà vẫn xử lý được."
+      }
+    ],
+    "answerProduct": {
+      "en": "Correct mode, EOF-before-read loop, conversion, write and CLOSEFILE.",
+      "vi": "Đúng mode, vòng EOF-trước-đọc, chuyển kiểu, ghi và CLOSEFILE."
+    },
+    "method": [
+      {
+        "en": "State the representation and its conventions.",
+        "vi": "Nêu biểu diễn và quy ước."
+      },
+      {
+        "en": "Trace the state in the stated order.",
+        "vi": "Trace trạng thái theo thứ tự đã nêu."
+      },
+      {
+        "en": "Check the boundary or empty case.",
+        "vi": "Kiểm trường hợp biên hoặc rỗng."
+      },
+      {
+        "en": "Return exactly the requested product.",
+        "vi": "Trả đúng sản phẩm được yêu cầu."
+      },
+      {
+        "en": "Write the input and output schemas before the algorithm.",
+        "vi": "Viết schema input và output trước thuật toán."
+      },
+      {
+        "en": "Choose READ for source and deliberately choose WRITE or APPEND for destination.",
+        "vi": "Chọn READ cho nguồn và chủ ý chọn WRITE hoặc APPEND cho đích."
+      },
+      {
+        "en": "Guard the first read of each complete record, parse and convert fields, then filter/transform and write.",
+        "vi": "Bảo vệ lần đọc đầu của mỗi record đầy đủ, parse và chuyển field, rồi lọc/biến đổi và ghi."
+      },
+      {
+        "en": "Close every opened file and state empty/partial-record behaviour.",
+        "vi": "Đóng mọi file đã mở và nêu hành vi file rỗng/record thiếu."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t10-model",
+      "title": {
+        "en": "Mode defines preservation",
+        "vi": "Mode quyết định việc giữ nội dung"
+      },
+      "paragraphs": [
+        {
+          "en": "READ reads sequentially; WRITE creates/replaces and loses old content; APPEND writes after old content.",
+          "vi": "READ đọc tuần tự; WRITE tạo/thay và mất nội dung cũ; APPEND ghi sau nội dung cũ."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "State the line/record schema.",
+          "vi": "Nêu schema dòng/record."
+        },
+        {
+          "en": "Choose one correct open mode.",
+          "vi": "Chọn đúng một mode mở."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "book-t10",
+        "teacher-t10",
+        "qp-t10-s25-21-q7b"
+      ]
+    },
+    {
+      "id": "t10-operations",
+      "title": {
+        "en": "EOF guards reads",
+        "vi": "EOF bảo vệ việc đọc"
+      },
+      "paragraphs": [
+        {
+          "en": "EOF is TRUE for an empty opened file and after its last line. Test before READFILE to avoid an invented extra line.",
+          "vi": "EOF TRUE với file rỗng đã mở và sau dòng cuối. Kiểm trước READFILE để tránh dòng giả."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Test EOF before every READFILE.",
+          "vi": "Kiểm EOF trước mọi READFILE."
+        },
+        {
+          "en": "Convert data and close explicitly.",
+          "vi": "Chuyển dữ liệu và đóng rõ ràng."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "teacher-t10"
+      ]
+    },
+    {
+      "id": "t10-end-to-end-pipeline",
+      "title": {
+        "en": "A complete file transform is a contract",
+        "vi": "Biến đổi file hoàn chỉnh là một contract"
+      },
+      "paragraphs": [
+        {
+          "en": "A safe transform states both schemas, opens the source and destination in intentional modes, checks EOF before starting each record, converts text to required types, applies the condition, serialises output in the promised format and closes both files.",
+          "vi": "Biến đổi an toàn nêu cả hai schema, mở nguồn và đích với mode có chủ ý, kiểm EOF trước mỗi record, chuyển text sang kiểu cần thiết, áp dụng điều kiện, serialize output theo định dạng đã hứa và đóng cả hai file."
+        },
+        {
+          "en": "An empty source should execute zero record iterations and still leave both files closed. A partial final record violates the schema; it must be rejected or handled by a stated validation rule rather than silently invented.",
+          "vi": "Nguồn rỗng phải chạy 0 lần lặp record và vẫn đóng cả hai file. Record cuối thiếu vi phạm schema; phải bị từ chối hoặc xử lý bằng quy tắc validation đã nêu thay vì tự bịa dữ liệu."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "book-t10",
+        "teacher-t10"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T10",
+      "T10-X01"
+    ],
+    "title": {
+      "en": "Cursor, record and output mode",
+      "vi": "Con trỏ, record và mode output"
+    },
+    "introduction": {
+      "en": "The states separate current line, parsed value, output before/after and empty-file EOF.",
+      "vi": "Trạng thái tách dòng hiện tại, giá trị parse, output trước/sau và EOF file rỗng."
+    },
+    "task": {
+      "en": "Use Previous/Next to predict each before/action/after state, then explain it without relying on colour.",
+      "vi": "Dùng Previous/Next để dự đoán từng trạng thái trước/hành động/sau rồi giải thích không dựa vào màu."
+    },
+    "conventions": [
+      {
+        "en": "State the line/record schema.",
+        "vi": "Nêu schema dòng/record."
+      },
+      {
+        "en": "Choose one correct open mode.",
+        "vi": "Chọn đúng một mode mở."
+      },
+      {
+        "en": "Test EOF before every READFILE.",
+        "vi": "Kiểm EOF trước mọi READFILE."
+      },
+      {
+        "en": "Convert data and close explicitly.",
+        "vi": "Chuyển dữ liệu và đóng rõ ràng."
+      }
+    ],
+    "sourceIds": [
+      "s26",
+      "book-t10",
+      "teacher-t10"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T10-W1",
+      "title": {
+        "en": "Read a three-line record",
+        "vi": "Đọc record ba dòng"
+      },
+      "prompt": {
+        "en": "People.txt stores Name, Age, Active in consecutive triplets. Read complete records and output active names.",
+        "vi": "People.txt lưu Name, Age, Active theo bộ ba liên tiếp. Đọc record đầy đủ và xuất tên đang active."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "1",
+          "action": {
+            "en": "Fix schema",
+            "vi": "Chốt schema"
+          },
+          "why": {
+            "en": "Order determines fields.",
+            "vi": "Thứ tự quyết định field."
+          },
+          "result": {
+            "en": "Name, AgeText, ActiveText.",
+            "vi": "Name, AgeText, ActiveText."
+          }
+        },
+        {
+          "id": "2",
+          "action": {
+            "en": "Guard read",
+            "vi": "Bảo vệ đọc"
+          },
+          "why": {
+            "en": "Do not read past EOF.",
+            "vi": "Không đọc quá EOF."
+          },
+          "result": {
+            "en": "OPENFILE \"People.txt\" FOR READ; WHILE NOT EOF(\"People.txt\") guards the first read of each complete triplet.",
+            "vi": "OPENFILE \"People.txt\" FOR READ; WHILE NOT EOF(\"People.txt\") bảo vệ lần đọc đầu của mỗi bộ ba đầy đủ."
+          }
+        },
+        {
+          "id": "3",
+          "action": {
+            "en": "Convert and output",
+            "vi": "Chuyển và xuất"
+          },
+          "why": {
+            "en": "Age is numeric; Active arrives as text.",
+            "vi": "Age là số; Active đến dưới dạng text."
+          },
+          "result": {
+            "en": "Age←STR_TO_NUM(AgeText); OUTPUT Name when ActiveText=\"TRUE\".",
+            "vi": "Age←STR_TO_NUM(AgeText); OUTPUT Name khi ActiveText=\"TRUE\"."
+          }
+        }
+      ],
+      "answer": {
+        "en": "OPENFILE \"People.txt\" FOR READ\nWHILE NOT EOF(\"People.txt\")\n  READFILE \"People.txt\", Name\n  READFILE \"People.txt\", AgeText\n  READFILE \"People.txt\", ActiveText\n  Age ← STR_TO_NUM(AgeText)\n  IF ActiveText = \"TRUE\" THEN\n    OUTPUT Name\n  ENDIF\nENDWHILE\nCLOSEFILE \"People.txt\" The file contract requires complete three-line records; a partial final triplet is invalid input.",
+        "vi": "OPENFILE \"People.txt\" FOR READ\nWHILE NOT EOF(\"People.txt\")\n  READFILE \"People.txt\", Name\n  READFILE \"People.txt\", AgeText\n  READFILE \"People.txt\", ActiveText\n  Age ← STR_TO_NUM(AgeText)\n  IF ActiveText = \"TRUE\" THEN\n    OUTPUT Name\n  ENDIF\nENDWHILE\nCLOSEFILE \"People.txt\" Contract của file yêu cầu record đủ ba dòng; bộ ba cuối không đủ là input không hợp lệ."
+      },
+      "selfCheck": {
+        "en": "A partial final triplet violates the schema and needs separate validation.",
+        "vi": "Bộ ba cuối thiếu vi phạm schema và cần validation riêng."
+      },
+      "sourceIds": [
+        "teacher-t10",
+        "book-t10"
+      ]
+    },
+    {
+      "id": "T10-W2",
+      "title": {
+        "en": "Create a filtered multi-record report",
+        "vi": "Tạo báo cáo lọc nhiều record"
+      },
+      "prompt": {
+      "en": "Marks.txt stores three lines per record: StudentID, Subject and numeric MarkText. Create Passes.txt from scratch containing one line `StudentID|Subject|Mark` for every mark at least 50, and detect an incomplete final record without reading beyond EOF.",
+      "vi": "Marks.txt lưu ba dòng mỗi record: StudentID, Subject và MarkText dạng số. Tạo mới Passes.txt gồm một dòng `StudentID|Subject|Mark` cho mọi điểm ít nhất 50, đồng thời phát hiện record cuối thiếu dòng mà không đọc quá EOF."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "schema",
+          "action": {
+            "en": "State both schemas",
+            "vi": "Nêu cả hai schema"
+          },
+          "why": {
+            "en": "The loop and serialization depend on record boundaries.",
+            "vi": "Vòng lặp và serialize phụ thuộc ranh giới record."
+          },
+          "result": {
+            "en": "Input is a three-line record; output is one pipe-delimited line.",
+            "vi": "Input là record ba dòng; output là một dòng phân tách bằng dấu |."
+          }
+        },
+        {
+          "id": "modes",
+          "action": {
+            "en": "Open source READ and destination WRITE",
+            "vi": "Mở nguồn READ và đích WRITE"
+          },
+          "why": {
+            "en": "The report must be recreated, not added to an old run.",
+            "vi": "Báo cáo phải được tạo lại, không nối vào lần chạy cũ."
+          },
+          "result": {
+            "en": "OPENFILE Marks.txt FOR READ; OPENFILE Passes.txt FOR WRITE.",
+            "vi": "OPENFILE Marks.txt FOR READ; OPENFILE Passes.txt FOR WRITE."
+          }
+        },
+        {
+          "id": "process",
+          "action": {
+            "en": "Guard, read, convert, filter and write",
+            "vi": "Bảo vệ, đọc, chuyển, lọc và ghi"
+          },
+          "why": {
+            "en": "Every accepted output line comes from one complete input record.",
+            "vi": "Mỗi dòng output được nhận đến từ một input record đầy đủ."
+          },
+          "result": {
+          "en": "WHILE NOT EOF guards StudentID; test EOF again before Subject and MarkText so a partial record is rejected before an invalid READFILE; convert and write only a complete passing record.",
+          "vi": "WHILE NOT EOF bảo vệ StudentID; kiểm lại EOF trước Subject và MarkText để record thiếu bị từ chối trước READFILE không hợp lệ; chỉ chuyển kiểu và ghi record đầy đủ đạt yêu cầu."
+          }
+        },
+        {
+          "id": "finish",
+          "action": {
+            "en": "Close both files and check empty input",
+            "vi": "Đóng cả hai file và kiểm input rỗng"
+          },
+          "why": {
+            "en": "Resource and boundary behaviour are part of correctness.",
+            "vi": "Hành vi resource và biên là một phần tính đúng."
+          },
+          "result": {
+            "en": "Both CLOSEFILE operations execute after the loop; an empty input creates an empty output.",
+            "vi": "Cả hai CLOSEFILE chạy sau vòng lặp; input rỗng tạo output rỗng."
+          },
+          "check": {
+          "en": "An empty input creates an empty output; a partial final record closes both files and reports `INVALID PARTIAL RECORD` without fabricating fields.",
+          "vi": "Input rỗng tạo output rỗng; record cuối thiếu dòng vẫn làm đóng cả hai file và báo `INVALID PARTIAL RECORD` mà không bịa field."
+          }
+        }
+      ],
+      "answer": {
+      "en": "DECLARE StudentID, Subject, MarkText, OutputLine : STRING\nDECLARE Mark : INTEGER\nDECLARE ValidFile : BOOLEAN\nValidFile ← TRUE\nOPENFILE \"Marks.txt\" FOR READ\nOPENFILE \"Passes.txt\" FOR WRITE\nWHILE NOT EOF(\"Marks.txt\") AND ValidFile\n  READFILE \"Marks.txt\", StudentID\n  IF EOF(\"Marks.txt\") THEN\n    ValidFile ← FALSE\n  ELSE\n    READFILE \"Marks.txt\", Subject\n    IF EOF(\"Marks.txt\") THEN\n      ValidFile ← FALSE\n    ELSE\n      READFILE \"Marks.txt\", MarkText\n      Mark ← STR_TO_NUM(MarkText)\n      IF Mark >= 50 THEN\n        OutputLine ← StudentID & \"|\" & Subject & \"|\" & NUM_TO_STR(Mark)\n        WRITEFILE \"Passes.txt\", OutputLine\n      ENDIF\n    ENDIF\n  ENDIF\nENDWHILE\nCLOSEFILE \"Marks.txt\"\nCLOSEFILE \"Passes.txt\"\nIF NOT ValidFile THEN\n  OUTPUT \"INVALID PARTIAL RECORD\"\nENDIF",
+      "vi": "DECLARE StudentID, Subject, MarkText, OutputLine : STRING\nDECLARE Mark : INTEGER\nDECLARE ValidFile : BOOLEAN\nValidFile ← TRUE\nOPENFILE \"Marks.txt\" FOR READ\nOPENFILE \"Passes.txt\" FOR WRITE\nWHILE NOT EOF(\"Marks.txt\") AND ValidFile\n  READFILE \"Marks.txt\", StudentID\n  IF EOF(\"Marks.txt\") THEN\n    ValidFile ← FALSE\n  ELSE\n    READFILE \"Marks.txt\", Subject\n    IF EOF(\"Marks.txt\") THEN\n      ValidFile ← FALSE\n    ELSE\n      READFILE \"Marks.txt\", MarkText\n      Mark ← STR_TO_NUM(MarkText)\n      IF Mark >= 50 THEN\n        OutputLine ← StudentID & \"|\" & Subject & \"|\" & NUM_TO_STR(Mark)\n        WRITEFILE \"Passes.txt\", OutputLine\n      ENDIF\n    ENDIF\n  ENDIF\nENDWHILE\nCLOSEFILE \"Marks.txt\"\nCLOSEFILE \"Passes.txt\"\nIF NOT ValidFile THEN\n  OUTPUT \"INVALID PARTIAL RECORD\"\nENDIF"
+      },
+      "selfCheck": {
+      "en": "Can an empty source reach READFILE, can a partial record read beyond EOF, and can a failed mark reach WRITEFILE?",
+      "vi": "Nguồn rỗng có thể tới READFILE, record thiếu có thể đọc quá EOF và điểm trượt có thể tới WRITEFILE không?"
+      },
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "book-t10",
+        "teacher-t10"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T10-P1",
+      "title": {
+        "en": "Append an ID",
+        "vi": "Nối thêm ID"
+      },
+      "prompt": {
+        "en": "IDs.txt has A01,A02. Add A03 without loss.",
+        "vi": "IDs.txt có A01,A02. Thêm A03 không làm mất."
+      },
+      "working": [
+        {
+          "en": "Open APPEND.",
+          "vi": "Mở APPEND."
+        },
+        {
+          "en": "Write one line and close.",
+          "vi": "Ghi một dòng và đóng."
+        }
+      ],
+      "answer": {
+        "en": "OPENFILE \"IDs.txt\" FOR APPEND\nWRITEFILE \"IDs.txt\", \"A03\"\nCLOSEFILE \"IDs.txt\"\nFinal lines: \"A01\", \"A02\", \"A03\".",
+        "vi": "OPENFILE \"IDs.txt\" FOR APPEND\nWRITEFILE \"IDs.txt\", \"A03\"\nCLOSEFILE \"IDs.txt\"\nCác dòng cuối: \"A01\", \"A02\", \"A03\"."
+      },
+      "markGuidance": [
+        {
+          "en": "Correct mode.",
+          "vi": "Đúng mode."
+        },
+        {
+          "en": "Correct final content.",
+          "vi": "Nội dung cuối đúng."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "WRITE erases old lines.",
+          "vi": "WRITE xóa dòng cũ."
+        },
+        {
+          "en": "READ cannot write.",
+          "vi": "READ không ghi được."
+        }
+      ],
+      "selfCheck": {
+        "en": "When is WRITE correct?",
+        "vi": "Khi nào WRITE đúng?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t10",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T10-P2",
+      "title": {
+        "en": "Delimiter contract",
+        "vi": "Hợp đồng delimiter"
+      },
+      "prompt": {
+        "en": "Parse `S07|Nguyen|84`; explain if a name may contain `|`.",
+        "vi": "Parse `S07|Nguyen|84`; giải thích nếu tên có thể chứa `|`."
+      },
+      "working": [
+        {
+          "en": "State delimiter assumption.",
+          "vi": "Nêu giả thiết delimiter."
+        },
+        {
+          "en": "Convert mark only.",
+          "vi": "Chỉ chuyển kiểu mark."
+        }
+      ],
+      "answer": {
+        "en": "Fields S07,Nguyen,84; Mark numeric. If `|` may occur inside a field, escaping or another specified format is required.",
+        "vi": "Field S07,Nguyen,84; Mark là số. Nếu `|` có thể nằm trong field, cần escape hoặc định dạng khác đã nêu."
+      },
+      "markGuidance": [
+        {
+          "en": "Correct split/conversion.",
+          "vi": "Tách/chuyển đúng."
+        },
+        {
+          "en": "Identifies ambiguity.",
+          "vi": "Nhận ra mơ hồ."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Silent delimiter assumption is unsafe.",
+          "vi": "Giả định delimiter âm thầm là không an toàn."
+        },
+        {
+          "en": "StudentID should remain STRING.",
+          "vi": "StudentID nên giữ STRING."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which value preserves leading zeros?",
+        "vi": "Giá trị nào giữ số 0 đầu?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t10",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T10-P3",
+      "title": {
+        "en": "Build a one-pass summary",
+        "vi": "Dựng báo cáo một lượt"
+      },
+      "prompt": {
+        "en": "Sales.txt stores one integer amount per line. In one pass output the count, total and largest amount. State the empty-file output.",
+        "vi": "Sales.txt lưu một số tiền nguyên trên mỗi dòng. Trong một lượt, xuất số lượng, tổng và giá trị lớn nhất. Nêu output khi file rỗng."
+      },
+      "working": [
+        {
+          "en": "Initialise Count and Total before opening/looping.",
+          "vi": "Khởi tạo Count và Total trước khi mở/lặp."
+        },
+        {
+          "en": "Initialise Largest from the first real value or use a HasValue flag.",
+          "vi": "Khởi tạo Largest từ giá trị thật đầu tiên hoặc dùng HasValue."
+        },
+        {
+          "en": "Close before reporting the final result.",
+          "vi": "Đóng file trước khi báo cáo kết quả cuối."
+        }
+      ],
+      "answer": {
+        "en": "Count←0; Total←0; HasValue←FALSE. Open READ. While NOT EOF, read AmountText, convert to Amount, increment Count and Total; if NOT HasValue or Amount>Largest then set Largest; set HasValue TRUE. Close. If HasValue output Count, Total, Largest; otherwise output Count=0, Total=0 and `NO MAXIMUM`.",
+        "vi": "Count←0; Total←0; HasValue←FALSE. Mở READ. Khi NOT EOF, đọc AmountText, chuyển thành Amount, tăng Count và Total; nếu NOT HasValue hoặc Amount>Largest thì đặt Largest; đặt HasValue TRUE. Đóng file. Nếu HasValue, xuất Count, Total, Largest; nếu không, xuất Count=0, Total=0 và `NO MAXIMUM`."
+      },
+      "markGuidance": [
+        {
+          "en": "The solution is one pass and handles negative amounts safely.",
+          "vi": "Lời giải chạy một lượt và xử lý số âm an toàn."
+        },
+        {
+          "en": "Empty input has an explicit result without a fabricated maximum.",
+          "vi": "Input rỗng có kết quả rõ mà không bịa giá trị lớn nhất."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Initialising Largest to 0 fails when every amount is negative.",
+          "vi": "Khởi tạo Largest bằng 0 sai khi mọi giá trị đều âm."
+        },
+        {
+          "en": "Testing EOF after READFILE invents an extra record.",
+          "vi": "Kiểm EOF sau READFILE tạo thêm record giả."
+        }
+      ],
+      "selfCheck": {
+        "en": "What is Largest after the first valid line, even if it is -20?",
+        "vi": "Largest là gì sau dòng hợp lệ đầu dù nó là -20?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "book-t10",
+        "teacher-t10"
+      ]
+    },
+    {
+      "id": "T10-P4",
+      "title": {
+        "en": "Serialise updated records",
+        "vi": "Serialize record đã cập nhật"
+      },
+      "prompt": {
+      "en": "Stock.txt stores `Code|Quantity`. Copy all records to NewStock.txt, increasing the Quantity for the target Code by Delta and rejecting any result below zero. Give the complete pipeline and no-match behaviour.",
+      "vi": "Stock.txt lưu `Code|Quantity`. Copy mọi record sang NewStock.txt, tăng Quantity của Code đích thêm Delta và từ chối kết quả dưới 0. Nêu pipeline đầy đủ và hành vi no-match."
+      },
+      "working": [
+        {
+          "en": "Open input READ and fresh output WRITE.",
+          "vi": "Mở input READ và output mới WRITE."
+        },
+        {
+          "en": "Parse at the delimiter and convert Quantity.",
+          "vi": "Parse theo delimiter và chuyển Quantity."
+        },
+        {
+          "en": "Validate before updating; write every accepted record once.",
+          "vi": "Validation trước cập nhật; ghi mỗi record được nhận đúng một lần."
+        },
+        {
+          "en": "Track whether the target was found and close both files.",
+          "vi": "Theo dõi target có được tìm thấy và đóng cả hai file."
+        }
+      ],
+      "answer": {
+        "en": "Open Stock.txt READ and NewStock.txt WRITE; Found←FALSE. For each line until EOF, split Code and QuantityText, convert Quantity. If Code=TargetCode, set Found TRUE and compute NewQuantity←Quantity+Delta; if NewQuantity<0, keep the original record and output an error message, otherwise use NewQuantity. Write exactly one `Code|Quantity` line. Close both files. If NOT Found, output `TARGET NOT FOUND`; NewStock still contains an unchanged copy.",
+        "vi": "Mở Stock.txt READ và NewStock.txt WRITE; Found←FALSE. Với mỗi dòng tới EOF, tách Code và QuantityText, chuyển Quantity. Nếu Code=TargetCode, đặt Found TRUE và tính NewQuantity←Quantity+Delta; nếu NewQuantity<0, giữ record gốc và output thông báo lỗi, nếu không dùng NewQuantity. Ghi đúng một dòng `Code|Quantity`. Đóng cả hai file. Nếu NOT Found, output `TARGET NOT FOUND`; NewStock vẫn là bản copy không đổi."
+      },
+      "markGuidance": [
+        {
+          "en": "Parse, conversion, update validation, serialization and closing are explicit.",
+          "vi": "Parse, chuyển kiểu, validation cập nhật, serialize và đóng được nêu rõ."
+        },
+        {
+          "en": "No-match and invalid-update behaviours are deterministic.",
+          "vi": "Hành vi no-match và cập nhật không hợp lệ là xác định."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Using APPEND duplicates records on a second run.",
+          "vi": "Dùng APPEND làm lặp record ở lần chạy thứ hai."
+        },
+        {
+          "en": "Omitting unchanged records turns a copy into a filter.",
+          "vi": "Bỏ record không đổi biến phép copy thành filter."
+        }
+      ],
+      "selfCheck": {
+        "en": "Does every input record produce exactly one output record?",
+        "vi": "Mỗi input record có tạo đúng một output record không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "guide-2026",
+        "teacher-t10"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "EOF means blank line.",
+        "vi": "EOF nghĩa là dòng rỗng."
+      },
+      "correction": {
+        "en": "EOF means no line remains.",
+        "vi": "EOF nghĩa là không còn dòng."
+      },
+      "selfCheck": {
+        "en": "Can blank data occur earlier?",
+        "vi": "Dữ liệu rỗng có thể ở giữa không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "WRITE appends.",
+        "vi": "WRITE nối thêm."
+      },
+      "correction": {
+        "en": "WRITE replaces; APPEND adds.",
+        "vi": "WRITE thay; APPEND thêm."
+      },
+      "selfCheck": {
+        "en": "Must old content survive?",
+        "vi": "Nội dung cũ có phải giữ không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Read then test EOF.",
+        "vi": "Đọc rồi kiểm EOF."
+      },
+      "correction": {
+        "en": "Test first, including empty file.",
+        "vi": "Kiểm trước, kể cả file rỗng."
+      },
+      "selfCheck": {
+        "en": "What happens on empty input?",
+        "vi": "Điều gì xảy ra với input rỗng?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Rebuild the method from memory.",
+      "vi": "Dựng lại phương pháp từ trí nhớ."
+    },
+    "answerPoints": [
+      {
+        "en": "State the line/record schema.",
+        "vi": "Nêu schema dòng/record."
+      },
+      {
+        "en": "Choose one correct open mode.",
+        "vi": "Chọn đúng một mode mở."
+      },
+      {
+        "en": "Test EOF before every READFILE.",
+        "vi": "Kiểm EOF trước mọi READFILE."
+      },
+      {
+        "en": "Convert data and close explicitly.",
+        "vi": "Chuyển dữ liệu và đóng rõ ràng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Mode controls preservation.",
+      "vi": "Mode chi phối việc giữ dữ liệu."
+    },
+    {
+      "en": "EOF is checked before reading.",
+      "vi": "EOF được kiểm trước khi đọc."
+    },
+    {
+      "en": "Parsing needs an explicit schema.",
+      "vi": "Parse cần schema rõ."
+    },
+    {
+      "en": "A file algorithm is complete only when schemas, modes, EOF, conversion, processing, serialization and closing agree.",
+      "vi": "Thuật toán file chỉ hoàn chỉnh khi schema, mode, EOF, chuyển kiểu, xử lý, serialize và đóng nhất quán."
+    },
+    {
+      "en": "Empty and malformed-record behaviour must be stated, not guessed.",
+      "vi": "Phải nêu hành vi với file rỗng và record lỗi, không đoán."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F07",
+      "role": "owner",
+      "title": {
+        "en": "Text-file pipeline",
+        "vi": "Pipeline file text"
+      }
+    },
+    {
+      "id": "F09",
+      "role": "related",
+      "title": {
+        "en": "Convert strings and values",
+        "vi": "Chuyển chuỗi và giá trị"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "string-processing",
+    "iteration",
+    "records"
+  ],
+  "sources": [
+    {
+      "id": "s26",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "Subject content pp27–29, §§9.2–10.4.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "guide-2026",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, examinations in 2026",
+      "locator": "Relevant notation in §§1–9; local extracted copy checked 2026-10-02.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t10",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "Printed pp249–250; PDF pp265–266; EOF correction applied.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-t10",
+      "title": "9618/22 October/November 2025 Question 3",
+      "locator": "QP pp4–5 and published MS p8: text-file processing. Used as topic/adaptation evidence; no official mark allocation reproduced.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t10",
+      "title": "AlgoCore teacher-created T10 lesson set",
+      "locator": "T10-academic-r2, 2026-10-02; original fixtures and provisional mark guidance.",
+      "kind": "teacher-authored"
+    },
+    {
+      "id": "qp-t10-s25-21-q7b",
+      "title": "9618/21 May/June 2025 Question 7(b)",
+      "locator": "QP pp16–18 and published MS pp13–14: READ/EOF/CLOSE, APPEND/WRITE and the empty/nonexistent-file amendment.",
+      "kind": "question-paper"
+    }
+  ]
+}

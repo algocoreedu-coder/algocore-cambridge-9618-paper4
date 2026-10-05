@@ -1,0 +1,831 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.1-T03",
+  "slug": "bubble-sort",
+  "estimatedMinutes": 35,
+  "title": {
+    "en": "Bubble sort",
+    "vi": "Sắp xếp nổi bọt"
+  },
+  "question": {
+    "en": "How do adjacent comparisons build a guaranteed sorted region one pass at a time?",
+    "vi": "Các phép so sánh kề nhau xây vùng đã sorted sau từng pass như thế nào?"
+  },
+  "opening": {
+    "en": "Each complete ascending pass moves the largest remaining value to the current upper boundary.",
+    "vi": "Mỗi pass tăng dần hoàn chỉnh đưa giá trị lớn nhất còn lại tới biên trên hiện tại."
+  },
+  "objectives": [
+    {
+      "en": "Trace adjacent comparisons and swaps.",
+      "vi": "Trace so sánh và swap cặp kề."
+    },
+    {
+      "en": "Explain the completed upper region.",
+      "vi": "Giải thích vùng trên đã hoàn tất."
+    },
+    {
+      "en": "Write corrected pass-level early exit.",
+      "vi": "Viết early exit đúng ở mức pass."
+    },
+    {
+      "en": "Relate work to size and initial order.",
+      "vi": "Liên hệ công việc với size và thứ tự ban đầu."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Compare and swap two array values.",
+      "vi": "So sánh và swap hai giá trị mảng."
+    },
+    {
+      "en": "Distinguish one comparison from one pass.",
+      "vi": "Phân biệt một comparison với một pass."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "adjacent pair",
+      "meaning": {
+        "en": "Items at Index and Index+1.",
+        "vi": "Phần tử tại Index và Index+1."
+      }
+    },
+    {
+      "term": "pass",
+      "meaning": {
+        "en": "A complete scan to the current EndIndex.",
+        "vi": "Một lượt quét hoàn chỉnh tới EndIndex hiện tại."
+      }
+    },
+    {
+      "term": "swap",
+      "meaning": {
+        "en": "Exchange two out-of-order adjacent values.",
+        "vi": "Đổi chỗ hai giá trị kề sai thứ tự."
+      }
+    },
+    {
+      "term": "sorted region",
+      "meaning": {
+        "en": "Upper cells guaranteed final after completed passes.",
+        "vi": "Các ô trên được bảo đảm final sau các pass hoàn chỉnh."
+      }
+    },
+    {
+      "term": "early exit",
+      "meaning": {
+        "en": "Stop after a complete pass makes no swaps.",
+        "vi": "Dừng sau một pass hoàn chỉnh không có swap."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "adjacent",
+      "title": {
+        "en": "Compare neighbours",
+        "vi": "So sánh phần tử kề"
+      },
+      "paragraphs": [
+        {
+          "en": "For ascending order, swap only when the left value is greater than the right value.",
+          "vi": "Với thứ tự tăng dần, chỉ swap khi giá trị trái lớn hơn giá trị phải."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "pass-boundary",
+      "title": {
+        "en": "One pass completes one boundary",
+        "vi": "Một pass hoàn tất một biên"
+      },
+      "paragraphs": [
+        {
+          "en": "The largest unsorted value moves to EndIndex. Only after the complete pass may EndIndex shrink.",
+          "vi": "Giá trị unsorted lớn nhất đi tới EndIndex. Chỉ sau pass hoàn chỉnh mới thu EndIndex."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "early-exit",
+      "title": {
+        "en": "Reset Swapped once per pass",
+        "vi": "Reset Swapped một lần mỗi pass"
+      },
+      "paragraphs": [
+        {
+          "en": "A no-swap comparison proves little; a complete no-swap pass proves the active region is sorted.",
+          "vi": "Một comparison không swap chứng minh rất ít; pass hoàn chỉnh không swap chứng minh vùng active đã sorted."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "bubble-code",
+      "title": {
+        "en": "Cambridge pseudocode",
+        "vi": "Giả mã Cambridge"
+      },
+      "paragraphs": [
+        {
+          "en": "Swapped is reset before the FOR loop, correcting the misleading per-comparison placement in the coursebook example.",
+          "vi": "Swapped được reset trước vòng FOR, sửa vị trí gây hiểu nhầm theo từng comparison trong ví dụ coursebook."
+        }
+      ],
+      "code": "PROCEDURE BubbleSort(BYREF Data : ARRAY[0:4] OF INTEGER)\n  DECLARE EndIndex : INTEGER\n  DECLARE Index : INTEGER\n  DECLARE Temp : INTEGER\n  DECLARE Swapped : BOOLEAN\n  EndIndex ← 4\n  REPEAT\n    Swapped ← FALSE\n    FOR Index ← 0 TO EndIndex - 1\n      IF Data[Index] > Data[Index + 1] THEN\n        Temp ← Data[Index]\n        Data[Index] ← Data[Index + 1]\n        Data[Index + 1] ← Temp\n        Swapped ← TRUE\n      ENDIF\n    NEXT Index\n    EndIndex ← EndIndex - 1\n  UNTIL (Swapped = FALSE) OR (EndIndex = 0)\nENDPROCEDURE",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "bubble-sort",
+    "title": {
+      "en": "Pass-and-swap workbench",
+      "vi": "Bàn trace pass và swap"
+    },
+    "introduction": {
+      "en": "Active pair, swap result, pass boundary and completed region update together.",
+      "vi": "Cặp active, kết quả swap, biên pass và vùng hoàn tất cập nhật cùng nhau."
+    },
+    "task": {
+      "en": "Predict each swap and identify when early exit is valid.",
+      "vi": "Dự đoán từng swap và xác định khi nào early exit hợp lệ."
+    },
+    "conventions": [
+      {
+        "en": "Ascending order; swap only left>right.",
+        "vi": "Tăng dần; chỉ swap khi trái>phải."
+      },
+      {
+        "en": "Swapped resets once before each pass.",
+        "vi": "Swapped reset một lần trước mỗi pass."
+      },
+      {
+        "en": "Upper boundary shrinks after a complete pass.",
+        "vi": "Biên trên thu sau một pass hoàn chỉnh."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Sort [5,1,4,2,8]",
+      "vi": "Sort [5,1,4,2,8]"
+    },
+    "prompt": {
+      "en": "Trace comparisons, swaps and pass boundaries.",
+      "vi": "Trace comparisons, swaps và biên pass."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "setup",
+        "action": {
+          "en": "Set EndIndex←4 and Swapped←FALSE.",
+          "vi": "Đặt EndIndex←4 và Swapped←FALSE."
+        },
+        "why": {
+          "en": "The first pass covers pairs ending at index 4.",
+          "vi": "Pass đầu phủ các cặp kết thúc tại index 4."
+        },
+        "result": {
+          "en": "Active region is 0..4.",
+          "vi": "Vùng active là 0..4."
+        },
+        "check": {
+          "en": "Check that active region is 0..4.",
+          "vi": "Kiểm tra rằng vùng active là 0..4."
+        }
+      },
+      {
+        "id": "swap-01",
+        "action": {
+          "en": "Compare 5 and 1; swap.",
+          "vi": "So sánh 5 và 1; swap."
+        },
+        "why": {
+          "en": "5>1 violates ascending order.",
+          "vi": "5>1 vi phạm thứ tự tăng."
+        },
+        "result": {
+          "en": "[1,5,4,2,8]; Swapped=TRUE.",
+          "vi": "[1,5,4,2,8]; Swapped=TRUE."
+        },
+        "check": {
+          "en": "Check that [1,5,4,2,8]; swapped=true.",
+          "vi": "Kiểm tra rằng [1,5,4,2,8]; swapped=true."
+        }
+      },
+      {
+        "id": "swap-12",
+        "action": {
+          "en": "Compare 5 and 4; swap.",
+          "vi": "So sánh 5 và 4; swap."
+        },
+        "why": {
+          "en": "The active left value is still larger.",
+          "vi": "Giá trị trái active vẫn lớn hơn."
+        },
+        "result": {
+          "en": "[1,4,5,2,8].",
+          "vi": "[1,4,5,2,8]."
+        },
+        "check": {
+          "en": "Check that [1,4,5,2,8].",
+          "vi": "Kiểm tra rằng [1,4,5,2,8]."
+        }
+      },
+      {
+        "id": "swap-23",
+        "action": {
+          "en": "Compare 5 and 2; swap.",
+          "vi": "So sánh 5 và 2; swap."
+        },
+        "why": {
+          "en": "Adjacent order is wrong.",
+          "vi": "Thứ tự cặp kề sai."
+        },
+        "result": {
+          "en": "[1,4,2,5,8].",
+          "vi": "[1,4,2,5,8]."
+        },
+        "check": {
+          "en": "Check that [1,4,2,5,8].",
+          "vi": "Kiểm tra rằng [1,4,2,5,8]."
+        }
+      },
+      {
+        "id": "finish-pass",
+        "action": {
+          "en": "Compare 5 and 8; do not swap; finish pass.",
+          "vi": "So sánh 5 và 8; không swap; hoàn tất pass."
+        },
+        "why": {
+          "en": "5<=8 is already ascending.",
+          "vi": "5<=8 đã tăng dần."
+        },
+        "result": {
+          "en": "Index 4 is final; EndIndex←3.",
+          "vi": "Index 4 là final; EndIndex←3."
+        },
+        "check": {
+          "en": "Check that index 4 is final; endindex←3.",
+          "vi": "Kiểm tra rằng index 4 là final; endindex←3."
+        }
+      },
+      {
+        "id": "remaining",
+        "action": {
+          "en": "Run later passes until a complete no-swap pass.",
+          "vi": "Chạy các pass sau tới một pass hoàn chỉnh không swap."
+        },
+        "why": {
+          "en": "Each pass grows the completed upper region.",
+          "vi": "Mỗi pass mở rộng vùng trên hoàn tất."
+        },
+        "result": {
+          "en": "Final [1,2,4,5,8]; early exit follows the no-swap pass.",
+          "vi": "Final [1,2,4,5,8]; early exit sau pass không swap."
+        },
+        "check": {
+          "en": "Check that final [1,2,4,5,8]; early exit follows the no-swap pass.",
+          "vi": "Kiểm tra rằng final [1,2,4,5,8]; early exit sau pass không swap."
+        }
+      }
+    ],
+    "result": {
+      "en": "The array is ascending and every pass-level early exit is justified.",
+      "vi": "Mảng tăng dần và mọi early exit mức pass đều được biện minh."
+    },
+    "selfCheck": {
+      "en": "Was Swapped reset once before, not during, each pass?",
+      "vi": "Swapped có được reset một lần trước, không phải trong, mỗi pass không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "adjacent compare and swap",
+        "vi": "so sánh và swap cặp kề"
+      },
+      {
+        "en": "passes",
+        "vi": "các pass"
+      },
+      {
+        "en": "no swaps",
+        "vi": "không có swap"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: insertion sort saves one key and shifts a sorted prefix; bubble sort repeatedly compares adjacent pairs.",
+      "vi": "Dễ nhầm: insertion sort lưu một key và shift sorted prefix; bubble sort liên tục so cặp kề."
+    },
+    "method": [
+      {
+        "en": "Declare direction and boundary.",
+        "vi": "Khai báo hướng và biên."
+      },
+      {
+        "en": "Reset Swapped before a pass.",
+        "vi": "Reset Swapped trước pass."
+      },
+      {
+        "en": "Trace every adjacent comparison.",
+        "vi": "Trace mọi comparison kề."
+      },
+      {
+        "en": "Shrink boundary after the pass.",
+        "vi": "Thu biên sau pass."
+      },
+      {
+        "en": "Exit only after a full no-swap pass.",
+        "vi": "Chỉ exit sau pass hoàn chỉnh không swap."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Bubble sort: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho Sắp xếp nổi bọt: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Bubble sort; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của Sắp xếp nổi bọt; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Bubble sort to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của Sắp xếp nổi bọt với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Bubble sort with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh Sắp xếp nổi bọt với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Bubble sort, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của Sắp xếp nổi bọt, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Reset Swapped before every comparison.",
+        "vi": "Reset Swapped trước mọi comparison."
+      },
+      "correction": {
+        "en": "Reset it once before the complete pass.",
+        "vi": "Reset một lần trước pass hoàn chỉnh."
+      },
+      "selfCheck": {
+        "en": "Does the flag represent the whole pass?",
+        "vi": "Flag có đại diện cả pass không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Stop after one no-swap pair.",
+        "vi": "Dừng sau một cặp không swap."
+      },
+      "correction": {
+        "en": "Only a complete no-swap pass proves the active region sorted.",
+        "vi": "Chỉ pass hoàn chỉnh không swap chứng minh vùng active sorted."
+      },
+      "selfCheck": {
+        "en": "Were all active pairs checked?",
+        "vi": "Đã xét mọi cặp active chưa?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Compare arbitrary distant cells.",
+        "vi": "So sánh ô xa bất kỳ."
+      },
+      "correction": {
+        "en": "Bubble sort compares adjacent indices only.",
+        "vi": "Bubble sort chỉ so index kề."
+      },
+      "selfCheck": {
+        "en": "Are the indices Index and Index+1?",
+        "vi": "Các index có là Index và Index+1 không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Shrink the boundary after each swap.",
+        "vi": "Thu biên sau mỗi swap."
+      },
+      "correction": {
+        "en": "Shrink only after a complete pass.",
+        "vi": "Chỉ thu sau pass hoàn chỉnh."
+      },
+      "selfCheck": {
+        "en": "Has the largest active item reached the boundary?",
+        "vi": "Phần tử active lớn nhất đã tới biên chưa?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "When may ascending bubble sort swap?",
+        "vi": "Bubble sort tăng dần swap khi nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Left value > right value",
+            "vi": "Giá trị trái > giá trị phải"
+          },
+          "feedback": {
+            "en": "Correct: swap only an out-of-order adjacent pair",
+            "vi": "Đúng: chỉ swap cặp kề sai thứ tự"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Left value < right value",
+            "vi": "Giá trị trái < giá trị phải"
+          },
+          "feedback": {
+            "en": "Left value < right value conflicts with the rule: swap only an out-of-order adjacent pair",
+            "vi": "Giá trị trái < giá trị phải trái với quy tắc: chỉ swap cặp kề sai thứ tự"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Values are equal",
+            "vi": "Hai giá trị bằng nhau"
+          },
+          "feedback": {
+            "en": "Values are equal conflicts with the rule: swap only an out-of-order adjacent pair",
+            "vi": "Hai giá trị bằng nhau trái với quy tắc: chỉ swap cặp kề sai thứ tự"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "swap only an out-of-order adjacent pair",
+        "vi": "chỉ swap cặp kề sai thứ tự"
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which clue identifies bubble sort?",
+        "vi": "Dấu hiệu nào nhận diện bubble sort?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Adjacent pairs over repeated passes",
+            "vi": "Cặp kề qua nhiều pass"
+          },
+          "feedback": {
+            "en": "Correct: bubble sort scans adjacent pairs",
+            "vi": "Đúng: bubble sort quét các cặp kề"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Saved key and shifts",
+            "vi": "Lưu key và shift"
+          },
+          "feedback": {
+            "en": "Saved key and shifts conflicts with the rule: bubble sort scans adjacent pairs",
+            "vi": "Lưu key và shift trái với quy tắc: bubble sort quét các cặp kề"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Discard half a search window",
+            "vi": "Loại nửa cửa sổ search"
+          },
+          "feedback": {
+            "en": "Discard half a search window conflicts with the rule: bubble sort scans adjacent pairs",
+            "vi": "Loại nửa cửa sổ search trái với quy tắc: bubble sort quét các cặp kề"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "bubble sort scans adjacent pairs",
+        "vi": "bubble sort quét các cặp kề"
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "After [5,1] is compared ascending, what pair state follows?",
+        "vi": "Sau khi so [5,1] tăng dần, trạng thái cặp nào tiếp theo?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "[1,5] and Swapped=TRUE",
+            "vi": "[1,5] và Swapped=TRUE"
+          },
+          "feedback": {
+            "en": "Correct: 5>1 requires a swap and sets the pass flag",
+            "vi": "Đúng: 5>1 cần swap và đặt flag của pass"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "[5,1] and Swapped=FALSE",
+            "vi": "[5,1] và Swapped=FALSE"
+          },
+          "feedback": {
+            "en": "[5,1] and Swapped=FALSE conflicts with the rule: 5>1 requires a swap and sets the pass flag",
+            "vi": "[5,1] và Swapped=FALSE trái với quy tắc: 5>1 cần swap và đặt flag của pass"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "[5,5]",
+            "vi": "[5,5]"
+          },
+          "feedback": {
+            "en": "[5,5] conflicts with the rule: 5>1 requires a swap and sets the pass flag",
+            "vi": "[5,5] trái với quy tắc: 5>1 cần swap và đặt flag của pass"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "5>1 requires a swap and sets the pass flag",
+        "vi": "5>1 cần swap và đặt flag của pass"
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "What is guaranteed after the first full pass over five ascending-target values?",
+        "vi": "Điều gì được bảo đảm sau pass đầy đủ đầu tiên trên năm giá trị cần tăng dần?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The largest value is at index 4",
+            "vi": "Giá trị lớn nhất ở index 4"
+          },
+          "feedback": {
+            "en": "Correct: one complete pass fixes the upper boundary",
+            "vi": "Đúng: một pass hoàn chỉnh cố định biên trên"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The whole array is sorted",
+            "vi": "Toàn bộ mảng sorted"
+          },
+          "feedback": {
+            "en": "The whole array is sorted conflicts with the rule: one complete pass fixes the upper boundary",
+            "vi": "Toàn bộ mảng sorted trái với quy tắc: một pass hoàn chỉnh cố định biên trên"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The smallest value is always at index 0",
+            "vi": "Giá trị nhỏ nhất luôn ở index 0"
+          },
+          "feedback": {
+            "en": "The smallest value is always at index 0 conflicts with the rule: one complete pass fixes the upper boundary",
+            "vi": "Giá trị nhỏ nhất luôn ở index 0 trái với quy tắc: một pass hoàn chỉnh cố định biên trên"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "one complete pass fixes the upper boundary",
+        "vi": "một pass hoàn chỉnh cố định biên trên"
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Where is Swapped←FALSE placed?",
+        "vi": "Swapped←FALSE đặt ở đâu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Before the inner FOR loop each pass",
+            "vi": "Trước vòng FOR trong mỗi pass"
+          },
+          "feedback": {
+            "en": "Correct: the flag must summarize the complete pass",
+            "vi": "Đúng: flag phải tóm tắt cả pass"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Inside every IF comparison",
+            "vi": "Trong mỗi IF comparison"
+          },
+          "feedback": {
+            "en": "Inside every IF comparison conflicts with the rule: the flag must summarize the complete pass",
+            "vi": "Trong mỗi IF comparison trái với quy tắc: flag phải tóm tắt cả pass"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only after the entire algorithm",
+            "vi": "Chỉ sau toàn bộ thuật toán"
+          },
+          "feedback": {
+            "en": "Only after the entire algorithm conflicts with the rule: the flag must summarize the complete pass",
+            "vi": "Chỉ sau toàn bộ thuật toán trái với quy tắc: flag phải tóm tắt cả pass"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the flag must summarize the complete pass",
+        "vi": "flag phải tóm tắt cả pass"
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "A complete pass makes no swaps. What follows?",
+        "vi": "Một pass hoàn chỉnh không có swap. Điều gì tiếp theo?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Stop: the active region is sorted",
+            "vi": "Dừng: vùng active đã sorted"
+          },
+          "feedback": {
+            "en": "Correct: a full no-swap pass justifies early exit",
+            "vi": "Đúng: pass hoàn chỉnh không swap biện minh early exit"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Swap the first pair anyway",
+            "vi": "Vẫn swap cặp đầu"
+          },
+          "feedback": {
+            "en": "Swap the first pair anyway conflicts with the rule: a full no-swap pass justifies early exit",
+            "vi": "Vẫn swap cặp đầu trái với quy tắc: pass hoàn chỉnh không swap biện minh early exit"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Reset data to its input",
+            "vi": "Reset dữ liệu về input"
+          },
+          "feedback": {
+            "en": "Reset data to its input conflicts with the rule: a full no-swap pass justifies early exit",
+            "vi": "Reset dữ liệu về input trái với quy tắc: pass hoàn chỉnh không swap biện minh early exit"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "a full no-swap pass justifies early exit",
+        "vi": "pass hoàn chỉnh không swap biện minh early exit"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Describe one bubble pass and the early-exit proof.",
+      "vi": "Mô tả một bubble pass và chứng minh early exit."
+    },
+    "answerPoints": [
+      {
+        "en": "Compare every active adjacent pair.",
+        "vi": "So mọi cặp kề active."
+      },
+      {
+        "en": "Swap only left>right and record Swapped.",
+        "vi": "Chỉ swap khi trái>phải và ghi Swapped."
+      },
+      {
+        "en": "Shrink after the pass; stop if no swap occurred.",
+        "vi": "Thu biên sau pass; dừng nếu không có swap."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Bubble sort uses adjacent pairs.",
+      "vi": "Bubble sort dùng cặp kề."
+    },
+    {
+      "en": "One pass fixes one upper boundary.",
+      "vi": "Một pass cố định một biên trên."
+    },
+    {
+      "en": "Reset the flag once per pass.",
+      "vi": "Reset flag một lần mỗi pass."
+    }
+  ],
+  "relatedSlugs": [
+    "insertion-sort",
+    "time-and-space-complexity"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp458–461 / PDF pp474–477: bubble sort; pass-level correction documented",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "s21-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2021 question paper",
+      "locator": "Question 8, pp10–11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s21-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2021 mark scheme",
+      "locator": "Question 8, pp8–9",
+      "kind": "mark-scheme"
+    }
+  ]
+}

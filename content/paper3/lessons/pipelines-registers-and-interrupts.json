@@ -1,0 +1,987 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.1",
+  "topicId": "P3-15.1-T02",
+  "slug": "pipelines-registers-and-interrupts",
+  "title": {
+    "en": "Pipelines, registers and interrupts",
+    "vi": "Đường ống lệnh, thanh ghi và ngắt"
+  },
+  "question": {
+    "en": "How can a processor overlap instructions and still resume correctly after an interrupt?",
+    "vi": "Bộ xử lý chồng lấp các lệnh và tiếp tục đúng sau ngắt như thế nào?"
+  },
+  "opening": {
+    "en": "Think of several jobs moving through different workstations. Starting a second job before the first finishes can increase completed jobs per clock, but every job still needs all its stages. A processor must also remember which results are complete when an interrupt interrupts that flow. This lesson connects the clock table to the information held in registers.",
+    "vi": "Hãy hình dung nhiều công việc đi qua các vị trí xử lý khác nhau. Bắt đầu việc thứ hai trước khi việc đầu xong có thể tăng số việc hoàn tất mỗi nhịp, nhưng từng việc vẫn phải qua đủ giai đoạn. Bộ xử lý còn phải nhớ kết quả nào đã hoàn tất khi ngắt làm gián đoạn dòng đó. Bài này nối bảng nhịp với thông tin được giữ trong thanh ghi."
+  },
+  "estimatedMinutes": 30,
+  "objectives": [
+    {
+      "en": "Trace IF, ID, OF, IE and WB across a stated clock schedule.",
+      "vi": "Theo dõi IF, ID, OF, IE, WB trên lịch nhịp đã cho."
+    },
+    {
+      "en": "Distinguish the stage occupied during a clock from the boundary register contents after it.",
+      "vi": "Phân biệt giai đoạn đang hoạt động trong nhịp với nội dung thanh ghi ở cuối nhịp."
+    },
+    {
+      "en": "Calculate ideal completion time and explain throughput versus latency.",
+      "vi": "Tính thời gian hoàn tất lý tưởng và giải thích throughput khác latency."
+    },
+    {
+      "en": "Explain context preservation, unfinished instructions and restart under the stated interrupt policy.",
+      "vi": "Giải thích lưu ngữ cảnh, lệnh chưa xong và chạy lại theo chính sách ngắt đã nêu."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Recognise registers, the program counter and the fetch–execute cycle.",
+      "vi": "Nhận biết thanh ghi, program counter và chu trình fetch–execute."
+    },
+    {
+      "en": "Know the typical RISC/CISC comparison; no particular real instruction set is required.",
+      "vi": "Biết mô hình so sánh RISC/CISC điển hình; không cần một tập lệnh máy thực tế cụ thể."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Pipeline",
+      "meaning": {
+        "en": "An organisation in which different instructions occupy different execution stages concurrently.",
+        "vi": "Cách tổ chức cho các lệnh khác nhau cùng nằm ở các giai đoạn thực hiện khác nhau."
+      }
+    },
+    {
+      "term": "Pipeline register",
+      "meaning": {
+        "en": "Storage at a stage boundary for the instruction information, operands or result needed by the next stage.",
+        "vi": "Nơi lưu tại ranh giới giai đoạn, giữ thông tin lệnh, toán hạng hoặc kết quả mà giai đoạn sau cần."
+      }
+    },
+    {
+      "term": "Throughput",
+      "meaning": {
+        "en": "The rate of completed instructions, measured here as completions per clock.",
+        "vi": "Tốc độ hoàn tất lệnh, ở đây tính theo số lệnh hoàn tất mỗi nhịp."
+      }
+    },
+    {
+      "term": "Latency",
+      "meaning": {
+        "en": "The time from an instruction entering the first stage to its completion.",
+        "vi": "Thời gian từ khi một lệnh vào giai đoạn đầu đến khi hoàn tất."
+      }
+    },
+    {
+      "term": "Committed result",
+      "meaning": {
+        "en": "A completed result recorded as part of the program’s architectural state.",
+        "vi": "Kết quả đã hoàn tất và được ghi vào trạng thái kiến trúc của chương trình."
+      }
+    },
+    {
+      "term": "Interrupt context",
+      "meaning": {
+        "en": "Saved program state and a suitable continuation address needed for correct resumption.",
+        "vi": "Trạng thái chương trình đã lưu cùng địa chỉ tiếp tục phù hợp để chạy lại đúng."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "overlap-stages",
+      "title": {
+        "en": "Overlap different stages, not unfinished answers",
+        "vi": "Chồng lấp giai đoạn, không dùng đáp số dở dang"
+      },
+      "paragraphs": [
+        {
+          "en": "In sequential execution, one instruction finishes its stages before the next starts. In a pipeline, I2 can be fetched while I1 is decoded because the two stages use distinct parts of the processing organisation. This is concurrency within the instruction flow, not a claim that every instruction completes at once or that the machine has multiple cores.",
+          "vi": "Ở cách tuần tự, một lệnh hoàn thành các giai đoạn rồi lệnh sau mới bắt đầu. Trong pipeline, I2 có thể được nạp khi I1 đang giải mã vì hai giai đoạn dùng các phần xử lý riêng. Đây là sự đồng thời trong dòng lệnh, không phải mọi lệnh hoàn tất cùng lúc hoặc máy bắt buộc có nhiều core."
+        },
+        {
+          "en": "The teaching model uses IF: instruction fetch; ID: instruction decode; OF: operand fetch; IE: instruction execution; WB: write back. Each takes one clock and each stage accepts at most one instruction per clock. The six example instructions are independent and use separate destination registers, so data hazards, branches and shared-resource stalls do not alter this particular schedule.",
+          "vi": "Mô hình dùng IF: nạp lệnh; ID: giải mã; OF: lấy toán hạng; IE: thực hiện; WB: ghi kết quả. Mỗi giai đoạn dùng một nhịp và nhận tối đa một lệnh mỗi nhịp. Sáu lệnh mẫu độc lập, ghi vào các thanh ghi đích riêng nên phụ thuộc dữ liệu, nhánh và dừng do tài nguyên chung không làm thay đổi lịch cụ thể này."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-pipeline"
+      ]
+    },
+    {
+      "id": "clock-table",
+      "title": {
+        "en": "Read one column and one diagonal",
+        "vi": "Đọc một cột và một đường chéo"
+      },
+      "paragraphs": [
+        {
+          "en": "Each clock column shows simultaneous work; each instruction row shows that instruction’s progress. At clock 5, I1 is in WB, I2 in IE, I3 in OF, I4 in ID and I5 in IF. I6 has not started. At clock 6, I2 writes back while I6 is fetched. The last instruction, I6, writes back at clock 10. Counting the instructions visible in a column is different from counting completed instructions.",
+          "vi": "Mỗi cột nhịp cho thấy công việc diễn ra đồng thời; mỗi hàng lệnh cho thấy tiến trình của lệnh đó. Ở nhịp 5, I1 tại WB, I2 tại IE, I3 tại OF, I4 tại ID và I5 tại IF. I6 chưa bắt đầu. Ở nhịp 6, I2 ghi kết quả trong khi I6 được nạp. Lệnh cuối I6 ghi kết quả ở nhịp 10. Đếm lệnh đang xuất hiện trong một cột khác với đếm lệnh đã hoàn tất."
+        },
+        {
+          "en": "The early clocks fill the pipeline. Clocks 5 and 6 have all five stages occupied in this finite example. After the final fetch, earlier stages become empty as the remaining instructions drain out. For N independent instructions and k equal one-clock stages without stalls, the last completion is at N+k−1. Always check the assumptions before using that expression.",
+          "vi": "Các nhịp đầu làm đầy pipeline. Nhịp 5 và 6 có đủ năm giai đoạn hoạt động trong ví dụ hữu hạn này. Sau lần nạp cuối, các giai đoạn đầu rỗng dần khi lệnh còn lại đi hết. Với N lệnh độc lập và k giai đoạn bằng nhau, mỗi giai đoạn một nhịp, không dừng, lần hoàn tất cuối ở N+k−1. Luôn kiểm điều kiện trước khi dùng biểu thức đó."
+        }
+      ],
+      "sourceIds": [
+        "book-pipeline"
+      ]
+    },
+    {
+      "id": "boundary-registers",
+      "title": {
+        "en": "Registers carry information across a clock boundary",
+        "vi": "Thanh ghi mang thông tin qua ranh giới nhịp"
+      },
+      "paragraphs": [
+        {
+          "en": "A stage’s combinational work must not lose its result when the next instruction enters that stage. Boundary registers hold what the next stage needs: an instruction identity after IF, decoded control/destination information after ID, operand values after OF, and an intermediate result after IE. Separate architectural destination registers receive completed results at WB. These are related storage roles but not the same thing.",
+          "vi": "Kết quả xử lý của một giai đoạn không được mất khi lệnh kế tiếp đi vào đó. Thanh ghi ranh giới giữ thứ giai đoạn sau cần: định danh lệnh sau IF, thông tin giải mã/đích sau ID, toán hạng sau OF, kết quả trung gian sau IE. Thanh ghi đích kiến trúc riêng nhận kết quả hoàn tất ở WB. Đây là các vai trò lưu trữ liên quan nhưng khác nhau."
+        },
+        {
+          "en": "The grid records work during a clock; the register panel records the end-of-clock boundary. At clock 5, IE/WB holds I2’s calculated result for the next WB stage, while architectural R1 already contains I1’s completed value 5. Treating I2’s intermediate result as already committed would be wrong. The example register names show roles, not the fixed register layout of every real processor.",
+          "vi": "Lưới ghi công việc trong một nhịp; bảng thanh ghi ghi trạng thái cuối nhịp. Ở nhịp 5, IE/WB giữ kết quả đã tính của I2 cho giai đoạn WB kế tiếp, trong khi R1 kiến trúc đã chứa giá trị hoàn tất 5 của I1. Coi kết quả trung gian I2 như đã được ghi cuối là sai. Tên thanh ghi trong ví dụ minh họa vai trò, không phải bố trí cố định của mọi bộ xử lý."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-pipeline"
+      ]
+    },
+    {
+      "id": "throughput-and-latency",
+      "title": {
+        "en": "A faster stream need not shorten one journey",
+        "vi": "Dòng lệnh nhanh hơn không nhất thiết rút ngắn một lệnh"
+      },
+      "paragraphs": [
+        {
+          "en": "One instruction still traverses five stages, so I1 takes five clocks from fetch to write back. Once completions start, this ideal pipeline finishes one instruction at each successive clock. That completion interval describes throughput. It does not make I1 a one-clock instruction from start to finish. RISC descriptions of simple instructions and high completion rates must be read with the execution model being used.",
+          "vi": "Một lệnh vẫn qua năm giai đoạn nên I1 cần năm nhịp từ nạp đến ghi kết quả. Khi bắt đầu có lệnh hoàn tất, pipeline lý tưởng này hoàn tất một lệnh ở mỗi nhịp kế tiếp. Khoảng giữa các lần hoàn tất mô tả throughput. Nó không biến toàn bộ hành trình I1 thành một nhịp. Mô tả lệnh RISC đơn giản và tốc độ hoàn tất cao phải được đọc theo mô hình thực thi đang dùng."
+        },
+        {
+          "en": "Six instructions take 6×5=30 clocks sequentially but 6+5−1=10 with this pipeline. The finite-batch speed-up is 30/10=3, not automatically five. Fill and drain overhead matter. A real pipeline may also wait for dependencies or resources, so these numbers are a transparent ideal example rather than a universal processor benchmark.",
+          "vi": "Sáu lệnh cần 6×5=30 nhịp khi tuần tự nhưng 6+5−1=10 khi dùng pipeline này. Tỷ số tăng tốc cho nhóm hữu hạn là 30/10=3, không tự động bằng năm. Chi phí làm đầy và đi hết pipeline có ảnh hưởng. Pipeline thật còn có thể chờ phụ thuộc hoặc tài nguyên nên các số này là ví dụ lý tưởng có điều kiện, không phải benchmark phổ quát."
+        }
+      ],
+      "sourceIds": [
+        "book-pipeline"
+      ]
+    },
+    {
+      "id": "context-and-interrupt",
+      "title": {
+        "en": "Save a state from which the program can resume",
+        "vi": "Lưu trạng thái cho phép chương trình tiếp tục"
+      },
+      "paragraphs": [
+        {
+          "en": "An interrupt causes the processor to service an event and later resume the interrupted work. At the stated instruction boundary, the processor preserves the relevant registers/status and continuation address, runs the interrupt service routine, then restores the context. A suitable stack or other saved-context area keeps values available while the handler uses the processor. This basic need applies to RISC and CISC.",
+          "vi": "Ngắt khiến bộ xử lý phục vụ một sự kiện rồi tiếp tục công việc bị gián đoạn. Tại ranh giới lệnh đã nêu, bộ xử lý lưu các thanh ghi/trạng thái liên quan và địa chỉ tiếp tục, chạy trình phục vụ ngắt rồi khôi phục ngữ cảnh. Stack phù hợp hoặc vùng lưu ngữ cảnh giữ các giá trị trong khi trình phục vụ dùng bộ xử lý. Nhu cầu cơ bản này áp dụng cho cả RISC và CISC."
+        },
+        {
+          "en": "A pipeline adds unfinished instructions at different stages. The question is not merely where to jump for the handler, but which completed effects must remain and which unfinished work must be restarted. The visual saves architectural R1–R6, the stated status flag and restartPC. Its handler is an event with unspecified duration; no invented clock count or claim about all interrupt priorities is added.",
+          "vi": "Pipeline làm phát sinh các lệnh chưa xong ở nhiều giai đoạn. Vấn đề không chỉ là nhảy tới trình phục vụ ở đâu mà còn là hiệu ứng hoàn tất nào phải giữ và công việc dở nào phải làm lại. Visual lưu R1–R6 kiến trúc, cờ trạng thái đã nêu và restartPC. Trình phục vụ là sự kiện không cho thời lượng; không tự gán số nhịp hoặc quy tắc cho mọi mức ưu tiên ngắt."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-pipeline",
+        "s24-qp31",
+        "s24-ms31"
+      ]
+    },
+    {
+      "id": "flush-and-restart",
+      "title": {
+        "en": "Apply one interrupt policy consistently",
+        "vi": "Áp dụng nhất quán một chính sách ngắt"
+      },
+      "paragraphs": [
+        {
+          "en": "In the chosen policy, accept the interrupt after I1 completes WB at the end of clock 5. Preserve I1’s committed R1=5. Discard I2–I5 from the pipeline; they have not committed. I6 was not fetched, so it is unissued rather than discarded. Save I2 as the restart address, service the interrupt and restore the saved context. Restart by fetching I2, not I1 and not I6.",
+          "vi": "Trong chính sách đã chọn, nhận ngắt sau khi I1 xong WB ở cuối nhịp 5. Giữ R1=5 do I1 đã ghi. Bỏ I2–I5 khỏi pipeline vì chúng chưa hoàn tất. I6 chưa được nạp nên là lệnh chưa đưa vào, không phải lệnh bị bỏ. Lưu I2 làm địa chỉ chạy lại, phục vụ ngắt và khôi phục ngữ cảnh. Bắt đầu lại bằng nạp I2, không phải I1 hoặc I6."
+        },
+        {
+          "en": "Refetched I2 reaches WB at application clock 10, followed by I3–I6 at clocks 11–14. Each result commits once. Application clocks total 14 here; elapsed time also includes the handler duration, which has not been specified. The textbook mentions saving all pipeline-stage contents as an alternative. Do not combine that alternative with flushing in the same trace unless the question explicitly defines such a policy.",
+          "vi": "I2 được nạp lại đến WB ở nhịp chương trình 10, tiếp theo I3–I6 ở nhịp 11–14. Mỗi kết quả chỉ được ghi một lần. Ở đây có 14 nhịp chương trình; thời gian trôi qua còn gồm thời lượng trình phục vụ chưa được cho. Sách cũng nêu lưu toàn bộ nội dung các giai đoạn là phương án khác. Không trộn phương án đó với xóa pipeline trong cùng trace nếu đề không định nghĩa chính sách như vậy."
+        }
+      ],
+      "sourceIds": [
+        "book-pipeline",
+        "s24-ms31"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "pipeline-registers-interrupts",
+    "title": {
+      "en": "Follow clocks and saved state",
+      "vi": "Theo dõi nhịp và trạng thái được lưu"
+    },
+    "introduction": {
+      "en": "Six independent symbolic additions write R1–R6. Switch between ideal flow and an interrupt after clock 5.",
+      "vi": "Sáu phép cộng ký hiệu độc lập ghi R1–R6. Chọn luồng lý tưởng hoặc ngắt sau nhịp 5."
+    },
+    "task": {
+      "en": "Read the current clock column, predict the next boundary register, then explain which instructions can restart after the interrupt.",
+      "vi": "Đọc cột nhịp hiện tại, dự đoán thanh ghi ranh giới kế tiếp rồi giải thích lệnh nào phải chạy lại sau ngắt."
+    },
+    "conventions": [
+      {
+        "en": "IF→ID→OF→IE→WB; one clock per stage, no dependency or resource stall. I1–I6 write results 5,9,13,17,21,25 to distinct registers.",
+        "vi": "IF→ID→OF→IE→WB; mỗi giai đoạn một nhịp, không dừng do phụ thuộc hay tài nguyên. I1–I6 ghi 5,9,13,17,21,25 vào thanh ghi riêng."
+      },
+      {
+        "en": "The grid shows activity during a clock; boundary registers and architectural values show the end of that clock.",
+        "vi": "Lưới chỉ hoạt động trong nhịp; thanh ghi ranh giới và giá trị kiến trúc chỉ cuối nhịp."
+      },
+      {
+        "en": "Interrupt acceptance occurs after clock5 WB: I1 retained, I2–I5 flushed, I6 unissued, restart at I2. Handler duration is not counted as application clocks.",
+        "vi": "Nhận ngắt sau WB nhịp5: giữ I1, xóa I2–I5, I6 chưa nạp, chạy lại I2. Thời lượng phục vụ không được tính thành nhịp chương trình."
+      },
+      {
+        "en": "These are symbolic teaching operations, not executable assembly for a particular processor.",
+        "vi": "Đây là thao tác ký hiệu để học, không phải assembly thực thi cho bộ xử lý cụ thể."
+      }
+    ],
+    "sourceIds": [
+      "book-pipeline",
+      "s24-ms31"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Trace the interruption and restart",
+      "vi": "Theo dõi ngắt và chạy lại"
+    },
+    "prompt": {
+      "en": "Using the stated five-stage pipeline, trace six independent instructions when an interrupt is accepted just after clock5. Identify what is saved, discarded and restarted.",
+      "vi": "Dùng pipeline năm giai đoạn đã nêu, theo dõi sáu lệnh độc lập khi nhận ngắt ngay sau nhịp5. Xác định thứ được lưu, bị bỏ và chạy lại."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "ready",
+        "action": {
+          "en": "Prepare six independent register-result instructions.",
+          "vi": "Chuẩn bị sáu lệnh độc lập ghi vào các thanh ghi riêng."
+        },
+        "why": {
+          "en": "One stage takes one clock; no data dependency, branch or resource conflict is modelled.",
+          "vi": "Mỗi giai đoạn dùng một nhịp; mô hình không có phụ thuộc dữ liệu, nhánh hoặc tranh chấp tài nguyên."
+        },
+        "result": {
+          "en": "The pipeline is empty; no result has committed.",
+          "vi": "Pipeline rỗng; chưa có kết quả cuối được ghi."
+        }
+      },
+      {
+        "id": "cycle-1",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I1; ID: —; OF: —; IE: —; WB: —.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I1; ID: —; OF: —; IE: —; WB: —."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. No instruction commits on this clock.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. Không có lệnh nào ghi kết quả cuối ở nhịp này."
+        }
+      },
+      {
+        "id": "cycle-2",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I2; ID: I1; OF: —; IE: —; WB: —.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I2; ID: I1; OF: —; IE: —; WB: —."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. No instruction commits on this clock.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. Không có lệnh nào ghi kết quả cuối ở nhịp này."
+        }
+      },
+      {
+        "id": "cycle-3",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I3; ID: I2; OF: I1; IE: —; WB: —.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I3; ID: I2; OF: I1; IE: —; WB: —."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. No instruction commits on this clock.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. Không có lệnh nào ghi kết quả cuối ở nhịp này."
+        }
+      },
+      {
+        "id": "cycle-4",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I4; ID: I3; OF: I2; IE: I1; WB: —.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I4; ID: I3; OF: I2; IE: I1; WB: —."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. No instruction commits on this clock.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. Không có lệnh nào ghi kết quả cuối ở nhịp này."
+        }
+      },
+      {
+        "id": "cycle-5",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I5; ID: I4; OF: I3; IE: I2; WB: I1.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I5; ID: I4; OF: I3; IE: I2; WB: I1."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. I1 commits its result at this boundary.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. I1 ghi kết quả ở ranh giới này."
+        }
+      },
+      {
+        "id": "save-and-flush",
+        "action": {
+          "en": "After I1 writes back at clock 5, save registers/status and restart address I2; discard the unfinished I2–I5 stages.",
+          "vi": "Sau khi I1 ghi kết quả ở nhịp 5, lưu thanh ghi/trạng thái và địa chỉ chạy lại I2; bỏ phần đang xử lý của I2–I5."
+        },
+        "why": {
+          "en": "Only I1 has committed. Keeping incomplete stage results as if complete would corrupt the restart; I6 has not been fetched.",
+          "vi": "Chỉ I1 đã hoàn tất. Coi kết quả dở dang là kết quả cuối sẽ làm sai việc chạy lại; I6 chưa được nạp."
+        },
+        "result": {
+          "en": "The pipeline is empty, R1=5 is retained, and saved restartPC is I2.",
+          "vi": "Pipeline rỗng, R1=5 được giữ và restartPC đã lưu là I2."
+        }
+      },
+      {
+        "id": "service-interrupt",
+        "action": {
+          "en": "Run the interrupt service routine as a separate event.",
+          "vi": "Chạy trình phục vụ ngắt như một sự kiện riêng."
+        },
+        "why": {
+          "en": "The example does not specify handler duration, so it adds no invented application-clock count.",
+          "vi": "Ví dụ không cho thời lượng trình phục vụ nên không tự gán số nhịp chương trình."
+        },
+        "result": {
+          "en": "The interrupt is serviced; the saved program context remains available.",
+          "vi": "Ngắt đã được phục vụ; ngữ cảnh chương trình đã lưu vẫn sẵn sàng."
+        }
+      },
+      {
+        "id": "restore-context",
+        "action": {
+          "en": "Restore the saved registers/status and use I2 as the next instruction address.",
+          "vi": "Khôi phục thanh ghi/trạng thái đã lưu và dùng I2 làm địa chỉ lệnh tiếp theo."
+        },
+        "why": {
+          "en": "I1 must not execute twice; the discarded instructions must be fetched again.",
+          "vi": "Không được thực thi I1 hai lần; các lệnh đã bỏ phải được nạp lại."
+        },
+        "result": {
+          "en": "The next application clock refetches I2; handler time remains unspecified.",
+          "vi": "Nhịp chương trình tiếp theo nạp lại I2; thời gian phục vụ vẫn không được chỉ định."
+        }
+      },
+      {
+        "id": "restart-cycle-6",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I2; ID: —; OF: —; IE: —; WB: —.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I2; ID: —; OF: —; IE: —; WB: —."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. No instruction commits on this clock.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. Không có lệnh nào ghi kết quả cuối ở nhịp này."
+        }
+      },
+      {
+        "id": "restart-cycle-7",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I3; ID: I2; OF: —; IE: —; WB: —.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I3; ID: I2; OF: —; IE: —; WB: —."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. No instruction commits on this clock.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. Không có lệnh nào ghi kết quả cuối ở nhịp này."
+        }
+      },
+      {
+        "id": "restart-cycle-8",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I4; ID: I3; OF: I2; IE: —; WB: —.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I4; ID: I3; OF: I2; IE: —; WB: —."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. No instruction commits on this clock.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. Không có lệnh nào ghi kết quả cuối ở nhịp này."
+        }
+      },
+      {
+        "id": "restart-cycle-9",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I5; ID: I4; OF: I3; IE: I2; WB: —.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I5; ID: I4; OF: I3; IE: I2; WB: —."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. No instruction commits on this clock.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. Không có lệnh nào ghi kết quả cuối ở nhịp này."
+        }
+      },
+      {
+        "id": "restart-cycle-10",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: I6; ID: I5; OF: I4; IE: I3; WB: I2.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: I6; ID: I5; OF: I4; IE: I3; WB: I2."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. I2 commits its result at this boundary.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. I2 ghi kết quả ở ranh giới này."
+        }
+      },
+      {
+        "id": "restart-cycle-11",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: —; ID: I6; OF: I5; IE: I4; WB: I3.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: —; ID: I6; OF: I5; IE: I4; WB: I3."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. I3 commits its result at this boundary.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. I3 ghi kết quả ở ranh giới này."
+        }
+      },
+      {
+        "id": "restart-cycle-12",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: —; ID: —; OF: I6; IE: I5; WB: I4.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: —; ID: —; OF: I6; IE: I5; WB: I4."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. I4 commits its result at this boundary.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. I4 ghi kết quả ở ranh giới này."
+        }
+      },
+      {
+        "id": "restart-cycle-13",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: —; ID: —; OF: —; IE: I6; WB: I5.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: —; ID: —; OF: —; IE: I6; WB: I5."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. I5 commits its result at this boundary.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. I5 ghi kết quả ở ranh giới này."
+        }
+      },
+      {
+        "id": "restart-cycle-14",
+        "action": {
+          "en": "Advance each issued instruction by one stage: IF: —; ID: —; OF: —; IE: —; WB: I6.",
+          "vi": "Cho mỗi lệnh đã đưa vào tiến một giai đoạn: IF: —; ID: —; OF: —; IE: —; WB: I6."
+        },
+        "why": {
+          "en": "Separate stages can operate concurrently; boundary registers retain the information required by the next stage.",
+          "vi": "Các giai đoạn riêng có thể hoạt động đồng thời; thanh ghi ranh giới giữ thông tin cần cho giai đoạn kế tiếp."
+        },
+        "result": {
+          "en": "End-of-clock boundary registers now describe the next stage inputs. I6 commits its result at this boundary.",
+          "vi": "Thanh ghi ở cuối nhịp hiện chứa đầu vào cho giai đoạn tiếp theo. I6 ghi kết quả ở ranh giới này."
+        }
+      }
+    ],
+    "result": {
+      "en": "I1 is committed once; I2–I6 are completed after restart. R1–R6 end as5,9,13,17,21,25. The trace has14 application clocks plus unspecified handler time.",
+      "vi": "I1 được ghi một lần; I2–I6 hoàn tất sau chạy lại. R1–R6 kết thúc bằng5,9,13,17,21,25. Trace có14 nhịp chương trình cộng thời gian phục vụ chưa cho."
+    },
+    "selfCheck": {
+      "en": "Explain why retaining I1 and restarting I2 prevents both duplicated and lost results.",
+      "vi": "Giải thích vì sao giữ I1 và chạy lại I2 tránh cả kết quả lặp lẫn bị mất."
+    },
+    "sourceIds": [
+      "book-pipeline",
+      "s24-ms31"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "An instruction/stage/clock grid signals a pipeline trace: read stages and boundary timing before filling cells.",
+        "vi": "Lưới lệnh/giai đoạn/nhịp báo hiệu trace pipeline: đọc giai đoạn và mốc ranh giới trước khi điền ô."
+      },
+      {
+        "en": "“Explain how pipelining affects interrupt handling” requires unfinished work and context/restart, not just a definition of an interrupt.",
+        "vi": "“Giải thích pipeline ảnh hưởng xử lý ngắt” đòi hỏi công việc chưa xong và ngữ cảnh/chạy lại, không chỉ định nghĩa ngắt."
+      },
+      {
+        "en": "“Compare performance” needs a common workload and assumptions; separate completion rate from one-instruction latency.",
+        "vi": "“So sánh hiệu năng” cần cùng công việc và điều kiện; tách tốc độ hoàn tất khỏi latency của một lệnh."
+      }
+    ],
+    "distinguish": {
+      "en": "A pipeline is not Flynn SIMD merely because several instructions appear in one clock; Flynn counts instruction/data streams. OS process scheduling is a separate question unless the prompt connects it to the interrupt.",
+      "vi": "Pipeline không tự là Flynn SIMD chỉ vì nhiều lệnh xuất hiện trong một nhịp; Flynn đếm luồng lệnh/dữ liệu. Lập lịch process của OS là vấn đề khác nếu đề không nối nó với ngắt."
+    },
+    "method": [
+      {
+        "en": "Write the stage order, stage cost, instruction issue rule and interrupt boundary.",
+        "vi": "Ghi thứ tự giai đoạn, chi phí, quy tắc đưa lệnh vào và ranh giới ngắt."
+      },
+      {
+        "en": "Fill one clock column at a time; retain earlier results and distinguish active from completed work.",
+        "vi": "Điền từng cột nhịp; giữ kết quả trước và phân biệt đang xử lý với đã xong."
+      },
+      {
+        "en": "At an interrupt, name the saved context, unfinished instructions and correct restart address.",
+        "vi": "Khi có ngắt, nêu ngữ cảnh được lưu, lệnh dở dang và địa chỉ chạy lại đúng."
+      },
+      {
+        "en": "State the final values/count and explain the assumptions that make it valid.",
+        "vi": "Nêu giá trị/số lượng cuối và giải thích điều kiện khiến kết quả đúng."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "One completion per clock means every instruction takes one clock.",
+        "vi": "Một lệnh hoàn tất mỗi nhịp nghĩa là mọi lệnh chỉ mất một nhịp."
+      },
+      "correction": {
+        "en": "That is throughput. Trace I1 across IF,ID,OF,IE,WB: its latency remains five clocks.",
+        "vi": "Đó là throughput. Theo I1 qua IF,ID,OF,IE,WB: latency của nó vẫn năm nhịp."
+      }
+    },
+    {
+      "mistake": {
+        "en": "All instructions visible at clock5 have finished.",
+        "vi": "Mọi lệnh xuất hiện ở nhịp5 đều đã xong."
+      },
+      "correction": {
+        "en": "Only I1 is at WB. Check architectural registers separately from pipeline boundaries.",
+        "vi": "Chỉ I1 ở WB. Kiểm thanh ghi kiến trúc riêng với thanh ghi ranh giới pipeline."
+      }
+    },
+    {
+      "mistake": {
+        "en": "After the handler, skip to I6 because I2–I5 already entered the pipeline.",
+        "vi": "Sau phục vụ, nhảy đến I6 vì I2–I5 đã vào pipeline."
+      },
+      "correction": {
+        "en": "Entering is not committing. Under this flush policy I2–I5 must be refetched, beginning with I2.",
+        "vi": "Đi vào chưa phải hoàn tất. Theo chính sách xóa này phải nạp lại I2–I5, bắt đầu I2."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A five-stage pipeline always makes a whole program five times faster.",
+        "vi": "Pipeline năm giai đoạn luôn làm cả chương trình nhanh gấp năm."
+      },
+      "correction": {
+        "en": "Compute the actual finite schedule: six instructions give30/10=3 in the ideal case; stalls and interrupts can add time.",
+        "vi": "Tính lịch hữu hạn thực tế: sáu lệnh cho30/10=3 khi lý tưởng; dừng và ngắt có thể thêm thời gian."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "clock-five",
+      "prompt": {
+        "en": "At clock5, which instruction is being fetched?",
+        "vi": "Ở nhịp5, lệnh nào đang được nạp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "I5",
+            "vi": "I5"
+          },
+          "feedback": {
+            "en": "Correct: I1 reaches WB while I5 is in IF.",
+            "vi": "Đúng: I1 đến WB khi I5 ở IF."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "I6",
+            "vi": "I6"
+          },
+          "feedback": {
+            "en": "I6 enters at clock6, not clock5.",
+            "vi": "I6 đi vào nhịp6, không phải nhịp5."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "I1",
+            "vi": "I1"
+          },
+          "feedback": {
+            "en": "I1 was fetched at clock1 and is now writing back.",
+            "vi": "I1 được nạp ở nhịp1 và giờ ghi kết quả."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "At clock 5, find IF in the instruction-by-clock matrix; its row identifies I5.",
+        "vi": "Ở nhịp 5, tìm IF trong ma trận lệnh theo nhịp; hàng chứa IF là I5."
+      }
+    },
+    {
+      "id": "boundary-role",
+      "prompt": {
+        "en": "At the end of clock5, IE/WB holds I2’s result. What follows?",
+        "vi": "Cuối nhịp5, IE/WB giữ kết quả I2. Suy ra điều gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "I2 has already committed",
+            "vi": "I2 đã được ghi cuối"
+          },
+          "feedback": {
+            "en": "The boundary feeds the next WB; do not confuse it with the architectural destination register.",
+            "vi": "Ranh giới cấp cho WB kế tiếp; không nhầm với thanh ghi đích kiến trúc."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "WB can use that result at the next clock",
+            "vi": "WB có thể dùng kết quả đó ở nhịp tiếp theo"
+          },
+          "feedback": {
+            "en": "Correct: the register retains the value across the stage boundary.",
+            "vi": "Đúng: thanh ghi giữ giá trị qua ranh giới giai đoạn."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "I2 must return to IF without an interrupt",
+            "vi": "I2 phải về IF dù không có ngắt"
+          },
+          "feedback": {
+            "en": "Normal progression is into WB, not a restart.",
+            "vi": "Tiến trình bình thường đi vào WB, không chạy lại."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Differentiate current-stage work, end-boundary information and committed state.",
+        "vi": "Phân biệt việc giai đoạn hiện tại, thông tin cuối ranh giới và trạng thái hoàn tất."
+      }
+    },
+    {
+      "id": "latency-throughput",
+      "prompt": {
+        "en": "In the ideal model, choose the correct pair.",
+        "vi": "Trong mô hình lý tưởng, chọn cặp đúng."
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Latency1; completion interval5",
+            "vi": "Latency1; khoảng hoàn tất5"
+          },
+          "feedback": {
+            "en": "The five-stage journey and one-clock completion interval are reversed.",
+            "vi": "Hành trình năm giai đoạn và khoảng hoàn tất một nhịp bị đảo."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Latency5; completion interval1 after fill",
+            "vi": "Latency5; khoảng hoàn tất1 sau khi làm đầy"
+          },
+          "feedback": {
+            "en": "Correct: overlap changes the stream’s completion rate.",
+            "vi": "Đúng: chồng lấp thay đổi tốc độ hoàn tất của dòng lệnh."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Latency0; all six finish together",
+            "vi": "Latency0; cả sáu xong cùng lúc"
+          },
+          "feedback": {
+            "en": "Each instruction still performs five ordered stages.",
+            "vi": "Mỗi lệnh vẫn thực hiện năm giai đoạn có thứ tự."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Trace one instruction for latency and two adjacent completions for throughput.",
+        "vi": "Theo một lệnh để tìm latency và hai lần hoàn tất kề nhau để xét throughput."
+      }
+    },
+    {
+      "id": "restart-address",
+      "prompt": {
+        "en": "The clock5 interrupt uses the stated flush policy. Which instruction restarts first?",
+        "vi": "Ngắt nhịp5 dùng chính sách xóa đã nêu. Lệnh nào chạy lại trước?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "I1",
+            "vi": "I1"
+          },
+          "feedback": {
+            "en": "I1 already committed; repeating it could duplicate an effect.",
+            "vi": "I1 đã hoàn tất; làm lại có thể lặp hiệu ứng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "I6",
+            "vi": "I6"
+          },
+          "feedback": {
+            "en": "That skips the uncommitted effects of I2–I5.",
+            "vi": "Như vậy bỏ qua hiệu ứng chưa hoàn tất của I2–I5."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "I2",
+            "vi": "I2"
+          },
+          "feedback": {
+            "en": "Correct: it is the first instruction after the committed boundary.",
+            "vi": "Đúng: đó là lệnh đầu tiên sau ranh giới đã hoàn tất."
+          }
+        }
+      ],
+      "correctChoiceId": "c",
+      "explanation": {
+        "en": "Save enough state to resume at the first unfinished instruction.",
+        "vi": "Lưu đủ trạng thái để tiếp tục tại lệnh đầu chưa hoàn tất."
+      }
+    },
+    {
+      "id": "new-batch",
+      "prompt": {
+        "en": "Ten independent instructions use five one-clock stages without stalls. How many clocks until the last WB?",
+        "vi": "Mười lệnh độc lập dùng năm giai đoạn, mỗi giai đoạn một nhịp, không dừng. Lần WB cuối ở nhịp bao nhiêu?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "10",
+            "vi": "10"
+          },
+          "feedback": {
+            "en": "This omits the four additional fill/drain positions.",
+            "vi": "Kết quả bỏ bốn vị trí thêm do các giai đoạn."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "14",
+            "vi": "14"
+          },
+          "feedback": {
+            "en": "Correct:10+5−1=14; sequential execution would use50.",
+            "vi": "Đúng:10+5−1=14; tuần tự sẽ dùng50."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "50",
+            "vi": "50"
+          },
+          "feedback": {
+            "en": "That assumes each instruction waits for the previous one to finish.",
+            "vi": "Đó là giả sử mỗi lệnh chờ lệnh trước hoàn tất."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Use N+k−1 only after checking equal stage cost and no stalls.",
+        "vi": "Chỉ dùng N+k−1 sau khi kiểm các giai đoạn bằng nhau và không dừng."
+      }
+    },
+    {
+      "id": "handler-duration",
+      "prompt": {
+        "en": "The interrupted trace shows14 application clocks. Can you report total elapsed time as14 clocks?",
+        "vi": "Trace bị ngắt có14 nhịp chương trình. Có thể báo tổng thời gian trôi qua bằng14 nhịp không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes; handlers take no time",
+            "vi": "Có; trình phục vụ không mất thời gian"
+          },
+          "feedback": {
+            "en": "The display omits an unspecified duration; omission does not make it zero.",
+            "vi": "Màn hình không cho thời lượng; không cho không có nghĩa là bằng0."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No; add the handler time once specified",
+            "vi": "Không; phải thêm thời gian phục vụ khi được cho"
+          },
+          "feedback": {
+            "en": "Correct: keep counted application progress separate from unspecified service time.",
+            "vi": "Đúng: tách tiến trình chương trình đã đếm với thời gian phục vụ chưa biết."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No; multiply14 by the number of registers",
+            "vi": "Không; nhân14 với số thanh ghi"
+          },
+          "feedback": {
+            "en": "Register count alone does not determine elapsed handler time.",
+            "vi": "Riêng số thanh ghi không xác định thời gian phục vụ."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "State what a number counts and what it excludes.",
+        "vi": "Nêu rõ một số đang đếm gì và chưa tính gì."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Without looking at the grid, explain why a pipeline needs registers and why an interrupt needs a restart policy.",
+      "vi": "Không nhìn lưới, giải thích vì sao pipeline cần thanh ghi và ngắt cần chính sách chạy lại."
+    },
+    "answerPoints": [
+      {
+        "en": "Boundary registers preserve stage outputs while other stages work on different instructions.",
+        "vi": "Thanh ghi ranh giới giữ đầu ra giai đoạn trong khi các giai đoạn khác xử lý lệnh khác."
+      },
+      {
+        "en": "Architectural results and unfinished pipeline work must be distinguished at the interrupt boundary.",
+        "vi": "Phải phân biệt kết quả kiến trúc với công việc pipeline dở dang tại ranh giới ngắt."
+      },
+      {
+        "en": "Saved registers/status and a correct restart address let the program resume without lost or repeated effects.",
+        "vi": "Thanh ghi/trạng thái đã lưu và địa chỉ chạy lại đúng giúp tiếp tục mà không mất hoặc lặp hiệu ứng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Read clock columns for concurrency and instruction rows for latency.",
+      "vi": "Đọc cột nhịp để thấy đồng thời, hàng lệnh để thấy latency."
+    },
+    {
+      "en": "A boundary register holds information for the next stage; WB commits a result.",
+      "vi": "Thanh ghi ranh giới giữ thông tin cho giai đoạn sau; WB ghi kết quả hoàn tất."
+    },
+    {
+      "en": "Interrupt traces are meaningful only with a stated boundary and restart policy.",
+      "vi": "Trace ngắt chỉ có nghĩa khi nêu ranh giới và chính sách chạy lại."
+    }
+  ],
+  "relatedSlugs": [
+    "risc-and-cisc",
+    "flynn-architectures-and-massive-parallelism",
+    "kernel-interrupts-and-scheduling"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.1",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-pipeline",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter15.1.1, printed pages348–350 (PDF pages364–366): five-stage pipeline, registers and interrupt policies",
+      "kind": "book"
+    },
+    {
+      "id": "s24-qp31",
+      "title": "Cambridge9618/31 — May/June2024 question paper",
+      "locator": "Question11(a–c), page11",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s24-ms31",
+      "title": "Cambridge9618/31 — May/June2024 mark scheme",
+      "locator": "Question11(a–c), page14",
+      "kind": "mark-scheme"
+    }
+  ]
+}

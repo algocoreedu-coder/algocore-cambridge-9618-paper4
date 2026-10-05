@@ -1,0 +1,903 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.1",
+  "topicId": "P3-14.2-T01",
+  "slug": "packet-journey-and-routers",
+  "title": {
+    "en": "Packet journey and routers",
+    "vi": "Hành trình packet và router"
+  },
+  "question": {
+    "en": "How can packets reach one destination by different routes and still reconstruct one message?",
+    "vi": "Packet đi qua tuyến khác nhau đến cùng đích rồi khôi phục một thông điệp như thế nào?"
+  },
+  "opening": {
+    "en": "The message NETWORK is divided into NET, WO and RK. A link fails after the first packet has crossed it. Follow the destination field and the supplied routing tables to see what can move, what cannot, and why arrival order need not be message order.",
+    "vi": "Thông điệp NETWORK được chia thành NET, WO và RK. Một liên kết hỏng sau khi packet đầu đã đi qua. Theo dõi trường đích và bảng định tuyến đã cho để biết phần nào di chuyển được, phần nào không và vì sao thứ tự đến không nhất thiết là thứ tự thông điệp."
+  },
+  "objectives": [
+    {
+      "en": "Trace splitting, addressing, forwarding, arrival and reassembly in packet switching.",
+      "vi": "Theo dõi chia nhỏ, đánh địa chỉ, chuyển tiếp, nhận và ghép lại trong packet switching."
+    },
+    {
+      "en": "Use a router’s destination lookup and available next-hop information to justify forwarding.",
+      "vi": "Dùng tra cứu theo đích và next hop khả dụng để giải thích chuyển tiếp của router."
+    },
+    {
+      "en": "Identify the limits of a supplied route and separate receiver ordering from IP delivery.",
+      "vi": "Nhận ra giới hạn tuyến đã cho và tách việc sắp thứ tự ở bên nhận khỏi truyền IP."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know Internet and Link responsibilities in the four-layer model and recognise source/destination hosts.",
+      "vi": "Biết trách nhiệm Internet và Link trong mô hình bốn tầng, nhận diện host nguồn/đích."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Packet",
+      "meaning": {
+        "en": "A bounded unit carrying payload and control information for network transmission.",
+        "vi": "Đơn vị hữu hạn mang payload và thông tin điều khiển để truyền qua mạng."
+      }
+    },
+    {
+      "term": "Router / next hop",
+      "meaning": {
+        "en": "A device forwarding packets between networks / the next adjacent device selected for forwarding.",
+        "vi": "Thiết bị chuyển tiếp packet giữa các mạng / thiết bị kề tiếp theo được chọn để chuyển tiếp."
+      }
+    },
+    {
+      "term": "Routing table",
+      "meaning": {
+        "en": "Stored forwarding information used to match a destination to a next hop or outgoing interface.",
+        "vi": "Thông tin chuyển tiếp được lưu để khớp đích với next hop hoặc giao diện đi ra."
+      }
+    },
+    {
+      "term": "Receiver buffer / reassembly",
+      "meaning": {
+        "en": "Temporary storage for arriving data / recovering the complete data in its required order.",
+        "vi": "Vùng giữ tạm dữ liệu đến / khôi phục dữ liệu đầy đủ theo thứ tự cần thiết."
+      }
+    },
+    {
+      "term": "Hop limit",
+      "meaning": {
+        "en": "A bounded forwarding allowance that prevents a packet circulating indefinitely.",
+        "vi": "Giới hạn số lần chuyển tiếp giúp packet không lưu chuyển vô hạn."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "split-and-reassemble",
+      "title": {
+        "en": "A message becomes separately handled units",
+        "vi": "Thông điệp thành các đơn vị được xử lý riêng"
+      },
+      "paragraphs": [
+        {
+          "en": "Packet switching divides data into smaller units that can share network links with other traffic. Each packet carries control information including a destination address, so a router can forward it without reading the whole application message. The network does not reserve one end-to-end circuit for the entire conversation.",
+          "vi": "Packet switching chia dữ liệu thành đơn vị nhỏ có thể dùng chung liên kết mạng với lưu lượng khác. Mỗi packet mang thông tin điều khiển gồm địa chỉ đích để router chuyển tiếp mà không cần đọc toàn bộ thông điệp ứng dụng. Mạng không dành riêng một circuit xuyên suốt cho cả cuộc trao đổi."
+        },
+        {
+          "en": "The destination needs all required data in the correct order before reconstructing this complete message. Packets may arrive out of order because their routes or waiting conditions differ. They may also follow the same route. “May take different routes” is accurate; “every packet must take a different route” is not.",
+          "vi": "Bên đích cần đủ dữ liệu bắt buộc theo thứ tự đúng trước khi khôi phục thông điệp đầy đủ này. Packet có thể đến sai thứ tự vì tuyến hoặc điều kiện chờ khác nhau. Chúng cũng có thể đi cùng tuyến. “Có thể đi tuyến khác nhau” là đúng; “mọi packet bắt buộc đi tuyến khác nhau” thì không."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-packets",
+        "s22-ms31"
+      ]
+    },
+    {
+      "id": "control-versus-payload",
+      "title": {
+        "en": "Read the destination, preserve the payload",
+        "vi": "Đọc đích, giữ nguyên payload"
+      },
+      "paragraphs": [
+        {
+          "en": "A router uses destination addressing to decide where to forward a packet. The payload is the carried data, such as NET in p1. The final destination is not replaced by the next router’s identity: a next hop tells the device where to send locally while the packet remains addressed towards the destination host. Link framing is renewed for each local link.",
+          "vi": "Router dùng địa chỉ đích để quyết định chuyển packet đi đâu. Payload là dữ liệu được mang, như NET trong p1. Đích cuối không bị thay bằng danh tính router tiếp theo: next hop cho biết gửi cục bộ tới đâu trong khi packet vẫn hướng tới host đích. Frame Link được tạo lại trên mỗi liên kết cục bộ."
+        },
+        {
+          "en": "The diagram’s order labels 1, 2, 3 are teaching metadata for reconstruction. They are not a claim that an IP header contains an application-message sequence number or that IP guarantees ordered delivery. With TCP, Transport supplies ordering and recovery; applications using other transport services may need their own handling. The lesson uses a general message model rather than a byte-accurate header drawing.",
+          "vi": "Nhãn thứ tự 1, 2, 3 trên sơ đồ là metadata minh họa để khôi phục. Chúng không khẳng định IP header chứa số thứ tự thông điệp ứng dụng hoặc IP bảo đảm giao đúng thứ tự. Khi dùng TCP, Transport cung cấp sắp thứ tự và khôi phục; ứng dụng dùng dịch vụ giao vận khác có thể cần tự xử lý. Bài dùng mô hình thông điệp tổng quát thay vì vẽ header chính xác từng byte."
+        }
+      ],
+      "sourceIds": [
+        "book-routing",
+        "s25-ms33",
+        "tcp-standard"
+      ]
+    },
+    {
+      "id": "router-next-hop",
+      "title": {
+        "en": "A forwarding decision has an evidence chain",
+        "vi": "Quyết định chuyển tiếp phải có căn cứ"
+      },
+      "paragraphs": [
+        {
+          "en": "Follow this chain at a router: read the destination address; consult the routing table; identify a matching route and usable outgoing next hop; forward the packet. A table may contain destination networks, gateways, interfaces and route metrics. You do not need to invent these fields when the question only supplies a simple destination-to-next-hop table.",
+          "vi": "Theo chuỗi sau ở router: đọc địa chỉ đích; tra bảng định tuyến; xác định tuyến khớp và next hop đi ra dùng được; chuyển packet. Bảng có thể chứa mạng đích, gateway, giao diện và thước đo tuyến. Không cần tự tạo những trường này khi đề chỉ cho bảng đơn giản từ đích tới next hop."
+        },
+        {
+          "en": "The chosen route depends on the routing information and policy, not necessarily the smallest number of links or the shortest line in a drawing. This example supplies an ordered primary/alternative table: use R2 while its link is up, otherwise the declared alternative R3 if available. It performs no shortest-path calculation, route discovery or congestion measurement.",
+          "vi": "Tuyến được chọn phụ thuộc thông tin và chính sách định tuyến, không nhất thiết là ít liên kết nhất hoặc đường ngắn nhất trên hình. Ví dụ cho bảng chính/thay thế có thứ tự: dùng R2 khi liên kết hoạt động, nếu không thì dùng R3 đã khai báo nếu khả dụng. Ví dụ không tính đường ngắn nhất, tìm tuyến mới hay đo tắc nghẽn."
+        }
+      ],
+      "sourceIds": [
+        "book-routing",
+        "s25-qp33",
+        "s25-ms33"
+      ]
+    },
+    {
+      "id": "failure-and-hop-limit",
+      "title": {
+        "en": "Stop when the forwarding evidence stops",
+        "vi": "Dừng khi không còn căn cứ chuyển tiếp"
+      },
+      "paragraphs": [
+        {
+          "en": "A failed link can be bypassed only if usable routing information supplies another path. In the successful variant, p1 has already crossed R1–R2 when that link fails, so it can still continue from R2 to Destination. Later packets use R1’s supplied alternative via R3. In the second variant, the R1 table has no alternative: the visual stops and explains the missing route instead of pretending that topology alone authorises forwarding.",
+          "vi": "Chỉ có thể tránh liên kết hỏng nếu thông tin định tuyến dùng được cung cấp đường khác. Ở nhánh thành công, p1 đã qua R1–R2 trước khi liên kết đó hỏng nên vẫn đi tiếp từ R2 đến Destination. Packet sau dùng phương án R3 đã cho trong bảng R1. Ở nhánh thứ hai, bảng R1 không có thay thế: visual dừng và giải thích thiếu tuyến thay vì coi riêng sơ đồ kết nối là đủ căn cứ chuyển tiếp."
+        },
+        {
+          "en": "Networks also need a way to prevent endless forwarding loops. A hop allowance is reduced as a packet passes through forwarding routers; once exhausted, the packet is discarded rather than forwarded indefinitely. This is a forwarding limit, not a promise that the packet will arrive within that many seconds. The bounded visual has no loop and does not animate hop-counter arithmetic.",
+          "vi": "Mạng còn cần cách ngăn vòng lặp chuyển tiếp vô hạn. Số lần chuyển tiếp cho phép giảm khi packet qua các router chuyển tiếp; khi hết, packet bị loại thay vì tiếp tục mãi. Đây là giới hạn chuyển tiếp, không phải cam kết packet sẽ đến trong từng ấy giây. Visual hữu hạn này không có vòng lặp và không hoạt họa phép tính bộ đếm hop."
+        }
+      ],
+      "sourceIds": [
+        "book-routing",
+        "s25-ms33"
+      ]
+    },
+    {
+      "id": "arrival-versus-message-order",
+      "title": {
+        "en": "The receiving set and the receiving order differ",
+        "vi": "Tập đã nhận khác với thứ tự nhận"
+      },
+      "paragraphs": [
+        {
+          "en": "In the worked schedule, p2 arrives first, then p1, then p3. Keep an arrival list to describe what happened and use the original order labels to reconstruct NET + WO + RK. The buffer holds data until the required set is complete. After only p2 and p1, the message is still incomplete even though those two can be put in the right relative order.",
+          "vi": "Trong lịch ví dụ, p2 đến trước, rồi p1, rồi p3. Giữ danh sách thứ tự đến để mô tả sự kiện và dùng nhãn thứ tự gốc để ghép NET + WO + RK. Bộ đệm giữ dữ liệu đến khi tập bắt buộc đầy đủ. Chỉ có p2 và p1 thì thông điệp vẫn thiếu dù đã có thể xếp đúng thứ tự tương đối của hai phần đó."
+        },
+        {
+          "en": "Packet switching alone does not guarantee recovery from loss. When reliable transport such as TCP is used, missing or corrupted data can trigger recovery and retransmission; permanent failure can still prevent completion. This successful trace schedules no corruption or retransmission. Do not silently replace missing content with an empty string or declare success because the last scheduled packet arrived.",
+          "vi": "Riêng packet switching không bảo đảm khôi phục khi mất dữ liệu. Khi dùng giao vận tin cậy như TCP, dữ liệu thiếu hoặc hỏng có thể dẫn tới khôi phục và truyền lại; lỗi kéo dài vẫn có thể ngăn hoàn tất. Hành trình thành công này không có hỏng dữ liệu hay truyền lại. Không âm thầm thay nội dung thiếu bằng chuỗi rỗng hoặc tuyên bố thành công chỉ vì packet cuối trong lịch đã đến."
+        }
+      ],
+      "sourceIds": [
+        "book-packets",
+        "tcp-standard"
+      ]
+    },
+    {
+      "id": "router-answer-method",
+      "title": {
+        "en": "Match the answer to the requested scale",
+        "vi": "Trả lời đúng mức độ đề yêu cầu"
+      },
+      "paragraphs": [
+        {
+          "en": "For a router-function question, focus on destination address → routing table → next hop → forwarding, adding the hop limit if relevant. For a whole-message question, start with splitting/addressing, explain repeated forwarding across the network, and finish with complete, correctly ordered reconstruction. A list of TCP/IP layer names is not a substitute for either explanation.",
+          "vi": "Nếu hỏi chức năng router, tập trung địa chỉ đích → bảng định tuyến → next hop → chuyển tiếp, thêm giới hạn hop khi phù hợp. Nếu hỏi toàn thông điệp, bắt đầu chia nhỏ/đánh địa chỉ, giải thích chuyển tiếp lặp qua mạng và kết thúc bằng khôi phục đủ, đúng thứ tự. Liệt kê tên các tầng TCP/IP không thay thế được hai cách giải thích này."
+        },
+        {
+          "en": "May/June 2025 Paper 33 question 4(b) is a checked example of router-function wording; May/June 2022 Paper 31 question 3 asks about transmission mechanisms. The small topology here is a new teaching example. Use only its stated links and tables, and distinguish a conditional capability to reroute from guaranteed delivery.",
+          "vi": "May/June 2025 Paper 33 câu 4(b) là ví dụ đã kiểm tra về cách hỏi chức năng router; May/June 2022 Paper 31 câu 3 hỏi cơ chế truyền. Sơ đồ nhỏ ở đây là ví dụ học tập mới. Chỉ dùng liên kết và bảng đã nêu, phân biệt khả năng đổi tuyến có điều kiện với bảo đảm đến đích."
+        }
+      ],
+      "sourceIds": [
+        "s25-qp33",
+        "s22-qp31"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "packet-routing",
+    "title": {
+      "en": "Read, look up and forward",
+      "vi": "Đọc, tra bảng và chuyển tiếp"
+    },
+    "introduction": {
+      "en": "Trace three labelled packets through R1 and its supplied routes. Inspect the table row as well as the highlighted link.",
+      "vi": "Theo dõi ba packet có nhãn qua R1 và các tuyến đã cho. Xem cả dòng bảng lẫn liên kết được tô sáng."
+    },
+    "task": {
+      "en": "Predict the next hop from the destination and table. When the link fails, check whether an explicit alternative exists before forwarding. Reconstruct only after all three identities arrive.",
+      "vi": "Dự đoán next hop từ đích và bảng. Khi liên kết hỏng, kiểm tra có phương án thay thế rõ ràng trước khi chuyển tiếp. Chỉ khôi phục sau khi đủ ba định danh."
+    },
+    "conventions": [
+      {
+        "en": "Source and Destination label the end hosts; R1–R3 are routers. These are schematic identities, not literal IP-address strings.",
+        "vi": "Source và Destination là hai host đầu cuối; R1–R3 là router. Đây là định danh minh họa, không phải chuỗi địa chỉ IP thực."
+      },
+      {
+        "en": "p1=NET, p2=WO, p3=RK. Their order labels describe message reconstruction, not a byte-level IP header.",
+        "vi": "p1=NET, p2=WO, p3=RK. Nhãn thứ tự mô tả khôi phục thông điệp, không phải IP header cấp byte."
+      },
+      {
+        "en": "The reroute variant declares an R1 primary via R2 and alternative via R3. Only R1–R2 fails, after p1 crosses it; R2–Destination remains up.",
+        "vi": "Nhánh đổi tuyến khai báo tuyến chính R1 qua R2 và thay thế qua R3. Chỉ R1–R2 hỏng sau khi p1 đi qua; R2–Destination vẫn hoạt động."
+      },
+      {
+        "en": "Arrival order p2,p1,p3 is the declared teaching schedule, not a calculation of link speed or router queueing.",
+        "vi": "Thứ tự đến p2,p1,p3 là lịch học tập đã nêu, không phải phép tính tốc độ liên kết hay hàng đợi router."
+      },
+      {
+        "en": "The no-route variant omits the alternative table entry and stops at R1. No route-discovery protocol, NAT, fragmentation, loop or retransmission is simulated.",
+        "vi": "Nhánh không có tuyến bỏ dòng thay thế và dừng ở R1. Không mô phỏng giao thức tìm tuyến, NAT, phân mảnh, vòng lặp hay truyền lại."
+      }
+    ],
+    "sourceIds": [
+      "book-packets",
+      "book-routing",
+      "s25-ms33"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "A failed link after p1 has passed",
+      "vi": "Liên kết hỏng sau khi p1 đã đi qua"
+    },
+    "prompt": {
+      "en": "Split NETWORK into p1=NET, p2=WO, p3=RK. R1 has Destination→R2 as primary and Destination→R3 as alternative; R2 and R3 connect directly to Destination. Follow the stated failure and arrival schedule.",
+      "vi": "Chia NETWORK thành p1=NET, p2=WO, p3=RK. R1 có Destination→R2 là chính và Destination→R3 là thay thế; R2 và R3 nối trực tiếp đến Destination. Theo dõi lịch hỏng liên kết và đến đích đã nêu."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "split",
+        "action": {
+          "en": "Split NETWORK into p1=NET, p2=WO and p3=RK, all addressed to Destination.",
+          "vi": "Chia NETWORK thành p1=NET, p2=WO, p3=RK, cùng địa chỉ đích Destination."
+        },
+        "why": {
+          "en": "Each unit needs destination information; teaching order labels support later reconstruction.",
+          "vi": "Mỗi đơn vị cần thông tin đích; nhãn thứ tự minh họa hỗ trợ khôi phục sau đó."
+        },
+        "result": {
+          "en": "All three packets are at Source; none has arrived.",
+          "vi": "Ba packet ở Source; chưa packet nào đến đích."
+        }
+      },
+      {
+        "id": "read-destination",
+        "action": {
+          "en": "Source hands the packets to R1; inspect p1’s Destination field.",
+          "vi": "Source chuyển các packet đến R1; đọc trường Destination của p1."
+        },
+        "why": {
+          "en": "R1 selects forwarding information by destination, not by the message text NET.",
+          "vi": "R1 chọn thông tin chuyển tiếp theo đích, không theo nội dung NET."
+        },
+        "result": {
+          "en": "R1 holds p1, p2 and p3; p1 is selected for lookup.",
+          "vi": "R1 giữ p1, p2, p3; p1 được chọn để tra bảng."
+        }
+      },
+      {
+        "id": "lookup-route",
+        "action": {
+          "en": "Match Destination to R1’s primary row via R2.",
+          "vi": "Khớp Destination với dòng chính của R1 qua R2."
+        },
+        "why": {
+          "en": "A matching route must also have an available next link before forwarding.",
+          "vi": "Tuyến khớp còn phải có liên kết tiếp theo hoạt động trước khi chuyển tiếp."
+        },
+        "result": {
+          "en": "The primary row is identified; now check its link.",
+          "vi": "Đã xác định dòng chính; tiếp theo kiểm tra liên kết."
+        }
+      },
+      {
+        "id": "forward-next-hop",
+        "action": {
+          "en": "Send p1 along the available R1–R2 link.",
+          "vi": "Gửi p1 qua liên kết R1–R2 đang hoạt động."
+        },
+        "why": {
+          "en": "The chosen next hop is adjacent and matches the supplied primary row.",
+          "vi": "Next hop đã chọn nằm kề và khớp dòng chính đã cho."
+        },
+        "result": {
+          "en": "p1 is at R2; its final destination is still Destination.",
+          "vi": "p1 ở R2; địa chỉ đích cuối vẫn là Destination."
+        }
+      },
+      {
+        "id": "link-unavailable",
+        "action": {
+          "en": "Mark R1–R2 unavailable after p1 has already crossed it.",
+          "vi": "Đánh dấu R1–R2 không hoạt động sau khi p1 đã đi qua."
+        },
+        "why": {
+          "en": "p2 and p3 need another usable next hop; p1 can still use R2–Destination.",
+          "vi": "p2, p3 cần next hop khác dùng được; p1 vẫn có thể dùng R2–Destination."
+        },
+        "result": {
+          "en": "Only R1–R2 is down. R1’s declared alternative via R3 remains available.",
+          "vi": "Chỉ R1–R2 hỏng. Phương án đã khai báo của R1 qua R3 vẫn hoạt động."
+        }
+      },
+      {
+        "id": "route-p2",
+        "action": {
+          "en": "Read p2’s Destination field and use R1’s available alternative row via R3.",
+          "vi": "Đọc trường Destination của p2 và dùng dòng thay thế còn hoạt động của R1 qua R3."
+        },
+        "why": {
+          "en": "The primary link is down; the explicit second row supplies the next hop.",
+          "vi": "Liên kết chính hỏng; dòng thứ hai được nêu rõ cung cấp next hop."
+        },
+        "result": {
+          "en": "p2 reaches R3 with the same final destination.",
+          "vi": "p2 tới R3 và vẫn giữ cùng đích cuối."
+        }
+      },
+      {
+        "id": "arrive-p2",
+        "action": {
+          "en": "R3 matches Destination to its direct row and forwards p2 to the receiver.",
+          "vi": "R3 khớp Destination với dòng trực tiếp rồi chuyển p2 đến bên nhận."
+        },
+        "why": {
+          "en": "This trace schedules this arrival next; it does not calculate network time or promise a fastest route.",
+          "vi": "Hành trình định sẵn lần đến này tiếp theo; không tính thời gian mạng hay cam kết tuyến nhanh nhất."
+        },
+        "result": {
+          "en": "Arrival buffer: p2. Keep payloads associated with their original order labels.",
+          "vi": "Bộ đệm theo thứ tự đến: p2. Giữ payload gắn với nhãn thứ tự ban đầu."
+        }
+      },
+      {
+        "id": "arrive-p1",
+        "action": {
+          "en": "R2 matches Destination to its direct row and forwards p1 to the receiver.",
+          "vi": "R2 khớp Destination với dòng trực tiếp rồi chuyển p1 đến bên nhận."
+        },
+        "why": {
+          "en": "This trace schedules this arrival next; it does not calculate network time or promise a fastest route.",
+          "vi": "Hành trình định sẵn lần đến này tiếp theo; không tính thời gian mạng hay cam kết tuyến nhanh nhất."
+        },
+        "result": {
+          "en": "Arrival buffer: p2, p1. Keep payloads associated with their original order labels.",
+          "vi": "Bộ đệm theo thứ tự đến: p2, p1. Giữ payload gắn với nhãn thứ tự ban đầu."
+        }
+      },
+      {
+        "id": "route-p3",
+        "action": {
+          "en": "Read p3’s Destination field and use R1’s available alternative row via R3.",
+          "vi": "Đọc trường Destination của p3 và dùng dòng thay thế còn hoạt động của R1 qua R3."
+        },
+        "why": {
+          "en": "The primary link is down; the explicit second row supplies the next hop.",
+          "vi": "Liên kết chính hỏng; dòng thứ hai được nêu rõ cung cấp next hop."
+        },
+        "result": {
+          "en": "p3 reaches R3 with the same final destination.",
+          "vi": "p3 tới R3 và vẫn giữ cùng đích cuối."
+        }
+      },
+      {
+        "id": "arrive-p3",
+        "action": {
+          "en": "R3 matches Destination to its direct row and forwards p3 to the receiver.",
+          "vi": "R3 khớp Destination với dòng trực tiếp rồi chuyển p3 đến bên nhận."
+        },
+        "why": {
+          "en": "This trace schedules this arrival next; it does not calculate network time or promise a fastest route.",
+          "vi": "Hành trình định sẵn lần đến này tiếp theo; không tính thời gian mạng hay cam kết tuyến nhanh nhất."
+        },
+        "result": {
+          "en": "Arrival buffer: p2, p1, p3. Keep payloads associated with their original order labels.",
+          "vi": "Bộ đệm theo thứ tự đến: p2, p1, p3. Giữ payload gắn với nhãn thứ tự ban đầu."
+        }
+      },
+      {
+        "id": "reassemble",
+        "action": {
+          "en": "Check p1, p2 and p3 are all present, then join NET + WO + RK.",
+          "vi": "Kiểm tra đã đủ p1, p2, p3 rồi ghép NET + WO + RK."
+        },
+        "why": {
+          "en": "Arrival order p2, p1, p3 must not become application-message order.",
+          "vi": "Không được dùng thứ tự đến p2, p1, p3 làm thứ tự thông điệp ứng dụng."
+        },
+        "result": {
+          "en": "The complete message is NETWORK. Receiver ordering is a higher-layer service, not a guarantee supplied by IP alone.",
+          "vi": "Thông điệp đầy đủ là NETWORK. Sắp thứ tự ở bên nhận là dịch vụ tầng cao hơn, không phải bảo đảm do riêng IP cung cấp."
+        }
+      }
+    ],
+    "result": {
+      "en": "Arrival order is p2,p1,p3; reconstruction order is p1,p2,p3, producing NETWORK. The final destination and each payload remain unchanged.",
+      "vi": "Thứ tự đến là p2,p1,p3; thứ tự khôi phục là p1,p2,p3, tạo NETWORK. Đích cuối và payload từng packet không đổi."
+    },
+    "selfCheck": {
+      "en": "At every forward, identify the router, destination, matching row, available next link and changed packet location. Then distinguish arrival list from complete ordered message.",
+      "vi": "Mỗi lần chuyển tiếp, xác định router, đích, dòng khớp, liên kết tiếp theo khả dụng và vị trí packet đã đổi. Sau đó phân biệt danh sách đến với thông điệp đầy đủ đã sắp đúng."
+    },
+    "sourceIds": [
+      "book-routing",
+      "s25-ms33"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "“Destination address”, “routing table”, “next hop” and router diagrams call for a forwarding trace.",
+        "vi": "“Địa chỉ đích”, “bảng định tuyến”, “next hop” và sơ đồ router yêu cầu truy vết chuyển tiếp."
+      },
+      {
+        "en": "“Reassemble”, “arrive out of order” and “missing packet” call for receiver completeness/order checks.",
+        "vi": "“Ghép lại”, “đến sai thứ tự” và “thiếu packet” yêu cầu kiểm tra đủ/thứ tự bên nhận."
+      },
+      {
+        "en": "A failed link changes usable choices, but does not itself supply new table entries.",
+        "vi": "Liên kết hỏng thay đổi lựa chọn dùng được nhưng không tự cung cấp dòng bảng mới."
+      }
+    ],
+    "distinguish": {
+      "en": "This topic expands the network part of the TCP/IP journey. It is not Application-protocol selection, BitTorrent peer discovery or a full route-finding algorithm.",
+      "vi": "Chủ đề mở rộng đoạn qua mạng trong hành trình TCP/IP. Không phải chọn giao thức Application, tìm peer BitTorrent hay thuật toán tìm đường đầy đủ."
+    },
+    "method": [
+      {
+        "en": "Keep source, final destination, packet identity and payload visible.",
+        "vi": "Giữ rõ nguồn, đích cuối, định danh packet và payload."
+      },
+      {
+        "en": "Read destination, match the supplied table, check availability, then forward one hop.",
+        "vi": "Đọc đích, khớp bảng đã cho, kiểm tra khả dụng rồi chuyển một hop."
+      },
+      {
+        "en": "Record actual arrival order separately from message order.",
+        "vi": "Ghi thứ tự đến thực tế riêng với thứ tự thông điệp."
+      },
+      {
+        "en": "Stop on an unsupported route or incomplete required packet set.",
+        "vi": "Dừng khi tuyến không có căn cứ hoặc tập packet bắt buộc chưa đủ."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Every packet takes a different or geometrically shortest route.",
+        "vi": "Mọi packet đi tuyến khác nhau hoặc tuyến ngắn nhất trên hình."
+      },
+      "correction": {
+        "en": "Routes can coincide; routers use available routing information and policy.",
+        "vi": "Các tuyến có thể trùng; router dùng thông tin và chính sách định tuyến khả dụng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "The next router replaces the final IP destination.",
+        "vi": "Router tiếp theo thay thế đích IP cuối."
+      },
+      "correction": {
+        "en": "Next-hop forwarding is local; the final destination remains the end host in this model.",
+        "vi": "Chuyển tiếp next hop mang tính cục bộ; đích cuối vẫn là host đầu cuối trong mô hình."
+      }
+    },
+    {
+      "mistake": {
+        "en": "IP guarantees ordered reconstruction of application messages.",
+        "vi": "IP bảo đảm khôi phục thông điệp ứng dụng đúng thứ tự."
+      },
+      "correction": {
+        "en": "Ordering and recovery need suitable higher-layer handling; labels here are teaching metadata.",
+        "vi": "Sắp thứ tự và khôi phục cần xử lý tầng cao phù hợp; nhãn ở đây là metadata minh họa."
+      }
+    },
+    {
+      "mistake": {
+        "en": "If one link fails, every already-forwarded packet must be lost.",
+        "vi": "Một liên kết hỏng thì mọi packet đã chuyển trước đó đều mất."
+      },
+      "correction": {
+        "en": "Check location: p1 has already passed the failed link and still has a working onward link.",
+        "vi": "Kiểm tra vị trí: p1 đã qua liên kết hỏng và vẫn có liên kết tiếp theo hoạt động."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "next-hop-lookup",
+      "prompt": {
+        "en": "R1 reads destination D. Its table maps D to R2 on an available link. What justifies forwarding to R2?",
+        "vi": "R1 đọc đích D. Bảng ánh xạ D tới R2 qua liên kết hoạt động. Điều gì giải thích chuyển tới R2?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The payload happens to contain the letters R2",
+            "vi": "Payload tình cờ chứa chữ R2"
+          },
+          "feedback": {
+            "en": "Router forwarding uses destination/routing information, not arbitrary payload text.",
+            "vi": "Router dùng thông tin đích/định tuyến, không dùng chữ tùy ý trong payload."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A matching usable table entry selects that next hop",
+            "vi": "Dòng bảng khớp và dùng được chọn next hop đó"
+          },
+          "feedback": {
+            "en": "Correct: destination lookup plus availability is the evidence.",
+            "vi": "Đúng: tra cứu đích kèm khả dụng là căn cứ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "R2 is drawn closest on the page",
+            "vi": "R2 được vẽ gần nhất trên trang"
+          },
+          "feedback": {
+            "en": "Diagram geometry is not a declared routing metric.",
+            "vi": "Vị trí hình học không phải thước đo định tuyến đã khai báo."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Explain the table-based decision, not merely an arrow direction.",
+        "vi": "Giải thích quyết định dựa bảng, không chỉ hướng mũi tên."
+      }
+    },
+    {
+      "id": "out-of-order",
+      "prompt": {
+        "en": "The arrival buffer is p2=WO, p1=NET, p3=RK. What is the complete original message?",
+        "vi": "Bộ đệm đến là p2=WO, p1=NET, p3=RK. Thông điệp gốc đầy đủ là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "WONETRK",
+            "vi": "WONETRK"
+          },
+          "feedback": {
+            "en": "That uses arrival order rather than original order.",
+            "vi": "Đó là dùng thứ tự đến thay vì thứ tự gốc."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "NETWORK",
+            "vi": "NETWORK"
+          },
+          "feedback": {
+            "en": "Correct: reorder by p1,p2,p3, then join the payloads.",
+            "vi": "Đúng: sắp theo p1,p2,p3 rồi ghép payload."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "NETRK",
+            "vi": "NETRK"
+          },
+          "feedback": {
+            "en": "This omits p2 instead of including all required data.",
+            "vi": "Đáp án bỏ p2 thay vì dùng đủ dữ liệu bắt buộc."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Completeness and ordering are both necessary in this message reconstruction.",
+        "vi": "Tính đầy đủ và thứ tự đều cần thiết khi khôi phục thông điệp này."
+      }
+    },
+    {
+      "id": "missing-packet",
+      "prompt": {
+        "en": "Only p1 and p3 arrived. Which action is correct for this complete-message task?",
+        "vi": "Chỉ p1 và p3 đã đến. Hành động nào đúng với tác vụ khôi phục thông điệp đầy đủ?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Declare complete because the highest label p3 arrived",
+            "vi": "Tuyên bố đầy đủ vì nhãn lớn nhất p3 đã đến"
+          },
+          "feedback": {
+            "en": "A final label does not prove earlier labels arrived.",
+            "vi": "Nhãn cuối không chứng minh các nhãn trước đã đến."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Keep the result incomplete and identify p2 as missing",
+            "vi": "Giữ kết quả chưa đầy đủ và xác định p2 còn thiếu"
+          },
+          "feedback": {
+            "en": "Correct: further recovery depends on the transport/application used.",
+            "vi": "Đúng: xử lý khôi phục tiếp tùy giao vận/ứng dụng đang dùng."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Copy p1 into p2 without requesting data",
+            "vi": "Sao chép p1 thành p2 không cần yêu cầu dữ liệu"
+          },
+          "feedback": {
+            "en": "That invents incorrect payload.",
+            "vi": "Điều đó tạo payload sai."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Never equate the end of an observed schedule with successful message completion.",
+        "vi": "Không coi hết lịch quan sát là thông điệp đã hoàn tất."
+      }
+    },
+    {
+      "id": "route-failure-transfer",
+      "prompt": {
+        "en": "p1 is already at R2 when R1–R2 fails. R2–Destination is still up. What can be concluded?",
+        "vi": "p1 đã ở R2 khi R1–R2 hỏng. R2–Destination vẫn hoạt động. Kết luận nào đúng?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "p1 must return to Source",
+            "vi": "p1 bắt buộc quay về Source"
+          },
+          "feedback": {
+            "en": "No stated rule requires returning over the failed link.",
+            "vi": "Không quy tắc đã nêu nào yêu cầu quay lại liên kết hỏng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "p1 can continue using R2’s usable direct route",
+            "vi": "p1 có thể tiếp tục qua tuyến trực tiếp dùng được của R2"
+          },
+          "feedback": {
+            "en": "Correct: location and the remaining path matter.",
+            "vi": "Đúng: vị trí và đường còn lại mới là yếu tố cần xét."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Every packet is guaranteed delivery forever",
+            "vi": "Mọi packet được bảo đảm đến đích mãi mãi"
+          },
+          "feedback": {
+            "en": "One usable hop is not an unlimited delivery guarantee.",
+            "vi": "Một hop dùng được không phải bảo đảm đến đích vô hạn."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Separate packets before the failed link from packets already beyond it.",
+        "vi": "Phân biệt packet còn trước liên kết hỏng với packet đã đi qua."
+      }
+    },
+    {
+      "id": "no-route",
+      "prompt": {
+        "en": "R1’s only row for D uses a down link to R2. A drawing includes R3, but there is no alternative row. What should this model do?",
+        "vi": "Dòng duy nhất của R1 tới D dùng liên kết hỏng đến R2. Hình có R3 nhưng không có dòng thay thế. Mô hình nên làm gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Invent a route through R3 because it looks convenient",
+            "vi": "Tự tạo tuyến qua R3 vì trông thuận tiện"
+          },
+          "feedback": {
+            "en": "Topology alone is not the model’s supplied forwarding policy.",
+            "vi": "Chỉ topology chưa phải chính sách chuyển tiếp được cho."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Stop and explain that no usable supplied route exists",
+            "vi": "Dừng và giải thích không có tuyến đã cho dùng được"
+          },
+          "feedback": {
+            "en": "Correct: the visual must expose its evidence limit.",
+            "vi": "Đúng: visual cần thể hiện giới hạn căn cứ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Remove the destination address",
+            "vi": "Xóa địa chỉ đích"
+          },
+          "feedback": {
+            "en": "Removing addressing does not create a route.",
+            "vi": "Bỏ địa chỉ không tạo ra tuyến."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "A real network may learn new routes; this bounded table example does not simulate that process.",
+        "vi": "Mạng thật có thể học tuyến mới; ví dụ bảng hữu hạn này không mô phỏng quá trình đó."
+      }
+    },
+    {
+      "id": "hop-limit-purpose",
+      "prompt": {
+        "en": "What is the purpose of reducing a packet’s hop allowance at forwarding routers?",
+        "vi": "Mục đích giảm số hop cho phép của packet ở router chuyển tiếp là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Prevent indefinite circulation if routing loops occur",
+            "vi": "Ngăn lưu chuyển vô hạn nếu xảy ra vòng lặp định tuyến"
+          },
+          "feedback": {
+            "en": "Correct: an exhausted allowance stops continued forwarding.",
+            "vi": "Đúng: hết giới hạn thì dừng chuyển tiếp tiếp tục."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Guarantee arrival in a fixed number of seconds",
+            "vi": "Bảo đảm đến trong số giây cố định"
+          },
+          "feedback": {
+            "en": "A hop allowance is not a timer for guaranteed delivery.",
+            "vi": "Giới hạn hop không phải đồng hồ bảo đảm đến đích."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Sort all payload into application order",
+            "vi": "Xếp mọi payload theo thứ tự ứng dụng"
+          },
+          "feedback": {
+            "en": "Hop control does not perform application reassembly.",
+            "vi": "Điều khiển hop không ghép lại thông điệp ứng dụng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Distinguish a bounded forwarding lifetime from routing choice and receiver ordering.",
+        "vi": "Phân biệt thời gian tồn tại chuyển tiếp hữu hạn với chọn tuyến và sắp thứ tự bên nhận."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Describe both a single router decision and the complete packet-switched message journey.",
+      "vi": "Mô tả cả quyết định của một router và hành trình thông điệp packet switching đầy đủ."
+    },
+    "answerPoints": [
+      {
+        "en": "Split data, attach destination/control information and send packets.",
+        "vi": "Chia dữ liệu, gắn thông tin đích/điều khiển và gửi packet."
+      },
+      {
+        "en": "At each router, inspect destination, use routing information, check the next link and forward.",
+        "vi": "Tại mỗi router, đọc đích, dùng thông tin định tuyến, kiểm tra liên kết tiếp rồi chuyển tiếp."
+      },
+      {
+        "en": "Packets can follow different routes and arrive out of order; suitable receiver handling reconstructs complete data.",
+        "vi": "Packet có thể đi khác tuyến và đến sai thứ tự; xử lý bên nhận phù hợp khôi phục dữ liệu đầy đủ."
+      },
+      {
+        "en": "An unavailable route, missing data or exhausted hop allowance needs explicit handling, not an assumed success.",
+        "vi": "Không có tuyến, thiếu dữ liệu hoặc hết giới hạn hop cần xử lý rõ, không giả định thành công."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Destination → table → usable next hop → forwarding.",
+      "vi": "Đích → bảng → next hop dùng được → chuyển tiếp."
+    },
+    {
+      "en": "A route change is conditional on information and availability.",
+      "vi": "Đổi tuyến phụ thuộc thông tin và tính khả dụng."
+    },
+    {
+      "en": "Arrival order is an observation; message order is a reconstruction requirement.",
+      "vi": "Thứ tự đến là sự kiện quan sát; thứ tự thông điệp là yêu cầu khôi phục."
+    }
+  ],
+  "relatedSlugs": [
+    "tcp-ip-stack-and-message-journey",
+    "choosing-a-switching-method",
+    "bittorrent-and-peer-to-peer-transfer"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 33, section 14.2 Circuit switching, packet switching",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-packets",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed pages 339–340 (PDF pages 355–356): packet transmission and reassembly",
+      "kind": "book"
+    },
+    {
+      "id": "book-routing",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed pages 341–343 (PDF pages 357–359): routing tables, routers and network journey",
+      "kind": "book"
+    },
+    {
+      "id": "s25-qp33",
+      "title": "Cambridge 9618/33 — May/June 2025 question paper",
+      "locator": "Question 4(a)–(b), page 6",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-ms33",
+      "title": "Cambridge 9618/33 — May/June 2025 mark scheme",
+      "locator": "Question 4(a)–(b), page 9",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s22-qp31",
+      "title": "Cambridge 9618/31 — May/June 2022 question paper",
+      "locator": "Question 3, page 6",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s22-ms31",
+      "title": "Cambridge 9618/31 — May/June 2022 mark scheme",
+      "locator": "Question 3, page 5",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "tcp-standard",
+      "title": "IETF RFC 9293 — Transmission Control Protocol",
+      "locator": "Section 2.2: ordering and reliable transport; distinction from IP packet forwarding",
+      "kind": "guide",
+      "url": "https://www.rfc-editor.org/rfc/rfc9293.html#section-2.2"
+    }
+  ]
+}

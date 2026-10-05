@@ -1,0 +1,692 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.16.1",
+  "topicId": "P3-16.1-T04",
+  "slug": "paging-segmentation-and-virtual-memory",
+  "estimatedMinutes": 45,
+  "title": {
+    "en": "Paging, segmentation and virtual memory",
+    "vi": "Phân trang, phân đoạn và bộ nhớ ảo"
+  },
+  "question": {
+    "en": "How does a logical address locate data that may not yet be in RAM?",
+    "vi": "Địa chỉ logic xác định dữ liệu có thể chưa ở RAM bằng cách nào?"
+  },
+  "opening": {
+    "en": "An address used by a program is not necessarily the physical location of its data. Memory management translates addresses, checks valid access and brings needed data into RAM. Trace those responsibilities separately: a missing page and an out-of-bounds segment offset require different responses.",
+    "vi": "Địa chỉ chương trình dùng không nhất thiết là vị trí vật lý của dữ liệu. Quản lý bộ nhớ dịch địa chỉ, kiểm tra truy cập hợp lệ và đưa dữ liệu cần thiết vào RAM. Hãy trace riêng các trách nhiệm này: thiếu trang và offset vượt giới hạn đoạn cần phản ứng khác nhau."
+  },
+  "objectives": [
+    {
+      "en": "Calculate page/offset and frame/offset addresses with a page table.",
+      "vi": "Tính địa chỉ trang/offset và khung/offset bằng bảng trang."
+    },
+    {
+      "en": "Check a segment limit before adding its base address.",
+      "vi": "Kiểm tra giới hạn đoạn trước khi cộng địa chỉ nền."
+    },
+    {
+      "en": "Explain a page fault and finite virtual memory without confusing either with a virtual machine.",
+      "vi": "Giải thích page fault và bộ nhớ ảo hữu hạn, không nhầm với máy ảo."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Use integer quotient and remainder; distinguish RAM from secondary storage.",
+      "vi": "Dùng thương nguyên và số dư; phân biệt RAM với bộ nhớ thứ cấp."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Page / frame",
+      "meaning": {
+        "en": "A fixed-size unit of logical memory / a same-size slot in physical RAM.",
+        "vi": "Đơn vị bộ nhớ logic kích thước cố định / một ô cùng kích thước trong RAM vật lý."
+      }
+    },
+    {
+      "term": "Offset",
+      "meaning": {
+        "en": "The distance from the beginning of a page or segment, not the size of that region.",
+        "vi": "Khoảng cách từ đầu trang hoặc đoạn, không phải kích thước vùng đó."
+      }
+    },
+    {
+      "term": "Page fault",
+      "meaning": {
+        "en": "An access requires a page that is not currently resident in RAM.",
+        "vi": "Một truy cập cần trang hiện chưa nằm trong RAM."
+      }
+    },
+    {
+      "term": "Segment",
+      "meaning": {
+        "en": "A variable-sized logical region, such as code or data, described by a base and limit.",
+        "vi": "Vùng logic kích thước thay đổi, như mã hoặc dữ liệu, được mô tả bằng nền và giới hạn."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "page-and-frame",
+      "title": {
+        "en": "Split an address before consulting the page table",
+        "vi": "Tách địa chỉ trước khi tra bảng trang"
+      },
+      "paragraphs": [
+        {
+          "en": "Paging divides logical memory into fixed-sized pages and RAM into equally sized frames. A page can occupy a frame that is not adjacent to the frame of the next logical page. The page table records the mapping and whether a page is resident. The program can therefore use consecutive logical addresses without requiring one consecutive physical allocation.",
+          "vi": "Phân trang chia bộ nhớ logic thành trang cố định và RAM thành khung cùng kích thước. Một trang có thể nằm trong khung không kề khung của trang logic tiếp theo. Bảng trang ghi ánh xạ và việc trang có đang ở RAM không. Vì vậy chương trình dùng địa chỉ logic liên tiếp mà không cần được cấp một vùng vật lý liên tiếp."
+        },
+        {
+          "en": "For page size S and non-negative logical address A, page=A DIV S and offset=A MOD S. If that page is present in frame F, physical address=F×S+offset. The offset is preserved; the page number is replaced by a frame number. With S=16 and A=35, page=2 and offset=3. Page 2 in frame 5 gives 5×16+3=83.",
+          "vi": "Với kích thước trang S và địa chỉ logic A không âm, trang=A DIV S và offset=A MOD S. Nếu trang nằm trong khung F, địa chỉ vật lý=F×S+offset. Offset được giữ; số trang được thay bằng số khung. Với S=16 và A=35, trang=2 và offset=3. Trang 2 ở khung 5 cho 5×16+3=83."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "segment-base-limit",
+      "title": {
+        "en": "Check the segment, then form its physical address",
+        "vi": "Kiểm tra đoạn rồi tạo địa chỉ vật lý"
+      },
+      "paragraphs": [
+        {
+          "en": "Segmentation groups memory by logical purpose in variable-sized regions. A logical address contains a segment identifier and an offset. The identifier indexes a table entry containing a base address and a limit. In this lesson the limit is the number of addressable locations, so valid offsets satisfy 0≤offset<limit. Only after that check does base+offset give a physical address.",
+          "vi": "Phân đoạn nhóm bộ nhớ theo mục đích logic thành các vùng có kích thước thay đổi. Địa chỉ logic gồm mã đoạn và offset. Mã đoạn dùng tra mục bảng chứa địa chỉ nền và giới hạn. Trong bài này, giới hạn là số vị trí có thể định địa chỉ nên offset hợp lệ thỏa 0≤offset<limit. Chỉ sau kiểm tra đó mới dùng nền+offset để tạo địa chỉ vật lý."
+        },
+        {
+          "en": "Segment 1 has base 300 and limit 12. Offset 7 gives 307; offset 12 is rejected because the last valid offset is 11. Do not calculate segment number+offset or use the offset as the segment’s length. A bounds failure is a protection/addressing error, not a request to fetch a missing page.",
+          "vi": "Đoạn 1 có nền 300 và giới hạn 12. Offset 7 cho 307; offset 12 bị từ chối vì offset cuối hợp lệ là 11. Không tính số đoạn+offset hoặc xem offset là chiều dài đoạn. Vượt giới hạn là lỗi bảo vệ/địa chỉ, không phải yêu cầu nạp một trang còn thiếu."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "w24-31-qp",
+        "w24-31-ms"
+      ]
+    },
+    {
+      "id": "virtual-memory",
+      "title": {
+        "en": "Use backing storage without pretending it is RAM",
+        "vi": "Dùng bộ nhớ hỗ trợ mà không coi nó là RAM"
+      },
+      "paragraphs": [
+        {
+          "en": "Virtual memory allows parts of a program’s address space to remain on secondary storage while currently needed pages reside in RAM. It can support a program or collection of programs whose total mapped memory exceeds immediately available RAM. RAM and backing-store capacity are finite; moving pages takes time. A larger virtual address space does not give unlimited fast memory.",
+          "vi": "Bộ nhớ ảo cho phép một phần không gian địa chỉ chương trình nằm trên bộ nhớ thứ cấp trong khi các trang đang cần nằm trong RAM. Nó có thể hỗ trợ một hoặc nhiều chương trình có tổng bộ nhớ được ánh xạ vượt RAM hiện có. RAM và dung lượng hỗ trợ đều hữu hạn; chuyển trang mất thời gian. Không gian địa chỉ ảo lớn hơn không tạo bộ nhớ nhanh vô hạn."
+        },
+        {
+          "en": "On a valid access to a non-resident page, the OS handles a page fault: locate the page in backing storage, obtain a frame, load the page, update mapping/presence information and retry the interrupted access. A free frame avoids eviction. If no suitable free frame exists, a replacement policy chooses a victim; a modified victim may need writing back. A page fault is normally recoverable, unlike an invalid address.",
+          "vi": "Khi truy cập hợp lệ tới trang chưa ở RAM, hệ điều hành xử lý page fault: tìm trang trong bộ nhớ hỗ trợ, lấy khung, nạp trang, cập nhật ánh xạ/trạng thái hiện diện và thử lại truy cập bị ngắt. Có khung trống thì không cần đẩy trang khác ra. Nếu không có khung trống phù hợp, chính sách thay thế chọn trang bị loại; trang đã sửa có thể cần ghi lại. Page fault thường khôi phục được, khác với địa chỉ không hợp lệ."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "w23-32-qp",
+        "w23-32-ms"
+      ]
+    },
+    {
+      "id": "compare-organisations",
+      "title": {
+        "en": "Compare allocation and fragmentation carefully",
+        "vi": "So sánh cấp phát và phân mảnh cẩn thận"
+      },
+      "paragraphs": [
+        {
+          "en": "Equal-sized paging frames simplify finding space and avoid external fragmentation between allocated frames; unused space within the final page can cause internal fragmentation. Variable-sized segments match logical units and can support separate protection, but allocating and freeing different-sized regions can leave external gaps. Neither method removes the need for translation information and protection checks.",
+          "vi": "Các khung phân trang bằng nhau đơn giản hóa tìm chỗ trống và tránh phân mảnh ngoài giữa các khung đã cấp; phần không dùng trong trang cuối có thể gây phân mảnh trong. Đoạn có kích thước thay đổi phù hợp đơn vị logic và có thể có bảo vệ riêng, nhưng cấp/thu hồi các vùng khác kích thước có thể để lại khoảng trống bên ngoài. Không cách nào loại bỏ nhu cầu thông tin dịch địa chỉ và kiểm tra bảo vệ."
+        },
+        {
+          "en": "Virtual memory is a memory-management abstraction. A virtual machine is a software-managed execution environment that presents virtual hardware to a guest system. Both may occur on one computer, but adding a guest operating system is not a step in servicing a page fault.",
+          "vi": "Bộ nhớ ảo là sự trừu tượng hóa quản lý bộ nhớ. Máy ảo là môi trường thực thi do phần mềm quản lý, cung cấp phần cứng ảo cho hệ thống khách. Cả hai có thể cùng tồn tại trên một máy tính, nhưng thêm hệ điều hành khách không phải bước xử lý page fault."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "memory-addressing",
+    "title": {
+      "en": "Follow translation and fault recovery",
+      "vi": "Theo dõi dịch địa chỉ và khôi phục page fault"
+    },
+    "introduction": {
+      "en": "The logical address, lookup entry, resident status and physical result update together. A fault has no physical answer until the page is loaded and the lookup is retried.",
+      "vi": "Địa chỉ logic, mục tra bảng, trạng thái hiện diện và kết quả vật lý cập nhật cùng nhau. Khi lỗi trang chưa có đáp án vật lý cho tới lúc nạp trang và tra lại."
+    },
+    "task": {
+      "en": "Compare address 35 with 50, then compare segment 1 offsets 7 and 12. Predict whether a physical address should exist at each step.",
+      "vi": "So sánh địa chỉ 35 với 50, rồi so offset 7 và 12 của đoạn 1. Dự đoán mỗi bước có nên tồn tại địa chỉ vật lý không."
+    },
+    "conventions": [
+      {
+        "en": "Page size=16 addressable units. Frames are numbered from 0; page 3 initially is absent and loads into free frame 2.",
+        "vi": "Kích thước trang=16 đơn vị địa chỉ. Khung đánh số từ 0; trang 3 ban đầu vắng mặt và được nạp vào khung trống 2."
+      },
+      {
+        "en": "Segment limits count locations; the bound is strict: offset<limit.",
+        "vi": "Giới hạn đoạn đếm số vị trí; điều kiện chặt: offset<limit."
+      },
+      {
+        "en": "The example models translation and recovery, without a measured disk delay or a universal real-machine layout.",
+        "vi": "Ví dụ mô hình hóa dịch địa chỉ và khôi phục, không gán độ trễ đĩa đo được hay bố trí chung cho mọi máy."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "title": {
+      "en": "Resolve logical address 50 after a page fault",
+      "vi": "Giải quyết địa chỉ logic 50 sau page fault"
+    },
+    "prompt": {
+      "en": "Page size is 16. Page 3 is absent; frame 2 is free. Translate address 50 and explain each recovery step.",
+      "vi": "Kích thước trang là 16. Trang 3 vắng mặt; khung 2 trống. Dịch địa chỉ 50 và giải thích từng bước khôi phục."
+    },
+    "steps": [
+      {
+        "id": "split-address",
+        "action": {
+          "en": "Calculate 50 DIV 16 and 50 MOD 16.",
+          "vi": "Tính 50 DIV 16 và 50 MOD 16."
+        },
+        "why": {
+          "en": "The quotient selects the page; the remainder locates a unit within it.",
+          "vi": "Thương chọn trang; dư xác định vị trí trong trang."
+        },
+        "result": {
+          "en": "Page=3, offset=2.",
+          "vi": "Trang=3, offset=2."
+        }
+      },
+      {
+        "id": "lookup",
+        "action": {
+          "en": "Read page-table entry 3.",
+          "vi": "Đọc mục 3 của bảng trang."
+        },
+        "why": {
+          "en": "A page number is not itself a physical frame number.",
+          "vi": "Số trang tự nó không phải số khung vật lý."
+        },
+        "result": {
+          "en": "Present=false; no physical address yet.",
+          "vi": "Present=false; chưa có địa chỉ vật lý."
+        }
+      },
+      {
+        "id": "page-fault",
+        "action": {
+          "en": "Raise and handle the non-resident-page condition.",
+          "vi": "Phát sinh và xử lý tình trạng trang chưa ở RAM."
+        },
+        "why": {
+          "en": "The logical access is valid but its data must first be loaded.",
+          "vi": "Truy cập logic hợp lệ nhưng phải nạp dữ liệu trước."
+        },
+        "result": {
+          "en": "The access waits for page 3; no invented address is returned.",
+          "vi": "Truy cập chờ trang 3; không trả địa chỉ giả."
+        }
+      },
+      {
+        "id": "load-page",
+        "action": {
+          "en": "Load page 3 into free frame 2.",
+          "vi": "Nạp trang 3 vào khung trống 2."
+        },
+        "why": {
+          "en": "A free frame makes eviction unnecessary in this scenario.",
+          "vi": "Khung trống khiến tình huống này không cần loại trang khác."
+        },
+        "result": {
+          "en": "Entry 3 records frame 2 and present=true.",
+          "vi": "Mục 3 ghi khung 2 và present=true."
+        }
+      },
+      {
+        "id": "retry",
+        "action": {
+          "en": "Retry the interrupted lookup.",
+          "vi": "Thử lại thao tác tra bị ngắt."
+        },
+        "why": {
+          "en": "The updated table now supports translation.",
+          "vi": "Bảng được cập nhật nay cho phép dịch."
+        },
+        "result": {
+          "en": "Page 3 resolves to frame 2; offset stays 2.",
+          "vi": "Trang 3 ánh xạ khung 2; offset vẫn là 2."
+        }
+      },
+      {
+        "id": "translate",
+        "action": {
+          "en": "Calculate 2×16+2.",
+          "vi": "Tính 2×16+2."
+        },
+        "why": {
+          "en": "The frame base and unchanged offset form the physical address.",
+          "vi": "Nền khung và offset không đổi tạo địa chỉ vật lý."
+        },
+        "result": {
+          "en": "Physical address=34.",
+          "vi": "Địa chỉ vật lý=34."
+        },
+        "check": {
+          "en": "The offset remains within 0–15.",
+          "vi": "Offset vẫn nằm trong 0–15."
+        }
+      }
+    ],
+    "result": {
+      "en": "Address 50 translates to 34 only after the missing page has been loaded and its mapping updated.",
+      "vi": "Địa chỉ 50 chỉ dịch thành 34 sau khi trang thiếu được nạp và ánh xạ được cập nhật."
+    },
+    "selfCheck": {
+      "en": "Explain why address 35 gives 83 without this fault path, and why segment offset 12 cannot use the same recovery.",
+      "vi": "Giải thích vì sao địa chỉ 35 cho 83 mà không đi qua lỗi trang này, và vì sao offset đoạn 12 không thể dùng cùng cách khôi phục."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A page/frame table, page size or logical address requires quotient/remainder translation.",
+        "vi": "Bảng trang/khung, kích thước trang hoặc địa chỉ logic yêu cầu dịch bằng thương/dư."
+      },
+      {
+        "en": "Base and limit indicate segmentation; a missing resident page indicates virtual-memory service.",
+        "vi": "Nền và giới hạn báo hiệu phân đoạn; trang chưa ở RAM báo hiệu xử lý bộ nhớ ảo."
+      }
+    ],
+    "distinguish": {
+      "en": "A page fault concerns residency of a valid page; a segment bounds failure concerns validity. Neither is a virtual-machine creation event.",
+      "vi": "Page fault liên quan việc trang hợp lệ có ở RAM không; vượt giới hạn đoạn liên quan tính hợp lệ. Không sự kiện nào là tạo máy ảo."
+    },
+    "method": [
+      {
+        "en": "Write the page size or base/limit convention first.",
+        "vi": "Ghi kích thước trang hoặc quy ước nền/giới hạn trước."
+      },
+      {
+        "en": "Check the relevant table and validity/presence before calculating a result.",
+        "vi": "Kiểm tra bảng và tính hợp lệ/hiện diện trước khi tính kết quả."
+      },
+      {
+        "en": "For a fault, explain load→update→retry; for a valid mapping show the full address equation.",
+        "vi": "Với lỗi trang, giải thích nạp→cập nhật→thử lại; với ánh xạ hợp lệ, trình bày đầy đủ phương trình địa chỉ."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Physical address=page number+offset.",
+        "vi": "Địa chỉ vật lý=số trang+offset."
+      },
+      "correction": {
+        "en": "Look up a frame, then multiply it by page size and add the offset.",
+        "vi": "Tra khung rồi nhân số khung với kích thước trang và cộng offset."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Offset equal to the segment limit is valid.",
+        "vi": "Offset bằng giới hạn đoạn là hợp lệ."
+      },
+      "correction": {
+        "en": "With a length-based limit, the last offset is limit−1.",
+        "vi": "Với giới hạn là độ dài, offset cuối là limit−1."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Every page fault requires an eviction or a program crash.",
+        "vi": "Mọi page fault đều cần loại trang hoặc làm chương trình lỗi."
+      },
+      "correction": {
+        "en": "A free frame can be used; a valid missing page is normally loaded and retried.",
+        "vi": "Có thể dùng khung trống; trang hợp lệ bị thiếu thường được nạp rồi thử lại."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "page-address",
+      "prompt": {
+        "en": "Size=16, logical address=35, page 2→frame 5. Which result is correct?",
+        "vi": "Cỡ=16, địa chỉ logic=35, trang 2→khung 5. Kết quả nào đúng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "83",
+            "vi": "83"
+          },
+          "feedback": {
+            "en": "Correct: 35=2×16+3 and 5×16+3=83.",
+            "vi": "Đúng: 35=2×16+3 và 5×16+3=83."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "8",
+            "vi": "8"
+          },
+          "feedback": {
+            "en": "5+3 omits the frame size.",
+            "vi": "5+3 bỏ mất kích thước khung."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "35",
+            "vi": "35"
+          },
+          "feedback": {
+            "en": "That retains the logical page rather than using the mapping.",
+            "vi": "Đó là giữ trang logic thay vì dùng ánh xạ."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Preserve the offset while replacing the page number with the table’s frame number.",
+        "vi": "Giữ offset khi thay số trang bằng số khung từ bảng."
+      }
+    },
+    {
+      "id": "segment-bound",
+      "prompt": {
+        "en": "Segment 1 has base 300, limit 12. Is offset 12 allowed?",
+        "vi": "Đoạn 1 nền 300, giới hạn 12. Offset 12 được phép không?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No; valid offsets are 0–11.",
+            "vi": "Không; offset hợp lệ là 0–11."
+          },
+          "feedback": {
+            "en": "Correct: the limit is a count, not the final offset.",
+            "vi": "Đúng: giới hạn là số lượng, không phải offset cuối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes; physical address 312.",
+            "vi": "Có; địa chỉ vật lý 312."
+          },
+          "feedback": {
+            "en": "Adding before checking produces an address outside the segment.",
+            "vi": "Cộng trước khi kiểm tra tạo địa chỉ ngoài đoạn."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes; segment 1 plus offset gives 13.",
+            "vi": "Có; đoạn 1 cộng offset cho 13."
+          },
+          "feedback": {
+            "en": "The segment identifier is not the base address.",
+            "vi": "Mã đoạn không phải địa chỉ nền."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Bounds checking precedes address formation.",
+        "vi": "Kiểm tra giới hạn có trước việc tạo địa chỉ."
+      }
+    },
+    {
+      "id": "fault-order",
+      "prompt": {
+        "en": "Page 3 is absent. What must happen before physical address 34 becomes valid?",
+        "vi": "Trang 3 vắng mặt. Cần gì trước khi địa chỉ vật lý 34 có hiệu lực?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Load into frame 2, update the entry and retry.",
+            "vi": "Nạp vào khung 2, cập nhật mục bảng và thử lại."
+          },
+          "feedback": {
+            "en": "Correct: translation depends on the new valid mapping.",
+            "vi": "Đúng: dịch phụ thuộc ánh xạ mới hợp lệ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Return 34 immediately because the offset is known.",
+            "vi": "Trả 34 ngay vì đã biết offset."
+          },
+          "feedback": {
+            "en": "The missing frame mapping prevents an immediate result.",
+            "vi": "Chưa có ánh xạ khung nên không thể có kết quả ngay."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Create a guest operating system.",
+            "vi": "Tạo hệ điều hành khách."
+          },
+          "feedback": {
+            "en": "That describes virtual-machine use, not page-fault service.",
+            "vi": "Đó là dùng máy ảo, không phải xử lý lỗi trang."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Knowing the offset alone does not locate a non-resident page in RAM.",
+        "vi": "Chỉ biết offset không xác định được trang chưa ở RAM."
+      }
+    },
+    {
+      "id": "free-frame-transfer",
+      "prompt": {
+        "en": "A valid missing page is requested while one frame is free. Must FIFO select a victim?",
+        "vi": "Yêu cầu trang hợp lệ còn thiếu khi có một khung trống. FIFO bắt buộc chọn nạn nhân không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No; use the free frame without eviction.",
+            "vi": "Không; dùng khung trống mà không loại trang."
+          },
+          "feedback": {
+            "en": "Correct: a fault and a replacement are different events.",
+            "vi": "Đúng: lỗi trang và thay thế là hai sự kiện khác nhau."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes; every fault removes a resident page.",
+            "vi": "Có; mọi lỗi trang loại một trang đang ở RAM."
+          },
+          "feedback": {
+            "en": "That ignores available unallocated space.",
+            "vi": "Bạn đã bỏ qua vùng chưa cấp sẵn có."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No loading is necessary.",
+            "vi": "Không cần nạp."
+          },
+          "feedback": {
+            "en": "The page is still absent and must be brought into RAM.",
+            "vi": "Trang vẫn vắng mặt nên cần đưa vào RAM."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "First find space; choose a victim only when required.",
+        "vi": "Trước hết tìm chỗ trống; chỉ chọn nạn nhân khi cần."
+      }
+    },
+    {
+      "id": "finite-memory-transfer",
+      "prompt": {
+        "en": "A program maps more memory than RAM. Which explanation is sound?",
+        "vi": "Chương trình ánh xạ nhiều bộ nhớ hơn RAM. Giải thích nào đúng?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Non-resident pages can remain on finite backing storage, with transfer costs.",
+            "vi": "Trang chưa ở RAM có thể nằm trong bộ nhớ hỗ trợ hữu hạn, kèm chi phí chuyển."
+          },
+          "feedback": {
+            "en": "Correct: this states both mechanism and limitation.",
+            "vi": "Đúng: nêu cả cơ chế và giới hạn."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Virtual memory makes every access as fast as RAM.",
+            "vi": "Bộ nhớ ảo làm mọi truy cập nhanh như RAM."
+          },
+          "feedback": {
+            "en": "Fault handling and storage transfer can be much slower.",
+            "vi": "Xử lý lỗi trang và chuyển từ bộ nhớ thứ cấp có thể chậm hơn nhiều."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Virtual memory guarantees unlimited storage.",
+            "vi": "Bộ nhớ ảo bảo đảm lưu trữ vô hạn."
+          },
+          "feedback": {
+            "en": "Address-space and backing-store limits still apply.",
+            "vi": "Giới hạn không gian địa chỉ và bộ nhớ hỗ trợ vẫn tồn tại."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Capacity abstraction is not a guarantee of free or unlimited performance.",
+        "vi": "Trừu tượng hóa dung lượng không bảo đảm hiệu năng miễn phí hay vô hạn."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain paging translation, segmentation bounds and one page-fault recovery path.",
+      "vi": "Giải thích dịch phân trang, giới hạn phân đoạn và một đường khôi phục lỗi trang."
+    },
+    "answerPoints": [
+      {
+        "en": "Page=A DIV size, offset=A MOD size; physical=frame×size+offset.",
+        "vi": "Trang=A DIV cỡ, offset=A MOD cỡ; vật lý=khung×cỡ+offset."
+      },
+      {
+        "en": "Check offset<limit before base+offset for a segment.",
+        "vi": "Kiểm offset<limit trước nền+offset cho đoạn."
+      },
+      {
+        "en": "Load a valid missing page, update its table entry and retry; backing storage is finite.",
+        "vi": "Nạp trang hợp lệ còn thiếu, cập nhật mục bảng và thử lại; bộ nhớ hỗ trợ hữu hạn."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "A table mapping, not a logical identifier alone, determines the physical location.",
+      "vi": "Ánh xạ bảng, không chỉ mã logic, quyết định vị trí vật lý."
+    },
+    {
+      "en": "Residency and address validity are different checks.",
+      "vi": "Hiện diện trong RAM và tính hợp lệ địa chỉ là hai kiểm tra khác nhau."
+    },
+    {
+      "en": "Page faults can require replacement, but do not always do so.",
+      "vi": "Lỗi trang có thể cần thay thế nhưng không phải luôn luôn."
+    }
+  ],
+  "relatedSlugs": [
+    "replacement-and-thrashing",
+    "virtual-machines"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for 2026, Version 2",
+      "locator": "Printed/PDF p35, §16 System Software",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder 2019, ISBN 9781510457591",
+      "locator": "Printed pp383–387 / PDF pp399–403, paging, segmentation and virtual memory; corrected segment-base calculation",
+      "kind": "book"
+    },
+    {
+      "id": "w24-31-qp",
+      "title": "Cambridge 9618 w24 Paper 31 Question Paper",
+      "locator": "PDF p8 Q8(a–b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w24-31-ms",
+      "title": "Cambridge 9618 w24 Paper 31 Mark Scheme",
+      "locator": "PDF pp10–11 Q8(a–b)",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "w23-32-qp",
+      "title": "Cambridge 9618 w23 Paper 32 Question Paper",
+      "locator": "PDF p4 Q5(a–b)",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w23-32-ms",
+      "title": "Cambridge 9618 w23 Paper 32 Mark Scheme",
+      "locator": "PDF p4 Q5(a–b)",
+      "kind": "mark-scheme"
+    }
+  ]
+}

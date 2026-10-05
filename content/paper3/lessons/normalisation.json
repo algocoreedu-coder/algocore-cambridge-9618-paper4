@@ -1,0 +1,551 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.3-T02",
+  "slug": "normalisation",
+  "title": {
+    "en": "Normalisation",
+    "vi": "Chuẩn hóa"
+  },
+  "question": {
+    "en": "How can the mantissa change while the represented number stays the same?",
+    "vi": "Mantissa thay đổi mà số được biểu diễn vẫn giữ nguyên bằng cách nào?"
+  },
+  "opening": {
+    "en": "The same number can have several mantissa/exponent pairs. A pair with repeated sign bits wastes available mantissa positions. Normalisation shifts those redundant bits away while compensating with the exponent. The important check is not just the new bit pattern: the value must remain unchanged.",
+    "vi": "Cùng một số có thể có nhiều cặp mantissa/exponent. Cặp có bit dấu lặp lãng phí các vị trí định trị sẵn có. Chuẩn hóa dịch bỏ bit dư đồng thời bù bằng số mũ. Không chỉ kiểm mẫu bit mới: giá trị phải giữ nguyên."
+  },
+  "objectives": [
+    {
+      "en": "Recognise normalised positive and negative two’s-complement mantissas.",
+      "vi": "Nhận biết định trị bù hai dương và âm đã chuẩn hóa."
+    },
+    {
+      "en": "Trace a value-preserving shift with a compensating exponent change.",
+      "vi": "Trace phép dịch giữ giá trị cùng thay đổi số mũ để bù."
+    },
+    {
+      "en": "Explain zero and an exponent limit without an invalid shift.",
+      "vi": "Giải thích số không và giới hạn số mũ mà không dịch sai."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "M is an eight-bit two’s-complement fraction; E is a four-bit two’s-complement integer.",
+      "vi": "M là phân số bù hai tám bit; E là số nguyên bù hai bốn bit."
+    },
+    {
+      "en": "Decode with value=M×2^E.",
+      "vi": "Giải mã bằng value=M×2^E."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Normalisation",
+      "meaning": {
+        "en": "Choosing a nonzero mantissa with no redundant repeated sign bit immediately after the sign.",
+        "vi": "Chọn định trị khác không không có bit dấu lặp dư ngay sau bit dấu."
+      }
+    },
+    {
+      "term": "Invariant",
+      "meaning": {
+        "en": "A property that remains true through every permitted step; here, the represented value.",
+        "vi": "Tính chất giữ đúng qua mọi bước hợp lệ; ở đây là giá trị được biểu diễn."
+      }
+    },
+    {
+      "term": "Redundant sign bit",
+      "meaning": {
+        "en": "An extra leading sign bit that can be removed by a valid value-preserving shift.",
+        "vi": "Bit dấu đầu dư có thể bỏ qua phép dịch hợp lệ giữ nguyên giá trị."
+      }
+    },
+    {
+      "term": "Exponent floor",
+      "meaning": {
+        "en": "The smallest exponent that fits the declared exponent field.",
+        "vi": "Số mũ nhỏ nhất vừa trường số mũ đã cho."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "recognise",
+      "title": {
+        "en": "Read the first two bits together",
+        "vi": "Đọc hai bit đầu cùng nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "For this two’s-complement fraction, a normalised positive mantissa begins 01 and a normalised negative mantissa begins 10. Equivalently, the first two bits differ. A positive 00 prefix or negative 11 prefix shows a redundant sign bit when the value is nonzero. Do not require every normalised number to start 01: that would exclude negative values.",
+          "vi": "Với phân số bù hai này, định trị dương chuẩn hóa bắt đầu 01 và định trị âm chuẩn hóa bắt đầu 10. Tương đương, hai bit đầu khác nhau. Đầu 00 ở số dương hoặc 11 ở số âm cho thấy bit dấu dư khi giá trị khác không. Không yêu cầu mọi số chuẩn hóa đều bắt đầu 01 vì sẽ loại số âm."
+        },
+        {
+          "en": "Normalisation makes useful use of the fixed mantissa width by removing redundant leading sign bits. It also gives a consistent normalised representation for a representable nonzero value in this format. It does not recover bits discarded by an earlier approximation: preserving a rounded value is not the same as recovering the original exact value.",
+          "vi": "Chuẩn hóa sử dụng hiệu quả độ rộng định trị cố định bằng cách bỏ bit dấu dư đầu. Nó cũng tạo dạng chuẩn hóa nhất quán cho giá trị khác không biểu diễn được trong định dạng này. Nó không khôi phục bit đã mất do xấp xỉ trước đó: giữ giá trị đã làm tròn khác với khôi phục giá trị chính xác ban đầu."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "compensate",
+      "title": {
+        "en": "Double M and decrease E by one",
+        "vi": "Nhân đôi M và giảm E một đơn vị"
+      },
+      "paragraphs": [
+        {
+          "en": "Let I be the signed integer represented by the eight mantissa bits, so M=I/128. A valid left shift of a redundant sign bit replaces I by 2I and appends 0 on the right. Decrease E by 1 at the same time. Then (2I/128)×2^(E−1)=(I/128)×2^E. This equation is the reason for the exponent change.",
+          "vi": "Gọi I là số nguyên có dấu từ tám bit định trị, nên M=I/128. Dịch trái hợp lệ khi có bit dấu dư thay I bằng 2I và thêm 0 bên phải. Đồng thời giảm E một đơn vị. Khi đó (2I/128)×2^(E−1)=(I/128)×2^E. Đẳng thức này là lý do phải đổi số mũ."
+        },
+        {
+          "en": "For +5, M00101000 means 40/128 and E0100 means 4. Shift once to M01010000=80/128 and E0011=3. Before and after both give 5. Stop when the first two M bits differ; continuing would no longer be the same normalisation operation within this width.",
+          "vi": "Với +5, M00101000 nghĩa là 40/128 và E0100 là 4. Dịch một lần được M01010000=80/128 và E0011=3. Trước và sau đều cho 5. Dừng khi hai bit đầu M khác nhau; tiếp tục dịch sẽ không còn là cùng phép chuẩn hóa trong độ rộng này."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "negative",
+      "title": {
+        "en": "Negative values obey the same invariant",
+        "vi": "Số âm giữ cùng bất biến"
+      },
+      "paragraphs": [
+        {
+          "en": "M11101000 is not a positive fraction with a minus sign added later. Its signed integer is 232−256=−24, so M=−24/128. With E5, the value is−6. The shifts 11101000→11010000→10100000 give signed integers−24→−48→−96 while E goes 5→4→3. Each pair still represents−6.",
+          "vi": "M11101000 không phải phân số dương rồi gắn dấu trừ về sau. Số nguyên có dấu là 232−256=−24 nên M=−24/128. Với E5, giá trị là−6. Các phép dịch 11101000→11010000→10100000 cho số nguyên có dấu−24→−48→−96 trong khi E đi 5→4→3. Mỗi cặp vẫn biểu diễn−6."
+        },
+        {
+          "en": "The final 10 prefix means normalised negative, not a sign error. The mantissa sign is retained by correctly shifting only while redundant sign bits remain. Always decode at least the starting and finishing pair to detect a wrong exponent direction or incorrect sign handling.",
+          "vi": "Đầu 10 cuối cùng nghĩa là âm chuẩn hóa, không phải lỗi dấu. Dấu định trị được giữ bằng việc chỉ dịch đúng khi còn bit dấu dư. Luôn giải mã ít nhất cặp đầu và cuối để phát hiện đổi số mũ sai chiều hoặc xử lý dấu sai."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "exceptions",
+      "title": {
+        "en": "Check whether another shift is possible",
+        "vi": "Kiểm xem có thể dịch thêm hay không"
+      },
+      "paragraphs": [
+        {
+          "en": "Zero is a separate case. In this course model it uses M00000000/E0000 and is not required to satisfy the normalised-nonzero prefix test. Repeatedly shifting zeros will never create 01 or 10; stop and identify zero instead.",
+          "vi": "Số không là trường hợp riêng. Trong mô hình này nó dùng M00000000/E0000 và không phải thỏa mẫu đầu của số khác không chuẩn hóa. Dịch số không mãi không tạo 01 hay 10; cần dừng và nhận diện số không."
+        },
+        {
+          "en": "The exponent can also prevent a shift. M00100000/E1000 has M1/4 and E−8, giving 1/1024. Its M still begins 00, but the required new exponent would be−9, outside the four-bit range−8..7. Report that it cannot be normalised in this format. Do not wrap to+7 or silently replace it with zero.",
+          "vi": "Số mũ cũng có thể ngăn phép dịch. M00100000/E1000 có M1/4 và E−8, cho 1/1024. M vẫn bắt đầu 00 nhưng số mũ mới cần−9, ngoài miền bốn bit−8..7. Cần báo không thể chuẩn hóa trong định dạng này. Không quay vòng thành+7 hay âm thầm thay bằng số không."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "normalisation",
+    "title": {
+      "en": "Preserve the value at every shift",
+      "vi": "Giữ giá trị ở từng phép dịch"
+    },
+    "introduction": {
+      "en": "Each snapshot connects mantissa bits, signed M, exponent and decoded value.",
+      "vi": "Mỗi trạng thái nối bit định trị, M có dấu, số mũ và giá trị giải mã."
+    },
+    "task": {
+      "en": "Trace−6 and predict E before each shift. Then compare+5, zero and the exponent-floor case.",
+      "vi": "Trace−6 và dự đoán E trước mỗi phép dịch. Sau đó so sánh+5, số không và trường hợp chạm sàn số mũ."
+    },
+    "conventions": [
+      {
+        "en": "M8/E4, both two’s complement; M has its point after the sign.",
+        "vi": "M8/E4, cả hai bù hai; M có dấu chấm sau bit dấu."
+      },
+      {
+        "en": "For nonzero M, shift while its first two bits match, but only if E−1 remains in−8..7.",
+        "vi": "Với M khác không, dịch khi hai bit đầu giống nhau nhưng chỉ khi E−1 còn trong−8..7."
+      },
+      {
+        "en": "Zero is separate. A blocked shift keeps the original state and reports the limit.",
+        "vi": "Số không xử lý riêng. Phép dịch bị chặn giữ trạng thái gốc và báo giới hạn."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Normalise−6 through two shifts",
+      "vi": "Chuẩn hóa−6 qua hai phép dịch"
+    },
+    "prompt": {
+      "en": "Start with M11101000 and E0101. Normalise the pair and verify that its value is preserved.",
+      "vi": "Bắt đầu M11101000 và E0101. Chuẩn hóa cặp này rồi kiểm giá trị được giữ."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "read",
+        "action": {
+          "en": "Decode the starting pair.",
+          "vi": "Giải mã cặp đầu."
+        },
+        "why": {
+          "en": "Knowing the value gives an independent check on all later shifts.",
+          "vi": "Biết giá trị cho cách kiểm độc lập mọi phép dịch sau."
+        },
+        "result": {
+          "en": "I=−24, M=−24/128, E5; value=−6.",
+          "vi": "I=−24, M=−24/128, E5; value=−6."
+        },
+        "check": {
+          "en": "11101000 is signed 232−256, not unsigned 232.",
+          "vi": "11101000 có dấu là 232−256, không phải 232 không dấu."
+        }
+      },
+      {
+        "id": "shift-one",
+        "action": {
+          "en": "Shift M left once and reduce E.",
+          "vi": "Dịch M trái một lần và giảm E."
+        },
+        "why": {
+          "en": "The 11 prefix contains one redundant sign bit.",
+          "vi": "Đầu 11 có một bit dấu dư."
+        },
+        "result": {
+          "en": "M11010000=−48/128, E0100=4; value=−6.",
+          "vi": "M11010000=−48/128, E0100=4; value=−6."
+        },
+        "check": {
+          "en": "M doubled while the scale halved.",
+          "vi": "M nhân đôi trong khi thang độ lớn giảm nửa."
+        }
+      },
+      {
+        "id": "shift-two",
+        "action": {
+          "en": "Repeat because the prefix is still 11.",
+          "vi": "Lặp vì đầu vẫn là 11."
+        },
+        "why": {
+          "en": "Another redundant sign bit remains and E can be decreased.",
+          "vi": "Còn bit dấu dư và E vẫn có thể giảm."
+        },
+        "result": {
+          "en": "M10100000=−96/128, E0011=3; value=−6.",
+          "vi": "M10100000=−96/128, E0011=3; value=−6."
+        },
+        "check": {
+          "en": "Two left shifts require a total exponent decrease of 2.",
+          "vi": "Hai lần dịch trái cần tổng mức giảm số mũ là 2."
+        }
+      },
+      {
+        "id": "stop",
+        "action": {
+          "en": "Stop at prefix 10 and decode the result.",
+          "vi": "Dừng tại đầu 10 và giải mã kết quả."
+        },
+        "why": {
+          "en": "The negative mantissa is now normalised.",
+          "vi": "Định trị âm giờ đã chuẩn hóa."
+        },
+        "result": {
+          "en": "(−96/128)×2^3=−6, matching the start.",
+          "vi": "(−96/128)×2^3=−6, khớp ban đầu."
+        },
+        "check": {
+          "en": "The sign, value and required bit widths all agree.",
+          "vi": "Dấu, giá trị và độ rộng bit yêu cầu đều khớp."
+        }
+      }
+    ],
+    "result": {
+      "en": "Normalised result: M10100000/E0011; the value remains−6.",
+      "vi": "Kết quả chuẩn hóa: M10100000/E0011; giá trị vẫn−6."
+    },
+    "selfCheck": {
+      "en": "Check both the 10 prefix and the decoded−6; neither check alone is sufficient.",
+      "vi": "Kiểm cả đầu 10 và giá trị−6 giải mã; riêng từng kiểm tra chưa đủ."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A question supplies M/E bits and asks whether they are normalised or to normalise them.",
+        "vi": "Đề cho bit M/E và hỏi đã chuẩn hóa chưa hoặc yêu cầu chuẩn hóa."
+      },
+      {
+        "en": "An explanation asks why redundant leading sign bits should be removed.",
+        "vi": "Yêu cầu giải thích vì sao nên bỏ bit dấu dư đầu."
+      }
+    ],
+    "distinguish": {
+      "en": "Conversion starts from a number or bit pattern to change representation. Normalisation starts from an M/E pair and changes the pair while preserving its value.",
+      "vi": "Đổi biểu diễn bắt đầu từ số hoặc bit để chuyển dạng. Chuẩn hóa bắt đầu từ cặp M/E rồi đổi cặp trong khi giữ giá trị."
+    },
+    "method": [
+      {
+        "en": "Identify zero separately and decode signed E.",
+        "vi": "Nhận diện số không riêng và giải mã E có dấu."
+      },
+      {
+        "en": "Check the first two M bits; count required left shifts.",
+        "vi": "Kiểm hai bit đầu M; đếm số lần dịch trái cần có."
+      },
+      {
+        "en": "Decrease E per shift, respect its limit, then verify the value.",
+        "vi": "Giảm E mỗi lần dịch, giữ giới hạn và kiểm lại giá trị."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“A left shift needs E to increase.”",
+        "vi": "“Dịch trái cần tăng E.”"
+      },
+      "correction": {
+        "en": "Doubling M requires halving the scale, so E decreases. Increasing E as well would multiply the value by 4.",
+        "vi": "Nhân đôi M cần giảm nửa thang độ lớn nên E giảm. Tăng cả E sẽ nhân giá trị với 4."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Negative normalised M must begin 01.”",
+        "vi": "“M âm chuẩn hóa phải bắt đầu 01.”"
+      },
+      "correction": {
+        "en": "Negative normalised two’s-complement fractions begin 10.",
+        "vi": "Phân số bù hai âm chuẩn hóa bắt đầu 10."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Normalisation restores precision already lost.”",
+        "vi": "“Chuẩn hóa khôi phục độ chính xác đã mất.”"
+      },
+      "correction": {
+        "en": "It preserves the stored value; discarded information cannot be reconstructed from that value alone.",
+        "vi": "Nó giữ giá trị đã lưu; thông tin bị bỏ không thể dựng lại chỉ từ giá trị đó."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "M00110000/E0011 represents 3. Which pair is its normalised form?",
+        "vi": "M00110000/E0011 biểu diễn 3. Cặp nào là dạng chuẩn hóa?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "M01100000/E0010",
+            "vi": "M01100000/E0010"
+          },
+          "feedback": {
+            "en": "Correct. M changes 48/128→96/128 and E3→2, so value stays 3.",
+            "vi": "Đúng. M đổi 48/128→96/128 và E3→2 nên giá trị vẫn 3."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "M01100000/E0100",
+            "vi": "M01100000/E0100"
+          },
+          "feedback": {
+            "en": "Increasing E while doubling M makes the value 12, not 3.",
+            "vi": "Tăng E khi nhân đôi M làm giá trị thành 12, không phải 3."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "M00110000/E0010",
+            "vi": "M00110000/E0010"
+          },
+          "feedback": {
+            "en": "Only reducing E halves the value and leaves M unnormalised.",
+            "vi": "Chỉ giảm E làm giá trị còn nửa và M vẫn chưa chuẩn hóa."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Normalisation needs both the correct prefix and value preservation.",
+        "vi": "Chuẩn hóa cần cả mẫu đầu đúng và giữ giá trị."
+      }
+    },
+    {
+      "id": "zero",
+      "prompt": {
+        "en": "Why should the zero preset not loop until its first two bits differ?",
+        "vi": "Vì sao trường hợp số không không được lặp tới khi hai bit đầu khác nhau?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Zero must become negative.",
+            "vi": "Số không phải thành âm."
+          },
+          "feedback": {
+            "en": "Changing the sign or value would violate the task.",
+            "vi": "Đổi dấu hoặc giá trị vi phạm yêu cầu."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Shifting zeros never creates a nonzero normalised prefix.",
+            "vi": "Dịch bit không không tạo mẫu đầu chuẩn hóa khác không."
+          },
+          "feedback": {
+            "en": "Correct. Zero is handled by its separate representation convention.",
+            "vi": "Đúng. Số không theo quy ước biểu diễn riêng."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "E always wraps to 0.",
+            "vi": "E luôn quay vòng về 0."
+          },
+          "feedback": {
+            "en": "Wrapping an exponent is not a valid normalisation rule.",
+            "vi": "Quay vòng số mũ không phải quy tắc chuẩn hóa hợp lệ."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Test zero before applying the normalised-nonzero rule.",
+        "vi": "Kiểm số không trước quy tắc chuẩn hóa số khác không."
+      }
+    },
+    {
+      "id": "floor",
+      "prompt": {
+        "en": "M begins 00 and E is−8 in M8/E4. A left shift needs E−1. What should happen?",
+        "vi": "M bắt đầu 00 và E=−8 trong M8/E4. Dịch trái cần E−1. Nên làm gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Wrap E to+7 and continue.",
+            "vi": "Quay E về+7 rồi tiếp tục."
+          },
+          "feedback": {
+            "en": "That changes the scale drastically instead of preserving the value.",
+            "vi": "Làm vậy đổi mạnh thang độ lớn thay vì giữ giá trị."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Claim successful normalisation without changing anything.",
+            "vi": "Báo chuẩn hóa thành công mà không đổi gì."
+          },
+          "feedback": {
+            "en": "The nonzero M still begins 00.",
+            "vi": "M khác không vẫn bắt đầu 00."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "Report that another required shift exceeds the exponent range.",
+            "vi": "Báo phép dịch cần thêm vượt miền số mũ."
+          },
+          "feedback": {
+            "en": "Correct.−9 does not fit the four-bit signed exponent.",
+            "vi": "Đúng.−9 không vừa số mũ có dấu bốn bit."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "A correct procedure can report that the required normalised result does not fit.",
+        "vi": "Quy trình đúng có thể báo kết quả chuẩn hóa yêu cầu không vừa."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain the invariant, the positive/negative prefix test, and the two stopping exceptions.",
+      "vi": "Giải thích bất biến, mẫu đầu dương/âm và hai ngoại lệ dừng."
+    },
+    "answerPoints": [
+      {
+        "en": "M doubles while E decreases 1; value stays the same.",
+        "vi": "M nhân đôi trong khi E giảm 1; giá trị giữ nguyên."
+      },
+      {
+        "en": "Nonzero normalised M starts 01 or 10.",
+        "vi": "M khác không chuẩn hóa bắt đầu 01 hoặc 10."
+      },
+      {
+        "en": "Zero is separate; exponent underflow prevents a required shift.",
+        "vi": "Số không xử lý riêng; chạm giới hạn dưới số mũ ngăn phép dịch cần có."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Track value as well as bits.",
+      "vi": "Theo dõi giá trị cùng với bit."
+    },
+    {
+      "en": "Normalisation removes redundant sign positions, not past approximation errors.",
+      "vi": "Chuẩn hóa bỏ vị trí dấu dư, không xóa sai số xấp xỉ trước đó."
+    }
+  ],
+  "relatedSlugs": [
+    "signed-floating-point-conversion",
+    "precision-range-and-limits",
+    "approximation-rounding-and-range-errors"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.3, p.33",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=33"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.321–323; examples independently checked",
+      "kind": "book"
+    }
+  ]
+}

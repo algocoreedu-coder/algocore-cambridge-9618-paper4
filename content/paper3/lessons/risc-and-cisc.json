@@ -1,0 +1,670 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.15.1",
+  "topicId": "P3-15.1-T01",
+  "slug": "risc-and-cisc",
+  "estimatedMinutes": 25,
+  "title": {
+    "en": "RISC and CISC",
+    "vi": "RISC và CISC"
+  },
+  "question": {
+    "en": "How can a shorter program still involve more work inside each instruction?",
+    "vi": "Vì sao chương trình ít lệnh vẫn có thể đòi hỏi nhiều công việc bên trong mỗi lệnh?"
+  },
+  "opening": {
+    "en": "RISC and CISC describe approaches to an instruction set and its implementation. Compare the same task, explain what each instruction asks the processor to do, and qualify the conclusions you draw about performance.",
+    "vi": "RISC và CISC mô tả cách thiết kế tập lệnh và triển khai bộ xử lý. Hãy so cùng nhiệm vụ, giải thích mỗi lệnh yêu cầu bộ xử lý làm gì và nêu điều kiện khi kết luận về hiệu năng."
+  },
+  "objectives": [
+    {
+      "en": "Compare instruction formats, addressing modes, registers and memory access.",
+      "vi": "So sánh định dạng lệnh, chế độ địa chỉ, thanh ghi và truy cập bộ nhớ."
+    },
+    {
+      "en": "Trace a load/store sequence and a symbolic complex instruction for the same calculation.",
+      "vi": "Truy vết chuỗi load/store và một lệnh phức hợp minh họa cho cùng phép tính."
+    },
+    {
+      "en": "Explain why instruction count alone does not determine execution time.",
+      "vi": "Giải thích vì sao chỉ số lệnh không quyết định thời gian thực hiện."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know the roles of registers, main memory and the control unit.",
+      "vi": "Biết vai trò thanh ghi, bộ nhớ chính và bộ điều khiển."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Instruction set",
+      "meaning": {
+        "en": "The machine-level operations and formats made available by a processor architecture.",
+        "vi": "Các thao tác và định dạng lệnh máy mà kiến trúc bộ xử lý cung cấp."
+      }
+    },
+    {
+      "term": "Load/store",
+      "meaning": {
+        "en": "A model in which explicit load and store instructions transfer values between memory and registers.",
+        "vi": "Mô hình dùng lệnh load và store riêng để chuyển giá trị giữa bộ nhớ và thanh ghi."
+      }
+    },
+    {
+      "term": "Addressing mode",
+      "meaning": {
+        "en": "The rule used to locate an instruction’s operand.",
+        "vi": "Quy tắc xác định vị trí toán hạng của lệnh."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "design-approaches",
+      "title": {
+        "en": "Describe the design approach",
+        "vi": "Mô tả hướng thiết kế"
+      },
+      "paragraphs": [
+        {
+          "en": "In the syllabus comparison, RISC uses a smaller set of relatively simple operations and fewer instruction formats. CISC provides a larger, more varied set that can express more complex operations in one instruction. Reduced refers to the instruction-set design, not to having less RAM or doing less useful work.",
+          "vi": "Trong mô hình so sánh của chương trình, RISC dùng tập thao tác tương đối đơn giản và ít định dạng lệnh hơn. CISC có tập lệnh lớn, đa dạng hơn và có thể diễn đạt thao tác phức tạp trong một lệnh. Reduced nói về thiết kế tập lệnh, không phải ít RAM hay làm ít công việc hữu ích."
+        },
+        {
+          "en": "A high-level task can therefore require more RISC instructions while each is simpler to decode and execute. A CISC instruction may hide several internal operations. These are useful contrasting tendencies; real processors can combine techniques, so avoid turning a comparison into a universal claim about every chip.",
+          "vi": "Một nhiệm vụ mức cao vì thế có thể cần nhiều lệnh RISC hơn, trong khi từng lệnh dễ giải mã và thực hiện hơn. Lệnh CISC có thể che nhiều thao tác nội bộ. Đây là các xu hướng để so sánh; bộ xử lý thực có thể kết hợp kỹ thuật, nên không biến chúng thành khẳng định cho mọi chip."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "formats-and-addressing",
+      "title": {
+        "en": "Connect formats to decoding",
+        "vi": "Liên hệ định dạng với giải mã"
+      },
+      "paragraphs": [
+        {
+          "en": "The conventional RISC model has fixed-length instructions, fewer formats and fewer addressing modes. Regular fields make instruction boundaries and operand locations easier to decode. The conventional CISC model allows variable-length instructions and more addressing modes, increasing expressive power but requiring more complex decoding.",
+          "vi": "Mô hình RISC thông thường có lệnh dài cố định, ít định dạng và ít chế độ địa chỉ. Các trường đều đặn giúp giải mã ranh giới lệnh và vị trí toán hạng dễ hơn. Mô hình CISC thông thường cho phép lệnh dài thay đổi và nhiều chế độ địa chỉ, tăng khả năng diễn đạt nhưng đòi giải mã phức tạp hơn."
+        },
+        {
+          "en": "When asked for a difference, compare the same property on both sides: fixed versus variable length, or fewer versus more addressing modes. Do not compare “RISC is simple” with an unrelated CISC use case. An addressing mode concerns how an operand is found, not how many bits the final result has.",
+          "vi": "Khi đề hỏi khác biệt, so cùng một thuộc tính ở hai phía: độ dài cố định với thay đổi, hoặc ít với nhiều chế độ địa chỉ. Không ghép “RISC đơn giản” với một ứng dụng CISC không liên quan. Chế độ địa chỉ nói về cách tìm toán hạng, không phải số bit của kết quả."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "registers-and-memory",
+      "title": {
+        "en": "Follow data across memory and registers",
+        "vi": "Theo dữ liệu giữa bộ nhớ và thanh ghi"
+      },
+      "paragraphs": [
+        {
+          "en": "A typical RISC load/store design performs arithmetic on registers and uses separate instructions for memory transfers. Many general-purpose registers help keep intermediate values near the processing hardware. In the conventional comparison, CISC uses fewer registers and supports more operations or addressing modes involving memory.",
+          "vi": "Thiết kế RISC load/store điển hình làm số học trên thanh ghi và dùng lệnh riêng để chuyển dữ liệu bộ nhớ. Nhiều thanh ghi đa dụng giúp giữ giá trị trung gian gần phần xử lý. Trong phép so sánh thông thường, CISC dùng ít thanh ghi hơn và hỗ trợ nhiều thao tác hoặc chế độ địa chỉ liên quan đến bộ nhớ hơn."
+        },
+        {
+          "en": "For X=7 and Y=5, a register result of12 is not yet the same as Z=12 in memory. The final STORE makes that change visible at the required destination. A symbolic complex ADDMEM instruction can include the read, add and write work, but that work has not vanished merely because the program contains one instruction.",
+          "vi": "Với X=7 và Y=5, kết quả12 trong thanh ghi chưa đồng nghĩa Z=12 trong bộ nhớ. STORE cuối mới thay đổi nơi đích cần thiết. Lệnh phức hợp minh họa ADDMEM có thể gồm đọc, cộng và ghi, nhưng công việc ấy không biến mất chỉ vì chương trình có một lệnh."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "cycles-and-pipelining",
+      "title": {
+        "en": "Separate simplicity, throughput and latency",
+        "vi": "Phân biệt đơn giản, throughput và latency"
+      },
+      "paragraphs": [
+        {
+          "en": "The syllabus comparison often describes simple RISC instructions as single-cycle and complex CISC instructions as potentially multi-cycle. This is a stated comparison model, not a rule that a pipelined instruction travels through every stage in one clock. Regular operations make pipelining easier; pipeline throughput and the latency of one instruction are different quantities.",
+          "vi": "Phép so sánh trong chương trình thường mô tả lệnh RISC đơn giản là single-cycle và lệnh CISC phức hợp có thể multi-cycle. Đây là mô hình so sánh được nêu, không phải quy tắc rằng lệnh đi qua mọi tầng pipeline trong một nhịp. Thao tác đều đặn giúp pipeline dễ hơn; throughput và latency của một lệnh là hai đại lượng khác nhau."
+        },
+        {
+          "en": "Execution time also depends on clock period, instruction mix, memory access and implementation. Without those assumptions, four instructions versus one is a code-length observation, not a speed result. The linked pipeline lesson supplies explicit stage and clock assumptions when calculating time.",
+          "vi": "Thời gian còn phụ thuộc chu kỳ clock, loại lệnh, truy cập bộ nhớ và cách triển khai. Thiếu những giả định ấy, bốn lệnh so với một chỉ là nhận xét về độ dài chương trình, không phải kết quả tốc độ. Bài pipeline liên quan nêu rõ giả định giai đoạn và nhịp khi tính thời gian."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "exam-comparison",
+      "title": {
+        "en": "Build an explained comparison",
+        "vi": "Viết phép so sánh có giải thích"
+      },
+      "paragraphs": [
+        {
+          "en": "Use a property, contrast and consequence. For example, fewer regular instruction formats simplify decoding and help organise a regular pipeline. Variable lengths and richer operations require the control unit to recognise more cases. Explain the mechanism instead of attaching “fast” or “slow” to a label.",
+          "vi": "Dùng cấu trúc thuộc tính, đối chiếu và hệ quả. Ví dụ, ít định dạng đều đặn giúp giải mã đơn giản và tổ chức pipeline đều đặn. Độ dài thay đổi và thao tác phong phú đòi bộ điều khiển nhận biết nhiều trường hợp. Giải thích cơ chế thay vì gắn nhãn “nhanh” hay “chậm”."
+        },
+        {
+          "en": "May/June2022 Paper31 question4 is a verified example of describing RISC/CISC and giving paired differences. It is evidence of an assessed task type, not a claim that the same question will recur. If a question supplies a particular processor model, use its stated facts over a generic comparison.",
+          "vi": "May/June2022 Paper31 câu4 là ví dụ đã kiểm về mô tả RISC/CISC và nêu khác biệt theo cặp. Đây là bằng chứng về dạng nhiệm vụ đã được đánh giá, không khẳng định câu đó sẽ lặp lại. Nếu đề cho mô hình bộ xử lý cụ thể, dùng dữ kiện đề thay cho so sánh tổng quát."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "past-qp",
+        "past-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "risc-cisc",
+    "title": {
+      "en": "One calculation, two instruction profiles",
+      "vi": "Một phép tính, hai kiểu tập lệnh"
+    },
+    "introduction": {
+      "en": "Compare how X+Y reaches Z. Watch operands, registers and memory separately.",
+      "vi": "So cách X+Y đi tới Z. Quan sát riêng toán hạng, thanh ghi và bộ nhớ."
+    },
+    "task": {
+      "en": "Before each step, predict which value changes and whether Z is already updated.",
+      "vi": "Trước từng bước, dự đoán giá trị nào đổi và Z đã được cập nhật chưa."
+    },
+    "conventions": [
+      {
+        "en": "LOAD/ADD/STORE and ADDMEM are symbolic teaching operations, not an executable ISA.",
+        "vi": "LOAD/ADD/STORE và ADDMEM là thao tác minh họa, không phải ISA thực thi."
+      },
+      {
+        "en": "The CISC phases are internal work of one instruction; phases are not clock counts.",
+        "vi": "Các pha CISC là công việc bên trong một lệnh; số pha không phải số nhịp."
+      },
+      {
+        "en": "Both profiles start at X=7,Y=5,Z=0 and finish at Z=12.",
+        "vi": "Cả hai bắt đầu X=7,Y=5,Z=0 và kết thúc Z=12."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "syllabus-2026"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Trace the load/store result",
+      "vi": "Truy vết kết quả load/store"
+    },
+    "prompt": {
+      "en": "Use the RISC teaching profile to calculate Z=X+Y for X=7,Y=5.",
+      "vi": "Dùng mô hình RISC minh họa tính Z=X+Y với X=7,Y=5."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "ready",
+        "action": {
+          "en": "Read X=7 and Y=5; the target is Z=X+Y.",
+          "vi": "Đọc X=7 và Y=5; mục tiêu là Z=X+Y."
+        },
+        "why": {
+          "en": "Compare identical work, not different problems.",
+          "vi": "Phải so cùng công việc, không so hai bài toán khác nhau."
+        },
+        "result": {
+          "en": "Z=0; no result has been stored.",
+          "vi": "Z=0; chưa lưu kết quả."
+        }
+      },
+      {
+        "id": "load-x",
+        "action": {
+          "en": "Execute LOAD R1,X.",
+          "vi": "Thực hiện LOAD R1,X."
+        },
+        "why": {
+          "en": "The load/store profile brings memory data into a register.",
+          "vi": "Mô hình load/store đưa dữ liệu bộ nhớ vào thanh ghi."
+        },
+        "result": {
+          "en": "R1=7; X and Z are unchanged.",
+          "vi": "R1=7; X và Z không đổi."
+        }
+      },
+      {
+        "id": "load-y",
+        "action": {
+          "en": "Execute LOAD R2,Y.",
+          "vi": "Thực hiện LOAD R2,Y."
+        },
+        "why": {
+          "en": "Both operands must be available before the register addition.",
+          "vi": "Phải có cả hai toán hạng trước khi cộng trên thanh ghi."
+        },
+        "result": {
+          "en": "R2=5; R1 remains7.",
+          "vi": "R2=5; R1 vẫn bằng7."
+        }
+      },
+      {
+        "id": "add",
+        "action": {
+          "en": "Execute ADD R3,R1,R2.",
+          "vi": "Thực hiện ADD R3,R1,R2."
+        },
+        "why": {
+          "en": "This arithmetic instruction acts on registers in the stated profile.",
+          "vi": "Lệnh số học này thao tác trên thanh ghi trong mô hình đã nêu."
+        },
+        "result": {
+          "en": "R3=12; Z is still0.",
+          "vi": "R3=12; Z vẫn bằng0."
+        }
+      },
+      {
+        "id": "store",
+        "action": {
+          "en": "Execute STORE Z,R3.",
+          "vi": "Thực hiện STORE Z,R3."
+        },
+        "why": {
+          "en": "A separate store makes the result available at the memory destination.",
+          "vi": "Lệnh store riêng đưa kết quả tới ô nhớ đích."
+        },
+        "result": {
+          "en": "Z=12 after four symbolic instructions. No elapsed time is inferred.",
+          "vi": "Z=12 sau bốn lệnh minh họa. Không suy ra thời gian thực hiện."
+        }
+      }
+    ],
+    "result": {
+      "en": "The four instructions leave Z=12. The CISC profile reaches the same memory result through one complex instruction with internal phases.",
+      "vi": "Bốn lệnh để lại Z=12. Mô hình CISC đạt cùng kết quả bộ nhớ qua một lệnh phức hợp có các pha nội bộ."
+    },
+    "selfCheck": {
+      "en": "After ADD but before STORE, which contains12: R3, Z, or both?",
+      "vi": "Sau ADD nhưng trước STORE, nơi nào chứa12: R3, Z hay cả hai?"
+    },
+    "sourceIds": [
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Instruction format, addressing mode or load/store comparisons point to RISC/CISC.",
+        "vi": "So định dạng lệnh, chế độ địa chỉ hoặc load/store hướng tới RISC/CISC."
+      },
+      {
+        "en": "“Identify differences” asks for matched properties; “explain” requires a consequence.",
+        "vi": "“Nêu khác biệt” cần thuộc tính đối ứng; “giải thích” cần hệ quả."
+      }
+    ],
+    "distinguish": {
+      "en": "Pipeline questions ask about overlapping stages and clocks. RISC/CISC questions compare architectural instruction characteristics; the topics are connected but not interchangeable.",
+      "vi": "Câu pipeline hỏi giai đoạn chồng lấp và nhịp. Câu RISC/CISC so đặc tính tập lệnh kiến trúc; hai chủ đề liên quan nhưng không thay thế nhau."
+    },
+    "method": [
+      {
+        "en": "State the compared property.",
+        "vi": "Nêu thuộc tính được so."
+      },
+      {
+        "en": "Describe both sides using the supplied model.",
+        "vi": "Mô tả hai phía theo mô hình đề cho."
+      },
+      {
+        "en": "Connect the property to decoding, data movement or pipeline organisation.",
+        "vi": "Liên hệ thuộc tính với giải mã, chuyển dữ liệu hoặc tổ chức pipeline."
+      },
+      {
+        "en": "Separate instruction count from elapsed time.",
+        "vi": "Tách số lệnh khỏi thời gian thực hiện."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "RISC always finishes every program faster.",
+        "vi": "RISC luôn chạy mọi chương trình nhanh hơn."
+      },
+      "correction": {
+        "en": "Performance needs workload and implementation assumptions; the label alone is insufficient.",
+        "vi": "Hiệu năng cần giả định về công việc và triển khai; chỉ nhãn chưa đủ."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Reduced means fewer lines for every program.",
+        "vi": "Reduced nghĩa mọi chương trình đều ít dòng hơn."
+      },
+      "correction": {
+        "en": "Simpler instructions may require more program instructions for the same task.",
+        "vi": "Lệnh đơn giản hơn có thể khiến cùng nhiệm vụ cần nhiều lệnh chương trình hơn."
+      }
+    },
+    {
+      "mistake": {
+        "en": "One complex instruction means one elementary operation.",
+        "vi": "Một lệnh phức hợp nghĩa một thao tác cơ bản."
+      },
+      "correction": {
+        "en": "One instruction may perform several internal operations.",
+        "vi": "Một lệnh có thể thực hiện nhiều thao tác nội bộ."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "memory-result",
+      "prompt": {
+        "en": "After ADD R3,R1,R2 but before STORE, what are R3 and Z?",
+        "vi": "Sau ADD R3,R1,R2 nhưng trước STORE, R3 và Z là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "12 and0",
+            "vi": "12 và0"
+          },
+          "feedback": {
+            "en": "Correct: the register result has not been stored.",
+            "vi": "Đúng: kết quả thanh ghi chưa được lưu."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "12 and12",
+            "vi": "12 và12"
+          },
+          "feedback": {
+            "en": "Z changes only at STORE in this profile.",
+            "vi": "Z chỉ đổi ở STORE trong mô hình này."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "0 and12",
+            "vi": "0 và12"
+          },
+          "feedback": {
+            "en": "ADD writes R3, not Z.",
+            "vi": "ADD ghi R3, không ghi Z."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Track the destination of each operation.",
+        "vi": "Theo đúng đích của từng thao tác."
+      }
+    },
+    {
+      "id": "formats",
+      "prompt": {
+        "en": "Which is a matched conventional comparison?",
+        "vi": "Đâu là phép so sánh thông thường theo cặp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "RISC fixed length; CISC variable length",
+            "vi": "RISC dài cố định; CISC dài thay đổi"
+          },
+          "feedback": {
+            "en": "Correct: both describe instruction length.",
+            "vi": "Đúng: cả hai nói về độ dài lệnh."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "RISC has registers; CISC has no registers",
+            "vi": "RISC có thanh ghi; CISC không có thanh ghi"
+          },
+          "feedback": {
+            "en": "Both use registers; the conventional contrast concerns number and use.",
+            "vi": "Cả hai dùng thanh ghi; đối chiếu thông thường nói về số lượng và cách dùng."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "RISC uses less RAM in every program",
+            "vi": "RISC dùng ít RAM hơn trong mọi chương trình"
+          },
+          "feedback": {
+            "en": "That is not a universal consequence of the design label.",
+            "vi": "Đó không phải hệ quả phổ quát của nhãn thiết kế."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Compare one architectural property, with appropriate qualification.",
+        "vi": "So một thuộc tính kiến trúc và nêu điều kiện phù hợp."
+      }
+    },
+    {
+      "id": "internal-work",
+      "prompt": {
+        "en": "What does the read/add/write trace of ADDMEM represent?",
+        "vi": "Trace đọc/cộng/ghi của ADDMEM thể hiện gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Three independent program instructions",
+            "vi": "Ba lệnh chương trình độc lập"
+          },
+          "feedback": {
+            "en": "The profile issues one complex instruction; the phases are internal.",
+            "vi": "Mô hình phát một lệnh phức hợp; các pha là nội bộ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Internal work of one symbolic instruction",
+            "vi": "Công việc nội bộ của một lệnh minh họa"
+          },
+          "feedback": {
+            "en": "Correct: code count and internal work differ.",
+            "vi": "Đúng: số lệnh chương trình khác công việc nội bộ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Exactly three measured clock cycles",
+            "vi": "Đúng ba nhịp đã đo"
+          },
+          "feedback": {
+            "en": "No phase duration is supplied.",
+            "vi": "Không có thời lượng pha được cung cấp."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Do not invent timing from the number of displayed steps.",
+        "vi": "Không suy thời gian từ số bước hiển thị."
+      }
+    },
+    {
+      "id": "new-task",
+      "prompt": {
+        "en": "A new task needs six simple instructions or two complex instructions. What can be concluded without timing data?",
+        "vi": "Nhiệm vụ mới cần sáu lệnh đơn giản hoặc hai lệnh phức hợp. Không có dữ liệu thời gian thì kết luận được gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The complex version is three times faster",
+            "vi": "Bản phức hợp nhanh gấp ba"
+          },
+          "feedback": {
+            "en": "Instruction counts alone do not establish speed.",
+            "vi": "Chỉ số lệnh chưa xác định tốc độ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The simple version is always faster",
+            "vi": "Bản đơn giản luôn nhanh hơn"
+          },
+          "feedback": {
+            "en": "The workload, clock and implementation are unspecified.",
+            "vi": "Chưa nêu công việc, clock và cách triển khai."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The instruction counts differ; execution time remains undetermined",
+            "vi": "Số lệnh khác nhau; thời gian thực hiện chưa xác định"
+          },
+          "feedback": {
+            "en": "Correct: this follows exactly from the given evidence.",
+            "vi": "Đúng: đây là điều rút ra được từ dữ kiện."
+          }
+        }
+      ],
+      "correctChoiceId": "c",
+      "explanation": {
+        "en": "A defensible answer separates a known count from an unknown duration.",
+        "vi": "Đáp án có cơ sở tách số lượng đã biết khỏi thời lượng chưa biết."
+      }
+    },
+    {
+      "id": "pipeline-transfer",
+      "prompt": {
+        "en": "Why can regular instruction formats help pipelining?",
+        "vi": "Vì sao định dạng lệnh đều đặn có thể giúp pipeline?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Decoding and stage organisation are easier to make regular",
+            "vi": "Dễ tổ chức giải mã và các giai đoạn đều đặn hơn"
+          },
+          "feedback": {
+            "en": "Correct: this explains a mechanism, without claiming all latency disappears.",
+            "vi": "Đúng: giải thích cơ chế mà không nói mọi độ trễ biến mất."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "They remove every data dependency",
+            "vi": "Chúng loại mọi phụ thuộc dữ liệu"
+          },
+          "feedback": {
+            "en": "Program dependencies can still occur.",
+            "vi": "Phụ thuộc của chương trình vẫn có thể xuất hiện."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Every instruction skips operand fetch",
+            "vi": "Mọi lệnh bỏ qua lấy toán hạng"
+          },
+          "feedback": {
+            "en": "Regular formats do not eliminate needed operands.",
+            "vi": "Định dạng đều đặn không loại nhu cầu toán hạng."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Explain what becomes simpler, not an unrelated absolute benefit.",
+        "vi": "Giải thích phần nào đơn giản hơn, không nêu lợi ích tuyệt đối không liên quan."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain a RISC/CISC difference and one limitation of a speed claim.",
+      "vi": "Giải thích một khác biệt RISC/CISC và một giới hạn khi nhận xét tốc độ."
+    },
+    "answerPoints": [
+      {
+        "en": "Compare the same property on both sides.",
+        "vi": "So cùng thuộc tính ở hai phía."
+      },
+      {
+        "en": "Simple load/store operations expose register and memory movement.",
+        "vi": "Thao tác load/store đơn giản thể hiện việc chuyển thanh ghi và bộ nhớ."
+      },
+      {
+        "en": "Elapsed time needs assumptions beyond instruction count.",
+        "vi": "Thời gian cần giả định ngoài số lệnh."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "RISC/CISC are architectural approaches, not universal speed rankings.",
+      "vi": "RISC/CISC là hướng thiết kế, không phải bảng xếp hạng tốc độ phổ quát."
+    },
+    {
+      "en": "Instruction length, addressing and register use explain the comparison.",
+      "vi": "Độ dài lệnh, chế độ địa chỉ và cách dùng thanh ghi giải thích phép so."
+    }
+  ],
+  "relatedSlugs": [
+    "pipelines-registers-and-interrupts"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.1",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter15.1.1, printed347–348 / PDF363–364",
+      "kind": "book"
+    },
+    {
+      "id": "past-qp",
+      "title": "Cambridge9618/31 — May/June2022 question paper",
+      "locator": "Question4(a,b), page7",
+      "kind": "question-paper"
+    },
+    {
+      "id": "past-ms",
+      "title": "Cambridge9618/31 — May/June2022 mark scheme",
+      "locator": "Question4(a,b), page6",
+      "kind": "mark-scheme"
+    }
+  ]
+}

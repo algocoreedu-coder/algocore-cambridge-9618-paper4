@@ -1,0 +1,651 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.3-T04",
+  "slug": "approximation-rounding-and-range-errors",
+  "title": {
+    "en": "Approximation, rounding and range errors",
+    "vi": "Xấp xỉ, làm tròn và lỗi phạm vi"
+  },
+  "question": {
+    "en": "When a value cannot be stored exactly, what changes and what error should we report?",
+    "vi": "Khi không lưu được chính xác một giá trị, điều gì thay đổi và phải nêu sai số nào?"
+  },
+  "opening": {
+    "en": "13.375 has a finite binary expansion, yet it does not fit a mantissa with only five fractional positions at its required scale. 0.1 has a different problem: its binary expansion repeats forever. Both need approximation in a finite field. Overflow and underflow are different again: the exact result is outside a stated range.",
+    "vi": "13.375 có khai triển nhị phân hữu hạn nhưng vẫn không vừa định trị chỉ có năm vị trí phân số tại thang cần dùng. 0.1 gặp vấn đề khác: nhị phân lặp vô hạn. Cả hai cần xấp xỉ trong trường hữu hạn. Overflow và underflow lại khác: kết quả chính xác nằm ngoài phạm vi đã nêu."
+  },
+  "objectives": [
+    {
+      "en": "Explain why finite storage may not represent a real value exactly.",
+      "vi": "Giải thích vì sao lưu trữ hữu hạn có thể không biểu diễn chính xác giá trị thực."
+    },
+    {
+      "en": "Compare truncation and rounding under an explicit tie rule.",
+      "vi": "So cắt và làm tròn theo quy tắc xử lý hòa rõ ràng."
+    },
+    {
+      "en": "Calculate signed and absolute error, and distinguish precision error from range errors.",
+      "vi": "Tính sai số có dấu và tuyệt đối, phân biệt sai số độ chính xác với lỗi phạm vi."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Binary fractions, normalisation and value=M×2^E.",
+      "vi": "Phân số nhị phân, chuẩn hóa và value=M×2^E."
+    },
+    {
+      "en": "The role of mantissa width and exponent limits.",
+      "vi": "Vai trò độ rộng định trị và giới hạn số mũ."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Approximation",
+      "meaning": {
+        "en": "Replacing an exact value with a representable nearby value.",
+        "vi": "Thay giá trị chính xác bằng giá trị gần đó biểu diễn được."
+      }
+    },
+    {
+      "term": "Truncation toward zero",
+      "meaning": {
+        "en": "Discarding excess magnitude precision so the retained value moves toward zero.",
+        "vi": "Bỏ phần độ chính xác dư của độ lớn để giá trị giữ lại tiến về không."
+      }
+    },
+    {
+      "term": "Rounding to nearest",
+      "meaning": {
+        "en": "Selecting the closest representable value, with an explicit rule if equally close.",
+        "vi": "Chọn giá trị biểu diễn được gần nhất, có quy tắc rõ khi cách đều."
+      }
+    },
+    {
+      "term": "Signed error",
+      "meaning": {
+        "en": "Stored value minus exact value.",
+        "vi": "Giá trị lưu trừ giá trị chính xác."
+      }
+    },
+    {
+      "term": "Underflow",
+      "meaning": {
+        "en": "A nonzero result has magnitude too small for the required representable range.",
+        "vi": "Kết quả khác không có độ lớn quá nhỏ cho miền biểu diễn yêu cầu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "finite",
+      "title": {
+        "en": "Two reasons for losing exactness",
+        "vi": "Hai lý do mất tính chính xác"
+      },
+      "paragraphs": [
+        {
+          "en": "A binary fraction can be finite yet require more significant places than the mantissa provides. 13.375=1101.011₂=0.1101011₂×2^4. An M6 field has one sign bit and only five fractional bits, so it cannot retain all seven fractional positions in that normalised magnitude. Appending extra exponent bits would not restore the missing local detail.",
+          "vi": "Phân số nhị phân có thể hữu hạn nhưng cần nhiều vị trí có nghĩa hơn định trị cung cấp. 13.375=1101.011₂=0.1101011₂×2^4. Trường M6 có một bit dấu và chỉ năm bit phân số nên không giữ được cả bảy vị trí phân số trong độ lớn chuẩn hóa đó. Thêm bit số mũ không khôi phục chi tiết cục bộ bị thiếu."
+        },
+        {
+          "en": "Some decimal fractions are infinite in binary. To convert 0.1, repeatedly multiply the fractional remainder by 2 and take the next bit. The remainders eventually repeat, producing 0.000110011…₂. No finite mantissa stores that entire recurring expansion. The issue is the number system and finite width, not a display fault.",
+          "vi": "Một số phân số thập phân là vô hạn trong nhị phân. Đổi 0.1 bằng cách liên tục nhân phần dư phân số với 2 rồi lấy bit tiếp. Phần dư cuối cùng lặp, tạo 0.000110011…₂. Không định trị hữu hạn nào giữ toàn khai triển tuần hoàn đó. Vấn đề nằm ở hệ số và độ rộng hữu hạn, không phải lỗi hiển thị."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "methods",
+      "title": {
+        "en": "Declare the approximation rule",
+        "vi": "Công bố quy tắc xấp xỉ"
+      },
+      "paragraphs": [
+        {
+          "en": "Here truncation means toward zero. For positive 13.375 in M6/E4, retaining 0.11010₂×2^4 gives 13. Nearest rounding compares the neighbours 13 and 13.5: the distances are 0.375 and 0.125, so 13.5 is nearer. Its mantissa becomes 011011 and the exponent stays 0100.",
+          "vi": "Ở đây cắt nghĩa là về phía không. Với 13.375 dương trong M6/E4, giữ 0.11010₂×2^4 cho 13. Làm tròn gần nhất so hai hàng xóm 13 và 13.5: khoảng cách 0.375 và 0.125 nên 13.5 gần hơn. Định trị thành 011011 và số mũ giữ 0100."
+        },
+        {
+          "en": "If the exact value is halfway between two choices, this lesson uses ties away from zero. Thus 13.25 rounds to 13.5 and−13.25 rounds to−13.5 in the corresponding M6/E4 scale. Other systems may use another rule, such as ties to even. The question’s stated rule takes priority; do not present this teaching convention as universal.",
+          "vi": "Nếu giá trị chính xác cách đều hai lựa chọn, bài dùng quy tắc hòa thì ra xa không. Vì vậy 13.25 làm tròn thành 13.5 và−13.25 thành−13.5 tại thang M6/E4 tương ứng. Hệ thống khác có thể dùng quy tắc khác như hòa về chẵn. Phải ưu tiên quy tắc đề nêu; không trình bày quy ước minh họa này là phổ quát."
+        },
+        {
+          "en": "For negative values, truncation toward zero is not the same as blindly deleting low bits from a two’s-complement pattern. Work with the exact magnitude and the declared rule, then encode the retained signed value. Rounding can also carry into a new scale; if that happens, renormalise and check that the new exponent still fits.",
+          "vi": "Với số âm, cắt về không không giống xóa tùy tiện các bit thấp của mẫu bù hai. Hãy xử lý độ lớn chính xác theo quy tắc đã nêu rồi mã hóa giá trị có dấu giữ lại. Làm tròn cũng có thể phát sinh nhớ sang thang mới; khi đó cần chuẩn hóa lại và kiểm số mũ mới còn vừa."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "error",
+      "title": {
+        "en": "Measure error against the exact value",
+        "vi": "Đo sai số so với giá trị chính xác"
+      },
+      "paragraphs": [
+        {
+          "en": "Use signed error=stored−exact, and absolute error=|stored−exact|. For 13.375, truncation to 13 gives error−0.375=−3/8; rounding to 13.5 gives+0.125=+1/8. A negative signed error means the stored value is numerically lower than the exact value, not that the input was necessarily negative.",
+          "vi": "Dùng sai số có dấu=giá trị lưu−giá trị chính xác, và sai số tuyệt đối=|giá trị lưu−giá trị chính xác|. Với 13.375, cắt thành 13 cho−0.375=−3/8; làm tròn thành 13.5 cho+0.125=+1/8. Sai số có dấu âm nghĩa là giá trị lưu nhỏ hơn giá trị chính xác, không có nghĩa đầu vào chắc chắn âm."
+        },
+        {
+          "en": "For 0.1 in M8/E4 with nearest rounding, M01100110/E1101 stores 102/128×2^(−3)=51/512=0.099609375. Compared with exact 1/10, its signed error is−1/2560. Writing the displayed result as “0.10” does not change the internal stored fraction or remove this error.",
+          "vi": "Với 0.1 trong M8/E4 làm tròn gần nhất, M01100110/E1101 lưu 102/128×2^(−3)=51/512=0.099609375. So với 1/10 chính xác, sai số có dấu là−1/2560. Viết kết quả hiển thị thành “0.10” không đổi phân số lưu bên trong hay xóa sai số."
+        },
+        {
+          "en": "Errors can propagate through later calculations. If that stored approximation to 0.1 is added three times using exact addition for this illustration, the result is 153/512=0.298828125 rather than 3/10, with error−3/2560. A system that rounds after each arithmetic operation is a different model and may produce a different result. State which operations are rounded before tracing an accumulated error.",
+          "vi": "Sai số có thể truyền qua tính toán sau. Nếu cộng xấp xỉ 0.1 đã lưu đó ba lần bằng phép cộng chính xác trong ví dụ này, kết quả là 153/512=0.298828125 thay vì 3/10, sai số−3/2560. Hệ thống làm tròn sau từng phép toán là mô hình khác và có thể cho kết quả khác. Cần nêu phép nào làm tròn trước khi trace sai số tích lũy."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "range",
+      "title": {
+        "en": "Separate out-of-range results from local approximation",
+        "vi": "Tách kết quả ngoài miền khỏi xấp xỉ cục bộ"
+      },
+      "paragraphs": [
+        {
+          "en": "Under the normalised M8/E4 requirement, the maximum positive is 127 and the smallest positive nonzero value is 1/512. The exact positive result 100×2=200 exceeds 127: this is overflow. The exact positive result(1/512)/2=1/1024 is nonzero but below 1/512: it is underflow for the required normalised representation.",
+          "vi": "Theo yêu cầu M8/E4 chuẩn hóa, dương lớn nhất là 127 và dương khác không nhỏ nhất là 1/512. Kết quả dương chính xác 100×2=200 vượt 127: đây là overflow. Kết quả dương chính xác(1/512)/2=1/1024 khác không nhưng nhỏ hơn 1/512: đây là underflow đối với biểu diễn chuẩn hóa yêu cầu."
+        },
+        {
+          "en": "Underflow does not mean “the answer is negative”, and zero itself is not underflow. A negative overflow would exceed the negative side’s magnitude limit, which must be checked separately. What a real system does next—signal an error, use another representation or apply a special policy—is not specified by these mathematical examples. Do not invent an automatic zero or infinity result.",
+          "vi": "Underflow không có nghĩa “đáp án âm”, và bản thân số không không phải underflow. Overflow phía âm vượt giới hạn độ lớn phía âm, cần kiểm riêng. Hệ thống thực sẽ làm gì tiếp—báo lỗi, dùng dạng khác hoặc chính sách riêng—không được quy định bởi các ví dụ toán này. Không tự kết luận kết quả tự động là không hay vô cực."
+        },
+        {
+          "en": "Division by zero is a separate undefined operation, not merely an example of a finite result exceeding the range. When classifying an error, first identify the exact intended result and the format’s assumptions, then decide whether the issue is insufficient precision or an out-of-range magnitude.",
+          "vi": "Chia cho không là phép toán không xác định riêng, không chỉ là ví dụ kết quả hữu hạn vượt miền. Khi phân loại lỗi, trước tiên xác định kết quả chính xác dự định và giả thiết định dạng rồi quyết định vấn đề là thiếu độ chính xác hay độ lớn ngoài miền."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "rounding-errors",
+    "title": {
+      "en": "See the exact value and its stored neighbour",
+      "vi": "Nhìn giá trị chính xác và hàng xóm được lưu"
+    },
+    "introduction": {
+      "en": "Choose an approximation example or a range-limit example. Their captions state the format being used.",
+      "vi": "Chọn ví dụ xấp xỉ hoặc giới hạn phạm vi. Chú thích nêu định dạng đang dùng."
+    },
+    "task": {
+      "en": "For 13.375 in M6/E4, predict the truncate and nearest results, then compare their signed errors. Switch to 0.1, overflow and underflow to identify the different causes.",
+      "vi": "Với 13.375 trong M6/E4, dự đoán kết quả cắt và làm tròn gần nhất rồi so sai số có dấu. Chuyển sang 0.1, overflow và underflow để nhận diện nguyên nhân khác nhau."
+    },
+    "conventions": [
+      {
+        "en": "13.375 uses M6/E4;0.1 and range examples use M8/E4.",
+        "vi": "13.375 dùng M6/E4;0.1 và ví dụ phạm vi dùng M8/E4."
+      },
+      {
+        "en": "Truncation is toward zero. Nearest ties are resolved away from zero in this teaching model.",
+        "vi": "Cắt về phía không. Khi hòa, làm tròn gần nhất ra xa không trong mô hình này."
+      },
+      {
+        "en": "Exact decimal values are treated as fractions; error is stored−exact.",
+        "vi": "Giá trị thập phân chính xác được coi là phân số; sai số là giá trị lưu−chính xác."
+      },
+      {
+        "en": "Range cases report the mathematical limit; they do not invent a machine exception policy.",
+        "vi": "Ví dụ phạm vi báo giới hạn toán học; không tự thêm chính sách ngoại lệ máy."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Approximate 13.375 with a six-bit mantissa",
+      "vi": "Xấp xỉ 13.375 với định trị sáu bit"
+    },
+    "prompt": {
+      "en": "Use M6/E4, both two’s complement. Compare truncation toward zero with nearest rounding for 13.375 and calculate both signed errors.",
+      "vi": "Dùng M6/E4, cả hai bù hai. So cắt về không với làm tròn gần nhất cho 13.375 và tính hai sai số có dấu."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "exact",
+        "action": {
+          "en": "Write the exact binary value.",
+          "vi": "Viết giá trị nhị phân chính xác."
+        },
+        "why": {
+          "en": "The bits being discarded must come from the exact value.",
+          "vi": "Bit bị bỏ phải xuất phát từ giá trị chính xác."
+        },
+        "result": {
+          "en": "13.375=1101.011₂=0.1101011₂×2^4.",
+          "vi": "13.375=1101.011₂=0.1101011₂×2^4."
+        },
+        "check": {
+          "en": "The fractional part 0.011₂ is 1/4+1/8=0.375.",
+          "vi": "Phần phân số 0.011₂ là 1/4+1/8=0.375."
+        }
+      },
+      {
+        "id": "retain",
+        "action": {
+          "en": "Separate the retained and omitted magnitude bits.",
+          "vi": "Tách bit độ lớn giữ lại và bỏ đi."
+        },
+        "why": {
+          "en": "M6 includes a sign bit, leaving five fractional positions.",
+          "vi": "M6 gồm bit dấu nên còn năm vị trí phân số."
+        },
+        "result": {
+          "en": "Retain 0.11010 and omit the tail 11; exponent is 0100.",
+          "vi": "Giữ 0.11010 và bỏ phần đuôi 11; số mũ là 0100."
+        },
+        "check": {
+          "en": "Do not accidentally retain six fractional bits.",
+          "vi": "Không giữ nhầm sáu bit phân số."
+        }
+      },
+      {
+        "id": "truncate",
+        "action": {
+          "en": "Use the retained positive magnitude.",
+          "vi": "Dùng độ lớn dương được giữ."
+        },
+        "why": {
+          "en": "Toward-zero truncation selects the lower neighbour for a positive input.",
+          "vi": "Cắt về không chọn hàng xóm thấp hơn với đầu vào dương."
+        },
+        "result": {
+          "en": "M011010/E0100 stores 26/32×16=13; signed error=−3/8.",
+          "vi": "M011010/E0100 lưu 26/32×16=13; sai số có dấu=−3/8."
+        },
+        "check": {
+          "en": "The absolute error is 3/8.",
+          "vi": "Sai số tuyệt đối là 3/8."
+        }
+      },
+      {
+        "id": "nearest",
+        "action": {
+          "en": "Compare the two neighbouring values.",
+          "vi": "So hai giá trị hàng xóm."
+        },
+        "why": {
+          "en": "13.375 is 0.125 from 13.5 and 0.375 from 13; it is not a tie.",
+          "vi": "13.375 cách 13.5 là 0.125 và cách 13 là 0.375; đây không phải hòa."
+        },
+        "result": {
+          "en": "M011011/E0100 stores 27/32×16=13.5; signed error=+1/8.",
+          "vi": "M011011/E0100 lưu 27/32×16=13.5; sai số có dấu=+1/8."
+        },
+        "check": {
+          "en": "Nearest has smaller absolute error here:1/8<3/8.",
+          "vi": "Gần nhất có sai số tuyệt đối nhỏ hơn ở đây:1/8<3/8."
+        }
+      },
+      {
+        "id": "check",
+        "action": {
+          "en": "Decode each stored pair independently.",
+          "vi": "Giải mã độc lập mỗi cặp được lưu."
+        },
+        "why": {
+          "en": "A plausible bit pattern is insufficient unless its value and error agree.",
+          "vi": "Mẫu bit trông hợp lý chưa đủ nếu giá trị và sai số không khớp."
+        },
+        "result": {
+          "en": "Exact 107/8; truncate 104/8; nearest 108/8.",
+          "vi": "Chính xác 107/8; cắt 104/8; gần nhất 108/8."
+        },
+        "check": {
+          "en": "Subtract exact from stored, not the reverse.",
+          "vi": "Lấy giá trị lưu trừ chính xác, không đảo chiều."
+        }
+      }
+    ],
+    "result": {
+      "en": "Truncation stores 13 with error−3/8; nearest stores 13.5 with error+1/8.",
+      "vi": "Cắt lưu 13 với sai số−3/8; gần nhất lưu 13.5 với sai số+1/8."
+    },
+    "selfCheck": {
+      "en": "Mark exact and both stored values on the same number line. Explain why the tie rule was not needed for this input.",
+      "vi": "Đánh dấu giá trị chính xác và hai giá trị lưu trên cùng trục số. Giải thích vì sao đầu vào này không cần quy tắc hòa."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A question asks which bits are omitted, why a real cannot be represented exactly, or how rounding changes a result.",
+        "vi": "Đề hỏi bit nào bị bỏ, vì sao số thực không biểu diễn chính xác hay làm tròn đổi kết quả thế nào."
+      },
+      {
+        "en": "An exact result is compared with a largest or smallest representable magnitude.",
+        "vi": "Kết quả chính xác được so với độ lớn lớn nhất hoặc nhỏ nhất biểu diễn được."
+      }
+    ],
+    "distinguish": {
+      "en": "Insufficient mantissa precision causes approximation inside a usable scale. Overflow and underflow concern the stated range. These are not interchangeable explanations.",
+      "vi": "Thiếu độ chính xác định trị gây xấp xỉ trong thang dùng được. Overflow và underflow liên quan miền đã nêu. Không thể dùng các giải thích này thay nhau."
+    },
+    "method": [
+      {
+        "en": "State M/E widths, normalisation requirement and rounding rule.",
+        "vi": "Nêu độ rộng M/E, yêu cầu chuẩn hóa và quy tắc làm tròn."
+      },
+      {
+        "en": "Keep the exact value separate from candidate stored values.",
+        "vi": "Tách giá trị chính xác khỏi các giá trị lưu ứng viên."
+      },
+      {
+        "en": "Check range, apply the rule, decode and calculate stored−exact.",
+        "vi": "Kiểm miền, áp dụng quy tắc, giải mã và tính giá trị lưu−chính xác."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“Finite binary expansion always fits.”",
+        "vi": "“Nhị phân hữu hạn luôn vừa.”"
+      },
+      "correction": {
+        "en": "It may need more significant positions than the available mantissa.",
+        "vi": "Nó có thể cần nhiều vị trí có nghĩa hơn định trị sẵn có."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Rounding the displayed decimal removes internal error.”",
+        "vi": "“Làm tròn thập phân hiển thị xóa sai số bên trong.”"
+      },
+      "correction": {
+        "en": "Formatting a display does not change the stored binary value.",
+        "vi": "Định dạng hiển thị không đổi giá trị nhị phân được lưu."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Underflow means a negative answer.”",
+        "vi": "“Underflow nghĩa là đáp án âm.”"
+      },
+      "correction": {
+        "en": "It concerns a nonzero magnitude too small for the required range, not the sign alone.",
+        "vi": "Nó nói về độ lớn khác không quá nhỏ cho miền yêu cầu, không chỉ dấu."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Truncate negative two’s complement by removing low bits without checking direction.”",
+        "vi": "“Cắt bù hai âm bằng cách bỏ bit thấp mà không kiểm chiều.”"
+      },
+      "correction": {
+        "en": "That may move toward negative infinity; the declared rule here is toward zero.",
+        "vi": "Cách đó có thể đi về âm vô cực; quy tắc ở đây là về không."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "finite",
+      "prompt": {
+        "en": "Why does 13.375 need approximation in M6/E4 despite finite binary expansion?",
+        "vi": "Vì sao 13.375 cần xấp xỉ trong M6/E4 dù nhị phân hữu hạn?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Every finite binary value causes overflow.",
+            "vi": "Mọi giá trị nhị phân hữu hạn gây overflow."
+          },
+          "feedback": {
+            "en": "The value is within the scale range; the problem is the mantissa width.",
+            "vi": "Giá trị nằm trong thang độ lớn; vấn đề là độ rộng định trị."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Its normalised magnitude needs more than five fractional bits.",
+            "vi": "Độ lớn chuẩn hóa cần hơn năm bit phân số."
+          },
+          "feedback": {
+            "en": "Correct. M6 leaves only five fractional positions after the sign.",
+            "vi": "Đúng. M6 chỉ còn năm vị trí phân số sau dấu."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "The exponent 4 is negative.",
+            "vi": "Số mũ 4 là âm."
+          },
+          "feedback": {
+            "en": "4 is positive and fits E4.",
+            "vi": "4 là dương và vừa E4."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Distinguish a finite expansion from one that fits the specified width.",
+        "vi": "Phân biệt khai triển hữu hạn với khai triển vừa độ rộng yêu cầu."
+      }
+    },
+    {
+      "id": "tie-transfer",
+      "prompt": {
+        "en": "At this M6/E4 scale,−13.25 lies halfway between−13 and−13.5. With ties away from zero, what is stored?",
+        "vi": "Tại thang M6/E4 này,−13.25 cách đều−13 và−13.5. Quy tắc hòa ra xa không lưu gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "−13",
+            "vi": "−13"
+          },
+          "feedback": {
+            "en": "That is toward zero; it is not the tie rule stated here.",
+            "vi": "Đó là về không; không phải quy tắc hòa đã nêu."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "−13.5",
+            "vi": "−13.5"
+          },
+          "feedback": {
+            "en": "Correct.−13.5 is farther from zero; signed error is−0.25.",
+            "vi": "Đúng.−13.5 xa không hơn; sai số có dấu là−0.25."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "13.5",
+            "vi": "13.5"
+          },
+          "feedback": {
+            "en": "Rounding does not change a negative input into a positive number here.",
+            "vi": "Làm tròn không đổi đầu vào âm thành số dương ở đây."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Read the rule and apply it to magnitude; do not confuse nearest ties with truncation.",
+        "vi": "Đọc quy tắc và áp dụng theo độ lớn; không nhầm hòa của gần nhất với cắt."
+      }
+    },
+    {
+      "id": "range-transfer",
+      "prompt": {
+        "en": "Normalised M8/E4 has minimum positive 1/512. The exact result is 1/2048. Which classification fits?",
+        "vi": "M8/E4 chuẩn hóa có dương nhỏ nhất 1/512. Kết quả chính xác là 1/2048. Phân loại nào đúng?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Overflow",
+            "vi": "Overflow"
+          },
+          "feedback": {
+            "en": "The value is too small, not too large.",
+            "vi": "Giá trị quá nhỏ, không phải quá lớn."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Underflow under the normalised requirement",
+            "vi": "Underflow theo yêu cầu chuẩn hóa"
+          },
+          "feedback": {
+            "en": "Correct. The result is nonzero and below the smallest allowed positive value.",
+            "vi": "Đúng. Kết quả khác không và nhỏ hơn số dương nhỏ nhất cho phép."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "Exactly zero",
+            "vi": "Chính xác là không"
+          },
+          "feedback": {
+            "en": "1/2048 is not zero; a system policy must not be invented.",
+            "vi": "1/2048 không phải không; không được tự thêm chính sách hệ thống."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "A range classification is not a claim about an automatic replacement value.",
+        "vi": "Phân loại phạm vi không khẳng định giá trị thay thế tự động."
+      }
+    },
+    {
+      "id": "error-sign",
+      "prompt": {
+        "en": "A stored value is 6.25 and the exact value is 6.1875. What is signed error stored−exact?",
+        "vi": "Giá trị lưu là 6.25 và chính xác là 6.1875. Sai số có dấu lưu−chính xác bằng bao nhiêu?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "−0.0625",
+            "vi": "−0.0625"
+          },
+          "feedback": {
+            "en": "This subtracts in the opposite order.",
+            "vi": "Đáp án trừ ngược thứ tự."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "0",
+            "vi": "0"
+          },
+          "feedback": {
+            "en": "The two values differ; a short decimal display does not erase the difference.",
+            "vi": "Hai giá trị khác nhau; hiển thị thập phân ngắn không xóa khác biệt."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "+0.0625",
+            "vi": "+0.0625"
+          },
+          "feedback": {
+            "en": "Correct. The stored value exceeds the exact value by 1/16.",
+            "vi": "Đúng. Giá trị lưu lớn hơn chính xác 1/16."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "Signed error indicates direction; absolute error gives its size.",
+        "vi": "Sai số có dấu chỉ chiều; sai số tuyệt đối cho độ lớn."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Distinguish the two causes of inexact storage and the two range errors, then state the error formula.",
+      "vi": "Phân biệt hai nguyên nhân lưu không chính xác và hai lỗi phạm vi rồi nêu công thức sai số."
+    },
+    "answerPoints": [
+      {
+        "en": "A finite expansion may be too long; some fractions recur in binary.",
+        "vi": "Khai triển hữu hạn có thể quá dài; một số phân số tuần hoàn trong nhị phân."
+      },
+      {
+        "en": "Use the stated truncation/rounding rule and tie convention.",
+        "vi": "Dùng quy tắc cắt/làm tròn và hòa đã nêu."
+      },
+      {
+        "en": "Signed error=stored−exact; overflow is too large, underflow is too small and nonzero for the required range.",
+        "vi": "Sai số có dấu=lưu−chính xác; overflow quá lớn, underflow quá nhỏ và khác không theo miền yêu cầu."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Keep the exact value visible until the final error calculation.",
+      "vi": "Giữ giá trị chính xác tới phép tính sai số cuối."
+    },
+    {
+      "en": "Name the format and policy; do not blame every discrepancy on the same cause.",
+      "vi": "Nêu định dạng và chính sách; không quy mọi sai lệch về cùng nguyên nhân."
+    }
+  ],
+  "relatedSlugs": [
+    "precision-range-and-limits",
+    "normalisation",
+    "signed-floating-point-conversion"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.3, p.33",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=33"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.320–321,324–325; examples independently checked",
+      "kind": "book"
+    }
+  ]
+}

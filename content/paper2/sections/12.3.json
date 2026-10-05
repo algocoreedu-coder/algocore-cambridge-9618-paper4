@@ -1,0 +1,424 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.12.3.2",
+  "sectionId": "12.3",
+  "scenario": {
+    "label": {
+      "en": "SHARED SCENARIO",
+      "vi": "TÌNH HUỐNG XUYÊN SUỐT"
+    },
+    "title": {
+      "en": "Verify a changed delivery-charge program",
+      "vi": "Xác minh chương trình phí giao hàng đã sửa"
+    },
+    "context": {
+      "en": "A working program gains a new discount rule. The team must prevent faults, trace and debug the change, plan tests and prove old behaviour still works.",
+      "vi": "Chương trình đang chạy thêm rule discount. Nhóm phải phòng fault, trace và debug thay đổi, lập test và chứng minh behavior cũ vẫn đúng."
+    },
+    "bigQuestion": {
+      "en": "What evidence shows both the new requirement and promised old behaviour are correct?",
+      "vi": "Bằng chứng nào cho thấy requirement mới và behavior cũ đã cam kết đều đúng?"
+    }
+  },
+  "prerequisiteGuidance": [
+    {
+      "topicId": "T26",
+      "slug": "dry-run-trace-tables",
+      "title": {
+        "en": "Dry runs and trace tables",
+        "vi": "Chạy thử bằng tay và bảng trace"
+      },
+      "reason": {
+        "en": "Learn this decision first because its output becomes evidence for the next topic.",
+        "vi": "Học quyết định này trước vì output của nó trở thành bằng chứng cho topic tiếp theo."
+      }
+    },
+    {
+      "topicId": "T27",
+      "slug": "errors-debugging",
+      "title": {
+        "en": "Errors and debugging",
+        "vi": "Lỗi và gỡ lỗi"
+      },
+      "reason": {
+        "en": "Learn this decision first because its output becomes evidence for the next topic.",
+        "vi": "Học quyết định này trước vì output của nó trở thành bằng chứng cho topic tiếp theo."
+      }
+    },
+    {
+      "topicId": "T28",
+      "slug": "testing-methods",
+      "title": {
+        "en": "Testing methods",
+        "vi": "Phương pháp kiểm thử"
+      },
+      "reason": {
+        "en": "Learn this decision first because its output becomes evidence for the next topic.",
+        "vi": "Học quyết định này trước vì output của nó trở thành bằng chứng cho topic tiếp theo."
+      }
+    },
+    {
+      "topicId": "T29",
+      "slug": "test-strategy-test-plan",
+      "title": {
+        "en": "Test strategies and test plans",
+        "vi": "Chiến lược và kế hoạch kiểm thử"
+      },
+      "reason": {
+        "en": "Learn this decision first because its output becomes evidence for the next topic.",
+        "vi": "Học quyết định này trước vì output của nó trở thành bằng chứng cho topic tiếp theo."
+      }
+    },
+    {
+      "topicId": "T30",
+      "slug": "test-data",
+      "title": {
+        "en": "Test data",
+        "vi": "Dữ liệu kiểm thử"
+      },
+      "reason": {
+        "en": "Learn this decision first because its output becomes evidence for the next topic.",
+        "vi": "Học quyết định này trước vì output của nó trở thành bằng chứng cho topic tiếp theo."
+      }
+    },
+    {
+      "topicId": "T31",
+      "slug": "maintenance",
+      "title": {
+        "en": "Maintenance",
+        "vi": "Bảo trì"
+      },
+      "reason": {
+        "en": "Learn this decision first because its output becomes evidence for the next topic.",
+        "vi": "Học quyết định này trước vì output của nó trở thành bằng chứng cho topic tiếp theo."
+      }
+    },
+    {
+      "topicId": "T32",
+      "slug": "amendment-efficiency",
+      "title": {
+        "en": "Amendment and efficiency",
+        "vi": "Sửa đổi và hiệu quả"
+      },
+      "reason": {
+        "en": "Use this topic to integrate and verify the section’s complete answer.",
+        "vi": "Dùng topic này để tích hợp và kiểm đáp án hoàn chỉnh của section."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "dry run",
+      "meaning": {
+        "en": "Manual execution recording exact state changes.",
+        "vi": "Chạy tay ghi state change chính xác."
+      }
+    },
+    {
+      "term": "fault",
+      "meaning": {
+        "en": "A defect that can cause wrong behaviour.",
+        "vi": "Defect có thể gây behavior sai."
+      }
+    },
+    {
+      "term": "expected result",
+      "meaning": {
+        "en": "An outcome derived independently from a requirement.",
+        "vi": "Outcome suy độc lập từ requirement."
+      }
+    },
+    {
+      "term": "regression testing",
+      "meaning": {
+        "en": "Rerunning relevant old tests after a change.",
+        "vi": "Chạy lại test cũ liên quan sau thay đổi."
+      }
+    }
+  ],
+  "topicRelationship": {
+    "title": {
+      "en": "One system, connected decisions",
+      "vi": "Một hệ thống, các quyết định liên kết"
+    },
+    "introduction": {
+      "en": "Work through the topics in order, then combine their checks in an extended problem.",
+      "vi": "Học các topic theo thứ tự rồi phối hợp các phép kiểm trong bài tổng hợp."
+    },
+    "items": [
+      {
+        "topicId": "T26",
+        "slug": "dry-run-trace-tables",
+        "question": {
+          "en": "What does the given code actually do?",
+          "vi": "Code được cho thực sự làm gì?"
+        },
+        "result": {
+          "en": "An exact trace and output without silently repairing intent.",
+          "vi": "Trace và output chính xác, không âm thầm sửa ý định."
+        }
+      },
+      {
+        "topicId": "T27",
+        "slug": "errors-debugging",
+        "question": {
+          "en": "Where is the first wrong state?",
+          "vi": "State sai đầu ở đâu?"
+        },
+        "result": {
+          "en": "A counterexample, classified fault, minimal patch and regression evidence.",
+          "vi": "Counterexample, fault được phân loại, patch nhỏ và regression evidence."
+        }
+      },
+      {
+        "topicId": "T28",
+        "slug": "testing-methods",
+        "question": {
+          "en": "Which testing method fits purpose and stage?",
+          "vi": "Testing method nào khớp mục đích và stage?"
+        },
+        "result": {
+          "en": "A justified method distinct from data or individual cases.",
+          "vi": "Method có lý do, khác data hoặc case."
+        }
+      },
+      {
+        "topicId": "T29",
+        "slug": "test-strategy-test-plan",
+        "question": {
+          "en": "Which requirement is each test proving?",
+          "vi": "Mỗi test chứng minh requirement nào?"
+        },
+        "result": {
+          "en": "A plan linking input, expected, status and actual after execution.",
+          "vi": "Plan nối input, expected, status và actual sau chạy."
+        }
+      },
+      {
+        "topicId": "T30",
+        "slug": "test-data",
+        "question": {
+          "en": "Which classes and boundaries expose mistakes?",
+          "vi": "Class và boundary nào làm lộ lỗi?"
+        },
+        "result": {
+          "en": "Normal, abnormal and extreme/boundary values derived from the domain.",
+          "vi": "Giá trị normal, abnormal và extreme/boundary suy từ domain."
+        }
+      },
+      {
+        "topicId": "T31",
+        "slug": "maintenance",
+        "question": {
+          "en": "Why is deployed software changing?",
+          "vi": "Vì sao software đã deploy thay đổi?"
+        },
+        "result": {
+          "en": "A maintenance type justified by cause and goal.",
+          "vi": "Loại maintenance theo cause và goal."
+        }
+      },
+      {
+        "topicId": "T32",
+        "slug": "amendment-efficiency",
+        "question": {
+          "en": "Which contract changed and what must remain?",
+          "vi": "Contract nào đổi và phần nào phải giữ?"
+        },
+        "result": {
+          "en": "A minimal amendment with new and regression evidence.",
+          "vi": "Amendment tối thiểu với bằng chứng mới và regression."
+        }
+      }
+    ],
+    "connection": {
+      "en": "Prevention reduces fault opportunities, tracing localises divergence, a requirement-based plan selects methods and data, and a change finishes only after new and old contracts have evidence.",
+      "vi": "Phòng ngừa giảm cơ hội fault, trace định vị divergence, plan theo requirement chọn method và data, và thay đổi chỉ hoàn tất khi contract mới/cũ có bằng chứng."
+    }
+  },
+  "visual": {
+    "assetId": "S12.3",
+    "anchorId": "section-12-3-concept-map",
+    "title": {
+      "en": "Build an evidence chain from requirement to regression",
+      "vi": "Xây chuỗi bằng chứng từ requirement đến regression"
+    },
+    "introduction": {
+      "en": "Move through code, trace, counterexample, patch, test-plan coverage and before/after work.",
+      "vi": "Đi qua code, trace, counterexample, patch, coverage của test plan và work trước/sau."
+    },
+    "task": {
+      "en": "Predict the expected result independently before revealing any simulated actual result.",
+      "vi": "Dự đoán expected độc lập trước khi mở actual result mô phỏng."
+    }
+  },
+  "workedChapter": {
+    "title": {
+      "en": "Worked chapter: verify a changed delivery-charge program",
+      "vi": "Bài giải xuyên chương: xác minh chương trình phí giao hàng đã sửa"
+    },
+    "prompt": {
+      "en": "A working program gains a new discount rule. The team must prevent faults, trace and debug the change, plan tests and prove old behaviour still works.",
+      "vi": "Chương trình đang chạy thêm rule discount. Nhóm phải phòng fault, trace và debug thay đổi, lập test và chứng minh behavior cũ vẫn đúng."
+    },
+    "fieldTable": {
+      "ariaLabel": {
+        "en": "12.3 worked comparison",
+        "vi": "Bảng so sánh bài giải 12.3"
+      },
+      "firstColumn": {
+        "en": "Element / value",
+        "vi": "Thành phần / giá trị"
+      },
+      "secondColumn": {
+        "en": "Decision / working",
+        "vi": "Quyết định / cách làm"
+      },
+      "thirdColumn": {
+        "en": "Evidence / check",
+        "vi": "Bằng chứng / tự kiểm"
+      }
+    },
+    "fields": [
+      {
+        "field": "Requirement",
+        "value": "Discount at Total >= 100",
+        "assignment": {
+          "en": "Derive behaviour before reading code.",
+          "vi": "Suy behavior trước đọc code."
+        },
+        "report": {
+          "en": "Test 99, 100, 101 and abnormal totals.",
+          "vi": "Test 99, 100, 101 và total abnormal."
+        }
+      },
+      {
+        "field": "Counterexample",
+        "value": "100 gets no discount",
+        "assignment": {
+          "en": "Trace to the first wrong state.",
+          "vi": "Trace tới state sai đầu."
+        },
+        "report": {
+          "en": "Do not patch before reproducing.",
+          "vi": "Không patch trước tái hiện."
+        }
+      },
+      {
+        "field": "Patch",
+        "value": "Change > to >=",
+        "assignment": {
+          "en": "Change only the responsible rule.",
+          "vi": "Chỉ đổi rule chịu trách nhiệm."
+        },
+        "report": {
+          "en": "Review dependencies and duplicate rules.",
+          "vi": "Review dependency và rule trùng."
+        }
+      },
+      {
+        "field": "Evidence",
+        "value": "New and regression cases",
+        "assignment": {
+          "en": "Expected results are independent.",
+          "vi": "Expected result độc lập."
+        },
+        "report": {
+          "en": "Record actual only after execution.",
+          "vi": "Chỉ ghi actual sau chạy."
+        }
+      }
+    ],
+    "moduleTable": {
+      "ariaLabel": {
+        "en": "12.3 process and responsibility table",
+        "vi": "Bảng quy trình và trách nhiệm 12.3"
+      },
+      "firstColumn": {
+        "en": "Stage / responsibility",
+        "vi": "Giai đoạn / trách nhiệm"
+      },
+      "inputColumn": {
+        "en": "Input",
+        "vi": "Input"
+      },
+      "outputColumn": {
+        "en": "Output",
+        "vi": "Output"
+      },
+      "boundaryColumn": {
+        "en": "Boundary",
+        "vi": "Ranh giới"
+      }
+    },
+    "modules": [
+      {
+        "name": "Prevent and review",
+        "input": "Requirements and design",
+        "output": "Reviewable contracts",
+        "boundary": {
+          "en": "Finds ambiguity before execution.",
+          "vi": "Tìm ambiguity trước execution."
+        }
+      },
+      {
+        "name": "Trace and diagnose",
+        "input": "Code and counterexample",
+        "output": "First divergence",
+        "boundary": {
+          "en": "Observes before changing.",
+          "vi": "Quan sát trước thay đổi."
+        }
+      },
+      {
+        "name": "Plan and execute",
+        "input": "Requirements and domain",
+        "output": "Expected then actual",
+        "boundary": {
+          "en": "Makes coverage reproducible.",
+          "vi": "Làm coverage tái hiện được."
+        }
+      },
+      {
+        "name": "Maintain and verify",
+        "input": "Patch and old suite",
+        "output": "New and regression evidence",
+        "boundary": {
+          "en": "Requires both contracts to pass.",
+          "vi": "Yêu cầu cả hai contract pass."
+        }
+      }
+    ],
+    "fullAnswer": {
+      "en": "Translate each requirement into observable outcomes and reduce faults with clear interfaces, validation, modularity, documentation and review. Run a small counterexample and record changes to the first divergence, classify the error and make the smallest justified patch. Build a test plan with independently derived expected results and normal, abnormal and extreme/boundary data. Record actual only after execution; pass new and regression cases, and claim efficiency only from a defined reproducible measure.",
+      "vi": "Chuyển mỗi requirement thành outcome quan sát được và giảm fault bằng interface rõ, validation, modularity, documentation, review. Chạy counterexample nhỏ và ghi thay đổi đến divergence đầu, phân loại error và tạo patch nhỏ nhất có lý do. Lập test plan với expected độc lập và data normal, abnormal, extreme/boundary. Chỉ ghi actual sau chạy; pass case mới và regression, và chỉ claim efficiency theo phép đo tái hiện được."
+    },
+    "checks": [
+      {
+        "en": "Expected results are independent of implementation.",
+        "vi": "Expected result độc lập implementation."
+      },
+      {
+        "en": "Method, class, case, expected and actual remain distinct.",
+        "vi": "Method, class, case, expected và actual tách rõ."
+      },
+      {
+        "en": "Evidence includes failure, fixed trace and regression.",
+        "vi": "Bằng chứng gồm failure, trace đã sửa và regression."
+      }
+    ],
+    "nextStep": {
+      "slug": "test-strategy-test-plan",
+      "anchor": "practise",
+      "label": {
+        "en": "Next: turn requirements into a complete evidence plan",
+        "vi": "Tiếp theo: chuyển requirement thành evidence plan hoàn chỉnh"
+      }
+    }
+  },
+  "patternIds": [
+    "F12",
+    "F13",
+    "F16"
+  ]
+}

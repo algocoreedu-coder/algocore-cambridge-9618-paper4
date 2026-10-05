@@ -1,0 +1,844 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.19.1",
+  "topicId": "P3-19.2-T01",
+  "slug": "designing-and-tracing-recursion",
+  "estimatedMinutes": 45,
+  "title": {
+    "en": "Designing and tracing recursion",
+    "vi": "Thiết kế và trace đệ quy"
+  },
+  "question": {
+    "en": "How do a reachable base case and a smaller recursive call build a correct result?",
+    "vi": "Base case reachable và recursive call nhỏ hơn xây result đúng như thế nào?"
+  },
+  "opening": {
+    "en": "Factorial(4) winds through 4,3,2,1,0; the base value then returns through the calls in reverse order.",
+    "vi": "Factorial(4) winding qua 4,3,2,1,0; base value rồi return ngược qua các call."
+  },
+  "objectives": [
+    {
+      "en": "Identify base and recursive cases.",
+      "vi": "Nhận diện base case và recursive case."
+    },
+    {
+      "en": "Prove progress toward the base.",
+      "vi": "Chứng minh progress tới base."
+    },
+    {
+      "en": "Write typed recursive pseudocode.",
+      "vi": "Viết giả mã recursive có type."
+    },
+    {
+      "en": "Separate call order from return order.",
+      "vi": "Tách call order khỏi return order."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Evaluate multiplication and list sums.",
+      "vi": "Tính multiplication và list sum."
+    },
+    {
+      "en": "Read a function call and return value.",
+      "vi": "Đọc function call và return value."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "recursion",
+      "meaning": {
+        "en": "A subroutine invokes itself directly or indirectly.",
+        "vi": "Subroutine gọi chính nó trực tiếp hoặc gián tiếp."
+      }
+    },
+    {
+      "term": "base case",
+      "meaning": {
+        "en": "Reachable case that returns without another recursive call.",
+        "vi": "Case reachable trả về không gọi recursive tiếp."
+      }
+    },
+    {
+      "term": "recursive case",
+      "meaning": {
+        "en": "Reduces the problem and invokes the subroutine again.",
+        "vi": "Giảm bài toán và gọi lại subroutine."
+      }
+    },
+    {
+      "term": "progress measure",
+      "meaning": {
+        "en": "Quantity moving toward the base.",
+        "vi": "Đại lượng tiến tới base."
+      }
+    },
+    {
+      "term": "unwinding",
+      "meaning": {
+        "en": "Return values flow back to suspended callers.",
+        "vi": "Return value chảy ngược về caller đang chờ."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "essential",
+      "title": {
+        "en": "Three essential features",
+        "vi": "Ba feature thiết yếu"
+      },
+      "paragraphs": [
+        {
+          "en": "A safe recursive function has a reachable base case, a recursive/general case and measurable progress toward the base.",
+          "vi": "Recursive function an toàn có base case reachable, recursive/general case và progress đo được tới base."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "factorial-base",
+      "title": {
+        "en": "Canonical factorial base is zero",
+        "vi": "Base factorial chuẩn là zero"
+      },
+      "paragraphs": [
+        {
+          "en": "This source-aligned fixture defines 0!=1. Factorial(4) calls 4,3,2,1,0, so maximum depth is five frames.",
+          "vi": "Fixture theo nguồn định nghĩa 0!=1. Factorial(4) gọi 4,3,2,1,0, nên depth tối đa năm frame."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "call-return",
+      "title": {
+        "en": "Wind then unwind",
+        "vi": "Winding rồi unwinding"
+      },
+      "paragraphs": [
+        {
+          "en": "Calls occur before the base result. Each suspended multiplication completes in reverse call order: 0,1,2,3,4.",
+          "vi": "Call xảy ra trước base result. Mỗi multiplication đang chờ hoàn tất theo thứ tự call ngược: 0,1,2,3,4."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    },
+    {
+      "id": "recursion-code",
+      "title": {
+        "en": "Cambridge pseudocode",
+        "vi": "Giả mã Cambridge"
+      },
+      "paragraphs": [
+        {
+          "en": "The typed function tests the base before making the smaller call.",
+          "vi": "Function có type xét base trước khi gọi nhỏ hơn."
+        }
+      ],
+      "code": "FUNCTION Factorial(Number : INTEGER) RETURNS INTEGER\n  IF Number = 0 THEN\n    RETURN 1\n  ENDIF\n  RETURN Number * Factorial(Number - 1)\nENDFUNCTION",
+      "sourceIds": [
+        "syllabus-2026",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "recursion-trace",
+    "title": {
+      "en": "Recursive call-and-return trace",
+      "vi": "Trace call và return đệ quy"
+    },
+    "introduction": {
+      "en": "Arguments, active rule, call order and returned values are shown separately.",
+      "vi": "Argument, active rule, call order và return value hiển thị riêng."
+    },
+    "task": {
+      "en": "Trace factorial and list sum, then block no-progress and unreachable-base fixtures.",
+      "vi": "Trace factorial và list sum, rồi chặn fixture no-progress và unreachable-base."
+    },
+    "conventions": [
+      {
+        "en": "Factorial base Number=0 returns 1.",
+        "vi": "Base factorial Number=0 trả 1."
+      },
+      {
+        "en": "Each recursive argument must progress.",
+        "vi": "Mỗi argument recursive phải tiến triển."
+      },
+      {
+        "en": "Unsafe known fixtures are diagnosed, not executed.",
+        "vi": "Fixture unsafe đã biết được chẩn đoán, không execute."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Trace Factorial(4)",
+      "vi": "Trace Factorial(4)"
+    },
+    "prompt": {
+      "en": "Show call order 4→0 and return order 0→4.",
+      "vi": "Trình bày call order 4→0 và return order 0→4."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "domain",
+        "action": {
+          "en": "Declare Number as a non-negative INTEGER.",
+          "vi": "Khai báo Number là INTEGER không âm."
+        },
+        "why": {
+          "en": "The base/progress proof depends on the domain.",
+          "vi": "Chứng minh base/progress phụ thuộc domain."
+        },
+        "result": {
+          "en": "Input 4 is valid.",
+          "vi": "Input 4 hợp lệ."
+        },
+        "check": {
+          "en": "Check that input 4 is valid.",
+          "vi": "Kiểm tra rằng input 4 hợp lệ."
+        }
+      },
+      {
+        "id": "call-4",
+        "action": {
+          "en": "4 is not base; call Factorial(3).",
+          "vi": "4 không phải base; gọi Factorial(3)."
+        },
+        "why": {
+          "en": "Number−1 progresses toward 0.",
+          "vi": "Number−1 tiến tới 0."
+        },
+        "result": {
+          "en": "Call order starts 4→3.",
+          "vi": "Call order bắt đầu 4→3."
+        },
+        "check": {
+          "en": "Check that call order starts 4→3.",
+          "vi": "Kiểm tra rằng call order bắt đầu 4→3."
+        }
+      },
+      {
+        "id": "calls-3-1",
+        "action": {
+          "en": "Call Factorial(2), then Factorial(1), then Factorial(0).",
+          "vi": "Gọi Factorial(2), rồi Factorial(1), rồi Factorial(0)."
+        },
+        "why": {
+          "en": "Every argument decreases by one.",
+          "vi": "Mỗi argument giảm một."
+        },
+        "result": {
+          "en": "Winding order 4,3,2,1,0; depth 5.",
+          "vi": "Winding order 4,3,2,1,0; depth 5."
+        },
+        "check": {
+          "en": "Check that winding order 4,3,2,1,0; depth 5.",
+          "vi": "Kiểm tra rằng winding order 4,3,2,1,0; depth 5."
+        }
+      },
+      {
+        "id": "base",
+        "action": {
+          "en": "At Number=0, return 1.",
+          "vi": "Tại Number=0, trả 1."
+        },
+        "why": {
+          "en": "The base performs no recursive call.",
+          "vi": "Base không thực hiện recursive call."
+        },
+        "result": {
+          "en": "Factorial(0)=1 starts unwinding.",
+          "vi": "Factorial(0)=1 bắt đầu unwinding."
+        },
+        "check": {
+          "en": "Check that factorial(0)=1 starts unwinding.",
+          "vi": "Kiểm tra rằng factorial(0)=1 bắt đầu unwinding."
+        },
+        "code": "RETURN 1"
+      },
+      {
+        "id": "unwind-1-2",
+        "action": {
+          "en": "Compute 1×1=1, then 2×1=2.",
+          "vi": "Tính 1×1=1, rồi 2×1=2."
+        },
+        "why": {
+          "en": "Each child result returns to its immediate caller.",
+          "vi": "Mỗi child result trả về immediate caller."
+        },
+        "result": {
+          "en": "Factorial(1)=1; Factorial(2)=2.",
+          "vi": "Factorial(1)=1; Factorial(2)=2."
+        },
+        "check": {
+          "en": "Check that factorial(1)=1; factorial(2)=2.",
+          "vi": "Kiểm tra rằng factorial(1)=1; factorial(2)=2."
+        }
+      },
+      {
+        "id": "unwind-3-4",
+        "action": {
+          "en": "Compute 3×2=6, then 4×6=24.",
+          "vi": "Tính 3×2=6, rồi 4×6=24."
+        },
+        "why": {
+          "en": "Unwinding is reverse call order.",
+          "vi": "Unwinding là call order ngược."
+        },
+        "result": {
+          "en": "Return order 0,1,2,3,4; final 24.",
+          "vi": "Return order 0,1,2,3,4; final 24."
+        },
+        "check": {
+          "en": "Check that return order 0,1,2,3,4; final 24.",
+          "vi": "Kiểm tra rằng return order 0,1,2,3,4; final 24."
+        }
+      }
+    ],
+    "result": {
+      "en": "Factorial(4)=24 with five frames and canonical base Number=0.",
+      "vi": "Factorial(4)=24 với năm frame và base chuẩn Number=0."
+    },
+    "selfCheck": {
+      "en": "Does the trace include the Number=0 frame before unwinding?",
+      "vi": "Trace có gồm frame Number=0 trước unwinding không?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "calls itself",
+        "vi": "gọi chính nó"
+      },
+      {
+        "en": "base case",
+        "vi": "base case"
+      },
+      {
+        "en": "smaller subproblem",
+        "vi": "subproblem nhỏ hơn"
+      }
+    ],
+    "distinguish": {
+      "en": "Near miss: calling another function is not necessarily recursion; a call chain must return to the same subroutine directly or indirectly.",
+      "vi": "Dễ nhầm: gọi function khác không nhất thiết là recursion; call chain phải quay về cùng subroutine trực tiếp hoặc gián tiếp."
+    },
+    "method": [
+      {
+        "en": "State domain and base result.",
+        "vi": "Nêu domain và base result."
+      },
+      {
+        "en": "Name the progress measure.",
+        "vi": "Nêu progress measure."
+      },
+      {
+        "en": "Write base before recursive call.",
+        "vi": "Viết base trước recursive call."
+      },
+      {
+        "en": "List winding calls.",
+        "vi": "Liệt kê winding calls."
+      },
+      {
+        "en": "Return in reverse order and combine.",
+        "vi": "Return theo thứ tự ngược và combine."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "Write a complete response for Designing and tracing recursion: declare the convention, show every required operation and close all Cambridge pseudocode structures.",
+          "vi": "Viết câu trả lời đầy đủ cho Thiết kế và trace đệ quy: khai báo quy ước, trình bày mọi thao tác cần thiết và đóng mọi cấu trúc giả mã Cambridge."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record each state change for Designing and tracing recursion; include unchanged decisions and the final result.",
+          "vi": "Ghi từng thay đổi trạng thái của Thiết kế và trace đệ quy; gồm cả quyết định không đổi và kết quả cuối."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link the rule for Designing and tracing recursion to the resulting state or performance consequence.",
+          "vi": "Liên hệ quy tắc của Thiết kế và trace đệ quy với trạng thái hoặc hệ quả hiệu năng."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use one shared criterion and the same task before comparing Designing and tracing recursion with another method.",
+          "vi": "Dùng một tiêu chí chung và cùng nhiệm vụ trước khi so sánh Thiết kế và trace đệ quy với phương pháp khác."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Name the feature of Designing and tracing recursion, then connect it to the requirement in the given situation.",
+          "vi": "Nêu đặc điểm của Thiết kế và trace đệ quy, rồi nối nó với yêu cầu của tình huống đã cho."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A base-case line is enough even if unreachable.",
+        "vi": "Có dòng base case là đủ dù unreachable."
+      },
+      "correction": {
+        "en": "Prove the recursive argument can reach the base.",
+        "vi": "Chứng minh argument recursive có thể tới base."
+      },
+      "selfCheck": {
+        "en": "Does the measure move toward the condition?",
+        "vi": "Measure có tiến tới condition không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Factorial base is 1 in this lesson.",
+        "vi": "Base factorial là 1 trong bài này."
+      },
+      "correction": {
+        "en": "The source-aligned base is Number=0 returning 1.",
+        "vi": "Base theo nguồn là Number=0 trả 1."
+      },
+      "selfCheck": {
+        "en": "Is there a Factorial(0) frame?",
+        "vi": "Có frame Factorial(0) không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Call and return order are identical.",
+        "vi": "Call order và return order giống nhau."
+      },
+      "correction": {
+        "en": "Returns occur in reverse after the base.",
+        "vi": "Return xảy ra ngược sau base."
+      },
+      "selfCheck": {
+        "en": "Which caller receives the base result first?",
+        "vi": "Caller nào nhận base result đầu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Short recursive code uses constant stack space.",
+        "vi": "Code recursive ngắn dùng stack space constant."
+      },
+      "correction": {
+        "en": "Each active call needs a separate frame.",
+        "vi": "Mỗi call active cần frame riêng."
+      },
+      "selfCheck": {
+        "en": "How does depth change with n?",
+        "vi": "Depth đổi theo n thế nào?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "recall",
+      "prompt": {
+        "en": "What are the three essential recursion features?",
+        "vi": "Ba feature thiết yếu của recursion là gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Base, recursive case and progress",
+            "vi": "Base, recursive case và progress"
+          },
+          "feedback": {
+            "en": "Correct: safe recursion must stop and reduce the problem",
+            "vi": "Đúng: recursion an toàn phải dừng và giảm bài toán"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Loop, queue and key",
+            "vi": "Loop, queue và key"
+          },
+          "feedback": {
+            "en": "Loop, queue and key conflicts with the rule: safe recursion must stop and reduce the problem",
+            "vi": "Loop, queue và key trái với quy tắc: recursion an toàn phải dừng và giảm bài toán"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only a self-call",
+            "vi": "Chỉ một self-call"
+          },
+          "feedback": {
+            "en": "Only a self-call conflicts with the rule: safe recursion must stop and reduce the problem",
+            "vi": "Chỉ một self-call trái với quy tắc: recursion an toàn phải dừng và giảm bài toán"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "safe recursion must stop and reduce the problem",
+        "vi": "recursion an toàn phải dừng và giảm bài toán"
+      }
+    },
+    {
+      "id": "recognise",
+      "prompt": {
+        "en": "Which code is recursive?",
+        "vi": "Code nào recursive?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Factorial calls Factorial(Number−1)",
+            "vi": "Factorial gọi Factorial(Number−1)"
+          },
+          "feedback": {
+            "en": "Correct: the subroutine invokes itself on a smaller argument",
+            "vi": "Đúng: subroutine gọi chính nó với argument nhỏ hơn"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Main calls Output once",
+            "vi": "Main gọi Output một lần"
+          },
+          "feedback": {
+            "en": "Main calls Output once conflicts with the rule: the subroutine invokes itself on a smaller argument",
+            "vi": "Main gọi Output một lần trái với quy tắc: subroutine gọi chính nó với argument nhỏ hơn"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A FOR loop increments Index",
+            "vi": "Vòng FOR tăng Index"
+          },
+          "feedback": {
+            "en": "A FOR loop increments Index conflicts with the rule: the subroutine invokes itself on a smaller argument",
+            "vi": "Vòng FOR tăng Index trái với quy tắc: subroutine gọi chính nó với argument nhỏ hơn"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "the subroutine invokes itself on a smaller argument",
+        "vi": "subroutine gọi chính nó với argument nhỏ hơn"
+      }
+    },
+    {
+      "id": "predict",
+      "prompt": {
+        "en": "After Factorial(2) calls Factorial(1), next call?",
+        "vi": "Sau Factorial(2) gọi Factorial(1), call tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Factorial(0)",
+            "vi": "Factorial(0)"
+          },
+          "feedback": {
+            "en": "Correct: Number−1 reaches the zero base",
+            "vi": "Đúng: Number−1 tới base zero"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Factorial(2)",
+            "vi": "Factorial(2)"
+          },
+          "feedback": {
+            "en": "Factorial(2) conflicts with the rule: Number−1 reaches the zero base",
+            "vi": "Factorial(2) trái với quy tắc: Number−1 tới base zero"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Factorial(−1)",
+            "vi": "Factorial(−1)"
+          },
+          "feedback": {
+            "en": "Factorial(−1) conflicts with the rule: Number−1 reaches the zero base",
+            "vi": "Factorial(−1) trái với quy tắc: Number−1 tới base zero"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Number−1 reaches the zero base",
+        "vi": "Number−1 tới base zero"
+      }
+    },
+    {
+      "id": "trace",
+      "prompt": {
+        "en": "Maximum frames for Factorial(4) under this contract?",
+        "vi": "Số frame tối đa cho Factorial(4) theo contract này?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "5",
+            "vi": "5"
+          },
+          "feedback": {
+            "en": "Correct: frames exist for 4,3,2,1,0",
+            "vi": "Đúng: có frame cho 4,3,2,1,0"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "4",
+            "vi": "4"
+          },
+          "feedback": {
+            "en": "4 conflicts with the rule: frames exist for 4,3,2,1,0",
+            "vi": "4 trái với quy tắc: có frame cho 4,3,2,1,0"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "6",
+            "vi": "6"
+          },
+          "feedback": {
+            "en": "6 conflicts with the rule: frames exist for 4,3,2,1,0",
+            "vi": "6 trái với quy tắc: có frame cho 4,3,2,1,0"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "frames exist for 4,3,2,1,0",
+        "vi": "có frame cho 4,3,2,1,0"
+      }
+    },
+    {
+      "id": "write",
+      "prompt": {
+        "en": "Which base pseudocode is locked?",
+        "vi": "Giả mã base nào đã khóa?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "IF Number = 0 THEN RETURN 1",
+            "vi": "IF Number = 0 THEN RETURN 1"
+          },
+          "feedback": {
+            "en": "Correct: 0! is 1 and the base makes no further call",
+            "vi": "Đúng: 0! là 1 và base không gọi tiếp"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "IF Number = 1 THEN RETURN 0",
+            "vi": "IF Number = 1 THEN RETURN 0"
+          },
+          "feedback": {
+            "en": "IF Number = 1 THEN RETURN 0 conflicts with the rule: 0! is 1 and the base makes no further call",
+            "vi": "IF Number = 1 THEN RETURN 0 trái với quy tắc: 0! là 1 và base không gọi tiếp"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "RETURN Factorial(Number)",
+            "vi": "RETURN Factorial(Number)"
+          },
+          "feedback": {
+            "en": "RETURN Factorial(Number) conflicts with the rule: 0! is 1 and the base makes no further call",
+            "vi": "RETURN Factorial(Number) trái với quy tắc: 0! là 1 và base không gọi tiếp"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "0! is 1 and the base makes no further call",
+        "vi": "0! là 1 và base không gọi tiếp"
+      }
+    },
+    {
+      "id": "transfer",
+      "prompt": {
+        "en": "A function calls itself with the same positive argument. Decision?",
+        "vi": "Function gọi chính nó với cùng argument dương. Quyết định?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Block: no progress toward base",
+            "vi": "Chặn: không progress tới base"
+          },
+          "feedback": {
+            "en": "Correct: known no-progress recursion is unsafe",
+            "vi": "Đúng: recursion no-progress đã biết là unsafe"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Run indefinitely as valid",
+            "vi": "Chạy vô hạn như hợp lệ"
+          },
+          "feedback": {
+            "en": "Run indefinitely as valid conflicts with the rule: known no-progress recursion is unsafe",
+            "vi": "Chạy vô hạn như hợp lệ trái với quy tắc: recursion no-progress đã biết là unsafe"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Treat as iteration",
+            "vi": "Coi là iteration"
+          },
+          "feedback": {
+            "en": "Treat as iteration conflicts with the rule: known no-progress recursion is unsafe",
+            "vi": "Coi là iteration trái với quy tắc: recursion no-progress đã biết là unsafe"
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "known no-progress recursion is unsafe",
+        "vi": "recursion no-progress đã biết là unsafe"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain Factorial(4) from design through trace.",
+      "vi": "Giải thích Factorial(4) từ design tới trace."
+    },
+    "answerPoints": [
+      {
+        "en": "Base Number=0 returns 1.",
+        "vi": "Base Number=0 trả 1."
+      },
+      {
+        "en": "Recursive case decreases by one.",
+        "vi": "Recursive case giảm một."
+      },
+      {
+        "en": "Calls 4→0; returns 0→4; result 24.",
+        "vi": "Calls 4→0; returns 0→4; result 24."
+      },
+      {
+        "en": "State the declared convention and verify the final invariant or boundary.",
+        "vi": "Nêu quy ước đã công bố và kiểm tra invariant hoặc boundary cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "A base case must be reachable.",
+      "vi": "Base case phải reachable."
+    },
+    {
+      "en": "Progress must be measurable.",
+      "vi": "Progress phải đo được."
+    },
+    {
+      "en": "Winding and unwinding orders differ.",
+      "vi": "Order winding và unwinding khác nhau."
+    }
+  ],
+  "relatedSlugs": [
+    "call-stacks-and-unwinding",
+    "time-and-space-complexity"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — syllabus for examinations in 2026, Version 2",
+      "locator": "Printed/PDF p37, §§19.1–19.2",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Watson and Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019, ISBN 9781510457591",
+      "locator": "Chapter 19, printed pp490–493 / PDF pp506–509: recursion; factorial base 0 and trace",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "pp5–24: presentation, declarations, arrays, operators, control structures and subroutines",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide.pdf"
+    },
+    {
+      "id": "s23-31-qp",
+      "title": "Cambridge 9618/31 — May/June 2023 question paper",
+      "locator": "Question 12, pp11–12",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s23-31-ms",
+      "title": "Cambridge 9618/31 — May/June 2023 mark scheme",
+      "locator": "Question 12, pp9–10",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "w25-33-qp",
+      "title": "Cambridge 9618/33 — October/November 2025 question paper",
+      "locator": "Question 11, p9",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w25-33-ms",
+      "title": "Cambridge 9618/33 — October/November 2025 mark scheme",
+      "locator": "Question 11, p13",
+      "kind": "mark-scheme"
+    }
+  ]
+}

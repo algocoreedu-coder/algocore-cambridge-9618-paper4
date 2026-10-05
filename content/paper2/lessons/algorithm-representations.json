@@ -1,0 +1,1410 @@
+{
+  "schemaVersion": 1,
+  "version": "T04-academic-r6-reviewed",
+  "topicId": "T04",
+  "sectionId": "9.2",
+  "slug": "algorithm-representations",
+  "learningMode": "diagram",
+  "estimatedMinutes": 85,
+  "title": {
+    "en": "Structured English, flowcharts and pseudocode",
+    "vi": "Structured English, flowchart và pseudocode"
+  },
+  "question": {
+    "en": "How can three representations preserve exactly the same control flow?",
+    "vi": "Ba cách biểu diễn giữ chính xác cùng luồng điều khiển như thế nào?"
+  },
+  "opening": {
+    "en": "Trace the same input through all three forms: equivalent forms make the same decisions, repetitions and outputs.",
+    "vi": "Trace cùng input qua ba dạng: các dạng tương đương phải có cùng lựa chọn, lặp và output."
+  },
+  "objectives": [
+    {
+      "en": "Recognise verified flowchart symbols.",
+      "vi": "Nhận ra ký hiệu flowchart đã xác minh."
+    },
+    {
+      "en": "Convert sequence, selection and iteration between representations.",
+      "vi": "Chuyển sequence, selection và iteration giữa các biểu diễn."
+    },
+    {
+      "en": "Use boundary traces to prove equivalence.",
+      "vi": "Dùng trace biên để chứng minh tương đương."
+    },
+    {
+      "en": "Construct and repair longer equivalent algorithms containing validation, nested selection, bounded or sentinel iteration and termination.",
+      "vi": "Dựng và sửa các thuật toán dài tương đương có validation, selection lồng, vòng lặp giới hạn hoặc sentinel và điều kiện kết thúc."
+    },
+    {
+      "en": "Translate structured English, flowcharts and pseudocode without changing branch or loop semantics.",
+      "vi": "Chuyển đổi structured English, flowchart và pseudocode mà không đổi semantics của nhánh hoặc vòng lặp."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Algorithm refinement",
+        "vi": "Làm mịn thuật toán"
+      },
+      "reason": {
+        "en": "The contract and detailed steps must exist before choosing notation.",
+        "vi": "Phải có hợp đồng và bước chi tiết trước khi chọn ký pháp."
+      }
+    },
+    {
+      "title": {
+        "en": "Selection and iteration",
+        "vi": "Lựa chọn và lặp"
+      },
+      "reason": {
+        "en": "Their semantics determine branches and loop-back arrows.",
+        "vi": "Ngữ nghĩa quyết định nhánh và mũi tên quay vòng."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "structured English",
+      "meaning": {
+        "en": "controlled plain-language algorithm steps",
+        "vi": "các bước thuật toán bằng ngôn ngữ thường có kiểm soát"
+      }
+    },
+    {
+      "term": "terminator",
+      "meaning": {
+        "en": "rounded Start/End symbol",
+        "vi": "ký hiệu Start/End bo tròn"
+      }
+    },
+    {
+      "term": "process",
+      "meaning": {
+        "en": "rectangle for calculation or assignment",
+        "vi": "hình chữ nhật cho tính toán hoặc gán"
+      }
+    },
+    {
+      "term": "decision",
+      "meaning": {
+        "en": "diamond with a Boolean question",
+        "vi": "hình thoi chứa câu hỏi Boolean"
+      }
+    },
+    {
+      "term": "rejoin",
+      "meaning": {
+        "en": "point where alternative paths share a continuation",
+        "vi": "điểm các đường thay thế cùng tiếp tục"
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "Draw or complete a flowchart.",
+        "vi": "Vẽ hoặc hoàn thành flowchart."
+      },
+      {
+        "en": "Convert structured English, flowchart or pseudocode.",
+        "vi": "Chuyển structured English, flowchart hoặc pseudocode."
+      },
+      {
+        "en": "Words if, otherwise, while, until or for reveal control flow.",
+        "vi": "Các từ if, otherwise, while, until hoặc for cho thấy luồng điều khiển."
+      },
+      {
+        "en": "The task asks to complete, draw, convert or repair a representation rather than merely trace it.",
+        "vi": "Bài yêu cầu hoàn thiện, vẽ, chuyển đổi hoặc sửa một biểu diễn thay vì chỉ trace."
+      },
+      {
+        "en": "A long specification contains validation, multiple branches, repeated input or a sentinel.",
+        "vi": "Một đặc tả dài có validation, nhiều nhánh, input lặp hoặc sentinel."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "A module hierarchy is a flowchart.",
+        "vi": "Phân cấp module là flowchart."
+      },
+      {
+        "en": "Every diamond represents IF rather than a loop test.",
+        "vi": "Mọi hình thoi đều là IF chứ không phải phép kiểm vòng lặp."
+      },
+      {
+        "en": "Moving a decision after its process box preserves the algorithm.",
+        "vi": "Chuyển decision xuống sau process box vẫn giữ nguyên thuật toán."
+      },
+      {
+        "en": "A loop back-edge may return to any earlier box without affecting termination.",
+        "vi": "Cạnh quay lại của vòng lặp có thể về bất kỳ box trước nào mà không ảnh hưởng kết thúc."
+      }
+    ],
+    "answerProduct": {
+      "en": "A complete labelled representation whose trace matches every required state change and output.",
+      "vi": "Biểu diễn đầy đủ có nhãn với trace khớp mọi thay đổi trạng thái và output."
+    },
+    "method": [
+      {
+        "en": "Mark Start, inputs and promised outputs.",
+        "vi": "Đánh dấu Start, input và output đã hứa."
+      },
+      {
+        "en": "Choose symbol by role: I/O, process or Boolean test.",
+        "vi": "Chọn ký hiệu theo vai trò: I/O, xử lý hay phép kiểm Boolean."
+      },
+      {
+        "en": "Label exits and draw rejoin/loop-back explicitly.",
+        "vi": "Ghi nhãn lối ra và vẽ rõ nhập lại/quay vòng."
+      },
+      {
+        "en": "Trace normal, boundary and zero-iteration data.",
+        "vi": "Trace dữ liệu thường, biên và lặp 0 lần."
+      },
+      {
+        "en": "Annotate each statement as input, process, decision, output or repetition before translating.",
+        "vi": "Gắn nhãn mỗi phát biểu là input, process, decision, output hoặc lặp trước khi chuyển đổi."
+      },
+      {
+        "en": "Write every decision outcome and confirm that paths merge or terminate intentionally.",
+        "vi": "Viết mọi kết quả của decision và xác nhận các đường nhánh nhập lại hoặc kết thúc có chủ ý."
+      },
+      {
+        "en": "For each loop identify entry test, update/back-edge and exit condition; test zero, one and boundary iterations.",
+        "vi": "Với mỗi vòng lặp, xác định phép kiểm khi vào, cập nhật/cạnh quay lại và điều kiện thoát; thử 0, 1 và số vòng ở biên."
+      },
+      {
+        "en": "Trace the same inputs through both representations and compare outputs and termination.",
+        "vi": "Trace cùng input qua hai biểu diễn rồi so sánh output và điều kiện kết thúc."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t04-pseudocode-syntax",
+      "title": {
+        "en": "Cambridge pseudocode syntax quick reference",
+        "vi": "Bảng tra nhanh cú pháp pseudocode Cambridge"
+      },
+      "paragraphs": [
+        {
+          "en": "Write Cambridge keywords in upper case and meaningful identifiers in mixed case. Use the left arrow (←) for assignment. The equals sign (=) compares values in a condition and assigns a literal only in a CONSTANT declaration; it does not assign to a variable.",
+          "vi": "Viết từ khóa Cambridge bằng chữ hoa và identifier có nghĩa bằng mixed case. Dùng mũi tên trái (←) để gán. Dấu bằng (=) dùng để so sánh trong điều kiện và gán literal khi khai báo CONSTANT; không dùng để gán cho biến."
+        },
+        {
+          "en": "Close every block with its matching keyword. Indentation shows structure, but ENDIF, ENDCASE, NEXT, ENDWHILE, UNTIL, ENDPROCEDURE and ENDFUNCTION make the structure unambiguous.",
+          "vi": "Đóng mỗi khối bằng đúng từ khóa tương ứng. Thụt lề giúp thấy cấu trúc, còn ENDIF, ENDCASE, NEXT, ENDWHILE, UNTIL, ENDPROCEDURE và ENDFUNCTION giúp cấu trúc không mơ hồ."
+        }
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Construct",
+            "vi": "Cấu trúc"
+          },
+          {
+            "en": "Cambridge syntax",
+            "vi": "Cú pháp Cambridge"
+          },
+          {
+            "en": "What to check",
+            "vi": "Điểm cần kiểm"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "Variable",
+              "vi": "Biến"
+            },
+            {
+              "en": "DECLARE Score : INTEGER",
+              "vi": "DECLARE Score : INTEGER"
+            },
+            {
+              "en": "Identifier, colon, then data type.",
+              "vi": "Identifier, dấu hai chấm, rồi kiểu dữ liệu."
+            }
+          ],
+          [
+            {
+              "en": "Constant",
+              "vi": "Hằng"
+            },
+            {
+              "en": "CONSTANT MaxMark = 100",
+              "vi": "CONSTANT MaxMark = 100"
+            },
+            {
+              "en": "The value must be a literal.",
+              "vi": "Giá trị phải là literal."
+            }
+          ],
+          [
+            {
+              "en": "Assignment",
+              "vi": "Phép gán"
+            },
+            {
+              "en": "Total ← Price * Quantity",
+              "vi": "Total ← Price * Quantity"
+            },
+            {
+              "en": "Use ←, not =, to change a variable.",
+              "vi": "Dùng ←, không dùng =, để đổi giá trị biến."
+            }
+          ],
+          [
+            {
+              "en": "Input / output",
+              "vi": "Nhập / xuất"
+            },
+            {
+              "en": "INPUT Name   |   OUTPUT \"Hello \", Name",
+              "vi": "INPUT Name   |   OUTPUT \"Hello \", Name"
+            },
+            {
+              "en": "INPUT needs a variable; OUTPUT may contain several comma-separated values.",
+              "vi": "INPUT cần một biến; OUTPUT có thể chứa nhiều giá trị ngăn bằng dấu phẩy."
+            }
+          ],
+          [
+            {
+              "en": "IF",
+              "vi": "IF"
+            },
+            {
+              "en": "IF Mark >= 50 THEN … ELSE … ENDIF",
+              "vi": "IF Mark >= 50 THEN … ELSE … ENDIF"
+            },
+            {
+              "en": "The condition is Boolean; ELSE is optional.",
+              "vi": "Điều kiện phải là Boolean; ELSE không bắt buộc."
+            }
+          ],
+          [
+            {
+              "en": "CASE",
+              "vi": "CASE"
+            },
+            {
+              "en": "CASE OF Grade … OTHERWISE … ENDCASE",
+              "vi": "CASE OF Grade … OTHERWISE … ENDCASE"
+            },
+            {
+              "en": "Each value or range has one branch; OTHERWISE comes last.",
+              "vi": "Mỗi giá trị hoặc khoảng có một nhánh; OTHERWISE đặt cuối."
+            }
+          ],
+          [
+            {
+              "en": "FOR",
+              "vi": "FOR"
+            },
+            {
+              "en": "FOR Index ← 1 TO 10 … NEXT Index",
+              "vi": "FOR Index ← 1 TO 10 … NEXT Index"
+            },
+            {
+              "en": "The end value is inclusive; STEP is optional.",
+              "vi": "Giá trị cuối được tính; STEP không bắt buộc."
+            }
+          ],
+          [
+            {
+              "en": "WHILE",
+              "vi": "WHILE"
+            },
+            {
+              "en": "WHILE Count < Limit … ENDWHILE",
+              "vi": "WHILE Count < Limit … ENDWHILE"
+            },
+            {
+              "en": "The condition is tested before the body.",
+              "vi": "Điều kiện được kiểm trước thân vòng lặp."
+            }
+          ],
+          [
+            {
+              "en": "REPEAT",
+              "vi": "REPEAT"
+            },
+            {
+              "en": "REPEAT … UNTIL Valid = TRUE",
+              "vi": "REPEAT … UNTIL Valid = TRUE"
+            },
+            {
+              "en": "The body runs at least once; TRUE exits.",
+              "vi": "Thân chạy ít nhất một lần; TRUE thì thoát."
+            }
+          ],
+          [
+            {
+              "en": "Array",
+              "vi": "Mảng"
+            },
+            {
+              "en": "DECLARE Marks : ARRAY[1:30] OF INTEGER",
+              "vi": "DECLARE Marks : ARRAY[1:30] OF INTEGER"
+            },
+            {
+              "en": "State lower and upper bounds and one element type.",
+              "vi": "Nêu cận dưới, cận trên và một kiểu phần tử."
+            }
+          ],
+          [
+            {
+              "en": "Procedure / function",
+              "vi": "Procedure / function"
+            },
+            {
+              "en": "PROCEDURE Show(Value : INTEGER) … ENDPROCEDURE   |   FUNCTION Max(A : INTEGER, B : INTEGER) RETURNS INTEGER … RETURN A … ENDFUNCTION",
+              "vi": "PROCEDURE Show(Value : INTEGER) … ENDPROCEDURE   |   FUNCTION Max(A : INTEGER, B : INTEGER) RETURNS INTEGER … RETURN A … ENDFUNCTION"
+            },
+            {
+              "en": "A function declares one return type and returns one value.",
+              "vi": "Function khai báo một kiểu trả về và trả về một giá trị."
+            }
+          ],
+          [
+            {
+              "en": "Text file",
+              "vi": "Tệp văn bản"
+            },
+            {
+              "en": "OPENFILE \"Data.txt\" FOR READ   |   READFILE \"Data.txt\", Line   |   WRITEFILE \"Out.txt\", Line   |   CLOSEFILE \"Data.txt\"",
+              "vi": "OPENFILE \"Data.txt\" FOR READ   |   READFILE \"Data.txt\", Line   |   WRITEFILE \"Out.txt\", Line   |   CLOSEFILE \"Data.txt\""
+            },
+            {
+              "en": "Open in the correct mode before access and close after use.",
+              "vi": "Mở đúng mode trước khi truy cập và đóng sau khi dùng."
+            }
+          ]
+        ]
+      },
+      "sourceIds": [
+        "guide-2026",
+        "s26",
+        "teacher-t04"
+      ]
+    },
+    {
+      "id": "t04-flowchart-symbols",
+      "title": {
+        "en": "Flowchart symbol quick reference",
+        "vi": "Bảng tra nhanh ký hiệu flowchart"
+      },
+      "paragraphs": [
+        {
+          "en": "Choose a symbol by the role of the step, then connect it with arrowed flow lines. A decision asks a Boolean question and its exits must be labelled with outcomes such as Yes/No or True/False.",
+          "vi": "Chọn ký hiệu theo vai trò của bước rồi nối bằng đường luồng có mũi tên. Decision đặt câu hỏi Boolean và các lối ra phải ghi kết quả như Yes/No hoặc True/False."
+        }
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Symbol",
+            "vi": "Ký hiệu"
+          },
+          {
+            "en": "Use",
+            "vi": "Cách dùng"
+          },
+          {
+            "en": "Do not confuse it with",
+            "vi": "Không nhầm với"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "Rounded terminator",
+              "vi": "Terminator bo tròn"
+            },
+            {
+              "en": "Start or End only",
+              "vi": "Chỉ dùng cho Start hoặc End"
+            },
+            {
+              "en": "A process step",
+              "vi": "Một bước xử lý"
+            }
+          ],
+          [
+            {
+              "en": "Parallelogram",
+              "vi": "Hình bình hành"
+            },
+            {
+              "en": "Input or output",
+              "vi": "Input hoặc output"
+            },
+            {
+              "en": "Assignment or calculation",
+              "vi": "Phép gán hoặc tính toán"
+            }
+          ],
+          [
+            {
+              "en": "Rectangle",
+              "vi": "Hình chữ nhật"
+            },
+            {
+              "en": "Process, assignment or calculation",
+              "vi": "Process, phép gán hoặc tính toán"
+            },
+            {
+              "en": "A Boolean test",
+              "vi": "Phép kiểm Boolean"
+            }
+          ],
+          [
+            {
+              "en": "Diamond",
+              "vi": "Hình thoi"
+            },
+            {
+              "en": "Decision with labelled outcomes",
+              "vi": "Decision có các lối ra được gắn nhãn"
+            },
+            {
+              "en": "An instruction that always runs",
+              "vi": "Một lệnh luôn được thực hiện"
+            }
+          ],
+          [
+            {
+              "en": "Arrowed flow line",
+              "vi": "Đường luồng có mũi tên"
+            },
+            {
+              "en": "Direction and order of control flow",
+              "vi": "Hướng và thứ tự của luồng điều khiển"
+            },
+            {
+              "en": "A structure-chart hierarchy link",
+              "vi": "Đường phân cấp trong structure chart"
+            }
+          ],
+          [
+            {
+              "en": "Connector",
+              "vi": "Connector"
+            },
+            {
+              "en": "Continue a flow elsewhere to keep the diagram readable",
+              "vi": "Nối tiếp luồng ở vị trí khác để sơ đồ dễ đọc"
+            },
+            {
+              "en": "A step that processes data",
+              "vi": "Một bước xử lý dữ liệu"
+            }
+          ]
+        ]
+      },
+      "sourceIds": [
+        "book-t04",
+        "teacher-t04",
+        "qp-t04"
+      ]
+    },
+    {
+      "id": "t04-symbols",
+      "title": {
+        "en": "Five verified roles",
+        "vi": "Năm vai trò đã xác minh"
+      },
+      "paragraphs": [
+        {
+          "en": "Use rounded Start/End, parallelogram input/output, rectangle process, diamond decision and arrowed flow lines.",
+          "vi": "Dùng Start/End bo tròn, bình hành input/output, chữ nhật xử lý, thoi quyết định và đường luồng có mũi tên."
+        },
+        {
+          "en": "A decision needs labelled exits. IF branches rejoin before shared work; a loop has a returning line to its test or update.",
+          "vi": "Quyết định cần lối ra có nhãn. Nhánh IF nhập lại trước phần chung; vòng lặp có đường quay về phép kiểm hoặc cập nhật."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "A calculation is a process, not a Boolean decision.",
+          "vi": "Phép tính là xử lý, không phải quyết định Boolean."
+        },
+        {
+          "en": "Structure-chart links show hierarchy, not time.",
+          "vi": "Đường structure chart thể hiện phân cấp, không phải thời gian."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "book-t04",
+        "teacher-t04",
+        "qp-t04-w25-22-q2"
+      ]
+    },
+    {
+      "id": "t04-constructs",
+      "title": {
+        "en": "Convert semantics, not shapes",
+        "vi": "Chuyển ngữ nghĩa, không chuyển hình dạng"
+      },
+      "paragraphs": [
+        {
+          "en": "Sequence follows once; IF chooses one branch; CASE chooses one value/range or OTHERWISE without fall-through.",
+          "vi": "Sequence đi một lần; IF chọn một nhánh; CASE chọn một giá trị/khoảng hoặc OTHERWISE và không fall-through."
+        },
+        {
+          "en": "WHILE tests before the body, REPEAT after at least one run, and FOR includes initialise, inclusive test and update.",
+          "vi": "WHILE kiểm trước thân, REPEAT kiểm sau ít nhất một lần chạy, FOR gồm khởi tạo, kiểm bao gồm và cập nhật."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "For REPEAT UNTIL Valid, TRUE exits.",
+          "vi": "Với REPEAT UNTIL Valid, TRUE thoát."
+        },
+        {
+          "en": "Trace exact boundary values at branch labels.",
+          "vi": "Trace đúng giá trị biên tại nhãn nhánh."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "book-t04"
+      ]
+    },
+    {
+      "id": "t04-long-equivalence",
+      "title": {
+        "en": "Preserve decisions and loop invariants",
+        "vi": "Giữ nguyên decision và invariant vòng lặp"
+      },
+      "paragraphs": [
+        {
+          "en": "Equivalent representations must make the same decisions for the same data, perform the same updates, produce the same outputs and terminate under the same conditions. Matching keywords or shapes is insufficient.",
+          "vi": "Các biểu diễn tương đương phải ra cùng quyết định với cùng dữ liệu, thực hiện cùng cập nhật, tạo cùng output và kết thúc trong cùng điều kiện. Chỉ khớp từ khóa hoặc hình dạng là chưa đủ."
+        },
+        {
+          "en": "In a longer algorithm, record the loop invariant: what is true before and after every iteration. This exposes misplaced initialisation, an update on only one branch, or a back-edge that skips validation.",
+          "vi": "Trong thuật toán dài, ghi invariant vòng lặp: điều gì đúng trước và sau mỗi lần lặp. Việc này làm lộ khởi tạo sai vị trí, cập nhật chỉ ở một nhánh hoặc cạnh quay lại bỏ qua validation."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "book-t04",
+        "teacher-t04"
+      ]
+    },
+    {
+      "id": "t04-flowchart-construction",
+      "title": {
+        "en": "Build a flowchart from control structure",
+        "vi": "Dựng flowchart từ cấu trúc điều khiển"
+      },
+      "paragraphs": [
+        {
+          "en": "Begin with one start terminal and identify the intended stop. Use input/output parallelograms, process rectangles and decision diamonds with labelled outcomes. Use connectors only to improve readability; they do not perform processing.",
+          "vi": "Bắt đầu bằng một terminal Start và xác định Stop dự kiến. Dùng hình bình hành cho input/output, hình chữ nhật cho process và hình thoi cho decision với kết quả được gắn nhãn. Chỉ dùng connector để dễ đọc; connector không xử lý dữ liệu."
+        },
+        {
+          "en": "For pre-condition iteration, the false/exit edge leaves the decision while the repeat edge reaches the body, performs the update and returns to the same decision. Check that every branch either rejoins, repeats or terminates.",
+          "vi": "Với vòng lặp kiểm điều kiện trước, cạnh false/exit rời decision còn cạnh lặp đi vào thân, thực hiện cập nhật rồi quay về chính decision đó. Kiểm mọi nhánh đều nhập lại, lặp hoặc kết thúc."
+        }
+      ],
+      "sourceIds": [
+        "guide-2026",
+        "book-t04",
+        "teacher-t04"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T04",
+      "T04-F01",
+      "T04-F02",
+      "T04-F03",
+      "T04-F04",
+      "T04-F05",
+      "T04-F06",
+      "T04-F07",
+      "T04-F08"
+    ],
+    "title": {
+      "en": "Complete flowchart atlas",
+      "vi": "Atlas flowchart đầy đủ"
+    },
+    "introduction": {
+      "en": "The set covers symbols, sequence, IF/rejoin, WHILE, REPEAT, FOR, nested IF and CASE.",
+      "vi": "Bộ hình bao phủ ký hiệu, sequence, IF/nhập lại, WHILE, REPEAT, FOR, IF lồng và CASE."
+    },
+    "task": {
+      "en": "Narrate each route without colour: condition, label, update and output.",
+      "vi": "Kể từng đường không dựa màu: điều kiện, nhãn, cập nhật và output."
+    },
+    "conventions": [
+      {
+        "en": "A diamond contains one Boolean question.",
+        "vi": "Hình thoi chứa một câu hỏi Boolean."
+      },
+      {
+        "en": "REPEAT exits when UNTIL is TRUE.",
+        "vi": "REPEAT thoát khi UNTIL TRUE."
+      },
+      {
+        "en": "CASE chooses one branch and OTHERWISE handles no match.",
+        "vi": "CASE chọn một nhánh và OTHERWISE xử lý khi không khớp."
+      }
+    ],
+    "sourceIds": [
+      "s26",
+      "book-t04",
+      "guide-2026",
+      "teacher-t04"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T04-W1",
+      "title": {
+        "en": "Prove IF equivalence",
+        "vi": "Chứng minh IF tương đương"
+      },
+      "prompt": {
+        "en": "Input Mark; output PASS when Mark>=50, otherwise RETRY. Give all three forms and trace 49 and 50.",
+        "vi": "Nhập Mark; xuất PASS khi Mark>=50, ngược lại RETRY. Nêu ba dạng và trace 49, 50."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "english",
+          "action": {
+            "en": "Write controlled English",
+            "vi": "Viết structured English"
+          },
+          "why": {
+            "en": "State threshold and both products.",
+            "vi": "Nêu ngưỡng và cả hai sản phẩm."
+          },
+          "result": {
+            "en": "Input Mark; if at least 50 output PASS; otherwise RETRY.",
+            "vi": "Nhập Mark; nếu ít nhất 50 xuất PASS; ngược lại RETRY."
+          }
+        },
+        {
+          "id": "flow",
+          "action": {
+            "en": "Choose symbols",
+            "vi": "Chọn ký hiệu"
+          },
+          "why": {
+            "en": "Input/output and Boolean test have distinct roles.",
+            "vi": "Input/output và phép kiểm Boolean có vai trò khác nhau."
+          },
+          "result": {
+            "en": "Start→INPUT Mark→diamond Mark>=50?→TRUE PASS/FALSE RETRY→End.",
+            "vi": "Start→INPUT Mark→thoi Mark>=50?→TRUE PASS/FALSE RETRY→End."
+          }
+        },
+        {
+          "id": "pseudo",
+          "action": {
+            "en": "Translate",
+            "vi": "Chuyển đổi"
+          },
+          "why": {
+            "en": "Keep the same predicate.",
+            "vi": "Giữ cùng vị từ."
+          },
+          "result": {
+            "en": "IF Mark>=50 THEN OUTPUT \"PASS\" ELSE OUTPUT \"RETRY\" ENDIF.",
+            "vi": "IF Mark>=50 THEN OUTPUT \"PASS\" ELSE OUTPUT \"RETRY\" ENDIF."
+          }
+        },
+        {
+          "id": "trace",
+          "action": {
+            "en": "Trace boundaries",
+            "vi": "Trace biên"
+          },
+          "why": {
+            "en": "Boundary data exposes > versus >=.",
+            "vi": "Dữ liệu biên làm lộ > và >=."
+          },
+          "result": {
+            "en": "49→FALSE→RETRY; 50→TRUE→PASS.",
+            "vi": "49→FALSE→RETRY; 50→TRUE→PASS."
+          }
+        }
+      ],
+      "answer": {
+        "en": "All forms use Mark>=50 and produce exactly one matching output.",
+        "vi": "Mọi dạng dùng Mark>=50 và tạo đúng một output khớp."
+      },
+      "selfCheck": {
+        "en": "Changing to Mark>50 makes the trace for 50 fail.",
+        "vi": "Đổi thành Mark>50 làm trace 50 sai."
+      },
+      "sourceIds": [
+        "teacher-t04",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T04-W2",
+      "title": {
+        "en": "Translate a validated sentinel specification",
+        "vi": "Chuyển đặc tả sentinel có validation"
+      },
+      "prompt": {
+        "en": "Repeatedly input a mark. -1 ends input. Other values must be 0..100. Count valid passes (>=50), valid fails and rejected values, then output all three counts.",
+        "vi": "Nhập điểm lặp lại. -1 kết thúc input. Giá trị khác phải trong 0..100. Đếm số đạt hợp lệ (>=50), trượt hợp lệ và bị từ chối, rồi xuất cả ba số."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "classify",
+          "action": {
+            "en": "Mark control roles",
+            "vi": "Đánh dấu vai trò điều khiển"
+          },
+          "why": {
+            "en": "The sentinel, validity decision and pass/fail decision must not be merged.",
+            "vi": "Sentinel, decision hợp lệ và decision đạt/trượt không được gộp."
+          },
+          "result": {
+            "en": "First decide Mark=-1; otherwise decide range; only valid marks reach pass/fail.",
+            "vi": "Đầu tiên quyết định Mark=-1; nếu không thì quyết định miền; chỉ điểm hợp lệ đi tới đạt/trượt."
+          }
+        },
+        {
+          "id": "initialise",
+          "action": {
+            "en": "Initialise once before the loop",
+            "vi": "Khởi tạo một lần trước vòng lặp"
+          },
+          "why": {
+            "en": "Resetting a counter inside the loop loses previous records.",
+            "vi": "Đặt lại bộ đếm trong vòng lặp làm mất record trước."
+          },
+          "result": {
+            "en": "PassCount, FailCount and RejectedCount start at 0.",
+            "vi": "PassCount, FailCount và RejectedCount bắt đầu bằng 0."
+          }
+        },
+        {
+          "id": "translate",
+          "action": {
+            "en": "Construct the nested decisions and back-edge",
+            "vi": "Dựng decision lồng và cạnh quay lại"
+          },
+          "why": {
+            "en": "Only the sentinel exits; every processed non-sentinel value returns to INPUT.",
+            "vi": "Chỉ sentinel thoát; mọi giá trị không phải sentinel đã xử lý quay lại INPUT."
+          },
+          "result": {
+            "en": "Invalid increments RejectedCount; valid >=50 increments PassCount; other valid increments FailCount.",
+            "vi": "Không hợp lệ tăng RejectedCount; hợp lệ >=50 tăng PassCount; hợp lệ còn lại tăng FailCount."
+          }
+        },
+        {
+          "id": "equivalence",
+          "action": {
+            "en": "Test boundary traces",
+            "vi": "Trace các biên"
+          },
+          "why": {
+            "en": "Boundary cases reveal changed inequalities or wrong exit placement.",
+            "vi": "Ca biên làm lộ bất đẳng thức bị đổi hoặc vị trí thoát sai."
+          },
+          "result": {
+            "en": "Inputs -1, 0, 49, 50, 100 and 101 follow the intended paths; only -1 stops.",
+            "vi": "Các input -1, 0, 49, 50, 100 và 101 đi đúng đường; chỉ -1 dừng."
+          },
+          "check": {
+            "en": "The flowchart and pseudocode must output 1 pass, 2 fails and 1 rejected for 0,49,50,101,-1.",
+            "vi": "Flowchart và pseudocode phải xuất 1 đạt, 2 trượt và 1 bị từ chối cho 0,49,50,101,-1."
+          }
+        }
+      ],
+      "answer": {
+        "en": "DECLARE Mark, PassCount, FailCount, RejectedCount : INTEGER\nPassCount ← 0\nFailCount ← 0\nRejectedCount ← 0\nINPUT Mark\nWHILE Mark <> -1\n  IF Mark < 0 OR Mark > 100 THEN\n    RejectedCount ← RejectedCount + 1\n  ELSE\n    IF Mark >= 50 THEN\n      PassCount ← PassCount + 1\n    ELSE\n      FailCount ← FailCount + 1\n    ENDIF\n  ENDIF\n  INPUT Mark\nENDWHILE\nOUTPUT PassCount, FailCount, RejectedCount\nA flowchart must preserve the same three decisions, labelled outcomes and back-edge to INPUT.",
+        "vi": "DECLARE Mark, PassCount, FailCount, RejectedCount : INTEGER\nPassCount ← 0\nFailCount ← 0\nRejectedCount ← 0\nINPUT Mark\nWHILE Mark <> -1\n  IF Mark < 0 OR Mark > 100 THEN\n    RejectedCount ← RejectedCount + 1\n  ELSE\n    IF Mark >= 50 THEN\n      PassCount ← PassCount + 1\n    ELSE\n      FailCount ← FailCount + 1\n    ENDIF\n  ENDIF\n  INPUT Mark\nENDWHILE\nOUTPUT PassCount, FailCount, RejectedCount\nFlowchart phải giữ cùng ba decision, nhãn kết quả và cạnh quay lại INPUT."
+      },
+      "selfCheck": {
+        "en": "Does every non-sentinel input increment exactly one counter, and can -1 increment none?",
+        "vi": "Mỗi input không phải sentinel có tăng đúng một bộ đếm và -1 có không tăng bộ đếm nào không?"
+      },
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "book-t04",
+        "teacher-t04"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T04-P1",
+      "title": {
+        "en": "Flowchart with a rejoin",
+        "vi": "Flowchart có điểm nhập lại"
+      },
+      "prompt": {
+        "en": "Input Length,Width; Area←Length*Width; output LARGE if Area>100 else STANDARD; then always output Area. Trace 10×10 and 11×10.",
+        "vi": "Nhập Length,Width; Area←Length*Width; xuất LARGE nếu Area>100, ngược lại STANDARD; sau đó luôn xuất Area. Trace 10×10 và 11×10."
+      },
+      "working": [
+        {
+          "en": "Use I/O, process and decision symbols.",
+          "vi": "Dùng ký hiệu I/O, xử lý và quyết định."
+        },
+        {
+          "en": "Rejoin both category branches before OUTPUT Area.",
+          "vi": "Nhập lại hai nhánh trước OUTPUT Area."
+        }
+      ],
+      "answer": {
+        "en": "Start→INPUT→Area process→Area>100?→LARGE/STANDARD→rejoin→OUTPUT Area→End. Outputs STANDARD,100 and LARGE,110.",
+        "vi": "Start→INPUT→xử lý Area→Area>100?→LARGE/STANDARD→nhập lại→OUTPUT Area→End. Output STANDARD,100 và LARGE,110."
+      },
+      "markGuidance": [
+        {
+          "en": "Correct symbols and labelled exits.",
+          "vi": "Đúng ký hiệu và lối ra có nhãn."
+        },
+        {
+          "en": "Shared output after rejoin; boundary traces correct.",
+          "vi": "Output chung sau nhập lại; trace biên đúng."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Putting Area calculation in a diamond confuses process and test.",
+          "vi": "Đặt phép tính Area trong hình thoi là nhầm xử lý với phép kiểm."
+        },
+        {
+          "en": "Area=100 is not LARGE under >100.",
+          "vi": "Area=100 không phải LARGE với >100."
+        }
+      ],
+      "selfCheck": {
+        "en": "What changes if the requirement says at least 100?",
+        "vi": "Điều gì đổi nếu yêu cầu nói ít nhất 100?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t04"
+      ]
+    },
+    {
+      "id": "T04-P2",
+      "title": {
+        "en": "Sentinel flowchart to pseudocode",
+        "vi": "Flowchart sentinel sang pseudocode"
+      },
+      "prompt": {
+        "en": "Repeatedly input Score; -1 ends, otherwise add Score to Total. Write pseudocode and trace 4,6,-1.",
+        "vi": "Lặp nhập Score; -1 kết thúc, ngược lại cộng Score vào Total. Viết pseudocode và trace 4,6,-1."
+      },
+      "working": [
+        {
+          "en": "Initialise Total once.",
+          "vi": "Khởi tạo Total một lần."
+        },
+        {
+          "en": "Read before testing and guard the addition.",
+          "vi": "Đọc trước khi kiểm và bảo vệ phép cộng."
+        }
+      ],
+      "answer": {
+        "en": "Total←0; REPEAT INPUT Score; IF Score<>-1 THEN Total←Total+Score ENDIF; UNTIL Score=-1; OUTPUT Total. Result 10.",
+        "vi": "Total←0; REPEAT INPUT Score; IF Score<>-1 THEN Total←Total+Score ENDIF; UNTIL Score=-1; OUTPUT Total. Kết quả 10."
+      },
+      "markGuidance": [
+        {
+          "en": "Sentinel not added.",
+          "vi": "Không cộng sentinel."
+        },
+        {
+          "en": "UNTIL expresses stop and trace outputs 10.",
+          "vi": "UNTIL diễn đạt dừng và trace xuất 10."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Adding before checking gives 9.",
+          "vi": "Cộng trước kiểm cho 9."
+        },
+        {
+          "en": "UNTIL Score<>-1 exits after 4.",
+          "vi": "UNTIL Score<>-1 thoát sau 4."
+        }
+      ],
+      "selfCheck": {
+        "en": "A WHILE form needs a priming INPUT before its first test.",
+        "vi": "Dạng WHILE cần INPUT mồi trước lần kiểm đầu."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t04",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T04-P3",
+      "title": {
+        "en": "Draw a bounded flowchart",
+        "vi": "Vẽ flowchart có vòng lặp giới hạn"
+      },
+      "prompt": {
+        "en": "From pseudocode that inputs five temperatures, counts values below 0 and outputs the count, specify every flowchart node, labelled edge and loop back-edge.",
+        "vi": "Từ pseudocode nhập năm nhiệt độ, đếm giá trị dưới 0 và xuất số đếm, hãy nêu mọi node flowchart, cạnh có nhãn và cạnh quay lại vòng lặp."
+      },
+      "working": [
+        {
+          "en": "Initialise Index and Count before the decision.",
+          "vi": "Khởi tạo Index và Count trước decision."
+        },
+        {
+          "en": "Label the loop decision and the below-zero decision.",
+          "vi": "Gắn nhãn decision vòng lặp và decision dưới 0."
+        },
+        {
+          "en": "Place Index update before the back-edge.",
+          "vi": "Đặt cập nhật Index trước cạnh quay lại."
+        }
+      ],
+      "answer": {
+        "en": "Start → process Index←1, Count←0 → decision Index<=5. True → input Temperature → decision Temperature<0. True → process Count←Count+1; False bypasses that process. Both branches merge at process Index←Index+1, whose arrow returns to decision Index<=5. The False edge from Index<=5 goes to output Count → Stop. Both decisions require labelled True/False edges.",
+        "vi": "Start → process Index←1, Count←0 → decision Index<=5. True → input Temperature → decision Temperature<0. True → process Count←Count+1; False bỏ qua process đó. Hai nhánh nhập tại process Index←Index+1, có mũi tên quay về decision Index<=5. Cạnh False từ Index<=5 đi tới output Count → Stop. Cả hai decision cần cạnh True/False có nhãn."
+      },
+      "markGuidance": [
+        {
+          "en": "Start/stop, process, input/output and decision symbols are used correctly, and both decision outcomes are labelled.",
+          "vi": "Các ký hiệu start/stop, process, input/output và decision được dùng đúng, đồng thời cả hai kết quả decision đều có nhãn."
+        },
+        {
+          "en": "The update and back-edge guarantee exactly five iterations.",
+          "vi": "Cập nhật và cạnh quay lại bảo đảm đúng năm lần lặp."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Returning directly from the input box skips the counter update.",
+          "vi": "Quay lại trực tiếp từ box input làm bỏ cập nhật bộ đếm."
+        },
+        {
+          "en": "Putting OUTPUT inside the loop produces five partial outputs.",
+          "vi": "Đặt OUTPUT trong vòng lặp tạo năm output chưa hoàn tất."
+        }
+      ],
+      "selfCheck": {
+        "en": "What path occurs when the first temperature is not below zero?",
+        "vi": "Đường đi nào xảy ra khi nhiệt độ đầu không dưới 0?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "guide-2026",
+        "book-t04",
+        "teacher-t04"
+      ]
+    },
+    {
+      "id": "T04-P4",
+      "title": {
+        "en": "Repair a sentinel flowchart",
+        "vi": "Sửa flowchart sentinel"
+      },
+      "prompt": {
+        "en": "A flawed diagram tests Value=0 only after adding Value to Total, and its back-edge returns to the addition box instead of the input box. State both faults and the corrected order for summing non-zero values.",
+        "vi": "Một sơ đồ lỗi chỉ kiểm Value=0 sau khi cộng Value vào Total và cạnh quay lại trở về box cộng thay vì box input. Nêu cả hai lỗi và thứ tự đúng để tính tổng các giá trị khác 0."
+      },
+      "working": [
+        {
+          "en": "Trace the sentinel as the first input.",
+          "vi": "Trace sentinel ở input đầu."
+        },
+        {
+          "en": "Identify which box must receive the back-edge.",
+          "vi": "Xác định box phải nhận cạnh quay lại."
+        },
+        {
+          "en": "Rewrite the node order.",
+          "vi": "Viết lại thứ tự node."
+        }
+      ],
+      "answer": {
+        "en": "Fault 1: the sentinel is processed before it is tested. Fault 2: the back-edge repeats addition without reading a new value, so it may never terminate. Correct flow: Start → Total←0 → INPUT Value → decision Value=0. True → OUTPUT Total → Stop. False → Total←Total+Value → back to INPUT Value.",
+        "vi": "Lỗi 1: sentinel bị xử lý trước khi kiểm. Lỗi 2: cạnh quay lại lặp phép cộng mà không đọc giá trị mới nên có thể không kết thúc. Luồng đúng: Start → Total←0 → INPUT Value → decision Value=0. True → OUTPUT Total → Stop. False → Total←Total+Value → quay về INPUT Value."
+      },
+      "markGuidance": [
+        {
+          "en": "Both semantic faults and their effects are explained.",
+          "vi": "Giải thích cả hai lỗi semantics và hậu quả."
+        },
+        {
+          "en": "The repaired order is complete and terminating.",
+          "vi": "Thứ tự đã sửa đầy đủ và có kết thúc."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Saying only that an arrow is wrong without stating the changed behaviour.",
+          "vi": "Chỉ nói mũi tên sai mà không nêu hành vi bị đổi."
+        },
+        {
+          "en": "Returning to the decision without accepting another input.",
+          "vi": "Quay về decision mà không nhận input mới."
+        }
+      ],
+      "selfCheck": {
+        "en": "With first input 0, can any addition run?",
+        "vi": "Với input đầu là 0, phép cộng nào có được chạy không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "guide-2026",
+        "teacher-t04"
+      ]
+    },
+    {
+      "id": "T04-P5",
+      "title": {
+        "en": "Translate structured English into complete pseudocode",
+        "vi": "Chuyển structured English thành pseudocode đầy đủ"
+      },
+      "prompt": {
+        "en": "A shop inputs ProductCode and Quantity until ProductCode is END. Quantity must be 1..20. For valid entries, add Quantity to TotalItems and count orders; reject invalid quantities. Output TotalItems and valid order count.",
+        "vi": "Cửa hàng nhập ProductCode và Quantity cho tới khi ProductCode là END. Quantity phải trong 1..20. Với entry hợp lệ, cộng Quantity vào TotalItems và đếm đơn; từ chối số lượng không hợp lệ. Xuất TotalItems và số đơn hợp lệ."
+      },
+      "working": [
+        {
+          "en": "Declare and initialise every accumulator.",
+          "vi": "Khai báo và khởi tạo mọi accumulator."
+        },
+        {
+          "en": "Keep the sentinel outside the quantity validation.",
+          "vi": "Giữ sentinel ngoài validation số lượng."
+        },
+        {
+          "en": "Update and repeat input on every non-sentinel path.",
+          "vi": "Cập nhật và lặp input ở mọi đường không phải sentinel."
+        }
+      ],
+      "answer": {
+        "en": "DECLARE ProductCode : STRING\nDECLARE Quantity, TotalItems, OrderCount : INTEGER\nTotalItems ← 0\nOrderCount ← 0\nINPUT ProductCode\nWHILE ProductCode <> \"END\"\n  INPUT Quantity\n  IF Quantity >= 1 AND Quantity <= 20 THEN\n    TotalItems ← TotalItems + Quantity\n    OrderCount ← OrderCount + 1\n  ELSE\n    OUTPUT \"Invalid quantity\"\n  ENDIF\n  INPUT ProductCode\nENDWHILE\nOUTPUT TotalItems, OrderCount",
+        "vi": "DECLARE ProductCode : STRING\nDECLARE Quantity, TotalItems, OrderCount : INTEGER\nTotalItems ← 0\nOrderCount ← 0\nINPUT ProductCode\nWHILE ProductCode <> \"END\"\n  INPUT Quantity\n  IF Quantity >= 1 AND Quantity <= 20 THEN\n    TotalItems ← TotalItems + Quantity\n    OrderCount ← OrderCount + 1\n  ELSE\n    OUTPUT \"Invalid quantity\"\n  ENDIF\n  INPUT ProductCode\nENDWHILE\nOUTPUT TotalItems, OrderCount"
+      },
+      "markGuidance": [
+        {
+          "en": "Declarations, initialisation, validation and termination are all present.",
+          "vi": "Có đủ khai báo, khởi tạo, validation và kết thúc."
+        },
+        {
+          "en": "Only valid records update both accumulators.",
+          "vi": "Chỉ record hợp lệ cập nhật cả hai accumulator."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Reading Quantity before checking END creates an incomplete sentinel record.",
+          "vi": "Đọc Quantity trước khi kiểm END tạo record sentinel không đầy đủ."
+        },
+        {
+          "en": "Incrementing OrderCount for rejected quantities.",
+          "vi": "Tăng OrderCount cho số lượng bị từ chối."
+        }
+      ],
+      "selfCheck": {
+        "en": "For END as the first code, are both outputs zero without reading Quantity?",
+        "vi": "Nếu code đầu là END, cả hai output có bằng 0 mà không đọc Quantity không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "teacher-t04"
+      ]
+    },
+    {
+      "id": "T04-P6",
+      "title": {
+        "en": "Trace nested selection inside iteration",
+        "vi": "Trace selection lồng trong vòng lặp"
+      },
+      "prompt": {
+        "en": "Using T04-P5, trace codes A1, B2, END with quantities 3 and 25. Give TotalItems, OrderCount and every message.",
+        "vi": "Dùng T04-P5, trace code A1, B2, END với quantity 3 và 25. Nêu TotalItems, OrderCount và mọi message."
+      },
+      "working": [
+        {
+          "en": "Create one row per non-sentinel record.",
+          "vi": "Tạo một hàng cho mỗi record không phải sentinel."
+        },
+        {
+          "en": "Evaluate the range before updating totals.",
+          "vi": "Đánh giá miền trước khi cập nhật tổng."
+        },
+        {
+          "en": "Do not create a row for END.",
+          "vi": "Không tạo hàng cho END."
+        }
+      ],
+      "answer": {
+        "en": "A1,3 is valid: TotalItems=3, OrderCount=1. B2,25 is invalid: output \"Invalid quantity\" and keep TotalItems=3, OrderCount=1. END stops before a quantity is read. Final output is 3 and 1.",
+        "vi": "A1,3 hợp lệ: TotalItems=3, OrderCount=1. B2,25 không hợp lệ: output \"Invalid quantity\" và giữ TotalItems=3, OrderCount=1. END dừng trước khi đọc quantity. Output cuối là 3 và 1."
+      },
+      "markGuidance": [
+        {
+          "en": "The trace preserves initialisation, branch decisions and termination.",
+          "vi": "Trace giữ đúng khởi tạo, quyết định nhánh và kết thúc."
+        },
+        {
+          "en": "The invalid item changes no accumulator.",
+          "vi": "Item không hợp lệ không đổi accumulator nào."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Counting END as an order.",
+          "vi": "Đếm END thành một đơn."
+        },
+        {
+          "en": "Adding 25 before validating it.",
+          "vi": "Cộng 25 trước khi validation."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which invariant remains true after each record?",
+        "vi": "Invariant nào vẫn đúng sau mỗi record?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t04",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T04-P7",
+      "title": {
+        "en": "Translate a modular structured-English design",
+        "vi": "Chuyển thiết kế structured English có module"
+      },
+      "prompt": {
+        "en": "Translate this structured-English design into complete pseudocode. Input AthleteID until `END`. For each athlete, input three positive REAL lap times, re-entering any value that is not above zero. Use a function Mean3 with three REAL parameters, then output AthleteID and the average. Include declarations, module interface, validation and termination.",
+        "vi": "Chuyển thiết kế structured English sau thành pseudocode đầy đủ. Nhập AthleteID tới `END`. Với mỗi vận động viên, nhập ba thời gian vòng đua REAL dương và nhập lại mọi giá trị không lớn hơn 0. Dùng function Mean3 có ba parameter REAL rồi xuất AthleteID cùng trung bình. Có đủ khai báo, interface module, validation và kết thúc."
+      },
+      "working": [
+        {
+          "en": "Derive STRING, REAL and module return types before writing control flow.",
+          "vi": "Suy kiểu STRING, REAL và return của module trước khi viết control flow."
+        },
+        {
+          "en": "Place the sentinel test before reading a three-time record.",
+          "vi": "Đặt phép kiểm sentinel trước khi đọc record ba thời gian."
+        },
+        {
+          "en": "Use a validation loop for each lap and call Mean3 only after all three are valid.",
+          "vi": "Dùng vòng validation cho mỗi lap và chỉ gọi Mean3 sau khi cả ba hợp lệ."
+        }
+      ],
+      "answer": {
+        "en": "FUNCTION Mean3(Lap1 : REAL, Lap2 : REAL, Lap3 : REAL) RETURNS REAL\n  RETURN (Lap1 + Lap2 + Lap3) / 3.0\nENDFUNCTION\nDECLARE AthleteID : STRING\nDECLARE Lap1, Lap2, Lap3, Average : REAL\nINPUT AthleteID\nWHILE AthleteID <> \"END\"\n  REPEAT\n    INPUT Lap1\n  UNTIL Lap1 > 0.0\n  REPEAT\n    INPUT Lap2\n  UNTIL Lap2 > 0.0\n  REPEAT\n    INPUT Lap3\n  UNTIL Lap3 > 0.0\n  Average ← Mean3(Lap1, Lap2, Lap3)\n  OUTPUT AthleteID, Average\n  INPUT AthleteID\nENDWHILE",
+        "vi": "FUNCTION Mean3(Lap1 : REAL, Lap2 : REAL, Lap3 : REAL) RETURNS REAL\n  RETURN (Lap1 + Lap2 + Lap3) / 3.0\nENDFUNCTION\nDECLARE AthleteID : STRING\nDECLARE Lap1, Lap2, Lap3, Average : REAL\nINPUT AthleteID\nWHILE AthleteID <> \"END\"\n  REPEAT\n    INPUT Lap1\n  UNTIL Lap1 > 0.0\n  REPEAT\n    INPUT Lap2\n  UNTIL Lap2 > 0.0\n  REPEAT\n    INPUT Lap3\n  UNTIL Lap3 > 0.0\n  Average ← Mean3(Lap1, Lap2, Lap3)\n  OUTPUT AthleteID, Average\n  INPUT AthleteID\nENDWHILE"
+      },
+      "markGuidance": [
+        {
+          "en": "Declarations and the Mean3 header/return match the design.",
+          "vi": "Khai báo cùng header/return Mean3 khớp thiết kế."
+        },
+        {
+          "en": "The sentinel, three validation loops, function call and final update preserve the structured-English order.",
+          "vi": "Sentinel, ba vòng validation, lời gọi function và cập nhật cuối giữ đúng thứ tự structured English."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Reading lap times before testing `END` creates an incomplete sentinel record.",
+          "vi": "Đọc thời gian trước khi kiểm `END` tạo record sentinel không đầy đủ."
+        },
+        {
+          "en": "Calling Mean3 before validation allows a non-positive time into the average.",
+          "vi": "Gọi Mean3 trước validation làm thời gian không dương đi vào trung bình."
+        }
+      ],
+      "selfCheck": {
+        "en": "For first input `END`, can any lap input or function call execute?",
+        "vi": "Nếu input đầu là `END`, có input lap hoặc lời gọi function nào chạy không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "teacher-t04"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "A diamond calculates a value.",
+        "vi": "Hình thoi tính giá trị."
+      },
+      "correction": {
+        "en": "It asks a Boolean question; calculations use rectangles.",
+        "vi": "Nó hỏi Boolean; tính toán dùng chữ nhật."
+      },
+      "selfCheck": {
+        "en": "Can both exits be labelled TRUE/FALSE?",
+        "vi": "Hai lối ra có ghi TRUE/FALSE được không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "REPEAT continues when UNTIL is TRUE.",
+        "vi": "REPEAT tiếp tục khi UNTIL TRUE."
+      },
+      "correction": {
+        "en": "It stops when UNTIL is TRUE.",
+        "vi": "Nó dừng khi UNTIL TRUE."
+      },
+      "selfCheck": {
+        "en": "Which label reaches End?",
+        "vi": "Nhãn nào tới End?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "CASE falls through.",
+        "vi": "CASE chạy rơi xuống."
+      },
+      "correction": {
+        "en": "It selects one value/range or OTHERWISE.",
+        "vi": "Nó chọn một giá trị/khoảng hoặc OTHERWISE."
+      },
+      "selfCheck": {
+        "en": "Should a later branch also execute?",
+        "vi": "Nhánh sau có chạy không?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Rebuild the conversion checklist.",
+      "vi": "Dựng lại checklist chuyển đổi."
+    },
+    "answerPoints": [
+      {
+        "en": "Five symbol roles.",
+        "vi": "Năm vai trò ký hiệu."
+      },
+      {
+        "en": "Label exits and rejoin/loop-back.",
+        "vi": "Ghi nhãn lối ra và nhập lại/quay vòng."
+      },
+      {
+        "en": "WHILE pre-tests; REPEAT post-tests; FOR has four roles.",
+        "vi": "WHILE kiểm trước; REPEAT kiểm sau; FOR có bốn vai trò."
+      },
+      {
+        "en": "Trace the same boundary input in every form.",
+        "vi": "Trace cùng input biên ở mọi dạng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Equivalent forms preserve state and output.",
+      "vi": "Các dạng tương đương giữ trạng thái và output."
+    },
+    {
+      "en": "Shapes, labels and arrows all carry meaning.",
+      "vi": "Hình, nhãn và mũi tên đều mang nghĩa."
+    },
+    {
+      "en": "Tracing exposes reversed conditions and missing rejoins.",
+      "vi": "Trace phát hiện điều kiện đảo và thiếu nhập lại."
+    },
+    {
+      "en": "Representation equivalence is proved by decisions, updates, outputs and termination, not appearance.",
+      "vi": "Tính tương đương biểu diễn được chứng minh bằng decision, cập nhật, output và kết thúc, không phải hình thức."
+    },
+    {
+      "en": "Every loop needs an entry test, progress/update, back-edge and exit.",
+      "vi": "Mọi vòng lặp cần phép kiểm khi vào, tiến triển/cập nhật, cạnh quay lại và lối thoát."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F02",
+      "role": "related",
+      "title": {
+        "en": "Refine and convert",
+        "vi": "Làm mịn và chuyển đổi"
+      }
+    },
+    {
+      "id": "F10",
+      "role": "related",
+      "title": {
+        "en": "Sentinel, validation and loops",
+        "vi": "Sentinel, validation và vòng lặp"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "algorithms-ipo-refinement",
+    "selection",
+    "iteration",
+    "structure-charts"
+  ],
+  "sources": [
+    {
+      "id": "s26",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "Subject content pp27–29, §§9.2–10.4.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "guide-2026",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, examinations in 2026",
+      "locator": "Relevant notation in §§1–9; local extracted copy checked 2026-10-02.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t04",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "Printed pp219–237 and p272 Figure 11.1; flowchart notation checked in Figure 9.3/Table 9.4.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-t04",
+      "title": "9618/22 May/June 2025 Question 4",
+      "locator": "QP p7: complete a flowchart; topic locator only.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t04",
+      "title": "AlgoCore teacher-created T04 lesson set",
+      "locator": "T04-academic-r2, 2026-10-02; original tasks and provisional criteria.",
+      "kind": "teacher-authored"
+    },
+    {
+      "id": "qp-t04-w25-22-q2",
+      "title": "9618/22 October/November 2025 Question 2",
+      "locator": "QP p3 and published MS pp6–7: sentinel-controlled input into a bounded array; control-flow representation calibration.",
+      "kind": "question-paper"
+    }
+  ]
+}

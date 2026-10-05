@@ -1,0 +1,1075 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.1",
+  "topicId": "P3-14.1-T01",
+  "slug": "tcp-ip-stack-and-message-journey",
+  "title": {
+    "en": "TCP/IP stack and message journey",
+    "vi": "Mô hình TCP/IP và hành trình thông điệp"
+  },
+  "question": {
+    "en": "How does a request reach the right application on another host?",
+    "vi": "Một yêu cầu đến đúng ứng dụng trên máy khác như thế nào?"
+  },
+  "opening": {
+    "en": "A student selects a revision page in a browser on Host A. A web server on Host B must understand the request. The browser does not place an unlabelled message straight onto the internet: several cooperating layers prepare it, carry it and recover its meaning at the other end.",
+    "vi": "Một học sinh chọn trang ôn tập trong trình duyệt ở Host A. Máy chủ web ở Host B cần hiểu yêu cầu này. Trình duyệt không đưa thẳng một thông điệp không có thông tin điều khiển lên internet: nhiều tầng phối hợp chuẩn bị, truyền và khôi phục ý nghĩa của thông điệp ở đầu nhận."
+  },
+  "objectives": [
+    {
+      "en": "Explain why the communicating parties need agreed protocols, not just a physical connection.",
+      "vi": "Giải thích vì sao hai bên cần giao thức thống nhất, bên cạnh kết nối vật lý."
+    },
+    {
+      "en": "Name the four TCP/IP layers in order and assign a precise responsibility to each.",
+      "vi": "Nêu đúng thứ tự bốn tầng TCP/IP và gắn một trách nhiệm cụ thể với từng tầng."
+    },
+    {
+      "en": "Trace a message down the sender’s stack and up the receiver’s stack through adjacent layers.",
+      "vi": "Theo dõi thông điệp đi xuống stack bên gửi rồi đi lên stack bên nhận qua các tầng kề nhau."
+    },
+    {
+      "en": "Explain how added control information helps delivery while the application data is preserved.",
+      "vi": "Giải thích thông tin điều khiển bổ sung hỗ trợ việc truyền như thế nào trong khi dữ liệu ứng dụng được giữ nguyên."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Recognise a host, a client and a server, and know that a network carries data between devices.",
+      "vi": "Nhận biết host, client và server; biết mạng truyền dữ liệu giữa các thiết bị."
+    },
+    {
+      "en": "Know that an IP address identifies a network interface and that a message may be divided into smaller units.",
+      "vi": "Biết địa chỉ IP nhận diện một giao diện mạng và thông điệp có thể được chia thành những đơn vị nhỏ hơn."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Protocol",
+      "meaning": {
+        "en": "Agreed rules for an exchange, including how messages are structured and how the participants respond.",
+        "vi": "Tập quy tắc thống nhất cho việc trao đổi, gồm cấu trúc thông điệp và cách các bên phản hồi."
+      }
+    },
+    {
+      "term": "Protocol suite",
+      "meaning": {
+        "en": "A related set of protocols that cooperate to provide communication services.",
+        "vi": "Một tập giao thức liên quan, phối hợp cung cấp các dịch vụ truyền thông."
+      }
+    },
+    {
+      "term": "Layer",
+      "meaning": {
+        "en": "A part of the communication design with a defined responsibility and interfaces to adjacent layers.",
+        "vi": "Một phần trong thiết kế truyền thông có trách nhiệm xác định và giao diện với các tầng kề nhau."
+      }
+    },
+    {
+      "term": "Payload",
+      "meaning": {
+        "en": "The data carried for the next higher layer; in this visual, the unchanged application request inside the control-information wrappers.",
+        "vi": "Dữ liệu được mang cho tầng phía trên; trong visual này là yêu cầu ứng dụng không đổi nằm bên trong các phần thông tin điều khiển."
+      }
+    },
+    {
+      "term": "Encapsulation / decapsulation",
+      "meaning": {
+        "en": "Adding control information around data as it moves down the stack; processing and removing that information as it moves up.",
+        "vi": "Bổ sung thông tin điều khiển quanh dữ liệu khi đi xuống stack; xử lý và bỏ thông tin đó khi đi lên."
+      }
+    },
+    {
+      "term": "Segment / datagram / frame",
+      "meaning": {
+        "en": "Names for units at the TCP Transport, IP Internet and Link layers respectively. Their boundaries include different control information.",
+        "vi": "Tên các đơn vị tương ứng ở tầng Transport dùng TCP, tầng Internet dùng IP và tầng Link. Mỗi đơn vị bao gồm thông tin điều khiển khác nhau."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "agreed-rules",
+      "title": {
+        "en": "A connection is not yet a shared language",
+        "vi": "Có kết nối chưa có nghĩa là hiểu nhau"
+      },
+      "paragraphs": [
+        {
+          "en": "A cable or radio link can carry bits, but it cannot tell the receiver what those bits mean. The two ends need compatible rules for message format, interpretation and the sequence of an exchange. For example, a web client must issue a request that the web server can recognise; merely sending the name of a page in an arbitrary format is not enough.",
+          "vi": "Cáp hoặc liên kết vô tuyến có thể mang các bit, nhưng không tự cho bên nhận biết chúng có ý nghĩa gì. Hai đầu cần quy tắc tương thích về định dạng, cách diễn giải thông điệp và trình tự trao đổi. Ví dụ, web client phải gửi yêu cầu mà web server nhận biết được; chỉ gửi tên trang theo một định dạng tùy ý là chưa đủ."
+        },
+        {
+          "en": "A protocol supplies those agreed rules. Both participants must implement the appropriate protocol for the exchange. They need not use the same brand of hardware or the same operating system: matching the agreed behaviour is what makes their communication compatible.",
+          "vi": "Giao thức cung cấp các quy tắc thống nhất đó. Cả hai bên phải thực hiện giao thức phù hợp với việc trao đổi. Họ không cần dùng cùng hãng thiết bị hay cùng hệ điều hành: chính hành vi tuân theo quy tắc chung tạo ra khả năng tương thích."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-protocols"
+      ]
+    },
+    {
+      "id": "layered-services",
+      "title": {
+        "en": "Divide the job into cooperating layers",
+        "vi": "Chia công việc cho các tầng phối hợp"
+      },
+      "paragraphs": [
+        {
+          "en": "Communication involves different jobs: expressing an application request, providing host-to-host delivery, addressing data across networks and moving it over a local link. A protocol stack groups related jobs into layers. Each layer provides a service to the layer above and uses a service from the layer below.",
+          "vi": "Truyền thông gồm nhiều công việc: biểu diễn yêu cầu ứng dụng, cung cấp việc truyền giữa hai host, đánh địa chỉ dữ liệu qua các mạng và chuyển dữ liệu trên liên kết cục bộ. Protocol stack nhóm những công việc liên quan thành các tầng. Mỗi tầng cung cấp dịch vụ cho tầng trên và sử dụng dịch vụ của tầng dưới."
+        },
+        {
+          "en": "Within one host, this model passes data between adjacent layers. The sending Application layer passes to Transport, not straight to Link. At the other host, the corresponding protocols interpret the information intended for them. This is logical cooperation between matching layers; it does not mean there is a separate physical wire between every matching pair.",
+          "vi": "Trong một host, mô hình này chuyển dữ liệu giữa những tầng kề nhau. Application bên gửi chuyển cho Transport, không nhảy thẳng đến Link. Ở host kia, các giao thức tương ứng diễn giải thông tin dành cho chúng. Đây là sự phối hợp logic giữa các tầng tương ứng, không phải mỗi cặp tầng có một dây nối vật lý riêng."
+        },
+        {
+          "en": "Separating responsibilities makes the system easier to develop and change: one layer can change its internal method while preserving its interface to neighbouring layers. A protocol stack is this layered organisation, not the last-in-first-out stack data structure used for PUSH and POP operations.",
+          "vi": "Tách trách nhiệm giúp hệ thống dễ phát triển và thay đổi: một tầng có thể đổi cách xử lý bên trong mà vẫn giữ giao diện với các tầng bên cạnh. Protocol stack là cách tổ chức theo tầng này, không phải cấu trúc dữ liệu stack vào sau ra trước dùng thao tác PUSH và POP."
+        }
+      ],
+      "sourceIds": [
+        "book-protocols",
+        "s25-ms32",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "four-layer-functions",
+      "title": {
+        "en": "Four layers, four distinct responsibilities",
+        "vi": "Bốn tầng với bốn trách nhiệm riêng"
+      },
+      "paragraphs": [
+        {
+          "en": "For this syllabus, use exactly four layers, from top to bottom: Application, Transport, Internet, Link. TCP/IP names a suite, not a single protocol that performs every task. HTTP is an Application protocol; TCP belongs to Transport; IP belongs to Internet.",
+          "vi": "Trong syllabus này, dùng đúng bốn tầng từ trên xuống: Application, Transport, Internet, Link. TCP/IP là tên một bộ giao thức, không phải một giao thức duy nhất làm mọi việc. HTTP là giao thức Application; TCP thuộc Transport; IP thuộc Internet."
+        },
+        {
+          "en": "The Link layer connects the stack to the network. It includes the local transmission service in this four-layer model; do not add a fifth Physical layer or replace the diagram with the seven-layer OSI model when the question asks for the four TCP/IP layers.",
+          "vi": "Tầng Link nối stack với mạng. Trong mô hình bốn tầng này, nó bao gồm dịch vụ truyền cục bộ; không thêm tầng Physical thứ năm hoặc thay bằng sơ đồ OSI bảy tầng khi đề hỏi bốn tầng TCP/IP."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-protocols",
+        "s24-ms31",
+        "s25-ms33"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Layer",
+            "vi": "Tầng"
+          },
+          {
+            "en": "Responsibility in this journey",
+            "vi": "Trách nhiệm trong hành trình này"
+          },
+          {
+            "en": "Do not confuse with",
+            "vi": "Phân biệt với"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "Application",
+              "vi": "Application — Ứng dụng"
+            },
+            {
+              "en": "Provides communication services to applications. HTTP gives the request a format and meaning that the web server can interpret.",
+              "vi": "Cung cấp dịch vụ truyền thông cho ứng dụng. HTTP tạo định dạng và ý nghĩa của yêu cầu để web server diễn giải."
+            },
+            {
+              "en": "Choosing a route through the network.",
+              "vi": "Chọn tuyến qua mạng."
+            }
+          ],
+          [
+            {
+              "en": "Transport",
+              "vi": "Transport — Giao vận"
+            },
+            {
+              "en": "Provides communication between the end hosts. With TCP, divides the byte stream into segments and supports reliable, ordered delivery to the receiving application.",
+              "vi": "Cung cấp truyền thông giữa hai host đầu cuối. Với TCP, chia luồng byte thành segment và hỗ trợ việc giao dữ liệu tin cậy, đúng thứ tự cho ứng dụng nhận."
+            },
+            {
+              "en": "Forcing packets to travel along one route or arrive in order on the network.",
+              "vi": "Bắt buộc packet đi cùng một tuyến hoặc đến theo thứ tự trên mạng."
+            }
+          ],
+          [
+            {
+              "en": "Internet",
+              "vi": "Internet — Liên mạng"
+            },
+            {
+              "en": "Adds source and destination IP addressing and handles delivery across interconnected networks, using routing to reach the intended destination.",
+              "vi": "Bổ sung địa chỉ IP nguồn, đích và xử lý việc truyền qua các mạng liên kết, dùng định tuyến để đến đích dự kiến."
+            },
+            {
+              "en": "Interpreting the web page request.",
+              "vi": "Diễn giải yêu cầu trang web."
+            }
+          ],
+          [
+            {
+              "en": "Link",
+              "vi": "Link — Liên kết"
+            },
+            {
+              "en": "Frames the data for a local link, interfaces with network hardware and transfers it between directly connected devices.",
+              "vi": "Đóng dữ liệu thành frame cho liên kết cục bộ, giao tiếp với phần cứng mạng và chuyển dữ liệu giữa các thiết bị nối trực tiếp."
+            },
+            {
+              "en": "Providing the complete end-to-end application service by itself.",
+              "vi": "Tự mình cung cấp toàn bộ dịch vụ ứng dụng giữa hai đầu cuối."
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "tcp-delivery",
+      "title": {
+        "en": "What TCP contributes at Transport",
+        "vi": "TCP đóng góp gì ở tầng Transport"
+      },
+      "paragraphs": [
+        {
+          "en": "A large application message need not be transmitted as one unit. TCP can divide the application byte stream into segments and add information used to manage their delivery. Sequence information allows the receiver to put data in order; error detection, acknowledgements and retransmission support reliable delivery when data is corrupted or lost.",
+          "vi": "Thông điệp ứng dụng lớn không nhất thiết được truyền thành một đơn vị duy nhất. TCP có thể chia luồng byte của ứng dụng thành các segment và thêm thông tin để quản lý việc truyền. Thông tin thứ tự giúp bên nhận sắp dữ liệu đúng trật tự; phát hiện lỗi, xác nhận và truyền lại hỗ trợ truyền tin cậy khi dữ liệu hỏng hoặc mất."
+        },
+        {
+          "en": "Distinguish arrival on the network from delivery to the application. Segments can arrive out of order; TCP at the receiver can wait for missing data and deliver an ordered stream upwards. “TCP delivers in order” does not mean “IP packets always arrive in order”. A permanent connection failure can still prevent completion.",
+          "vi": "Phân biệt dữ liệu đến qua mạng với dữ liệu được giao cho ứng dụng. Segment có thể đến không đúng thứ tự; TCP bên nhận có thể chờ dữ liệu thiếu rồi giao luồng có thứ tự lên trên. “TCP giao dữ liệu đúng thứ tự” không có nghĩa “packet IP luôn đến đúng thứ tự”. Lỗi kết nối kéo dài vẫn có thể khiến việc truyền không hoàn thành."
+        },
+        {
+          "en": "The small request in the visual fits in one simplified transport unit. That keeps attention on the layers; it does not claim that every message fits in one segment. Connection setup, acknowledgements and retransmissions are explained here but are not separately animated in this successful one-way trace.",
+          "vi": "Yêu cầu nhỏ trong visual nằm gọn trong một đơn vị giao vận giản lược. Cách này giúp tập trung vào các tầng, không khẳng định mọi thông điệp đều vừa một segment. Thiết lập kết nối, xác nhận và truyền lại được giải thích tại đây nhưng không được hoạt họa riêng trong hành trình một chiều thành công này."
+        }
+      ],
+      "sourceIds": [
+        "book-transport",
+        "s24-ms31",
+        "tcp-standard"
+      ]
+    },
+    {
+      "id": "control-information",
+      "title": {
+        "en": "Add control information without replacing the request",
+        "vi": "Thêm thông tin điều khiển mà không thay yêu cầu"
+      },
+      "paragraphs": [
+        {
+          "en": "Imagine the application request as a note inside labelled envelopes. Transport adds control information around the application data. Internet adds addressing around that transport unit. Link places the IP datagram inside a frame for the next local link. This is encapsulation: the inner data becomes the payload of the next lower layer.",
+          "vi": "Hãy hình dung yêu cầu ứng dụng như một tờ ghi chú nằm trong các phong bì có nhãn. Transport thêm thông tin điều khiển quanh dữ liệu ứng dụng. Internet thêm thông tin địa chỉ quanh đơn vị giao vận. Link đặt IP datagram trong một frame cho liên kết cục bộ tiếp theo. Đó là đóng gói: dữ liệu bên trong trở thành payload của tầng dưới kế tiếp."
+        },
+        {
+          "en": "The visual shows three simplified wrappers: Transport control, Internet addressing and Link control. The application request already includes its application-level meaning; no fourth invented wrapper is needed. These boxes represent responsibilities, not a byte-accurate header diagram. A real link frame can include a trailer as well as a header.",
+          "vi": "Visual hiển thị ba phần bao giản lược: điều khiển Transport, địa chỉ Internet và điều khiển Link. Yêu cầu ứng dụng đã có ý nghĩa ở cấp ứng dụng; không cần tạo thêm một phần bao thứ tư giả định. Những khối này biểu diễn trách nhiệm, không phải sơ đồ header chính xác từng byte. Frame liên kết thực có thể gồm trailer bên cạnh header."
+        },
+        {
+          "en": "At the receiving host, Link processes its own control information and passes the enclosed datagram upwards. Internet then processes its information, followed by Transport. Removing an outer wrapper exposes the next inner unit; it does not erase the application request. This reverse processing is decapsulation.",
+          "vi": "Ở host nhận, Link xử lý thông tin điều khiển của mình rồi chuyển datagram bên trong lên trên. Sau đó Internet xử lý thông tin của nó, rồi đến Transport. Bỏ phần bao bên ngoài làm lộ đơn vị nằm bên trong, không xóa yêu cầu ứng dụng. Quá trình xử lý ngược này gọi là tháo gói."
+        }
+      ],
+      "sourceIds": [
+        "book-protocols",
+        "book-transport",
+        "s25-ms33"
+      ]
+    },
+    {
+      "id": "host-to-host-journey",
+      "title": {
+        "en": "Down, across, then up",
+        "vi": "Đi xuống, qua mạng, rồi đi lên"
+      },
+      "paragraphs": [
+        {
+          "en": "Host A starts at Application and moves through Transport → Internet → Link. Link sends into the network. At Host B, Link receives from the network and passes upwards through Internet → Transport → Application. Within either host, every handoff is to an adjacent layer. The receiving web server can then interpret the recovered HTTP request.",
+          "vi": "Host A bắt đầu ở Application rồi đi qua Transport → Internet → Link. Link gửi vào mạng. Ở Host B, Link nhận từ mạng và chuyển lên qua Internet → Transport → Application. Trong mỗi host, lần bàn giao nào cũng đến tầng kề bên. Sau đó web server nhận có thể diễn giải yêu cầu HTTP đã được khôi phục."
+        },
+        {
+          "en": "Across the internet there may be several local links and routers between the hosts. Link framing serves one local hop at a time and is renewed for subsequent links. The final incoming frame is therefore not necessarily the original outgoing frame. This visual collapses those intermediate hops; the unchanged inner request is what we follow end to end.",
+          "vi": "Qua internet có thể có nhiều liên kết cục bộ và router giữa hai host. Frame Link phục vụ từng chặng cục bộ và được tạo lại cho những liên kết tiếp theo. Vì vậy frame đi vào cuối cùng không nhất thiết là frame đi ra ban đầu. Visual rút gọn các chặng trung gian đó; đối tượng được theo dõi xuyên suốt là yêu cầu bên trong không đổi."
+        },
+        {
+          "en": "The network-transit step is a location in the journey, not an additional TCP/IP layer. A response would make Host B the sender and Host A the receiver, using the same down-then-up pattern. The names of the layers and their order do not reverse just because the hosts swap roles.",
+          "vi": "Bước qua mạng là một vị trí trong hành trình, không phải tầng TCP/IP bổ sung. Khi phản hồi, Host B trở thành bên gửi và Host A trở thành bên nhận, vẫn dùng quy trình xuống rồi lên. Tên và thứ tự các tầng không bị đảo chỉ vì hai host đổi vai trò."
+        }
+      ],
+      "sourceIds": [
+        "s25-ms32",
+        "book-protocols",
+        "book-transport",
+        "internet-standard"
+      ]
+    },
+    {
+      "id": "answer-the-task",
+      "title": {
+        "en": "Recognise the question before writing",
+        "vi": "Nhận diện yêu cầu trước khi viết"
+      },
+      "paragraphs": [
+        {
+          "en": "If a question asks for a layer’s function, identify its responsibility and explain an action, such as Transport adding sequence information for ordered delivery. If it asks how the suite is applied between hosts, explain the top-to-bottom sending path, the Link interface to the network, the bottom-to-top receiving path and adjacent-layer handoffs. A list of functions alone does not describe that journey.",
+          "vi": "Nếu câu hỏi yêu cầu chức năng của một tầng, hãy nêu trách nhiệm rồi giải thích một hành động, chẳng hạn Transport thêm thông tin thứ tự để giao dữ liệu đúng trật tự. Nếu hỏi cách áp dụng bộ giao thức giữa hai host, hãy giải thích đường gửi từ trên xuống, giao diện Link với mạng, đường nhận từ dưới lên và việc bàn giao giữa các tầng kề nhau. Chỉ liệt kê chức năng chưa mô tả được hành trình."
+        },
+        {
+          "en": "The May/June 2025 Paper 32 question 3(b) explicitly distinguishes the whole journey from individual layer functions. Practise both forms of answer. The examples and checkpoints here are newly written teaching tasks; they are not copied examination answers or officially marked questions.",
+          "vi": "Câu 3(b), Paper 32 kỳ May/June 2025 phân biệt rõ hành trình tổng thể với chức năng từng tầng. Hãy luyện cả hai dạng trả lời. Ví dụ và checkpoint ở đây là bài luyện mới do giáo viên biên soạn, không phải đáp án chép từ đề hoặc câu hỏi được chấm điểm chính thức."
+        }
+      ],
+      "sourceIds": [
+        "s25-qp32",
+        "s25-ms32",
+        "s24-qp31",
+        "s24-ms31"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "tcp-ip-stack",
+    "title": {
+      "en": "Follow one request through both hosts",
+      "vi": "Theo dõi một yêu cầu qua hai host"
+    },
+    "introduction": {
+      "en": "Keep your eye on the inner request. Select a resource, then watch the active host and layer as control information is added and removed.",
+      "vi": "Theo dõi yêu cầu bên trong. Chọn tài nguyên, rồi quan sát host và tầng đang xử lý khi thông tin điều khiển được thêm và bỏ."
+    },
+    "task": {
+      "en": "Before Next, predict which adjacent layer handles the request next and whether the number of wrappers grows or shrinks. Use the responsibility mode to explain one layer without tracing the entire journey.",
+      "vi": "Trước khi nhấn Next, dự đoán tầng kề nào xử lý tiếp và số phần bao sẽ tăng hay giảm. Dùng chế độ trách nhiệm để giải thích một tầng mà không kể toàn bộ hành trình."
+    },
+    "conventions": [
+      {
+        "en": "Two resource choices represent small HTTP requests, each carried in one simplified transport unit. The request labels describe the data; they are not complete HTTP wire messages.",
+        "vi": "Hai lựa chọn tài nguyên biểu diễn các yêu cầu HTTP nhỏ, mỗi yêu cầu nằm trong một đơn vị giao vận giản lược. Nhãn yêu cầu mô tả dữ liệu, không phải thông điệp HTTP đầy đủ trên đường truyền."
+      },
+      {
+        "en": "Both hosts show the four-layer TCP/IP model. Network transit is a journey phase, not a fifth layer.",
+        "vi": "Cả hai host dùng mô hình TCP/IP bốn tầng. Qua mạng là một chặng trong hành trình, không phải tầng thứ năm."
+      },
+      {
+        "en": "Wrappers summarise control information, not exact header fields or sizes. Application data stays inside; the corresponding receiving layer processes each wrapper.",
+        "vi": "Các phần bao tóm lược thông tin điều khiển, không biểu diễn trường hay kích thước header chính xác. Dữ liệu ứng dụng nằm bên trong; tầng nhận tương ứng xử lý từng phần bao."
+      },
+      {
+        "en": "Intermediate routers and links are collapsed. Link control applies to one local hop and is renewed between hops; the first outgoing frame and final incoming frame may differ.",
+        "vi": "Router và liên kết trung gian được rút gọn. Điều khiển Link áp dụng cho một chặng cục bộ và được tạo lại giữa các chặng; frame đi ra đầu tiên và frame đi vào cuối cùng có thể khác nhau."
+      },
+      {
+        "en": "This successful one-way trace omits connection setup, loss, retries and the response. Back, jump and Reset revisit the same teaching states; they do not send real traffic.",
+        "vi": "Hành trình một chiều thành công này lược bỏ thiết lập kết nối, mất dữ liệu, thử lại và phản hồi. Back, nhảy bước và Reset mở lại cùng các trạng thái minh họa, không gửi lưu lượng mạng thật."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book-protocols",
+      "book-transport",
+      "s25-ms32"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Deliver the revision-page request",
+      "vi": "Chuyển yêu cầu trang ôn tập"
+    },
+    "prompt": {
+      "en": "Host A requests /revision from the web application on Host B. Trace this successful request, showing the current layer and the information around the application data. Assume the small request fits in one transport unit; omit intermediate-hop detail.",
+      "vi": "Host A yêu cầu /revision từ ứng dụng web ở Host B. Theo dõi lần truyền thành công này, nêu tầng hiện tại và thông tin bao quanh dữ liệu ứng dụng. Giả sử yêu cầu nhỏ vừa một đơn vị giao vận; lược bỏ chi tiết các chặng trung gian."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "sender-application",
+        "action": {
+          "en": "Prepare the HTTP request at Host A’s Application layer.",
+          "vi": "Chuẩn bị yêu cầu HTTP tại tầng Application của Host A."
+        },
+        "why": {
+          "en": "The web server needs a request expressed using agreed application rules.",
+          "vi": "Web server cần một yêu cầu được biểu diễn theo quy tắc ứng dụng chung."
+        },
+        "result": {
+          "en": "Application data describes the request for /revision. No lower-layer wrappers have been added yet.",
+          "vi": "Dữ liệu ứng dụng mô tả yêu cầu /revision. Chưa có phần bao của tầng dưới."
+        },
+        "check": {
+          "en": "The next layer is Transport, not Link.",
+          "vi": "Tầng tiếp theo là Transport, không phải Link."
+        }
+      },
+      {
+        "id": "sender-transport",
+        "action": {
+          "en": "Pass the request to Transport and add TCP control information.",
+          "vi": "Chuyển yêu cầu cho Transport và thêm thông tin điều khiển TCP."
+        },
+        "why": {
+          "en": "End-to-end delivery needs information for ordering, checking and managing transmitted data.",
+          "vi": "Việc truyền giữa hai đầu cuối cần thông tin để sắp thứ tự, kiểm tra và quản lý dữ liệu truyền."
+        },
+        "result": {
+          "en": "Transport control surrounds the unchanged application data: one wrapper.",
+          "vi": "Điều khiển Transport bao quanh dữ liệu ứng dụng không đổi: một phần bao."
+        },
+        "check": {
+          "en": "TCP can divide larger streams; this example follows just one small unit.",
+          "vi": "TCP có thể chia luồng lớn hơn; ví dụ này chỉ theo dõi một đơn vị nhỏ."
+        }
+      },
+      {
+        "id": "sender-internet",
+        "action": {
+          "en": "Pass the transport unit to Internet and add IP addressing.",
+          "vi": "Chuyển đơn vị giao vận cho Internet và thêm địa chỉ IP."
+        },
+        "why": {
+          "en": "Delivery across networks needs the source and intended destination host addresses.",
+          "vi": "Truyền qua các mạng cần địa chỉ host nguồn và host đích dự kiến."
+        },
+        "result": {
+          "en": "Internet addressing surrounds Transport control and the request: two wrappers, outermost first Internet → Transport.",
+          "vi": "Địa chỉ Internet bao quanh điều khiển Transport và yêu cầu: hai phần bao, từ ngoài vào là Internet → Transport."
+        },
+        "check": {
+          "en": "The intended destination is Host B, not merely the next local neighbour.",
+          "vi": "Đích dự kiến là Host B, không chỉ là thiết bị hàng xóm ở chặng cục bộ."
+        }
+      },
+      {
+        "id": "sender-link",
+        "action": {
+          "en": "Pass the IP datagram to Link and frame it for the first local link.",
+          "vi": "Chuyển IP datagram cho Link và đóng frame cho liên kết cục bộ đầu tiên."
+        },
+        "why": {
+          "en": "The network interface needs a unit suitable for transfer to a directly connected device.",
+          "vi": "Giao diện mạng cần một đơn vị phù hợp để truyền đến thiết bị được nối trực tiếp."
+        },
+        "result": {
+          "en": "Link → Internet → Transport wrappers enclose the request. Link now interfaces with the network.",
+          "vi": "Các phần bao Link → Internet → Transport chứa yêu cầu. Link lúc này giao tiếp với mạng."
+        },
+        "check": {
+          "en": "There are three wrappers but still only four TCP/IP layers, including Application.",
+          "vi": "Có ba phần bao nhưng vẫn chỉ có bốn tầng TCP/IP, gồm Application."
+        }
+      },
+      {
+        "id": "network-transit",
+        "action": {
+          "en": "Carry the data across the network towards Host B.",
+          "vi": "Truyền dữ liệu qua mạng về phía Host B."
+        },
+        "why": {
+          "en": "Host A and Host B may be separated by multiple links and routers.",
+          "vi": "Host A và Host B có thể được ngăn cách bởi nhiều liên kết và router."
+        },
+        "result": {
+          "en": "The request remains unchanged. Local Link control is renewed along the omitted hops; the diagram now represents the final incoming link.",
+          "vi": "Yêu cầu vẫn không đổi. Điều khiển Link cục bộ được tạo lại qua các chặng đã lược bỏ; sơ đồ lúc này biểu diễn liên kết đi vào cuối cùng."
+        },
+        "check": {
+          "en": "This phase adds no fifth layer and does not mean the first frame travels unchanged end to end.",
+          "vi": "Chặng này không thêm tầng thứ năm và không có nghĩa frame đầu tiên đi nguyên vẹn xuyên suốt."
+        }
+      },
+      {
+        "id": "receiver-link",
+        "action": {
+          "en": "Host B’s Link layer receives the frame and processes Link control.",
+          "vi": "Tầng Link của Host B nhận frame và xử lý điều khiển Link."
+        },
+        "why": {
+          "en": "It must recover the enclosed IP datagram from the local transmission.",
+          "vi": "Tầng này cần lấy IP datagram bên trong từ việc truyền cục bộ."
+        },
+        "result": {
+          "en": "The Link wrapper is removed; Internet → Transport still surround the request.",
+          "vi": "Phần bao Link được bỏ; Internet → Transport vẫn bao quanh yêu cầu."
+        },
+        "check": {
+          "en": "The next receiving layer is Internet; the request has not reached Application yet.",
+          "vi": "Tầng nhận tiếp theo là Internet; yêu cầu chưa đến Application."
+        }
+      },
+      {
+        "id": "receiver-internet",
+        "action": {
+          "en": "Host B’s Internet layer processes the IP information and passes up the transport unit.",
+          "vi": "Tầng Internet của Host B xử lý thông tin IP và chuyển đơn vị giao vận lên trên."
+        },
+        "why": {
+          "en": "The addressed data must be handled at the destination and delivered to the next higher layer.",
+          "vi": "Dữ liệu đã được đánh địa chỉ cần được xử lý tại đích và giao cho tầng phía trên kế tiếp."
+        },
+        "result": {
+          "en": "The Internet wrapper is removed; Transport control remains around the same request.",
+          "vi": "Phần bao Internet được bỏ; điều khiển Transport còn bao quanh cùng yêu cầu."
+        },
+        "check": {
+          "en": "Removing addressing information does not remove the application data.",
+          "vi": "Bỏ thông tin địa chỉ không làm mất dữ liệu ứng dụng."
+        }
+      },
+      {
+        "id": "receiver-transport",
+        "action": {
+          "en": "TCP processes its control information and delivers the request data upwards.",
+          "vi": "TCP xử lý thông tin điều khiển của nó và giao dữ liệu yêu cầu lên trên."
+        },
+        "why": {
+          "en": "The receiving application needs the recovered data in the correct order, rather than raw transport units.",
+          "vi": "Ứng dụng nhận cần dữ liệu đã khôi phục đúng thứ tự, thay vì các đơn vị giao vận thô."
+        },
+        "result": {
+          "en": "The Transport wrapper is removed. The original application data remains, ready for Application.",
+          "vi": "Phần bao Transport được bỏ. Dữ liệu ứng dụng ban đầu còn nguyên, sẵn sàng cho Application."
+        },
+        "check": {
+          "en": "This successful trace has no missing data. A missing segment would require further transport handling.",
+          "vi": "Hành trình thành công này không thiếu dữ liệu. Nếu thiếu segment thì cần xử lý giao vận bổ sung."
+        }
+      },
+      {
+        "id": "receiver-application",
+        "action": {
+          "en": "The web application at Host B interprets the recovered HTTP request.",
+          "vi": "Ứng dụng web ở Host B diễn giải yêu cầu HTTP đã khôi phục."
+        },
+        "why": {
+          "en": "The application protocol gives the delivered data its service-level meaning.",
+          "vi": "Giao thức ứng dụng quy định ý nghĩa của dữ liệu đã giao ở cấp dịch vụ."
+        },
+        "result": {
+          "en": "Host B recognises the request for /revision. Producing and returning the page would be a separate response journey.",
+          "vi": "Host B nhận biết yêu cầu /revision. Tạo và gửi trang về sẽ là một hành trình phản hồi riêng."
+        },
+        "check": {
+          "en": "Compare the initial and final request: same resource, three wrappers added, three processed and removed.",
+          "vi": "So sánh yêu cầu đầu và cuối: cùng tài nguyên, ba phần bao được thêm, rồi cả ba được xử lý và bỏ."
+        }
+      }
+    ],
+    "result": {
+      "en": "The request has crossed both hosts’ stacks without changing its application meaning: Application → Transport → Internet → Link → network → Link → Internet → Transport → Application.",
+      "vi": "Yêu cầu đã đi qua stack của cả hai host mà không đổi ý nghĩa ứng dụng: Application → Transport → Internet → Link → mạng → Link → Internet → Transport → Application."
+    },
+    "selfCheck": {
+      "en": "Name the active host as well as the layer. Check adjacency, opposite travel directions, unchanged inner data and balanced additions/removals. Explain which omitted detail would be needed to trace individual routers.",
+      "vi": "Nêu cả host đang xử lý và tên tầng. Kiểm tra các tầng kề nhau, hai chiều di chuyển ngược nhau, dữ liệu bên trong không đổi và số phần bao thêm/bỏ cân bằng. Giải thích cần chi tiết nào đã lược bỏ để theo dõi từng router."
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book-protocols",
+      "book-transport",
+      "s25-ms32",
+      "s25-ms33"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "“Order the layers” asks for the four names in the TCP/IP stack.",
+        "vi": "“Sắp xếp các tầng” yêu cầu bốn tên theo thứ tự trong TCP/IP stack."
+      },
+      {
+        "en": "“Purpose/function of Transport or Link” asks what that layer does and why.",
+        "vi": "“Mục đích/chức năng của Transport hoặc Link” hỏi tầng đó làm gì và vì sao."
+      },
+      {
+        "en": "“A message is sent from one host to another” calls for both hosts, the network boundary and direction through the stack.",
+        "vi": "“Thông điệp được gửi từ host này sang host khác” cần nêu cả hai host, ranh giới với mạng và chiều đi qua stack."
+      }
+    ],
+    "distinguish": {
+      "en": "A protocol is a set of rules; a layer groups responsibilities; a journey explains their ordered cooperation. A router question focuses on forwarding to the next hop and belongs to the packet-journey topic.",
+      "vi": "Giao thức là tập quy tắc; tầng nhóm các trách nhiệm; hành trình giải thích sự phối hợp có trình tự của chúng. Câu hỏi về router tập trung vào chuyển tiếp đến chặng kế và thuộc bài hành trình packet."
+    },
+    "method": [
+      {
+        "en": "Identify whether the task asks for names, one responsibility or the whole journey.",
+        "vi": "Xác định đề hỏi tên, một trách nhiệm hay cả hành trình."
+      },
+      {
+        "en": "For a journey, label sender and receiver, then write down → network → up using adjacent layers.",
+        "vi": "Với hành trình, ghi bên gửi và bên nhận, rồi viết xuống → mạng → lên qua các tầng kề nhau."
+      },
+      {
+        "en": "Connect each action to its actor and information: TCP control, IP addressing or local Link framing.",
+        "vi": "Gắn mỗi hành động với chủ thể và thông tin: điều khiển TCP, địa chỉ IP hoặc frame Link cục bộ."
+      },
+      {
+        "en": "Check that the receiver recovers the same application data and that the answer respects any instruction to omit individual functions.",
+        "vi": "Kiểm tra bên nhận khôi phục cùng dữ liệu ứng dụng và câu trả lời tuân thủ yêu cầu nếu đề dặn không mô tả chức năng riêng từng tầng."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "TCP/IP has TCP and IP as its only two layers.",
+        "vi": "TCP/IP chỉ có hai tầng TCP và IP."
+      },
+      "correction": {
+        "en": "They are protocol names within a four-layer suite: Application, Transport, Internet and Link.",
+        "vi": "Đó là tên giao thức trong bộ có bốn tầng: Application, Transport, Internet và Link."
+      }
+    },
+    {
+      "mistake": {
+        "en": "The receiver starts at Application because Application is always drawn at the top.",
+        "vi": "Bên nhận bắt đầu ở Application vì Application luôn được vẽ trên cùng."
+      },
+      "correction": {
+        "en": "Incoming network data first enters Link; it travels upwards to Application.",
+        "vi": "Dữ liệu từ mạng đi vào Link trước, rồi đi lên Application."
+      }
+    },
+    {
+      "mistake": {
+        "en": "TCP makes packets arrive over the network in exactly the original order.",
+        "vi": "TCP khiến packet đến qua mạng đúng nguyên thứ tự ban đầu."
+      },
+      "correction": {
+        "en": "TCP can recover ordered delivery to the application from segments that arrived out of order.",
+        "vi": "TCP có thể khôi phục thứ tự giao cho ứng dụng từ những segment đến không đúng thứ tự."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Removing a header discards the message being taught.",
+        "vi": "Bỏ header nghĩa là loại bỏ thông điệp đang truyền."
+      },
+      "correction": {
+        "en": "A layer processes its control information and passes the enclosed data to the next higher layer.",
+        "vi": "Một tầng xử lý thông tin điều khiển của nó rồi chuyển dữ liệu bên trong cho tầng trên kế tiếp."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Link addressing identifies the complete internet route.",
+        "vi": "Địa chỉ Link xác định toàn bộ tuyến internet."
+      },
+      "correction": {
+        "en": "Link serves a local hop. Internet addressing identifies the intended end destination; routers handle forwarding between networks.",
+        "vi": "Link phục vụ chặng cục bộ. Địa chỉ Internet xác định đích đầu cuối dự kiến; router xử lý chuyển tiếp giữa các mạng."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "common-rules",
+      "prompt": {
+        "en": "Two hosts have a working cable but use incompatible message formats. What is missing?",
+        "vi": "Hai host có cáp hoạt động nhưng dùng định dạng thông điệp không tương thích. Điều gì còn thiếu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "rules",
+          "label": {
+            "en": "An agreed protocol for interpreting the exchange.",
+            "vi": "Giao thức thống nhất để diễn giải việc trao đổi."
+          },
+          "feedback": {
+            "en": "Correct. Receiving bits is insufficient if their format and meaning are not shared.",
+            "vi": "Đúng. Nhận được bit là chưa đủ nếu không thống nhất định dạng và ý nghĩa."
+          }
+        },
+        {
+          "id": "brand",
+          "label": {
+            "en": "The same brand of computer.",
+            "vi": "Cùng hãng máy tính."
+          },
+          "feedback": {
+            "en": "Hardware brands can differ while both hosts implement the same protocol.",
+            "vi": "Hãng phần cứng có thể khác nhau trong khi hai host cùng thực hiện một giao thức."
+          }
+        },
+        {
+          "id": "extra",
+          "label": {
+            "en": "An extra TCP/IP layer between every pair of layers.",
+            "vi": "Một tầng TCP/IP bổ sung giữa mọi cặp tầng."
+          },
+          "feedback": {
+            "en": "The missing agreement is not repaired by inventing layers.",
+            "vi": "Thiếu thống nhất không được khắc phục bằng cách tạo thêm tầng."
+          }
+        }
+      ],
+      "correctChoiceId": "rules",
+      "explanation": {
+        "en": "A protocol supplies shared rules for the format and behaviour of communication.",
+        "vi": "Giao thức cung cấp quy tắc chung về định dạng và hành vi truyền thông."
+      }
+    },
+    {
+      "id": "receiver-next",
+      "prompt": {
+        "en": "Host B has processed and removed the Link wrapper. Which layer handles the enclosed unit next?",
+        "vi": "Host B đã xử lý và bỏ phần bao Link. Tầng nào xử lý đơn vị bên trong tiếp theo?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "internet",
+          "label": {
+            "en": "Internet",
+            "vi": "Internet"
+          },
+          "feedback": {
+            "en": "Correct. The receiver moves upwards from Link to the adjacent Internet layer.",
+            "vi": "Đúng. Bên nhận đi lên từ Link đến tầng Internet kề bên."
+          }
+        },
+        {
+          "id": "application",
+          "label": {
+            "en": "Application",
+            "vi": "Application"
+          },
+          "feedback": {
+            "en": "That would skip Internet and Transport. The data has not completed the receiving stack.",
+            "vi": "Như vậy sẽ bỏ qua Internet và Transport. Dữ liệu chưa đi hết stack bên nhận."
+          }
+        },
+        {
+          "id": "transport",
+          "label": {
+            "en": "Transport",
+            "vi": "Transport"
+          },
+          "feedback": {
+            "en": "Transport follows Internet on the receiving path, not Link directly.",
+            "vi": "Transport theo sau Internet ở chiều nhận, không theo ngay Link."
+          }
+        }
+      ],
+      "correctChoiceId": "internet",
+      "explanation": {
+        "en": "Receiving order is Link → Internet → Transport → Application.",
+        "vi": "Thứ tự nhận là Link → Internet → Transport → Application."
+      }
+    },
+    {
+      "id": "responsibility-order",
+      "prompt": {
+        "en": "Segments arrive out of order, but the web application receives the data in order. Which layer’s TCP service explains this?",
+        "vi": "Segment đến không đúng thứ tự nhưng ứng dụng web nhận dữ liệu đúng thứ tự. Dịch vụ TCP ở tầng nào giải thích điều này?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "transport",
+          "label": {
+            "en": "Transport",
+            "vi": "Transport"
+          },
+          "feedback": {
+            "en": "Correct. TCP uses sequence information to support ordered delivery to the application.",
+            "vi": "Đúng. TCP dùng thông tin thứ tự để hỗ trợ giao dữ liệu đúng trật tự cho ứng dụng."
+          }
+        },
+        {
+          "id": "internet",
+          "label": {
+            "en": "Internet",
+            "vi": "Internet"
+          },
+          "feedback": {
+            "en": "IP addressing and routing do not by themselves guarantee ordered application delivery.",
+            "vi": "Địa chỉ và định tuyến IP không tự bảo đảm giao dữ liệu đúng thứ tự cho ứng dụng."
+          }
+        },
+        {
+          "id": "link",
+          "label": {
+            "en": "Link",
+            "vi": "Link"
+          },
+          "feedback": {
+            "en": "Link serves local transmission; this is an end-to-end ordering responsibility.",
+            "vi": "Link phục vụ truyền cục bộ; đây là trách nhiệm sắp thứ tự giữa hai đầu cuối."
+          }
+        }
+      ],
+      "correctChoiceId": "transport",
+      "explanation": {
+        "en": "Network arrival order and application delivery order are different. TCP operates at Transport.",
+        "vi": "Thứ tự đến qua mạng khác với thứ tự giao cho ứng dụng. TCP hoạt động ở Transport."
+      }
+    },
+    {
+      "id": "reverse-response",
+      "prompt": {
+        "en": "Now Host B sends the page back. Which outline correctly describes the response?",
+        "vi": "Bây giờ Host B gửi trang trở lại. Sơ đồ nào mô tả đúng phản hồi?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "down-up",
+          "label": {
+            "en": "Down B’s stack, across the network, up A’s stack.",
+            "vi": "Xuống stack của B, qua mạng, lên stack của A."
+          },
+          "feedback": {
+            "en": "Correct. The host roles change but the sending and receiving rules stay the same.",
+            "vi": "Đúng. Vai trò host đổi nhưng quy tắc gửi và nhận giữ nguyên."
+          }
+        },
+        {
+          "id": "up-down",
+          "label": {
+            "en": "Up B’s stack, across the network, down A’s stack.",
+            "vi": "Lên stack của B, qua mạng, xuống stack của A."
+          },
+          "feedback": {
+            "en": "That reverses the sending and receiving directions incorrectly.",
+            "vi": "Cách này đảo sai chiều gửi và nhận."
+          }
+        },
+        {
+          "id": "direct",
+          "label": {
+            "en": "Directly from B’s Application to A’s Application, skipping the lower layers.",
+            "vi": "Trực tiếp từ Application của B đến Application của A, bỏ qua tầng dưới."
+          },
+          "feedback": {
+            "en": "Applications cooperate logically but their data still uses the lower-layer services.",
+            "vi": "Ứng dụng phối hợp về logic nhưng dữ liệu vẫn sử dụng dịch vụ của các tầng dưới."
+          }
+        }
+      ],
+      "correctChoiceId": "down-up",
+      "explanation": {
+        "en": "Sender and receiver are roles in a particular transmission, not permanent labels for a machine.",
+        "vi": "Bên gửi và bên nhận là vai trò trong một lần truyền, không phải nhãn cố định của máy."
+      }
+    },
+    {
+      "id": "payload-preserved",
+      "prompt": {
+        "en": "Immediately after Host B’s Internet layer removes its wrapper, what remains in this model?",
+        "vi": "Ngay sau khi tầng Internet của Host B bỏ phần bao của nó, mô hình còn gì?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "transport-data",
+          "label": {
+            "en": "Transport control around the unchanged application data.",
+            "vi": "Điều khiển Transport quanh dữ liệu ứng dụng không đổi."
+          },
+          "feedback": {
+            "en": "Correct. The next inner unit remains intact for Transport.",
+            "vi": "Đúng. Đơn vị bên trong tiếp theo còn nguyên để giao cho Transport."
+          }
+        },
+        {
+          "id": "nothing",
+          "label": {
+            "en": "Nothing; all data was part of the removed IP information.",
+            "vi": "Không còn gì; mọi dữ liệu đều thuộc thông tin IP đã bị bỏ."
+          },
+          "feedback": {
+            "en": "The IP control wrapper and its payload are different; removing the wrapper preserves the enclosed unit.",
+            "vi": "Phần bao điều khiển IP khác với payload; bỏ phần bao vẫn giữ đơn vị bên trong."
+          }
+        },
+        {
+          "id": "link-data",
+          "label": {
+            "en": "Link control around the request.",
+            "vi": "Điều khiển Link quanh yêu cầu."
+          },
+          "feedback": {
+            "en": "Link control was already processed at the earlier receiving Link step.",
+            "vi": "Điều khiển Link đã được xử lý ở bước Link bên nhận trước đó."
+          }
+        }
+      ],
+      "correctChoiceId": "transport-data",
+      "explanation": {
+        "en": "Decapsulation proceeds from the outside inward: Link, Internet, then Transport.",
+        "vi": "Tháo gói đi từ ngoài vào trong: Link, Internet, rồi Transport."
+      }
+    },
+    {
+      "id": "journey-not-list",
+      "prompt": {
+        "en": "A question asks how a message passes between hosts and says not to describe individual layer functions. Which point directly answers it?",
+        "vi": "Một câu hỏi yêu cầu cách thông điệp đi giữa hai host và dặn không mô tả chức năng riêng từng tầng. Ý nào trả lời trực tiếp?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "adjacent",
+          "label": {
+            "en": "It passes down adjacent sender layers to Link, across the network, then up adjacent receiver layers.",
+            "vi": "Nó đi xuống qua các tầng kề nhau bên gửi đến Link, qua mạng, rồi đi lên qua các tầng kề nhau bên nhận."
+          },
+          "feedback": {
+            "en": "Correct. This describes the path and interaction that the question requests.",
+            "vi": "Đúng. Ý này mô tả đường đi và sự tương tác mà câu hỏi yêu cầu."
+          }
+        },
+        {
+          "id": "http",
+          "label": {
+            "en": "HTTP transfers web resources.",
+            "vi": "HTTP truyền tài nguyên web."
+          },
+          "feedback": {
+            "en": "True as a protocol purpose, but it does not explain the message’s journey through the suite.",
+            "vi": "Đúng về mục đích giao thức, nhưng chưa giải thích hành trình qua bộ giao thức."
+          }
+        },
+        {
+          "id": "ips",
+          "label": {
+            "en": "Internet adds IP addressing.",
+            "vi": "Internet thêm địa chỉ IP."
+          },
+          "feedback": {
+            "en": "This is an individual layer function; the stated task asks for the whole application of the stack.",
+            "vi": "Đây là chức năng riêng một tầng; yêu cầu đã nêu hỏi cách áp dụng toàn bộ stack."
+          }
+        }
+      ],
+      "correctChoiceId": "adjacent",
+      "explanation": {
+        "en": "Read the required output: a path through the stack is different from a catalogue of functions.",
+        "vi": "Đọc kết quả đề yêu cầu: đường đi qua stack khác với danh sách chức năng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Without the diagram, sketch two four-layer hosts and trace a small message. Then explain why compatible protocols are necessary and distinguish one Transport job from one Internet job.",
+      "vi": "Không nhìn sơ đồ, vẽ hai host có bốn tầng và theo dõi một thông điệp nhỏ. Sau đó giải thích vì sao cần giao thức tương thích và phân biệt một công việc của Transport với một công việc của Internet."
+    },
+    "answerPoints": [
+      {
+        "en": "Top to bottom on both hosts: Application, Transport, Internet, Link.",
+        "vi": "Từ trên xuống trên cả hai host: Application, Transport, Internet, Link."
+      },
+      {
+        "en": "Sender down, network between Link interfaces, receiver up; adjacent-layer handoffs.",
+        "vi": "Bên gửi đi xuống, mạng nối giữa các giao diện Link, bên nhận đi lên; bàn giao qua các tầng kề nhau."
+      },
+      {
+        "en": "Protocols provide agreed formats and behaviour so the receiver can interpret the exchange.",
+        "vi": "Giao thức cung cấp định dạng và hành vi thống nhất để bên nhận diễn giải việc trao đổi."
+      },
+      {
+        "en": "TCP at Transport supports ordered, reliable end-to-end delivery; IP at Internet provides addressing and delivery across networks.",
+        "vi": "TCP ở Transport hỗ trợ giao dữ liệu giữa hai đầu cuối tin cậy, đúng thứ tự; IP ở Internet cung cấp địa chỉ và việc truyền qua các mạng."
+      },
+      {
+        "en": "Control information is added and later processed at the appropriate receiving layers; the application data survives.",
+        "vi": "Thông tin điều khiển được thêm rồi xử lý ở tầng nhận phù hợp; dữ liệu ứng dụng vẫn được giữ lại."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "A protocol is an agreement about communication; the TCP/IP suite organises cooperating protocols into four layers.",
+      "vi": "Giao thức là sự thống nhất về cách giao tiếp; bộ TCP/IP tổ chức các giao thức phối hợp thành bốn tầng."
+    },
+    {
+      "en": "The sender moves down the stack and the receiver moves up it. Link is the interface to the network.",
+      "vi": "Bên gửi đi xuống stack, bên nhận đi lên. Link là giao diện với mạng."
+    },
+    {
+      "en": "Encapsulation adds control information; decapsulation processes it without losing the inner application data.",
+      "vi": "Đóng gói thêm thông tin điều khiển; tháo gói xử lý thông tin đó mà không làm mất dữ liệu ứng dụng bên trong."
+    },
+    {
+      "en": "Choose the form of explanation the question asks for: one layer’s purpose or the whole host-to-host journey.",
+      "vi": "Chọn đúng dạng giải thích đề hỏi: mục đích một tầng hoặc toàn bộ hành trình giữa hai host."
+    }
+  ],
+  "relatedSlugs": [
+    "application-protocol-selection",
+    "packet-journey-and-routers"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 33, section 14.1 Protocols",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-protocols",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed pages 329–331 (PDF pages 345–347): protocol agreement, four-layer stack, application services",
+      "kind": "book"
+    },
+    {
+      "id": "book-transport",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed pages 333–334 (PDF pages 349–350): TCP, Internet and Link responsibilities",
+      "kind": "book"
+    },
+    {
+      "id": "s24-qp31",
+      "title": "Cambridge 9618/31 — May/June 2024 question paper",
+      "locator": "Question 2(a)–(c), page 3: layer order and functions",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s24-ms31",
+      "title": "Cambridge 9618/31 — May/June 2024 mark scheme",
+      "locator": "Question 2(a)–(c), page 5",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s25-qp32",
+      "title": "Cambridge 9618/32 — May/June 2025 question paper",
+      "locator": "Question 3(a)–(b), page 4: applying the stack between hosts",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s25-ms32",
+      "title": "Cambridge 9618/32 — May/June 2025 mark scheme",
+      "locator": "Question 3(a)–(b), page 5",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "s25-ms33",
+      "title": "Cambridge 9618/33 — May/June 2025 mark scheme",
+      "locator": "Question 4(a), page 9: Internet and Link responsibilities",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "internet-standard",
+      "title": "IETF RFC 1122 — Requirements for Internet Hosts: Communication Layers",
+      "locator": "Section 1.1.3: Internet protocol suite; technical clarification of the layered model",
+      "kind": "guide",
+      "url": "https://www.rfc-editor.org/rfc/rfc1122.html#section-1.1.3"
+    },
+    {
+      "id": "tcp-standard",
+      "title": "IETF RFC 9293 — Transmission Control Protocol",
+      "locator": "Section 2.2: ordered byte-stream delivery, loss/error detection and retransmission",
+      "kind": "guide",
+      "url": "https://www.rfc-editor.org/rfc/rfc9293.html#section-2.2"
+    }
+  ]
+}

@@ -1,0 +1,626 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.1-T04",
+  "slug": "records-and-composite-models",
+  "title": {
+    "en": "Records and composite models",
+    "vi": "Bản ghi và mô hình dữ liệu phức hợp"
+  },
+  "question": {
+    "en": "How can one value describe an entity with several different attributes?",
+    "vi": "Một giá trị mô tả thực thể có nhiều thuộc tính khác nhau như thế nào?"
+  },
+  "opening": {
+    "en": "A student entry needs an ID, a name and a score. Three disconnected arrays make it easy to update one student’s name beside another student’s score. A record groups the fields for one entity; an array of records then stores several students using the same structure.",
+    "vi": "Mỗi mục học sinh cần ID, tên và điểm. Ba mảng tách rời dễ làm tên của học sinh này đứng cạnh điểm của học sinh khác khi cập nhật. Record gom trường của một thực thể; mảng record lưu nhiều học sinh theo cùng cấu trúc."
+  },
+  "objectives": [
+    {
+      "en": "Choose meaningful field names and appropriate types for an entity.",
+      "vi": "Chọn tên trường có nghĩa và kiểu phù hợp cho thực thể."
+    },
+    {
+      "en": "Distinguish a record type, one instance and an array of records.",
+      "vi": "Phân biệt kiểu record, một bản ghi cụ thể và mảng record."
+    },
+    {
+      "en": "Trace a field access/update and explain the limited connection to classes and objects.",
+      "vi": "Trace truy cập/cập nhật trường và giải thích mối liên hệ cơ bản với lớp, đối tượng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Built-in data types and one-based array indices.",
+      "vi": "Kiểu dữ liệu có sẵn và chỉ số mảng bắt đầu từ một."
+    },
+    {
+      "en": "A type definition is different from a variable declaration.",
+      "vi": "Định nghĩa kiểu khác khai báo biến."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Record",
+      "meaning": {
+        "en": "A composite value grouping named fields; fields may have different types.",
+        "vi": "Giá trị phức hợp gom các trường có tên; trường có thể có kiểu khác nhau."
+      }
+    },
+    {
+      "term": "Field",
+      "meaning": {
+        "en": "A named attribute within a record, with its declared type.",
+        "vi": "Thuộc tính có tên trong record cùng kiểu đã khai báo."
+      }
+    },
+    {
+      "term": "Instance",
+      "meaning": {
+        "en": "One concrete value or object created from a common type or class.",
+        "vi": "Một giá trị hoặc đối tượng cụ thể được tạo từ kiểu hoặc lớp chung."
+      }
+    },
+    {
+      "term": "Dot notation",
+      "meaning": {
+        "en": "Select a named member, for example Student.Score.",
+        "vi": "Chọn thành viên có tên, ví dụ Student.Score."
+      }
+    },
+    {
+      "term": "Class and object",
+      "meaning": {
+        "en": "A class describes attributes and methods; an object is an instance with its own state.",
+        "vi": "Lớp mô tả thuộc tính và phương thức; đối tượng là thực thể của lớp có trạng thái riêng."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "design-the-entity",
+      "title": {
+        "en": "Design fields from meaning",
+        "vi": "Thiết kế trường theo ý nghĩa"
+      },
+      "paragraphs": [
+        {
+          "en": "A record type is a reusable description of an entity, not the data for one particular entity. Choose a field for each required attribute and give each field a type that matches the intended operations. A score used in integer arithmetic is INTEGER; a name is STRING. A phone number is usually a STRING because leading zeros and symbols matter and arithmetic is not its purpose.",
+          "vi": "Kiểu record là mô tả thực thể có thể dùng lại, không phải dữ liệu của một thực thể cụ thể. Chọn trường cho mỗi thuộc tính cần có và kiểu phù hợp thao tác dự định. Điểm dùng tính toán số nguyên là INTEGER; tên là STRING. Số điện thoại thường là STRING vì số không đầu và ký hiệu có ý nghĩa, không dùng để tính toán."
+        },
+        {
+          "en": "The example deliberately uses numeric StudentID values 101 and 102. Another application with IDs such as A101 would need STRING. Field types come from the problem, not from the field name alone. A field may also use an earlier user-defined type, such as an enum for a fixed status domain.",
+          "vi": "Ví dụ chủ ý dùng StudentID dạng số 101 và 102. Ứng dụng khác có ID như A101 cần STRING. Kiểu trường dựa vào bài toán, không chỉ tên trường. Trường cũng có thể dùng kiểu tự định nghĩa trước đó, chẳng hạn enum cho miền trạng thái cố định."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book",
+        "guide"
+      ],
+      "code": "TYPE TStudent\n   DECLARE StudentID : INTEGER\n   DECLARE Name : STRING\n   DECLARE Score : INTEGER\nENDTYPE"
+    },
+    {
+      "id": "type-instance-array",
+      "title": {
+        "en": "One structure, several independent records",
+        "vi": "Một cấu trúc, nhiều bản ghi độc lập"
+      },
+      "paragraphs": [
+        {
+          "en": "DECLARE Student : TStudent creates one record variable with the named fields. DECLARE Students : ARRAY[1:2] OF TStudent creates two elements, each of the same record type. The array chooses a record by index; the record chooses a field by name. Different fields inside a record do not make the array element types different.",
+          "vi": "DECLARE Student : TStudent tạo một biến record với các trường có tên. DECLARE Students : ARRAY[1:2] OF TStudent tạo hai phần tử, mỗi phần tử cùng kiểu record. Mảng chọn bản ghi bằng chỉ số; record chọn trường bằng tên. Các trường khác kiểu bên trong không làm kiểu phần tử mảng khác nhau."
+        },
+        {
+          "en": "Students[2].Score means first select the second record, then select its Score field. Assigning 85 changes that field only. It does not change the type definition, the array length or the first student’s score. Dot notation names a member; an array index identifies an element.",
+          "vi": "Students[2].Score nghĩa là chọn bản ghi thứ hai rồi chọn trường Score. Gán 85 chỉ đổi trường đó, không đổi định nghĩa kiểu, độ dài mảng hay điểm học sinh đầu. Dấu chấm gọi tên thành viên; chỉ số mảng xác định phần tử."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book",
+        "guide"
+      ],
+      "code": "DECLARE Students : ARRAY[1:2] OF TStudent\nStudents[1].StudentID ← 101\nStudents[1].Name ← \"An\"\nStudents[1].Score ← 72\nStudents[2].StudentID ← 102\nStudents[2].Name ← \"Binh\"\nStudents[2].Score ← 81\nStudents[2].Score ← 85"
+    },
+    {
+      "id": "validate-the-update",
+      "title": {
+        "en": "Check both the path and the value",
+        "vi": "Kiểm cả đường truy cập và giá trị"
+      },
+      "paragraphs": [
+        {
+          "en": "A correct update needs a valid index, an existing field name and a value compatible with the declared field type. The string \"high\" cannot be used as the INTEGER Score in this demonstration. Rejecting that candidate should leave the old valid score intact; validation is not an excuse to erase another field.",
+          "vi": "Cập nhật đúng cần chỉ số hợp lệ, tên trường tồn tại và giá trị tương thích kiểu trường. Chuỗi \"high\" không thể dùng làm Score kiểu INTEGER trong minh họa. Từ chối giá trị này phải giữ điểm hợp lệ trước đó; kiểm tra dữ liệu không phải lý do xóa trường khác."
+        },
+        {
+          "en": "Data modelling and business rules are separate. INTEGER specifies a kind of value, but a rule such as 0≤Score≤100 is an additional application constraint. If a visual enforces such a rule, it must state it; do not claim INTEGER itself means “an exam mark from zero to one hundred”.",
+          "vi": "Mô hình dữ liệu và quy tắc ứng dụng là riêng biệt. INTEGER chỉ định loại giá trị, còn 0≤Score≤100 là ràng buộc ứng dụng bổ sung. Nếu minh họa áp dụng quy tắc này, cần công bố; không nói INTEGER tự có nghĩa là “điểm thi từ không đến một trăm”."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "class-bridge",
+      "title": {
+        "en": "From grouped data to data with behaviour",
+        "vi": "Từ dữ liệu được nhóm tới dữ liệu cùng hành vi"
+      },
+      "paragraphs": [
+        {
+          "en": "A class is also a composite type, but it can combine attributes with methods. An object is an instance of that class and has its own attribute values. A record does not automatically acquire methods, constructors or encapsulation merely because it groups fields. Here the short class example establishes the distinction; the full OOP design belongs to section 20.",
+          "vi": "Lớp cũng là kiểu phức hợp nhưng có thể kết hợp thuộc tính với phương thức. Đối tượng là một thực thể của lớp và có giá trị thuộc tính riêng. Record không tự có phương thức, hàm tạo hay đóng gói chỉ vì gom trường. Ví dụ lớp ngắn ở đây nhằm phân biệt; thiết kế OOP đầy đủ thuộc section 20."
+        },
+        {
+          "en": "In Cambridge pseudocode a constructor is a procedure named NEW. MyCounter ← NEW TCounter(5) creates an object whose constructor stores 5. Calling MyCounter.GetValue() asks its method for that object’s current value. A second object can have a different value while sharing the same class definition.",
+          "vi": "Trong pseudocode Cambridge, hàm tạo là thủ tục tên NEW. MyCounter ← NEW TCounter(5) tạo đối tượng có hàm tạo lưu 5. Gọi MyCounter.GetValue() yêu cầu phương thức trả giá trị hiện tại của đối tượng đó. Đối tượng thứ hai có thể giữ giá trị khác dù cùng định nghĩa lớp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book",
+        "guide"
+      ],
+      "code": "CLASS TCounter\n   PRIVATE Value : INTEGER\n   PUBLIC PROCEDURE NEW(StartValue : INTEGER)\n      Value ← StartValue\n   ENDPROCEDURE\n   PUBLIC FUNCTION GetValue() RETURNS INTEGER\n      RETURN Value\n   ENDFUNCTION\nENDCLASS\nMyCounter ← NEW TCounter(5)\nOUTPUT MyCounter.GetValue()"
+    }
+  ],
+  "visual": {
+    "kind": "records",
+    "title": {
+      "en": "Select a record, then select a field",
+      "vi": "Chọn bản ghi rồi chọn trường"
+    },
+    "introduction": {
+      "en": "Switch between the type, one record and an array view. The field names link structure to stored data.",
+      "vi": "Chuyển giữa kiểu, một bản ghi và mảng. Tên trường nối cấu trúc với dữ liệu được lưu."
+    },
+    "task": {
+      "en": "Read Students[2].Score, update it to 85, then try a value of the wrong type. Identify which cells must remain unchanged.",
+      "vi": "Đọc Students[2].Score, cập nhật thành 85 rồi thử giá trị sai kiểu. Xác định những ô phải giữ nguyên."
+    },
+    "conventions": [
+      {
+        "en": "Students uses indices 1 and 2.",
+        "vi": "Students dùng chỉ số 1 và 2."
+      },
+      {
+        "en": "StudentID and Score are INTEGER; Name is STRING in this example.",
+        "vi": "StudentID và Score là INTEGER; Name là STRING trong ví dụ."
+      },
+      {
+        "en": "Only the selected field in the selected record is changed by a valid update.",
+        "vi": "Cập nhật hợp lệ chỉ đổi trường được chọn trong bản ghi được chọn."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Correct the second student’s score",
+      "vi": "Sửa điểm học sinh thứ hai"
+    },
+    "prompt": {
+      "en": "Students contains (101, An, 72) and (102, Binh, 81). Update the second student’s Score to 85 without changing other data.",
+      "vi": "Students chứa (101, An, 72) và (102, Binh, 81). Cập nhật Score của học sinh thứ hai thành 85 mà không đổi dữ liệu khác."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "choose-record",
+        "action": {
+          "en": "Select index 2.",
+          "vi": "Chọn chỉ số 2."
+        },
+        "why": {
+          "en": "The array index selects an entire TStudent record.",
+          "vi": "Chỉ số mảng chọn toàn bộ một bản ghi TStudent."
+        },
+        "result": {
+          "en": "The selected record is StudentID 102, Name Binh, Score 81.",
+          "vi": "Bản ghi được chọn có StudentID 102, Name Binh, Score 81."
+        },
+        "check": {
+          "en": "Index 2 is not the same thing as StudentID 102.",
+          "vi": "Chỉ số 2 không phải StudentID 102."
+        }
+      },
+      {
+        "id": "choose-field",
+        "action": {
+          "en": "Select the Score field by name.",
+          "vi": "Chọn trường Score bằng tên."
+        },
+        "why": {
+          "en": "Dot notation selects the field inside the chosen record.",
+          "vi": "Dấu chấm chọn trường bên trong bản ghi đã chọn."
+        },
+        "result": {
+          "en": "Students[2].Score currently equals 81.",
+          "vi": "Students[2].Score hiện bằng 81."
+        },
+        "check": {
+          "en": "Its declared type is INTEGER.",
+          "vi": "Kiểu đã khai báo là INTEGER."
+        },
+        "code": "OUTPUT Students[2].Score"
+      },
+      {
+        "id": "validate",
+        "action": {
+          "en": "Check that 85 is an INTEGER value.",
+          "vi": "Kiểm 85 là giá trị INTEGER."
+        },
+        "why": {
+          "en": "The candidate must match the field’s declared type before assignment.",
+          "vi": "Giá trị thử phải khớp kiểu trường trước khi gán."
+        },
+        "result": {
+          "en": "85 is compatible; the update can proceed.",
+          "vi": "85 tương thích; có thể cập nhật."
+        },
+        "check": {
+          "en": "A string such as \"high\" would fail this type check.",
+          "vi": "Chuỗi như \"high\" không đạt kiểm tra kiểu này."
+        }
+      },
+      {
+        "id": "update",
+        "action": {
+          "en": "Assign the new score.",
+          "vi": "Gán điểm mới."
+        },
+        "why": {
+          "en": "The access path identifies exactly one field in one instance.",
+          "vi": "Đường truy cập xác định đúng một trường trong một bản ghi."
+        },
+        "result": {
+          "en": "Students[2].Score becomes 85; Students[1].Score stays 72.",
+          "vi": "Students[2].Score thành 85; Students[1].Score giữ 72."
+        },
+        "check": {
+          "en": "Both IDs and names are unchanged, and the array still has two records.",
+          "vi": "Hai ID, hai tên không đổi và mảng vẫn có hai bản ghi."
+        },
+        "code": "Students[2].Score ← 85"
+      }
+    ],
+    "result": {
+      "en": "Only the second record’s Score changes from 81 to 85.",
+      "vi": "Chỉ Score của bản ghi thứ hai đổi từ 81 thành 85."
+    },
+    "selfCheck": {
+      "en": "Read the path left to right, then compare the before/after tables cell by cell.",
+      "vi": "Đọc đường truy cập từ trái sang phải rồi so bảng trước/sau theo từng ô."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book",
+      "guide"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Several attributes describe one entity and the question asks you to choose fields and data types.",
+        "vi": "Nhiều thuộc tính mô tả một thực thể và đề yêu cầu chọn trường, kiểu dữ liệu."
+      },
+      {
+        "en": "An access expression mixes [index] and .Field, indicating an array of records.",
+        "vi": "Biểu thức truy cập kết hợp [index] với .Field, gợi ý mảng record."
+      }
+    ],
+    "distinguish": {
+      "en": "An array selects same-type elements by index; a record selects named fields that may differ in type. A class additionally defines behaviour through methods.",
+      "vi": "Mảng chọn phần tử cùng kiểu bằng chỉ số; record chọn trường có tên có thể khác kiểu. Lớp còn định nghĩa hành vi qua phương thức."
+    },
+    "method": [
+      {
+        "en": "Identify the entity and required attributes.",
+        "vi": "Xác định thực thể và thuộc tính cần có."
+      },
+      {
+        "en": "Choose types from the values and operations, including any existing user-defined type.",
+        "vi": "Chọn kiểu theo giá trị và thao tác, gồm kiểu tự định nghĩa có sẵn nếu phù hợp."
+      },
+      {
+        "en": "Define the record, declare instances and trace each index/field access precisely.",
+        "vi": "Định nghĩa record, khai báo bản ghi cụ thể và trace chính xác chỉ số/trường."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“All fields in a record must have the same type.”",
+        "vi": "“Mọi trường record phải cùng kiểu.”"
+      },
+      "correction": {
+        "en": "A record can combine different field types; the common structure defines each record instance.",
+        "vi": "Record có thể kết hợp trường khác kiểu; cấu trúc chung quy định từng bản ghi."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Updating the type’s Score changes every student.”",
+        "vi": "“Cập nhật Score của kiểu làm đổi mọi học sinh.”"
+      },
+      "correction": {
+        "en": "A type is a description; assignment targets a particular instance’s field.",
+        "vi": "Kiểu là mô tả; phép gán nhắm trường của bản ghi cụ thể."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Any number-looking field should be INTEGER.”",
+        "vi": "“Trường trông giống số đều nên là INTEGER.”"
+      },
+      "correction": {
+        "en": "Choose by meaning: phone numbers or IDs with leading zeros may need STRING.",
+        "vi": "Chọn theo ý nghĩa: điện thoại hoặc ID có số không đầu có thể cần STRING."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "path",
+      "prompt": {
+        "en": "Which expression selects the second student’s name?",
+        "vi": "Biểu thức nào chọn tên học sinh thứ hai?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Students[2].Name",
+            "vi": "Students[2].Name"
+          },
+          "feedback": {
+            "en": "Correct: index chooses the record and dot notation chooses the named field.",
+            "vi": "Đúng: chỉ số chọn bản ghi; dấu chấm chọn trường có tên."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Students.Name[2]",
+            "vi": "Students.Name[2]"
+          },
+          "feedback": {
+            "en": "That changes the order of selection and does not match this array-of-records declaration.",
+            "vi": "Cách này đảo thứ tự chọn và không khớp khai báo mảng record này."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "TStudent.Name",
+            "vi": "TStudent.Name"
+          },
+          "feedback": {
+            "en": "TStudent names the type, not the second stored instance.",
+            "vi": "TStudent là tên kiểu, không phải bản ghi thứ hai."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Follow the declared structure rather than rearranging the same words.",
+        "vi": "Đi theo cấu trúc đã khai báo, không hoán đổi tùy ý các từ."
+      }
+    },
+    {
+      "id": "field-type",
+      "prompt": {
+        "en": "A library member ID may be \"00128\" or \"A128\". Which type best preserves it?",
+        "vi": "ID thành viên thư viện có thể là \"00128\" hoặc \"A128\". Kiểu nào giữ đúng dữ liệu?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "INTEGER",
+            "vi": "INTEGER"
+          },
+          "feedback": {
+            "en": "INTEGER cannot preserve the letter and would not preserve leading zeros as part of the identifier.",
+            "vi": "INTEGER không giữ chữ cái và không giữ số không đầu như một phần định danh."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "STRING",
+            "vi": "STRING"
+          },
+          "feedback": {
+            "en": "Correct. The ID is a sequence of identifying characters, not a quantity to calculate with.",
+            "vi": "Đúng. ID là chuỗi ký tự định danh, không phải đại lượng dùng tính toán."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "BOOLEAN",
+            "vi": "BOOLEAN"
+          },
+          "feedback": {
+            "en": "Two truth values cannot represent this range of identifiers.",
+            "vi": "Hai giá trị đúng/sai không thể biểu diễn các định danh này."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Field meaning and permitted values determine its type.",
+        "vi": "Ý nghĩa và giá trị cho phép quyết định kiểu trường."
+      }
+    },
+    {
+      "id": "record-vs-class",
+      "prompt": {
+        "en": "Which feature belongs specifically to the class/object model described here?",
+        "vi": "Đặc điểm nào thuộc mô hình lớp/đối tượng được mô tả ở đây?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "Grouping several named fields.",
+            "vi": "Gom nhiều trường có tên."
+          },
+          "feedback": {
+            "en": "Records also group named fields, so that alone does not distinguish a class.",
+            "vi": "Record cũng gom trường có tên nên riêng điều đó chưa phân biệt lớp."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Storing more than one instance.",
+            "vi": "Lưu nhiều thực thể."
+          },
+          "feedback": {
+            "en": "An array can hold many record instances too.",
+            "vi": "Mảng cũng có thể chứa nhiều bản ghi cụ thể."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "Combining attributes with callable methods for an object.",
+            "vi": "Kết hợp thuộc tính với phương thức có thể gọi cho đối tượng."
+          },
+          "feedback": {
+            "en": "Correct. The class describes data and behaviour; each object has its own state.",
+            "vi": "Đúng. Lớp mô tả dữ liệu và hành vi; mỗi đối tượng có trạng thái riêng."
+          }
+        }
+      ],
+      "correctChoiceId": "3",
+      "explanation": {
+        "en": "A record-to-class connection should not erase the difference in behaviour.",
+        "vi": "Liên hệ record với lớp không được xóa sự khác biệt về hành vi."
+      }
+    },
+    {
+      "id": "object-state-transfer",
+      "prompt": {
+        "en": "Using the TCounter class above, A ← NEW TCounter(5) and B ← NEW TCounter(9). What do A.GetValue() and B.GetValue() return?",
+        "vi": "Với lớp TCounter ở trên, A ← NEW TCounter(5) và B ← NEW TCounter(9). A.GetValue() và B.GetValue() trả gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "9 and9",
+            "vi": "9 và9"
+          },
+          "feedback": {
+            "en": "Constructing B does not overwrite A’s instance attribute.",
+            "vi": "Tạo B không ghi đè thuộc tính của đối tượng A."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "5 and9",
+            "vi": "5 và9"
+          },
+          "feedback": {
+            "en": "Correct. Each constructor initialises its own object; each method reads that object’s Value.",
+            "vi": "Đúng. Mỗi hàm tạo khởi tạo đối tượng riêng; mỗi phương thức đọc Value của đối tượng đó."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "The class name twice",
+            "vi": "Tên lớp hai lần"
+          },
+          "feedback": {
+            "en": "The method explicitly returns the stored INTEGER Value, not the type name.",
+            "vi": "Phương thức trả rõ INTEGER Value được lưu, không phải tên kiểu."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "A class defines shared structure and behaviour; each object carries its own state.",
+        "vi": "Lớp định nghĩa cấu trúc và hành vi chung; mỗi đối tượng có trạng thái riêng."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Describe the difference between TStudent, Students[2] and Students[2].Score, then name the role of a class constructor.",
+      "vi": "Phân biệt TStudent, Students[2], Students[2].Score rồi nêu vai trò hàm tạo của lớp."
+    },
+    "answerPoints": [
+      {
+        "en": "TStudent is a type; Students[2] is one record instance; .Score is one field value.",
+        "vi": "TStudent là kiểu; Students[2] là một bản ghi; .Score là giá trị của một trường."
+      },
+      {
+        "en": "Updating a field does not alter every instance.",
+        "vi": "Cập nhật trường không đổi mọi bản ghi."
+      },
+      {
+        "en": "A constructor NEW initialises a new object’s state.",
+        "vi": "Hàm tạo NEW khởi tạo trạng thái đối tượng mới."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Model one entity with named, typed fields.",
+      "vi": "Mô hình hóa một thực thể bằng trường có tên, có kiểu."
+    },
+    {
+      "en": "Select the record first and the field second.",
+      "vi": "Chọn bản ghi trước rồi chọn trường."
+    },
+    {
+      "en": "A class adds methods and object behaviour; it is not just another name for a record.",
+      "vi": "Lớp thêm phương thức và hành vi đối tượng; không chỉ là tên khác của record."
+    }
+  ],
+  "relatedSlugs": [
+    "user-defined-and-enumerated-types",
+    "pointers-and-referenced-data",
+    "class-object-design-and-encapsulation"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.1, p.32",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=32"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.307; examples independently checked",
+      "kind": "book"
+    },
+    {
+      "id": "guide",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, exams 2026, Version 1",
+      "locator": "pp.13–14,28–29; code in this lesson is algorithmic pseudocode, not executable Python",
+      "kind": "guide",
+      "url": "https://www.cambridgeinternational.org/Images/697401-2026-pseudocode-guide-for-teachers.pdf"
+    }
+  ]
+}

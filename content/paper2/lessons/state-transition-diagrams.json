@@ -1,0 +1,553 @@
+{
+  "schemaVersion": 1,
+  "version": "T25-academic-r1",
+  "topicId": "T25",
+  "sectionId": "12.2",
+  "slug": "state-transition-diagrams",
+  "learningMode": "diagram",
+  "estimatedMinutes": 55,
+  "title": {
+    "en": "State-transition diagrams",
+    "vi": "Sơ đồ chuyển trạng thái"
+  },
+  "question": {
+    "en": "How can states, events and guards describe valid changes in a system over time?",
+    "vi": "Trạng thái, sự kiện và điều kiện mô tả các thay đổi hợp lệ của hệ thống theo thời gian như thế nào?"
+  },
+  "opening": {
+    "en": "Track the current state first. An event can cause a directed transition only when its guard is satisfied; an invalid event leaves the system unchanged unless the model says otherwise.",
+    "vi": "Trước hết hãy theo dõi trạng thái hiện tại. Một sự kiện chỉ gây ra chuyển đổi có hướng khi điều kiện của nó đúng; sự kiện không hợp lệ giữ hệ thống nguyên trạng nếu mô hình không quy định khác."
+  },
+  "objectives": [
+    {
+      "en": "Distinguish a state, event, guard, action and directed transition.",
+      "vi": "Phân biệt trạng thái, sự kiện, điều kiện, hành động và chuyển đổi có hướng."
+    },
+    {
+      "en": "Translate a transition table into a consistent diagram.",
+      "vi": "Chuyển bảng chuyển trạng thái thành sơ đồ nhất quán."
+    },
+    {
+      "en": "Trace a sequence of valid and invalid events from a stated start state.",
+      "vi": "Trace chuỗi sự kiện hợp lệ và không hợp lệ từ trạng thái bắt đầu đã cho."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Selection",
+        "vi": "Rẽ nhánh"
+      },
+      "reason": {
+        "en": "A guard is a Boolean condition that decides whether a transition may occur.",
+        "vi": "Điều kiện guard là biểu thức Boolean quyết định chuyển đổi có được xảy ra hay không."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "state",
+      "meaning": {
+        "en": "A named condition of the system that persists until an event changes it.",
+        "vi": "Điều kiện được đặt tên của hệ thống và được giữ cho tới khi sự kiện làm thay đổi."
+      }
+    },
+    {
+      "term": "event",
+      "meaning": {
+        "en": "An occurrence offered to the current state.",
+        "vi": "Một sự việc được đưa vào trạng thái hiện tại."
+      }
+    },
+    {
+      "term": "guard",
+      "meaning": {
+        "en": "A condition that must be true for a transition to be taken.",
+        "vi": "Điều kiện phải đúng để chuyển đổi được thực hiện."
+      }
+    },
+    {
+      "term": "transition",
+      "meaning": {
+        "en": "A directed change from one state to another, labelled by an event and optional guard/action.",
+        "vi": "Thay đổi có hướng từ trạng thái này sang trạng thái khác, được gắn sự kiện và guard/action tùy chọn."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The question names states and asks what happens after events.",
+        "vi": "Đề nêu các trạng thái và hỏi điều gì xảy ra sau các sự kiện."
+      },
+      {
+        "en": "A table or diagram contains arrows labelled with events or conditions.",
+        "vi": "Bảng hoặc sơ đồ có mũi tên gắn sự kiện hoặc điều kiện."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "A structure chart also uses boxes and lines, but it describes module relationships, not behaviour over time.",
+        "vi": "Structure chart cũng dùng hộp và đường nối nhưng mô tả quan hệ module, không mô tả hành vi theo thời gian."
+      },
+      {
+        "en": "A flowchart follows control flow through actions and decisions, rather than persistent states receiving events.",
+        "vi": "Flowchart theo luồng điều khiển qua thao tác và quyết định, không phải các trạng thái bền nhận sự kiện."
+      }
+    ],
+    "answerProduct": {
+      "en": "A labelled state diagram or event trace that states the current state after every event.",
+      "vi": "Sơ đồ trạng thái có nhãn hoặc event trace nêu trạng thái hiện tại sau mỗi sự kiện."
+    },
+    "method": [
+      {
+        "en": "List every state and identify the stated start state.",
+        "vi": "Liệt kê mọi trạng thái và xác định trạng thái bắt đầu."
+      },
+      {
+        "en": "For each current-state/event pair, test the guard and find the directed next state.",
+        "vi": "Với từng cặp trạng thái hiện tại/sự kiện, kiểm guard và tìm trạng thái kế tiếp có hướng."
+      },
+      {
+        "en": "For an unspecified or guard-failing event, record no transition and explain why.",
+        "vi": "Với sự kiện không được định nghĩa hoặc guard sai, ghi không chuyển đổi và giải thích lý do."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "T25-U1",
+      "title": {
+        "en": "Read the model as a contract",
+        "vi": "Đọc mô hình như một contract"
+      },
+      "paragraphs": [
+        {
+          "en": "A state describes what behaviour is currently possible. An event is considered from that state, and a guard can restrict a transition.",
+          "vi": "Trạng thái mô tả hành vi hiện đang khả dĩ. Sự kiện được xét từ trạng thái đó và guard có thể giới hạn chuyển đổi."
+        },
+        {
+          "en": "Arrow direction matters. The same event may have a different result in another state, so never trace from the event name alone.",
+          "vi": "Hướng mũi tên rất quan trọng. Cùng sự kiện có thể cho kết quả khác ở trạng thái khác, vì vậy không trace chỉ từ tên sự kiện."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "State: persistent condition",
+          "vi": "State: điều kiện bền"
+        },
+        {
+          "en": "Event: occurrence to handle",
+          "vi": "Event: sự việc cần xử lý"
+        },
+        {
+          "en": "Guard: permission condition",
+          "vi": "Guard: điều kiện cho phép"
+        },
+        {
+          "en": "Transition: directed change",
+          "vi": "Transition: thay đổi có hướng"
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book"
+      ]
+    },
+    {
+      "id": "T25-U2",
+      "title": {
+        "en": "Trace one event at a time",
+        "vi": "Trace từng sự kiện"
+      },
+      "paragraphs": [
+        {
+          "en": "Begin at the stated start state. Read one event, locate an outgoing transition with a satisfied guard, update the state, and only then process the next event.",
+          "vi": "Bắt đầu ở trạng thái đã cho. Đọc một sự kiện, tìm chuyển đổi đi ra có guard đúng, cập nhật trạng thái rồi mới xử lý sự kiện tiếp theo."
+        },
+        {
+          "en": "If no transition is valid, keep the current state unless an error state or other response is explicitly modelled.",
+          "vi": "Nếu không có chuyển đổi hợp lệ, giữ trạng thái hiện tại trừ khi mô hình nêu rõ trạng thái lỗi hoặc phản hồi khác."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Record current state before the event.",
+          "vi": "Ghi trạng thái hiện tại trước sự kiện."
+        },
+        {
+          "en": "Do not invent an accepting/final state.",
+          "vi": "Không tự tạo trạng thái chấp nhận/kết thúc."
+        },
+        {
+          "en": "Explain rejected events.",
+          "vi": "Giải thích sự kiện bị từ chối."
+        }
+      ],
+      "sourceIds": [
+        "syl",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T25",
+      "T25-X01"
+    ],
+    "title": {
+      "en": "Camera event player",
+      "vi": "Trình phát sự kiện camera"
+    },
+    "introduction": {
+      "en": "Use the transition table and diagram together; both must encode the same next-state rule.",
+      "vi": "Dùng bảng chuyển và sơ đồ cùng nhau; cả hai phải biểu diễn cùng quy tắc trạng thái kế tiếp."
+    },
+    "task": {
+      "en": "Play each event, predict the next state, then compare the highlighted arrow and table row.",
+      "vi": "Phát từng sự kiện, dự đoán trạng thái kế tiếp rồi đối chiếu mũi tên và hàng bảng được tô sáng."
+    },
+    "conventions": [
+      {
+        "en": "Circles are states; the incoming marker identifies the start state.",
+        "vi": "Hình tròn là trạng thái; dấu đi vào xác định trạng thái bắt đầu."
+      },
+      {
+        "en": "Arrow labels show event [guard] and optional action.",
+        "vi": "Nhãn mũi tên cho biết event [guard] và action tùy chọn."
+      },
+      {
+        "en": "No matching transition means no state change unless stated.",
+        "vi": "Không có chuyển đổi phù hợp nghĩa là không đổi trạng thái nếu không có quy định khác."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "teacher-t25"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T25-W1",
+      "title": {
+        "en": "Trace a guarded camera sequence",
+        "vi": "Trace chuỗi camera có guard"
+      },
+      "prompt": {
+        "en": "A camera starts OFF. POWER moves OFF→READY. RECORD moves READY→RECORDING only if storageFree. STOP moves RECORDING→READY. Trace POWER, RECORD with storageFree=FALSE, RECORD after storage becomes free, STOP.",
+        "vi": "Camera bắt đầu OFF. POWER chuyển OFF→READY. RECORD chỉ chuyển READY→RECORDING nếu storageFree. STOP chuyển RECORDING→READY. Trace POWER, RECORD khi storageFree=FALSE, RECORD sau khi có bộ nhớ trống, STOP."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "T25-W1-S1",
+          "action": {
+            "en": "Apply POWER from OFF.",
+            "vi": "Áp dụng POWER từ OFF."
+          },
+          "why": {
+            "en": "The outgoing POWER transition is defined without a guard.",
+            "vi": "Chuyển đổi POWER đi ra được định nghĩa không có guard."
+          },
+          "result": {
+            "en": "Current state becomes READY.",
+            "vi": "Trạng thái hiện tại thành READY."
+          },
+          "check": {
+            "en": "Use the arrow direction OFF→READY.",
+            "vi": "Dùng hướng mũi tên OFF→READY."
+          }
+        },
+        {
+          "id": "T25-W1-S2",
+          "action": {
+            "en": "Test RECORD while storageFree is FALSE.",
+            "vi": "Kiểm RECORD khi storageFree là FALSE."
+          },
+          "why": {
+            "en": "The event matches but its guard fails.",
+            "vi": "Sự kiện khớp nhưng guard sai."
+          },
+          "result": {
+            "en": "Remain READY and record the rejection reason.",
+            "vi": "Giữ READY và ghi lý do từ chối."
+          },
+          "check": {
+            "en": "Do not move to an invented error state.",
+            "vi": "Không chuyển sang trạng thái lỗi tự tạo."
+          }
+        },
+        {
+          "id": "T25-W1-S3",
+          "action": {
+            "en": "Set storageFree TRUE, apply RECORD, then STOP.",
+            "vi": "Đặt storageFree TRUE, áp dụng RECORD rồi STOP."
+          },
+          "why": {
+            "en": "The guarded transition is now enabled, followed by a valid STOP transition.",
+            "vi": "Chuyển đổi có guard giờ được phép, sau đó là chuyển đổi STOP hợp lệ."
+          },
+          "result": {
+            "en": "READY→RECORDING→READY.",
+            "vi": "READY→RECORDING→READY."
+          },
+          "check": {
+            "en": "Final state is READY and every event has one recorded outcome.",
+            "vi": "Trạng thái cuối là READY và mỗi sự kiện có một kết quả được ghi."
+          }
+        }
+      ],
+      "answer": {
+        "en": "State trace: OFF --POWER→ READY; RECORD with no storage: READY (no transition); RECORD with storage: RECORDING; STOP: READY.",
+        "vi": "State trace: OFF --POWER→ READY; RECORD khi không có bộ nhớ: READY (không chuyển); RECORD khi có bộ nhớ: RECORDING; STOP: READY."
+      },
+      "selfCheck": {
+        "en": "Did you evaluate each event from the state produced by the previous event and state why the guarded event was rejected?",
+        "vi": "Bạn có xét từng sự kiện từ trạng thái do sự kiện trước tạo ra và nêu lý do sự kiện có guard bị từ chối không?"
+      },
+      "sourceIds": [
+        "teacher-t25"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T25-P1",
+      "title": {
+        "en": "Complete a missing transition",
+        "vi": "Hoàn thiện chuyển đổi còn thiếu"
+      },
+      "prompt": {
+        "en": "A turnstile has LOCKED and UNLOCKED. COIN changes LOCKED→UNLOCKED; PUSH changes UNLOCKED→LOCKED. Add the result of PUSH in LOCKED and trace PUSH, COIN, PUSH.",
+        "vi": "Cổng xoay có LOCKED và UNLOCKED. COIN chuyển LOCKED→UNLOCKED; PUSH chuyển UNLOCKED→LOCKED. Bổ sung kết quả PUSH ở LOCKED và trace PUSH, COIN, PUSH."
+      },
+      "working": [
+        {
+          "en": "Start LOCKED and inspect only outgoing transitions for each event.",
+          "vi": "Bắt đầu LOCKED và chỉ xét chuyển đổi đi ra cho từng sự kiện."
+        },
+        {
+          "en": "Treat PUSH in LOCKED as no transition because none is defined.",
+          "vi": "Xử lý PUSH ở LOCKED là không chuyển vì không được định nghĩa."
+        },
+        {
+          "en": "Continue with the current state after every event.",
+          "vi": "Tiếp tục với trạng thái hiện tại sau mỗi sự kiện."
+        }
+      ],
+      "answer": {
+        "en": "LOCKED --PUSH→ LOCKED (rejected); --COIN→ UNLOCKED; --PUSH→ LOCKED.",
+        "vi": "LOCKED --PUSH→ LOCKED (bị từ chối); --COIN→ UNLOCKED; --PUSH→ LOCKED."
+      },
+      "markGuidance": [
+        {
+          "en": "State the no-transition outcome and reason.",
+          "vi": "Nêu kết quả không chuyển và lý do."
+        },
+        {
+          "en": "Give both valid directed transitions.",
+          "vi": "Nêu đúng hai chuyển đổi có hướng hợp lệ."
+        },
+        {
+          "en": "State final state LOCKED.",
+          "vi": "Nêu trạng thái cuối LOCKED."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Move on an undefined event.",
+          "vi": "Chuyển trạng thái với sự kiện không được định nghĩa."
+        },
+        {
+          "en": "Process every event from the start state.",
+          "vi": "Xử lý mọi sự kiện từ trạng thái bắt đầu."
+        }
+      ],
+      "selfCheck": {
+        "en": "Does each event start from the previous row's resulting state?",
+        "vi": "Mỗi sự kiện có bắt đầu từ trạng thái kết quả của hàng trước không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t25"
+      ]
+    },
+    {
+      "id": "T25-P2",
+      "title": {
+        "en": "Translate a transition table",
+        "vi": "Chuyển bảng sang sơ đồ"
+      },
+      "prompt": {
+        "en": "A lamp table states OFF+PRESS→ON, ON+PRESS→OFF, and ON+TIMEOUT [auto=TRUE]→OFF. Describe the nodes and labelled arrows.",
+        "vi": "Bảng đèn nêu OFF+PRESS→ON, ON+PRESS→OFF và ON+TIMEOUT [auto=TRUE]→OFF. Mô tả các node và mũi tên có nhãn."
+      },
+      "working": [
+        {
+          "en": "Create one node for each distinct state.",
+          "vi": "Tạo một node cho mỗi trạng thái khác nhau."
+        },
+        {
+          "en": "Create one directed arrow per table row.",
+          "vi": "Tạo một mũi tên có hướng cho mỗi hàng bảng."
+        },
+        {
+          "en": "Keep the guard on the TIMEOUT label.",
+          "vi": "Giữ guard trên nhãn TIMEOUT."
+        }
+      ],
+      "answer": {
+        "en": "Nodes OFF and ON; OFF→ON labelled PRESS; ON→OFF labelled PRESS; ON→OFF labelled TIMEOUT [auto=TRUE]. Mark the stated start state if supplied.",
+        "vi": "Node OFF và ON; OFF→ON nhãn PRESS; ON→OFF nhãn PRESS; ON→OFF nhãn TIMEOUT [auto=TRUE]. Đánh dấu trạng thái bắt đầu nếu đề cho."
+      },
+      "markGuidance": [
+        {
+          "en": "Two correct state nodes.",
+          "vi": "Hai node trạng thái đúng."
+        },
+        {
+          "en": "Three arrows with correct directions and labels.",
+          "vi": "Ba mũi tên đúng hướng và nhãn."
+        },
+        {
+          "en": "Guard retained on TIMEOUT.",
+          "vi": "Giữ guard trên TIMEOUT."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Create a third state called PRESS.",
+          "vi": "Tạo trạng thái thứ ba tên PRESS."
+        },
+        {
+          "en": "Drop the guard from the arrow.",
+          "vi": "Bỏ guard khỏi mũi tên."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can every table row be matched to exactly one arrow?",
+        "vi": "Mỗi hàng bảng có khớp đúng một mũi tên không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t25"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Treat an event as a state.",
+        "vi": "Coi event là state."
+      },
+      "correction": {
+        "en": "States persist; events occur and are written on transition labels.",
+        "vi": "State tồn tại; event xảy ra và được viết trên nhãn chuyển đổi."
+      },
+      "selfCheck": {
+        "en": "Could the named item be the current condition before and after an event?",
+        "vi": "Mục được nêu có thể là điều kiện hiện tại trước và sau sự kiện không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Follow every arrow with the right label regardless of current state.",
+        "vi": "Theo mọi mũi tên có nhãn đúng bất kể state hiện tại."
+      },
+      "correction": {
+        "en": "Only outgoing transitions from the current state are candidates.",
+        "vi": "Chỉ các chuyển đổi đi ra từ state hiện tại mới được xét."
+      },
+      "selfCheck": {
+        "en": "Where does the arrow start?",
+        "vi": "Mũi tên bắt đầu ở đâu?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "What five checks make an event trace reliable?",
+      "vi": "Năm kiểm tra nào giúp event trace đáng tin cậy?"
+    },
+    "answerPoints": [
+      {
+        "en": "Know the current state.",
+        "vi": "Biết state hiện tại."
+      },
+      {
+        "en": "Read one event.",
+        "vi": "Đọc một event."
+      },
+      {
+        "en": "Find an outgoing arrow.",
+        "vi": "Tìm mũi tên đi ra."
+      },
+      {
+        "en": "Evaluate its guard.",
+        "vi": "Đánh giá guard."
+      },
+      {
+        "en": "Record the next state or justified no-transition.",
+        "vi": "Ghi state kế tiếp hoặc không chuyển có lý do."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "State diagrams model behaviour over time, not module hierarchy or execution flow.",
+      "vi": "Sơ đồ trạng thái mô hình hóa hành vi theo thời gian, không phải phân cấp module hay luồng thực thi."
+    },
+    {
+      "en": "Trace from the current state and keep failed/undefined events explicit.",
+      "vi": "Trace từ state hiện tại và nêu rõ sự kiện sai guard/không được định nghĩa."
+    },
+    {
+      "en": "A table and diagram must encode the same transitions.",
+      "vi": "Bảng và sơ đồ phải biểu diễn cùng các chuyển đổi."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F14",
+      "role": "owner",
+      "title": {
+        "en": "State-transition reasoning",
+        "vi": "Lập luận chuyển trạng thái"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "selection",
+    "structure-charts",
+    "testing-methods"
+  ],
+  "sources": [
+    {
+      "id": "syl",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§12.2, printed/PDF p30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp287–293; PDF pp303–309; state-transition diagrams in §12.2.2.",
+      "kind": "book"
+    },
+    {
+      "id": "qp1",
+      "title": "9618/22 May/June 2025 Question 5(a)",
+      "locator": "QP p9; state-transition diagram context used as exam-style calibration only.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t25",
+      "title": "AlgoCore teacher-created T25 worked examples, practice and marking guidance",
+      "locator": "T25-academic-r1, 2026-10-02; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}

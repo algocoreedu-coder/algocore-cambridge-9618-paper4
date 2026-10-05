@@ -1,0 +1,834 @@
+{
+  "schemaVersion": 1,
+  "version": "T13-academic-r3-gap-closure",
+  "topicId": "T13",
+  "sectionId": "10.4",
+  "slug": "linked-list",
+  "learningMode": "diagram",
+  "estimatedMinutes": 75,
+  "title": {
+    "en": "Linked lists",
+    "vi": "Danh sách liên kết"
+  },
+  "question": {
+    "en": "How do links define logical order while a free list preserves reusable storage?",
+    "vi": "Link xác định thứ tự logic và free list giữ ô tái dùng thế nào?"
+  },
+  "opening": {
+    "en": "Follow Start and Next, not physical row order; save old links before any update.",
+    "vi": "Theo Start và Next, không theo thứ tự hàng vật lý; giữ link cũ trước khi cập nhật."
+  },
+  "objectives": [
+    {
+      "en": "Separate physical index from logical order.",
+      "vi": "Tách chỉ số vật lý khỏi thứ tự logic."
+    },
+    {
+      "en": "Trace insertion/deletion without losing links.",
+      "vi": "Trace chèn/xóa không làm mất link."
+    },
+    {
+      "en": "Keep live and free chains disjoint.",
+      "vi": "Giữ live chain và free chain không chồng."
+    },
+    {
+      "en": "Delete or edit head/middle nodes, reconnect logical links and return physical slots to a free list before reuse.",
+      "vi": "Xóa hoặc sửa node đầu/giữa, nối lại link logic và trả slot vật lý về free list trước khi tái dùng."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Records and arrays",
+        "vi": "Record và array"
+      },
+      "reason": {
+        "en": "Nodes are commonly represented by data and next-pointer fields at indices.",
+        "vi": "Node thường được biểu diễn bằng field data và next-pointer tại các chỉ số."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Start",
+      "meaning": {
+        "en": "index of first live node or null",
+        "vi": "chỉ số node sống đầu hoặc null"
+      }
+    },
+    {
+      "term": "Next",
+      "meaning": {
+        "en": "link to next logical node",
+        "vi": "link tới node logic tiếp"
+      }
+    },
+    {
+      "term": "null",
+      "meaning": {
+        "en": "sentinel meaning no next node",
+        "vi": "sentinel nghĩa là không có node sau"
+      }
+    },
+    {
+      "term": "free list",
+      "meaning": {
+        "en": "chain of unused reusable slots",
+        "vi": "chuỗi ô chưa dùng có thể tái dùng"
+      }
+    },
+    {
+      "term": "live chain",
+      "meaning": {
+        "en": "nodes reachable from Start",
+        "vi": "các node tới được từ Start"
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "A table has Data and Next/pointer fields.",
+        "vi": "Bảng có field Data và Next/pointer."
+      },
+      {
+        "en": "Trace Start, Free, insertion or deletion.",
+        "vi": "Trace Start, Free, chèn hoặc xóa."
+      },
+      {
+        "en": "The task gives StartPointer, NextPointer and FreePointer arrays and asks for a mutation.",
+        "vi": "Bài cho array StartPointer, NextPointer và FreePointer rồi yêu cầu mutation."
+      },
+      {
+        "en": "Physical array order differs from the logical list order.",
+        "vi": "Thứ tự array vật lý khác thứ tự list logic."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "Row order is list order.",
+        "vi": "Thứ tự hàng là thứ tự list."
+      },
+      {
+        "en": "An unused node may belong to both chains.",
+        "vi": "Node chưa dùng có thể thuộc cả hai chain."
+      },
+      {
+        "en": "Deleting a node means clearing its data cell only.",
+        "vi": "Xóa node chỉ là xóa ô data."
+      },
+      {
+        "en": "A freed slot can be reused without first updating FreePointer.",
+        "vi": "Slot đã giải phóng có thể tái dùng mà không cập nhật FreePointer trước."
+      }
+    ],
+    "answerProduct": {
+      "en": "A pointer trace with correct logical sequence, null termination and disjoint live/free chains.",
+      "vi": "Trace pointer đúng chuỗi logic, kết thúc null và live/free chain không chồng."
+    },
+    "method": [
+      {
+        "en": "State the representation and its conventions.",
+        "vi": "Nêu biểu diễn và quy ước."
+      },
+      {
+        "en": "Trace the state in the stated order.",
+        "vi": "Trace trạng thái theo thứ tự đã nêu."
+      },
+      {
+        "en": "Check the boundary or empty case.",
+        "vi": "Kiểm trường hợp biên hoặc rỗng."
+      },
+      {
+        "en": "Return exactly the requested product.",
+        "vi": "Trả đúng sản phẩm được yêu cầu."
+      },
+      {
+        "en": "Trace the logical list from StartPointer before editing any cell.",
+        "vi": "Trace list logic từ StartPointer trước khi sửa ô nào."
+      },
+      {
+        "en": "Find the predecessor unless deleting the head, then bypass the target.",
+        "vi": "Tìm predecessor trừ khi xóa head, rồi nối bỏ qua target."
+      },
+      {
+        "en": "Push the deleted physical slot onto the free list by linking it to the old FreePointer.",
+        "vi": "Đưa slot vật lý đã xóa lên đầu free list bằng cách nối nó tới FreePointer cũ."
+      },
+      {
+        "en": "On reuse, pop FreePointer before writing data and reconnect logical links.",
+        "vi": "Khi tái dùng, pop FreePointer trước khi ghi data và nối lại link logic."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t13-model",
+      "title": {
+        "en": "Links define order",
+        "vi": "Link xác định thứ tự"
+      },
+      "paragraphs": [
+        {
+          "en": "Start identifies the first live node; repeatedly follow Next until null. Physical array rows may be visited in any order.",
+          "vi": "Start xác định node sống đầu; lặp theo Next tới null. Các hàng array vật lý có thể được thăm theo bất kỳ thứ tự."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Write Start, Free and null convention.",
+          "vi": "Viết quy ước Start, Free và null."
+        },
+        {
+          "en": "Follow links, never row order.",
+          "vi": "Theo link, không theo thứ tự hàng."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "book-t13",
+        "teacher-t13",
+        "qp-t13-s25-23-q2b"
+      ]
+    },
+    {
+      "id": "t13-operations",
+      "title": {
+        "en": "Updates must preserve both chains",
+        "vi": "Cập nhật phải giữ cả hai chain"
+      },
+      "paragraphs": [
+        {
+          "en": "When allocating, save Free's next slot before overwriting the node link. When deleting, bypass the node in the live chain then link it into the free chain. No node may be in both.",
+          "vi": "Khi cấp phát, giữ ô kế của Free trước khi ghi đè link node. Khi xóa, bỏ qua node trong live chain rồi nối nó vào free chain. Không node nào thuộc cả hai."
+        }
+      ],
+      "bullets": [
+        {
+          "en": "Save the old link before overwriting.",
+          "vi": "Lưu link cũ trước khi ghi đè."
+        },
+        {
+          "en": "Audit every slot: live, free or intentionally unused.",
+          "vi": "Kiểm mọi ô: live, free hoặc chưa dùng có chủ ý."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "guide-2026",
+        "teacher-t13"
+      ]
+    },
+    {
+      "id": "t13-delete-reuse-invariants",
+      "title": {
+        "en": "Two chains share one array",
+        "vi": "Hai chuỗi cùng dùng một array"
+      },
+      "paragraphs": [
+        {
+          "en": "The logical list and free list are separate pointer chains over the same physical arrays. Every allocated slot must be reachable exactly once from StartPointer, and every available slot exactly once from FreePointer; a slot must never be in both chains.",
+          "vi": "List logic và free list là hai chuỗi pointer riêng trên cùng array vật lý. Mỗi slot đã cấp phát phải đi tới được đúng một lần từ StartPointer và mỗi slot trống đúng một lần từ FreePointer; một slot không được thuộc cả hai chuỗi."
+        },
+        {
+          "en": "Deleting a middle node requires changing its predecessor's link before repurposing the deleted node's NextPointer. Deleting the head changes StartPointer directly. Reuse pops the first free slot and then inserts it into the logical chain.",
+          "vi": "Xóa node giữa cần đổi link của predecessor trước khi dùng lại NextPointer của node bị xóa. Xóa head đổi trực tiếp StartPointer. Tái dùng pop slot trống đầu rồi chèn nó vào chuỗi logic."
+        }
+      ],
+      "sourceIds": [
+        "s26",
+        "book-t13",
+        "teacher-t13"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T13",
+      "T13-X01"
+    ],
+    "title": {
+      "en": "Logical links, deletion and reuse",
+      "vi": "Link logic, xóa và tái dùng"
+    },
+    "introduction": {
+      "en": "The fixtures use corrected original data so live and free chains remain valid despite known source-book pointer errors.",
+      "vi": "Fixture dùng dữ liệu tự biên soạn đã sửa để live/free chain hợp lệ, tránh lỗi pointer đã biết trong sách."
+    },
+    "task": {
+      "en": "Use Previous/Next to predict each before/action/after state, then explain it without relying on colour.",
+      "vi": "Dùng Previous/Next để dự đoán từng trạng thái trước/hành động/sau rồi giải thích không dựa vào màu."
+    },
+    "conventions": [
+      {
+        "en": "Write Start, Free and null convention.",
+        "vi": "Viết quy ước Start, Free và null."
+      },
+      {
+        "en": "Follow links, never row order.",
+        "vi": "Theo link, không theo thứ tự hàng."
+      },
+      {
+        "en": "Save the old link before overwriting.",
+        "vi": "Lưu link cũ trước khi ghi đè."
+      },
+      {
+        "en": "Audit every slot: live, free or intentionally unused.",
+        "vi": "Kiểm mọi ô: live, free hoặc chưa dùng có chủ ý."
+      }
+    ],
+    "sourceIds": [
+      "s26",
+      "book-t13",
+      "teacher-t13"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T13-W1",
+      "title": {
+        "en": "Insert at the front safely",
+        "vi": "Chèn đầu an toàn"
+      },
+      "prompt": {
+        "en": "Start=3; live 3(Ada)→1(Bo)→-1. Free=0; free 0→2→4→-1. Insert Cy at front.",
+        "vi": "Start=3; live 3(Ada)→1(Bo)→-1. Free=0; free 0→2→4→-1. Chèn Cy ở đầu."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "1",
+          "action": {
+            "en": "Allocate index 0",
+            "vi": "Cấp phát chỉ số 0"
+          },
+          "why": {
+            "en": "Free points to the reusable node.",
+            "vi": "Free chỉ node tái dùng."
+          },
+          "result": {
+            "en": "New=0; Free←Next[0]=2.",
+            "vi": "New=0; Free←Next[0]=2."
+          }
+        },
+        {
+          "id": "2",
+          "action": {
+            "en": "Preserve old head",
+            "vi": "Giữ head cũ"
+          },
+          "why": {
+            "en": "New node must point to previous Start.",
+            "vi": "Node mới phải chỉ Start cũ."
+          },
+          "result": {
+            "en": "Data[0]=\"Cy\"; Next[0]←3.",
+            "vi": "Data[0]=\"Cy\"; Next[0]←3."
+          }
+        },
+        {
+          "id": "3",
+          "action": {
+            "en": "Move Start",
+            "vi": "Chuyển Start"
+          },
+          "why": {
+            "en": "New node becomes first.",
+            "vi": "Node mới thành đầu."
+          },
+          "result": {
+            "en": "Start←0; live 0→3→1; free 2→4.",
+            "vi": "Start←0; live 0→3→1; free 2→4."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Final live Cy,Ada,Bo at indices 0,3,1; free indices 2,4. Chains are disjoint and null-terminated.",
+        "vi": "Live cuối Cy,Ada,Bo tại chỉ số 0,3,1; free 2,4. Hai chain không chồng và kết thúc null."
+      },
+      "selfCheck": {
+        "en": "If Next[0] were changed before saving it, how would free index 2 be lost?",
+        "vi": "Nếu đổi Next[0] trước khi lưu, chỉ số free 2 bị mất thế nào?"
+      },
+      "sourceIds": [
+        "teacher-t13",
+        "book-t13"
+      ]
+    },
+    {
+      "id": "T13-W2",
+      "title": {
+        "en": "Delete a middle node and reuse its slot",
+        "vi": "Xóa node giữa và tái dùng slot"
+      },
+      "prompt": {
+        "en": "StartPointer=1. Active list: index1 Ada → index3 Chen → index4 Mina → -1. FreePointer=2 and free chain index2 → index0 → -1. Delete Chen, then insert Ben after Ada using the first free slot.",
+        "vi": "StartPointer=1. List active: index1 Ada → index3 Chen → index4 Mina → -1. FreePointer=2 và free chain index2 → index0 → -1. Xóa Chen rồi chèn Ben sau Ada bằng slot trống đầu."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "trace",
+          "action": {
+            "en": "Separate active and free chains",
+            "vi": "Tách chuỗi active và free"
+          },
+          "why": {
+            "en": "Physical adjacency has no logical meaning.",
+            "vi": "Vị trí vật lý kề nhau không có nghĩa logic."
+          },
+          "result": {
+            "en": "Active indices are 1,3,4; free indices are 2,0.",
+            "vi": "Index active là 1,3,4; index free là 2,0."
+          }
+        },
+        {
+          "id": "bypass",
+          "action": {
+            "en": "Bypass target index3",
+            "vi": "Nối bỏ qua target index3"
+          },
+          "why": {
+            "en": "Ada's successor must become Chen's successor before index3 is reused.",
+            "vi": "Successor của Ada phải thành successor của Chen trước khi index3 được tái dùng."
+          },
+          "result": {
+            "en": "Next[1]←Next[3]=4.",
+            "vi": "Next[1]←Next[3]=4."
+          }
+        },
+        {
+          "id": "free",
+          "action": {
+            "en": "Push index3 onto free list",
+            "vi": "Đưa index3 lên free list"
+          },
+          "why": {
+            "en": "The old free chain must remain reachable.",
+            "vi": "Chuỗi free cũ phải vẫn đi tới được."
+          },
+          "result": {
+            "en": "Next[3]←FreePointer=2; FreePointer←3, giving 3→2→0.",
+            "vi": "Next[3]←FreePointer=2; FreePointer←3, tạo 3→2→0."
+          }
+        },
+        {
+          "id": "reuse",
+          "action": {
+            "en": "Pop index3 and insert Ben",
+            "vi": "Pop index3 và chèn Ben"
+          },
+          "why": {
+            "en": "Reuse must remove the slot from free before adding it to active.",
+            "vi": "Tái dùng phải loại slot khỏi free trước khi thêm vào active."
+          },
+          "result": {
+            "en": "NewIndex←3; FreePointer←Next[3]=2; Data[3]←Ben; Next[3]←4; Next[1]←3.",
+            "vi": "NewIndex←3; FreePointer←Next[3]=2; Data[3]←Ben; Next[3]←4; Next[1]←3."
+          },
+          "check": {
+            "en": "Final active 1→3→4 and free 2→0 are disjoint.",
+            "vi": "Active cuối 1→3→4 và free 2→0 không giao nhau."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Delete: Next[1]←4; Next[3]←2; FreePointer←3. Reuse: NewIndex←3; FreePointer←2; Data[3]←\"Ben\"; Next[3]←4; Next[1]←3. Final logical list is Ada, Ben, Mina; free list is index2, index0.",
+        "vi": "Xóa: Next[1]←4; Next[3]←2; FreePointer←3. Tái dùng: NewIndex←3; FreePointer←2; Data[3]←\"Ben\"; Next[3]←4; Next[1]←3. List logic cuối là Ada, Ben, Mina; free list là index2, index0."
+      },
+      "selfCheck": {
+        "en": "Is every physical index reachable from exactly one of StartPointer or FreePointer?",
+        "vi": "Mỗi index vật lý có đi tới được từ đúng một trong StartPointer hoặc FreePointer không?"
+      },
+      "sourceIds": [
+        "s26",
+        "book-t13",
+        "teacher-t13"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T13-P1",
+      "title": {
+        "en": "Traverse physical disorder",
+        "vi": "Duyệt khi thứ tự vật lý khác"
+      },
+      "prompt": {
+        "en": "Start=2; Data/Next: 2:(18,5), 5:(27,1), 1:(40,-1). Output logical data.",
+        "vi": "Start=2; Data/Next: 2:(18,5), 5:(27,1), 1:(40,-1). Xuất dữ liệu logic."
+      },
+      "working": [
+        {
+          "en": "Begin at Start.",
+          "vi": "Bắt đầu ở Start."
+        },
+        {
+          "en": "Follow Next until -1.",
+          "vi": "Theo Next tới -1."
+        }
+      ],
+      "answer": {
+        "en": "Indices 2→5→1; output 18,27,40.",
+        "vi": "Chỉ số 2→5→1; output 18,27,40."
+      },
+      "markGuidance": [
+        {
+          "en": "Correct index chain.",
+          "vi": "Đúng chuỗi chỉ số."
+        },
+        {
+          "en": "Correct data order and termination.",
+          "vi": "Đúng thứ tự dữ liệu và kết thúc."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Row order 1,2,5 is wrong.",
+          "vi": "Thứ tự hàng 1,2,5 là sai."
+        },
+        {
+          "en": "Do not output pointer values as data.",
+          "vi": "Không xuất pointer như dữ liệu."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which physical row is visited second?",
+        "vi": "Hàng vật lý nào được thăm thứ hai?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t13",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T13-P2",
+      "title": {
+        "en": "Delete and reuse",
+        "vi": "Xóa và tái dùng"
+      },
+      "prompt": {
+        "en": "Live 2→5→1→-1; free 0→3→4→-1. Delete node 5 after node 2, then put 5 at free head.",
+        "vi": "Live 2→5→1→-1; free 0→3→4→-1. Xóa node 5 sau node 2 rồi đưa 5 vào đầu free."
+      },
+      "working": [
+        {
+          "en": "Bypass 5: Next[2]←Next[5].",
+          "vi": "Bỏ qua 5: Next[2]←Next[5]."
+        },
+        {
+          "en": "Link deleted node to old Free, then Free←5.",
+          "vi": "Nối node xóa vào Free cũ rồi Free←5."
+        }
+      ],
+      "answer": {
+        "en": "Live 2→1→-1; free 5→0→3→4→-1.",
+        "vi": "Live 2→1→-1; free 5→0→3→4→-1."
+      },
+      "markGuidance": [
+        {
+          "en": "Live chain bypasses 5.",
+          "vi": "Live chain bỏ qua 5."
+        },
+        {
+          "en": "All free nodes retained and disjoint.",
+          "vi": "Mọi node free được giữ và không chồng."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Free←5 before saving old Free can lose node 0.",
+          "vi": "Free←5 trước khi giữ Free cũ có thể mất node 0."
+        },
+        {
+          "en": "Leaving Next[2]=5 keeps deleted node live.",
+          "vi": "Giữ Next[2]=5 làm node xóa vẫn live."
+        }
+      ],
+      "selfCheck": {
+        "en": "Audit all indices in both chains.",
+        "vi": "Kiểm mọi chỉ số trong hai chain."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t13",
+        "guide-2026"
+      ]
+    },
+    {
+      "id": "T13-P3",
+      "title": {
+        "en": "Delete the head and reuse it at the tail",
+        "vi": "Xóa head và tái dùng ở tail"
+      },
+      "prompt": {
+        "en": "Active list StartPointer=2: index2 A → index0 B → index4 C → -1. FreePointer=1: index1 → index3 → -1. Delete A, then append D using the first free slot. Give all changed pointers.",
+        "vi": "List active StartPointer=2: index2 A → index0 B → index4 C → -1. FreePointer=1: index1 → index3 → -1. Xóa A rồi append D bằng slot trống đầu. Nêu mọi pointer thay đổi."
+      },
+      "working": [
+        {
+          "en": "For head deletion update StartPointer directly.",
+          "vi": "Khi xóa head, cập nhật trực tiếp StartPointer."
+        },
+        {
+          "en": "Push index2 onto the old free chain.",
+          "vi": "Đưa index2 lên chuỗi free cũ."
+        },
+        {
+          "en": "Pop index2 again and connect the current tail index4 to it.",
+          "vi": "Pop lại index2 và nối tail index4 hiện tại tới nó."
+        }
+      ],
+      "answer": {
+        "en": "Delete A: StartPointer←Next[2]=0; Next[2]←FreePointer=1; FreePointer←2. Append D: NewIndex←FreePointer=2; FreePointer←Next[2]=1; Data[2]←D; Next[2]←-1; Next[4]←2. Final active list is B(index0)→C(index4)→D(index2); free list 1→3.",
+        "vi": "Xóa A: StartPointer←Next[2]=0; Next[2]←FreePointer=1; FreePointer←2. Append D: NewIndex←FreePointer=2; FreePointer←Next[2]=1; Data[2]←D; Next[2]←-1; Next[4]←2. List active cuối là B(index0)→C(index4)→D(index2); free list 1→3."
+      },
+      "markGuidance": [
+        {
+          "en": "Head, free-list and tail links are all updated.",
+          "vi": "Head, free-list và link tail đều được cập nhật."
+        },
+        {
+          "en": "Logical output is independent of physical order.",
+          "vi": "Output logic không phụ thuộc thứ tự vật lý."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Searching for a predecessor of the head.",
+          "vi": "Tìm predecessor của head."
+        },
+        {
+          "en": "Forgetting to set the appended node's Next to -1.",
+          "vi": "Quên đặt Next của node append thành -1."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which pointer identifies the list immediately after deleting the old head?",
+        "vi": "Pointer nào xác định list ngay sau khi xóa head cũ?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "book-t13",
+        "teacher-t13"
+      ]
+    },
+    {
+      "id": "T13-P4",
+      "title": {
+        "en": "Handle an empty free list",
+        "vi": "Xử lý free list rỗng"
+      },
+      "prompt": {
+        "en": "FreePointer=-1 and the active list occupies every array slot. An insertion is requested after index2. Explain the correct behaviour and why writing any Data cell is unsafe.",
+        "vi": "FreePointer=-1 và list active chiếm mọi slot array. Có yêu cầu chèn sau index2. Giải thích hành vi đúng và vì sao ghi vào ô Data nào cũng không an toàn."
+      },
+      "working": [
+        {
+          "en": "Check FreePointer before reading a free index.",
+          "vi": "Kiểm FreePointer trước khi đọc index trống."
+        },
+        {
+          "en": "Preserve every active pointer when capacity is exhausted.",
+          "vi": "Giữ mọi pointer active khi hết capacity."
+        },
+        {
+          "en": "Return a defined failure result.",
+          "vi": "Trả kết quả thất bại đã định nghĩa."
+        }
+      ],
+      "answer": {
+        "en": "If FreePointer=-1, report or return `LIST FULL`/FALSE and perform no mutation. There is no available physical slot to pop. Overwriting an active Data cell would change an existing logical node, and changing one of its links could lose the rest of the chain.",
+        "vi": "Nếu FreePointer=-1, báo hoặc trả `LIST FULL`/FALSE và không mutation. Không có slot vật lý trống để pop. Ghi đè ô Data active sẽ đổi node logic hiện có và đổi link có thể làm mất phần còn lại của chuỗi."
+      },
+      "markGuidance": [
+        {
+          "en": "Failure is detected before mutation.",
+          "vi": "Phát hiện thất bại trước mutation."
+        },
+        {
+          "en": "The explanation distinguishes capacity from logical insertion position.",
+          "vi": "Giải thích phân biệt capacity với vị trí chèn logic."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Using -1 as an array index.",
+          "vi": "Dùng -1 làm array index."
+        },
+        {
+          "en": "Overwriting the node after which insertion was requested.",
+          "vi": "Ghi đè node đứng trước vị trí chèn."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which invariants remain unchanged after the rejected insertion?",
+        "vi": "Invariant nào giữ nguyên sau insertion bị từ chối?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t13",
+        "book-t13"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Array row order is list order.",
+        "vi": "Thứ tự hàng array là thứ tự list."
+      },
+      "correction": {
+        "en": "Start/Next define logical order.",
+        "vi": "Start/Next định nghĩa thứ tự logic."
+      },
+      "selfCheck": {
+        "en": "What does Start point to?",
+        "vi": "Start chỉ đâu?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Overwrite a link before saving it.",
+        "vi": "Ghi đè link trước khi lưu."
+      },
+      "correction": {
+        "en": "Store the old successor/free link first.",
+        "vi": "Lưu successor/link free cũ trước."
+      },
+      "selfCheck": {
+        "en": "Which chain would be lost?",
+        "vi": "Chain nào sẽ mất?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "A node can be live and free.",
+        "vi": "Node có thể vừa live vừa free."
+      },
+      "correction": {
+        "en": "Chains must be disjoint.",
+        "vi": "Hai chain phải không chồng."
+      },
+      "selfCheck": {
+        "en": "Does any index appear twice?",
+        "vi": "Có chỉ số nào xuất hiện hai lần không?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Rebuild the method from memory.",
+      "vi": "Dựng lại phương pháp từ trí nhớ."
+    },
+    "answerPoints": [
+      {
+        "en": "Write Start, Free and null convention.",
+        "vi": "Viết quy ước Start, Free và null."
+      },
+      {
+        "en": "Follow links, never row order.",
+        "vi": "Theo link, không theo thứ tự hàng."
+      },
+      {
+        "en": "Save the old link before overwriting.",
+        "vi": "Lưu link cũ trước khi ghi đè."
+      },
+      {
+        "en": "Audit every slot: live, free or intentionally unused.",
+        "vi": "Kiểm mọi ô: live, free hoặc chưa dùng có chủ ý."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Logical order follows links.",
+      "vi": "Thứ tự logic theo link."
+    },
+    {
+      "en": "Pointer update order preserves reachability.",
+      "vi": "Thứ tự cập nhật pointer giữ khả năng tới node."
+    },
+    {
+      "en": "Live and free chains must be disjoint and complete.",
+      "vi": "Live/free chain phải không chồng và đầy đủ."
+    },
+    {
+      "en": "Deletion must reconnect the logical chain before the physical slot joins the free chain.",
+      "vi": "Xóa phải nối lại chuỗi logic trước khi slot vật lý vào free chain."
+    },
+    {
+      "en": "A slot belongs to exactly one of the active or free chains.",
+      "vi": "Một slot thuộc đúng một trong chuỗi active hoặc free."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F08",
+      "role": "related",
+      "title": {
+        "en": "ADT state and pointer",
+        "vi": "Trạng thái và pointer ADT"
+      }
+    },
+    {
+      "id": "F12",
+      "role": "related",
+      "title": {
+        "en": "Trace and debug pointers",
+        "vi": "Trace và debug pointer"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "records",
+    "arrays",
+    "adt-stack",
+    "queue"
+  ],
+  "sources": [
+    {
+      "id": "s26",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "Subject content pp27–29, §§9.2–10.4.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "guide-2026",
+      "title": "Cambridge 9618 Pseudocode Guide for Teachers, examinations in 2026",
+      "locator": "Relevant notation in §§1–9; local extracted copy checked 2026-10-02.",
+      "kind": "guide"
+    },
+    {
+      "id": "book-t13",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "Printed pp250–259; PDF pp266–275. Known pointer errors on printed pp256–258 are not copied; original invariant-checked fixtures used.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-t13",
+      "title": "9618/22 May/June 2025 Question 6",
+      "locator": "QP pp12–13 and published MS pp15–16: linked-list Place/insertion source mapping. Used as topic/adaptation evidence; no official mark allocation reproduced.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "teacher-t13",
+      "title": "AlgoCore teacher-created T13 lesson set",
+      "locator": "T13-academic-r2, 2026-10-02; original fixtures and provisional mark guidance.",
+      "kind": "teacher-authored"
+    },
+    {
+      "id": "qp-t13-s25-23-q2b",
+      "title": "9618/23 May/June 2025 Question 2(b)",
+      "locator": "QP p6 and published MS p8: complete linked-list Data/Pointer representation and identify the first node.",
+      "kind": "question-paper"
+    }
+  ]
+}

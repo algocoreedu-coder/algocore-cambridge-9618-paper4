@@ -1,0 +1,541 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "topicId": "P3-13.2-T01",
+  "slug": "organisation-versus-access",
+  "title": {
+    "en": "Organisation versus access",
+    "vi": "Tổ chức tệp và cách truy cập"
+  },
+  "question": {
+    "en": "Does the order of stored records determine every way we can read them?",
+    "vi": "Thứ tự lưu bản ghi có quyết định mọi cách đọc chúng không?"
+  },
+  "opening": {
+    "en": "A club receives member records in the order 25, 12, 31, 18. Storing that arrival order is useful for a log. Keeping the same records in key order helps process all members in order. Locating one member directly is a third need. Separate the layout of the file from the operation used to access it.",
+    "vi": "Câu lạc bộ nhận bản ghi thành viên theo thứ tự 25, 12, 31, 18. Giữ thứ tự đến phù hợp nhật ký. Lưu các bản ghi đó theo khóa giúp xử lý thành viên có thứ tự. Tìm trực tiếp một thành viên là nhu cầu thứ ba. Hãy tách cách bố trí tệp khỏi thao tác truy cập."
+  },
+  "objectives": [
+    {
+      "en": "Distinguish serial, sequential and random organisation.",
+      "vi": "Phân biệt tổ chức serial, sequential và random."
+    },
+    {
+      "en": "Trace sequential access and explain when an unsuccessful scan may stop early.",
+      "vi": "Trace truy cập tuần tự và giải thích khi nào tìm không thấy được phép dừng sớm."
+    },
+    {
+      "en": "Explain how an index or calculated address supports direct access.",
+      "vi": "Giải thích cách chỉ mục hoặc địa chỉ tính toán hỗ trợ truy cập trực tiếp."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "A record groups fields; a key identifies the required record.",
+      "vi": "Record gom các trường; khóa xác định bản ghi cần tìm."
+    },
+    {
+      "en": "Comparing integer keys and tracing a loop.",
+      "vi": "So sánh khóa số nguyên và trace vòng lặp."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Organisation",
+      "meaning": {
+        "en": "The rule for arranging records in a file.",
+        "vi": "Quy tắc bố trí bản ghi trong tệp."
+      }
+    },
+    {
+      "term": "Serial",
+      "meaning": {
+        "en": "Records are stored in the order received.",
+        "vi": "Bản ghi được lưu theo thứ tự nhận."
+      }
+    },
+    {
+      "term": "Sequential organisation",
+      "meaning": {
+        "en": "Records are maintained in order of a specified key.",
+        "vi": "Bản ghi được duy trì theo thứ tự của khóa xác định."
+      }
+    },
+    {
+      "term": "Direct access",
+      "meaning": {
+        "en": "Locating a requested record using its address, rather than reading every preceding record.",
+        "vi": "Định vị bản ghi qua địa chỉ thay vì đọc mọi bản ghi đứng trước."
+      }
+    },
+    {
+      "term": "Index",
+      "meaning": {
+        "en": "A separate mapping that helps locate records from their keys.",
+        "vi": "Ánh xạ riêng giúp định vị bản ghi từ khóa."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "layout",
+      "title": {
+        "en": "First describe storage order",
+        "vi": "Trước hết mô tả thứ tự lưu"
+      },
+      "paragraphs": [
+        {
+          "en": "Serial organisation preserves arrival order: 25,12,31,18 in this example. It suits append-oriented logs because a new record can be added at the end. The keys are not sorted, so a large key near the beginning says nothing about the later keys.",
+          "vi": "Tổ chức serial giữ thứ tự đến: 25,12,31,18 trong ví dụ. Nó phù hợp nhật ký thường thêm cuối vì bản ghi mới có thể đặt ở cuối. Khóa không được sắp nên khóa lớn ở đầu không nói gì về các khóa phía sau."
+        },
+        {
+          "en": "Sequential organisation maintains a chosen key order, here 12,18,25,31. Reading the file in that order can suit batch processing. Inserting key 22 must preserve the ordering: the resulting sequence is 12,18,22,25,31. Maintaining that arrangement may require rewriting or reorganising records; it is not a cost-free append.",
+          "vi": "Tổ chức sequential duy trì thứ tự khóa, ở đây là 12,18,25,31. Đọc theo thứ tự đó phù hợp xử lý theo lô. Thêm khóa 22 phải giữ thứ tự: dãy mới là 12,18,22,25,31. Duy trì bố trí có thể cần ghi lại hoặc tổ chức lại bản ghi; không đơn giản là thêm cuối không tốn chi phí."
+        },
+        {
+          "en": "Random organisation means a key is used to determine where a record is stored, often through hashing. It does not mean shuffling the records unpredictably. If two keys select the same location, an explicit collision policy is needed.",
+          "vi": "Tổ chức random dùng khóa để xác định nơi lưu bản ghi, thường qua hashing. Nó không có nghĩa xáo bản ghi tùy tiện. Nếu hai khóa chọn cùng vị trí, cần quy tắc xử lý va chạm rõ ràng."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "access",
+      "title": {
+        "en": "Then describe how records are reached",
+        "vi": "Sau đó mô tả cách đến bản ghi"
+      },
+      "paragraphs": [
+        {
+          "en": "Sequential access examines records one after another. It can be used on both serial and sequentially organised files. With an unsorted serial file, an unsuccessful search must reach the end. With ascending keys, a search may stop at the first key greater than the target, because every later key is at least as large.",
+          "vi": "Truy cập tuần tự xét lần lượt từng bản ghi. Có thể dùng cho tệp tổ chức serial lẫn sequential. Trong tệp serial không sắp, tìm không thấy phải đi tới cuối. Với khóa tăng dần, có thể dừng tại khóa đầu tiên lớn hơn khóa cần tìm vì mọi khóa sau đều không nhỏ hơn."
+        },
+        {
+          "en": "Direct access uses a known or calculated location. A sequentially organised file can also support direct access through an index that maps keys to record locations. The sorted arrangement alone does not magically supply the address: describe the index or addressing mechanism. A random file commonly calculates a home location from the key, then checks the stored key and any collision route.",
+          "vi": "Truy cập trực tiếp dùng vị trí biết trước hoặc tính được. Tệp tổ chức sequential cũng có thể hỗ trợ truy cập trực tiếp qua chỉ mục ánh xạ khóa tới vị trí. Chỉ sắp thứ tự chưa tự cung cấp địa chỉ: cần nêu chỉ mục hay cơ chế định địa chỉ. Tệp random thường tính vị trí gốc từ khóa rồi kiểm khóa được lưu và đường xử lý va chạm."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    },
+    {
+      "id": "choose",
+      "title": {
+        "en": "Choose from the workload, not a label",
+        "vi": "Chọn theo công việc cần làm"
+      },
+      "paragraphs": [
+        {
+          "en": "If the task is to append a time-ordered event log and later read all events, serial organisation is a natural candidate. If the task processes every account in account-number order, sequential organisation is useful. If individual records are repeatedly requested by key, direct access can avoid a complete scan, but its index or hash table has storage and maintenance costs.",
+          "vi": "Nếu cần thêm nhật ký sự kiện theo thời gian rồi đọc mọi sự kiện, serial là lựa chọn tự nhiên. Nếu xử lý mọi tài khoản theo mã tài khoản, sequential hữu ích. Nếu thường xuyên yêu cầu riêng từng bản ghi theo khóa, truy cập trực tiếp có thể tránh quét hết, nhưng chỉ mục hay bảng hash có chi phí lưu và duy trì."
+        },
+        {
+          "en": "A justified answer names the required operation, the organisation or access method, and the reason they fit. Do not claim that random access always needs exactly one read: collisions and storage details can add work. Likewise, sequential organisation does not forbid every form of direct access.",
+          "vi": "Đáp án có lý do cần nêu thao tác cần làm, cách tổ chức hoặc truy cập, và vì sao phù hợp. Không nói truy cập random luôn chỉ đọc một lần: va chạm và chi tiết lưu trữ có thể thêm công việc. Tương tự, tổ chức sequential không cấm mọi dạng truy cập trực tiếp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus",
+        "book"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "file-organisation",
+    "title": {
+      "en": "Same records, different journeys",
+      "vi": "Cùng bản ghi, các đường truy cập khác nhau"
+    },
+    "introduction": {
+      "en": "Compare storage order and the access path separately. A read marker shows what the current search has actually inspected.",
+      "vi": "So sánh riêng thứ tự lưu và đường truy cập. Dấu đọc cho biết tìm kiếm hiện tại đã thật sự xét gì."
+    },
+    "task": {
+      "en": "Find key 20 in the serial and sequential layouts. Predict why the sorted search stops at 25 while the serial scan must continue.",
+      "vi": "Tìm khóa 20 trong bố trí serial và sequential. Dự đoán vì sao tìm trên dãy có thứ tự dừng tại 25 còn quét serial phải tiếp tục."
+    },
+    "conventions": [
+      {
+        "en": "Keys arrive as 25,12,31,18 and are unique.",
+        "vi": "Khóa đến theo thứ tự 25,12,31,18 và không trùng nhau."
+      },
+      {
+        "en": "Sequential organisation uses ascending key order. Direct access to a sequential file needs an index or equivalent location mechanism.",
+        "vi": "Tổ chức sequential dùng khóa tăng dần. Truy cập trực tiếp tệp sequential cần chỉ mục hoặc cơ chế vị trí tương đương."
+      },
+      {
+        "en": "The random layout uses key MOD 7 and linear probing; indices 0..6 are logical slots, not byte addresses.",
+        "vi": "Bố trí random dùng key MOD 7 và dò tuyến tính; chỉ số 0..6 là ô logic, không phải địa chỉ byte."
+      }
+    ],
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Find a missing key without an invalid shortcut",
+      "vi": "Tìm khóa vắng mặt mà không dừng sai"
+    },
+    "prompt": {
+      "en": "Seek key 20 in records that arrived as 25,12,31,18. Compare a serial scan with a sequentially organised ascending scan.",
+      "vi": "Tìm khóa 20 trong bản ghi đến theo thứ tự 25,12,31,18. So sánh quét serial với quét tệp sequential tăng dần."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "layouts",
+        "action": {
+          "en": "Write both storage orders.",
+          "vi": "Viết cả hai thứ tự lưu."
+        },
+        "why": {
+          "en": "An early-stop rule depends on whether order is guaranteed.",
+          "vi": "Quy tắc dừng sớm phụ thuộc việc thứ tự có được đảm bảo hay không."
+        },
+        "result": {
+          "en": "Serial:25,12,31,18. Sequential:12,18,25,31.",
+          "vi": "Serial:25,12,31,18. Sequential:12,18,25,31."
+        },
+        "check": {
+          "en": "The same four records appear once in each layout.",
+          "vi": "Cùng bốn bản ghi xuất hiện đúng một lần ở mỗi bố trí."
+        }
+      },
+      {
+        "id": "serial",
+        "action": {
+          "en": "Compare 20 with every serial record.",
+          "vi": "So sánh 20 với từng bản ghi serial."
+        },
+        "why": {
+          "en": "Seeing 25 first does not rule out 20 later in an unsorted file.",
+          "vi": "Gặp 25 đầu tiên không loại được 20 ở phía sau tệp chưa sắp."
+        },
+        "result": {
+          "en": "Read 25→12→31→18, then reach the end: not found.",
+          "vi": "Đọc 25→12→31→18 rồi hết tệp: không tìm thấy."
+        },
+        "check": {
+          "en": "Do not stop at the first key larger than 20.",
+          "vi": "Không dừng tại khóa đầu lớn hơn 20."
+        }
+      },
+      {
+        "id": "sorted",
+        "action": {
+          "en": "Scan ascending keys until the decision is certain.",
+          "vi": "Quét khóa tăng dần tới khi kết luận chắc chắn."
+        },
+        "why": {
+          "en": "After 12 and 18, the next key 25 is already greater than 20.",
+          "vi": "Sau 12 và 18, khóa tiếp 25 đã lớn hơn 20."
+        },
+        "result": {
+          "en": "Read 12→18→25; stop not found without reading 31.",
+          "vi": "Đọc 12→18→25; dừng không tìm thấy mà không cần đọc 31."
+        },
+        "check": {
+          "en": "The stopping reason is sorted order, not simply three reads.",
+          "vi": "Lý do dừng là thứ tự khóa, không phải cứ đọc ba lần."
+        }
+      },
+      {
+        "id": "explain",
+        "action": {
+          "en": "State the assumption that made the shortcut valid.",
+          "vi": "Nêu giả thiết làm cách dừng sớm hợp lệ."
+        },
+        "why": {
+          "en": "A correct method must be valid for every file satisfying its assumptions.",
+          "vi": "Phương pháp đúng phải hợp lệ cho mọi tệp thỏa giả thiết."
+        },
+        "result": {
+          "en": "Later keys cannot be 20 because the sequential file is ascending.",
+          "vi": "Khóa phía sau không thể là 20 vì tệp sequential tăng dần."
+        },
+        "check": {
+          "en": "If the ordering guarantee is removed, use the serial stopping rule.",
+          "vi": "Nếu bỏ đảm bảo thứ tự, phải dùng quy tắc dừng của serial."
+        }
+      }
+    ],
+    "result": {
+      "en": "Both searches correctly report missing 20; their read paths differ because of storage order.",
+      "vi": "Cả hai tìm kiếm đều báo đúng là thiếu 20; đường đọc khác nhau vì thứ tự lưu khác."
+    },
+    "selfCheck": {
+      "en": "Now seek 18. Trace comparisons rather than reusing the missing-key result.",
+      "vi": "Bây giờ tìm 18. Trace các phép so sánh thay vì dùng lại kết quả tìm khóa vắng mặt."
+    },
+    "sourceIds": [
+      "syllabus",
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "A task asks how records are arranged, inserted or kept in key order.",
+        "vi": "Đề hỏi cách bố trí, thêm bản ghi hoặc giữ thứ tự khóa."
+      },
+      {
+        "en": "A task asks how a requested record is reached or which records are read.",
+        "vi": "Đề hỏi cách đến bản ghi cần tìm hoặc những bản ghi nào được đọc."
+      }
+    ],
+    "distinguish": {
+      "en": "Serial versus sequential describes organisation here; sequential versus direct describes access. The same word can appear in different roles.",
+      "vi": "Ở đây serial và sequential mô tả tổ chức; sequential và direct mô tả truy cập. Cùng một từ có thể xuất hiện ở vai trò khác nhau."
+    },
+    "method": [
+      {
+        "en": "Identify the key and storage-order guarantee.",
+        "vi": "Xác định khóa và đảm bảo thứ tự lưu."
+      },
+      {
+        "en": "Name the access method and any supporting index or hash.",
+        "vi": "Nêu cách truy cập và chỉ mục hay hash hỗ trợ."
+      },
+      {
+        "en": "Trace the actual comparisons, then justify success or the stopping condition.",
+        "vi": "Trace so sánh thực tế rồi giải thích tìm thấy hoặc điều kiện dừng."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "“Random organisation means random shuffle.”",
+        "vi": "“Tổ chức random là xáo ngẫu nhiên.”"
+      },
+      "correction": {
+        "en": "A repeatable key-to-location rule is used; collisions need a policy.",
+        "vi": "Dùng quy tắc khóa-vị trí lặp lại được; va chạm cần chính sách."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“A serial scan can stop when a key exceeds the target.”",
+        "vi": "“Quét serial có thể dừng khi khóa vượt khóa tìm.”"
+      },
+      "correction": {
+        "en": "That shortcut requires ordered keys; an unsorted later record could still match.",
+        "vi": "Cách dừng đó cần khóa có thứ tự; bản ghi sau trong tệp chưa sắp vẫn có thể khớp."
+      }
+    },
+    {
+      "mistake": {
+        "en": "“Sequential organisation permits only sequential access.”",
+        "vi": "“Tổ chức sequential chỉ cho truy cập tuần tự.”"
+      },
+      "correction": {
+        "en": "An index can support direct access while records remain in key order.",
+        "vi": "Chỉ mục có thể hỗ trợ truy cập trực tiếp trong khi bản ghi vẫn theo thứ tự khóa."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "serial-stop",
+      "prompt": {
+        "en": "An unsorted serial file starts with key 40. You seek 20. What can you conclude?",
+        "vi": "Tệp serial chưa sắp bắt đầu bằng khóa 40. Bạn tìm 20. Kết luận nào đúng?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "20 is absent.",
+            "vi": "Không có 20."
+          },
+          "feedback": {
+            "en": "A later unsorted record could still have key 20.",
+            "vi": "Bản ghi phía sau chưa sắp vẫn có thể có khóa 20."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Keep scanning unless a match or the end is reached.",
+            "vi": "Tiếp tục quét tới khi khớp hoặc hết tệp."
+          },
+          "feedback": {
+            "en": "Correct. No ordering guarantee supports an earlier negative conclusion.",
+            "vi": "Đúng. Không có đảm bảo thứ tự để kết luận vắng mặt sớm."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "40 must be a collision.",
+            "vi": "40 chắc chắn là va chạm."
+          },
+          "feedback": {
+            "en": "A comparison in a scan does not establish a hashing collision.",
+            "vi": "So sánh khi quét không chứng minh va chạm hash."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "The data organisation determines which stopping assumptions are available.",
+        "vi": "Cách tổ chức dữ liệu quyết định giả thiết dừng nào có thể dùng."
+      }
+    },
+    {
+      "id": "sorted-insert",
+      "prompt": {
+        "en": "Where must 22 appear in ascending 12,18,25,31 after insertion?",
+        "vi": "Sau khi chèn,22 phải ở đâu trong dãy tăng 12,18,25,31?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "At the end, after 31.",
+            "vi": "Ở cuối, sau 31."
+          },
+          "feedback": {
+            "en": "That would break ascending key order.",
+            "vi": "Vị trí đó phá thứ tự khóa tăng."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Between 18 and 25.",
+            "vi": "Giữa 18 và 25."
+          },
+          "feedback": {
+            "en": "Correct. Both neighbouring comparisons preserve ascending order.",
+            "vi": "Đúng. So sánh với hai hàng xóm đều giữ thứ tự tăng."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "At a randomly chosen location.",
+            "vi": "Vị trí chọn ngẫu nhiên."
+          },
+          "feedback": {
+            "en": "Sequential organisation is defined by key order, not arbitrary placement.",
+            "vi": "Tổ chức sequential dựa vào thứ tự khóa, không phải vị trí tùy ý."
+          }
+        }
+      ],
+      "correctChoiceId": "2",
+      "explanation": {
+        "en": "Describe any required reorganisation rather than assuming an append is sufficient.",
+        "vi": "Nêu việc tổ chức lại cần có, không giả định thêm cuối là đủ."
+      }
+    },
+    {
+      "id": "index",
+      "prompt": {
+        "en": "Which statement correctly relates organisation and access?",
+        "vi": "Phát biểu nào liên hệ đúng tổ chức và truy cập?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "1",
+          "label": {
+            "en": "An index can locate a record directly in a sequentially organised file.",
+            "vi": "Chỉ mục có thể định vị trực tiếp bản ghi trong tệp tổ chức sequential."
+          },
+          "feedback": {
+            "en": "Correct. The index supplies a location while the file retains key order.",
+            "vi": "Đúng. Chỉ mục cung cấp vị trí trong khi tệp giữ thứ tự khóa."
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "Every direct lookup reads exactly one record in every system.",
+            "vi": "Mọi tìm trực tiếp đều đọc đúng một bản ghi trong mọi hệ thống."
+          },
+          "feedback": {
+            "en": "Collisions and supporting structures can require additional work.",
+            "vi": "Va chạm và cấu trúc hỗ trợ có thể đòi thêm công việc."
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "Sorting records automatically reveals every byte address.",
+            "vi": "Sắp bản ghi tự tiết lộ mọi địa chỉ byte."
+          },
+          "feedback": {
+            "en": "Order alone is not a key-to-address mapping.",
+            "vi": "Chỉ có thứ tự chưa tạo ánh xạ khóa-địa chỉ."
+          }
+        }
+      ],
+      "correctChoiceId": "1",
+      "explanation": {
+        "en": "Keep layout and the mechanism that reaches a record distinct.",
+        "vi": "Tách bố trí khỏi cơ chế đến bản ghi."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain serial, sequential and random organisation, then distinguish sequential and direct access.",
+      "vi": "Giải thích tổ chức serial, sequential, random rồi phân biệt truy cập tuần tự và trực tiếp."
+    },
+    "answerPoints": [
+      {
+        "en": "Organisation describes placement; access describes how records are reached.",
+        "vi": "Tổ chức mô tả vị trí; truy cập mô tả cách đến bản ghi."
+      },
+      {
+        "en": "Sorted scans may stop beyond the target; serial scans cannot use that rule.",
+        "vi": "Quét đã sắp có thể dừng khi vượt khóa; quét serial không được dùng quy tắc đó."
+      },
+      {
+        "en": "Direct access needs an address mechanism such as an index or hash.",
+        "vi": "Truy cập trực tiếp cần cơ chế địa chỉ như chỉ mục hoặc hash."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "State both the workload and the mechanism when justifying a file design.",
+      "vi": "Nêu cả công việc và cơ chế khi giải thích thiết kế tệp."
+    },
+    {
+      "en": "A stopping rule is valid only under its ordering assumptions.",
+      "vi": "Quy tắc dừng chỉ hợp lệ khi thỏa giả thiết thứ tự."
+    }
+  ],
+  "relatedSlugs": [
+    "hashing-to-locate-records",
+    "collisions-and-retrieval",
+    "records-and-composite-models"
+  ],
+  "sources": [
+    {
+      "id": "syllabus",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus, 2026, Version 2",
+      "locator": "Section 13.2, p.32",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf#page=32"
+    },
+    {
+      "id": "book",
+      "title": "David Watson and Helen Williams, Cambridge International AS & A Level Computer Science, Hodder Education, 2019",
+      "locator": "Chapter 13, printed pp.308–310; examples independently checked",
+      "kind": "book"
+    }
+  ]
+}

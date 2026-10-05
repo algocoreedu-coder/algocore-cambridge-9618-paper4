@@ -1,0 +1,721 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.15.1",
+  "topicId": "P3-15.2-T05",
+  "slug": "karnaugh-maps",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Karnaugh maps",
+    "vi": "Bản đồ Karnaugh"
+  },
+  "question": {
+    "en": "Which changing inputs can a group eliminate while preserving every required1?",
+    "vi": "Nhóm ô loại được đầu vào thay đổi nào mà vẫn giữ mọi hàng1 cần thiết?"
+  },
+  "opening": {
+    "en": "A K-map reorganises a truth table so adjacent cells differ in one bit. Grouping suitable1s exposes variables that no longer matter and produces a simpler sum-of-products.",
+    "vi": "K-map sắp lại bảng chân trị để các ô kề nhau khác một bit. Nhóm các ô1 phù hợp cho thấy biến nào không còn ảnh hưởng và tạo tổng các tích đơn giản hơn."
+  },
+  "objectives": [
+    {
+      "en": "Place truth-table values correctly in two-, three- and four-variable Gray-code maps.",
+      "vi": "Đặt đúng giá trị bảng chân trị vào map Gray hai, ba, bốn biến."
+    },
+    {
+      "en": "Validate groups including edge wrapping, overlap and singleton cases.",
+      "vi": "Kiểm nhóm gồm nối mép, chồng lấp và ô đơn."
+    },
+    {
+      "en": "Derive constant literals and verify complete equivalent SOP coverage.",
+      "vi": "Suy literal không đổi và kiểm SOP tương đương phủ đủ."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Know binary row numbering, SOP and Boolean complement rules.",
+      "vi": "Biết đánh số hàng nhị phân, SOP và quy tắc bù Boolean."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Gray-code order",
+      "meaning": {
+        "en": "An ordering where adjacent labels differ in exactly one bit, including wrap adjacency used by the map.",
+        "vi": "Thứ tự có nhãn kề nhau khác đúng một bit, gồm kề nối mép của map."
+      }
+    },
+    {
+      "term": "Implicant group",
+      "meaning": {
+        "en": "A valid rectangular power-of-two set of1 cells whose constant bits define a product term.",
+        "vi": "Nhóm ô1 hình chữ nhật có kích thước lũy thừa hai; các bit không đổi xác định một tích."
+      }
+    },
+    {
+      "term": "Coverage",
+      "meaning": {
+        "en": "Every required1 cell belongs to at least one selected valid group.",
+        "vi": "Mọi ô1 cần thiết thuộc ít nhất một nhóm hợp lệ được chọn."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "map-from-table",
+      "title": {
+        "en": "Place values by labels, not visual counting",
+        "vi": "Đặt giá trị theo nhãn, không đếm ô theo mắt"
+      },
+      "paragraphs": [
+        {
+          "en": "A K-map contains the same outputs as the truth table, rearranged. For three variables here, rows are A=0,1 and columns BC=00,01,11,10. For four variables, rows AB and columns CD both use00,01,11,10. The order11 before10 is deliberate, not a printing error.",
+          "vi": "K-map chứa cùng đầu ra bảng chân trị nhưng sắp lại. Với ba biến ở đây, hàng A=0,1 và cột BC=00,01,11,10. Với bốn biến, cả hàng AB lẫn cột CD dùng00,01,11,10. Thứ tự11 trước10 là cố ý, không phải lỗi in."
+        },
+        {
+          "en": "To place minterm6 in the three-variable map, write6 as110: A=1 and BC=10, so use the second row and last column. Do not put it in a cell merely because that cell is sixth in a visual scan. A misplaced1 changes the function before grouping even begins.",
+          "vi": "Để đặt minterm6 ở map ba biến, viết6 thành110: A=1, BC=10 nên chọn hàng thứ hai và cột cuối. Không đặt chỉ vì ô là ô thứ sáu khi nhìn quét. Đặt sai một ô1 đã đổi hàm trước khi bắt đầu nhóm."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "valid-groups",
+      "title": {
+        "en": "Use rectangles of size2^k",
+        "vi": "Dùng hình chữ nhật kích thước2^k"
+      },
+      "paragraphs": [
+        {
+          "en": "For a sum-of-products map without don’t-care entries, every cell in a selected group must contain1. Groups are axis-aligned rectangles on the map and have1,2,4,8 or16 cells as the map permits. A group of6 is invalid: the number must be a power of two, not simply even. Diagonal pairs and arbitrary bent shapes are not valid groups.",
+          "vi": "Với map tổng các tích không có ô don’t-care, mọi ô trong nhóm được chọn phải là1. Nhóm là hình chữ nhật theo hàng/cột và có1,2,4,8 hoặc16 ô tùy map. Nhóm6 không hợp lệ: số ô phải là lũy thừa hai, không chỉ số chẵn. Cặp chéo và hình gấp khúc tùy ý không hợp lệ."
+        },
+        {
+          "en": "Prefer larger valid groups when they remove more literals, but also ensure all1s are covered. A singleton is allowed when it cannot join a larger valid group. Re-selecting the same cell twice does not make a two-cell group. These rules are justified by Boolean cancellation, not by a visual pattern alone.",
+          "vi": "Ưu tiên nhóm lớn hợp lệ khi loại được nhiều literal hơn, nhưng vẫn phải phủ mọi ô1. Ô đơn được phép nếu không ghép được nhóm hợp lệ lớn hơn. Chọn cùng ô hai lần không tạo nhóm hai ô. Quy tắc dựa trên khử biến Boolean, không chỉ hình thức."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "wrap-and-overlap",
+      "title": {
+        "en": "Join edges and reuse useful cells",
+        "vi": "Nối mép và dùng lại ô hữu ích"
+      },
+      "paragraphs": [
+        {
+          "en": "The first and last Gray-code columns are adjacent; the first and last rows of a four-variable map are also adjacent. A group may wrap across those edges. The four corner cells form a valid wrapped2×2 group when all contain1. The page is flat, but the adjacency behaves like a surface joined at opposite edges.",
+          "vi": "Cột Gray đầu và cuối kề nhau; hàng đầu/cuối của map bốn biến cũng kề nhau. Nhóm có thể nối qua các mép đó. Bốn ô góc tạo nhóm2×2 nối mép hợp lệ nếu đều1. Trang giấy phẳng nhưng quan hệ kề như bề mặt nối hai mép đối diện."
+        },
+        {
+          "en": "Groups may overlap. In the majority example, groups[3,7],[5,7],[6,7] all use cell7, giving BC,AC,AB. Reusing cell7 in different valid groups does not add its output numerically: OR remains1. Overlap is useful when it lets each required1 belong to an appropriate larger group.",
+          "vi": "Các nhóm được chồng lấp. Trong ví dụ đa số, nhóm[3,7],[5,7],[6,7] đều dùng ô7, cho BC,AC,AB. Dùng lại ô7 trong các nhóm hợp lệ không cộng đầu ra theo số học: OR vẫn1. Chồng lấp hữu ích khi giúp mỗi ô1 thuộc nhóm lớn phù hợp."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "constant-literals",
+      "title": {
+        "en": "Keep only variables that remain constant",
+        "vi": "Chỉ giữ biến không đổi"
+      },
+      "paragraphs": [
+        {
+          "en": "Write the full bit labels of every cell in a group. Retain each variable that has the same value throughout: constant1 gives the normal literal, constant0 gives its NOT. Remove variables that change. In[3,7]=[011,111], A changes while B=C=1, so the term is B AND C.",
+          "vi": "Viết đủ nhãn bit của mọi ô trong nhóm. Giữ biến có cùng giá trị ở cả nhóm: luôn1 dùng literal thường, luôn0 dùng NOT. Bỏ biến thay đổi. Với[3,7]=[011,111], A đổi còn B=C=1 nên tích là B AND C."
+        },
+        {
+          "en": "For corner cells[0,2,8,10]=[0000,0010,1000,1010], A and C vary while B=D=0. The term is NOT B AND NOT D. A group of2^k cells eliminates k independent changing variables. If a proposed term covers additional0 cells, either the group or the literal derivation is wrong.",
+          "vi": "Với các góc[0,2,8,10]=[0000,0010,1000,1010], A/C đổi còn B=D=0. Tích là NOT B AND NOT D. Nhóm2^k ô loại k biến độc lập thay đổi. Nếu tích đề xuất phủ thêm ô0, nhóm hoặc cách suy literal đã sai."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "coverage-and-sop",
+      "title": {
+        "en": "Combine groups and check the whole function",
+        "vi": "Gộp nhóm và kiểm toàn hàm"
+      },
+      "paragraphs": [
+        {
+          "en": "OR the product term from every selected group. Then check two conditions: every original1 is covered, and no original0 is covered. A valid group alone does not mean the map is complete. An optimal cover may have more than one acceptable set of groups; every accepted answer must represent the required function and meet the requested form.",
+          "vi": "OR tích của từng nhóm được chọn. Sau đó kiểm hai điều: mọi ô1 gốc được phủ, không ô0 gốc nào bị phủ. Một nhóm hợp lệ chưa nghĩa map đã hoàn tất. Có thể có hơn một cách nhóm tối ưu chấp nhận được; mọi đáp án phải biểu diễn hàm yêu cầu và đúng dạng đề hỏi."
+        },
+        {
+          "en": "For the majority map with1s at3,5,6,7, BC OR AC OR AB is a complete SOP. Each pair is necessary for at least one of3,5,6. For an all-zero map the function is0; an all-one map can form one full-map group giving1. The current presets contain no don’t-care cells.",
+          "vi": "Với map đa số có1 ở3,5,6,7, BC OR AC OR AB là SOP đầy đủ. Mỗi cặp cần cho ít nhất một ô3,5,6. Map toàn0 cho hàm0; map toàn1 có thể nhóm toàn map cho1. Các mẫu hiện tại không có ô don’t-care."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "syllabus-2026"
+      ]
+    },
+    {
+      "id": "benefit-and-exam-method",
+      "title": {
+        "en": "Use the map to make simplification inspectable",
+        "vi": "Dùng map để nhìn rõ việc rút gọn"
+      },
+      "paragraphs": [
+        {
+          "en": "The map makes adjacency, cancellation and remaining coverage visible, often making a small Boolean simplification easier to inspect than a long algebraic chain. It can lead to fewer literals and a simpler circuit. It is not a proof of an exact speed or power saving, and large-variable maps become harder to handle visually.",
+          "vi": "Map làm rõ kề nhau, khử biến và phần chưa phủ, thường giúp kiểm rút gọn Boolean nhỏ dễ hơn chuỗi đại số dài. Nó có thể giảm literal và làm mạch đơn giản hơn. Không chứng minh mức tăng tốc hay giảm điện chính xác; map nhiều biến lớn sẽ khó nhìn hơn."
+        },
+        {
+          "en": "October/November2025 Paper33 question6(a) asks for groups and a simplified SOP, explicitly limiting further simplification. Follow such form instructions: show the groups, derive a term from each, OR them and verify the table. Do not replace the requested grouped SOP with an unrelated final form.",
+          "vi": "October/November2025 Paper33 câu6(a) yêu cầu nhóm và SOP rút gọn, nêu rõ giới hạn rút gọn tiếp. Tuân thủ dạng ấy: vẽ nhóm, suy tích từng nhóm, OR rồi kiểm bảng. Không thay SOP theo nhóm được hỏi bằng dạng cuối khác."
+        }
+      ],
+      "sourceIds": [
+        "book",
+        "past-qp",
+        "past-ms"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "karnaugh-map",
+    "title": {
+      "en": "Select cells, justify a group, verify the SOP",
+      "vi": "Chọn ô, giải thích nhóm, kiểm SOP"
+    },
+    "introduction": {
+      "en": "Use the two-, three- or four-variable map. Select cells, validate the shape and values, then inspect constant literals and complete coverage.",
+      "vi": "Dùng map hai, ba hoặc bốn biến. Chọn ô, kiểm hình và giá trị rồi xem literal không đổi cùng độ phủ đầy đủ."
+    },
+    "task": {
+      "en": "Try a valid wrap group and an invalid diagonal or six-cell group. Explain why each is accepted or rejected.",
+      "vi": "Thử nhóm nối mép hợp lệ và nhóm chéo hoặc sáu ô sai. Giải thích vì sao được nhận hay bị từ chối."
+    },
+    "conventions": [
+      {
+        "en": "Cells are identified by the binary minterm number with A most significant.",
+        "vi": "Ô được định danh bằng số minterm nhị phân với A là bit cao nhất."
+      },
+      {
+        "en": "Gray labels determine adjacency; opposite edges can join.",
+        "vi": "Nhãn Gray quyết định kề nhau; mép đối diện có thể nối."
+      },
+      {
+        "en": "Only1s may be grouped; size must be2^k, rectangles may wrap and groups may overlap.",
+        "vi": "Chỉ nhóm ô1; kích thước2^k, hình chữ nhật có thể nối mép và các nhóm có thể chồng."
+      },
+      {
+        "en": "No don’t-care values are used. A valid group is not automatically a complete solution.",
+        "vi": "Không dùng don’t-care. Nhóm hợp lệ không tự động là lời giải đầy đủ."
+      }
+    ],
+    "sourceIds": [
+      "book",
+      "syllabus-2026"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Read the four corners as one group",
+      "vi": "Đọc bốn góc thành một nhóm"
+    },
+    "prompt": {
+      "en": "For a four-variable map with1 at minterms0,2,8,10 only, derive a simplified SOP.",
+      "vi": "Với map bốn biến chỉ có1 ở minterm0,2,8,10, suy SOP rút gọn."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "place-values",
+        "action": {
+          "en": "Use AB rows and CD columns in Gray order00,01,11,10. Place1 at0000,0010,1000,1010.",
+          "vi": "Dùng hàng AB/cột CD theo Gray00,01,11,10. Đặt1 tại0000,0010,1000,1010."
+        },
+        "why": {
+          "en": "Labels, not visual index, determine each cell.",
+          "vi": "Nhãn, không phải thứ tự nhìn, xác định ô."
+        },
+        "result": {
+          "en": "The four1s occupy the four corners.",
+          "vi": "Bốn ô1 nằm ở bốn góc."
+        }
+      },
+      {
+        "id": "select-group",
+        "action": {
+          "en": "Select all four corner cells.",
+          "vi": "Chọn cả bốn góc."
+        },
+        "why": {
+          "en": "Opposite row and column edges are adjacent in the Gray map.",
+          "vi": "Mép hàng/cột đối diện kề nhau trong map Gray."
+        },
+        "result": {
+          "en": "Selected minterms are0,2,8,10.",
+          "vi": "Minterm được chọn là0,2,8,10."
+        }
+      },
+      {
+        "id": "validate-group",
+        "action": {
+          "en": "Check distinct cells, four1s and wrapped rectangular shape.",
+          "vi": "Kiểm ô không trùng, bốn ô1 và hình chữ nhật nối mép."
+        },
+        "why": {
+          "en": "Four is2^2 and the corners form a toroidal2×2 rectangle.",
+          "vi": "Bốn bằng2^2 và các góc tạo chữ nhật2×2 nối mép."
+        },
+        "result": {
+          "en": "The group is valid.",
+          "vi": "Nhóm hợp lệ."
+        }
+      },
+      {
+        "id": "derive-term",
+        "action": {
+          "en": "Compare the bit labels across the group.",
+          "vi": "So nhãn bit trên cả nhóm."
+        },
+        "why": {
+          "en": "Keep constant variables and remove changing ones.",
+          "vi": "Giữ biến không đổi, bỏ biến thay đổi."
+        },
+        "result": {
+          "en": "B=0,D=0 stay constant; A,C vary. Term=NOT B AND NOT D.",
+          "vi": "B=0,D=0 không đổi; A/C thay đổi. Tích=NOT B AND NOT D."
+        }
+      },
+      {
+        "id": "combine-terms",
+        "action": {
+          "en": "Use the single group’s term as the SOP.",
+          "vi": "Dùng tích của nhóm duy nhất làm SOP."
+        },
+        "why": {
+          "en": "The group already covers every required1.",
+          "vi": "Nhóm đã phủ mọi ô1 cần thiết."
+        },
+        "result": {
+          "en": "Y=NOT B AND NOT D.",
+          "vi": "Y=NOT B AND NOT D."
+        }
+      },
+      {
+        "id": "verify-equivalence",
+        "action": {
+          "en": "Evaluate the result for all16 input combinations.",
+          "vi": "Tính kết quả trên đủ16 tổ hợp."
+        },
+        "why": {
+          "en": "No original1 may disappear and no original0 may become1.",
+          "vi": "Không ô1 gốc nào bị mất và không ô0 gốc nào thành1."
+        },
+        "result": {
+          "en": "The result is1 exactly at0,2,8,10; the functions agree.",
+          "vi": "Kết quả1 đúng tại0,2,8,10; hai hàm khớp."
+        }
+      }
+    ],
+    "result": {
+      "en": "A and C are eliminated; B and D remain complemented.",
+      "vi": "A/C bị loại; B/D giữ dưới dạng phủ định."
+    },
+    "selfCheck": {
+      "en": "Why would using B AND D select the opposite set of rows?",
+      "vi": "Vì sao dùng B AND D sẽ chọn tập hàng đối lập?"
+    },
+    "sourceIds": [
+      "book"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "Gray-coded axes and loops around1s identify K-map simplification.",
+        "vi": "Trục mã Gray và vòng quanh ô1 chỉ ra rút gọn K-map."
+      },
+      {
+        "en": "“Simplified sum-of-products” means derive a product from each valid group and OR them.",
+        "vi": "“Tổng các tích rút gọn” nghĩa suy tích từng nhóm hợp lệ rồi OR."
+      }
+    ],
+    "distinguish": {
+      "en": "Truth-table order is normally binary; K-map order uses Gray adjacency. Group size concerns cells, not how many loops are drawn. Algebraic factoring may change the requested SOP form.",
+      "vi": "Bảng chân trị thường theo nhị phân; map dùng kề Gray. Kích thước nhóm nói về số ô, không phải số vòng. Đặt chung đại số có thể làm đổi dạng SOP được yêu cầu."
+    },
+    "method": [
+      {
+        "en": "Copy axis variables and Gray labels exactly.",
+        "vi": "Chép đúng biến trên trục và nhãn Gray."
+      },
+      {
+        "en": "Map each input row to its cell.",
+        "vi": "Đưa từng hàng đầu vào vào đúng ô."
+      },
+      {
+        "en": "Choose large valid groups, allowing wraps and overlaps, until all1s are covered.",
+        "vi": "Chọn nhóm lớn hợp lệ, cho nối mép/chồng lấp, đến khi phủ mọi1."
+      },
+      {
+        "en": "Keep constant literals, OR the terms, then check every row.",
+        "vi": "Giữ literal không đổi, OR các tích rồi kiểm mọi hàng."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Any even number of1s is a valid group.",
+        "vi": "Mọi số chẵn ô1 đều là nhóm hợp lệ."
+      },
+      "correction": {
+        "en": "The count must be a power of two and the shape a valid rectangle; six is invalid.",
+        "vi": "Số ô phải là lũy thừa hai và hình là chữ nhật hợp lệ; sáu sai."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Diagonal cells are adjacent.",
+        "vi": "Ô chéo kề nhau."
+      },
+      "correction": {
+        "en": "Adjacency is horizontal/vertical including wraps, not diagonal.",
+        "vi": "Kề theo ngang/dọc gồm nối mép, không chéo."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A1 cell may be used only once.",
+        "vi": "Ô1 chỉ được dùng một lần."
+      },
+      "correction": {
+        "en": "Different groups may overlap; OR does not double-count a1.",
+        "vi": "Các nhóm khác nhau được chồng; OR không cộng đôi ô1."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Keep the variables that change inside a group.",
+        "vi": "Giữ biến thay đổi trong nhóm."
+      },
+      "correction": {
+        "en": "Changing variables are eliminated; constant variables define the product.",
+        "vi": "Biến thay đổi bị loại; biến không đổi xác định tích."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "gray-placement",
+      "prompt": {
+        "en": "In the three-variable map, where is minterm6=110?",
+        "vi": "Trong map ba biến, minterm6=110 ở đâu?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A=1,BC=10",
+            "vi": "A=1,BC=10"
+          },
+          "feedback": {
+            "en": "Correct: use the row/column bit labels.",
+            "vi": "Đúng: dùng nhãn bit hàng/cột."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A=1,BC=11",
+            "vi": "A=1,BC=11"
+          },
+          "feedback": {
+            "en": "That is minterm7, not6.",
+            "vi": "Đó là minterm7, không phải6."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Always the sixth cell in a left-to-right scan",
+            "vi": "Luôn là ô thứ sáu khi quét trái sang phải"
+          },
+          "feedback": {
+            "en": "Gray order changes the visual order of minterms.",
+            "vi": "Thứ tự Gray làm đổi thứ tự minterm khi nhìn."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Translate the complete binary input into the axis labels.",
+        "vi": "Đổi đầy đủ đầu vào nhị phân thành nhãn trục."
+      }
+    },
+    {
+      "id": "six-group",
+      "prompt": {
+        "en": "Can six adjacent1s be used as one K-map group?",
+        "vi": "Có thể dùng sáu ô1 kề nhau làm một nhóm không?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, because six is even",
+            "vi": "Có, vì sáu là số chẵn"
+          },
+          "feedback": {
+            "en": "Evenness is insufficient; six is not2^k.",
+            "vi": "Chẵn chưa đủ; sáu không phải2^k."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No: split into valid power-of-two groups with allowed overlap",
+            "vi": "Không: chia thành nhóm lũy thừa hai hợp lệ, có thể chồng"
+          },
+          "feedback": {
+            "en": "Correct: each group must satisfy both size and shape.",
+            "vi": "Đúng: mỗi nhóm phải thỏa kích thước và hình."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No group can overlap another",
+            "vi": "Không nhóm nào được chồng nhóm khác"
+          },
+          "feedback": {
+            "en": "Overlap is allowed and may help the valid cover.",
+            "vi": "Chồng lấp được phép và có thể giúp phủ hợp lệ."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "A valid cover may use several groups; it need not be a disjoint partition.",
+        "vi": "Độ phủ hợp lệ có thể dùng nhiều nhóm; không cần chia rời nhau."
+      }
+    },
+    {
+      "id": "constant-pair",
+      "prompt": {
+        "en": "What term comes from cells011 and111?",
+        "vi": "Tích nào suy từ ô011 và111?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A",
+            "vi": "A"
+          },
+          "feedback": {
+            "en": "A changes between the cells and must be eliminated.",
+            "vi": "A đổi giữa hai ô nên phải loại."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "B AND C",
+            "vi": "B AND C"
+          },
+          "feedback": {
+            "en": "Correct: B and C stay1 while A varies.",
+            "vi": "Đúng: B/C giữ1 khi A đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "NOT B AND NOT C",
+            "vi": "NOT B AND NOT C"
+          },
+          "feedback": {
+            "en": "Both bits are1, so they are not complemented.",
+            "vi": "Hai bit là1 nên không phủ định."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Only invariant bit values become literals.",
+        "vi": "Chỉ giá trị bit không đổi thành literal."
+      }
+    },
+    {
+      "id": "wrap-transfer",
+      "prompt": {
+        "en": "A new four-variable map has1 only at all four corners. Is one four-cell group valid?",
+        "vi": "Map bốn biến mới chỉ có1 ở cả bốn góc. Một nhóm bốn ô có hợp lệ không?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, through both row and column wrapping",
+            "vi": "Có, qua nối mép hàng và cột"
+          },
+          "feedback": {
+            "en": "Correct: it is a wrapped2×2 rectangle.",
+            "vi": "Đúng: đây là chữ nhật2×2 nối mép."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No, because the page has gaps between corners",
+            "vi": "Không, vì trang có khoảng cách giữa các góc"
+          },
+          "feedback": {
+            "en": "Map adjacency is determined by Gray labels and wrapping.",
+            "vi": "Kề của map do nhãn Gray và nối mép quyết định."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only if diagonal groups are allowed",
+            "vi": "Chỉ khi cho phép nhóm chéo"
+          },
+          "feedback": {
+            "en": "The valid connection is edge wrapping, not a diagonal rule.",
+            "vi": "Kết nối hợp lệ là nối mép, không phải quy tắc chéo."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Check topology and labels, not physical distance on the page.",
+        "vi": "Kiểm quan hệ kề và nhãn, không phải khoảng cách trên trang."
+      }
+    },
+    {
+      "id": "coverage-transfer",
+      "prompt": {
+        "en": "For ones at3,5,6,7, you select only group[3,7]. Is the solution complete?",
+        "vi": "Với các ô1 ở3,5,6,7, chỉ chọn nhóm[3,7]. Lời giải đã đủ chưa?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes: one valid group is enough",
+            "vi": "Có: một nhóm hợp lệ là đủ"
+          },
+          "feedback": {
+            "en": "Validity of one group does not cover the remaining1s.",
+            "vi": "Một nhóm hợp lệ chưa phủ những ô1 còn lại."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No: cells5 and6 remain uncovered",
+            "vi": "Chưa: ô5 và6 chưa được phủ"
+          },
+          "feedback": {
+            "en": "Correct: add valid groups so every required1 is covered.",
+            "vi": "Đúng: thêm nhóm hợp lệ để phủ mọi ô1 cần thiết."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No: a two-cell group is always invalid",
+            "vi": "Chưa: nhóm hai ô luôn sai"
+          },
+          "feedback": {
+            "en": "Two is a valid power of two; the issue is incomplete coverage.",
+            "vi": "Hai là lũy thừa hai hợp lệ; vấn đề là phủ chưa đủ."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Distinguish local group validity from complete functional equivalence.",
+        "vi": "Phân biệt nhóm hợp lệ cục bộ với tương đương toàn hàm."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Describe how labels, group geometry and constant literals combine into a verified SOP.",
+      "vi": "Mô tả cách nhãn, hình nhóm và literal không đổi kết hợp thành SOP đã kiểm."
+    },
+    "answerPoints": [
+      {
+        "en": "Gray-code labels determine placement and adjacency, including opposite-edge wraps.",
+        "vi": "Nhãn Gray quyết định vị trí/kề, gồm nối mép đối diện."
+      },
+      {
+        "en": "Use rectangular power-of-two1 groups; overlap is allowed and every1 must be covered.",
+        "vi": "Dùng nhóm1 chữ nhật lũy thừa hai; cho chồng và phải phủ mọi1."
+      },
+      {
+        "en": "Retain invariant literals, OR the terms and check all2^n input rows.",
+        "vi": "Giữ literal bất biến, OR tích và kiểm đủ2^n hàng."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "A valid group removes changing variables; it never covers a required0.",
+      "vi": "Nhóm hợp lệ loại biến thay đổi; không phủ ô0 phải giữ."
+    },
+    {
+      "en": "Group validity and complete coverage are separate checks.",
+      "vi": "Tính hợp lệ của nhóm và phủ đầy đủ là hai phép kiểm riêng."
+    }
+  ],
+  "relatedSlugs": [
+    "circuit-truth-table-and-expression",
+    "boolean-simplification"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 34, section 15.2",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter15.2.5, printed363–369 / PDF379–385; Gray order and wrap examples; group-size rule corrected to powers of two",
+      "kind": "book"
+    },
+    {
+      "id": "past-qp",
+      "title": "Cambridge9618/33 — October/November2025 question paper",
+      "locator": "Question6(a), page5",
+      "kind": "question-paper"
+    },
+    {
+      "id": "past-ms",
+      "title": "Cambridge9618/33 — October/November2025 mark scheme",
+      "locator": "Question6(a), page9",
+      "kind": "mark-scheme"
+    }
+  ]
+}

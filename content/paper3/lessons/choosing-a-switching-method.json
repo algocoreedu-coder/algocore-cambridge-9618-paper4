@@ -1,0 +1,1063 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.1",
+  "topicId": "P3-14.2-T02",
+  "slug": "choosing-a-switching-method",
+  "title": {
+    "en": "Choose a switching method",
+    "vi": "Chọn phương pháp chuyển mạch"
+  },
+  "question": {
+    "en": "When is reserving a channel worth the capacity left idle?",
+    "vi": "Khi nào việc dành riêng kênh đáng chấp nhận phần dung lượng nhàn rỗi?"
+  },
+  "opening": {
+    "en": "A continuous conversation and a short transfer with a long pause put different demands on a network. Compare what circuit and packet switching actually do with the same demand, then connect each consequence to the stated priorities. A method name alone is not a justification.",
+    "vi": "Cuộc trao đổi liên tục và lần truyền ngắn có khoảng nghỉ dài tạo nhu cầu khác nhau lên mạng. So sánh circuit switching và packet switching thực sự xử lý cùng nhu cầu thế nào, rồi nối hệ quả với ưu tiên đã nêu. Chỉ tên phương pháp chưa phải lời giải thích."
+  },
+  "objectives": [
+    {
+      "en": "Describe circuit establishment, reserved use and release.",
+      "vi": "Mô tả thiết lập circuit, sử dụng phần dành riêng và giải phóng."
+    },
+    {
+      "en": "Explain how packets share capacity and why overhead, queueing and ordering may matter.",
+      "vi": "Giải thích packet dùng chung dung lượng và vì sao thông tin điều khiển, hàng đợi, sắp thứ tự có thể quan trọng."
+    },
+    {
+      "en": "Compare both methods using the same criteria and justify a conditional choice.",
+      "vi": "So sánh hai phương pháp theo cùng tiêu chí và giải thích lựa chọn có điều kiện."
+    },
+    {
+      "en": "Provide genuinely distinct benefits/drawbacks when the question requires them.",
+      "vi": "Nêu lợi ích/hạn chế thực sự khác nhau khi đề yêu cầu."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Understand packet addressing, router forwarding and receiver reconstruction.",
+      "vi": "Hiểu đánh địa chỉ packet, chuyển tiếp router và khôi phục ở bên nhận."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Circuit switching",
+      "meaning": {
+        "en": "A communication method that establishes and reserves an end-to-end channel for a conversation, then releases it.",
+        "vi": "Phương pháp thiết lập và dành riêng kênh giữa hai đầu cho cuộc trao đổi, rồi giải phóng kênh."
+      }
+    },
+    {
+      "term": "Packet switching",
+      "meaning": {
+        "en": "A communication method that sends addressed units through shared network resources without reserving a circuit for the whole conversation.",
+        "vi": "Phương pháp gửi đơn vị có địa chỉ qua tài nguyên mạng dùng chung, không dành riêng circuit cho toàn cuộc trao đổi."
+      }
+    },
+    {
+      "term": "Reserved / busy / idle",
+      "meaning": {
+        "en": "Allocated to a conversation / currently carrying data / currently carrying no useful data. Reservation can remain while idle.",
+        "vi": "Được cấp cho cuộc trao đổi / đang mang dữ liệu / hiện không mang dữ liệu hữu ích. Phần cấp có thể vẫn tồn tại khi nhàn rỗi."
+      }
+    },
+    {
+      "term": "Overhead / queueing",
+      "meaning": {
+        "en": "Control data or processing beyond payload / waiting for access to a busy shared resource.",
+        "vi": "Dữ liệu điều khiển hoặc xử lý ngoài payload / chờ được dùng tài nguyên chung đang bận."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "circuit-lifecycle",
+      "title": {
+        "en": "Establish, use, release",
+        "vi": "Thiết lập, sử dụng, giải phóng"
+      },
+      "paragraphs": [
+        {
+          "en": "Circuit switching first establishes an end-to-end path and allocates a channel to the conversation. Data is then carried over that established route. When the conversation ends, the channel is released so that its resources can be allocated elsewhere. Establishment is part of the mechanism, not an optional event to omit from a description.",
+          "vi": "Circuit switching trước tiên thiết lập đường giữa hai đầu và cấp một kênh cho cuộc trao đổi. Sau đó dữ liệu được truyền qua tuyến đã thiết lập. Khi cuộc trao đổi kết thúc, kênh được giải phóng để tài nguyên có thể cấp cho bên khác. Thiết lập là một phần cơ chế, không phải sự kiện tùy ý có thể bỏ khỏi mô tả."
+        },
+        {
+          "en": "The reserved channel belongs to this conversation while it is active, including pauses in useful data. “Dedicated” refers to the allocated channel or capacity; it does not necessarily mean the conversation owns an entire physical cable. The successful trace keeps data on the same established route and preserves its order. A fault can still interrupt communication.",
+          "vi": "Kênh dành riêng thuộc cuộc trao đổi trong thời gian hoạt động, kể cả lúc tạm ngừng dữ liệu hữu ích. “Dành riêng” nói tới kênh hoặc dung lượng được cấp, không nhất thiết cuộc trao đổi sở hữu cả cáp vật lý. Hành trình thành công giữ dữ liệu trên cùng tuyến đã lập và bảo toàn thứ tự. Sự cố vẫn có thể làm gián đoạn truyền thông."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book-circuit",
+        "s22-ms31"
+      ]
+    },
+    {
+      "id": "reservation-tradeoff",
+      "title": {
+        "en": "Predictability has a resource cost",
+        "vi": "Tính dễ dự đoán có chi phí tài nguyên"
+      },
+      "paragraphs": [
+        {
+          "en": "After a circuit is established, the conversation has its allocated capacity and avoids competing with unrelated packet traffic for that allocation. This can suit a sustained service whose priority is predictable delivery. Data following one established path does not need reordering merely because different routes were taken. Traditional circuit-switched telephone calls are a useful example.",
+          "vi": "Sau khi circuit được thiết lập, cuộc trao đổi có phần dung lượng đã cấp và tránh cạnh tranh với lưu lượng packet không liên quan trong phần đó. Điều này có thể phù hợp dịch vụ liên tục ưu tiên truyền dễ dự đoán. Dữ liệu đi một tuyến đã lập không cần sắp lại chỉ vì đi khác tuyến. Cuộc gọi điện thoại chuyển mạch kênh truyền thống là ví dụ hữu ích."
+        },
+        {
+          "en": "The cost is that unused reserved capacity cannot simply be used by another conversation while the circuit remains allocated. Setup also takes work and can delay the beginning of useful transfer. If the established path fails, communication on that circuit is disrupted; a new usable circuit would need to be established rather than assuming automatic packet-style rerouting.",
+          "vi": "Chi phí là dung lượng dành riêng chưa dùng không thể đơn giản được cuộc trao đổi khác sử dụng khi circuit vẫn được cấp. Thiết lập cũng tốn xử lý và có thể làm chậm lúc bắt đầu truyền hữu ích. Nếu tuyến đã lập hỏng, truyền trên circuit bị gián đoạn; cần lập circuit mới dùng được thay vì giả định tự đổi tuyến như packet."
+        }
+      ],
+      "sourceIds": [
+        "book-circuit",
+        "w25-ms32",
+        "s22-ms31"
+      ]
+    },
+    {
+      "id": "packet-sharing-tradeoff",
+      "title": {
+        "en": "Share capacity, handle individual units",
+        "vi": "Dùng chung dung lượng, xử lý từng đơn vị"
+      },
+      "paragraphs": [
+        {
+          "en": "Packet switching divides data into addressed units and lets traffic from different conversations use network links in different turns. It does not reserve a dedicated end-to-end channel for one conversation’s whole lifetime. During A’s pause, B can use shared capacity. A packet still occupies the link while it is being transmitted; “shared” does not mean all users transmit through the same resource simultaneously.",
+          "vi": "Packet switching chia dữ liệu thành đơn vị có địa chỉ và cho lưu lượng các cuộc trao đổi dùng liên kết ở những lượt khác nhau. Nó không dành riêng kênh giữa hai đầu cho toàn thời gian một cuộc trao đổi. Khi A nghỉ, B có thể dùng dung lượng chung. Packet vẫn chiếm liên kết lúc đang truyền; “dùng chung” không có nghĩa mọi người truyền đồng thời qua cùng tài nguyên."
+        },
+        {
+          "en": "Packets need control information and forwarding decisions. They can wait behind other traffic, take alternative routes and arrive out of order, so delays can vary and receiving data may need buffering/reconstruction. Alternative routing can help after a fault if usable routes exist; suitable transport can retransmit missing data. Neither capability is a guarantee that every packet always arrives.",
+          "vi": "Packet cần thông tin điều khiển và quyết định chuyển tiếp. Chúng có thể chờ lưu lượng khác, đi tuyến thay thế và đến sai thứ tự, nên độ trễ có thể biến thiên và bên nhận có thể cần đệm/khôi phục. Đổi tuyến có thể hỗ trợ sau sự cố nếu tồn tại tuyến dùng được; giao vận phù hợp có thể truyền lại dữ liệu thiếu. Cả hai khả năng đều không bảo đảm mọi packet luôn đến."
+        },
+        {
+          "en": "“No dedicated circuit setup” does not mean “no setup of any kind”. A packet network can carry a TCP connection that has its own setup. Keep the switching mechanism separate from the protocols layered above it.",
+          "vi": "“Không thiết lập circuit dành riêng” không có nghĩa “không có bất kỳ thiết lập nào”. Mạng packet có thể mang kết nối TCP với quá trình thiết lập riêng. Hãy tách cơ chế chuyển mạch khỏi giao thức ở tầng phía trên."
+        }
+      ],
+      "sourceIds": [
+        "book-packets",
+        "w25-ms32",
+        "s22-ms31"
+      ]
+    },
+    {
+      "id": "compare-by-criterion",
+      "title": {
+        "en": "Compare the same property on both sides",
+        "vi": "So sánh cùng một thuộc tính ở hai phía"
+      },
+      "paragraphs": [
+        {
+          "en": "A comparison is strongest when each row answers the same question for both methods. Do not compare circuit setup against packet security and call that one difference. State the mechanism and its consequence: reservation during idle periods can waste allocated capacity; sharing that capacity can increase contention and variation in delay.",
+          "vi": "So sánh tốt nhất khi mỗi dòng trả lời cùng một câu hỏi cho hai phương pháp. Không so thiết lập circuit với bảo mật packet rồi gọi đó là một khác biệt. Nêu cơ chế và hệ quả: giữ phần cấp khi nghỉ có thể lãng phí dung lượng; dùng chung phần đó có thể tăng cạnh tranh và biến thiên độ trễ."
+        }
+      ],
+      "sourceIds": [
+        "book-circuit",
+        "book-packets",
+        "w25-ms32"
+      ],
+      "table": {
+        "headers": [
+          {
+            "en": "Criterion",
+            "vi": "Tiêu chí"
+          },
+          {
+            "en": "Circuit switching",
+            "vi": "Circuit switching"
+          },
+          {
+            "en": "Packet switching",
+            "vi": "Packet switching"
+          }
+        ],
+        "rows": [
+          [
+            {
+              "en": "Before transfer",
+              "vi": "Trước khi truyền"
+            },
+            {
+              "en": "Establish and reserve a channel.",
+              "vi": "Thiết lập và dành riêng kênh."
+            },
+            {
+              "en": "No dedicated circuit for the entire conversation; packets need forwarding information.",
+              "vi": "Không có circuit dành riêng cả cuộc trao đổi; packet cần thông tin chuyển tiếp."
+            }
+          ],
+          [
+            {
+              "en": "During an idle gap",
+              "vi": "Trong khoảng nghỉ"
+            },
+            {
+              "en": "The allocated channel remains unavailable to other conversations until release.",
+              "vi": "Kênh đã cấp vẫn không dành cho cuộc trao đổi khác đến khi giải phóng."
+            },
+            {
+              "en": "Shared capacity can carry another conversation’s packets.",
+              "vi": "Dung lượng chung có thể mang packet của cuộc trao đổi khác."
+            }
+          ],
+          [
+            {
+              "en": "Route and order",
+              "vi": "Tuyến và thứ tự"
+            },
+            {
+              "en": "Data follows the established route in the successful circuit.",
+              "vi": "Dữ liệu theo tuyến đã lập trong circuit thành công."
+            },
+            {
+              "en": "Routes may differ; receiver handling may need to restore order.",
+              "vi": "Tuyến có thể khác; bên nhận có thể cần khôi phục thứ tự."
+            }
+          ],
+          [
+            {
+              "en": "Delay and work",
+              "vi": "Độ trễ và xử lý"
+            },
+            {
+              "en": "Setup before transfer; predictable allocated service afterwards, under stated conditions.",
+              "vi": "Thiết lập trước truyền; dịch vụ được cấp dễ dự đoán sau đó theo điều kiện đã nêu."
+            },
+            {
+              "en": "Per-packet control/forwarding, possible queueing and reconstruction work.",
+              "vi": "Điều khiển/chuyển tiếp từng packet, có thể có hàng đợi và xử lý khôi phục."
+            }
+          ],
+          [
+            {
+              "en": "Fault response",
+              "vi": "Xử lý sự cố"
+            },
+            {
+              "en": "A failed established path disrupts that circuit; recovery needs a usable replacement.",
+              "vi": "Tuyến đã lập hỏng làm gián đoạn circuit; khôi phục cần thay thế dùng được."
+            },
+            {
+              "en": "Packets may use a supplied/learned alternative if it is usable; no alternative means no guaranteed progress.",
+              "vi": "Packet có thể dùng tuyến thay thế đã cho/học được nếu dùng được; không có thay thế thì không bảo đảm tiếp tục."
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "scenario-justification",
+      "title": {
+        "en": "Let the requirements decide the preference",
+        "vi": "Dùng yêu cầu để quyết định ưu tiên"
+      },
+      "paragraphs": [
+        {
+          "en": "For a long, sustained conversation that prioritises predictable reserved service and accepts setup, circuit switching can be a justified choice. Explain why the allocated channel helps this demand, then acknowledge reservation and setup costs. Do not claim that all real-time applications require circuits: packet networks can also carry voice and video with suitable capacity and delay handling.",
+          "vi": "Với cuộc trao đổi dài, liên tục, ưu tiên dịch vụ dành riêng dễ dự đoán và chấp nhận thiết lập, circuit switching có thể là lựa chọn hợp lý. Giải thích kênh được cấp giúp nhu cầu đó thế nào rồi thừa nhận chi phí dành riêng và thiết lập. Không khẳng định mọi ứng dụng thời gian thực cần circuit: mạng packet cũng truyền được thoại/video khi có dung lượng và xử lý độ trễ phù hợp."
+        },
+        {
+          "en": "For short, intermittent transfers with gaps, sharing can make better use of capacity because other traffic can use those gaps. Packet switching is therefore a natural choice when efficient shared use matters more than a fixed delivery delay. Its control overhead, possible queueing and receiver work remain relevant. Changing priorities can change the justified choice; this is not a universal speed ranking.",
+          "vi": "Với lần truyền ngắn, không liên tục và có khoảng trống, dùng chung có thể tận dụng dung lượng tốt hơn vì lưu lượng khác dùng được khoảng đó. Vì vậy packet switching phù hợp khi dùng chung hiệu quả quan trọng hơn độ trễ cố định. Thông tin điều khiển, khả năng xếp hàng và xử lý bên nhận vẫn cần xét. Đổi ưu tiên có thể đổi lựa chọn hợp lý; đây không phải xếp hạng tốc độ phổ quát."
+        }
+      ],
+      "sourceIds": [
+        "book-circuit",
+        "book-packets",
+        "w25-ms32"
+      ]
+    },
+    {
+      "id": "answer-with-distinct-evidence",
+      "title": {
+        "en": "Give distinct reasons and qualify the claim",
+        "vi": "Nêu lý do riêng biệt và giới hạn khẳng định"
+      },
+      "paragraphs": [
+        {
+          "en": "If asked for different advantages and disadvantages, select different mechanisms rather than reversing one phrase. For example, a circuit advantage can concern order/predictability, while its drawback concerns unused reserved capacity. A packet advantage can concern a usable alternative route, while its drawback concerns queueing/reassembly. Tie each to a consequence instead of writing only “faster” or “better”.",
+          "vi": "Nếu đề yêu cầu ưu điểm và nhược điểm khác nhau, chọn cơ chế khác nhau thay vì đảo ngược một cụm từ. Ví dụ ưu điểm circuit có thể là thứ tự/tính dễ dự đoán, còn hạn chế là phần dành riêng không dùng. Ưu điểm packet có thể là tuyến thay thế dùng được, còn hạn chế là hàng đợi/ghép lại. Gắn mỗi điểm với hệ quả thay vì chỉ viết “nhanh hơn” hay “tốt hơn”."
+        },
+        {
+          "en": "May/June 2022 Paper 31 question 3 explicitly requests different advantages and disadvantages; October/November 2025 Paper 32 question 4 separates benefits from paired differences. These checked examples guide answer form, not frequency predictions. Avoid absolute claims that circuit data cannot be lost or that different packet routes provide encryption: neither switching method alone proves confidentiality or error-free delivery.",
+          "vi": "May/June 2022 Paper 31 câu 3 yêu cầu rõ ưu/nhược điểm khác nhau; October/November 2025 Paper 32 câu 4 tách lợi ích khỏi khác biệt theo cặp. Các ví dụ đã kiểm tra này hướng dẫn dạng trả lời, không dự đoán tần suất. Tránh nói dữ liệu circuit không thể mất hoặc đi nhiều tuyến packet tạo mã hóa: riêng phương pháp chuyển mạch không chứng minh bí mật hay truyền không lỗi."
+        }
+      ],
+      "sourceIds": [
+        "s22-qp31",
+        "w25-qp32",
+        "book-circuit",
+        "book-packets"
+      ]
+    }
+  ],
+  "visual": {
+    "kind": "switching-methods",
+    "title": {
+      "en": "Compare the same demand twice",
+      "vi": "So sánh cùng nhu cầu qua hai cách"
+    },
+    "introduction": {
+      "en": "Choose continuous or bursty demand, then follow circuit and packet versions of that same demand. Read reserved, busy and idle as separate properties.",
+      "vi": "Chọn nhu cầu liên tục hoặc theo đợt, rồi theo dõi bản circuit và packet của cùng nhu cầu đó. Đọc dành riêng, đang bận và nhàn rỗi như các thuộc tính riêng."
+    },
+    "task": {
+      "en": "At the interval, predict whether another conversation can use the capacity. Then justify the preferred method using the scenario’s priority and one tradeoff.",
+      "vi": "Ở khoảng giữa, dự đoán cuộc trao đổi khác có dùng được dung lượng không. Sau đó giải thích phương pháp ưu tiên bằng ưu tiên của tình huống và một đánh đổi."
+    },
+    "conventions": [
+      {
+        "en": "Both methods receive the same A demand: continuous A1,A2,A3 or bursty A1, a pause, A2. B1 is separate competing traffic.",
+        "vi": "Hai phương pháp nhận cùng nhu cầu A: liên tục A1,A2,A3 hoặc theo đợt A1, nghỉ, A2. B1 là lưu lượng cạnh tranh riêng."
+      },
+      {
+        "en": "Steps are explanatory events, not equal time slots or measured seconds. No rate, delay or cost result is calculated.",
+        "vi": "Các bước là sự kiện giải thích, không phải khe thời gian bằng nhau hay số giây đo được. Không tính tốc độ, độ trễ hay chi phí."
+      },
+      {
+        "en": "A reserved circuit channel is unavailable to other conversations even while idle. Shared packet capacity allows other traffic in other turns, not simultaneous use of the same link.",
+        "vi": "Kênh circuit dành riêng không cho cuộc trao đổi khác dùng ngay cả khi nghỉ. Dung lượng packet dùng chung cho lưu lượng khác ở lượt khác, không cùng dùng một liên kết đồng thời."
+      },
+      {
+        "en": "Both traces assume successful transmission. Circuit fault recovery, detailed packet routes and loss recovery are explained in text rather than silently simulated.",
+        "vi": "Cả hai hành trình giả sử truyền thành công. Khôi phục lỗi circuit, tuyến packet chi tiết và khôi phục mất dữ liệu được giải thích bằng chữ, không âm thầm mô phỏng."
+      },
+      {
+        "en": "The recommendation follows declared priorities; neither method is labelled always fastest, always secure or universally required for real-time data.",
+        "vi": "Khuyến nghị theo ưu tiên đã nêu; không phương pháp nào được gọi luôn nhanh nhất, luôn bảo mật hay bắt buộc cho mọi dữ liệu thời gian thực."
+      }
+    ],
+    "sourceIds": [
+      "book-circuit",
+      "book-packets",
+      "s22-ms31",
+      "w25-ms32"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "A1, a pause, then A2",
+      "vi": "A1, một khoảng nghỉ rồi A2"
+    },
+    "prompt": {
+      "en": "For the bursty scenario, first inspect the six circuit events, then reset to the six packet events. The same A data is sent in each version; the key difference is whether B1 can use A’s pause. These are two traces, not one twelve-event connection.",
+      "vi": "Với tình huống theo đợt, trước tiên xem sáu sự kiện circuit, rồi bắt đầu lại với sáu sự kiện packet. Mỗi bản gửi cùng dữ liệu A; khác biệt chính là B1 có dùng được khoảng nghỉ của A không. Đây là hai hành trình, không phải một kết nối mười hai sự kiện."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "circuit-establish",
+        "action": {
+          "en": "Request a dedicated end-to-end channel for conversation A.",
+          "vi": "Yêu cầu kênh dành riêng giữa hai đầu cho cuộc trao đổi A."
+        },
+        "why": {
+          "en": "Circuit setup must succeed before the data transfer begins.",
+          "vi": "Phải thiết lập circuit thành công trước khi truyền dữ liệu."
+        },
+        "result": {
+          "en": "Setup is represented as an event, not a measured delay.",
+          "vi": "Thiết lập được biểu diễn như sự kiện, không phải độ trễ đo được."
+        }
+      },
+      {
+        "id": "circuit-reserve",
+        "action": {
+          "en": "Reserve the channel along the selected path for A.",
+          "vi": "Dành riêng kênh dọc tuyến đã chọn cho A."
+        },
+        "why": {
+          "en": "Other conversations cannot use this allocated channel until it is released.",
+          "vi": "Cuộc trao đổi khác không thể dùng kênh đã cấp này đến khi nó được giải phóng."
+        },
+        "result": {
+          "en": "A owns the channel although it is not carrying data at this instant.",
+          "vi": "A giữ kênh dù tại thời điểm minh họa này chưa có dữ liệu."
+        }
+      },
+      {
+        "id": "circuit-transmit-first",
+        "action": {
+          "en": "Carry A1 over the established channel.",
+          "vi": "Truyền A1 qua kênh đã thiết lập."
+        },
+        "why": {
+          "en": "The reserved path is available for A’s data.",
+          "vi": "Tuyến dành riêng sẵn sàng cho dữ liệu A."
+        },
+        "result": {
+          "en": "A1 reaches the receiver in this successful circuit trace.",
+          "vi": "A1 đến bên nhận trong hành trình circuit thành công này."
+        }
+      },
+      {
+        "id": "circuit-interval",
+        "action": {
+          "en": "A pauses; leave the channel reserved.",
+          "vi": "A tạm nghỉ; vẫn giữ kênh dành riêng."
+        },
+        "why": {
+          "en": "Reservation persists even without useful data.",
+          "vi": "Phần dành riêng vẫn tồn tại ngay cả khi không có dữ liệu hữu ích."
+        },
+        "result": {
+          "en": "The channel is reserved but idle; B1 cannot use this allocation.",
+          "vi": "Kênh được dành riêng nhưng nhàn rỗi; B1 không thể dùng phần cấp này."
+        }
+      },
+      {
+        "id": "circuit-transmit-last",
+        "action": {
+          "en": "Carry A2 on the same reserved path.",
+          "vi": "Truyền A2 trên cùng tuyến dành riêng."
+        },
+        "why": {
+          "en": "The channel remains allocated until the conversation ends.",
+          "vi": "Kênh vẫn được cấp đến khi cuộc trao đổi kết thúc."
+        },
+        "result": {
+          "en": "All of A’s data has arrived in order in this successful trace.",
+          "vi": "Toàn bộ dữ liệu A đến đúng thứ tự trong hành trình thành công này."
+        }
+      },
+      {
+        "id": "circuit-release",
+        "action": {
+          "en": "Terminate the conversation and release the reserved channel.",
+          "vi": "Kết thúc cuộc trao đổi và giải phóng kênh dành riêng."
+        },
+        "why": {
+          "en": "Resources should become available to other conversations.",
+          "vi": "Tài nguyên cần được trả lại cho cuộc trao đổi khác."
+        },
+        "result": {
+          "en": "A’s reservation ends; another conversation can now use the channel.",
+          "vi": "Phần dành riêng cho A kết thúc; cuộc trao đổi khác có thể dùng kênh."
+        }
+      },
+      {
+        "id": "packet-split",
+        "action": {
+          "en": "Represent A’s data as addressed packets with control information.",
+          "vi": "Biểu diễn dữ liệu A thành packet có địa chỉ và thông tin điều khiển."
+        },
+        "why": {
+          "en": "Each packet can be forwarded over shared resources without reserving a circuit for the whole conversation.",
+          "vi": "Mỗi packet có thể được chuyển qua tài nguyên dùng chung mà không dành riêng circuit cho toàn cuộc trao đổi."
+        },
+        "result": {
+          "en": "Packets are ready; no end-to-end resource is reserved for A.",
+          "vi": "Packet đã sẵn sàng; không có tài nguyên xuyên suốt nào dành riêng cho A."
+        }
+      },
+      {
+        "id": "packet-share-first",
+        "action": {
+          "en": "Transmit A1 during one turn on the shared link.",
+          "vi": "Truyền A1 trong một lượt trên liên kết dùng chung."
+        },
+        "why": {
+          "en": "A packet occupies the link while transmitted; other traffic can use other turns.",
+          "vi": "Packet chiếm liên kết khi đang truyền; lưu lượng khác có thể dùng lượt khác."
+        },
+        "result": {
+          "en": "The link carries A1 now without becoming reserved for the conversation.",
+          "vi": "Liên kết đang truyền A1 nhưng không trở thành kênh dành riêng cho cả cuộc trao đổi."
+        }
+      },
+      {
+        "id": "packet-interval",
+        "action": {
+          "en": "A has no data now; let another conversation send B1.",
+          "vi": "A chưa có dữ liệu mới; cho cuộc trao đổi khác gửi B1."
+        },
+        "why": {
+          "en": "Unreserved capacity can carry useful traffic during A’s gap.",
+          "vi": "Dung lượng không dành riêng có thể mang lưu lượng hữu ích trong khoảng nghỉ của A."
+        },
+        "result": {
+          "en": "B1 uses the gap; A has no reserved idle channel.",
+          "vi": "B1 dùng khoảng nghỉ; A không giữ một kênh nhàn rỗi dành riêng."
+        }
+      },
+      {
+        "id": "packet-share-last",
+        "action": {
+          "en": "Transmit A2 in a later shared turn.",
+          "vi": "Truyền A2 trong một lượt dùng chung sau đó."
+        },
+        "why": {
+          "en": "Sharing does not promise a fixed wait or a dedicated rate.",
+          "vi": "Dùng chung không cam kết thời gian chờ cố định hay tốc độ dành riêng."
+        },
+        "result": {
+          "en": "All A packets have been sent in this teaching schedule.",
+          "vi": "Mọi packet A đã được gửi theo lịch minh họa này."
+        }
+      },
+      {
+        "id": "packet-deliver",
+        "action": {
+          "en": "Receive the complete set of A packets.",
+          "vi": "Nhận đầy đủ các packet A."
+        },
+        "why": {
+          "en": "Reconstruction requires all necessary data, even if arrival order differs.",
+          "vi": "Khôi phục đòi hỏi đủ dữ liệu cần thiết, dù thứ tự đến có thể khác."
+        },
+        "result": {
+          "en": "All A units are now present at the receiver.",
+          "vi": "Bên nhận hiện có đầy đủ đơn vị A."
+        }
+      },
+      {
+        "id": "packet-reassemble",
+        "action": {
+          "en": "Check completeness and put the units in their original order.",
+          "vi": "Kiểm tra đủ dữ liệu rồi xếp các đơn vị theo thứ tự ban đầu."
+        },
+        "why": {
+          "en": "Shared transport can require receiver buffering and ordering.",
+          "vi": "Truyền qua mạng dùng chung có thể cần đệm và sắp thứ tự tại bên nhận."
+        },
+        "result": {
+          "en": "A’s message is complete. There is no dedicated circuit reservation to release.",
+          "vi": "Thông điệp A hoàn chỉnh. Không có circuit dành riêng cần giải phóng."
+        }
+      }
+    ],
+    "result": {
+      "en": "Both methods deliver A1 and A2. Circuit keeps its channel reserved during the pause; packet sharing allows B1 in that gap. Packet switching fits the stated priority of sharing capacity, while variable delay remains a tradeoff.",
+      "vi": "Cả hai giao A1 và A2. Circuit giữ kênh dành riêng trong khoảng nghỉ; dùng chung packet cho B1 truyền trong khoảng đó. Packet switching phù hợp ưu tiên dùng chung dung lượng đã nêu, còn độ trễ biến thiên là đánh đổi."
+    },
+    "selfCheck": {
+      "en": "Compare equal A demand and the same resource criterion. Do not infer a numerical speedup from event counts or assume an idle reserved channel is free.",
+      "vi": "So sánh cùng nhu cầu A và cùng tiêu chí tài nguyên. Không suy ra tăng tốc bằng số từ số sự kiện hoặc coi kênh dành riêng nhàn rỗi là kênh tự do."
+    },
+    "sourceIds": [
+      "book-circuit",
+      "book-packets",
+      "w25-ms32"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "“Dedicated”, “established before transfer” and “released” identify the circuit lifecycle.",
+        "vi": "“Dành riêng”, “thiết lập trước truyền” và “giải phóng” nhận diện vòng đời circuit."
+      },
+      {
+        "en": "“Bursty”, “shared bandwidth”, “queueing” and “reassembly” suggest packet-switching tradeoffs.",
+        "vi": "“Theo đợt”, “băng thông dùng chung”, “hàng đợi”, “ghép lại” gợi các đánh đổi packet switching."
+      },
+      {
+        "en": "“Compare”, “two differences” or “different advantage/disadvantage” controls the answer structure.",
+        "vi": "“So sánh”, “hai khác biệt” hoặc “ưu/nhược điểm khác nhau” quyết định cấu trúc trả lời."
+      }
+    ],
+    "distinguish": {
+      "en": "Choose a switching mechanism from traffic/resource constraints; this is distinct from choosing HTTP versus SMTP or looking up one router’s next hop.",
+      "vi": "Chọn cơ chế chuyển mạch theo ràng buộc lưu lượng/tài nguyên; khác với chọn HTTP/SMTP hay tra next hop của một router."
+    },
+    "method": [
+      {
+        "en": "Extract the priority: predictability, efficient sharing, setup tolerance or resilience.",
+        "vi": "Rút ra ưu tiên: dễ dự đoán, dùng chung hiệu quả, chấp nhận thiết lập hay khả năng ứng phó sự cố."
+      },
+      {
+        "en": "Describe each mechanism before claiming an advantage.",
+        "vi": "Mô tả cơ chế trước khi nêu ưu điểm."
+      },
+      {
+        "en": "Compare the same criterion on both sides and link consequence to the scenario.",
+        "vi": "So sánh cùng tiêu chí ở hai phía rồi nối hệ quả với tình huống."
+      },
+      {
+        "en": "Include a drawback and remove unsupported always/never claims.",
+        "vi": "Nêu hạn chế và bỏ khẳng định luôn/không bao giờ thiếu căn cứ."
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Idle means a reserved circuit is available to other users.",
+        "vi": "Nhàn rỗi nghĩa circuit dành riêng đang cho người khác dùng được."
+      },
+      "correction": {
+        "en": "It can be idle and still allocated; release is a separate event.",
+        "vi": "Nó có thể nhàn rỗi mà vẫn được cấp; giải phóng là sự kiện riêng."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Packet switching has no setup of any kind.",
+        "vi": "Packet switching không có bất kỳ thiết lập nào."
+      },
+      "correction": {
+        "en": "It does not establish a dedicated switching circuit for the conversation; higher-layer connections may still have setup.",
+        "vi": "Nó không lập circuit chuyển mạch dành riêng cho cuộc trao đổi; kết nối tầng trên vẫn có thể cần thiết lập."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Circuit switching never loses data and is always faster.",
+        "vi": "Circuit switching không bao giờ mất dữ liệu và luôn nhanh hơn."
+      },
+      "correction": {
+        "en": "A fault can interrupt a circuit; speed and delay depend on stated conditions.",
+        "vi": "Sự cố có thể ngắt circuit; tốc độ và độ trễ phụ thuộc điều kiện đã nêu."
+      }
+    },
+    {
+      "mistake": {
+        "en": "Different packet routes automatically make the data confidential.",
+        "vi": "Tuyến packet khác nhau tự làm dữ liệu bí mật."
+      },
+      "correction": {
+        "en": "Route diversity is not encryption; confidentiality requires suitable security measures.",
+        "vi": "Đa dạng tuyến không phải mã hóa; tính bí mật cần biện pháp bảo mật phù hợp."
+      }
+    },
+    {
+      "mistake": {
+        "en": "A video call proves circuit switching is mandatory.",
+        "vi": "Cuộc gọi video chứng minh bắt buộc dùng circuit switching."
+      },
+      "correction": {
+        "en": "Packet networks also carry voice/video; justify the method against the given priorities and network conditions.",
+        "vi": "Mạng packet cũng truyền thoại/video; cần giải thích lựa chọn theo ưu tiên và điều kiện mạng đã cho."
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "idle-reservation",
+      "prompt": {
+        "en": "A circuit is established but A pauses. May B immediately use A’s allocated channel?",
+        "vi": "Circuit đã lập nhưng A tạm nghỉ. B có được dùng ngay kênh đã cấp cho A không?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, because no useful data is present",
+            "vi": "Có, vì không có dữ liệu hữu ích"
+          },
+          "feedback": {
+            "en": "Idle and unallocated are not the same state.",
+            "vi": "Nhàn rỗi và chưa cấp không phải cùng trạng thái."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No, it remains reserved until released",
+            "vi": "Không, nó vẫn dành riêng đến khi giải phóng"
+          },
+          "feedback": {
+            "en": "Correct: the reservation persists through the pause.",
+            "vi": "Đúng: phần dành riêng tồn tại qua khoảng nghỉ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only if B renames its data as A",
+            "vi": "Chỉ khi B đổi tên dữ liệu thành A"
+          },
+          "feedback": {
+            "en": "Renaming does not change resource allocation.",
+            "vi": "Đổi tên không thay đổi cấp tài nguyên."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "Separate reserved status from current link use.",
+        "vi": "Tách trạng thái dành riêng khỏi việc liên kết đang dùng làm gì."
+      }
+    },
+    {
+      "id": "circuit-order",
+      "prompt": {
+        "en": "Which sequence describes circuit switching?",
+        "vi": "Chuỗi nào mô tả circuit switching?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Establish/reserve → transfer → release",
+            "vi": "Thiết lập/dành riêng → truyền → giải phóng"
+          },
+          "feedback": {
+            "en": "Correct: it includes both ends of the reservation lifecycle.",
+            "vi": "Đúng: gồm cả đầu và cuối vòng đời dành riêng."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Transfer → reserve forever → establish",
+            "vi": "Truyền → dành riêng mãi → thiết lập"
+          },
+          "feedback": {
+            "en": "The data phase requires establishment first.",
+            "vi": "Giai đoạn dữ liệu cần thiết lập trước."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Split → invent a random route → discard every packet",
+            "vi": "Chia → tự tạo tuyến ngẫu nhiên → loại mọi packet"
+          },
+          "feedback": {
+            "en": "This describes neither valid mechanism.",
+            "vi": "Đây không phải cơ chế hợp lệ nào."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Mechanism descriptions should include setup, use and termination.",
+        "vi": "Mô tả cơ chế cần có thiết lập, sử dụng và kết thúc."
+      }
+    },
+    {
+      "id": "choose-for-bursty-demand",
+      "prompt": {
+        "en": "A service sends short bursts separated by long gaps and accepts variable delay. Which justification is strongest?",
+        "vi": "Dịch vụ gửi đợt ngắn cách nhau bởi khoảng nghỉ dài và chấp nhận độ trễ biến thiên. Lý do nào tốt nhất?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Packet switching, because other traffic can use the gaps",
+            "vi": "Packet switching vì lưu lượng khác dùng được khoảng nghỉ"
+          },
+          "feedback": {
+            "en": "Correct: the mechanism matches the stated resource priority.",
+            "vi": "Đúng: cơ chế phù hợp ưu tiên tài nguyên đã nêu."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Circuit switching, because idle reservation is always free",
+            "vi": "Circuit switching vì phần dành riêng nhàn rỗi luôn miễn chi phí"
+          },
+          "feedback": {
+            "en": "Reserved idle capacity is still unavailable to others.",
+            "vi": "Dung lượng dành riêng nhàn rỗi vẫn không cho bên khác dùng."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Packet switching, because it encrypts every packet",
+            "vi": "Packet switching vì nó mã hóa mọi packet"
+          },
+          "feedback": {
+            "en": "Switching alone does not provide encryption.",
+            "vi": "Riêng chuyển mạch không cung cấp mã hóa."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "Use efficient sharing as the reason and acknowledge possible queueing/overhead.",
+        "vi": "Dùng chia sẻ hiệu quả làm lý do và thừa nhận khả năng hàng đợi/thông tin phụ."
+      }
+    },
+    {
+      "id": "justify-tradeoff",
+      "prompt": {
+        "en": "A sustained conversation prioritises predictable reserved service and accepts setup. Which answer is properly qualified?",
+        "vi": "Cuộc trao đổi liên tục ưu tiên dịch vụ dành riêng dễ dự đoán và chấp nhận thiết lập. Đáp án nào nêu đúng điều kiện?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Circuit fits those priorities, with setup and idle-reservation costs",
+            "vi": "Circuit phù hợp ưu tiên đó, kèm chi phí thiết lập và giữ phần nhàn rỗi"
+          },
+          "feedback": {
+            "en": "Correct: benefit and limitation are linked to stated priorities.",
+            "vi": "Đúng: lợi ích và hạn chế gắn với ưu tiên đã nêu."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Circuit is mandatory for every real-time service",
+            "vi": "Circuit bắt buộc cho mọi dịch vụ thời gian thực"
+          },
+          "feedback": {
+            "en": "Packet networks can support real-time media too.",
+            "vi": "Mạng packet cũng hỗ trợ media thời gian thực."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Packets can never carry continuous data",
+            "vi": "Packet không bao giờ mang được dữ liệu liên tục"
+          },
+          "feedback": {
+            "en": "Continuous application data can be packetised.",
+            "vi": "Dữ liệu ứng dụng liên tục có thể chia thành packet."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A scenario-specific preference is different from a universal requirement.",
+        "vi": "Ưu tiên theo tình huống khác yêu cầu phổ quát."
+      }
+    },
+    {
+      "id": "paired-comparison",
+      "prompt": {
+        "en": "Which is a valid paired difference using one criterion?",
+        "vi": "Đâu là khác biệt theo cặp hợp lệ dùng một tiêu chí?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Circuit reserves capacity during a pause; packet links can use it for other traffic",
+            "vi": "Circuit giữ dung lượng khi nghỉ; liên kết packet có thể dùng cho lưu lượng khác"
+          },
+          "feedback": {
+            "en": "Correct: both clauses compare resource availability in a gap.",
+            "vi": "Đúng: hai vế so sánh tính sẵn có tài nguyên trong khoảng nghỉ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Circuit has setup; packet data is always secret",
+            "vi": "Circuit có thiết lập; dữ liệu packet luôn bí mật"
+          },
+          "feedback": {
+            "en": "The criteria differ and the security claim is unsupported.",
+            "vi": "Tiêu chí khác nhau và khẳng định bảo mật thiếu căn cứ."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Circuit is better; packet is worse",
+            "vi": "Circuit tốt hơn; packet kém hơn"
+          },
+          "feedback": {
+            "en": "No mechanism, criterion or scenario is specified.",
+            "vi": "Không có cơ chế, tiêu chí hay tình huống cụ thể."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "State the same property for each method before drawing a conclusion.",
+        "vi": "Nêu cùng thuộc tính cho mỗi phương pháp trước khi kết luận."
+      }
+    },
+    {
+      "id": "distinct-drawbacks",
+      "prompt": {
+        "en": "After giving circuit predictability as an advantage, which drawback supplies a distinct mechanism?",
+        "vi": "Sau khi nêu tính dễ dự đoán của circuit là ưu điểm, hạn chế nào dựa vào cơ chế riêng biệt?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "It is not predictable",
+            "vi": "Nó không dễ dự đoán"
+          },
+          "feedback": {
+            "en": "This merely negates the advantage and is not a supported distinct point.",
+            "vi": "Đây chỉ phủ định ưu điểm, không phải ý riêng có căn cứ."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Its allocated channel remains unavailable to others while idle",
+            "vi": "Kênh đã cấp không cho bên khác dùng khi nhàn rỗi"
+          },
+          "feedback": {
+            "en": "Correct: this explains resource inefficiency, a different mechanism.",
+            "vi": "Đúng: giải thích kém hiệu quả tài nguyên, là cơ chế khác."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "It has no route",
+            "vi": "Nó không có tuyến"
+          },
+          "feedback": {
+            "en": "An established circuit does have a route.",
+            "vi": "Circuit đã thiết lập có tuyến."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "When different reasons are requested, change the mechanism rather than reverse the wording.",
+        "vi": "Khi đề cần lý do khác nhau, đổi cơ chế thay vì đảo cách diễn đạt."
+      }
+    },
+    {
+      "id": "packet-failure-limit",
+      "prompt": {
+        "en": "A packet link fails. When is rerouting a supported claim?",
+        "vi": "Liên kết packet hỏng. Khi nào có căn cứ nói đổi tuyến được?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Whenever any line is drawn elsewhere on a diagram",
+            "vi": "Bất cứ khi nào hình còn đường vẽ ở chỗ khác"
+          },
+          "feedback": {
+            "en": "A drawn link alone does not prove a usable route to the destination.",
+            "vi": "Chỉ đường vẽ không chứng minh tuyến tới đích dùng được."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "When forwarding information provides a usable alternative path",
+            "vi": "Khi thông tin chuyển tiếp cung cấp đường thay thế dùng được"
+          },
+          "feedback": {
+            "en": "Correct: the capability is conditional on an actual alternative.",
+            "vi": "Đúng: khả năng phụ thuộc phương án thay thế thực sự."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Always, because packet switching cannot fail",
+            "vi": "Luôn luôn vì packet switching không thể thất bại"
+          },
+          "feedback": {
+            "en": "Packet networks can also lack a route or lose data.",
+            "vi": "Mạng packet cũng có thể thiếu tuyến hoặc mất dữ liệu."
+          }
+        }
+      ],
+      "correctChoiceId": "b",
+      "explanation": {
+        "en": "A resilience benefit must not become an unconditional delivery guarantee.",
+        "vi": "Lợi ích ứng phó sự cố không được biến thành bảo đảm giao vô điều kiện."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Explain both mechanisms, then give one distinct benefit and drawback for each and a conditional use case.",
+      "vi": "Giải thích hai cơ chế, rồi nêu một ưu/hạn chế riêng biệt cho mỗi loại và tình huống dùng có điều kiện."
+    },
+    "answerPoints": [
+      {
+        "en": "Circuit: establish a reserved channel, transfer on that route, release it.",
+        "vi": "Circuit: lập kênh dành riêng, truyền trên tuyến đó, giải phóng."
+      },
+      {
+        "en": "Circuit can offer predictable allocated service; setup and unused reserved capacity are costs.",
+        "vi": "Circuit có thể cho dịch vụ được cấp dễ dự đoán; thiết lập và phần dành riêng chưa dùng là chi phí."
+      },
+      {
+        "en": "Packet: split/address, share links, forward, collect and reconstruct.",
+        "vi": "Packet: chia/đánh địa chỉ, dùng chung liên kết, chuyển tiếp, thu nhận và khôi phục."
+      },
+      {
+        "en": "Packet sharing suits intermittent demand; queueing, control overhead and ordering can add work/delay.",
+        "vi": "Dùng chung packet phù hợp nhu cầu gián đoạn; hàng đợi, thông tin phụ và sắp thứ tự có thể thêm xử lý/độ trễ."
+      },
+      {
+        "en": "Choose by stated priorities; neither mechanism alone guarantees speed, secrecy or successful delivery.",
+        "vi": "Chọn theo ưu tiên đã nêu; riêng cơ chế nào cũng không bảo đảm tốc độ, bí mật hay giao thành công."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Reserved, busy and idle describe different aspects of a resource.",
+      "vi": "Dành riêng, bận và nhàn rỗi mô tả các mặt khác nhau của tài nguyên."
+    },
+    {
+      "en": "Compare the same demand with the same criteria.",
+      "vi": "So sánh cùng nhu cầu theo cùng tiêu chí."
+    },
+    {
+      "en": "A good choice states mechanism, consequence, scenario fit and a tradeoff.",
+      "vi": "Lựa chọn tốt nêu cơ chế, hệ quả, sự phù hợp tình huống và một đánh đổi."
+    }
+  ],
+  "relatedSlugs": [
+    "packet-journey-and-routers",
+    "tcp-ip-stack-and-message-journey"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Page 33, section 14.2 Circuit switching, packet switching",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-circuit",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed page 338 (PDF page 354): circuit establishment, transfer, release and tradeoffs",
+      "kind": "book"
+    },
+    {
+      "id": "book-packets",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 14, printed pages 339–343 (PDF pages 355–359): packet sharing, comparison and applications",
+      "kind": "book"
+    },
+    {
+      "id": "s22-qp31",
+      "title": "Cambridge 9618/31 — May/June 2022 question paper",
+      "locator": "Question 3, page 6",
+      "kind": "question-paper"
+    },
+    {
+      "id": "s22-ms31",
+      "title": "Cambridge 9618/31 — May/June 2022 mark scheme",
+      "locator": "Question 3, page 5",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "w25-qp32",
+      "title": "Cambridge 9618/32 — October/November 2025 question paper",
+      "locator": "Question 4(a)–(b), page 4",
+      "kind": "question-paper"
+    },
+    {
+      "id": "w25-ms32",
+      "title": "Cambridge 9618/32 — October/November 2025 mark scheme",
+      "locator": "Question 4(a)–(b), page 9–10",
+      "kind": "mark-scheme"
+    }
+  ]
+}

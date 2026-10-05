@@ -1,0 +1,27 @@
+import {readFile,writeFile,mkdir,readdir,access} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const EVIDENCE=path.resolve(ROOT,'../planning/paper3-2026/completion-program-2026/evidence/section15');
+const ACCEPTED=path.resolve(ROOT,'../local-previews/paper3-section14-final-20260929');
+const previous=JSON.parse(await readFile(path.resolve(EVIDENCE,'../section14/QA_FINAL_PROMOTION_RESULT.json'),'utf8'));
+const sha=async p=>createHash('sha256').update(await readFile(p)).digest('hex');
+const exists=async p=>{try{await access(p);return true}catch{return false}};
+const collect=async(dir)=>{if(!await exists(path.join(ROOT,dir)))return[];const out=[];for(const entry of await readdir(path.join(ROOT,dir),{withFileTypes:true})){const f=path.posix.join(dir,entry.name);if(entry.isDirectory())out.push(...await collect(f));else if(entry.isFile())out.push(f);}return out;};
+const target=path.join(EVIDENCE,'QA_BASELINE.json');if(await exists(target))throw Error('Baseline already exists; preserve it and compare separately.');await mkdir(EVIDENCE,{recursive:true});
+const status=JSON.parse(await readFile(path.join(ROOT,'content/paper3/lesson-status.json'),'utf8'));
+const catalog=JSON.parse(await readFile(path.join(ROOT,'content/paper3/study-map.json'),'utf8'));
+const reviewed=new Set(status.lessons.filter(x=>x.state==='reviewed').map(x=>x.topicId));
+const acceptedEntries=status.lessons.filter(x=>/^P3-(13|14)\./.test(x.topicId));
+const acceptedContent=Object.fromEntries(await Promise.all(acceptedEntries.map(async l=>{const f=`content/paper3/lessons/${l.slug}.json`;return[f,await sha(path.join(ROOT,f))]})));
+const files=[...new Set([...Object.keys(previous.candidateHashes),...(await Promise.all(['app/components/algocore-ui','app/components/paper4-learning','app/components/paper4-visual','app/paper-4','app/docs','content/paper4','lib'].map(collect))).flat()])].sort();
+const currentHashes=Object.fromEntries(await Promise.all(files.map(async f=>[f,await sha(path.join(ROOT,f))])));
+const historicalDeltas=[];for(const[file,expected]of Object.entries(previous.candidateHashes)){if(currentHashes[file]!==expected)historicalDeltas.push({file,acceptedSha256:expected,currentSha256:currentHashes[file]});}
+const acceptedSnapshotBuild=(await readFile(path.join(ACCEPTED,'.next/BUILD_ID'),'utf8')).trim();
+const sharedBuild=await exists(path.join(ROOT,'.next/BUILD_ID'))?(await readFile(path.join(ROOT,'.next/BUILD_ID'),'utf8')).trim():null;
+const section15=catalog.topics.filter(t=>t.strandId.startsWith('15.'));
+const routes=[ '/paper-3?lang=en','/paper-3?lang=vi','/paper-3/sections/13?lang=en','/paper-3/sections/14?lang=en','/paper-3/sections/15?lang=en',...acceptedEntries.map(l=>`/paper-3/topics/${l.slug}?lang=en`),...section15.map(l=>`/paper-3/topics/${l.slug}?lang=en`),'/paper-4?lang=en','/docs','/paper-4/design-system'];
+const routeResults=await Promise.all(routes.map(async route=>{try{const r=await fetch('http://127.0.0.1:3033'+route,{cache:'no-store',signal:AbortSignal.timeout(12000)}),html=await r.text();return{route,status:r.status,acceptedBuildMarker:html.includes(acceptedSnapshotBuild),realLesson:html.includes('data-paper3-lesson='),plannedPreview:html.includes('topic-preparation-title'),htmlSha256:createHash('sha256').update(html).digest('hex')}}catch(e){return{route,error:String(e)}}}));
+const report={schemaVersion:1,capturedAt:new Date().toISOString(),scope:'Section15 pre-change baseline; source identity and SSR route observations only, not a new browser/lesson acceptance',appRoot:ROOT,acceptedSnapshot:ACCEPTED,acceptedBuildId:acceptedSnapshotBuild,sharedAuthoringBuildId:sharedBuild,sharedBuildIsNotServingAuthority:sharedBuild!==acceptedSnapshotBuild,availability:{available:catalog.topics.filter(t=>reviewed.has(t.id)).length,planned:catalog.topics.filter(t=>!reviewed.has(t.id)).length,total:catalog.topics.length},section15Topics:section15.map(t=>({id:t.id,slug:t.slug,status:reviewed.has(t.id)?'available':'planned'})),acceptedEntries,acceptedContent,statusSha256:await sha(path.join(ROOT,'content/paper3/lesson-status.json')),currentHashes,acceptedCandidateHashes:previous.candidateHashes,historicalDeltas,routeResults,policies:['No historical artifact overwritten','Use isolated named production snapshot for future QA','Any later delta to protected sources must be explained and attributed; never revert concurrent changes automatically','Availability must be calculated from current catalog/status, not assumed25 when concurrent work exists']};
+await writeFile(target,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({...report,currentHashes:undefined,acceptedCandidateHashes:undefined,acceptedEntries:undefined,acceptedContent:undefined,routeResults:undefined,section15Topics:undefined,protectedFileCount:files.length,routeCount:routeResults.length,routeFailures:routeResults.filter(r=>r.status!==200||!r.acceptedBuildMarker)},null,2));

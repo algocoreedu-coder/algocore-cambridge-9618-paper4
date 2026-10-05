@@ -1,0 +1,844 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.20.1",
+  "topicId": "P3-20.2-T03",
+  "slug": "exceptions-and-controlled-recovery",
+  "estimatedMinutes": 40,
+  "title": {
+    "en": "Exceptions and controlled recovery",
+    "vi": "Exception và phục hồi có kiểm soát"
+  },
+  "question": {
+    "en": "Where does control go when a runtime operation raises an exception?",
+    "vi": "Control đi đâu khi runtime operation raise exception?"
+  },
+  "opening": {
+    "en": "A program parses a quantity, opens a file and guarantees cleanup across normal, handled and unhandled paths.",
+    "vi": "Chương trình parse quantity, mở file và đảm bảo cleanup trên path normal, handled và unhandled."
+  },
+  "objectives": [
+    {
+      "en": "Explain exceptions and controlled recovery accurately.",
+      "vi": "Giải thích chính xác exception và phục hồi có kiểm soát."
+    },
+    {
+      "en": "Trace every visible state change.",
+      "vi": "Trace mọi thay đổi state nhìn thấy."
+    },
+    {
+      "en": "Use the declared convention.",
+      "vi": "Dùng convention đã khai báo."
+    },
+    {
+      "en": "Handle boundary and error cases.",
+      "vi": "Xử lý boundary và error case."
+    }
+  ],
+  "prerequisites": [
+    {
+      "en": "Read tables and simple code.",
+      "vi": "Đọc bảng và code đơn giản."
+    },
+    {
+      "en": "Distinguish a value from its location.",
+      "vi": "Phân biệt giá trị với vị trí của nó."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Runtime",
+      "meaning": {
+        "en": "An exception is an unexpected runtime event that disrupts normal control flow; handling prevents an uncontrolled halt where an appropriate handler exists.",
+        "vi": "Exception là sự kiện runtime bất ngờ làm gián đoạn control flow; handling tránh dừng mất kiểm soát khi có handler phù hợp."
+      }
+    },
+    {
+      "term": "state",
+      "meaning": {
+        "en": "Values relevant at one execution point.",
+        "vi": "Các giá trị liên quan tại một thời điểm thực thi."
+      }
+    },
+    {
+      "term": "trace",
+      "meaning": {
+        "en": "Ordered record of state changes.",
+        "vi": "Bản ghi có thứ tự của thay đổi state."
+      }
+    },
+    {
+      "term": "fixture",
+      "meaning": {
+        "en": "Declared teaching example with fixed assumptions.",
+        "vi": "Ví dụ dạy học có giả định cố định."
+      }
+    },
+    {
+      "term": "convention",
+      "meaning": {
+        "en": "Rule that fixes notation or interpretation.",
+        "vi": "Quy tắc khóa notation hoặc cách hiểu."
+      }
+    }
+  ],
+  "theory": [
+    {
+      "id": "exception",
+      "title": {
+        "en": "Runtime exception",
+        "vi": "Runtime exception"
+      },
+      "paragraphs": [
+        {
+          "en": "An exception is an unexpected runtime event that disrupts normal control flow; handling prevents an uncontrolled halt where an appropriate handler exists.",
+          "vi": "Exception là sự kiện runtime bất ngờ làm gián đoạn control flow; handling tránh dừng mất kiểm soát khi có handler phù hợp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "protected-handler",
+      "title": {
+        "en": "Protected block and matching handler",
+        "vi": "Protected block và matching handler"
+      },
+      "paragraphs": [
+        {
+          "en": "After a raise, remaining try statements are skipped and control moves to the first matching except block.",
+          "vi": "Sau raise, statement try còn lại bị skip và control tới except đầu tiên khớp."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "recovery",
+      "title": {
+        "en": "Recovery and termination",
+        "vi": "Phục hồi và termination"
+      },
+      "paragraphs": [
+        {
+          "en": "A handler may request new input, choose an alternate result or end safely; it must not pretend the failed operation succeeded.",
+          "vi": "Handler có thể yêu cầu input mới, chọn result khác hoặc kết thúc an toàn; không được giả operation fail đã succeed."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ]
+    },
+    {
+      "id": "trace-handler",
+      "title": {
+        "en": "Cleanup and unhandled path",
+        "vi": "Cleanup và unhandled path"
+      },
+      "paragraphs": [
+        {
+          "en": "Finally-style cleanup runs under the declared Python model; a mismatched exception propagates after cleanup.",
+          "vi": "Cleanup kiểu finally chạy theo model Python; exception không khớp propagate sau cleanup."
+        }
+      ],
+      "sourceIds": [
+        "syllabus-2026",
+        "book",
+        "pseudocode-2026"
+      ],
+      "code": "try:\n    quantity = int(raw)\n    result = 100 // quantity\nexcept ValueError:\n    result = None\nexcept ZeroDivisionError:\n    result = 0\nfinally:\n    resource_open = False"
+    }
+  ],
+  "visual": {
+    "kind": "exception-flow",
+    "title": {
+      "en": "Exception control-flow simulator",
+      "vi": "Mô phỏng control flow exception"
+    },
+    "introduction": {
+      "en": "Follow the raising statement, matching search, skipped lines, handler, finally and final resource state.",
+      "vi": "Theo statement raise, tìm handler, line bị skip, handler, finally và resource state cuối."
+    },
+    "task": {
+      "en": "Trace normal, ValueError, FileNotFoundError and mismatched/unhandled scenarios.",
+      "vi": "Trace normal, ValueError, FileNotFoundError và mismatched/unhandled."
+    },
+    "conventions": [
+      {
+        "en": "S20-EXC-PYTHON-1; Python 3 typed exceptions.",
+        "vi": "S20-EXC-PYTHON-1; exception typed của Python 3."
+      },
+      {
+        "en": "Normal, matching and mismatched paths are distinct.",
+        "vi": "Path normal, matching và mismatched tách biệt."
+      },
+      {
+        "en": "AlgoCore control-flow fixture; no code execution.",
+        "vi": "Fixture control-flow AlgoCore; không chạy code tùy ý."
+      }
+    ],
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "workedExample": {
+    "title": {
+      "en": "Trace a zero denominator",
+      "vi": "Trace mẫu số zero"
+    },
+    "prompt": {
+      "en": "raw='0'; result=100//quantity under Python 3 convention.",
+      "vi": "raw='0'; result=100//quantity theo Python 3."
+    },
+    "origin": "algocore-authored",
+    "officialMarks": null,
+    "steps": [
+      {
+        "id": "step-1",
+        "action": {
+          "en": "Enter try and parse '0'.",
+          "vi": "Vào try và parse '0'."
+        },
+        "why": {
+          "en": "int('0') succeeds.",
+          "vi": "int('0') succeed."
+        },
+        "result": {
+          "en": "quantity=0.",
+          "vi": "quantity=0."
+        },
+        "check": {
+          "en": "Check: quantity=0.",
+          "vi": "Tự kiểm tra: quantity=0."
+        }
+      },
+      {
+        "id": "step-2",
+        "action": {
+          "en": "Evaluate 100//0.",
+          "vi": "Tính 100//0."
+        },
+        "why": {
+          "en": "Python raises ZeroDivisionError.",
+          "vi": "Python raise ZeroDivisionError."
+        },
+        "result": {
+          "en": "No result is assigned.",
+          "vi": "Không assign result."
+        },
+        "check": {
+          "en": "Check: No result is assigned.",
+          "vi": "Tự kiểm tra: Không assign result."
+        }
+      },
+      {
+        "id": "step-3",
+        "action": {
+          "en": "Skip remaining try statements.",
+          "vi": "Skip statement try còn lại."
+        },
+        "why": {
+          "en": "Normal flow stops at the raising operation.",
+          "vi": "Normal flow dừng tại operation raise."
+        },
+        "result": {
+          "en": "Control searches handlers.",
+          "vi": "Control tìm handler."
+        },
+        "check": {
+          "en": "Check: Control searches handlers.",
+          "vi": "Tự kiểm tra: Control tìm handler."
+        }
+      },
+      {
+        "id": "step-4",
+        "action": {
+          "en": "Match ZeroDivisionError.",
+          "vi": "Match ZeroDivisionError."
+        },
+        "why": {
+          "en": "The handler type matches exactly.",
+          "vi": "Loại handler khớp."
+        },
+        "result": {
+          "en": "result=0 recovery value.",
+          "vi": "result=0 là recovery value."
+        },
+        "check": {
+          "en": "Check: result=0 recovery value.",
+          "vi": "Tự kiểm tra: result=0 là recovery value."
+        }
+      },
+      {
+        "id": "step-5",
+        "action": {
+          "en": "Run finally cleanup.",
+          "vi": "Chạy finally cleanup."
+        },
+        "why": {
+          "en": "Cleanup runs on handled and unhandled exits in this model.",
+          "vi": "Cleanup chạy với handled và unhandled exit trong model."
+        },
+        "result": {
+          "en": "resource_open=FALSE.",
+          "vi": "resource_open=FALSE."
+        },
+        "check": {
+          "en": "Check: resource_open=FALSE.",
+          "vi": "Tự kiểm tra: resource_open=FALSE."
+        }
+      },
+      {
+        "id": "step-6",
+        "action": {
+          "en": "Report controlled outcome.",
+          "vi": "Nêu outcome có kiểm soát."
+        },
+        "why": {
+          "en": "A trace distinguishes fallback from successful division.",
+          "vi": "Trace phân biệt fallback với phép chia thành công."
+        },
+        "result": {
+          "en": "Handled ZeroDivisionError; result=0; resource closed.",
+          "vi": "Handled ZeroDivisionError; result=0; resource đóng."
+        },
+        "check": {
+          "en": "Check: Handled ZeroDivisionError; result=0; resource closed.",
+          "vi": "Tự kiểm tra: Handled ZeroDivisionError; result=0; resource đóng."
+        }
+      }
+    ],
+    "result": {
+      "en": "The division does not complete; the matching handler sets fallback 0 and cleanup closes the resource.",
+      "vi": "Phép chia không hoàn tất; handler khớp đặt fallback 0 và cleanup đóng resource."
+    },
+    "selfCheck": {
+      "en": "Did you name the raising operation, skipped lines, matching type and final resource state?",
+      "vi": "Bạn đã nêu operation raise, line bị skip, type khớp và resource state cuối chưa?"
+    },
+    "sourceIds": [
+      "syllabus-2026",
+      "book",
+      "pseudocode-2026",
+      "qp",
+      "ms"
+    ]
+  },
+  "recognition": {
+    "cues": [
+      {
+        "en": "try/except/catch/finally",
+        "vi": "try/except/catch/finally"
+      },
+      {
+        "en": "runtime operation may fail",
+        "vi": "runtime operation có thể fail"
+      },
+      {
+        "en": "prevent unexpected termination",
+        "vi": "ngăn termination bất ngờ"
+      },
+      {
+        "en": "file missing, invalid conversion or divide by zero",
+        "vi": "file missing, conversion invalid hoặc chia zero"
+      }
+    ],
+    "distinguish": {
+      "en": "A syntax error prevents normal execution; ordinary validation is a deliberate branch; an exception is raised during runtime by an operation.",
+      "vi": "Syntax error ngăn thực thi; validation thường là branch chủ động; exception được operation raise lúc runtime."
+    },
+    "method": [
+      {
+        "en": "Declare language and possible exception types.",
+        "vi": "Khai báo language và exception type."
+      },
+      {
+        "en": "Trace until the exact raising operation.",
+        "vi": "Trace tới đúng operation raise."
+      },
+      {
+        "en": "Skip remaining protected statements and find a matching handler.",
+        "vi": "Skip statement protected còn lại và tìm handler khớp."
+      },
+      {
+        "en": "Show recovery/propagation, cleanup and final state.",
+        "vi": "Cho recovery/propagation, cleanup và state cuối."
+      }
+    ],
+    "commandWords": [
+      {
+        "command": "write",
+        "guidance": {
+          "en": "State the convention, then produce syntactically consistent code or notation.",
+          "vi": "Nêu convention rồi viết code/ký hiệu nhất quán cú pháp."
+        }
+      },
+      {
+        "command": "trace",
+        "guidance": {
+          "en": "Record every relevant state change in execution order.",
+          "vi": "Ghi mọi thay đổi trạng thái liên quan theo thứ tự thực thi."
+        }
+      },
+      {
+        "command": "explain",
+        "guidance": {
+          "en": "Link a cause or rule to its consequence; do not only name it.",
+          "vi": "Nối nguyên nhân hoặc quy tắc với hệ quả; không chỉ nêu tên."
+        }
+      },
+      {
+        "command": "compare",
+        "guidance": {
+          "en": "Use the same criterion for both alternatives.",
+          "vi": "Dùng cùng một tiêu chí cho cả hai phương án."
+        }
+      },
+      {
+        "command": "justify",
+        "guidance": {
+          "en": "Select a method and connect its feature to the scenario requirement.",
+          "vi": "Chọn phương pháp và nối đặc điểm của nó với yêu cầu tình huống."
+        }
+      }
+    ]
+  },
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Every invalid input is an exception.",
+        "vi": "Mọi input invalid là exception."
+      },
+      "correction": {
+        "en": "A validation condition may return FALSE without raising.",
+        "vi": "Validation có thể trả FALSE mà không raise."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Execution continues on the next try line after raise.",
+        "vi": "Sau raise chạy tiếp line try kế."
+      },
+      "correction": {
+        "en": "Remaining protected statements are skipped.",
+        "vi": "Statement protected còn lại bị skip."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Any handler catches every type.",
+        "vi": "Handler nào cũng catch mọi type."
+      },
+      "correction": {
+        "en": "Typed handlers match declared exception classes.",
+        "vi": "Typed handler match exception class."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Finally means success.",
+        "vi": "Finally nghĩa là success."
+      },
+      "correction": {
+        "en": "Finally is cleanup and may run on handled or unhandled paths.",
+        "vi": "Finally là cleanup và có thể chạy ở handled/unhandled path."
+      },
+      "selfCheck": {
+        "en": "Which declared rule disproves the mistake?",
+        "vi": "Quy tắc đã khai báo nào bác bỏ lỗi này?"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "cp-exc-recall",
+      "prompt": {
+        "en": "Which response begins an accurate answer about exceptions and controlled recovery?",
+        "vi": "Phản hồi nào bắt đầu câu trả lời chính xác về exception và phục hồi có kiểm soát?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "State the meaning and declared convention for exceptions and controlled recovery.",
+            "vi": "Nêu ý nghĩa và convention đã khai báo cho exception và phục hồi có kiểm soát."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-exc-recognition",
+      "prompt": {
+        "en": "Which evidence should identify the required method?",
+        "vi": "Bằng chứng nào xác định phương pháp cần dùng?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Use the supplied terms, state and required output.",
+            "vi": "Dùng term, state và output được cung cấp."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-exc-next-state",
+      "prompt": {
+        "en": "What must be read before predicting the next state?",
+        "vi": "Cần đọc gì trước khi dự đoán state tiếp?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Read the current state and exact operation rule.",
+            "vi": "Đọc current state và operation rule chính xác."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-exc-trace",
+      "prompt": {
+        "en": "What makes a trace row complete?",
+        "vi": "Điều gì làm trace row đầy đủ?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Show before state, applied rule, calculation and after state.",
+            "vi": "Cho before state, rule áp dụng, phép tính và after state."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-exc-write",
+      "prompt": {
+        "en": "How should code or notation be written?",
+        "vi": "Code hoặc notation nên được viết thế nào?"
+      },
+      "transfer": false,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Declare one convention and keep all syntax consistent.",
+            "vi": "Khai báo một convention và giữ cú pháp nhất quán."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    },
+    {
+      "id": "cp-exc-transfer",
+      "prompt": {
+        "en": "A new question changes a convention. What should you do?",
+        "vi": "Đề mới đổi convention. Bạn nên làm gì?"
+      },
+      "transfer": true,
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Restate the new convention and recompute from that state.",
+            "vi": "Nêu lại convention mới và tính lại từ state đó."
+          },
+          "feedback": {
+            "en": "Correct: the answer exposes the governing rule and state.",
+            "vi": "Đúng: câu trả lời cho thấy rule và state chi phối."
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Reuse the previous answer without checking inputs.",
+            "vi": "Dùng lại câu trước mà không kiểm tra input."
+          },
+          "feedback": {
+            "en": "This can preserve a result after its assumptions changed.",
+            "vi": "Cách này có thể giữ result khi giả định đã đổi."
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Infer hidden rules from the topic name.",
+            "vi": "Suy rule ẩn từ tên topic."
+          },
+          "feedback": {
+            "en": "Only stated conventions receive semantics.",
+            "vi": "Chỉ convention được nêu mới có semantics."
+          }
+        }
+      ],
+      "correctChoiceId": "a",
+      "explanation": {
+        "en": "A markable response links the declared rule to an observable state change.",
+        "vi": "Câu trả lời chấm được nối rule đã khai báo với state change quan sát được."
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "Trace normal, handled and unhandled exception paths.",
+      "vi": "Trace path normal, handled và unhandled."
+    },
+    "answerPoints": [
+      {
+        "en": "Name language and raising operation/type.",
+        "vi": "Nêu language và operation/type raise."
+      },
+      {
+        "en": "Show skipped protected statements.",
+        "vi": "Cho statement protected bị skip."
+      },
+      {
+        "en": "Match handler or show propagation.",
+        "vi": "Match handler hoặc show propagation."
+      },
+      {
+        "en": "Report recovery, cleanup and final state.",
+        "vi": "Nêu recovery, cleanup và state cuối."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Exceptions alter runtime control flow.",
+      "vi": "Exception đổi runtime control flow."
+    },
+    {
+      "en": "Typed handlers require a match.",
+      "vi": "Typed handler cần match."
+    },
+    {
+      "en": "Recovery must reflect failed operations honestly.",
+      "vi": "Recovery phải phản ánh operation fail đúng."
+    },
+    {
+      "en": "Cleanup and final resource state are part of the trace.",
+      "vi": "Cleanup và resource state cuối là phần của trace."
+    }
+  ],
+  "relatedSlugs": [
+    "serial-sequential-text-file-workflows",
+    "random-file-record-operations"
+  ],
+  "sources": [
+    {
+      "id": "syllabus-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 — Syllabus for exams in 2026, Version 2",
+      "locator": "Section 20, printed/PDF p.38",
+      "kind": "syllabus",
+      "url": "https://www.cambridgeinternational.org/Images/697372-2026-syllabus.pdf"
+    },
+    {
+      "id": "book",
+      "title": "Cambridge International AS & A Level Computer Science — David Watson and Helen Williams (Hodder Education, 2019)",
+      "locator": "Chapter 20, printed pp.535–537",
+      "kind": "book"
+    },
+    {
+      "id": "pseudocode-2026",
+      "title": "Cambridge International AS & A Level Computer Science 9618 Pseudocode Guide for Teachers for examination in 2026, Version 1",
+      "locator": "Relevant convention on pp.22–29",
+      "kind": "guide"
+    },
+    {
+      "id": "qp",
+      "title": "Cambridge 9618/31 October/November 2025 question paper",
+      "locator": "Q10, PDF p.10",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms",
+      "title": "Cambridge 9618/31 October/November 2025 mark scheme",
+      "locator": "Q10, PDF p.14",
+      "kind": "mark-scheme"
+    }
+  ]
+}

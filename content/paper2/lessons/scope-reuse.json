@@ -1,0 +1,872 @@
+{
+  "schemaVersion": 1,
+  "version": "T22-academic-r3-reviewed",
+  "topicId": "T22",
+  "sectionId": "11.3",
+  "slug": "scope-reuse",
+  "learningMode": "explanation",
+  "estimatedMinutes": 80,
+  "title": {
+    "en": "Local/global scope and reuse",
+    "vi": "Phạm vi local/global và tái sử dụng"
+  },
+  "question": {
+    "en": "Which storage does a statement access, and how do local state and explicit interfaces make a module safer to reuse?",
+    "vi": "Câu lệnh truy cập vùng nhớ nào, và trạng thái local cùng interface rõ ràng làm module an toàn hơn để tái sử dụng thế nào?"
+  },
+  "opening": {
+    "en": "A name is meaningful only within a scope. Two variables can share spelling but occupy different storage. Local variables restrict unintended effects; parameters and returns make dependencies visible so a module can be reused with different caller data.",
+    "vi": "Một tên chỉ có ý nghĩa trong phạm vi. Hai biến có thể cùng cách viết nhưng nằm ở vùng nhớ khác. Biến local hạn chế tác động ngoài ý muốn; tham số và return làm dependency rõ để module được tái sử dụng với dữ liệu caller khác."
+  },
+  "objectives": [
+    {
+      "en": "Identify whether a statement reads or changes local or global storage.",
+      "vi": "Xác định câu lệnh đọc hoặc đổi vùng nhớ local hay global."
+    },
+    {
+      "en": "Trace same-name variables in distinct scopes without treating them as one variable.",
+      "vi": "Trace biến cùng tên trong phạm vi khác nhau mà không coi chúng là một biến."
+    },
+    {
+      "en": "Explain contextual benefits of local variables and reusable modules.",
+      "vi": "Giải thích lợi ích theo bối cảnh của biến local và module tái sử dụng."
+    },
+    {
+      "en": "Remove a hidden global dependency by using a parameter and return or BYREF interface.",
+      "vi": "Loại dependency global ẩn bằng tham số và interface return hoặc BYREF."
+    },
+    {
+      "en": "Refactor a larger monolith into cohesive reusable modules with explicit interfaces, controlled scope and regression evidence.",
+      "vi": "Refactor một monolith lớn thành các module gắn kết, tái dùng được với interface rõ, scope được kiểm soát và bằng chứng regression."
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": {
+        "en": "Parameters, BYVAL and BYREF",
+        "vi": "Tham số, BYVAL và BYREF"
+      },
+      "reason": {
+        "en": "Explicit interfaces are the main alternative to hidden global dependencies.",
+        "vi": "Interface rõ là phương án chính thay cho dependency global ẩn."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "scope",
+      "meaning": {
+        "en": "The region where an identifier denotes a particular storage location.",
+        "vi": "Vùng mà identifier biểu thị một vị trí lưu trữ cụ thể."
+      }
+    },
+    {
+      "term": "local variable",
+      "meaning": {
+        "en": "Storage declared for and accessible within a module invocation.",
+        "vi": "Vùng lưu được khai báo cho và truy cập trong một lần gọi module."
+      }
+    },
+    {
+      "term": "global variable",
+      "meaning": {
+        "en": "Shared storage accessible from multiple parts of a program under the program's rules.",
+        "vi": "Vùng lưu dùng chung mà nhiều phần chương trình có thể truy cập theo quy tắc chương trình."
+      }
+    },
+    {
+      "term": "side effect",
+      "meaning": {
+        "en": "A change outside a module's returned value, such as modifying shared state.",
+        "vi": "Thay đổi ngoài giá trị trả về của module, như sửa trạng thái dùng chung."
+      }
+    },
+    {
+      "term": "reuse",
+      "meaning": {
+        "en": "Calling one tested module from multiple contexts through its declared interface.",
+        "vi": "Gọi một module đã kiểm từ nhiều bối cảnh qua interface đã khai báo."
+      }
+    }
+  ],
+  "recognition": {
+    "cues": [
+      {
+        "en": "The question asks why modules or local variables are used, or contrasts local and global variables.",
+        "vi": "Đề hỏi vì sao dùng module hoặc biến local, hay so local với global."
+      },
+      {
+        "en": "The same identifier appears inside and outside a module.",
+        "vi": "Cùng identifier xuất hiện bên trong và ngoài module."
+      },
+      {
+        "en": "A routine produces different or surprising results because it reads shared state.",
+        "vi": "Routine cho kết quả khác hoặc bất ngờ vì đọc trạng thái dùng chung."
+      },
+      {
+        "en": "A long program repeats validation, calculation or formatting in several branches.",
+        "vi": "Chương trình dài lặp validation, tính toán hoặc định dạng ở nhiều nhánh."
+      },
+      {
+        "en": "The task asks to improve reuse or maintenance without changing required behaviour.",
+        "vi": "Bài yêu cầu cải thiện reuse hoặc maintenance mà không đổi hành vi yêu cầu."
+      }
+    ],
+    "misleadingCues": [
+      {
+        "en": "Same spelling does not prove same storage; scope decides the binding.",
+        "vi": "Cùng cách viết không chứng minh cùng vùng nhớ; scope quyết định binding."
+      },
+      {
+        "en": "'Modules reduce errors' needs a mechanism and context, such as one tested implementation replacing repeated copies.",
+        "vi": "'Module giảm lỗi' cần cơ chế và bối cảnh, như một implementation đã kiểm thay các bản sao lặp."
+      },
+      {
+        "en": "Global access may be permitted but creates a dependency that should be explicit when reuse matters.",
+        "vi": "Truy cập global có thể được phép nhưng tạo dependency cần rõ khi tái sử dụng quan trọng."
+      },
+      {
+        "en": "Scope/reuse is a project teaching topic that organises §11.3 ideas; it is not claimed as a separate syllabus bullet.",
+        "vi": "Scope/reuse là topic giảng dạy của dự án tổ chức ý §11.3; không được tuyên bố là bullet syllabus riêng."
+      },
+      {
+        "en": "A module is good whenever it makes the main program shorter.",
+        "vi": "Module tốt bất cứ khi nào làm chương trình chính ngắn hơn."
+      },
+      {
+        "en": "Moving variables to global scope is the easiest way to connect modules safely.",
+        "vi": "Chuyển biến sang global scope là cách dễ nhất để nối module an toàn."
+      }
+    ],
+    "answerProduct": {
+      "en": "A scope map and before/after refactor explaining storage identity, dependencies, side effects and concrete reuse benefit.",
+      "vi": "Bản đồ scope và refactor trước/sau giải thích danh tính vùng nhớ, dependency, side effect và lợi ích tái sử dụng cụ thể."
+    },
+    "method": [
+      {
+        "en": "Mark each declaration and the scope it creates.",
+        "vi": "Đánh dấu từng khai báo và scope nó tạo."
+      },
+      {
+        "en": "Resolve each read/write to one storage location.",
+        "vi": "Ánh xạ mỗi lần đọc/ghi tới một vùng nhớ."
+      },
+      {
+        "en": "List inputs, returned results and hidden global dependencies.",
+        "vi": "Liệt kê input, kết quả trả và dependency global ẩn."
+      },
+      {
+        "en": "Replace hidden dependencies with typed parameters and results where appropriate.",
+        "vi": "Thay dependency ẩn bằng tham số có kiểu và kết quả khi phù hợp."
+      },
+      {
+        "en": "Explain the resulting testing, change and reuse effect in the scenario.",
+        "vi": "Giải thích tác động tới test, thay đổi và tái sử dụng trong tình huống."
+      },
+      {
+        "en": "Mark repeated or independently testable responsibilities and their required inputs/outputs.",
+        "vi": "Đánh dấu trách nhiệm lặp hoặc test độc lập được cùng input/output cần thiết."
+      },
+      {
+        "en": "Give each module one cohesive purpose and a minimal typed interface.",
+        "vi": "Cho mỗi module một mục đích gắn kết và interface có kiểu tối thiểu."
+      },
+      {
+        "en": "Use local variables by default; choose BYREF only when a caller-owned value must change.",
+        "vi": "Mặc định dùng biến local; chỉ chọn BYREF khi giá trị thuộc caller phải thay đổi."
+      },
+      {
+        "en": "Run regression cases through old and refactored designs and compare observable outputs and side effects.",
+        "vi": "Chạy regression qua thiết kế cũ và đã refactor rồi so output quan sát được cùng side effect."
+      }
+    ]
+  },
+  "theory": [
+    {
+      "id": "t22-scope",
+      "title": {
+        "en": "A name is resolved within a scope",
+        "vi": "Tên được ánh xạ trong một phạm vi"
+      },
+      "paragraphs": [
+        {
+          "en": "A local variable belongs to the module invocation in which it is declared. A global variable is shared more widely. If a local declaration uses the same spelling as a global name, scope rules distinguish the storage; a write to the local variable does not imply a write to the global one.",
+          "vi": "Biến local thuộc lần gọi module nơi nó được khai báo. Biến global được dùng chung rộng hơn. Nếu khai báo local dùng cùng cách viết với tên global, quy tắc scope phân biệt vùng nhớ; ghi biến local không đồng nghĩa ghi biến global."
+        },
+        {
+          "en": "Trace storage identity rather than names alone. Draw a separate box for each declaration and connect each statement to the box visible in that region.",
+          "vi": "Trace danh tính vùng nhớ thay vì chỉ tên. Vẽ hộp riêng cho từng khai báo và nối mỗi câu lệnh tới hộp thấy được trong vùng đó."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "book-t22",
+        "qp-s25-23-q1a",
+        "ms-s25-23-q1a"
+      ]
+    },
+    {
+      "id": "t22-reuse",
+      "title": {
+        "en": "Explicit interfaces support reuse",
+        "vi": "Interface rõ hỗ trợ tái sử dụng"
+      },
+      "paragraphs": [
+        {
+          "en": "Local variables reduce unintended interference because other modules cannot casually depend on or overwrite their intermediate state. Parameters make required input visible; function return values or intentional BYREF parameters make outputs visible.",
+          "vi": "Biến local giảm can thiệp ngoài ý muốn vì module khác không thể tùy tiện phụ thuộc hoặc ghi đè trạng thái trung gian. Tham số làm input cần thiết rõ; return của function hoặc tham số BYREF có chủ đích làm output rõ."
+        },
+        {
+          "en": "A reused module centralises one implementation: correcting or testing it benefits every caller that respects the same contract. This is a contextual benefit, not a keyword guarantee; poorly designed shared state can still spread faults.",
+          "vi": "Module tái sử dụng tập trung một implementation: sửa hoặc kiểm nó có lợi cho mọi caller tuân cùng hợp đồng. Đây là lợi ích theo bối cảnh, không phải bảo đảm theo keyword; trạng thái dùng chung thiết kế kém vẫn có thể lan lỗi."
+        }
+      ],
+      "sourceIds": [
+        "book-t22",
+        "qp-s25-23-q1a",
+        "ms-s25-23-q1a",
+        "teacher-t22"
+      ]
+    },
+    {
+      "id": "t22-large-refactor",
+      "title": {
+        "en": "Refactoring preserves a contract",
+        "vi": "Refactor giữ nguyên contract"
+      },
+      "paragraphs": [
+        {
+          "en": "Useful boundaries follow responsibility rather than line count. Validation, calculation, search and formatting may become separate modules when each has a stable input/output contract and can be reused or tested independently.",
+          "vi": "Ranh giới hữu ích theo trách nhiệm thay vì số dòng. Validation, tính toán, search và định dạng có thể thành module riêng khi mỗi phần có contract input/output ổn định và có thể tái dùng hoặc test độc lập."
+        },
+        {
+          "en": "Refactoring is correct only if externally visible behaviour is unchanged for normal, boundary, invalid and empty inputs. A responsibility/interface table plus regression cases makes that claim testable.",
+          "vi": "Refactor chỉ đúng nếu hành vi bên ngoài không đổi cho input thường, biên, không hợp lệ và rỗng. Bảng trách nhiệm/interface cùng regression case làm claim đó kiểm được."
+        }
+      ],
+      "sourceIds": [
+        "s26-11",
+        "book-t22",
+        "teacher-t22"
+      ]
+    }
+  ],
+  "visual": {
+    "assetIds": [
+      "T22"
+    ],
+    "title": {
+      "en": "Scope map: same name, different storage",
+      "vi": "Bản đồ scope: cùng tên, khác vùng nhớ"
+    },
+    "introduction": {
+      "en": "The visual places global and module-local boxes in distinct boundaries and traces one statement at a time.",
+      "vi": "Visual đặt hộp global và local của module trong các ranh giới riêng rồi trace từng câu lệnh."
+    },
+    "task": {
+      "en": "For every highlighted read or write, point to the exact storage box and predict which values remain after the module returns.",
+      "vi": "Với mỗi lần đọc hoặc ghi được tô, chỉ đúng hộp vùng nhớ và dự đoán giá trị còn lại sau khi module return."
+    },
+    "conventions": [
+      {
+        "en": "Scope boundaries, not colour alone, identify storage ownership.",
+        "vi": "Ranh giới scope, không chỉ màu, xác định chủ sở hữu vùng nhớ."
+      },
+      {
+        "en": "Same-name boxes carry separate scope labels.",
+        "vi": "Hộp cùng tên có nhãn scope riêng."
+      },
+      {
+        "en": "Dependency arrows show parameters or global reads; return arrows show declared results.",
+        "vi": "Mũi tên dependency thể hiện tham số hoặc đọc global; mũi tên return thể hiện kết quả đã khai báo."
+      }
+    ],
+    "sourceIds": [
+      "book-t22",
+      "teacher-t22"
+    ]
+  },
+  "workedExamples": [
+    {
+      "id": "T22-W1",
+      "title": {
+        "en": "Same name, different Total",
+        "vi": "Cùng tên, Total khác nhau"
+      },
+      "prompt": {
+        "en": "A program has global Total=100. PROCEDURE ShowSubtotal(Price:REAL, Quantity:INTEGER) declares local Total:REAL, assigns Total←Price*Quantity and outputs it. Caller invokes ShowSubtotal(4.00,3), then outputs global Total. Trace both outputs and explain the reuse benefit of the local design.",
+        "vi": "Chương trình có global Total=100. PROCEDURE ShowSubtotal(Price:REAL, Quantity:INTEGER) khai báo local Total:REAL, gán Total←Price*Quantity và xuất nó. Caller gọi ShowSubtotal(4.00,3), rồi xuất global Total. Trace cả hai output và giải thích lợi ích tái sử dụng của thiết kế local."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "map",
+          "action": {
+            "en": "Draw two Total boxes",
+            "vi": "Vẽ hai hộp Total"
+          },
+          "why": {
+            "en": "Two declarations in different scopes denote distinct storage.",
+            "vi": "Hai khai báo ở scope khác nhau biểu thị vùng nhớ khác."
+          },
+          "result": {
+            "en": "Global Total=100; callee local Total initially uninitialised.",
+            "vi": "Global Total=100; Total local callee ban đầu chưa khởi tạo."
+          }
+        },
+        {
+          "id": "bind",
+          "action": {
+            "en": "Bind Price=4.00 and Quantity=3",
+            "vi": "Gắn Price=4.00 và Quantity=3"
+          },
+          "why": {
+            "en": "The procedure depends on explicit parameters rather than a global price or quantity.",
+            "vi": "Procedure phụ thuộc tham số rõ thay vì price hoặc quantity global."
+          },
+          "result": {
+            "en": "Callee has parameter values 4.00 and 3.",
+            "vi": "Callee có giá trị tham số 4.00 và 3."
+          }
+        },
+        {
+          "id": "local-write",
+          "action": {
+            "en": "Assign the local Total",
+            "vi": "Gán Total local"
+          },
+          "why": {
+            "en": "The nearest declaration in the procedure scope is the local box.",
+            "vi": "Khai báo gần nhất trong scope procedure là hộp local."
+          },
+          "result": {
+            "en": "Local Total=12.00; global Total remains 100.",
+            "vi": "Total local=12.00; Total global vẫn 100."
+          }
+        },
+        {
+          "id": "outputs",
+          "action": {
+            "en": "Output inside then outside the procedure",
+            "vi": "Output bên trong rồi bên ngoài procedure"
+          },
+          "why": {
+            "en": "Each OUTPUT resolves Total in its own scope.",
+            "vi": "Mỗi OUTPUT ánh xạ Total trong scope của nó."
+          },
+          "result": {
+            "en": "Procedure outputs 12.00; caller later outputs 100.",
+            "vi": "Procedure xuất 12.00; caller sau đó xuất 100."
+          }
+        },
+        {
+          "id": "reuse",
+          "action": {
+            "en": "Explain why the design can be reused",
+            "vi": "Giải thích vì sao thiết kế có thể tái sử dụng"
+          },
+          "why": {
+            "en": "Different callers supply values through the same typed interface without changing shared Total.",
+            "vi": "Caller khác cung cấp giá trị qua cùng interface có kiểu mà không đổi Total dùng chung."
+          },
+          "result": {
+            "en": "One tested calculation works for many Price/Quantity pairs with no accidental global write.",
+            "vi": "Một phép tính đã kiểm dùng cho nhiều cặp Price/Quantity mà không ghi global ngoài ý muốn."
+          }
+        }
+      ],
+      "answer": {
+        "en": "The two outputs are 12.00 from local Total and 100 from global Total. Same spelling does not merge storage. Explicit parameters and local intermediate state let callers reuse the calculation without an unintended shared-state change.",
+        "vi": "Hai output là 12.00 từ Total local và 100 từ Total global. Cùng cách viết không hợp nhất vùng nhớ. Tham số rõ và trạng thái trung gian local cho phép caller tái sử dụng phép tính mà không vô tình đổi trạng thái dùng chung."
+      },
+      "selfCheck": {
+        "en": "Can you identify the declaration that owns each read and write of Total?",
+        "vi": "Bạn có thể xác định khai báo sở hữu mỗi lần đọc và ghi Total không?"
+      },
+      "sourceIds": [
+        "book-t22",
+        "teacher-t22"
+      ]
+    },
+    {
+      "id": "T22-W2",
+      "title": {
+        "en": "Refactor a repeated order-processing monolith",
+        "vi": "Refactor monolith xử lý đơn hàng bị lặp"
+      },
+      "prompt": {
+        "en": "A program validates quantity 1..20, calculates subtotal, applies the same membership discount and formats a receipt in both online and counter branches. Refactor it while keeping channel-specific input and delivery logic.",
+        "vi": "Chương trình validation số lượng 1..20, tính subtotal, áp cùng giảm giá thành viên và format biên lai trong cả nhánh online và tại quầy. Refactor mà vẫn giữ input và logic giao hàng riêng theo kênh."
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "steps": [
+        {
+          "id": "boundaries",
+          "action": {
+            "en": "Identify stable repeated responsibilities",
+            "vi": "Xác định trách nhiệm lặp ổn định"
+          },
+          "why": {
+            "en": "Repeated rules are maintenance risks and candidates for reuse.",
+            "vi": "Quy tắc lặp là rủi ro maintenance và ứng viên reuse."
+          },
+          "result": {
+            "en": "Extract IsValidQuantity, CalculateTotal and BuildReceipt; retain CollectOnlineDetails and CollectCounterDetails separately.",
+            "vi": "Tách IsValidQuantity, CalculateTotal và BuildReceipt; giữ riêng CollectOnlineDetails và CollectCounterDetails."
+          }
+        },
+        {
+          "id": "interfaces",
+          "action": {
+            "en": "Write minimal contracts",
+            "vi": "Viết contract tối thiểu"
+          },
+          "why": {
+            "en": "Modules should not depend on unrelated globals.",
+            "vi": "Module không nên phụ thuộc global không liên quan."
+          },
+          "result": {
+            "en": "IsValidQuantity(q)→BOOLEAN; CalculateTotal(price,q,isMember)→REAL; BuildReceipt(orderId,total,channel)→STRING.",
+            "vi": "IsValidQuantity(q)→BOOLEAN; CalculateTotal(price,q,isMember)→REAL; BuildReceipt(orderId,total,channel)→STRING."
+          }
+        },
+        {
+          "id": "scope",
+          "action": {
+            "en": "Keep temporary values local",
+            "vi": "Giữ giá trị tạm local"
+          },
+          "why": {
+            "en": "Local scope prevents calls from corrupting each other.",
+            "vi": "Scope local ngăn các lời gọi làm hỏng nhau."
+          },
+          "result": {
+            "en": "Subtotal and discount stay local to CalculateTotal; no BYREF is needed because the total is returned.",
+            "vi": "Subtotal và discount local trong CalculateTotal; không cần BYREF vì total được return."
+          }
+        },
+        {
+          "id": "regression",
+          "action": {
+            "en": "Compare behaviour before and after",
+            "vi": "So hành vi trước và sau"
+          },
+          "why": {
+            "en": "Shorter code alone does not prove correctness.",
+            "vi": "Code ngắn hơn không chứng minh tính đúng."
+          },
+          "result": {
+            "en": "Test quantity 0,1,20,21; member/non-member; online/counter; compare accept/reject, total and receipt.",
+            "vi": "Test quantity 0,1,20,21; member/non-member; online/tại quầy; so nhận/từ chối, total và biên lai."
+          },
+          "check": {
+            "en": "Channel-specific delivery behaviour stays in the calling branch.",
+            "vi": "Hành vi giao hàng riêng theo kênh vẫn ở nhánh gọi."
+          }
+        }
+      ],
+      "answer": {
+        "en": "Responsibility table: `IsValidQuantity(q:INTEGER) RETURNS BOOLEAN`; `CalculateTotal(price:REAL,q:INTEGER,isMember:BOOLEAN) RETURNS REAL`; `BuildReceipt(orderId:STRING,total:REAL,channel:STRING) RETURNS STRING`. The main program collects channel-specific data, calls validation, then total and receipt modules. All temporaries are local. Regression compares validation, total, receipt and delivery outcomes for both channels and all boundaries.",
+        "vi": "Bảng trách nhiệm: `IsValidQuantity(q:INTEGER) RETURNS BOOLEAN`; `CalculateTotal(price:REAL,q:INTEGER,isMember:BOOLEAN) RETURNS REAL`; `BuildReceipt(orderId:STRING,total:REAL,channel:STRING) RETURNS STRING`. Chương trình chính thu dữ liệu riêng theo kênh, gọi validation, rồi module total và receipt. Mọi biến tạm local. Regression so validation, total, receipt và kết quả giao hàng cho cả hai kênh và mọi biên."
+      },
+      "selfCheck": {
+        "en": "Can each module be tested without hidden global state, and do all old outputs still match?",
+        "vi": "Mỗi module có test được mà không có global state ẩn và mọi output cũ còn khớp không?"
+      },
+      "sourceIds": [
+        "s26-11",
+        "book-t22",
+        "teacher-t22"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "T22-P1",
+      "title": {
+        "en": "Trace two same-name variables",
+        "vi": "Trace hai biến cùng tên"
+      },
+      "prompt": {
+        "en": "Global Count=8. PROCEDURE Demo() declares local Count:INTEGER, assigns Count←2, outputs Count and ends. The caller then outputs Count. State outputs and final global value.",
+        "vi": "Global Count=8. PROCEDURE Demo() khai báo local Count:INTEGER, gán Count←2, xuất Count rồi kết thúc. Caller sau đó xuất Count. Nêu output và giá trị global cuối."
+      },
+      "working": [
+        {
+          "en": "Draw global and local Count separately.",
+          "vi": "Vẽ Count global và local riêng."
+        },
+        {
+          "en": "Resolve the procedure assignment/output to local scope and caller output to global scope.",
+          "vi": "Ánh xạ phép gán/output procedure vào local scope và output caller vào global scope."
+        }
+      ],
+      "answer": {
+        "en": "Demo outputs 2. The caller outputs 8. Global Count remains 8 because the procedure assignment targets its local Count.",
+        "vi": "Demo xuất 2. Caller xuất 8. Count global vẫn 8 vì phép gán procedure nhắm Count local."
+      },
+      "markGuidance": [
+        {
+          "en": "Both outputs and final global value are correct.",
+          "vi": "Cả hai output và giá trị global cuối đúng."
+        },
+        {
+          "en": "The explanation cites declarations/scopes rather than only saying 'local'.",
+          "vi": "Giải thích viện dẫn khai báo/scope chứ không chỉ nói 'local'."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Changing global Count to 2 because the names match.",
+          "vi": "Đổi Count global thành 2 vì tên trùng."
+        },
+        {
+          "en": "Treating the local variable as automatically initialised before Count←2.",
+          "vi": "Coi biến local tự động được khởi tạo trước Count←2."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which declaration is visible at each statement?",
+        "vi": "Khai báo nào nhìn thấy tại mỗi câu lệnh?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "qp-s25-23-q1a",
+        "teacher-t22"
+      ]
+    },
+    {
+      "id": "T22-P2",
+      "title": {
+        "en": "Remove a hidden global dependency",
+        "vi": "Loại dependency global ẩn"
+      },
+      "prompt": {
+        "en": "FUNCTION DiscountedPrice(Price:REAL) RETURNS REAL reads global DiscountRate and returns Price*(1-DiscountRate). Refactor it so different callers can supply their own rate and tests do not depend on shared state. State one concrete benefit.",
+        "vi": "FUNCTION DiscountedPrice(Price:REAL) RETURNS REAL đọc global DiscountRate và trả Price*(1-DiscountRate). Refactor để caller khác nhau cung cấp rate riêng và test không phụ thuộc trạng thái dùng chung. Nêu một lợi ích cụ thể."
+      },
+      "working": [
+        {
+          "en": "Add the hidden input to the interface with a compatible type.",
+          "vi": "Thêm input ẩn vào interface với kiểu tương thích."
+        },
+        {
+          "en": "Replace the global read with the new parameter and update the call.",
+          "vi": "Thay lần đọc global bằng tham số mới và cập nhật lời gọi."
+        },
+        {
+          "en": "Tie the benefit to independent callers or deterministic tests.",
+          "vi": "Gắn lợi ích với caller độc lập hoặc test xác định."
+        }
+      ],
+      "answer": {
+        "en": "FUNCTION DiscountedPrice(Price : REAL, DiscountRate : REAL) RETURNS REAL; RETURN Price * (1.0 - DiscountRate); ENDFUNCTION. Example call: FinalPrice←DiscountedPrice(100.0,0.15) gives 85.0. The dependency is visible, so tests can supply a known rate and callers can use different rates without changing shared state.",
+        "vi": "FUNCTION DiscountedPrice(Price : REAL, DiscountRate : REAL) RETURNS REAL; RETURN Price * (1.0 - DiscountRate); ENDFUNCTION. Ví dụ: FinalPrice←DiscountedPrice(100.0,0.15) cho 85.0. Dependency trở nên rõ nên test có thể cung cấp rate biết trước và caller dùng rate khác nhau mà không đổi trạng thái dùng chung."
+      },
+      "markGuidance": [
+        {
+          "en": "Header and body no longer read the global.",
+          "vi": "Header và thân không còn đọc global."
+        },
+        {
+          "en": "Call order/types and numeric result are correct.",
+          "vi": "Thứ tự/kiểu lời gọi và kết quả số đúng."
+        },
+        {
+          "en": "The benefit explains the mechanism in this scenario.",
+          "vi": "Lợi ích giải thích cơ chế trong tình huống này."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Keeping the global read and merely adding an unused parameter.",
+          "vi": "Giữ lần đọc global và chỉ thêm tham số không dùng."
+        },
+        {
+          "en": "Saying only 'easier' without explaining testing or caller independence.",
+          "vi": "Chỉ nói 'dễ hơn' mà không giải thích test hoặc tính độc lập caller."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can the function's result now be predicted from its arguments alone?",
+        "vi": "Kết quả function giờ có thể được dự đoán chỉ từ đối số không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "book-t22",
+        "teacher-t22"
+      ]
+    },
+    {
+      "id": "T22-P3",
+      "title": {
+        "en": "Choose boundaries for a school report program",
+        "vi": "Chọn ranh giới cho chương trình báo cáo trường học"
+      },
+      "prompt": {
+        "en": "A monolith inputs five marks, rechecks 0..100 in two places, calculates an average twice and formats the same grade in screen and file output. Propose modules, interfaces and scope; state what stays in main, then give regression cases proving accepted behaviour is unchanged.",
+        "vi": "Một monolith nhập năm điểm, kiểm lại 0..100 ở hai chỗ, tính average hai lần và format cùng grade cho output màn hình và file. Đề xuất module, interface và scope; nêu phần ở lại main rồi cho các regression case chứng minh hành vi đã chấp nhận không đổi."
+      },
+      "working": [
+        {
+          "en": "Group code by responsibility, not by output device alone.",
+          "vi": "Nhóm code theo trách nhiệm, không chỉ theo thiết bị output."
+        },
+        {
+          "en": "Declare typed inputs and return values.",
+          "vi": "Khai báo input có kiểu và return value."
+        },
+        {
+          "en": "Keep orchestration and one-time I/O in main.",
+          "vi": "Giữ điều phối và I/O một lần trong main."
+        },
+        {
+          "en": "Compare before/after outcomes for boundaries, invalid re-entry and both output destinations.",
+          "vi": "So kết quả trước/sau cho biên, nhập lại giá trị sai và cả hai đích output."
+        }
+      ],
+      "answer": {
+        "en": "Suggested modules: `ReadValidMark() RETURNS INTEGER` handles repeated input validation; `Mean(Marks:ARRAY,Count:INTEGER) RETURNS REAL`; `GradeFromMean(Value:REAL) RETURNS STRING`; `FormatReport(StudentID:STRING,MeanValue:REAL,Grade:STRING) RETURNS STRING`. Main gathers five values, orchestrates calls, then sends the same returned report string to screen and file. Loop indexes and calculation temporaries are local; no duplicated global average is needed. Regression cases: all marks 0 and all 100 preserve boundary acceptance and average; invalid -1 then 60 proves re-entry consumes no mark; a mixed set with a known grade proves calculation/format; compare the exact screen and file strings before and after refactoring.",
+        "vi": "Module đề xuất: `ReadValidMark() RETURNS INTEGER` xử lý input validation lặp; `Mean(Marks:ARRAY,Count:INTEGER) RETURNS REAL`; `GradeFromMean(Value:REAL) RETURNS STRING`; `FormatReport(StudentID:STRING,MeanValue:REAL,Grade:STRING) RETURNS STRING`. Main thu năm giá trị, điều phối lời gọi rồi gửi cùng chuỗi report trả về ra màn hình và file. Index vòng lặp và biến tính tạm local; không cần average global bị lặp. Regression case: mọi điểm bằng 0 và mọi điểm bằng 100 giữ đúng biên cùng average; -1 rồi 60 chứng minh nhập sai không tiêu thụ một điểm; một bộ trộn có grade biết trước kiểm tính/format; so chính xác chuỗi màn hình và file trước/sau refactor."
+      },
+      "markGuidance": [
+        {
+          "en": "Each module has one responsibility and a minimal interface.",
+          "vi": "Mỗi module có một trách nhiệm và interface tối thiểu."
+        },
+        {
+          "en": "The main program still owns orchestration and destinations.",
+          "vi": "Chương trình chính vẫn sở hữu điều phối và đích output."
+        },
+        {
+          "en": "Regression covers boundaries, invalid input, calculation/grade and both destinations.",
+          "vi": "Regression bao phủ biên, input sai, calculation/grade và cả hai đích."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Creating separate average modules for screen and file preserves duplication.",
+          "vi": "Tạo module average riêng cho màn hình và file vẫn giữ duplication."
+        },
+        {
+          "en": "Passing every variable BYREF creates hidden side effects.",
+          "vi": "Truyền mọi biến BYREF tạo side effect ẩn."
+        }
+      ],
+      "selfCheck": {
+        "en": "Which module can be regression-tested once for both output routes?",
+        "vi": "Module nào có thể regression-test một lần cho cả hai đường output?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "teacher-t22",
+        "book-t22"
+      ]
+    },
+    {
+      "id": "T22-P4",
+      "title": {
+        "en": "Implement and verify one refactored contract",
+        "vi": "Cài và kiểm một contract đã refactor"
+      },
+      "prompt": {
+        "en": "Implement `CountMatches(Values:ARRAY, Count:INTEGER, Target:INTEGER) RETURNS INTEGER` without globals. Then give regression cases for empty, no-match, repeated-match and partial-use arrays.",
+        "vi": "Cài `CountMatches(Values:ARRAY, Count:INTEGER, Target:INTEGER) RETURNS INTEGER` không dùng global. Sau đó nêu regression case cho array rỗng, no-match, match lặp và chỉ dùng một phần array."
+      },
+      "working": [
+        {
+          "en": "Use a local accumulator.",
+          "vi": "Dùng accumulator local."
+        },
+        {
+          "en": "Inspect only indices 0..Count-1.",
+          "vi": "Chỉ xem index 0..Count-1."
+        },
+        {
+          "en": "Return the value rather than modifying caller state.",
+          "vi": "Return giá trị thay vì sửa state của caller."
+        }
+      ],
+      "answer": {
+        "en": "FUNCTION CountMatches(Values : ARRAY OF INTEGER, Count : INTEGER, Target : INTEGER) RETURNS INTEGER\n  DECLARE Index, Matches : INTEGER\n  Matches ← 0\n  FOR Index ← 0 TO Count - 1\n    IF Values[Index] = Target THEN\n      Matches ← Matches + 1\n    ENDIF\n  NEXT Index\n  RETURN Matches\nENDFUNCTION\nRegression: Count=0→0; [1,2], target3→0; [4,4,4], target4→3; allocated [5,5,9,9] with Count=2,target9→0.",
+        "vi": "FUNCTION CountMatches(Values : ARRAY OF INTEGER, Count : INTEGER, Target : INTEGER) RETURNS INTEGER\n  DECLARE Index, Matches : INTEGER\n  Matches ← 0\n  FOR Index ← 0 TO Count - 1\n    IF Values[Index] = Target THEN\n      Matches ← Matches + 1\n    ENDIF\n  NEXT Index\n  RETURN Matches\nENDFUNCTION\nRegression: Count=0→0; [1,2], target3→0; [4,4,4], target4→3; array cấp phát [5,5,9,9] với Count=2,target9→0."
+      },
+      "markGuidance": [
+        {
+          "en": "The module has no global dependency or side effect.",
+          "vi": "Module không phụ thuộc global hoặc có side effect."
+        },
+        {
+          "en": "Cases verify behaviour and occupied-range contract.",
+          "vi": "Các case kiểm hành vi và contract miền đang dùng."
+        }
+      ],
+      "commonMistakes": [
+        {
+          "en": "Looping through the allocated length reads unused slots.",
+          "vi": "Lặp qua độ dài cấp phát đọc slot chưa dùng."
+        },
+        {
+          "en": "Making Matches global reduces reuse and test isolation.",
+          "vi": "Đặt Matches global làm giảm reuse và cô lập test."
+        }
+      ],
+      "selfCheck": {
+        "en": "Can two calls run in sequence without leaking the previous Matches value?",
+        "vi": "Hai lời gọi liên tiếp có chạy mà không rò giá trị Matches trước không?"
+      },
+      "origin": "algocore-authored",
+      "officialMarks": null,
+      "sourceIds": [
+        "s26-11",
+        "teacher-t22"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "mistake": {
+        "en": "Same identifier text means the same variable.",
+        "vi": "Cùng chữ identifier nghĩa là cùng biến."
+      },
+      "correction": {
+        "en": "Declaration and scope determine storage identity.",
+        "vi": "Khai báo và scope quyết định danh tính vùng nhớ."
+      },
+      "selfCheck": {
+        "en": "Which declaration owns this statement?",
+        "vi": "Khai báo nào sở hữu câu lệnh này?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Global variables always make reuse easier.",
+        "vi": "Biến global luôn làm tái sử dụng dễ hơn."
+      },
+      "correction": {
+        "en": "Hidden shared dependencies can make callers interfere and tests depend on execution history.",
+        "vi": "Dependency dùng chung ẩn có thể làm caller can thiệp nhau và test phụ thuộc lịch sử chạy."
+      },
+      "selfCheck": {
+        "en": "Can a caller know all inputs from the interface?",
+        "vi": "Caller có biết mọi input từ interface không?"
+      }
+    },
+    {
+      "mistake": {
+        "en": "Modules reduce errors automatically.",
+        "vi": "Module tự động giảm lỗi."
+      },
+      "correction": {
+        "en": "A single clear, tested implementation reduces duplicated changes; a vague or stateful module may not.",
+        "vi": "Một implementation rõ, đã kiểm giúp giảm thay đổi trùng lặp; module mơ hồ hoặc nhiều trạng thái có thể không."
+      },
+      "selfCheck": {
+        "en": "What concrete duplicate or interference is removed?",
+        "vi": "Trùng lặp hoặc can thiệp cụ thể nào được loại?"
+      }
+    }
+  ],
+  "recall": {
+    "prompt": {
+      "en": "How do scope and interface checks support safe reuse?",
+      "vi": "Kiểm scope và interface hỗ trợ tái sử dụng an toàn thế nào?"
+    },
+    "answerPoints": [
+      {
+        "en": "Map every declaration to a distinct storage box.",
+        "vi": "Ánh xạ mọi khai báo tới hộp vùng nhớ riêng."
+      },
+      {
+        "en": "Resolve each read/write within its scope.",
+        "vi": "Ánh xạ mỗi lần đọc/ghi trong scope."
+      },
+      {
+        "en": "Expose required inputs through typed parameters.",
+        "vi": "Công bố input cần qua tham số có kiểu."
+      },
+      {
+        "en": "Expose results through RETURN or intentional BYREF.",
+        "vi": "Công bố kết quả qua RETURN hoặc BYREF có chủ đích."
+      },
+      {
+        "en": "Explain the testing/change benefit in the actual scenario.",
+        "vi": "Giải thích lợi ích test/thay đổi trong tình huống thật."
+      }
+    ]
+  },
+  "takeaways": [
+    {
+      "en": "Scope, not spelling alone, identifies a variable's storage.",
+      "vi": "Scope, không chỉ cách viết, xác định vùng nhớ của biến."
+    },
+    {
+      "en": "Local state limits unintended interference; globals create shared dependencies.",
+      "vi": "Trạng thái local hạn chế can thiệp ngoài ý muốn; global tạo dependency dùng chung."
+    },
+    {
+      "en": "Explicit interfaces make modules easier to test, change and reuse in concrete contexts.",
+      "vi": "Interface rõ làm module dễ test, thay đổi và tái sử dụng trong bối cảnh cụ thể."
+    },
+    {
+      "en": "Refactor boundaries follow responsibilities and contracts.",
+      "vi": "Ranh giới refactor theo trách nhiệm và contract."
+    },
+    {
+      "en": "Regression evidence, not shorter code, proves unchanged behaviour.",
+      "vi": "Bằng chứng regression, không phải code ngắn hơn, chứng minh hành vi không đổi."
+    }
+  ],
+  "patternLinks": [
+    {
+      "id": "F11",
+      "role": "related",
+      "title": {
+        "en": "Module, interface and reuse reasoning",
+        "vi": "Lập luận module, interface và tái sử dụng"
+      }
+    }
+  ],
+  "relatedSlugs": [
+    "procedures-functions",
+    "parameters-byval-byref",
+    "structure-charts"
+  ],
+  "sources": [
+    {
+      "id": "s26-11",
+      "title": "Cambridge International AS & A Level Computer Science 9618 syllabus for 2026, version 2",
+      "locator": "§11.1–11.3, printed/PDF pp29–30.",
+      "kind": "syllabus"
+    },
+    {
+      "id": "book-t22",
+      "title": "Watson & Williams, Cambridge International AS & A Level Computer Science",
+      "locator": "ISBN 9781510457591, printed pp275–280 and pp293–300; PDF pp291–296 and pp309–316; modules, local state, reuse/testing context.",
+      "kind": "book"
+    },
+    {
+      "id": "qp-s25-23-q1a",
+      "title": "9618/23 May/June 2025 Question 1(a)",
+      "locator": "QP p2; reasons for modules, local/global difference and benefits of local variables.",
+      "kind": "question-paper"
+    },
+    {
+      "id": "ms-s25-23-q1a",
+      "title": "9618/23 May/June 2025 published mark scheme, Question 1(a)",
+      "locator": "MS p6; reviewed locally for accepted module/local-variable mechanisms. Lesson criteria remain teacher-authored.",
+      "kind": "mark-scheme"
+    },
+    {
+      "id": "teacher-t22",
+      "title": "AlgoCore teacher-authored T22 scope/reuse models",
+      "locator": "T22-academic-r1, 2026-10-02; project organisation topic under §11.3; no official mark allocation.",
+      "kind": "teacher-authored"
+    }
+  ]
+}
